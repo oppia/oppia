@@ -16,6 +16,9 @@
  * @fileoverview Modal and functionality for the create topic button.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+
 angular.module('entityCreationServicesModule').factory('TopicCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'UrlInterpolationService',

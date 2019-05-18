@@ -16,6 +16,11 @@
  * @fileoverview Directive for the exploration objective/goal field in forms.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-objective.service.ts');
+
 angular.module('explorationObjectiveEditorModule').directive(
   'explorationObjectiveEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {

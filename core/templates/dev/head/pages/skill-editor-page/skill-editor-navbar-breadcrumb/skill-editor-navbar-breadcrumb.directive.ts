@@ -16,6 +16,11 @@
  * @fileoverview Controller for the navbar breadcrumb of the skill editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+
 angular.module('skillEditorNavbarBreadcrumbModule').directive(
   'skillEditorNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {

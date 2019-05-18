@@ -16,6 +16,19 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
+require(
+  'components/common-layout-directives/loading-dots/loading-dots.directive.ts');
+
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-routing/' +
+  'skill-editor-routing.service.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('skillEditorNavbarModule').directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

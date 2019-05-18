@@ -17,6 +17,43 @@
  * editor page.
  */
 
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ParamChangeObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-category.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-param-changes.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-param-specs.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-title.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'parameter-metadata.service.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/LearnerParamsService.ts');
+require('pages/exploration_player/NumberAttemptsService.ts');
+require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
+
 angular.module('previewTabModule').controller('PreviewTab', [
   '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
   'EditableExplorationBackendApiService', 'ExplorationCategoryService',

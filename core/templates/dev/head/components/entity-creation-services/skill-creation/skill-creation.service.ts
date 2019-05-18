@@ -16,6 +16,9 @@
  * @fileoverview Functionality for creating a new skill.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+
 angular.module('entityCreationServicesModule').factory('SkillCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
   'UrlInterpolationService',

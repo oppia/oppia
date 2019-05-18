@@ -16,6 +16,12 @@
  * @fileoverview Controller for landing page.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
+require('pages/topic-landing-page/topic-landing-page.controller.ts'); 
+require('services/PageTitleService.ts');
+require('services/SiteAnalyticsService.ts');
+
 angular.module('topicLandingPageModule').controller('TopicLandingPage', [
   '$filter', '$scope', '$timeout', '$window', 'PageTitleService',
   'SiteAnalyticsService', 'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA',

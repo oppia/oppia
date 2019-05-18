@@ -16,7 +16,14 @@
  * @fileoverview Directive for the stories list.
  */
 
-angular.module('storiesListModule').directive('topicViewerStoriesList', [
+require(
+  'components/summary-tile-directives/story-summary-tile/' +
+  'story-summary-tile.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
+angular.module('storiesListModule').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

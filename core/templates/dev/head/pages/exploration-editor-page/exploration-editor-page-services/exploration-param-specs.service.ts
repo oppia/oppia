@@ -17,6 +17,10 @@
  * the specification of the parameters.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-property.service.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ExplorationParamSpecsService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
@@ -24,5 +28,4 @@ angular.module('explorationEditorPageModule').factory(
       child.propertyName = 'param_specs';
       return child;
     }
-  ]
-);
+  ]);

@@ -16,6 +16,25 @@
  * @fileoverview Directive for the exploration save & publish buttons.
  */
 
+require(
+  'components/common-layout-directives/loading-dots/' +
+  'loading-dots.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'change-list.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-rights/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-save.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-warnings.service.ts');
+require('services/EditabilityService.ts');
+
 angular.module('explorationSaveAndPulishButtonsModule').directive(
   'explorationSaveAndPublishButtons', [
     'UrlInterpolationService', function(UrlInterpolationService) {

@@ -17,6 +17,14 @@
  * state editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+
 angular.module('stateParamChangesEditorModule').directive(
   'stateParamChangesEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {

@@ -16,6 +16,13 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
+require('domain/topic/TopicUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('entityCreationServicesModule').factory('StoryCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'TopicEditorStateService', 'TopicUpdateService', 'UrlInterpolationService',

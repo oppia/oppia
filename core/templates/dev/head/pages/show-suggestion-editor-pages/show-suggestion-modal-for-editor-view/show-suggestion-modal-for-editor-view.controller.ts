@@ -16,6 +16,9 @@
  * @fileoverview Controller to show suggestion modal in editor view.
  */
 
+require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
+require('services/EditabilityService.ts');
+
 // TODO(Allan): Implement ability to edit suggestions before applying.
 angular.module('showSuggestionModalForEditorViewModule').controller(
   'ShowSuggestionModalForEditorView', [

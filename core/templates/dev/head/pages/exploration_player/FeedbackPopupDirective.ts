@@ -16,6 +16,16 @@
  * @fileoverview Directive for the feedback popup.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('services/AlertsService.ts');
+require('services/UserService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/BackgroundMaskService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 // This directive is unusual in that it should only be invoked indirectly, as
 // follows:
 //

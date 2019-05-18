@@ -18,6 +18,11 @@
  * retrieving the story, saving it, and listening for changes.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/story/StoryObjectFactory.ts');
+require('services/AlertsService.ts');
+
 angular.module('storyEditorModule').factory('StoryEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
   'StoryObjectFactory', 'UndoRedoService',

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the editor prerequisites page.
  */
 
+require('pages/signup-page/signup-page.controller.ts');
+
 describe('Signup controller', function() {
   describe('SignupCtrl', function() {
     var scope, ctrl, $httpBackend, rootScope, mockAlertsService, urlParams;

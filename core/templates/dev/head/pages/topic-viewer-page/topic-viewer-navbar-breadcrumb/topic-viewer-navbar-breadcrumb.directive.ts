@@ -16,6 +16,9 @@
  * @fileoverview Directive for the navbar breadcrumb of the topic viewer.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('topicViewerNavbarBreadcrumbModule').directive(
   'topicViewerNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {

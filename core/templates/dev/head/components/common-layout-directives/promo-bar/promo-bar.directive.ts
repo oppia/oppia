@@ -18,6 +18,9 @@
  * dismissible.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PromoBarService.ts');
+
 angular.module('promoBarModule').directive('promoBar', [
   'PromoBarService', 'UrlInterpolationService',
   function(PromoBarService, UrlInterpolationService) {

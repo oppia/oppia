@@ -17,6 +17,20 @@
  * footer.
  */
 
+require(
+  'components/profile-link-directives/profile-link-image/' +
+  'profile-link-image.directive.ts');
+require(
+  'components/common-layout-directives/sharing-links/' +
+  'sharing-links.directive.ts');
+require('filters/summarize-nonnegative-number.filter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
+
+require('components/ratings/rating-computation/rating-computation.service.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ContextService.ts');
+require('services/DateTimeFormatService.ts');
+
 oppia.controller('LearnerViewInfo', [
   '$http', '$log', '$scope', '$uibModal', 'ContextService',
   'UrlInterpolationService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',

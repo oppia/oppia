@@ -17,6 +17,10 @@
  * modal.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/SiteAnalyticsService.ts');
+
 angular.module('entityCreationServicesModule').factory(
   'ExplorationCreationService', [
     '$http', '$rootScope', '$timeout', '$uibModal', '$window',

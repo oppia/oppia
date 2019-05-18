@@ -16,6 +16,17 @@
  * @fileoverview Directive for the hint editor.
  */
 
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/EditabilityService.ts');
+
 angular.module('hintEditorModule').directive('hintEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

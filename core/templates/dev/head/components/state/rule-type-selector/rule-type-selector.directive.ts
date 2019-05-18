@@ -16,6 +16,12 @@
  * @fileoverview Directive for the rule type selector.
  */
 
+require('filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+
 angular.module('ruleTypeSelectorModule').directive(
   'ruleTypeSelector', [function() {
     return {

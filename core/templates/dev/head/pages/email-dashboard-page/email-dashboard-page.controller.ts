@@ -16,6 +16,11 @@
  * @fileoverview Controller for oppia email dashboard page.
  */
 
+require(
+  'pages/email-dashboard-page/email-dashboard-page-services/' +
+  'email-dashboard-data/email-dashboard-data.service.ts');
+require('services/UserService.ts');
+
 angular.module('emailDashboardPageModule').controller('EmailDashboard', [
   '$rootScope', '$scope', 'EmailDashboardDataService', 'UserService',
   function($rootScope, $scope, EmailDashboardDataService, UserService) {

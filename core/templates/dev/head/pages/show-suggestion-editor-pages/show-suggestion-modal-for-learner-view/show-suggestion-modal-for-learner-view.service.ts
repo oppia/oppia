@@ -16,6 +16,8 @@
  * @fileoverview Service to display suggestion modal in learner view.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('showSuggestionModalForLearnerViewModule').factory(
   'ShowSuggestionModalForLearnerViewService', [
     '$rootScope', '$uibModal',

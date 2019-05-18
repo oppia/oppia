@@ -15,6 +15,40 @@
 /**
  * @fileoverview Directive containing the exploration material to be translated.
  */
+require('components/state/response-header/response-header.directive.ts');
+require(
+  'pages/exploration-editor-page/translation_tab/AudioTranslationBarDirective.ts');
+require(
+  'pages/exploration-editor-page/translation_tab/' +
+  'StateTranslationEditorDirective.ts'
+);
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'router.service.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-status/translation-status.service.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-tab-active-content-id/translation-tab-active-content-id.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
 
 angular.module('stateTranslationModule').directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

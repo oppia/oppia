@@ -32,6 +32,16 @@ angular.module('topicEditorPageModule').constant(
 angular.module('topicEditorPageModule').constant(
   'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
   '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
-
 angular.module('topicEditorPageModule').constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
+angular.module('topicEditorPageModule').constant(
+  'EVENT_TOPIC_INITIALIZED', 'topicInitialized');
+angular.module('topicEditorPageModule').constant(
+  'EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
+angular.module('topicEditorPageModule').constant(
+  'EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
+angular.module('topicEditorPageModule').constant(
+  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
+angular.module('topicEditorPageModule').constant(
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
+  

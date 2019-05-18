@@ -16,6 +16,8 @@
  * @fileoverview Directive for the select2 autocomplete component.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('select2DropdownModule').directive('select2Dropdown', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     // Directive for incorporating select2 dropdowns.

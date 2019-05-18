@@ -17,6 +17,44 @@
  * state editor.
  */
 
+require('components/state/response-header/response-header.directive.ts');
+require('components/state/solution-editor/solution-editor.directive.ts');
+
+require('domain/exploration/SolutionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/solution-validity/' +
+  'solution-validity.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/solution-verification/' +
+  'solution-verification.service.ts');
+require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-hints.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-solution.service.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/GenerateContentIdService.ts');
+
 angular.module('stateSolutionEditorModule').directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

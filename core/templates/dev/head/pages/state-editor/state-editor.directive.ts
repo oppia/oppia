@@ -16,6 +16,26 @@
  * @fileoverview Directive for the state editor directive.
  */
 
+require(
+  'pages/state-editor/state-content-editor/state-content-editor.directive.ts');
+require(
+  'pages/state-editor/state-hints-editor/state-hints-editor.directive.ts');
+require(
+  'pages/state-editor/state-interaction-editor/' +
+  'state-interaction-editor.directive.ts');
+require('pages/state-editor/state-responses/state-responses.directive.ts');
+require(
+  'pages/state-editor/state-solution-editor/' +
+  'state-solution-editor.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+
 angular.module('stateEditorModule').directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

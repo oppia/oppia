@@ -16,6 +16,19 @@
  * @fileoverview Service to compare versions of explorations.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/state/StateObjectFactory.ts');
+require('domain/exploration/StatesObjectFactory.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-diff.service.ts');
+require(
+  'pages/exploration-editor-page/history-tab/history-tab-services/' +
+  'version-tree/version-tree.service.ts');
+
 angular.module('historyTabModule').factory('CompareVersionsService', [
   '$http', '$q', 'ExplorationDataService', 'ExplorationDiffService',
   'ReadOnlyExplorationBackendApiService', 'StateObjectFactory',

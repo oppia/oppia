@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Profile - Oppia
@@ -428,10 +428,13 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.js"></script>
-  <script src="/templates/dev/head/filters/summarize-nonnegative-number.filter.js"></script>
-  <script src="/templates/dev/head/filters/string-utility-filters/truncate.filter.js"></script>
-  <script src="/templates/dev/head/filters/string-utility-filters/truncate-and-capitalize.filter.js"></script>
-
-  <script src="/templates/dev/head/components/ratings/rating-computation/rating-computation.service.js"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}

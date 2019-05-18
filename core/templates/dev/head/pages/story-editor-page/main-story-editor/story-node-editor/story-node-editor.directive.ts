@@ -16,6 +16,13 @@
  * @fileoverview Controller for the story node editor.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/story/StoryUpdateService.ts');
+require(
+  'pages/story-editor-page/story-editor-services/story-editor-state/' +
+  'story-editor-state.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('storyNodeEditorModule').directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

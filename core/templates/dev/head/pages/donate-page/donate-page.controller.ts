@@ -16,6 +16,10 @@
  * @fileoverview Controllers for the donate page.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 angular.module('donatePageModule').controller('Donate', [
   '$http', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'WindowDimensionsService',

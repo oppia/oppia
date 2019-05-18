@@ -17,12 +17,12 @@
 * in the skill editor.
 */
 
-angular.module('skillEditorModule').constant(
-  'EVENT_SKILL_INITIALIZED', 'skillInitialized');
-angular.module('skillEditorModule').constant(
-  'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
-angular.module('skillEditorModule').constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/SkillObjectFactory.ts');
+require('domain/skill/SkillRightsBackendApiService.ts');
+require('domain/skill/SkillRightsObjectFactory.ts');
+require('services/AlertsService.ts');
 
 angular.module('skillEditorModule').factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',

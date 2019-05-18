@@ -16,6 +16,29 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'change-list.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/interaction-details-cache/' +
+  'interaction-details-cache.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-content.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+
 describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
     beforeEach(function() {

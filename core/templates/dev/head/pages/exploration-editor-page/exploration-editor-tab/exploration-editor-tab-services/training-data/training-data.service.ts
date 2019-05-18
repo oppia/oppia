@@ -18,6 +18,20 @@
  * across all answer groups.
  */
 
+require('domain/exploration/RuleObjectFactory.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'graph-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+
 angular.module('explorationEditorTabModule').factory('TrainingDataService', [
   '$http', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
   'ResponsesService', 'RuleObjectFactory', 'StateEditorService',

@@ -16,6 +16,20 @@
  * @fileoverview Controller for the main topic editor.
  */
 
+require(
+  'pages/topic-editor-page/main-topic-editor/' +
+  'main-topic-editor-stories-list/main-topic-editor-stories-list.directive.ts');
+
+require(
+  'components/entity-creation-services/story-creation/' +
+  'story-creation.service.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/topic/TopicUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+
 angular.module('mainTopicEditorModule').directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

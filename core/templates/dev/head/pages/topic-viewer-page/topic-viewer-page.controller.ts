@@ -16,6 +16,18 @@
  * @fileoverview Controllers for the topic viewer.
  */
 
+require(
+  'components/common-layout-directives/background-banner/' +
+  'background-banner.directive.ts');
+require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
+require(
+  'pages/topic-viewer-page/topic-viewer-navbar-breadcrumb/' +
+  'topic-viewer-navbar-breadcrumb.directive.ts');
+
+require('domain/topic_viewer/TopicViewerBackendApiService.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('topicViewerPageModule').controller('TopicViewer', [
   '$rootScope', '$scope', '$window', 'AlertsService',
   'TopicViewerBackendApiService',

@@ -13,8 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the navbar breadcrumb of the story editor.
+ * @fileoverview Controller for the navbar breadcrumb of the story editor.
  */
+
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/story-editor-page/story-editor-services/story-editor-state/' +
+  'story-editor-state.service.ts');
+require(
+  'pages/story-editor-page/main-story-editor/' +
+  'main-story-editor.directive.ts');
+require('services/contextual/UrlService.ts');
 
 angular.module('storyEditorNavbarBreadcrumbModule').directive(
   'storyEditorNavbarBreadcrumb', [

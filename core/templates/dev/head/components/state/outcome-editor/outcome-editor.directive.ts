@@ -16,6 +16,14 @@
  * @fileoverview Directives for the outcome editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-editor/' +
+  'state-editor.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+
 angular.module('outcomeEditorModule').directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

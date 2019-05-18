@@ -16,6 +16,21 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
+require(
+  'pages/skill-editor-page/skill-editor-main-tab/skill-description-editor/' +
+  'skill-description-editor.directive.ts');
+require(
+  'pages/skill-editor-page/skill-editor-main-tab/skill-concept-card-editor/' +
+  'skill-concept-card-editor.directive.ts');
+require(
+  'pages/skill-editor-page/skill-editor-main-tab/skill-misconceptions-editor/' +
+  'skill-misconceptions-editor.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+
 angular.module('skillEditorMainTabModule').directive('skillEditorMainTab', [
   'SkillEditorStateService', 'UrlInterpolationService',
   function(SkillEditorStateService, UrlInterpolationService) {

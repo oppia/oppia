@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,6 +15,24 @@
 /**
  * @fileoverview Directive for the concept card editor.
  */
+
+require('components/summary-list-header/summary-list-header.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require(
+  'pages/skill-editor-page/skill-editor-main-tab/skill-concept-card-editor/' +
+  'worked-example-editor/worked-example-editor.directive.ts');
+
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/format-rte-preview.filter.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+require('services/GenerateContentIdService.ts');
 
 angular.module('skillConceptCardEditorModule').directive(
   'skillConceptCardEditor', [

@@ -17,6 +17,40 @@
  * the training modal used for unresolved answers.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/training-data-editor-panel.service.ts');
+
+require('domain/exploration/AnswerGroupObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'angular-name/angular-name.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-warnings.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'graph-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/training-data/training-data.service.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+
 angular.module('explorationEditorTabModule').factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {

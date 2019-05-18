@@ -16,6 +16,16 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+require('components/StateGraphLayoutService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-warnings.service.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-status/translation-status.service.ts');
+
 /* eslint-disable angular/directive-restrict */
 angular.module('stateGraphVisualizationModule').directive(
   'stateGraphVisualization', [

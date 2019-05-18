@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for Interaction Details Cache Service.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/interaction-details-cache/' +
+  'interaction-details-cache.service.ts');
+
 describe('Interaction Details Cache Service', function() {
   describe('InteractionDetailsCache', function() {
     beforeEach(function() {

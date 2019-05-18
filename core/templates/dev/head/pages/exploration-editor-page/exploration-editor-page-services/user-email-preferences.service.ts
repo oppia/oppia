@@ -16,6 +16,12 @@
  * @fileoverview User exploration emails service for the exploration settings.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'UserEmailPreferencesService', [
     '$http', '$q', 'AlertsService', 'ExplorationDataService',

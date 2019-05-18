@@ -16,8 +16,10 @@
  * @fileoverview Controller to show suggestion modal in learner view.
  */
 
+require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
+
 angular.module('showSuggestionModalForLearnerViewModule').controller(
-  'ShowSuggestionModalForLearnerView', [
+  'showSuggestionModalForLearnerViewModule', [
     '$scope', '$uibModalInstance', 'SuggestionModalService', 'description',
     'newContent', 'oldContent',
     function($scope, $uibModalInstance, SuggestionModalService, description,
@@ -29,4 +31,5 @@ angular.module('showSuggestionModalForLearnerViewModule').controller(
         SuggestionModalService.cancelSuggestion($uibModalInstance);
       };
     }
-  ]);
+  ]
+);

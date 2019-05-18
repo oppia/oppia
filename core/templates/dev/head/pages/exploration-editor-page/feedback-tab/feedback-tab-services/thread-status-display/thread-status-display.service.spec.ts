@@ -18,6 +18,10 @@
  * feedback tab of the exploration editor.
  */
 
+require(
+  'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
+  'thread-status-display/thread-status-display.service.ts');
+
 describe('Thread Status Display Service', function() {
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));

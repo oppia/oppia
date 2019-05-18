@@ -17,6 +17,8 @@
  * the learner and editor views.
  */
 
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+
 // Service for assembling extension tags (for interactions).
 oppia.factory('ExtensionTagAssemblerService', [
   '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {

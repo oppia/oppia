@@ -17,6 +17,14 @@
  * committed to the server.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'autosave-info-modals.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('explorationEditorPageModule').factory('ChangeListService', [
   '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
   'ExplorationDataService',

@@ -17,6 +17,9 @@
  * text components.
  */
 
+require('services/HtmlEscaperService.ts');
+require('services/RteHelperService.ts');
+
 angular.module('ckEditorWidgetsModule').run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
   'HtmlEscaperService',

@@ -16,6 +16,8 @@
  * @fileoverview Service to create the question.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('entityCreationServicesModule').factory(
   'QuestionCreationService', [
     '$http', '$q', 'UrlInterpolationService',

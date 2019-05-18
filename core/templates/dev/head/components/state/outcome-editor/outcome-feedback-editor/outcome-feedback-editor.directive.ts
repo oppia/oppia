@@ -16,6 +16,9 @@
  * @fileoverview Directives for the outcome feedback editor.
  */
 
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('outcomeFeedbackEditorModule').directive(
   'outcomeFeedbackEditor', [
     'SubtitledHtmlObjectFactory', 'UrlInterpolationService',

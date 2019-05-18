@@ -17,6 +17,15 @@
  * on the type of response received as a result of the autosaving request.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'changes-in-human-readable-form.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require('services/LocalStorageService.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'AutosaveInfoModalsService', [
     '$log', '$timeout', '$uibModal', '$window',

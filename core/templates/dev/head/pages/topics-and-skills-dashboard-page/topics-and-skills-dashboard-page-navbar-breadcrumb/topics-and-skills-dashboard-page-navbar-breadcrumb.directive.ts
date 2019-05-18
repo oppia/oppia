@@ -13,9 +13,11 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the navbar breadcrumb of the topics and
- * skills dashboard.
+ * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('topicsAndSkillsDashboardNavbarBreadcrumbModule').directive(
   'topicsAndSkillsDashboardNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {

@@ -16,6 +16,20 @@
  * @fileoverview Directive for the state content editor.
  */
 
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'editor-first-time-events.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/EditabilityService.ts');
+
 angular.module('stateContentEditorModule').directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

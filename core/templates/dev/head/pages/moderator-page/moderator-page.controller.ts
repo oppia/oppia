@@ -16,6 +16,47 @@
 * @fileoverview Data and controllers for the Oppia moderator page.
 */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require(
+  'components/forms/forms-unicode-filters/' +
+  'convert-unicode-with-params-to-html.filter.ts');
+require(
+  'components/forms/forms-unicode-filters/convert-html-to-unicode.filter.ts');
+require(
+  'components/forms/forms-unicode-filters/convert-unicode-to-html.filter.ts');
+require('components/forms/forms-validators/is-at-least.filter.ts');
+require('components/forms/forms-validators/is-at-most.filter.ts');
+require('components/forms/forms-validators/is-float.filter.ts');
+require('components/forms/forms-validators/is-integer.filter.ts');
+require('components/forms/forms-validators/is-nonempty.filter.ts');
+require(
+  'components/forms/forms-directives/apply-validation/' +
+  'apply-validation.directive.ts');
+require(
+  'components/forms/forms-directives/require-is-float/' +
+  'require-is-float.directive.ts');
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-choices-editor/schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
+
 angular.module('moderatorPageModule').controller('Moderator', [
   '$http', '$rootScope', '$scope', 'AlertsService', 'DateTimeFormatService',
   function($http, $rootScope, $scope, AlertsService, DateTimeFormatService) {

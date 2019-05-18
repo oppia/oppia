@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for Solution Validity Service.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/solution-validity/' +
+  'solution-validity.service.ts');
+
 describe('Solution Validity Service', function() {
   describe('SolutionValidityService', function() {
     beforeEach(function() {

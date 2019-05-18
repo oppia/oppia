@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for Answer Groups Cache Service.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'AnswerGroupsCacheService.ts');
+
 describe('Answer Groups Cache Service', function() {
   describe('AnswerGroupsCache', function() {
     beforeEach(function() {

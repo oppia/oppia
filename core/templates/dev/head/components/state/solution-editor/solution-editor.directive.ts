@@ -16,6 +16,22 @@
  * @fileoverview Directive for the solution editor.
  */
 
+require('components/state/solution-editor/solution-explanation-editor/solution-explanation-editor.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('domain/exploration/SolutionObjectFactory.ts');
+require('pages/exploration-editor-page/exploration-editor-tab/exploration-editor-tab-services/solution-verification/solution-verification.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+
 angular.module('solutionEditorModule').directive('solutionEditor', [
   '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationHtmlFormatterService', 'SolutionObjectFactory',

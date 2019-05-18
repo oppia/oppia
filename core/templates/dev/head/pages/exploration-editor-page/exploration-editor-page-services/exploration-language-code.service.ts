@@ -14,6 +14,10 @@
 
 /** @fileoverview A data service that stores the exploration language code. */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-property.service.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ExplorationLanguageCodeService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {

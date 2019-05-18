@@ -16,6 +16,15 @@
  * @fileoverview Directive for the header of the response tiles.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-editor/' +
+  'state-editor.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/EditabilityService.ts');
+
 angular.module('responseHeaderModule').directive('responseHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

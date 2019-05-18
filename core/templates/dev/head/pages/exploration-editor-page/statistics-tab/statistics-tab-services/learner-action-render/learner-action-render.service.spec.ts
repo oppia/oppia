@@ -19,6 +19,13 @@
  * jasmine.any(Object).
  */
 
+require('domain/statistics/LearnerActionObjectFactory.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/statistics-tab-services/' +
+  'learner-action-render/learner-action-render.service.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/PlaythroughService.ts');
+
 describe('Learner Action Render Service', function() {
   beforeEach(angular.mock.module('oppia'));
 

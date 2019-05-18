@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   {{ collection_title }} - Oppia
@@ -379,25 +379,13 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.js"></script>
-  <script src="/templates/dev/head/filters/summarize-nonnegative-number.filter.js"></script>
-  <script src="/templates/dev/head/filters/string-utility-filters/truncate.filter.js"></script>
-  <script src="/templates/dev/head/filters/string-utility-filters/truncate-and-capitalize.filter.js"></script>
-
-  <script src="/templates/dev/head/domain/collection/CollectionNodeObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/collection/CollectionObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/collection/CollectionPlaythroughObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/collection/GuestCollectionProgressObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/collection/GuestCollectionProgressService.js"></script>
-  <script src="/templates/dev/head/domain/collection/ReadOnlyCollectionBackendApiService.js"></script>
-  <script src="/templates/dev/head/domain/utilities/BrowserCheckerService.js"></script>
-
-  <script src="/templates/dev/head/domain/objects/FractionObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/objects/NumberWithUnitsObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/objects/UnitsObjectFactory.js"></script>
-  <script src="/templates/dev/head/components/button-directives/exploration-embed-modal/exploration-embed-button.service.js"></script>
-  <script src="/templates/dev/head/components/ratings/rating-computation/rating-computation.service.js"></script>
-
-  <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
-  <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}

@@ -17,6 +17,20 @@
  * editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'router.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require('services/EditabilityService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 angular.module('stateNameEditorModule').directive('stateNameEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

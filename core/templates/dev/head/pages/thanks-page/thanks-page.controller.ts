@@ -16,6 +16,11 @@
  * @fileoverview Controllers for the 'thanks' page.
  */
 
+require(
+  'components/common-layout-directives/background-banner/' +
+  'background-banner.directive.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('thanksPageModule').controller('Thanks', [
   '$scope', 'UrlInterpolationService',
   function(

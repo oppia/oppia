@@ -16,6 +16,23 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-rights/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/EditabilityService.ts');
+require('services/ImprovementsService.ts');
+require('services/StateTopAnswersStatsService.ts');
+
 angular.module('unresolvedAnswersOverviewModule').directive(
   'unresolvedAnswersOverview', [
     'UrlInterpolationService', function(UrlInterpolationService) {

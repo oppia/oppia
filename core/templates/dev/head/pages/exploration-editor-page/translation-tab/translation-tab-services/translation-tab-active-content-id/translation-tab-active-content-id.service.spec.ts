@@ -16,6 +16,11 @@
  * @fileoverview Unit test for the Translation tab active content id service.
  */
 
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-tab-active-content-id/' +
+  'translation-tab-active-content-id.service.ts');
+
 describe('Translation tab active content id service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('StateRecordedVoiceoversService', {

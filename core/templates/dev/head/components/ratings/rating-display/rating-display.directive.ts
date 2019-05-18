@@ -16,6 +16,8 @@
  * @fileoverview Directive for displaying summary rating information.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('ratingDisplayModule').directive('ratingDisplay', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

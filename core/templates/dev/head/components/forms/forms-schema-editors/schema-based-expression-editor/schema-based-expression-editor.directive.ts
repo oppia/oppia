@@ -16,6 +16,8 @@
  * @fileoverview Directive for a schema-based editor for expressions.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('schemaBasedExpressionEditorModule').directive(
   'schemaBasedExpressionEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {

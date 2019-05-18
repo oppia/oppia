@@ -16,6 +16,15 @@
  * @fileoverview Controller for the stories list viewer.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/topic/TopicUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('mainTopicEditorStoriesListModule').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

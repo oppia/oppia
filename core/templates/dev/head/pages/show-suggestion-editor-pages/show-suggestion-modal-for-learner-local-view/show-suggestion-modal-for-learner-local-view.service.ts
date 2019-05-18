@@ -16,6 +16,13 @@
  * @fileoverview Service to display suggestion modal in learner local view.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/show-suggestion-editor-pages/' +
+  'show-suggestion-modal-for-learner-local-view/' +
+  'show-suggestion-modal-for-learner-local-view.controller.ts');
+require('services/AlertsService.ts');
+
 angular.module('showSuggestionModalForLocalViewModule').factory(
   'ShowSuggestionModalForLearnerLocalViewService', [
     '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',

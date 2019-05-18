@@ -16,6 +16,22 @@
  * @fileoverview Controllers for the exploration graph.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'graph-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'router.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+
 angular.module('explorationGraphModule').controller('ExplorationGraph', [
   '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
   'ExplorationStatesService', 'GraphDataService', 'RouterService',

@@ -17,6 +17,8 @@
  * playing the exploration in each node.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('collectionNodeListModule').directive('collectionNodeList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

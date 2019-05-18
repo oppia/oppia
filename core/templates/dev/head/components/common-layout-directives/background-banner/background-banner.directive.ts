@@ -16,6 +16,8 @@
  * @fileoverview Directive for the background banner.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('backgroundBannerModule').directive('backgroundBanner', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

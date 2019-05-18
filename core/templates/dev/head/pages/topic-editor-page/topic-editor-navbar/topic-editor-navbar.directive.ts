@@ -16,6 +16,20 @@
  * @fileoverview Directive for the navbar of the topic editor.
  */
 
+require(
+  'components/common-layout-directives/loading-dots/loading-dots.directive.ts');
+
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/topic/TopicRightsBackendApiService.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-routing/' +
+  'topic-editor-routing.service.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('topicEditorNavbarModule').directive('topicEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

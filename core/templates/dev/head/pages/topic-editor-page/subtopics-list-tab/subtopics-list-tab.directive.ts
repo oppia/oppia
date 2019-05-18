@@ -16,6 +16,14 @@
  * @fileoverview Controller for the subtopics list editor.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/topic/SubtopicPageObjectFactory.ts');
+require('domain/topic/TopicUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+
 angular.module('subtopicsListTabModule').directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,33 @@
  * @fileoverview Directive for the audio translation bar.
  */
 
+require('filters/format-timer.filter.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-language/translation-language.service.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-tab-active-content-id/' +
+  'translation-tab-active-content-id.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
+require('services/AlertsService.ts');
+require('services/AssetsBackendApiService.ts');
+require('services/AudioPlayerService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+require('services/IdGenerationService.ts');
+
 angular.module('audioTranslationBarModule').directive('audioTranslationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,15 @@
  * @fileoverview Directive for the navbar of the story editor.
  */
 
+require('domain/editor/undo_redo/BaseUndoRedoService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/story-editor-page/story-editor-services/story-editor-state/' +
+  'story-editor-state.service.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('storyEditorNavbarModule').directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

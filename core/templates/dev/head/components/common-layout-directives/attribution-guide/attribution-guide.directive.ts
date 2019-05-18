@@ -16,6 +16,9 @@
  * @fileoverview Directive for the attribution guide.
  */
 
+require('domain/utilities/BrowserCheckerService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('attributionGuideModule').directive('attributionGuide', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

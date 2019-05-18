@@ -17,6 +17,14 @@
  * feedback tab of the exploration editor.
  */
 
+require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
+require('domain/suggestion/SuggestionObjectFactory.ts');
+require('domain/suggestion/SuggestionThreadObjectFactory.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('feedbackTabModule').factory('ThreadDataService', [
   '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',

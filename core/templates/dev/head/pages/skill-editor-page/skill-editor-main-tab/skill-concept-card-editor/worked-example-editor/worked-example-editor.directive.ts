@@ -16,6 +16,13 @@
  * @fileoverview Directive for the worked example editor.
  */
 
+
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+
 angular.module('workedExampleEditorModule').directive(
   'workedExampleEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {

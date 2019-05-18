@@ -16,9 +16,10 @@
  * @fileoverview Tests that ratings are being displayed correctly.
  */
 
+require('components/ratings/rating-display/rating-display.directive.ts');
+
 describe('Rating display directive', function() {
   var outerScope, ctrlScope;
-
   beforeEach(angular.mock.module('directiveTemplates'));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
@@ -28,7 +29,6 @@ describe('Rating display directive', function() {
         '/core/templates/dev/head/components/rating_display_directive.html');
       $compile(templateHtml)($rootScope);
       $rootScope.$digest();
-
       outerScope = $rootScope.$new();
       var elem = angular.element(
         '<rating-display rating-value="5" is-editable="true">' +

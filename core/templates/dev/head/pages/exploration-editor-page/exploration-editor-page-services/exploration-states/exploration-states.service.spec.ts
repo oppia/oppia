@@ -16,6 +16,10 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+
 describe('ExplorationStatesService', function() {
   beforeEach(angular.mock.module('oppia'));
 

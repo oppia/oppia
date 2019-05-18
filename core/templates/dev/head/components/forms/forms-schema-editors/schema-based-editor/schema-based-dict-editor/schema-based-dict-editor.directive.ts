@@ -16,6 +16,14 @@
  * @fileoverview Directive for a schema-based editor for dicts.
  */
 
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/IdGenerationService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
+
 angular.module('schemaBasedDictEditorModule').directive(
   'schemaBasedDictEditor', [
     'NestedDirectivesRecursionTimeoutPreventionService',

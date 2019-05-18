@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,8 +16,10 @@
  * @fileoverview Controller for oppia email dashboard page.
  */
 
-angular.module('emailDashboardResultModule')
-  .controller('EmailDashboardResult', [
+require('domain/utilities/UrlInterpolationService.ts');
+
+angular.module('emailDashboardResultModule').controller(
+  'EmailDashboardResult', [
     '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
     function($http, $scope, $timeout, $window, UrlInterpolationService) {
       var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';

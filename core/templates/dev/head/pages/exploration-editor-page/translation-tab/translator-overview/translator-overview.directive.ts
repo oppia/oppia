@@ -17,6 +17,15 @@
  * translation language.
  */
 
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-language/translation-language.service.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-status/translation-status.service.ts');
+
 angular.module('translatorOverviewModule').directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

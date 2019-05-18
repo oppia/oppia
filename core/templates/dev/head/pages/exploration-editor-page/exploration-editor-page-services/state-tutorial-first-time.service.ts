@@ -16,6 +16,10 @@
  * @fileoverview Service for all tutorials to be run only for the first time.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'editor-first-time-events.service.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'StateTutorialFirstTimeService', [
     '$http', '$rootScope', 'EditorFirstTimeEventsService',

@@ -17,6 +17,11 @@
  * about the rights for this exploration.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ExplorationRightsService', [
     '$http', 'AlertsService', 'ExplorationDataService',

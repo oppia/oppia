@@ -25,7 +25,13 @@ angular.module('skillEditorModule').constant(
 angular.module('skillEditorModule').constant(
   'SKILL_RIGHTS_URL_TEMPLATE',
   '/skill_editor_handler/rights/<skill_id>');
-
 angular.module('skillEditorModule').constant(
   'SKILL_PUBLISH_URL_TEMPLATE',
   '/skill_editor_handler/publish_skill/<skill_id>');
+angular.module('skillEditorModule').constant(
+  'EVENT_SKILL_INITIALIZED', 'skillInitialized');
+angular.module('skillEditorModule').constant(
+  'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
+angular.module('skillEditorModule').constant(
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
+  

@@ -16,6 +16,18 @@
  * @fileoverview Controllers for the exploration history tab.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/history-tab/history-tab-services/' +
+  'compare-versions/compare-versions.service.ts');
+require(
+  'pages/exploration-editor-page/history-tab/history-tab-services/' +
+  'version-tree/version-tree.service.ts');
+require('services/DateTimeFormatService.ts');
+
 angular.module('historyTabModule').controller('HistoryTab', [
   '$http', '$log', '$rootScope', '$scope',
   '$uibModal', 'CompareVersionsService',

@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for statistics services.
  */
 
+require('domain/exploration/StatesObjectFactory.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/statistics-tab-services/' +
+  'state-improvement-suggestion/state-improvement-suggestion.service.ts'
+);
+require('pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
+
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));
 

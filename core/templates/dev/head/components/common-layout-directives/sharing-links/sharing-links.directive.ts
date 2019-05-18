@@ -16,6 +16,13 @@
  * @fileoverview Directive for the Social Sharing Links.
  */
 
+require(
+  'components/button-directives/exploration-embed-modal/' +
+  'exploration-embed-button.service.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/SiteAnalyticsService.ts');
+
 angular.module('sharingLinksModule').directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

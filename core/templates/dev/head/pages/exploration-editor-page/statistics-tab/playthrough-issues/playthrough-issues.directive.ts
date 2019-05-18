@@ -16,6 +16,19 @@
  * @fileoverview Directive for visualizing issues.
  */
 
+require(
+  'pages/exploration-editor-page/statistics-tab/early-quit-issue/' +
+  'early-quit-issue.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/multiple-incorrect-issue/' +
+  'multiple-incorrect-issue.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/cyclic-transitions-issue/' +
+  'cyclic-transitions-issue.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PlaythroughIssuesService.ts');
+
 angular.module('playthroughIssuesModule').directive('playthroughIssues', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

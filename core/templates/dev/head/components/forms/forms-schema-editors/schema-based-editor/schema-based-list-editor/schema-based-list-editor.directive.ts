@@ -16,6 +16,17 @@
  * @fileoverview Directive for a schema-based editor for lists.
  */
 
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/IdGenerationService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
+require('services/SchemaDefaultValueService.ts');
+require('services/SchemaUndefinedLastElementService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 angular.module('schemaBasedListEditorModule').directive(
   'schemaBasedListEditor', [
     'FocusManagerService', 'IdGenerationService',

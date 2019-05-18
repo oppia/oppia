@@ -16,22 +16,38 @@
  * @fileoverview Unit tests for custom filters.
  */
 
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
+require('filters/summarize-nonnegative-number.filter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
+require('pages/question-editor-page/question-editor-page.directive.ts');
+
 describe('Testing filters', function() {
   var filterNames = [
-    'underscoresToCamelCase',
     'camelCaseToHyphens',
-    'truncate',
-    'truncateAtFirstLine',
-    'replaceInputsWithEllipses',
-    'truncateAtFirstEllipsis',
-    'wrapTextWithEllipsis',
-    'parameterizeRuleDescription',
-    'normalizeWhitespace',
-    'convertToPlainText',
-    'summarizeNonnegativeNumber',
-    'truncateAndCapitalize',
     'capitalize',
-    'getAbbreviatedText'
+    'convertToPlainText',
+    'getAbbreviatedText',
+    'normalizeWhitespace',
+    'parameterizeRuleDescription',
+    'replaceInputsWithEllipses',
+    'summarizeNonnegativeNumber',
+    'truncate',
+    'truncateAndCapitalize',
+    'truncateAtFirstEllipsis',
+    'truncateAtFirstLine',
+    'underscoresToCamelCase',
+    'wrapTextWithEllipsis',
   ];
 
   beforeEach(angular.mock.module('oppia'));

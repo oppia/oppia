@@ -17,6 +17,10 @@
  * of the exploration editor page.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-rights/exploration-rights.service.ts');
+
 describe('Exploration rights service', function() {
   beforeEach(angular.mock.module('oppia'));
 

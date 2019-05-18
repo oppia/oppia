@@ -16,6 +16,15 @@
  * @fileoverview Directive for the skills list viewer.
  */
 
+require(
+  'pages/topics-and-skills-dashboard-page/select-topics/' +
+  'select-topics.directive.ts');
+
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+
 angular.module('skillsListModule').directive('skillsList', [
   '$http', 'AlertsService', 'UrlInterpolationService',
   function(

@@ -16,6 +16,8 @@
  * @fileoverview Controller to show suggestion modal in creator view.
  */
 
+require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
+
 angular.module('showSuggestionModalForCreatorViewModule').controller(
   'ShowSuggestionModalForCreatorView', [
     '$scope', '$uibModalInstance', 'SuggestionModalService',

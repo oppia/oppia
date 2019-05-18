@@ -16,6 +16,28 @@
  * @fileoverview Controller for the questions list.
  */
 
+require('directives/AngularHtmlBindDirective.ts');
+require('pages/question-editor-page/question-editor-page.directive.ts');
+
+require(
+  'components/entity-creation-services/question-creation/' +
+  'question-creation.service.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('questionsListPageModule').directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -17,15 +17,17 @@
  * is in production mode.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('adminProdModeActivitiesTab').directive(
   'adminProdModeActivitiesTab', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {
         restrict: 'E',
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/admin-page/activities-tab/admin-prod-mode-activities-tab/' +
-          'admin-prod-mode-activities-tab.directive.html')
+          '/pages/admin/activities_tab/' +
+          'admin_prod_mode_activities_tab_directive.html')
       };
     }
-  ]);
-
+  ]
+);

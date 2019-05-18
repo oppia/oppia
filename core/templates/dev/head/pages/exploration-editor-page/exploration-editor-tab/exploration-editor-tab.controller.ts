@@ -16,6 +16,40 @@
  * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/state-name-editor/' +
+  'state-name-editor.directive.tss');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'state-param-changes-editor/state-param-changes-editor.directive.ts');
+require('pages/state-editor/state-editor.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-warnings.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'graph-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'router.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
+
 angular.module('explorationEditorTabModule').controller(
   'ExplorationEditorTab', [
     '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',

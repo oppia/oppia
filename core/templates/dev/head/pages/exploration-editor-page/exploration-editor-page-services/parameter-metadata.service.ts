@@ -16,6 +16,18 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
+require('domain/exploration/ParamMetadataObjectFactory.ts');
+require('expressions/ExpressionInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-param-changes.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'graph-data.service.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ParameterMetadataService', [
     'ExplorationParamChangesService', 'ExplorationStatesService',

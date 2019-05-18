@@ -17,6 +17,14 @@
  * tab of the exploration editor.
  */
 
+require('filters/string-utility-filters/truncate.filter.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
+  'thread-status-display/thread-status-display.service.ts');
+require('services/DateTimeFormatService.ts');
+
 angular.module('threadTableModule').directive('threadTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,8 @@
  * @fileoverview Service to display suggestion modal in creator view.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('showSuggestionModalForCreatorViewModule').factory(
   'ShowSuggestionModalForCreatorViewService', [
     '$http', '$log', '$rootScope',

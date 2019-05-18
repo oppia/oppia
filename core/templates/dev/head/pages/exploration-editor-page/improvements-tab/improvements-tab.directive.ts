@@ -17,6 +17,14 @@
  * exploration editor.
  */
 
+require(
+  'pages/exploration-editor-page/improvements-tab/' +
+  'playthrough-improvement-card/playthrough-improvement-card.directive.ts'
+);
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ImprovementCardService.ts');
+
 angular.module('improvementsTabModule').directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

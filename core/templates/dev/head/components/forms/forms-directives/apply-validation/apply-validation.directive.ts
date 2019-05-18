@@ -16,6 +16,8 @@
  * @fileoverview Directive for applying validation.
  */
 
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+
 /* eslint-disable angular/directive-restrict */
 angular.module('applyValidationModule').directive(
   'applyValidation', ['$filter', function($filter) {

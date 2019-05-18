@@ -16,6 +16,118 @@
  * @fileoverview Primary controller for the topic editor page.
  */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require(
+  'components/ck-editor-helpers/ck-editor-rte/ck-editor-rte.directive.ts');
+require(
+  'components/ck-editor-helpers/ck-editor-widgets/' +
+  'ck-editor-widgets.initializer.ts');
+require(
+    'components/forms/forms-unicode-filters/' +
+    'convert-unicode-with-params-to-html.filter.ts');
+require(
+  'components/forms/forms-unicode-filters/convert-html-to-unicode.filter.ts');
+require(
+  'components/forms/forms-unicode-filters/convert-unicode-to-html.filter.ts');
+require('components/forms/forms-validators/is-at-least.filter.ts');
+require('components/forms/forms-validators/is-at-most.filter.ts');
+require('components/forms/forms-validators/is-float.filter.ts');
+require('components/forms/forms-validators/is-integer.filter.ts');
+require('components/forms/forms-validators/is-nonempty.filter.ts');
+require(
+  'components/forms/forms-directives/apply-validation/' +
+  'apply-validation.directive.ts');
+require(
+  'components/forms/forms-directives/require-is-float/' +
+  'require-is-float.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require('directives/MathjaxBindDirective.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-bool-editor/schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-choices-editor/schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-custom-editor/schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-expression-editor/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-float-editor/schema-based-float-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-html-editor/schema-based-html-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-int-editor/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+require(
+  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require(
+  'components/forms/forms-directives/select2-dropdown/' +
+  'select2-dropdown.directive.ts');
+require(
+  'components/forms/forms-directives/image-uploader/' +
+  'image-uploader.directive.ts');
+require(
+  'components/state/answer-group-editor/answer-group-editor.directive.ts');
+require('components/state/hint-editor/hint-editor.directive.ts');
+require('components/state/outcome-editor/outcome-editor.directive.ts');
+require(
+  'components/state/outcome-editor/outcome-destination-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state/outcome-editor/outcome-feedback-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require('components/state/response-header/response-header.directive.ts');
+require('components/state/rule-editor/rule-editor.directive.ts');
+require('components/state/rule-type-selector/rule-type-selector.directive.ts');
+require('components/state/solution-editor/solution-editor.directive.ts');
+require(
+  'components/state/solution-editor/solution-explanation-editor/' +
+  'solution-explanation-editor.directive.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('services/AutoplayedVideosService.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require(
+  'pages/topic-editor-page/topic-editor-navbar-breadcrumb/' +
+  'topic-editor-navbar-breadcrumb.directive.ts');
+require(
+  'pages/topic-editor-page/topic-editor-navbar/' +
+  'topic-editor-navbar.directive.ts');
+require(
+  'pages/topic-editor-page/main-topic-editor/main-topic-editor.directive.ts');
+require('pages/topic-editor-page/questions-tab/questions-tab.directive.ts');
+require(
+  'pages/topic-editor-page/subtopics-list-tab/subtopics-list-tab.directive.ts');
+
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('topicEditorPageModule').controller('TopicEditor', [
   '$scope', 'TopicEditorStateService', 'UrlService',
   function($scope, TopicEditorStateService, UrlService) {

@@ -16,6 +16,8 @@
  * @fileoverview Displays circled images with linking (when available).
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('circularImageModule').directive('circularImage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

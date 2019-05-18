@@ -16,6 +16,14 @@
  * @fileoverview Unit tests for question update service.
  */
 
+require('App.ts');
+require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/question/QuestionUpdateService.ts');
+require('domain/state/StateObjectFactory.ts');
+require('pages/question-editor-page/question-editor-page.directive.ts');
+
 describe('Question update service', function() {
   var QuestionUpdateService = null;
   var QuestionObjectFactory = null;

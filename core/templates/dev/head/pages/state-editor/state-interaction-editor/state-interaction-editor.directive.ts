@@ -17,6 +17,39 @@
  * editor.
  */
 
+require('directives/AngularHtmlBindDirective.ts');
+
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'editor-first-time-events.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/interaction-details-cache/' +
+  'interaction-details-cache.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-content.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-hints.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-solution.service.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/HtmlEscaperService.ts');
+
 angular.module('stateInteractionEditorModule').directive(
   'stateInteractionEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {

@@ -16,6 +16,9 @@
  * @fileoverview Directive for uploading images.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/IdGenerationService.ts');
+
 angular.module('imageUploaderModule').directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {

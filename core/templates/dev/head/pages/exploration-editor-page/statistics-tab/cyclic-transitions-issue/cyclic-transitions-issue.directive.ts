@@ -16,6 +16,10 @@
  * @fileoverview Directive for visualizing multiple incorrect issue.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/PlaythroughIssuesService.ts');
+
 angular.module('cyclicTransitionIssueModule').directive(
   'cyclicTransitionsIssue', [
     'UrlInterpolationService', function(UrlInterpolationService) {

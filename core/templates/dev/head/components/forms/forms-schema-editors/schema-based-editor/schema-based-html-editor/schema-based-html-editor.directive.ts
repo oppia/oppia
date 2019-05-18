@@ -16,6 +16,8 @@
  * @fileoverview Directive for a schema-based editor for HTML.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('schemaBasedHtmlEditorModule').directive(
   'schemaBasedHtmlEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
@@ -27,9 +29,8 @@ angular.module('schemaBasedHtmlEditorModule').directive(
           uiConfig: '&'
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/components/forms/forms-schema-editors/schema-based-editor/' +
-          'schema-based-html-editor/schema-based-html-editor.directive.html'),
+          '/components/forms/schema_editors/' +
+          'schema_based_html_editor_directive.html'),
         restrict: 'E',
       };
-    }]
-);
+    }]);

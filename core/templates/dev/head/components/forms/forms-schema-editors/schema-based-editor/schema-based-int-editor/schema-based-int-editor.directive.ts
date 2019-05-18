@@ -16,6 +16,8 @@
  * @fileoverview Directive for a schema-based editor for integers.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('schemaBasedIntEditorModule').directive('schemaBasedIntEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

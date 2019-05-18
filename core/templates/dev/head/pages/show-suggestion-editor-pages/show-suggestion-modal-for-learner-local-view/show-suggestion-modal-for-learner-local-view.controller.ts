@@ -16,6 +16,12 @@
  * @fileoverview Controller to show suggestion modal in learner local view.
  */
 
+
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
+
 angular.module('showSuggestionModalForLocalViewModule').controller(
   'ShowSuggestionModalForLearnerLocalView', [
     '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',

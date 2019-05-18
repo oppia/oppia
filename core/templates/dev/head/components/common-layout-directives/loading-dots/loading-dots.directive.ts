@@ -16,6 +16,8 @@
  * @fileoverview Directive for displaying animated loading dots.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('loadingDotsModule').directive('loadingDots', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,56 @@
  * @fileoverview Directive for managing the state responses in the state editor.
  */
 
+require(
+  'components/state/answer-group-editor/answer-group-editor.directive.ts');
+require('components/state/response-header/response-header.directive.ts');
+
+require('domain/exploration/AnswerGroupObjectFactory.ts');
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/RuleObjectFactory.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'editor-first-time-events.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/interaction-details-cache/' +
+  'interaction-details-cache.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-content.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-hints.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-solution.service.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/GenerateContentIdService.ts');
+require('services/HtmlEscaperService.ts');
+
 angular.module('stateResponsesModule').directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

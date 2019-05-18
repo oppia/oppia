@@ -17,6 +17,10 @@
  * text to speech data.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-property.service.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ExplorationAutomaticTextToSpeechService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {

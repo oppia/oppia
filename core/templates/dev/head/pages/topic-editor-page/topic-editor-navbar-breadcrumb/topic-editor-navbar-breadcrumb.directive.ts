@@ -16,6 +16,12 @@
  * @fileoverview Controller for the navbar breadcrumb of the topic editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+require('services/stateful/FocusManagerService.ts');
+
 angular.module('topicEditorNavbarBreadcrumbModule').directive(
   'topicEditorNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {

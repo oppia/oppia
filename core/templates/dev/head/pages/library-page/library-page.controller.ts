@@ -16,6 +16,30 @@
  * @fileoverview Data and controllers for the Oppia contributors' library page.
  */
 
+require(
+  'components/common-layout-directives/loading-dots/loading-dots.directive.ts');
+require(
+  'components/summary-tile-directives/exploration-summary-tile/' +
+  'exploration-summary-tile.directive.ts');
+require(
+  'components/summary-tile-directives/collection-summary-tile/' +
+  'collection-summary-tile.directive.ts');
+require('pages/library-page/library-footer/library-footer.controller.ts');
+require('pages/library-page/search-bar/search-bar.directive.ts');
+require('pages/library-page/search-results/search-results.directives.ts');
+
+require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
+require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts');
+require('domain/learner_dashboard/LearnerPlaylistService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/ConstructTranslationIdsService.ts');
+require('services/PageTitleService.ts');
+require('services/SearchService.ts');
+require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 angular.module('libraryPageModule').controller('Library', [
   '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'ConstructTranslationIdsService',

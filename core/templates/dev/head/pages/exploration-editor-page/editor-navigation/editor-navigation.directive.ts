@@ -17,6 +17,28 @@
  * in editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-rights/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-warnings.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'router.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'state-tutorial-first-time.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
+  'thread-data/thread-data.service.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 angular.module('editorNavigationModule').directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

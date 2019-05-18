@@ -16,6 +16,8 @@
  * @fileoverview Directive for Alert Messages
  */
 
+require('services/AlertsService.ts');
+
 angular.module('alertMessageModule').directive('alertMessage', [function() {
   return {
     restrict: 'E',

@@ -16,6 +16,14 @@
  * @fileoverview Controllers for the practice session.
  */
 
+require(
+  'components/common-layout-directives/background-banner/' +
+  'background-banner.directive.ts');
+require('pages/question-player-page/question-player-page.directive.ts');
+
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('practiceSessionPageModule').controller('PracticeSession', [
   '$http', '$rootScope', '$scope', 'AlertsService',
   'UrlInterpolationService', 'UrlService',

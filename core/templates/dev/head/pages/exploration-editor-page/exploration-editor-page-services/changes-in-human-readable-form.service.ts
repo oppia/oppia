@@ -16,6 +16,8 @@
  * @fileoverview Service to get changes in human readable form.
  */
 
+require('services/UtilsService.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ChangesInHumanReadableFormService', [
     'UtilsService', function(UtilsService) {

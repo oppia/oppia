@@ -17,6 +17,27 @@
  * both the exploration settings tab and the state editor page).
  */
 
+require(
+  'components/forms/forms-directives/select2-dropdown/' +
+  'select2-dropdown.directive.ts');
+require(
+  'pages/exploration-editor-page/value-generator-editor/' +
+  'value-generator-editor.directive.ts');
+
+require('domain/exploration/ParamChangeObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-param-specs.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+
 angular.module('paramsChangesEditorModule').directive('paramChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

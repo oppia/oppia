@@ -16,6 +16,13 @@
  * @fileoverview Service to get and set active content id in translation tab.
  */
 
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'TranslationTabActiveContentIdService', [
     '$log', '$rootScope', 'StateRecordedVoiceoversService',

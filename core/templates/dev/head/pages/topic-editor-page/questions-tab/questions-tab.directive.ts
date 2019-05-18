@@ -16,6 +16,29 @@
  * @fileoverview Controller for the questions tab.
  */
 
+require('pages/questions-list-page/questions-list-page.directive.ts');
+
+require(
+  'components/entity-creation-services/question-creation/' +
+  'question-creation.service.ts');
+require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/suggestion/QuestionSuggestionObjectFactory.ts');
+require('domain/suggestion/SuggestionThreadObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('questionsTabModule').directive('topicEditorQuestionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

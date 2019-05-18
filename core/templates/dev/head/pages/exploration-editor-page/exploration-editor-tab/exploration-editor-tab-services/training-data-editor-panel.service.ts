@@ -17,6 +17,39 @@
  * the training data editor of an answer group.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'test-interaction-panel/test-interaction-panel.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'angular-name/angular-name.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/training-data/training-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/training-modal.service.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-editor/' +
+  'state-editor.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 angular.module('explorationEditorTabModule').factory(
   'TrainingDataEditorPanelService', [
     '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',

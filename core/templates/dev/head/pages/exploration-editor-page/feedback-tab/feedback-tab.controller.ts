@@ -16,6 +16,31 @@
  * @fileoverview Controller for the exploration editor feedback tab.
  */
 
+require('domain/state/StateObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'change-list.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
+  'thread-data/thread-data.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
+  'thread-status-display/thread-status-display.service.ts');
+require(
+  'pages/show-suggestion-editor-pages/' +
+  'show-suggestion-modal-for-editor-view/' +
+  'show-suggestion-modal-for-editor-view.service.ts');
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/UserService.ts');
+
 angular.module('feedbackTabModule').controller('FeedbackTab', [
   '$log', '$q', '$rootScope', '$scope', '$uibModal',
   'AlertsService', 'ChangeListService', 'DateTimeFormatService',

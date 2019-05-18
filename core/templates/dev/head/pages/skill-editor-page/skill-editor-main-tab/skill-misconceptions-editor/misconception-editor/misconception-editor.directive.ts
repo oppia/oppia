@@ -16,6 +16,12 @@
  * @fileoverview Directive for the misconception editor.
  */
 
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+
 angular.module('misconceptionEditorModule').directive('misconceptionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

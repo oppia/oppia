@@ -36,9 +36,7 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
 
-        self.render_template(
-            'pages/topics-and-skills-dashboard-page/'
-            'topics-and-skills-dashboard-page.mainpage.html')
+        self.render_template('dist/topics-and-skills-dashboard-page.mainpage.html')
 
 
 class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):

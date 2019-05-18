@@ -16,6 +16,13 @@
  * @fileoverview Directive for the skill description editor.
  */
 
+require('domain/skill/SkillObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+
 angular.module('skillDescriptionEditorModule').directive(
   'skillDescriptionEditor', [
     'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',

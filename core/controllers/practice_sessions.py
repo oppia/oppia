@@ -37,7 +37,7 @@ class PracticeSessionsPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given name doesn\'t exist.'))
 
-        self.render_template('/pages/practice-session-page/practice-session-page.mainpage.html')
+        self.render_template('dist/practice-session-page.mainpage.html')
 
 
 class PracticeSessionsPageDataHandler(base.BaseHandler):

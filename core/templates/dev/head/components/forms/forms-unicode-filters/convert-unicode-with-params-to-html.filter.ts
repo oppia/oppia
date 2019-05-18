@@ -21,6 +21,9 @@
  * this is the end of a parameter.
  */
 
+require(
+  'components/forms/forms-unicode-filters/convert-unicode-to-html.filter.ts');
+
 angular.module('formsUnicodeFiltersModule').filter(
   'convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
     var assert = function(text) {

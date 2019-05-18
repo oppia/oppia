@@ -17,6 +17,10 @@
  * changes to parameters.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-property.service.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ExplorationParamChangesService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
@@ -24,5 +28,4 @@ angular.module('explorationEditorPageModule').factory(
       child.propertyName = 'param_changes';
       return child;
     }
-  ]
-);
+  ]);

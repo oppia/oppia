@@ -16,6 +16,33 @@
  * @fileoverview Controllers for the Learner dashboard.
  */
 
+require(
+  'components/common-layout-directives/background-banner/' +
+  'background-banner.directive.ts');
+require(
+  'components/common-layout-directives/loading-dots/loading-dots.directive.ts');
+require(
+  'components/summary-tile-directives/collection-summary-tile/'+
+  'collection-summary-tile.directive.ts');
+require(
+  'components/summary-tile-directives/exploration-summary-tile/' +
+  'exploration-summary-tile.directive.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+
+require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
+require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
+require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
+  'thread-status-display/thread-status-display.service.ts');
+require(
+  'pages/show-suggestion-editor-pages/show-suggestion-modal-for-learner-view/' +
+  'show-suggestion-modal-for-learner-view.service.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/UserService.ts');
+
 angular.module('learnerDashboardPageModule').controller('LearnerDashboard', [
   '$scope', '$rootScope', '$q', '$window', '$http', '$uibModal',
   'AlertsService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',

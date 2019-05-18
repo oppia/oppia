@@ -17,6 +17,15 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-property.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-rights/exploration-rights.service.ts');
+require('services/ValidatorsService.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ExplorationObjectiveService', [
     '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
@@ -34,5 +43,4 @@ angular.module('explorationEditorPageModule').factory(
       };
       return child;
     }
-  ]
-);
+  ]);

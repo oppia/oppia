@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Learner Dashboard - Oppia
@@ -1178,21 +1178,13 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/directives/AngularHtmlBindDirective.js"></script>
-
-  <script src="/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.js"></script>
-  <script src="/templates/dev/head/filters/summarize-nonnegative-number.filter.js"></script>
-  <script src="/templates/dev/head/filters/string-utility-filters/truncate.filter.js"></script>
-  <script src="/templates/dev/head/filters/string-utility-filters/truncate-and-capitalize.filter.js"></script>
-
-  <script src="/templates/dev/head/components/ratings/rating-computation/rating-computation.service.js"></script>
-
-  <script src="/templates/dev/head/services/HtmlEscaperService.js"></script>
-
-  <script src="/templates/dev/head/domain/feedback_thread/FeedbackThreadSummaryObjectFactory.js"></script>
-  <script src="/templates/dev/head/domain/feedback_message/FeedbackMessageSummaryObjectFactory.js"></script>
-  <script src="/templates/dev/head/pages/exploration-editor-page/feedback-tab/feedback-tab-services/thread-status-display/thread-status-display.service.js"></script>
-  <script src="/templates/dev/head/domain/learner_dashboard/LearnerDashboardBackendApiService.js"></script>
-  <script src="/templates/dev/head/pages/show-suggestion-editor-pages/show-suggestion-modal-for-learner-view/show-suggestion-modal-for-learner-view.service.js"></script>
-  <script src="/templates/dev/head/pages/show-suggestion-editor-pages/suggestion-modal.service.js"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}

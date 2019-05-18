@@ -16,6 +16,15 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
+require(
+  'components/entity-creation-services/skill-creation/' +
+  'skill-creation.service.ts');
+require(
+  'components/entity-creation-services/topic-creation/' +
+  'topic-creation.service.ts');
+require('domain/topic/EditableTopicBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('topicsAndSkillsDashboardNavbarModule').directive(
   'topicsAndSkillsDashboardNavbar', [
     'UrlInterpolationService', function(UrlInterpolationService) {

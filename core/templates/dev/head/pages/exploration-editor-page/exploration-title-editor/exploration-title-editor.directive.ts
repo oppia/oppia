@@ -16,6 +16,8 @@
  * @fileoverview Directive for the exploration title field in forms.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('explorationTitleEditorModule').directive(
   'explorationTitleEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {

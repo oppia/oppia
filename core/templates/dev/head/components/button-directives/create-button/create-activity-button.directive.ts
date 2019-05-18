@@ -16,6 +16,17 @@
  * @fileoverview Directive for the Create Exploration/Collection button.
  */
 
+require(
+  'components/entity-creation-services/collection-creation/' +
+  'collection-creation.service.ts');
+require(
+  'components/entity-creation-services/exploration-creation/' +
+  'exploration-creation.service.ts');
+require('domain/utilities/BrowserCheckerService.ts');
+require('services/contextual/UrlService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
+
 angular.module('createActivityButtonModule').directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

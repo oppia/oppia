@@ -16,6 +16,31 @@
  * @fileoverview Controller for the questions editor directive.
  */
 
+require('pages/state-editor/state-editor.directive.ts');
+
+require(
+  'components/entity-creation-services/question-creation/' +
+  'question-creation.service.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/question/QuestionUpdateService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/solution-validity/' +
+  'solution-validity.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'topic-editor-state.service.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+
 angular.module('questionEditorPageModule').directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,6 +16,8 @@
  * @fileoverview Directive for the side navigation bar.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('sideNavigationBarModule').directive('sideNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

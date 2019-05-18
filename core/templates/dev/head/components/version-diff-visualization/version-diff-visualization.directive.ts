@@ -17,6 +17,12 @@
  *   versions of an exploration.
  */
 
+require(
+  'components/common-layout-directives/loading-dots/' +
+  'loading-dots.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('visualDiffVisualizationModule').directive(
   'versionDiffVisualization', [
     'UrlInterpolationService', function(UrlInterpolationService) {
@@ -215,7 +221,7 @@ angular.module('visualDiffVisualizationModule').directive(
               newStateName, oldStateName, stateProperty) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/' +
+                '/pages/exploration-editor-page/' +
                 'state_diff_modal_directive.html'),
               backdrop: true,
               windowClass: 'state-diff-modal',

@@ -16,6 +16,8 @@
  * @fileoverview Converts unicode to HTML.
  */
 
+require('services/HtmlEscaperService.ts');
+
 angular.module('formsUnicodeFiltersModule').filter('convertUnicodeToHtml', [
   '$sanitize', 'HtmlEscaperService',
   function($sanitize, HtmlEscaperService) {

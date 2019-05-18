@@ -16,6 +16,8 @@
  * @fileoverview Directive for the select topics viewer.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('selectTopicsModule').directive('selectTopics', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

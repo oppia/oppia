@@ -16,6 +16,12 @@
  * @fileoverview Controllers for the teach page.
  */
 
+require(
+  'components/common-layout-directives/background-banner/' +
+  'background-banner.directive.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/SiteAnalyticsService.ts');
+
 angular.module('teachPageModule').controller('Teach', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService',

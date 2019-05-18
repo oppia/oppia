@@ -18,6 +18,17 @@
  * adding a new exploration.
  */
 
+require(
+  'components/forms/forms-directives/select2-dropdown/' +
+  'select2-dropdown.directive.ts');
+
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/CollectionValidationService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditor.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('services/AlertsService.ts');
+
 oppia.directive('collectionDetailsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

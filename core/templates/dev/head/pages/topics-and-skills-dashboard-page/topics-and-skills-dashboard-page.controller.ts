@@ -13,8 +13,37 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the topics and skills dashboard.
+ * @fileoverview Controllers for the topics and skills dashboard.
  */
+
+require(
+  'components/common-layout-directives/background-banner/' +
+  'background-banner.directive.ts');
+require('pages/topics_and_skills_dashboard/SkillsListDirective.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page-navbar-breadcrumb/' +
+  'topics-and-skills-dashboard-page-navbar-breadcrumb.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page-navbar/' +
+  'topics-and-skills-dashboard-page-navbar.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/topics-list/' +
+  'topics-list.directive.ts');
+
+require(
+  'components/entity-creation-services/skill-creation/' +
+  'skill-creation.service.ts');
+require(
+  'components/entity-creation-services/topic-creation/' +
+  'topic-creation.service.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardBackendApiService.ts'
+);
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
 
 angular.module('topicsAndSkillsDashboardModule').controller(
   'TopicsAndSkillsDashboard', [

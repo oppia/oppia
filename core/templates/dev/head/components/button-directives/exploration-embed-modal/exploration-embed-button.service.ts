@@ -16,6 +16,9 @@
  * @fileoverview Service for the 'embed exploration' modal.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/SiteAnalyticsService.ts');
+
 angular.module('explorationEmbedButtonModule').factory(
   'ExplorationEmbedButtonService', [
     '$uibModal', 'SiteAnalyticsService', 'UrlInterpolationService',

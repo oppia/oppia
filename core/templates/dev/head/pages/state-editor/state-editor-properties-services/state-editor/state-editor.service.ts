@@ -17,6 +17,11 @@
  * a state.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/solution-validity/' +
+  'solution-validity.service.ts');
+
 angular.module('stateEditorModule').factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(

@@ -16,6 +16,12 @@
  * @fileoverview Directive for the test interaction panel in the state editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require('pages/exploration_player/CurrentInteractionService.ts');
+
 angular.module('testInteractionPanelModule').directive('testInteractionPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

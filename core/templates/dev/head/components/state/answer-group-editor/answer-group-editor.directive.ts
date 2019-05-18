@@ -16,6 +16,25 @@
  * @fileoverview Directive for the answer group editor.
  */
 
+require('components/state/outcome-editor/outcome-editor.directive.ts');
+require('components/state/rule-editor/rule-editor.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('domain/exploration/RuleObjectFactory.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/editor_tab/TrainingDataEditorPanelService.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-editor/' +
+  'state-editor.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('answerGroupEditorModule').directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

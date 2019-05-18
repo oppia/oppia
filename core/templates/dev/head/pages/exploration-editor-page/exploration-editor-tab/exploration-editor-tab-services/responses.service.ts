@@ -17,6 +17,25 @@
  * answer groups.
  */
 
+require('domain/exploration/OutcomeObjectFactory.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'AnswerGroupsCacheService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'SolutionValidityService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'SolutionVerificationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+
 angular.module('explorationEditorTabModule').factory('ResponsesService', [
   '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
   'ContextService', 'OutcomeObjectFactory',

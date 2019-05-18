@@ -16,6 +16,25 @@
  * @fileoverview Controller for the questions tab.
  */
 
+require('pages/questions-list-page/questions-list-page.directive.ts');
+
+require(
+  'components/entity-creation-services/question-creation/' +
+  'question-creation.service.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('skillEditorQuestionsTabModule').directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

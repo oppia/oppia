@@ -18,21 +18,36 @@
  * keeps no mementos.
  */
 
+require('domain/exploration/StatesObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('pages/exploration-editor-page/exploration-editor-page-services/angular-name/angular-name.service.ts');
+require('pages/exploration-editor-page/exploration-editor-page-services/change-list.service.ts');
+require('pages/exploration-editor-page/exploration-editor-page-services/exploration-init-state-name.service.ts');
+require('pages/exploration-editor-page/exploration-editor-tab/exploration-editor-tab-services/solution-validity/solution-validity.service.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ValidatorsService.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ExplorationStatesService', [
     '$filter', '$injector', '$location', '$log', '$q', '$rootScope',
-    '$uibModal',
-    'AlertsService', 'AngularNameService', 'AnswerClassificationService',
-    'ChangeListService', 'ContextService', 'ExplorationInitStateNameService',
-    'SolutionValidityService', 'StateEditorService', 'StatesObjectFactory',
-    'UrlInterpolationService', 'ValidatorsService',
+    '$uibModal','AlertsService', 'AngularNameService',
+    'AnswerClassificationService', 'ChangeListService', 'ContextService',
+    'ExplorationInitStateNameService', 'SolutionValidityService',
+    'StateEditorService', 'StatesObjectFactory', 'UrlInterpolationService',
+    'ValidatorsService',
     function(
         $filter, $injector, $location, $log, $q, $rootScope,
-        $uibModal,
-        AlertsService, AngularNameService, AnswerClassificationService,
-        ChangeListService, ContextService, ExplorationInitStateNameService,
-        SolutionValidityService, StateEditorService, StatesObjectFactory,
-        UrlInterpolationService, ValidatorsService) {
+        $uibModal, AlertsService, AngularNameService,
+        AnswerClassificationService, ChangeListService, ContextService,
+        ExplorationInitStateNameService, SolutionValidityService,
+        StateEditorService, StatesObjectFactory, UrlInterpolationService,
+        ValidatorsService) {
       var _states = null;
 
       var stateAddedCallbacks = [];

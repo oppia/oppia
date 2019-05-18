@@ -16,6 +16,32 @@
  * @fileoverview Directive for the state translation status graph.
  */
 
+require(
+  'pages/exploration-editor-page/editor_tab/StateGraphVisualizationDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'graph-data.service.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
+  'translation-status/translation-status.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-written-translations.service.ts');
+
 angular.module('stateTranslationStatusGraphModule').directive(
   'stateTranslationStatusGraph', [
     'UrlInterpolationService', function(UrlInterpolationService) {

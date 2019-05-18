@@ -16,6 +16,12 @@
  * @fileoverview Directive for the solution explanation editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'state-property.service.ts');
+require('services/EditabilityService.ts');
+
 angular.module('solutionExplanationEditorModule').directive(
   'solutionExplanationEditor', [
     'StateSolutionService', 'UrlInterpolationService',

@@ -16,9 +16,24 @@
  * @fileoverview A service that lists all the exploration warnings.
  */
 
-// When an unresolved answer's frequency exceeds this threshold, an exploration
-// will be blocked from being published until the answer is resolved.
-oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
+require('expressions/ExpressionInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-param-changes.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'graph-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'parameter-metadata.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/solution-validity/solution-validity.service.ts');
+require('services/ImprovementsService.ts');
+require('services/StateTopAnswersStatsService.ts');
 
 angular.module('explorationEditorPageModule').factory(
   'ExplorationWarningsService', [

@@ -16,6 +16,106 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require(
+  'components/ck-editor-helpers/ck-editor-rte/ck-editor-rte.directive.ts');
+require(
+  'components/ck-editor-helpers/ck-editor-widgets/' +
+  'ck-editor-widgets.initializer.ts');
+require(
+  'components/forms/forms-unicode-filters/' +
+  'convert-unicode-with-params-to-html.filter.ts');
+require(
+  'components/forms/forms-unicode-filters/convert-html-to-unicode.filter.ts');
+require(
+  'components/forms/forms-unicode-filters/convert-unicode-to-html.filter.ts');
+require('components/forms/forms-validators/is-at-least.filter.ts');
+require('components/forms/forms-validators/is-at-most.filter.ts');
+require('components/forms/forms-validators/is-float.filter.ts');
+require('components/forms/forms-validators/is-integer.filter.ts');
+require('components/forms/forms-validators/is-nonempty.filter.ts');
+require(
+  'components/forms/forms-directives/apply-validation/' +
+  'apply-validation.directive.ts');
+require(
+  'components/forms/forms-directives/require-is-float/' +
+  'require-is-float.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require('directives/MathjaxBindDirective.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-custom-editor/schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-expression-editor/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-float-editor/schema-based-float-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-html-editor/schema-based-html-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-int-editor/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+require(
+  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require('services/HtmlEscaperService.ts');
+require('services/IdGenerationService.ts');
+require('services/RteHelperService.ts');
+require('services/SchemaDefaultValueService.ts');
+require('services/SchemaUndefinedLastElementService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
+require('services/GenerateContentIdService.ts');
+require(
+  'components/common-layout-directives/loading-dots/' +
+  'loading-dots.directive.ts');
+require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
+require('domain/editor/undo_redo/BaseUndoRedoService.ts');
+require('domain/story/EditableStoryBackendApiService.ts');
+require('domain/story/StoryObjectFactory.ts');
+require('domain/story/StoryContentsObjectFactory.ts');
+require('domain/story/StoryNodeObjectFactory.ts');
+require('domain/story/StoryUpdateService.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require(
+  'pages/story-editor-page/story-editor-navbar-breadcrumb/' +
+  'story-editor-navbar-breadcrumb.directive.ts');
+require(
+  'pages/story-editor-page/story-editor-navbar/' +
+  'story-editor-navbar.directive.ts');
+require(
+  'pages/story-editor-page/main-story-editor/' +
+  'main-story-editor.directive.ts');
+
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/story-editor-page/story-editor-services/story-editor-state/' +
+  'story-editor-state.service.ts');
+require('services/contextual/UrlService.ts');
+
 angular.module('storyEditorModule').controller('StoryEditor', [
   '$scope', '$uibModal', '$window', 'StoryEditorStateService',
   'UndoRedoService',

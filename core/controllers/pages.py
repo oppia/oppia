@@ -45,11 +45,10 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            self.render_template('pages/splash-page/splash-page.mainpage.html')
+            self.render_template('dist/splash-page.mainpage.html')
         else:
             try:
-                self.render_template(
-                    'pages/splash-page/splash_%s.html' % c_value)
+                self.render_template('dist/splash_%s.html' % c_value)
             except Exception:
                 # Old c values may have been deprecated, in which case we
                 # revert to the default splash page URL. When redirecting,
@@ -75,7 +74,7 @@ class AboutPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/about-page/about-page.mainpage.html')
+        self.render_template('dist/about-page.mainpage.html')
 
 
 class GetStartedPage(base.BaseHandler):
@@ -87,8 +86,7 @@ class GetStartedPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.GET_STARTED_PAGE_DESCRIPTION,
         })
-        self.render_template(
-            'pages/get_started/get-started-page.mainpage.html')
+        self.render_template('dist/get-started-page.mainpage.html')
 
 
 class TeachPage(base.BaseHandler):
@@ -100,7 +98,7 @@ class TeachPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
         })
-        self.render_template('/pages/teach-page/teach-page.mainpage.html')
+        self.render_template('dist/teach-page.mainpage.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -112,7 +110,7 @@ class ContactPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/contact-page/contact-page.mainpage.html')
+        self.render_template('dist/contact-page.mainpage.html')
 
 
 class DonatePage(base.BaseHandler):
@@ -124,7 +122,7 @@ class DonatePage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/donate-page/donate-page.mainpage.html')
+        self.render_template('dist/donate-page.mainpage.html')
 
 
 class ThanksPage(base.BaseHandler):
@@ -136,8 +134,7 @@ class ThanksPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
         })
-        self.render_template(
-            '/pages/thanks-page/thanks-page.mainpage.html')
+        self.render_template('dist/thanks-page.mainpage.html')
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -158,7 +155,7 @@ class TermsPage(base.BaseHandler):
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
 
-        self.render_template('pages/terms/terms.html')
+        self.render_template('dist/terms.html')
 
 
 class PrivacyPage(base.BaseHandler):
@@ -167,7 +164,7 @@ class PrivacyPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/privacy-page/privacy-page.mainpage.html')
+        self.render_template('dist/privacy-page.mainpage.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -203,7 +200,7 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/tests/console_errors.html')
+        self.render_template('dist/console_errors.html')
 
 
 class MaintenancePage(base.BaseHandler):
@@ -212,5 +209,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template(
-            'pages/maintenance-page/maintenance-page.mainpage.html')
+        self.render_template('dist/maintenance-page.mainpage.html')

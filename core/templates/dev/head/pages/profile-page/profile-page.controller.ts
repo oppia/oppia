@@ -16,6 +16,18 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
+require(
+  'components/common-layout-directives/background-banner/' +
+  'background-banner.directive.ts');
+require(
+  'components/summary-tile-directives/exploration-summary-tile/' +
+  'exploration-summary-tile.directive.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/UserService.ts');
+require('services/DateTimeFormatService.ts');
+
 angular.module('profilePageModule').controller('Profile', [
   '$http', '$log', '$rootScope', '$scope', '$window', 'DateTimeFormatService',
   'UrlInterpolationService', 'UserService',

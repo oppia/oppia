@@ -17,6 +17,12 @@
  * in collection player.
  */
 
+require(
+  'components/common-layout-directives/sharing-links/' +
+  'sharing-links.directive.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('collectionFooterModule').directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

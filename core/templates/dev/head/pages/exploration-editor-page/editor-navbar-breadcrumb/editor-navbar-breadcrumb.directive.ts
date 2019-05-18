@@ -17,6 +17,15 @@
  * in editor navbar.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-title.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'router.service.ts');
+require('services/stateful/FocusManagerService.ts');
+
 angular.module('editorNavbarBreadcrumbModule').directive(
   'editorNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {

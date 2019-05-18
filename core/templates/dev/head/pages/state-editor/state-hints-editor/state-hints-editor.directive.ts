@@ -17,6 +17,26 @@
  * editor.
  */
 
+require('components/state/hint-editor/hint-editor.directive.ts');
+require('components/state/response-header/response-header.directive.ts');
+
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/state-hints.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'pages/state-editor/state-editor-properties-services/' +
+  'state-solution.service.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+require('services/GenerateContentIdService.ts');
+
 angular.module('stateHintsEditorModule').directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -16,8 +16,11 @@
  * @fileoverview Controllers for the error page.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PageTitleService.ts');
+
 angular.module('errorPageModule').controller('Error', [
-  '$scope', 'UrlInterpolationService',
+  '$scope', 'PageTitleService', 'UrlInterpolationService',
   function(
       $scope, UrlInterpolationService) {
     $scope.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(

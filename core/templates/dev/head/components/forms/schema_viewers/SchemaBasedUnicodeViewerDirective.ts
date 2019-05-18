@@ -16,6 +16,11 @@
  * @fileoverview Directive for a schema-based viewer for unicode strings.
  */
 
+require(
+  'components/forms/forms-unicode-filters/' +
+  'convert-unicode-with-params-to-html.filter.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('schemaBasedUnicodeViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

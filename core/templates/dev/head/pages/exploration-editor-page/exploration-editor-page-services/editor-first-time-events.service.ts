@@ -18,6 +18,8 @@
  * is opened for the first time for an exploration.
  */
 
+require('services/SiteAnalyticsService.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'EditorFirstTimeEventsService', [
     'SiteAnalyticsService',

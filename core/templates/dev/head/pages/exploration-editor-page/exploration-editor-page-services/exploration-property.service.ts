@@ -18,6 +18,11 @@
  * with base class as ExplorationPropertyService.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'change-list.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('explorationEditorPageModule').factory(
   'ExplorationPropertyService', [
     '$log', '$rootScope', 'AlertsService', 'ChangeListService',

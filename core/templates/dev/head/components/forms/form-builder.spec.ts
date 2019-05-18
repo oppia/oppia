@@ -16,6 +16,27 @@
  * @fileoverview Tests for the form builders.
  */
 
+require(
+  'components/forms/forms-directives/apply-validation/' +
+  'apply-validation.directive.ts');
+require(
+  'components/forms/forms-unicode-filters/' +
+  'convert-html-to-unicode.filter.ts');
+require(
+  'components/forms/forms-unicode-filters/' +
+  'convert-unicode-to-html.filter.ts');
+require(
+  'components/forms/forms-unicode-filters/' +
+  'convert-unicode-with-params-to-html.filter.ts');
+require(
+  'components/forms/forms-directives/require-is-float/' +
+  'require-is-float.directive.ts');
+require('components/forms/forms-validators/is-at-least.filter.ts');
+require('components/forms/forms-validators/is-at-most.filter.ts');
+require('components/forms/forms-validators/is-float.filter.ts');
+require('components/forms/forms-validators/is-integer.filter.ts');
+require('components/forms/forms-validators/is-nonempty.filter.ts');
+
 describe('HTML to text', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -182,6 +203,11 @@ describe('Testing requireIsFloat directive', function() {
       '<input name="floatValue" type="number" ng-model="localValue" ' +
       'require-is-float apply-validation>' +
       '</form>';
+    scope.validators = function() {
+      return [{
+        id: 'isFloat'
+      }];
+    };
     $compile(element)(scope);
     testInput = scope.testForm.floatValue;
   }));

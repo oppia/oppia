@@ -16,6 +16,11 @@
  * @fileoverview Directive for the configuration tab in the admin panel.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/admin-page/admin-page-services/admin-task-manager/' +
+  'admin-task-manager.service.ts');
+
 angular.module('adminConfigTabModule').directive('adminConfigTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', function($http, AdminTaskManagerService,

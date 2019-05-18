@@ -15,42 +15,55 @@
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
-// TODO(sll): Remove the check for window.GLOBALS. This check is currently
-// only there so that the Karma tests run, since it looks like Karma doesn't
-// 'see' the GLOBALS variable that is defined in base.html. We should fix this
-// in order to make the testing and production environments match.
-var oppia = angular.module(
-  'oppia', [
-    'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
-    'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
-    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-    'adminPageModule',
-    'learnerDashboardPageModule', 'maintenancePageModule',
-    'moderatorPageModule', 'notificationsDashboardPageModule',
-    'practiceSessionPageModule', 'preferencesPageModule', 'profilePageModule',
-    'questionEditorPageModule', 'questionsListPageModule',
-    'questionPlayerPageModule', 'topicLandingPageModule', 'aboutPageModule',
-    'creatorDashboardPageModule', 'donatePageModule', 'errorPageModule',
-    'explorationEditorPageModule',
-    'collectionPlayerPageModule', 'emailDashboardPageModule',
-    'answerGroupEditorModule', 'buttonsDirectivesModule',
-    'ckEditorHelpersModule', 'codemirrorMergeviewModule',
-    'commonLayoutDirectivesModule', 'entityCreationServicesModule',
-    'libraryPageModule', 'filtersModule', 'formsModule',
-    'profileLinkDirectivesModule', 'ratingsModule', 'suggestionModalModule',
-    'summaryListHeaderModule', 'skillEditorModule',
-    'splashPageModule', 'stateEditorModule', 'stateModule', 'storyEditorModule',
-    'summaryTileDirectivesModule', 'summaryListHeaderModule',
-    'teachPageModule', 'thanksPageModule', 'topicsAndSkillsDashboardModule',
-    'topicEditorPageModule', 'topicViewerPageModule',
-    'visualDiffVisualizationModule'
-  ].concat(
-    window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
-for (var constantName in constants) {
-  oppia.constant(constantName, constants[constantName]);
-}
+require('I18nFooter.ts');
+require('directives/FocusOnDirective.ts');
+
+require('pages/Base.ts');
+
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/NavigationService.ts');
+require('services/UtilsService.ts');
+require('services/DebouncerService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/IdGenerationService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/TranslationFileHashLoaderService.ts');
+require('services/RteHelperService.ts');
+require('services/StateRulesStatsService.ts');
+require('services/ConstructTranslationIdsService.ts');
+require('services/UserService.ts');
+require('services/PromoBarService.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/BackgroundMaskService.ts');
+require('services/stateful/FocusManagerService.ts');
+require('services/SiteAnalyticsService.ts');
+
+require(
+  'components/common-layout-directives/alert-message/' +
+  'alert-message.directive.ts');
+require(
+  'components/button-directives/create-button/' +
+  'create-activity-button.directive.ts');
+
+require(
+  'components/forms/forms-directives/object-editor/object-editor.directive.ts');
+require('components/common-layout-directives/promo-bar/promo-bar.directive.ts');
+require(
+  'components/common-layout-directives/side-navigation-bar/' +
+  'side-navigation-bar.directive.ts');
+require(
+  'components/button-directives/social-buttons/social-buttons.directive.ts');
+require(
+  'components/common-layout-directives/top-navigation-bar/' +
+  'top-navigation-bar.directive.ts');
+
+require('domain/sidebar/SidebarStatusService.ts');
+require('domain/user/UserInfoObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
@@ -129,6 +142,19 @@ oppia.constant('LOGOUT_URL', '/logout');
 // merely avoids checking for whether the promo bar is enabled for every Oppia
 // page visited.
 oppia.constant('ENABLE_PROMO_BAR', true);
+
+// TODO(vojtechjelinek): Move these to separate file later, after we establish
+// process to follow for Angular constants (#6731).
+oppia.constant(
+  'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
+  '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
+oppia.constant(
+  'TOPIC_RIGHTS_URL_TEMPLATE', '/rightshandler/get_topic_rights/<topic_id>');
+oppia.constant(
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
+  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
+oppia.constant(
+  'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
 
 oppia.config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',

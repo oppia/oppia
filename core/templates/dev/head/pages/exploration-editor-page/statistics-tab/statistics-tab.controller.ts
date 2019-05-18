@@ -17,6 +17,29 @@
  * exploration editor.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/StatesObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-data/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-states/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'router.service.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/statistics-tab-services/' +
+  'state-improvement-suggestion/state-improvement-suggestion.service.ts'
+);
+require('services/AlertsService.ts');
+require('services/ComputeGraphService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/StateRulesStatsService.ts');
+
 angular.module('statisticsTabModule').controller('StatisticsTab', [
   '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
   'DateTimeFormatService', 'ExplorationDataService',

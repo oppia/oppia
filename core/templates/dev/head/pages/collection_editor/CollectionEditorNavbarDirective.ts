@@ -16,6 +16,25 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
+require(
+  'components/forms/forms-directives/select2-dropdown/' +
+  'select2-dropdown.directive.ts');
+require(
+  'components/common-layout-directives/loading-dots/' +
+  'loading-dots.directive.ts');
+
+require('domain/collection/CollectionRightsBackendApiService.ts');
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/CollectionValidationService.ts');
+require('domain/collection/EditableCollectionBackendApiService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'router.service.ts');
+require('services/AlertsService.ts');
+
 oppia.directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

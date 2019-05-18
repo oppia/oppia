@@ -16,6 +16,19 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
+require('components/summary-list-header/summary-list-header.directive.ts');
+require(
+  'pages/skill-editor-page/skill-editor-main-tab/' +
+  'skill-misconceptions-editor/misconception-editor/' +
+  'misconception-editor.directive.ts');
+
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'skill-editor-state.service.ts');
+
 angular.module('skillMisconceptionsEditorModule').directive(
   'skillMisconceptionsEditor', [
     'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',

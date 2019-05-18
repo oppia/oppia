@@ -16,6 +16,21 @@
  * @fileoverview Controller for the main story editor.
  */
 
+require(
+  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'schema-based-editor.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require(
+  'pages/story-editor-page/main-story-editor/story-node-editor/' +
+  'story-node-editor.directive.ts');
+
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/story/StoryUpdateService.ts');
+require(
+  'pages/story-editor-page/story-editor-services/story-editor-state/' +
+  'story-editor-state.service.ts');
+require('services/AlertsService.ts');
+
 angular.module('mainStoryEditorModule').directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

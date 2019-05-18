@@ -16,6 +16,33 @@
  * @fileoverview Controller for the learner's view of a collection.
  */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require('pages/collection_player/CollectionNodeListDirective.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require(
+  'components/common-layout-directives/attribution-guide/' +
+  'attribution-guide.directive.ts');
+require(
+  'components/common-layout-directives/background-banner/' +
+  'background-banner.directive.ts');
+require(
+  'components/summary-tile-directives/exploration-summary-tile/' +
+  'exploration-summary-tile.directive.ts');
+require('pages/collection_player/CollectionFooterDirective.ts');
+require('pages/collection_player/CollectionLocalNav.ts');
+
+require('domain/collection/CollectionObjectFactory.ts');
+require('domain/collection/CollectionPlaythroughObjectFactory.ts');
+require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+
+angular.module('collectionPlayerPageModule').constant(
+  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+
 angular.module('collectionPlayerPageModule').controller('CollectionPlayer', [
   '$anchorScroll', '$http', '$location', '$scope',
   'AlertsService', 'CollectionObjectFactory',
