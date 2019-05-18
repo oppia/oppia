@@ -81,37 +81,37 @@ oppia.controller('SettingsTab', [
       $scope.explorationParamSpecsService = ExplorationParamSpecsService;
       $scope.explorationParamChangesService = ExplorationParamChangesService;
       $scope.UserEmailPreferencesService = UserEmailPreferencesService;
-
-      ExplorationDataService.getData().then(function() {
-        $scope.refreshSettingsTab();
-        $scope.hasPageLoaded = true;
-      });
+      $scope.refreshSettingsTab();
     };
 
     $scope.refreshSettingsTab = function() {
-      // Ensure that ExplorationStatesService has been initialized before
-      // getting the state names from it. (Otherwise, navigating to the
-      // settings tab directly (by entering a URL that ends with /settings)
-      // results in a console error.
-      if (ExplorationStatesService.isInitialized()) {
-        var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
-          function(categoryItem) {
-            return categoryItem.id === ExplorationCategoryService.savedMemento;
+      $scope.hasPageLoaded = false;
+      ExplorationDataService.getData().then(function() {
+        // Ensure that ExplorationStatesService has been initialized before
+        // getting the state names from it. (Otherwise, navigating to the
+        // settings tab directly (by entering a URL that ends with /settings)
+        // results in a console error.
+        if (ExplorationStatesService.isInitialized()) {
+          var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
+            function(categoryItem) {
+              return categoryItem.id === ExplorationCategoryService.savedMemento;
+            }
+          );
+
+          // If the current category is not in the dropdown, add it
+          // as the first option.
+          if (!categoryIsInSelect2 &&
+              ExplorationCategoryService.savedMemento) {
+            $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
+              id: ExplorationCategoryService.savedMemento,
+              text: ExplorationCategoryService.savedMemento
+            });
           }
-        );
 
-        // If the current category is not in the dropdown, add it
-        // as the first option.
-        if (!categoryIsInSelect2 &&
-            ExplorationCategoryService.savedMemento) {
-          $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-            id: ExplorationCategoryService.savedMemento,
-            text: ExplorationCategoryService.savedMemento
-          });
+          $scope.stateNames = ExplorationStatesService.getStateNames();
         }
-
-        $scope.stateNames = ExplorationStatesService.getStateNames();
-      }
+        $scope.hasPageLoaded = true;
+      });
     };
 
     $scope.$on('refreshSettingsTab', $scope.refreshSettingsTab);
