@@ -16,6 +16,8 @@
  * @fileoverview Tests for SkillRightsObjectFactory.
  */
 
+require('domain/skill/SkillRightsObjectFactory.ts');
+
 describe('Skill rights object factory', function() {
   var SkillRightsObjectFactory = null;
 

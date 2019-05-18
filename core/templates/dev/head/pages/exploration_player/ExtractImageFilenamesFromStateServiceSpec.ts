@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the extracting image files in state service.
  */
 
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('pages/exploration_player/ExtractImageFilenamesFromStateService.ts');
+require('services/ContextService.ts');
+
 describe('Extracting Image file names in the state service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
