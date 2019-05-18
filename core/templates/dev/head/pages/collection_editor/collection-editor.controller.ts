@@ -16,6 +16,8 @@
  * @fileoverview Primary controller for the collection editor page.
  */
 
+// TODO(bhenning): These constants should be provided by the backend.
+
 require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
 require('pages/collection_editor/CollectionEditorNavbarDirective.ts');
 require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.ts');
@@ -24,18 +26,6 @@ require(
   'pages/collection_editor/settings_tab/CollectionSettingsTabDirective.ts');
 require(
   'pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.ts');
-
-// TODO(bhenning): These constants should be provided by the backend.
-
-angular.module('collectionEditorPageModule').constant(
-  'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
-
-angular.module('collectionEditorPageModule').constant(
-  'SEARCH_EXPLORATION_URL_TEMPLATE',
-  '/exploration/metadata_search?q=<query>');
-
-angular.module('collectionEditorPageModule').constant(
-  'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 angular.module('collectionEditorPageModule').controller('CollectionEditor', [
   'CollectionEditorStateService',

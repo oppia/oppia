@@ -16,15 +16,16 @@
  * @fileoverview Primary Module for the collection editor page.
  */
 
-// TODO(bhenning): These constants should be provided by the backend.
+angular.module('collectionEditorPageModule').constant(
+  'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
 
-angular.module('collectionEditorPageModule', [
-  'collectionHistoryTabModule', 'collectionDetailsEditorModule',
-  'collectionPermissionsCardModule', 'collectionSettingsTabModule',
-  'collectionEditorNavbarBreadcrumbModule', 'collectionEditorTabModule',
-  'collectionNodeCreatorModule', 'collectionNodeEditorModule',
-  'collectionStatisticsTabModule', 'collectionEditorNavbarModule'
-]);
+angular.module('collectionEditorPageModule').constant(
+  'SEARCH_EXPLORATION_URL_TEMPLATE',
+  '/exploration/metadata_search?q=<query>');
+
+angular.module('collectionEditorPageModule').constant(
+  'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+// TODO(bhenning): These constants should be provided by the backend.
 
 angular.module('collectionEditorPageModule').constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
@@ -37,9 +38,11 @@ angular.module('collectionEditorPageModule').constant(
   'COLLECTION_RIGHTS_URL_TEMPLATE',
   '/collection_editor_handler/rights/<collection_id>');
 
-angular.module('collectionEditorPageModule').constant(
-  'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
+angular.module('collectionEditorPageModule', [
+  'collectionHistoryTabModule', 'collectionDetailsEditorModule',
+  'collectionPermissionsCardModule', 'collectionSettingsTabModule',
+  'collectionEditorNavbarBreadcrumbModule', 'collectionEditorTabModule',
+  'collectionNodeCreatorModule', 'collectionNodeEditorModule',
+  'collectionStatisticsTabModule', 'collectionEditorNavbarModule'
+]);
 
-angular.module('collectionEditorPageModule').constant(
-  'SEARCH_EXPLORATION_URL_TEMPLATE',
-  '/exploration/metadata_search?q=<query>');
