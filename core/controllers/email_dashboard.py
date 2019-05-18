@@ -168,8 +168,7 @@ class EmailDashboardResultPage(base.BaseHandler):
             'query_id': query_id,
         })
         self.render_template(
-            'dist/email-dashboard-result/' +
-            'email-dashboard-result.mainpage.html')
+            'dist/email-dashboard-result.mainpage.html')
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):
