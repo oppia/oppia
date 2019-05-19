@@ -34,7 +34,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 import feconf
-import utils
 
 import jinja2
 
@@ -78,11 +77,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
 
         story_domain.Story.require_valid_title(title)
 
@@ -178,21 +172,6 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def _require_valid_version(
-            self, version_from_payload, subtopic_page_version):
-        """Check that the payload version matches the given subtopic page
-        version.
-        """
-        if version_from_payload is None:
-            raise base.BaseHandler.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
-
-        if version_from_payload != subtopic_page_version:
-            raise base.BaseHandler.InvalidInputException(
-                'Trying to update version %s of subtopic page from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (subtopic_page_version, version_from_payload))
-
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
@@ -271,9 +250,6 @@ class EditableTopicDataHandler(base.BaseHandler):
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
 
         version = self.payload.get('version')
         self._require_valid_version(version, topic.version)
@@ -289,12 +265,10 @@ class EditableTopicDataHandler(base.BaseHandler):
             else:
                 topic_and_subtopic_page_change_list.append(
                     topic_domain.TopicChange(change))
-        try:
-            topic_services.update_topic_and_subtopic_pages(
-                self.user_id, topic_id, topic_and_subtopic_page_change_list,
-                commit_message)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id, topic_and_subtopic_page_change_list,
+            commit_message)
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         skill_ids = topic.get_all_skill_ids()
@@ -383,9 +357,6 @@ class TopicManagerRightsHandler(base.BaseHandler):
         """
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
-        if assignee_id is None:
-            raise self.InvalidInputException(
-                'Expected a valid assignee id to be provided.')
         assignee_actions_info = user_services.UserActionsInfo(assignee_id)
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         try:
@@ -412,12 +383,9 @@ class TopicPublishHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Publish status should only be true or false.')
 
-        try:
-            if publish_status:
-                topic_services.publish_topic(topic_id, self.user_id)
-            else:
-                topic_services.unpublish_topic(topic_id, self.user_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
+        if publish_status:
+            topic_services.publish_topic(topic_id, self.user_id)
+        else:
+            topic_services.unpublish_topic(topic_id, self.user_id)
 
         self.render_json(self.values)

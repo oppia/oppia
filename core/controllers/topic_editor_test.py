@@ -64,6 +64,82 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
+    def test_get_can_not_access_handler_with_new_structure_editors_disabled(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.get_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
+                expected_status_int=404)
+
+        self.logout()
+
+    def test_handler_updates_story_summary_dicts(self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            topic_id = topic_services.get_new_topic_id()
+            canonical_story_id = story_services.get_new_story_id()
+            additional_story_id = story_services.get_new_story_id()
+
+            # 'self.topic_id' does not contain any canonical_story_summary_dicts
+            # or additional_story_summary_dicts.
+            response = self.get_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id))
+
+            self.assertEqual(response['canonical_story_summary_dicts'], [])
+            self.assertEqual(response['additional_story_summary_dicts'], [])
+
+            self.save_new_story(
+                canonical_story_id, self.admin_id, 'title', 'description',
+                'note')
+            self.save_new_story(
+                additional_story_id, self.admin_id, 'another title',
+                'another description', 'another note')
+            self.save_new_topic(
+                topic_id, self.admin_id, 'New name', 'New description',
+                [canonical_story_id], [additional_story_id], [self.skill_id],
+                [], 1)
+
+            response = self.get_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
+            canonical_story_summary_dicts = response[
+                'canonical_story_summary_dicts'][0]
+            additional_story_summary_dicts = response[
+                'additional_story_summary_dicts'][0]
+
+            self.assertEqual(
+                canonical_story_summary_dicts['description'], 'description')
+            self.assertEqual(canonical_story_summary_dicts['title'], 'title')
+            self.assertEqual(
+                canonical_story_summary_dicts['id'], canonical_story_id)
+            self.assertEqual(
+                additional_story_summary_dicts['description'],
+                'another description')
+            self.assertEqual(
+                additional_story_summary_dicts['title'], 'another title')
+            self.assertEqual(
+                additional_story_summary_dicts['id'], additional_story_id)
+
+        self.logout()
+
+    def test_post_can_not_access_handler_with_new_structure_editors_disabled(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.post_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
+                {'title': 'Story title'},
+                csrf_token=csrf_token, expected_status_int=404)
+
+        self.logout()
+
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
@@ -82,6 +158,17 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
 
 class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_handler_with_new_structure_editors_disabled(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.get_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id),
+                expected_status_int=404)
+
+        self.logout()
 
     def test_get(self):
         # Create 5 questions linked to the same skill.
@@ -147,6 +234,30 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_handler_with_new_structure_editors_disabled(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1), expected_status_int=404)
+
+        self.logout()
+
+    def test_get_can_not_access_handler_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, topic_services.get_new_topic_id()),
+                expected_status_int=404)
+
+        self.logout()
 
     def test_editable_subtopic_page_get(self):
         # Check that non-admins and non-topic managers cannot access the
@@ -233,6 +344,29 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 class TopicEditorTests(BaseTopicEditorControllerTests):
 
+    def test_get_can_not_access_topic_page_with_new_structure_editors_disabled(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.get_html_response(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
+                expected_status_int=404)
+
+        self.logout()
+
+    def test_get_can_not_access_topic_page_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            self.get_html_response(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_URL_PREFIX,
+                    topic_services.get_new_topic_id()), expected_status_int=404)
+
+        self.logout()
+
     def test_access_topic_editor_page(self):
         """Test access to editor pages for the sample topic."""
 
@@ -279,6 +413,29 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             self.assertEqual(
                 'Skill Description',
                 json_response['skill_id_to_description_dict'][self.skill_id])
+            self.logout()
+
+            # Check that editable topic handler is accessed only when a topic id
+            # passed has an associated topic.
+            self.login(self.ADMIN_EMAIL)
+
+            self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                    topic_services.get_new_topic_id()), expected_status_int=404)
+
+            self.logout()
+
+        # Check that editable topic handler is not accessible when new structure
+        # editors is disabled.
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.login(self.ADMIN_EMAIL)
+
+            self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                expected_status_int=404)
+
             self.logout()
 
     def test_editable_topic_handler_put(self):
@@ -418,6 +575,55 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
                 change_cmd, csrf_token=csrf_token, expected_status_int=401)
 
+            # Check that topic can not be edited when version is None.
+            self.login(self.ADMIN_EMAIL)
+
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                {'version': None}, csrf_token=csrf_token,
+                expected_status_int=400)
+            self.assertEqual(
+                json_response['error'],
+                'Invalid POST request: a version must be specified.')
+
+            self.logout()
+
+            # Check topic can not be edited when payload version differs from
+            # topic version.
+            self.login(self.ADMIN_EMAIL)
+
+            topic_id_1 = topic_services.get_new_topic_id()
+            self.save_new_topic(
+                topic_id_1, self.admin_id, 'Name 1', 'Description 1', [], [],
+                [self.skill_id], [], 1)
+
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, topic_id_1),
+                {'version': '3'}, csrf_token=csrf_token,
+                expected_status_int=400)
+
+            self.assertEqual(
+                json_response['error'],
+                'Trying to update version 1 of topic from version 3, '
+                'which is too old. Please reload the page and try again.')
+
+            self.logout()
+
+        # Check topic can not be edited when new structure editors is disabled.
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+
+            self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                {}, csrf_token=csrf_token,
+                expected_status_int=404)
+
+        self.logout()
+
     def test_editable_topic_handler_put_for_assigned_topic_manager(self):
         change_cmd = {
             'version': 2,
@@ -516,6 +722,29 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 expected_status_int=401)
             self.logout()
 
+            # Check that topic can not be deleted when the topic id passed does
+            # not have a topic associated with it.
+            self.login(self.ADMIN_EMAIL)
+
+            self.delete_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                    topic_services.get_new_topic_id()), expected_status_int=404)
+
+            self.logout()
+
+        # Check that topic can not be deleted when new structure editors is
+        # disabled.
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+            self.delete_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                expected_status_int=404)
+
+        self.logout()
+
 
 class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
 
@@ -598,8 +827,41 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
                 expected_status_int=401)
             self.logout()
 
+    def test_can_not_get_topic_rights_when_topic_id_has_no_associated_topic(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_RIGHTS_URL_PREFIX,
+                    topic_services.get_new_topic_id()), expected_status_int=400)
+            self.assertEqual(
+                json_response['error'],
+                'Expected a valid topic id to be provided.')
+
+        self.logout()
+
 
 class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_handler_with_invalid_publish_status(self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            response = self.get_html_response(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+            response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+                {'publish_status': 'invalid_status'}, csrf_token=csrf_token,
+                expected_status_int=400)
+            self.assertEqual(
+                response['error'],
+                'Publish status should only be true or false.')
+
+        self.logout()
 
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""
