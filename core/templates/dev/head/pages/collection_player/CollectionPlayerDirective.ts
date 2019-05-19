@@ -301,7 +301,7 @@ oppia.directive('collectionPlayer', ['UrlInterpolationService',
             }
           );
 
-          $scope.$watch('collection', function(newValue) {
+          $scope.$watch('$ctrl.collection', function(newValue) {
             if (newValue !== null) {
               ctrl.generatePathParameters();
             }
