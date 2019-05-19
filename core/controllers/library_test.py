@@ -222,7 +222,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         }, response_dict)
 
     def test_library_index_handler_for_top_rated(self):
-        """Test the handler for top rated scenario."""
+        """Test the handler for top rated explorations."""
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
             'activity_summary_dicts_by_category': [],
@@ -238,6 +238,8 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'preferred_language_codes': ['en'],
         }, response_dict)
+        activity_summary_dicts_by_category = (
+            response_dict['activity_summary_dicts_by_category'][0])
         self.assertDictContainsSubset({
             'categories': [],
             'header_i18n_id': (
@@ -245,11 +247,11 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'has_full_results_page': True,
             'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
             'protractor_id': 'top-rated',
-        }, response_dict['activity_summary_dicts_by_category'][0])
-        activity_summary = response_dict['activity_summary_dicts_by_category'][
-            0]['activity_summary_dicts']
+        }, activity_summary_dicts_by_category)
+        activity_summary_dicts = (
+            activity_summary_dicts_by_category['activity_summary_dicts'])
         self.assertEqual(
-            len(activity_summary), 1)
+            len(activity_summary_dicts), 1)
         self.assertDictContainsSubset({
             'id': '0',
             'category': 'Welcome',
@@ -257,10 +259,10 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, activity_summary[0])
+        }, activity_summary_dicts[0])
 
     def test_library_index_handler_for_featured(self):
-        """Test the handler for featured scenario."""
+        """Test the handler for featured explorations."""
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
             'activity_summary_dicts_by_category': [],
@@ -279,17 +281,19 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'preferred_language_codes': ['en'],
         }, response_dict)
+        activity_summary_dicts_by_category = (
+            response_dict['activity_summary_dicts_by_category'][0])
         self.assertDictContainsSubset({
             'categories': [],
             'header_i18n_id': (
                 feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES),
             'has_full_results_page': False,
             'full_results_url': None,
-        }, response_dict['activity_summary_dicts_by_category'][0])
-        activity_summary = response_dict['activity_summary_dicts_by_category'][
-            0]['activity_summary_dicts']
+        }, activity_summary_dicts_by_category)
+        activity_summary_dicts = (
+            activity_summary_dicts_by_category['activity_summary_dicts'])
         self.assertEqual(
-            len(activity_summary), 1)
+            len(activity_summary_dicts), 1)
         self.assertDictContainsSubset({
             'id': '0',
             'category': 'Welcome',
@@ -297,7 +301,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
-        }, activity_summary[0])
+        }, activity_summary_dicts[0])
 
 
 class LibraryGroupPageTests(test_utils.GenericTestBase):
