@@ -60,6 +60,24 @@ class ParameterDomainUnitTests(test_utils.GenericTestBase):
             ):
             param_domain.ParamChange('abc', 'Copier', ['a', 'b']).validate()
 
+        # Raise an error because the param_change name is not a string.
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected param_change name to be a string, '
+            'received'):
+            param_domain.ParamChange(3, 'Copier', {}).validate()
+
+        # Raise an error because the arg names in customization_args are not
+        # strings.
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid parameter change customization_arg name:'):
+            param_domain.ParamChange('abc', 'Copier', {1: '1'}).validate()
+
+        # Raise an error because generator id is invalid.
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected generator id to be a string, '
+            'received'):
+            param_domain.ParamChange('abc', {'Copier': 'value'}, {}).validate()
+
     def test_param_change_class(self):
         """Test the ParamChange class."""
         param_change = param_domain.ParamChange(

@@ -125,20 +125,6 @@ def index_collection_summaries(collection_summaries):
     ], SEARCH_INDEX_COLLECTIONS)
 
 
-def update_exploration_status_in_search(exp_id):
-    """Updates the exploration status in its search doc.
-
-    Args:
-        exp_id: str. The id of the exploration whose status is to be
-            updated.
-    """
-    rights = rights_manager.get_exploration_rights(exp_id)
-    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-        delete_explorations_from_search_index([exp_id])
-    else:
-        patch_exploration_search_document(rights.id, {})
-
-
 def _collection_summary_to_search_dict(collection_summary):
     """Converts a collection domain object to a search dict.
 
@@ -214,21 +200,6 @@ def delete_explorations_from_search_index(exploration_ids):
         exploration_ids, SEARCH_INDEX_EXPLORATIONS)
 
 
-def patch_exploration_search_document(exp_id, update):
-    """Patches an exploration's current search document, with the values
-    from the 'update' dictionary.
-
-    Args:
-        exp_id: str. The id of the exploration to be patched.
-        update: dict. Key-value pairs to patch the exploration's search
-            document with.
-    """
-    doc = search_services.get_document_from_index(
-        exp_id, SEARCH_INDEX_EXPLORATIONS)
-    doc.update(update)
-    search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
-
-
 def clear_exploration_search_index():
     """WARNING: This runs in-request, and may therefore fail if there are too
     many entries in the index.
@@ -275,20 +246,6 @@ def delete_collections_from_search_index(collection_ids):
         collection_ids, SEARCH_INDEX_COLLECTIONS)
 
 
-def patch_collection_search_document(collection_id, update):
-    """Patches an collection's current search document, with the values
-    from the 'update' dictionary.
-
-    Args:
-        collection_id: str. ID of the collection to be patched.
-        update: dict. Key-value pairs to patch the current search document with.
-    """
-    doc = search_services.get_document_from_index(
-        collection_id, SEARCH_INDEX_COLLECTIONS)
-    doc.update(update)
-    search_services.add_documents_to_index([doc], SEARCH_INDEX_COLLECTIONS)
-
-
 def clear_collection_search_index():
     """Clears the search index.
 
@@ -296,16 +253,3 @@ def clear_collection_search_index():
     many entries in the index.
     """
     search_services.clear_index(SEARCH_INDEX_COLLECTIONS)
-
-
-def update_collection_status_in_search(collection_id):
-    """Updates the status field of a collection in the search index.
-
-    Args:
-        collection_id: str. ID of the collection.
-    """
-    rights = rights_manager.get_collection_rights(collection_id)
-    if rights.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
-        delete_collections_from_search_index([collection_id])
-    else:
-        patch_collection_search_document(rights.id, {})
