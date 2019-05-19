@@ -75,6 +75,7 @@ require('pages/topic_editor/questions/QuestionsTabDirective.ts');
 require('pages/topic_editor/subtopics_editor/SubtopicsListTabDirective.ts');
 
 require('pages/topic_editor/TopicEditorStateService.ts');
+require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
@@ -83,8 +84,17 @@ oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 
 oppia.controller('TopicEditor', [
-  '$scope', 'TopicEditorStateService', 'UrlService',
-  function($scope, TopicEditorStateService, UrlService) {
+  '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',
+  'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+  function($scope, PageTitleService, TopicEditorStateService, UrlService,
+      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
     TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+
+    var setPageTitle = function() {
+      PageTitleService.setPageTitle(
+        TopicEditorStateService.getTopic().getName() + ' - Oppia');
+    };
+    $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+    $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
   }
 ]);

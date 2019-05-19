@@ -76,18 +76,21 @@ require('pages/story_editor/main_editor/StoryEditorDirective.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/story_editor/StoryEditorStateService.ts');
+require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 oppia.constant('NODE_ID_PREFIX', 'node_');
 
 oppia.controller('StoryEditor', [
-  '$scope', '$uibModal', '$window', 'StoryEditorStateService',
-  'UndoRedoService',
+  '$scope', '$uibModal', '$window', 'PageTitleService',
+  'StoryEditorStateService', 'UndoRedoService',
   'UrlInterpolationService', 'UrlService',
+  'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
   function(
-      $scope, $uibModal, $window, StoryEditorStateService,
-      UndoRedoService,
-      UrlInterpolationService, UrlService) {
+      $scope, $uibModal, $window, PageTitleService,
+      StoryEditorStateService, UndoRedoService,
+      UrlInterpolationService, UrlService,
+      EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
     var topicId = UrlService.getTopicIdFromUrl();
     StoryEditorStateService.loadStory(
@@ -117,5 +120,12 @@ oppia.controller('StoryEditor', [
           ), '_self');
       }
     };
+
+    var setPageTitle = function() {
+      PageTitleService.setPageTitle(
+        StoryEditorStateService.getStory().getTitle() + ' - Oppia');
+    };
+    $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
+    $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
   }
 ]);
