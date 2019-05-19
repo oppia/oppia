@@ -16,6 +16,27 @@
  * @fileoverview Directive for the translation tab.
  */
 
+require('components/attribution_guide/AttributionGuideDirective.ts');
+require(
+  'pages/exploration_editor/translation_tab/StateTranslationDirective.ts');
+require(
+  'pages/exploration_editor/translation_tab/' +
+  'StateTranslationStatusGraphDirective.ts'
+);
+require(
+  'pages/exploration_editor/translation_tab/TranslatorOverviewDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+
 oppia.directive('translationTab', [
   'ContextService', 'ExplorationDataService', 'ExplorationStatesService',
   'StateEditorService', 'StateRecordedVoiceoversService',

@@ -16,6 +16,10 @@
  * @fileoverview Tests for Story update service.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/story/StoryObjectFactory.ts');
+require('domain/story/StoryUpdateService.ts');
+
 describe('Story update service', function() {
   var StoryUpdateService = null;
   var StoryObjectFactory = null;

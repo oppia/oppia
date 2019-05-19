@@ -16,6 +16,8 @@
  * @fileoverview Tests for FeedbackMessageSummaryObjectFactory.
  */
 
+require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
+
 describe('Feedback message object factory', function() {
   var FeedbackMessageSummaryObjectFactory = null;
 

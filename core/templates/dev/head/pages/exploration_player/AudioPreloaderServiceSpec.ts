@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for the audio preloader service.
  */
 
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/AudioPreloaderService.ts');
+require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require('services/ContextService.ts');
+
 describe('Audio preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
