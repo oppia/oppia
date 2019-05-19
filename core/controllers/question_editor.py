@@ -50,7 +50,7 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException
 
         question_dict['question_state_data_schema_version'] = (
-            feconf.CURRENT_STATES_SCHEMA_VERSION)
+            feconf.CURRENT_STATE_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
         try:
             question = question_domain.Question.from_dict(question_dict)
@@ -134,13 +134,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
         """Updates properties of the given question."""
         if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
             raise self.PageNotFoundException
-
-        question = question_services.get_question_by_id(
-            question_id, strict=False)
-
-        if question is None:
-            raise self.PageNotFoundException(
-                'The question with the given id doesn\'t exist.')
 
         commit_message = self.payload.get('commit_message')
 

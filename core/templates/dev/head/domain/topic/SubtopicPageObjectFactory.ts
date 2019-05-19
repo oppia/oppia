@@ -17,6 +17,8 @@
  * subtopic page domain objects.
  */
 
+require('domain/topic/SubtopicPageContentsObjectFactory.ts');
+
 oppia.factory('SubtopicPageObjectFactory', [
   'SubtopicPageContentsObjectFactory',
   function(SubtopicPageContentsObjectFactory) {

@@ -67,7 +67,7 @@ class NotificationsDashboardPage(base.BaseHandler):
             'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
         })
         self.render_template(
-            'pages/notifications_dashboard/notifications_dashboard.html')
+            'dist/notifications_dashboard.html')
 
 
 class NotificationsDashboardHandler(base.BaseHandler):
@@ -145,7 +145,7 @@ class CreatorDashboardPage(base.BaseHandler):
                 interaction_templates),
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
-        self.render_template('pages/creator_dashboard/creator_dashboard.html')
+        self.render_template('dist/creator_dashboard.html')
 
 
 class CreatorDashboardHandler(base.BaseHandler):
@@ -417,7 +417,7 @@ class UploadExplorationHandler(base.BaseHandler):
         if constants.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
                 self.user_id, yaml_content, new_exploration_id, [],
-                strip_audio_translations=True)
+                strip_voiceovers=True)
             self.render_json({
                 EXPLORATION_ID_KEY: new_exploration_id
             })

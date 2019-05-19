@@ -17,6 +17,9 @@
  * exploration.
  */
 
+require('services/ContextService.ts');
+require('services/contextual/UrlService.ts');
+
 oppia.factory('ExplorationRecommendationsService', [
   '$http', 'ContextService', 'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT',
   'PAGE_CONTEXT',

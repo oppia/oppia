@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Practice Session: {{ topic_name }} - Oppia
@@ -19,9 +19,12 @@
     <div class="oppia-practice-session">
       Practice Session
     </div>
+    <question-player ng-if="questionPlayerConfig.skillList &&
+                            questionPlayerConfig.skillList.length > 0"
+                     player-config="questionPlayerConfig">
+    </question-player>
   </div>
   <style>
-
     .oppia-practice_session-container .oppia-practice-session {
       color: #01645c;
       font-family: 'Capriola', 'Roboto', Arial, sans-serif;
@@ -31,7 +34,7 @@
       padding-top: 66.5px;
       text-align: center;
     }
-    .oppia-practice_session-containerr {
+    .oppia-practice_session-container {
       color: black;
       font-family: 'Roboto', Arial, sans-serif;
       margin: 0 auto;
@@ -48,8 +51,13 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
-
-  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
-  <script src="/templates/dev/head/pages/practice_session/PracticeSession.js"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}
