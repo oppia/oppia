@@ -21,7 +21,7 @@
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/collection_editor/CollectionEditorStateService.ts');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require('pages/collection_editor/editor-tab/CollectionLinearizerService.ts');
 require('services/AlertsService.ts');
 
 angular.module('collectionNodeEditorModule').directive('collectionNodeEditor', [
@@ -33,7 +33,7 @@ angular.module('collectionNodeEditorModule').directive('collectionNodeEditor', [
         getLinearIndex: '&linearIndex'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/editor_tab/collection-node-editor/' +
+        '/pages/collection_editor/editor-tab/collection-node-editor/' +
         'collection-node-editor.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',

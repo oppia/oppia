@@ -16,14 +16,14 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
-require('pages/collection_editor/editor_tab/collection-node-creator/' +
+require('pages/collection_editor/editor-tab/collection-node-creator/' +
   'collection-node-creator.directive.ts');
-require('pages/collection_editor/editor_tab/collection-node-editor/' +
+require('pages/collection_editor/editor-tab/collection-node-editor/' +
   'collection-node-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/collection_editor/CollectionEditorStateService.ts');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require('pages/collection_editor/editor-tab/CollectionLinearizerService.ts');
 
 angular.module('collectionEditorTabModule').directive('collectionEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -31,7 +31,7 @@ angular.module('collectionEditorTabModule').directive('collectionEditorTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/editor_tab/' +
+        '/pages/collection_editor/editor-tab/' +
         'collection-editor-tab.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',

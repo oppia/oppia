@@ -23,7 +23,7 @@ require('domain/summary/ExplorationSummaryBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/NormalizeWhitespaceFilter.ts');
 require('pages/collection_editor/CollectionEditorStateService.ts');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require('pages/collection_editor/editor-tab/CollectionLinearizerService.ts');
 require('services/AlertsService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/ValidatorsService.ts');
@@ -33,7 +33,7 @@ angular.module('collectionNodeCreatorModule').directive('collectionNodeCreator',
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/editor_tab/collection-node-creator/' +
+        '/pages/collection_editor/editor-tab/collection-node-creator/' +
         'collection-node-creator.directive.html'),
       controller: [
         '$scope', '$http', '$window', '$filter', 'AlertsService',

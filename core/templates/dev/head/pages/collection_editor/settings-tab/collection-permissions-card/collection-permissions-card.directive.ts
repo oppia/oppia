@@ -13,18 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the statistics tab of the collection editor.
+ * @fileoverview Directive for displaying the collection's owner name and
+ * permissions.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
 
-angular.module('collectionStatisticsTabModule').directive('collectionStatisticsTab', [
+angular.module('collectionPermissionsCardModule').directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/statistics_tab/' +
-        'collection-statistics-tab.directive.html'),
-      controller: [function() {}]
+        '/pages/collection_editor/settings-tab/collection-permissions-card/' +
+        'collection-permissions-card.directive.html'),
+      controller: [
+        '$scope', 'CollectionEditorStateService',
+        function($scope, CollectionEditorStateService) {
+          $scope.collectionRights =
+            CollectionEditorStateService.getCollectionRights();
+          $scope.hasPageLoaded =
+            CollectionEditorStateService.hasLoadedCollection;
+        }
+      ]
     };
   }]);

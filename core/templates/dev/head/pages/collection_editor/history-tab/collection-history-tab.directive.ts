@@ -13,28 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying the collection's owner name and
- * permissions.
+ * @fileoverview Controller for the history tab of the collection editor.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
 
-angular.module('collectionPermissionsCardModule').directive('collectionPermissionsCard', [
+angular.module('collectionHistoryTabModule').directive('collectionHistoryTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings_tab/collection-permissions-card/' +
-        'collection-permissions-card.directive.html'),
-      controller: [
-        '$scope', 'CollectionEditorStateService',
-        function($scope, CollectionEditorStateService) {
-          $scope.collectionRights =
-            CollectionEditorStateService.getCollectionRights();
-          $scope.hasPageLoaded =
-            CollectionEditorStateService.hasLoadedCollection;
-        }
-      ]
+        '/pages/collection_editor/history-tab/' +
+        'collection-history-tab.directive.html'),
+      controller: [function() {}]
     };
   }]);

@@ -32,7 +32,7 @@ angular.module('collectionDetailsEditorModule').directive('collectionDetailsEdit
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings_tab/collection-details-editor/' +
+        '/pages/collection_editor/settings-tab/collection-details-editor/' +
         'collection-details-editor.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',

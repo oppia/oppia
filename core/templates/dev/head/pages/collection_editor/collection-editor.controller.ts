@@ -22,13 +22,13 @@ require('pages/collection_editor/collection-editor-navbar-breadcrumb/' +
   'collection-editor-navbar-breadcrumb.directive.ts');
 require('pages/collection_editor/collection-editor-navbar/' +
   'collection-editor-navbar.directive.ts');
-require('pages/collection_editor/editor_tab/' +
+require('pages/collection_editor/editor-tab/' +
   'collection-editor-tab.directive.ts');
-require('pages/collection_editor/history_tab/' +
+require('pages/collection_editor/history-tab/' +
   'collection-history-tab.directive.ts');
 require(
-  'pages/collection_editor/settings_tab/collection-settings-tabDirective.ts');
-require('pages/collection_editor/statistics_tab/' +
+  'pages/collection_editor/settings-tab/collection-settings-tabDirective.ts');
+require('pages/collection_editor/statistics-tab/' +
   'collection-statistics-tab.directive.ts');
 
 angular.module('collectionEditorPageModule').controller('CollectionEditor', [
