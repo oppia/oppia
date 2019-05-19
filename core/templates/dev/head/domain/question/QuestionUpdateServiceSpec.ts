@@ -16,6 +16,14 @@
  * @fileoverview Unit tests for question update service.
  */
 
+require('App.ts');
+require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/question/QuestionUpdateService.ts');
+require('domain/state/StateObjectFactory.ts');
+require('pages/question_editor/QuestionEditorDirective.ts');
+
 describe('Question update service', function() {
   var QuestionUpdateService = null;
   var QuestionObjectFactory = null;
@@ -69,9 +77,11 @@ describe('Question update service', function() {
         hints: [],
         id: 'TextInput',
       },
-      content_ids_to_audio_translations: {
-        content: {},
-        default_outcome: {}
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
       },
       written_translations: {
         translations_mapping: {
@@ -112,9 +122,11 @@ describe('Question update service', function() {
         hints: [],
         id: 'TextInput',
       },
-      content_ids_to_audio_translations: {
-        content: {},
-        default_outcome: {}
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          content: {},
+          default_outcome: {}
+        }
       },
       written_translations: {
         translations_mapping: {

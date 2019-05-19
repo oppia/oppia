@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for EditableTopicBackendApiService.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/topic/EditableTopicBackendApiService.ts');
+
 describe('Editable topic backend API service', function() {
   var EditableTopicBackendApiService = null;
   var sampleDataResults = null;
