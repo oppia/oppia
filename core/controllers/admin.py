@@ -111,14 +111,7 @@ class AdminPage(base.BaseHandler):
             'role_graph_data': role_services.get_role_graph_data()
         })
 
-<<<<<<< HEAD
-        self.render_template('pages/admin-page/admin.mainpage.html')
-||||||| merged common ancestors
-        self.render_template('pages/admin/admin.html')
-=======
-        self.render_template('dist/admin.html')
->>>>>>> develop
-
+        self.render_template('dist/admin-page/admin.mainpage.html')
 
 class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""

@@ -15,42 +15,6 @@
 /**
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
-<<<<<<< HEAD
-// TODO(sll): Remove the check for window.GLOBALS. This check is currently
-// only there so that the Karma tests run, since it looks like Karma doesn't
-// 'see' the GLOBALS variable that is defined in base.html. We should fix this
-// in order to make the testing and production environments match.
-var oppia = angular.module(
-  'oppia', [
-    'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
-    'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
-    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-    'adminModule'
-  ].concat(
-    window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
-
-for (var constantName in constants) {
-  oppia.constant(constantName, constants[constantName]);
-}
-||||||| merged common ancestors
-// TODO(sll): Remove the check for window.GLOBALS. This check is currently
-// only there so that the Karma tests run, since it looks like Karma doesn't
-// 'see' the GLOBALS variable that is defined in base.html. We should fix this
-// in order to make the testing and production environments match.
-var oppia = angular.module(
-  'oppia', [
-    'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
-    'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
-    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
-  ].concat(
-    window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
-
-for (var constantName in constants) {
-  oppia.constant(constantName, constants[constantName]);
-}
-=======
 
 require('I18nFooter.ts');
 require('directives/FocusOnDirective.ts');
@@ -90,7 +54,6 @@ require('components/top_navigation_bar/TopNavigationBarDirective.ts');
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
->>>>>>> develop
 
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
