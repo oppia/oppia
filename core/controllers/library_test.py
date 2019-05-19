@@ -205,7 +205,10 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_library_index_handler_for_user_preferred_language(self):
-        """Test the access to user's preferences."""
+        """Test whether the handler returns the correct language preference."""
+        # Since the default language is 'en', the language preference for the
+        # viewer is changed to 'de' to test if the preference returned is user's
+        # preference.
         self.login(self.VIEWER_EMAIL)
         response = self.get_html_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -318,7 +321,10 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
         self.get_html_response(feconf.LIBRARY_RECENTLY_PUBLISHED_URL)
 
     def test_library_group_page_for_user_preferred_language(self):
-        """Test the access to user's preferences."""
+        """Test whether the handler returns the correct language preference."""
+        # Since the default language is 'en', the language preference for the
+        # viewer is changed to 'de' to test if the preference returned is user's
+        # preference.
         self.login(self.VIEWER_EMAIL)
         response = self.get_html_response('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
