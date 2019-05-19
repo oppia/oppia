@@ -1382,7 +1382,7 @@ class LintChecksManager(object):
             print ''
             return summary_messages
 
-    def check_for_mandatory_pattern_in_file(
+    def _check_for_mandatory_pattern_in_file(
             self, pattern_list, filepath, failed):
         """Checks for a given mandatory pattern in a file.
 
@@ -1442,7 +1442,7 @@ class LintChecksManager(object):
                 MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
             for filepath in self.all_filepaths:
                 for pattern_list in sets_of_patterns_to_match:
-                    failed = self.check_for_mandatory_pattern_in_file(
+                    failed = self._check_for_mandatory_pattern_in_file(
                         pattern_list, filepath, failed)
 
             if failed:
