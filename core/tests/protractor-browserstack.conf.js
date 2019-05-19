@@ -135,7 +135,7 @@ exports.config = {
     device: process.env.DEVICE,
     os_version: process.env.OS_VERSION,
     real_mobile: 'true',
-    browserName: '',
+    browserName: ''
   },
 
   // Code to start browserstack local before start of test

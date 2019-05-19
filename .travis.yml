@@ -7,7 +7,7 @@ python:
 
 addons:
   browserstack:
-    forcelocal: true
+    # forcelocal: true
     username: $USERNAME
     access_key: $ACCESS_KEY
 
