@@ -45,7 +45,7 @@
         <a href="" ng-click="$ctrl.deselectAll('categories')"><i>Deselect All</i></a>
       </li>
       <hr ng-if="$ctrl.selectionDetails.categories.numSelections > 0" style="margin: 2px;">
-      <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
+      <li ng-repeat="item in $ctrl.selectionDetails.categories.masterList track by $index"
           ng-if="!$ctrl.selectionDetails.categories.selections[item.id]">
         <a href="" ng-click="$ctrl.toggleSelection('categories', item.id)" ng-if="!$first && !$last">
           <span translate="<[item.text]>" class="protractor-test-deselected"></span>
