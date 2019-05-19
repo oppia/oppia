@@ -15,7 +15,6 @@
 /**
  * @fileoverview Service for handling microphone data and mp3 audio processing.
  */
-
 oppia.factory('TranslationRecordingService', ['$q', '$window',
   function($q, $window) {
     var AudioContext = null,
@@ -35,8 +34,10 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
         return;
       }
       if (mp3Worker === null) {
-        var url = '/templates/dev/head/pages/exploration_editor/' +
-          'translation_tab/mp3Converter.js';
+        var url = '/third_party/static/lamejs-1.2.0/' +
+          'worker-example/worker-realtime.js';
+        // config the mp3 encoding worker
+        const config = {sampleRate: 44100, bitRate: 128};
         mp3Worker = new Worker(url);
         mp3Worker.onmessage = function(e) {
           switch (e.data.cmd) {
@@ -49,7 +50,7 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
               // console.warn(e);
           }
         };
-        mp3Worker.postMessage({cmd: 'init'});
+        mp3Worker.postMessage({cmd: 'init', config: config});
       }
     };
 
