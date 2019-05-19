@@ -16,8 +16,10 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
-require('pages/collection_editor/editor_tab/CollectionNodeCreatorDirective.ts');
-require('pages/collection_editor/editor_tab/CollectionNodeEditorDirective.ts');
+require('pages/collection_editor/editor_tab/collection-node-creator/' +
+  'collection-node-creator.directive.ts');
+require('pages/collection_editor/editor_tab/collection-node-editor/' +
+  'collection-node-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/collection_editor/CollectionEditorStateService.ts');
