@@ -16,6 +16,10 @@
  * @fileoverview ParameterizeRuleDescription filter for Oppia.
  */
 
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('filters/FormatRtePreviewFilter.ts');
+
 // Filter that changes {{...}} tags into the corresponding parameter input
 // values. Note that this returns an HTML string to accommodate the case of
 // multiple-choice input and image-click input.

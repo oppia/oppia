@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Versions Tree Service.
  */
 
+require('pages/exploration_editor/history_tab/VersionTreeService.ts');
+
 describe('Versions tree service', function() {
   beforeEach(angular.mock.module('oppia'));
 
