@@ -16,6 +16,7 @@
 
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
@@ -115,6 +116,52 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
                 feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID))
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
+        self.logout()
+
+    def test_editable_collection_handler_put_with_invalid_payload_version(self):
+        whitelisted_usernames = [self.EDITOR_USERNAME, self.VIEWER_USERNAME]
+        self.set_collection_editors(whitelisted_usernames)
+
+        rights_manager.create_new_collection_rights(
+            self.COLLECTION_ID, self.owner_id)
+        rights_manager.assign_role_for_collection(
+            self.admin, self.COLLECTION_ID, self.editor_id,
+            rights_manager.ROLE_EDITOR)
+        rights_manager.publish_collection(self.owner, self.COLLECTION_ID)
+
+        self.login(self.EDITOR_EMAIL)
+
+        # Call get handler to return the csrf token.
+        response = self.get_html_response(
+            '%s/%s' % (
+                feconf.COLLECTION_URL_PREFIX,
+                self.COLLECTION_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Raises error as version is None.
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
+                self.COLLECTION_ID),
+            {'version': None}, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Invalid POST request: a version must be specified.')
+
+        # Raises error as version from payload does not match the collection
+        # version.
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
+                self.COLLECTION_ID),
+            {'version': 2}, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Trying to update version 1 of collection from version 2, '
+            'which is too old. Please reload the page and try again.')
+
         self.logout()
 
     def test_editable_collection_handler_put_cannot_access(self):
@@ -238,6 +285,96 @@ class CollectionEditorTests(BaseCollectionEditorControllerTests):
         self.assertFalse(json_response['can_unpublish'])
         self.assertEqual(self.COLLECTION_ID, json_response['collection_id'])
         self.assertFalse(json_response['is_private'])
+        self.logout()
+
+    def test_can_not_publish_collection_with_invalid_payload_version(self):
+        self.set_collection_editors([self.OWNER_USERNAME])
+
+        # Login as owner and try to publish a collection with a public
+        # exploration.
+        self.login(self.OWNER_EMAIL)
+        collection_id = collection_services.get_new_collection_id()
+        exploration_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(exploration_id, self.owner_id)
+        self.save_new_valid_collection(
+            collection_id, self.owner_id, exploration_id=exploration_id)
+        rights_manager.publish_exploration(self.owner, exploration_id)
+        response = self.get_html_response(
+            '%s/%s' % (
+                feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Raises error as version is None.
+        response_dict = self.put_json(
+            '/collection_editor_handler/publish/%s' % collection_id,
+            {'version': None}, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Invalid POST request: a version must be specified.')
+
+        # Raises error as version from payload does not match the collection
+        # version.
+        response_dict = self.put_json(
+            '/collection_editor_handler/publish/%s' % collection_id,
+            {'version': 2}, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Trying to update version 1 of collection from version 2, '
+            'which is too old. Please reload the page and try again.')
+
+        self.logout()
+
+    def test_can_not_unpublish_collection_with_invalid_payload_version(self):
+        self.set_collection_editors([self.OWNER_USERNAME])
+
+        # Login as owner and publish a collection with a public exploration.
+        self.login(self.OWNER_EMAIL)
+        collection_id = collection_services.get_new_collection_id()
+        exploration_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(exploration_id, self.owner_id)
+        self.save_new_valid_collection(
+            collection_id, self.owner_id, exploration_id=exploration_id)
+        rights_manager.publish_exploration(self.owner, exploration_id)
+        collection = collection_services.get_collection_by_id(collection_id)
+        response = self.get_html_response(
+            '%s/%s' % (
+                feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+        response_dict = self.put_json(
+            '/collection_editor_handler/publish/%s' % collection_id,
+            {'version': collection.version},
+            csrf_token=csrf_token)
+        self.assertFalse(response_dict['is_private'])
+        self.logout()
+
+        # Login as admin and try to unpublish the collection.
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Raises error as version is None.
+        response_dict = self.put_json(
+            '/collection_editor_handler/unpublish/%s' % collection_id,
+            {'version': None}, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Invalid POST request: a version must be specified.')
+
+        # Raises error as version from payload does not match the collection
+        # version.
+        response_dict = self.put_json(
+            '/collection_editor_handler/unpublish/%s' % collection_id,
+            {'version': 2}, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'Trying to update version 1 of collection from version 2, '
+            'which is too old. Please reload the page and try again.')
+
         self.logout()
 
     def test_publish_unpublish_collection(self):
