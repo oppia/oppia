@@ -25,6 +25,8 @@ require(
 require(
   'pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.ts');
 
+require('pages/collection_editor/CollectionEditorStateService.ts');
+
 // TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
