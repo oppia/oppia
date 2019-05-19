@@ -14,6 +14,9 @@
 /**
  * @fileoverview Unit tests for QuestionPlayerBackendApiService.
  */
+
+require('domain/question/QuestionPlayerBackendApiService.ts');
+
 describe('Question Player backend Api service', function() {
   var QuestionPlayerBackendApiService = null;
   var sampleDataResults = null;
@@ -38,7 +41,9 @@ describe('Question Player backend Api service', function() {
           content: {
             html: 'Question 1'
           },
-          content_ids_to_audio_translations: {},
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Expression Parser Service.
  */
 
+require('expressions/ExpressionParserService.js');
+
 describe('Expression parser service', function() {
   beforeEach(angular.mock.module('oppia'));
 

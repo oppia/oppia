@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for SkillEditorStateService.js
  */
 
+require('domain/skill/SkillObjectFactory.ts');
+require('domain/skill/SkillRightsObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
+
 describe('Skill editor state service', function() {
   var SkillEditorStateService, $q, $rootScope,
     SkillObjectFactory, SkillUpdateService,

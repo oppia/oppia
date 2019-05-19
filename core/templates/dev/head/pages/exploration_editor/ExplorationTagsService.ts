@@ -16,6 +16,8 @@
  * @fileoverview A data service that stores tags for the exploration.
  */
 
+require('pages/exploration_editor/ExplorationPropertyService.ts');
+
 oppia.factory('ExplorationTagsService', [
   'ExplorationPropertyService',
   function(ExplorationPropertyService) {

@@ -16,6 +16,10 @@
  * @fileoverview Service to handle the updating of a skill.
  */
 
+require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/skill/SkillObjectFactory.ts');
+
 oppia.constant('SKILL_PROPERTY_DESCRIPTION', 'description');
 oppia.constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
 oppia.constant('SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');

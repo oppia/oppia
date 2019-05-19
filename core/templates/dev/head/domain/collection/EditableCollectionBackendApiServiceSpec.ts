@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for EditableCollectionBackendApiService.
  */
 
+require('domain/collection/EditableCollectionBackendApiService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+
 describe('Editable collection backend API service', function() {
   var EditableCollectionBackendApiService = null;
   var sampleDataResults = null;

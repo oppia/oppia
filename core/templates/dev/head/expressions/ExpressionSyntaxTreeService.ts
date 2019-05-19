@@ -16,6 +16,8 @@
  * @fileoverview Expression syntax tree service.
  */
 
+require('expressions/ExpressionParserService.js');
+
 oppia.factory('ExpressionSyntaxTreeService', [
   '$log', 'ExpressionParserService', 'PARAMETER_TYPES',
   function($log, ExpressionParserService, PARAMETER_TYPES) {

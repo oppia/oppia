@@ -16,6 +16,9 @@
  * @fileoverview Playthrough Improvement card directive.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PlaythroughIssuesService.ts');
+
 oppia.directive('playthroughImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

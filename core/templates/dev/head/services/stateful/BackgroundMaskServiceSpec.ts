@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the BackgroundMaskService.
  */
 
+require('services/stateful/BackgroundMaskService.ts');
+
 describe('Background Mask Service', function() {
   var BackgroundMaskService;
 

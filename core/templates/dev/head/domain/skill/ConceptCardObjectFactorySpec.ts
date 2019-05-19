@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for ConceptCardObjectFactory.
  */
 
+require('App.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/skill/ConceptCardObjectFactory.ts');
+
 describe('Concept card object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

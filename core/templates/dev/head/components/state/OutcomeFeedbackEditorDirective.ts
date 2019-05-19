@@ -16,18 +16,24 @@
  * @fileoverview Directives for the outcome feedback editor.
  */
 
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('outcomeFeedbackEditor', [
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
   function(SubtitledHtmlObjectFactory, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         outcome: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/outcome_feedback_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.OUTCOME_FEEDBACK_SCHEMA = {
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.OUTCOME_FEEDBACK_SCHEMA = {
           type: 'html'
         };
       }]

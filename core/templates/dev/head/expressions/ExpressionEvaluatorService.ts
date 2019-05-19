@@ -62,6 +62,10 @@
  * @fileoverview Service for expression evaluation.
  */
 
+require('expressions/ExpressionParserService.js');
+require('expressions/ExpressionSyntaxTreeService.ts');
+
+// Service for expression evaluation.
 oppia.factory('ExpressionEvaluatorService', [
   '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',
   function($log, ExpressionParserService, ExpressionSyntaxTreeService) {

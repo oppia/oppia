@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the player position service.
  */
 
+require('domain/state_card/StateCardObjectFactory.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+
 describe('Player position service', function() {
   beforeEach(angular.mock.module('oppia'));
 

@@ -16,6 +16,22 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+require('components/background/BackgroundBannerDirective.ts');
+require('components/loading/LoadingDotsDirective.ts');
+require('components/summary_tile/CollectionSummaryTileDirective.ts');
+require('components/summary_tile/ExplorationSummaryTileDirective.ts');
+require('filters/TruncateFilter.ts');
+
+require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
+require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
+require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require('pages/suggestion_editor/ShowSuggestionModalForLearnerViewService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/UserService.ts');
+
 oppia.constant('LEARNER_DASHBOARD_SECTION_I18N_IDS', {
   INCOMPLETE: 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION',
   COMPLETED: 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION',
@@ -370,10 +386,9 @@ oppia.controller('LearnerDashboard', [
         },
         sort: function(e, ui) {
           /* eslint-disable quote-props */
-          // Reset the position of the window on scrolling. This keeps the mouse
-          // position and elements in sync.
+          // Making top : 0px to avoid irregular change in position.
           ui.helper.css(
-            {'top': ui.position.top + $(window).scrollTop() + 'px'});
+            {'top': '0 px'});
           /* eslint-enable quote-props */
         },
         update: function(e, ui) {

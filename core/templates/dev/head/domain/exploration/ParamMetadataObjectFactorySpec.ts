@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for ParamMetadataObjectFactory.
  */
 
+require('domain/exploration/ParamMetadataObjectFactory.ts');
+
 describe('ParameterMetadata object factory', function() {
   var parameterMetadata = null;
   var pmof = null;

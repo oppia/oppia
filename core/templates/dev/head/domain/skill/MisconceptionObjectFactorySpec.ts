@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for MisconceptionObjectFacfory.
  */
 
+require('domain/skill/MisconceptionObjectFactory.ts');
+
 describe('Misconception object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

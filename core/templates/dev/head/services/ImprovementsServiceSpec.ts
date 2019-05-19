@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for improvements service.
  */
 
+require('services/ImprovementsService.ts');
+
 describe('ImprovementsService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
