@@ -16,6 +16,14 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'angular-name/angular-name.service.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('services/ContextService.ts');
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts')
+
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
   'ContextService', 'FractionObjectFactory', 'UrlInterpolationService',

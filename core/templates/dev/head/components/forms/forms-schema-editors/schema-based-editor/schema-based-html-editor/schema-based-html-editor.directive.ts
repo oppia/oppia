@@ -29,8 +29,8 @@ angular.module('schemaBasedHtmlEditorModule').directive(
           uiConfig: '&'
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/components/forms/schema_editors/' +
-          'schema_based_html_editor_directive.html'),
+          '/components/forms/forms-schema-editors/schema-based-editor/' +
+          'schema-based-html-editor/schema-based-html-editor.directive.html'),
         restrict: 'E',
       };
     }]);
