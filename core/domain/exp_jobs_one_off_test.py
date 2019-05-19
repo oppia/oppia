@@ -2206,7 +2206,7 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
                 mimetype='image/png'
             )
             fs_external.commit(
-                self.albert_id, 'image/abc.png', raw_image,
+                self.albert_id, 'image/abc_height_32_width_32.png', raw_image,
                 mimetype='image/png'
             )
 
@@ -2223,7 +2223,7 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
             # External directory can have other images, as all new images are
             # stored there.
             fs_external.commit(
-                self.albert_id, 'image/xyz.png', raw_image,
+                self.albert_id, 'image/xyz_height_32_width_32.png', raw_image,
                 mimetype='image/png'
             )
 
@@ -2238,20 +2238,20 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
             actual_output = exp_jobs_one_off.ImagesAuditJob.get_output(
                 job_id)
             expected_output = [
-                '[u\'exp_id_1\', [u"Missing Images: [\'def.png\', '
-                '\'ghi.png\']"]]',
-                '[u\'Images verified\', 0]'
+                '[u\'exp_id_1\', [u"Missing Images: [\''
+                'def_height_32_width_32.png\', \'ghi_height_32_width_32.png\']'
+                '"]]', '[u\'Images verified\', 0]'
             ]
             self.assertEqual(len(actual_output), 2)
             self.assertItemsEqual(actual_output, expected_output)
 
             fs_external.commit(
-                self.albert_id, 'image/def.png', raw_image,
+                self.albert_id, 'image/def_height_32_width_32.png', raw_image,
                 mimetype='image/png'
             )
 
             fs_external.commit(
-                self.albert_id, 'image/ghi.png', raw_image,
+                self.albert_id, 'image/ghi_height_32_width_32.png', raw_image,
                 mimetype='image/png'
             )
 
@@ -2268,7 +2268,7 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
                 mimetype='image/png'
             )
             fs_external.commit(
-                self.albert_id, 'image/abc.png', raw_image,
+                self.albert_id, 'image/abc_height_32_width_32.png', raw_image,
                 mimetype='image/png'
             )
 
