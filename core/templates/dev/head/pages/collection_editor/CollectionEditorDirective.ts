@@ -16,6 +16,7 @@
  * @fileoverview Primary directive for the collection editor page.
  */
 
+require('pages/collection_editor/CollectionEditorStateService.ts');
 require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.ts');
 require('pages/collection_editor/history_tab/CollectionHistoryTabDirective.ts');
 require(
