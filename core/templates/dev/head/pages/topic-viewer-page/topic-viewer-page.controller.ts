@@ -26,15 +26,16 @@ require(
 
 require('domain/topic_viewer/TopicViewerBackendApiService.ts');
 require('services/AlertsService.ts');
+require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 angular.module('topicViewerPageModule').controller('TopicViewer', [
   '$rootScope', '$scope', '$window', 'AlertsService',
-  'TopicViewerBackendApiService',
+  'PageTitleService', 'TopicViewerBackendApiService',
   'UrlService', 'FATAL_ERROR_CODES',
   function(
       $rootScope, $scope, $window, AlertsService,
-      TopicViewerBackendApiService,
+      PageTitleService, TopicViewerBackendApiService,
       UrlService, FATAL_ERROR_CODES) {
     $scope.setActiveTab = function(newActiveTabName) {
       $scope.activeTab = newActiveTabName;
@@ -45,6 +46,8 @@ angular.module('topicViewerPageModule').controller('TopicViewer', [
       return ($window.innerWidth < 500);
     };
     $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
+
+    PageTitleService.setPageTitle($scope.topicName + ' - Oppia');
 
     $rootScope.loadingMessage = 'Loading';
     TopicViewerBackendApiService.fetchTopicData($scope.topicName).then(

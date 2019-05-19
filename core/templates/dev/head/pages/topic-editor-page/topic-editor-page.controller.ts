@@ -126,11 +126,21 @@ require(
 require(
   'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
   'topic-editor-state.service.ts');
+require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 angular.module('topicEditorPageModule').controller('TopicEditor', [
-  '$scope', 'TopicEditorStateService', 'UrlService',
-  function($scope, TopicEditorStateService, UrlService) {
+  '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',
+  'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+  function($scope, PageTitleService, TopicEditorStateService, UrlService,
+      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
     TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+
+    var setPageTitle = function() {
+      PageTitleService.setPageTitle(
+        TopicEditorStateService.getTopic().getName() + ' - Oppia');
+    };
+    $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+    $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
   }
 ]);

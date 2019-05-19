@@ -114,16 +114,19 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/story-editor-page/story-editor-services/story-editor-state/' +
   'story-editor-state.service.ts');
+require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 angular.module('storyEditorModule').controller('StoryEditor', [
-  '$scope', '$uibModal', '$window', 'StoryEditorStateService',
-  'UndoRedoService',
+  '$scope', '$uibModal', '$window', 'PageTitleService',
+  'StoryEditorStateService', 'UndoRedoService',
   'UrlInterpolationService', 'UrlService',
+  'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
   function(
-      $scope, $uibModal, $window, StoryEditorStateService,
-      UndoRedoService,
-      UrlInterpolationService, UrlService) {
+      $scope, $uibModal, $window, PageTitleService,
+      StoryEditorStateService, UndoRedoService,
+      UrlInterpolationService, UrlService,
+      EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
     var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
     var topicId = UrlService.getTopicIdFromUrl();
     StoryEditorStateService.loadStory(
@@ -154,5 +157,12 @@ angular.module('storyEditorModule').controller('StoryEditor', [
           ), '_self');
       }
     };
+
+    var setPageTitle = function() {
+      PageTitleService.setPageTitle(
+        StoryEditorStateService.getStory().getTitle() + ' - Oppia');
+    };
+    $scope.$on(EVENT_STORY_INITIALIZED, setPageTitle);
+    $scope.$on(EVENT_STORY_REINITIALIZED, setPageTitle);
   }
 ]);
