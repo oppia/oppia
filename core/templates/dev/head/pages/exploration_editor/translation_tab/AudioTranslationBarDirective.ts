@@ -83,7 +83,7 @@ oppia.directive('audioTranslationBar', [
         '/pages/exploration_editor/translation_tab/' +
         'audio_translation_bar_directive.html'),
       controller: [
-        '$filter', '$interval','$window', '$rootScope', '$scope', '$timeout', '$uibModal',
+        '$filter', '$interval', '$rootScope', '$scope', '$timeout', '$uibModal',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
         'IdGenerationService', 'SiteAnalyticsService',
@@ -91,7 +91,7 @@ oppia.directive('audioTranslationBar', [
         'TranslationLanguageService', 'TranslationRecordingService',
         'TranslationTabActiveContentIdService', 'RECORDING_TIME_LIMIT',
         function(
-            $filter, $interval, $window, $rootScope, $scope, $timeout, $uibModal,
+            $filter, $interval, $rootScope, $scope, $timeout, $uibModal,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
             IdGenerationService, SiteAnalyticsService,
@@ -195,8 +195,9 @@ oppia.directive('audioTranslationBar', [
               $scope.timerInterval = $interval(function() {
                 $scope.elapsedTime++;
                 updateTimer();
-                // minus 1 to compensate for the audio 
+                // minus 1 to compensate for the audio
                 // recording timing inconsistency
+                // allows the server to accept the recording
                 if ($scope.elapsedTime === RECORDING_TIME_LIMIT - 1) {
                   $scope.stopRecording();
                 }
@@ -255,9 +256,7 @@ oppia.directive('audioTranslationBar', [
             $scope.recorder.getMp3Data().then(function(audio) {
               $rootScope.loadingMessage = '';
               var fileType = 'audio/mp3';
-              // console.log(audio.length);
               $scope.audioBlob = new Blob(audio, {type: fileType});
-              // console.log($window.URL.createObjectURL($scope.audioBlob));
               // free the browser from workers
               $scope.recorder.closeRecorder();
             });
