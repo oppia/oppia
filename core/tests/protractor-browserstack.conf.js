@@ -125,15 +125,17 @@ exports.config = {
   capabilities: {
     'browserstack.user': process.env.USERNAME,
     'browserstack.key': process.env.ACCESS_KEY,
+    'project' : 'oppia',
+    'build' : 'mobile-build',
+    'name' : 'e2e-tests',
+    'browserstack.networkProfile' : '4g-lte-advanced-good',
     'browserstack.local': true,
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
-    'browserstack.debug': true,
-    'browserstack.networkLogs': false,
     'browserstack.appium_version': '1.7.2',
     device: process.env.DEVICE,
     os_version: process.env.OS_VERSION,
     real_mobile: 'true',
-    browserName: ''
+    browserName: '',
   },
 
   // Code to start browserstack local before start of test
