@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+require('App.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {
     var scope, filter, ctrl, ecs, fs, ess, rootScope, outerScope;
@@ -59,9 +66,11 @@ describe('Sidebar state name controller', function() {
             content_id: 'content',
             html: 'First State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],
@@ -88,9 +97,11 @@ describe('Sidebar state name controller', function() {
             content_id: 'content',
             html: 'Second State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],
@@ -117,9 +128,11 @@ describe('Sidebar state name controller', function() {
             content_id: 'content',
             html: 'This is some content.'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],
@@ -149,12 +162,6 @@ describe('Sidebar state name controller', function() {
           },
         }
       });
-
-      var templateHtml = $templateCache.get(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_name_editor_directive.html');
-      $compile(templateHtml, $rootScope);
-      $rootScope.$digest();
 
       outerScope = $rootScope.$new();
       var elem = angular.element(

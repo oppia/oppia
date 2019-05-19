@@ -17,6 +17,12 @@
  * translation language.
  */
 
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
+
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
 oppia.directive('translatorOverview', [
@@ -45,7 +51,7 @@ oppia.directive('translatorOverview', [
           var prevLanguageCode = $window.localStorage.getItem(
             LAST_SELECTED_TRANSLATION_LANGUAGE);
           var allAudioLanguageCodes = LanguageUtilService
-            .getAllAudioLanguageCodes();
+            .getAllVoiceoverLanguageCodes();
 
           $scope.VOICEOVER_MODE = 'Voiceover';
           $scope.TRANSLATION_MODE = 'Translate';
@@ -83,7 +89,7 @@ oppia.directive('translatorOverview', [
             $scope.inVoiceoverMode = (
               TranslationTabActiveModeService.isVoiceoverModeActive());
             allAudioLanguageCodes = (
-              LanguageUtilService.getAllAudioLanguageCodes());
+              LanguageUtilService.getAllVoiceoverLanguageCodes());
             if ($scope.inTranslationMode) {
               var index = allAudioLanguageCodes.indexOf(
                 ExplorationLanguageCodeService.displayed);

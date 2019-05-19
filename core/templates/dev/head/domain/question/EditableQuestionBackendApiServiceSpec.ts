@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for EditableQuestionBackendApiService.
  */
 
+require('domain/question/EditableQuestionBackendApiService.ts');
+
 describe('Editable question backend API service', function() {
   var EditableQuestionBackendApiService = null;
   var sampleDataResults = null;
@@ -42,7 +44,9 @@ describe('Editable question backend API service', function() {
           content: {
             html: 'Question 1'
           },
-          content_ids_to_audio_translations: {},
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],

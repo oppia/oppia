@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for the learner parameters service.
  */
 
+require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/exploration/SolutionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/ImagePreloaderService.ts');
+require('pages/exploration_player/LearnerParamsService.ts');
+
 describe('Learner parameters service', function() {
   beforeEach(angular.mock.module('oppia'));
 

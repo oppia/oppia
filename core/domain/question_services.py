@@ -55,8 +55,7 @@ def _migrate_state_schema(versioned_question_state):
             'Sorry, we can only process v25-v%d state schemas at present.' %
             feconf.CURRENT_STATE_SCHEMA_VERSION)
 
-    while (state_schema_version <
-           feconf.CURRENT_STATE_SCHEMA_VERSION):
+    while state_schema_version < feconf.CURRENT_STATE_SCHEMA_VERSION:
         question_domain.Question.update_state_from_model(
             versioned_question_state, state_schema_version)
         state_schema_version += 1

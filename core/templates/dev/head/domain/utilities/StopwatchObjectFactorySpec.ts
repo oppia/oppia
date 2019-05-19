@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for StopwatchObjectFactory.
  */
 
+require('domain/utilities/StopwatchObjectFactory.ts');
+
 describe('Stopwatch object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

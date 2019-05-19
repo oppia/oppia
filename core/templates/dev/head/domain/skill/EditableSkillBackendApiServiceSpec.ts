@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for EditableSkillBackendApiService.
  */
 
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/skill/EditableSkillBackendApiService.ts');
+
 describe('Editable skill backend API service', function() {
   var EditableSkillBackendApiService = null;
   var UndoRedoService = null;

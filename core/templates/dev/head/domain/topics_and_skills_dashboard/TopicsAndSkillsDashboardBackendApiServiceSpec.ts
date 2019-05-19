@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardBackendApiService.ts'
+);
+require('domain/utilities/UrlInterpolationService.ts');
+
 describe('Topics and Skills Dashboard backend API service', function() {
   var TopicsAndSkillsDashboardBackendApiService = null;
   var $httpBackend = null;

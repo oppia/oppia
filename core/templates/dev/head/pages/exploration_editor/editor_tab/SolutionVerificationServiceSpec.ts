@@ -16,6 +16,16 @@
  * @fileoverview Unit tests for Solution Verification Service.
  */
 
+require('App.ts');
+require('domain/exploration/SolutionObjectFactory.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require(
+  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+
 describe('Solution Verification Service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -68,12 +78,14 @@ describe('Solution Verification Service', function() {
           content_id: 'content',
           html: 'First State Content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {},
-          hint_1: {},
-          hint_2: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            hint_1: {},
+            hint_2: {}
+          }
         },
         interaction: {
           id: 'TextInput',
@@ -131,10 +143,12 @@ describe('Solution Verification Service', function() {
           content_id: 'content',
           html: ''
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'TextInput',

@@ -163,7 +163,6 @@ class TopicEditorPage(base.BaseHandler):
 
         self.values.update({
             'topic_id': topic.id,
-            'topic_name': topic.name,
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
@@ -172,7 +171,7 @@ class TopicEditorPage(base.BaseHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
-        self.render_template('pages/topic_editor/topic_editor.html')
+        self.render_template('dist/topic_editor.html')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):

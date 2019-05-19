@@ -16,6 +16,10 @@
  * @fileoverview Service for solution verification.
  */
 
+require('pages/exploration_editor/AngularNameService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+
 oppia.factory('SolutionVerificationService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
   'StateEditorService',
