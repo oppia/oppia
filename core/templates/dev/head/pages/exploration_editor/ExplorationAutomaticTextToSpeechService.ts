@@ -17,6 +17,8 @@
  * text to speech data.
  */
 
+require('pages/exploration_editor/ExplorationPropertyService.ts');
+
 oppia.factory('ExplorationAutomaticTextToSpeechService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);

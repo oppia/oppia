@@ -17,11 +17,16 @@
  *   versions of an exploration.
  */
 
+require('components/loading/LoadingDotsDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('versionDiffVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         // An object with the following properties:
         // - nodes: an object whose keys are state IDs and whoe value is an
         //     object with the following keys:
@@ -51,7 +56,9 @@ oppia.directive('versionDiffVisualization', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/' +
         'version_diff_visualization_directive.html'),
-      controller: ['$scope', '$uibModal', function($scope, $uibModal) {
+      controllerAs: '$ctrl',
+      controller: ['$uibModal', function($uibModal) {
+        var ctrl = this;
         // Constants for color of nodes in diff graph
         var COLOR_ADDED = '#4EA24E';
         var COLOR_DELETED = '#DC143C';
@@ -83,23 +90,23 @@ oppia.directive('versionDiffVisualization', [
         _stateTypeUsed[NODE_TYPE_RENAMED] = false;
         _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
 
-        $scope.LEGEND_GRAPH_COLORS = {};
-        $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_ADDED] = COLOR_ADDED;
-        $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;
-        $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED] = COLOR_CHANGED;
-        $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_UNCHANGED] = COLOR_UNCHANGED;
-        $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_RENAMED] = COLOR_RENAMED_UNCHANGED;
-        $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED_RENAMED] = COLOR_CHANGED;
+        ctrl.LEGEND_GRAPH_COLORS = {};
+        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_ADDED] = COLOR_ADDED;
+        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;
+        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED] = COLOR_CHANGED;
+        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_UNCHANGED] = COLOR_UNCHANGED;
+        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_RENAMED] = COLOR_RENAMED_UNCHANGED;
+        ctrl.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED_RENAMED] = COLOR_CHANGED;
 
-        $scope.LEGEND_GRAPH_SECONDARY_LABELS = {};
-        $scope.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_CHANGED_RENAMED] = (
+        ctrl.LEGEND_GRAPH_SECONDARY_LABELS = {};
+        ctrl.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_CHANGED_RENAMED] = (
           '(was: Old name)');
-        $scope.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_RENAMED] = (
+        ctrl.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_RENAMED] = (
           '(was: Old name)');
-        $scope.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
+        ctrl.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
           hidden: 'stroke: none; marker-end: none;'
         };
-        $scope.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
+        ctrl.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
           added: (
             'stroke: #1F7D1F; stroke-opacity: 0.8; ' +
             'marker-end: url(#arrowhead-green)'),
@@ -108,26 +115,26 @@ oppia.directive('versionDiffVisualization', [
             'marker-end: url(#arrowhead-red)')
         };
         var diffGraphNodes = {};
-        $scope.diffGraphSecondaryLabels = {};
-        $scope.diffGraphNodeColors = {};
+        ctrl.diffGraphSecondaryLabels = {};
+        ctrl.diffGraphNodeColors = {};
 
-        var nodesData = $scope.getDiffData().nodes;
+        var nodesData = ctrl.getDiffData().nodes;
         for (var nodeId in nodesData) {
           var nodeStateProperty = nodesData[nodeId].stateProperty;
           if (nodeStateProperty === STATE_PROPERTY_ADDED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-            $scope.diffGraphNodeColors[nodeId] = COLOR_ADDED;
+            ctrl.diffGraphNodeColors[nodeId] = COLOR_ADDED;
             _stateTypeUsed[NODE_TYPE_ADDED] = true;
           } else if (nodeStateProperty === STATE_PROPERTY_DELETED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            $scope.diffGraphNodeColors[nodeId] = COLOR_DELETED;
+            ctrl.diffGraphNodeColors[nodeId] = COLOR_DELETED;
             _stateTypeUsed[NODE_TYPE_DELETED] = true;
           } else if (nodeStateProperty === STATE_PROPERTY_CHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
+            ctrl.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
             if (nodesData[nodeId].originalStateName !==
                 nodesData[nodeId].newestStateName) {
-              $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
+              ctrl.diffGraphSecondaryLabels[nodeId] = '(was: ' +
                 nodesData[nodeId].originalStateName + ')';
               diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
               _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = true;
@@ -136,13 +143,13 @@ oppia.directive('versionDiffVisualization', [
             }
           } else if (nodeStateProperty === STATE_PROPERTY_UNCHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
-            $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
+            ctrl.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
             if (nodesData[nodeId].originalStateName !==
                 nodesData[nodeId].newestStateName) {
-              $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
+              ctrl.diffGraphSecondaryLabels[nodeId] = '(was: ' +
                 nodesData[nodeId].originalStateName + ')';
               diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-              $scope.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
+              ctrl.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
               _stateTypeUsed[NODE_TYPE_RENAMED] = true;
             } else {
               _stateTypeUsed[NODE_TYPE_UNCHANGED] = true;
@@ -152,48 +159,48 @@ oppia.directive('versionDiffVisualization', [
           }
         }
 
-        $scope.v1InitStateId = $scope.getDiffData().v1InitStateId;
+        ctrl.v1InitStateId = ctrl.getDiffData().v1InitStateId;
 
-        $scope.diffGraphData = {
+        ctrl.diffGraphData = {
           nodes: diffGraphNodes,
-          links: $scope.getDiffData().links,
-          initStateId: $scope.getDiffData().v2InitStateId,
-          finalStateIds: $scope.getDiffData().finalStateIds
+          links: ctrl.getDiffData().links,
+          initStateId: ctrl.getDiffData().v2InitStateId,
+          finalStateIds: ctrl.getDiffData().finalStateIds
         };
 
         // Generate the legend graph
-        $scope.legendGraph = {
+        ctrl.legendGraph = {
           nodes: {},
           links: []
         };
         var _lastUsedStateType = null;
         for (var stateProperty in _stateTypeUsed) {
           if (_stateTypeUsed[stateProperty]) {
-            $scope.legendGraph.nodes[stateProperty] = stateProperty;
+            ctrl.legendGraph.nodes[stateProperty] = stateProperty;
             if (_lastUsedStateType) {
-              $scope.legendGraph.links.push({
+              ctrl.legendGraph.links.push({
                 source: _lastUsedStateType,
                 target: stateProperty,
                 linkProperty: 'hidden'
               });
             }
             _lastUsedStateType = stateProperty;
-            if (!$scope.legendGraph.hasOwnProperty('initStateId')) {
-              $scope.legendGraph.initStateId = stateProperty;
+            if (!ctrl.legendGraph.hasOwnProperty('initStateId')) {
+              ctrl.legendGraph.initStateId = stateProperty;
             }
           }
         }
-        $scope.legendGraph.finalStateIds = [_lastUsedStateType];
+        ctrl.legendGraph.finalStateIds = [_lastUsedStateType];
         // Opens the modal showing the history diff for a given state.
         // stateId is the unique ID assigned to a state during the
         // calculation of the state graph.
-        $scope.onClickStateInDiffGraph = function(stateId) {
+        ctrl.onClickStateInDiffGraph = function(stateId) {
           var oldStateName = undefined;
           if (nodesData[stateId].newestStateName !==
               nodesData[stateId].originalStateName) {
             oldStateName = nodesData[stateId].originalStateName;
           }
-          $scope.showStateDiffModal(nodesData[stateId].newestStateName,
+          ctrl.showStateDiffModal(nodesData[stateId].newestStateName,
             oldStateName, nodesData[stateId].stateProperty);
         };
 
@@ -206,7 +213,7 @@ oppia.directive('versionDiffVisualization', [
         //     version if the state name is changed.
         // - stateProperty is whether the state is added, changed, unchanged or
         //     deleted.
-        $scope.showStateDiffModal = function(
+        ctrl.showStateDiffModal = function(
             newStateName, oldStateName, stateProperty) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -223,9 +230,9 @@ oppia.directive('versionDiffVisualization', [
               },
               newState: function() {
                 if (stateProperty !== STATE_PROPERTY_DELETED &&
-                    $scope.getDiffData().v2States.hasOwnProperty(
+                    ctrl.getDiffData().v2States.hasOwnProperty(
                       newStateName)) {
-                  return $scope.getDiffData().v2States[newStateName];
+                  return ctrl.getDiffData().v2States[newStateName];
                 } else {
                   return null;
                 }
@@ -233,17 +240,17 @@ oppia.directive('versionDiffVisualization', [
               oldState: function() {
                 var stateNameToRetrieve = oldStateName || newStateName;
                 if (stateProperty !== STATE_PROPERTY_ADDED &&
-                    $scope.getDiffData().v1States.hasOwnProperty(
+                    ctrl.getDiffData().v1States.hasOwnProperty(
                       stateNameToRetrieve)) {
-                  return $scope.getDiffData().v1States[stateNameToRetrieve];
+                  return ctrl.getDiffData().v1States[stateNameToRetrieve];
                 } else {
                   return null;
                 }
               },
               headers: function() {
                 return {
-                  leftPane: $scope.getLaterVersionHeader(),
-                  rightPane: $scope.getEarlierVersionHeader()
+                  leftPane: ctrl.getLaterVersionHeader(),
+                  rightPane: ctrl.getEarlierVersionHeader()
                 };
               }
             },

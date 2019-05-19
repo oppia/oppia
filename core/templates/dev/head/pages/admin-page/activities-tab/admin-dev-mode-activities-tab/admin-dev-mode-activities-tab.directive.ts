@@ -17,6 +17,10 @@
  * is in developer mode.
  */
 
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/admin/AdminTaskManagerService.ts');
+
 angular.module('adminDevModeActivitiesTabModule').directive(
   'adminDevModeActivitiesTab', [
     '$http', 'AdminTaskManagerService', 'UrlInterpolationService',

@@ -16,6 +16,10 @@
  * @fileoverview Directive for the navigation bar in the admin panel.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/admin/AdminRouterService.ts');
+require('services/UserService.ts');
+
 angular.module('adminNavbarModule').directive('adminNavbar', [
   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
   'LOGOUT_URL', 'PROFILE_URL_TEMPLATE',

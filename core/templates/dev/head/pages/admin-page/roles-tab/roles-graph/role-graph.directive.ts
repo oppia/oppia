@@ -16,6 +16,10 @@
  * @fileoverview Directive for displaying Role graph.
  */
 
+require('components/StateGraphLayoutService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/TruncateFilter.ts');
+
 angular.module('roleGraphModule').directive('roleGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

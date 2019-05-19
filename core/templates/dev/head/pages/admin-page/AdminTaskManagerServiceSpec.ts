@@ -16,6 +16,8 @@
  * @fileoverview Tests for AdminTaskManagerService.
  */
 
+require('pages/admin/AdminTaskManagerService.ts');
+
 describe('Admin task manager service', function() {
   var AdminTaskManagerService = null;
 

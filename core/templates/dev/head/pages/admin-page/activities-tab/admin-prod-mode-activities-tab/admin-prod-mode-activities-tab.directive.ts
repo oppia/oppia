@@ -17,6 +17,7 @@
  * is in production mode.
  */
 
+<<<<<<< HEAD:core/templates/dev/head/pages/admin-page/activities-tab/admin-prod-mode-activities-tab/admin-prod-mode-activities-tab.directive.ts
 angular.module('adminProdModeActivitiesTab').directive(
   'adminProdModeActivitiesTab', [
     'UrlInterpolationService', function(UrlInterpolationService) {
@@ -29,3 +30,28 @@ angular.module('adminProdModeActivitiesTab').directive(
     }
   ]);
 
+||||||| merged common ancestors
+oppia.directive('adminProdModeActivitiesTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/admin/activities_tab/' +
+        'admin_prod_mode_activities_tab_directive.html')
+    };
+  }
+]);
+=======
+require('domain/utilities/UrlInterpolationService.ts');
+
+oppia.directive('adminProdModeActivitiesTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/admin/activities_tab/' +
+        'admin_prod_mode_activities_tab_directive.html')
+    };
+  }
+]);
+>>>>>>> develop:core/templates/dev/head/pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.ts
