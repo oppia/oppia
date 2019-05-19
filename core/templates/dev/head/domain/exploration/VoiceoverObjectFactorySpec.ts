@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Voiceover object factory.
  */
 
+require('domain/exploration/VoiceoverObjectFactory.ts');
+
 describe('Voiceover object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

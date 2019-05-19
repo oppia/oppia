@@ -16,6 +16,10 @@
  * @fileoverview Service to get and set active content id in translation tab.
  */
 
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+
 oppia.factory('TranslationTabActiveContentIdService', [
   '$log', '$rootScope', 'StateRecordedVoiceoversService',
   function($log, $rootScope, StateRecordedVoiceoversService) {

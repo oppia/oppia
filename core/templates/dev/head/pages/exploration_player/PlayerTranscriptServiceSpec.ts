@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the player transcript service.
  */
 
+require('domain/state_card/StateCardObjectFactory.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+
 describe('Player transcript service', function() {
   beforeEach(angular.mock.module('oppia'));
 
