@@ -16,9 +16,6 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/pages/collection_editor/collection-editor-navbar/collection-editor-navbar.directive.ts
-angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar', [
-=======
 require('components/forms/Select2DropdownDirective.ts');
 require('components/loading/LoadingDotsDirective.ts');
 
@@ -32,8 +29,7 @@ require('pages/collection_editor/CollectionEditorStateService.ts');
 require('pages/exploration_editor/RouterService.ts');
 require('services/AlertsService.ts');
 
-oppia.directive('collectionEditorNavbar', [
->>>>>>> develop:core/templates/dev/head/pages/collection_editor/CollectionEditorNavbarDirective.ts
+angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
