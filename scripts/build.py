@@ -1181,7 +1181,7 @@ def generate_build_directory():
     print 'Build completed.'
 
 
-def compile_typescript_files(project_dir):
+def compile_typescript_files(project_dir, compiled_js_dir):
     """Compiles typescript files to produce javascript files in
     local_compiled_js folder.
 
@@ -1189,13 +1189,14 @@ def compile_typescript_files(project_dir):
         project_dir: str. The project directory which contains the ts files
             to be compiled.
     """
-    safe_delete_directory_tree(os.path.join('local_compiled_js', ''))
+    safe_delete_directory_tree(compiled_js_dir)
     print 'Compiling ts files...'
     cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
 
-def compile_typescript_files_continuously(project_dir):
+def compile_typescript_files_continuously(
+        project_dir, compiled_js_dir, condition):
     """Compiles typescript files continuously i.e enable a watcher which
     monitors any changes in js files and recompiles them to ts files.
 
@@ -1208,7 +1209,7 @@ def compile_typescript_files_continuously(project_dir):
         '--watch" | awk \'{print $2}\'`'
     )
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
-    safe_delete_directory_tree(os.path.join('local_compiled_js', ''))
+    safe_delete_directory_tree(compiled_js_dir)
     print 'Compiling ts files in watch mode...'
     cmd = [
         './node_modules/typescript/bin/tsc', '--project', project_dir,
@@ -1217,7 +1218,7 @@ def compile_typescript_files_continuously(project_dir):
     with open('tsc_output_log.txt', 'w') as out:
         subprocess.Popen(cmd, stdout=out)
 
-    while True:
+    while condition:
         if os.path.isfile('tsc_output_log.txt'):
             with open('tsc_output_log.txt', 'r') as f:
                 lines = f.readlines()
@@ -1251,10 +1252,11 @@ def build():
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
+    compiled_js_dir = os.path.join('local_compiled_js', '')
     if not options.enable_watcher:
-        compile_typescript_files('.')
+        compile_typescript_files('.', compiled_js_dir)
     else:
-        compile_typescript_files_continuously('.')
+        compile_typescript_files_continuously('.', compiled_js_dir, True)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
