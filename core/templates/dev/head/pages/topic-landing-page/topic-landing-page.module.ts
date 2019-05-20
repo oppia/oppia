@@ -16,6 +16,10 @@
  * @fileoverview Module for the landing page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('topicLandingPageModule', []).name;
+
 angular.module('topicLandingPageModule', ['topicLandingPageStewardsModule']);
 
 // Note: This oppia constant needs to be keep in sync with

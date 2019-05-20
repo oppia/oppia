@@ -16,4 +16,8 @@
  * @fileoverview Module for the questions list.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('questionsListPageModule', []).name;
+
 angular.module('questionsListPageModule', []);

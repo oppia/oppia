@@ -16,4 +16,8 @@
 * @fileoverview Module for the Oppia moderator page.
 */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('moderatorPageModule', []).name;
+
 angular.module('moderatorPageModule', []);

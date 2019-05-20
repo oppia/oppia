@@ -17,6 +17,10 @@
  *               help tab in the navbar.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('explorationEditorPageModule', []).name;
+
 angular.module('explorationEditorPageModule', ['editorNavbarBreadcrumbModule',
   'editorNavigationModule', 'explorationEditorTabModule',
   'explorationSaveAndPulishButtonsModule', 'explorationObjectiveEditorModule',

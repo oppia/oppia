@@ -16,6 +16,10 @@
  * @fileoverview Module for the questions editor directive.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('questionEditorPageModule', []).name;
+
 angular.module('questionEditorPageModule', []);
 
 angular.module('questionEditorPageModule').constant(

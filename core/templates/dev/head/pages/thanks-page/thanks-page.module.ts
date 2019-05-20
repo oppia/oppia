@@ -16,4 +16,8 @@
  * @fileoverview Module for the 'thanks' page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('thanksPageModule', []).name;
+
 angular.module('thanksPageModule', []);

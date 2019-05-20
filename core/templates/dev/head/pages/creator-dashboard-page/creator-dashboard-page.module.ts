@@ -16,6 +16,10 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('creatorDashboardPageModule', []).name;
+
 angular.module('creatorDashboardPageModule', []);
 
 angular.module('creatorDashboardPageModule').constant(

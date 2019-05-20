@@ -16,6 +16,10 @@
  * @fileoverview Module for the CkEditor helpers.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('ckEditorHelpersModule', []).name;
+
 angular.module('ckEditorHelpersModule', ['ckEditorRteModule',
   'ckEditorWidgetsModule'
 ]);

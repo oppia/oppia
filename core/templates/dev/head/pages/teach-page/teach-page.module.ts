@@ -16,4 +16,8 @@
  * @fileoverview Module for the teach page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('teachPageModule', []).name;
+
 angular.module('teachPageModule', []);

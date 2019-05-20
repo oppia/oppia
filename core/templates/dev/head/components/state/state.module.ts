@@ -16,6 +16,10 @@
  * @fileoverview Module for state component.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('stateModule', []).name;
+
 angular.module('stateModule', ['answerGroupEditorModule', 'hintEditorModule',
   'outcomeEditorModule', 'responseHeaderModule', 'ruleEditorModule',
   'ruleTypeSelectorModule', 'solutionEditorModule'

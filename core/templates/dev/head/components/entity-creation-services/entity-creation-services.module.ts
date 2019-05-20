@@ -16,4 +16,8 @@
  * @fileoverview Module for the entity creation services.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('entityCreationServicesModule', []).name;
+
 angular.module('entityCreationServicesModule', []);

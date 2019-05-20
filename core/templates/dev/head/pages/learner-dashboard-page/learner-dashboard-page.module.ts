@@ -16,6 +16,10 @@
  * @fileoverview Module for the Learner dashboard.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('learnerDashboardPageModule', []).name;
+
 angular.module('learnerDashboardPageModule', []);
 
 angular.module('learnerDashboardPageModule').constant(

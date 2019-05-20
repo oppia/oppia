@@ -16,4 +16,8 @@
  * @fileoverview Module for the Oppia profile page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('profilePageModule', []).name;
+
 angular.module('profilePageModule', []);

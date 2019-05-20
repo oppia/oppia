@@ -16,6 +16,10 @@
  * @fileoverview Primary controller for the topic editor page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('topicEditorPageModule', []).name;
+
 angular.module('topicEditorPageModule', [
   'topicEditorNavbarBreadcrumbModule', 'topicEditorNavbarModule',
   'subtopicsListTabModule', 'questionsTabModule', 'mainTopicEditorModule']);

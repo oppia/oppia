@@ -16,4 +16,8 @@
  * @fileoverview Module for the error page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('errorPageModule', []).name;
+
 angular.module('errorPageModule', []);

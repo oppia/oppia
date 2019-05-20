@@ -16,6 +16,10 @@
  * @fileoverview Module for the buttons used by pages.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('buttonsDirectivesModule', []).name;
+
 angular.module('buttonsDirectivesModule', ['createActivityButtonModule',
   'explorationEmbedButtonModule', 'hintAndSolutionButtonsModule',
   'socialButtonsModule'

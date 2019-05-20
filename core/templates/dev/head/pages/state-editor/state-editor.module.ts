@@ -16,6 +16,10 @@
  * @fileoverview Module for the state editor directive.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('stateEditorModule', []).name;
+
 angular.module('stateEditorModule', ['stateSolutionEditorModule',
   'stateResponsesModule', 'stateInteractionEditorModule',
   'stateHintsEditorModule', 'stateContentEditorModule']);

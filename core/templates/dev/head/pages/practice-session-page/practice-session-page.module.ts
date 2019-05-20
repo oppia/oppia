@@ -16,6 +16,10 @@
  * @fileoverview Module for the practice session.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('practiceSessionPageModule', []).name;
+
 angular.module('practiceSessionPageModule', []);
 
 angular.module('practiceSessionPageModule').constant('TOTAL_QUESTIONS', 20);

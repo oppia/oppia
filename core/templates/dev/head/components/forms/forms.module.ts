@@ -16,6 +16,10 @@
  * @fileoverview Module for forms.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('formsModule', []).name;
+
 angular.module('formsModule', ['formsSchemaEditorsModule',
   'formsDirectivesModule', 'formsUnicodeFiltersModule', 'formsValidatorsModule'
 ]);

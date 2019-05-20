@@ -16,4 +16,8 @@
  * @fileoverview Module for the Oppia 'edit preferences' page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('preferencesPageModule', []).name;
+
 angular.module('preferencesPageModule', []);

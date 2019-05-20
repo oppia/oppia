@@ -16,6 +16,10 @@
  * @fileoverview Module for the learner's view of a collection.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('collectionPlayerPageModule', []).name;
+
 angular.module('collectionPlayerPageModule', [
   'collectionFooterModule', 'collectionNodeListModule',
   'collectionLocalNavModule'

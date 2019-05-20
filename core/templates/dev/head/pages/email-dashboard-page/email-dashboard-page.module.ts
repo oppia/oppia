@@ -16,4 +16,8 @@
  * @fileoverview Module for oppia email dashboard page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('emailDashboardPageModule', []).name;
+
 angular.module('emailDashboardPageModule', ['emailDashboardResultModule']);

@@ -16,6 +16,10 @@
  * @fileoverview Data and Module for the Oppia admin page.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('adminPageModule', []).name;
+
 angular.module('adminPageModule', [
   'adminNavbarModule', 'adminConfigTabModule', 'adminJobsTabModule',
   'adminMiscTabModule', 'adminRolesTabModule', 'roleGraphModule',

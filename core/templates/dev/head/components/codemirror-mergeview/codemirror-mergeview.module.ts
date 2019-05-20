@@ -16,4 +16,8 @@
  * @fileoverview Module for the codemirror mergeview component.
  */
 
+var load = require.context('./', true, /\.module\.ts$/)
+load.keys().forEach(load);
+module.exports = angular.module('codemirrorMergeviewModule', []).name;
+
 angular.module('codemirrorMergeviewModule', []);
