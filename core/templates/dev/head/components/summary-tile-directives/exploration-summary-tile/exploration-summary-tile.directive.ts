@@ -17,14 +17,13 @@
  */
 
 require(
-  'components/profile-link-directives/circular-image/' +
-  'circular-image.directive.ts');
+  'components/summary_tile/CircularImageDirective.ts');
 require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
-require('filters/summarize-nonnegative-number.filter.ts');
-require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
-require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/SummarizeNonnegativeNumberFilter.ts');
+require('filters/TruncateAndCapitalizeFilter.ts');
+require('filters/TruncateFilter.ts');
 
-require('components/ratings/rating-computation/rating-computation.service.ts');
+require('components/RatingComputationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
