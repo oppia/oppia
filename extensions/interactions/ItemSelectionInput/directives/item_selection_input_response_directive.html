@@ -1,14 +1,14 @@
-<div ng-if="answer.length === 0">
+<div ng-if="$ctrl.answer.length === 0">
   <em>No choices selected.</em>
 </div>
 
-<div ng-if="answer.length === 1" class="item-selection-input-response-content">
-  <angular-html-bind html-data="answer[0]">
+<div ng-if="$ctrl.answer.length === 1" class="item-selection-input-response-content">
+  <angular-html-bind html-data="$ctrl.answer[0]">
   </angular-html-bind>
 </div>
 
-<ul ng-if="answer.length > 1" class="item-selection-input-response-content">
-  <li ng-repeat="response in answer track by $index">
+<ul ng-if="$ctrl.answer.length > 1" class="item-selection-input-response-content">
+  <li ng-repeat="response in $ctrl.answer track by $index">
     <div>
       <angular-html-bind html-data="response">
       </angular-html-bind>

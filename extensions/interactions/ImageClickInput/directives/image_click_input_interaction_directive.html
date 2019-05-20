@@ -23,35 +23,35 @@
   }
 </style>
 
-<div ng-if="isLoadingIndicatorShown" class="oppia-image-container" ng-style="imageContainerStyle">
-  <img ng-src="<[loadingIndicatorUrl]>" class="center-element-horizontally" ng-style="loadingIndicatorStyle" alt="Loading...">
+<div ng-if="$ctrl.isLoadingIndicatorShown" class="oppia-image-container" ng-style="$ctrl.imageContainerStyle">
+  <img ng-src="<[$ctrl.loadingIndicatorUrl]>" class="center-element-horizontally" ng-style="$ctrl.loadingIndicatorStyle" alt="Loading...">
 </div>
-<div ng-if="isTryAgainShown" class="oppia-image-container" ng-style="imageContainerStyle">
-  <md-button ng-click="loadImage()" class="oppia-learner-reload-image-button center-element-horizontally">
+<div ng-if="$ctrl.isTryAgainShown" class="oppia-image-container" ng-style="$ctrl.imageContainerStyle">
+  <md-button ng-click="$ctrl.loadImage()" class="oppia-learner-reload-image-button center-element-horizontally">
     <span>Reload image<i class="material-icons oppia-reload-image-symbol">&#10227;</i></span>
   </md-button>
 </div>
 
-<div class="image-click-container" ng-if="!isLoadingIndicatorShown && !isTryAgainShown">
-  <img ng-src="<[imageUrl]>"
+<div class="image-click-container" ng-if="!$ctrl.isLoadingIndicatorShown && !$ctrl.isTryAgainShown">
+  <img ng-src="<[$ctrl.imageUrl]>"
        class="oppia-image-click-img"
-       ng-click="onClickImage($event)"
-       ng-mousemove="onMousemoveImage($event)">
-  <div ng-if="highlightRegionsOnHover">
-    <div ng-repeat="region in allRegions"
+       ng-click="$ctrl.onClickImage($event)"
+       ng-mousemove="$ctrl.onMousemoveImage($event)">
+  <div ng-if="$ctrl.highlightRegionsOnHover">
+    <div ng-repeat="region in $ctrl.allRegions"
          style="
-           height: <[getRegionDimensions($index).height]>px;
-           width: <[getRegionDimensions($index).width]>px;
-           left: <[getRegionDimensions($index).left]>px;
-           top: <[getRegionDimensions($index).top]>px;
+           height: <[$ctrl.getRegionDimensions($index).height]>px;
+           width: <[$ctrl.getRegionDimensions($index).width]>px;
+           left: <[$ctrl.getRegionDimensions($index).left]>px;
+           top: <[$ctrl.getRegionDimensions($index).top]>px;
            pointer-events: none;
            position: absolute;
-           display: <[getRegionDisplay(region.label)]>;
+           display: <[$ctrl.getRegionDisplay(region.label)]>;
            background: rgba(0,0,255,0.5);
            z-index: 10;">
     </div>
   </div>
-  <div ng-if="!highlightRegionsOnHover && !interactionIsActive"
+  <div ng-if="!$ctrl.highlightRegionsOnHover && !$ctrl.interactionIsActive"
        style="
        border-radius: 50%;
        width: 10px;
@@ -60,8 +60,8 @@
        border: 1px solid #000;
        z-index: 10;
        position: absolute;
-       display: <[getDotDisplay()]>;
-       left: <[getDotLocation().left]>px;
-       top: <[getDotLocation().top]>px;">
+       display: <[$ctrl.getDotDisplay()]>;
+       left: <[$ctrl.getDotLocation().left]>px;
+       top: <[$ctrl.getDotLocation().top]>px;">
   </div>
 </div>

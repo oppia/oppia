@@ -1,71 +1,71 @@
-<div ng-if="value.imagePath === ''">
-  <schema-based-editor local-value="value.imagePath"
+<div ng-if="$ctrl.value.imagePath === ''">
+  <schema-based-editor local-value="$ctrl.value.imagePath"
                        schema="{type: 'custom', obj_type: 'Filepath'}">
   </schema-based-editor>
 </div>
-<div style="position: relative" ng-if="value.imagePath !== ''">
+<div style="position: relative" ng-if="$ctrl.value.imagePath !== ''">
   <div>Add new regions by clicking on the image and dragging:</div>
   <svg class="oppia-image-with-regions-editor-svg"
        width="100%"
-       ng-attr-style="cursor: <[getCursorStyle()]>;"
-       ng-attr-height="<[getImageHeight()]>"
-       ng-mousedown="onSvgMouseDown($event)"
-       ng-mousemove="onSvgMouseMove($event)"
-       ng-mouseup="onSvgMouseUp($event)">
-    <image ng-href="<[getPreviewUrl(value.imagePath)]>"
+       ng-attr-style="cursor: <[$ctrl.getCursorStyle()]>;"
+       ng-attr-height="<[$ctrl.getImageHeight()]>"
+       ng-mousedown="$ctrl.onSvgMouseDown($event)"
+       ng-mousemove="$ctrl.onSvgMouseMove($event)"
+       ng-mouseup="$ctrl.onSvgMouseUp($event)">
+    <image ng-href="<[$ctrl.getPreviewUrl($ctrl.value.imagePath)]>"
            xlink:href=""
            x="0"
            y="0"
-           ng-attr-height="<[getImageHeight()]>"
-           ng-attr-width="<[getImageWidth()]>">
+           ng-attr-height="<[$ctrl.getImageHeight()]>"
+           ng-attr-width="<[$ctrl.getImageWidth()]>">
     </image>
-    <rect ng-if="userIsCurrentlyDrawing"
-          ng-attr-x="<[rectX]>"
-          ng-attr-y="<[rectY]>"
-          ng-attr-width="<[rectWidth]>"
-          ng-attr-height="<[rectHeight]>"
-          ng-attr-style="<[getRegionStyle(null)]>">
+    <rect ng-if="$ctrl.userIsCurrentlyDrawing"
+          ng-attr-x="<[$ctrl.rectX]>"
+          ng-attr-y="<[$ctrl.rectY]>"
+          ng-attr-width="<[$ctrl.rectWidth]>"
+          ng-attr-height="<[$ctrl.rectHeight]>"
+          ng-attr-style="<[$ctrl.getRegionStyle(null)]>">
     </rect>
-    <rect ng-repeat="labeledRegion in value.labeledRegions"
-          ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth()]>"
-          ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight()]>"
-          ng-attr-width="<[(labeledRegion.region.area[1][0] - labeledRegion.region.area[0][0]) * getImageWidth()]>"
-          ng-attr-height="<[(labeledRegion.region.area[1][1] - labeledRegion.region.area[0][1]) * getImageHeight()]>"
-          ng-attr-style="<[getRegionStyle($index)]>"
-          ng-mouseover="onMouseoverRegion($index)"
-          ng-mouseout="onMouseoutRegion($index)"
-          ng-mousemove="onMouseMoveRegion()"
-          ng-mousedown="onMousedownRegion($index)">
+    <rect ng-repeat="labeledRegion in $ctrl.value.labeledRegions"
+          ng-attr-x="<[labeledRegion.region.area[0][0] * $ctrl.getImageWidth()]>"
+          ng-attr-y="<[labeledRegion.region.area[0][1] * $ctrl.getImageHeight()]>"
+          ng-attr-width="<[(labeledRegion.region.area[1][0] - labeledRegion.region.area[0][0]) * $ctrl.getImageWidth()]>"
+          ng-attr-height="<[(labeledRegion.region.area[1][1] - labeledRegion.region.area[0][1]) * $ctrl.getImageHeight()]>"
+          ng-attr-style="<[$ctrl.getRegionStyle($index)]>"
+          ng-mouseover="$ctrl.onMouseoverRegion($index)"
+          ng-mouseout="$ctrl.onMouseoutRegion($index)"
+          ng-mousemove="$ctrl.onMouseMoveRegion()"
+          ng-mousedown="$ctrl.onMousedownRegion($index)">
     </rect>
-    <a ng-repeat="labeledRegion in value.labeledRegions" href
-       ng-click="deleteRegion($index)"
+    <a ng-repeat="labeledRegion in $ctrl.value.labeledRegions" href
+       ng-click="$ctrl.deleteRegion($index)"
        target="_blank" rel="noopener">
       <text font-family="Material Icons"
             font-size="20px"
             text-decoration="none"
-            ng-attr-style="<[getRegionTrashStyle($index)]>"
-            ng-attr-x="<[labeledRegion.region.area[1][0] * getImageWidth() - 25]>"
-            ng-attr-y="<[labeledRegion.region.area[1][1] * getImageHeight() - 5]>">
+            ng-attr-style="<[$ctrl.getRegionTrashStyle($index)]>"
+            ng-attr-x="<[labeledRegion.region.area[1][0] * $ctrl.getImageWidth() - 25]>"
+            ng-attr-y="<[labeledRegion.region.area[1][1] * $ctrl.getImageHeight() - 5]>">
             &#xE872;
       </text>
     </a>
-    <text ng-repeat="labeledRegion in value.labeledRegions"
-          ng-attr-style="<[getRegionLabelStyle($index)]>"
-          ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth() + 6]>"
-          ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight() + 18]>">
+    <text ng-repeat="labeledRegion in $ctrl.value.labeledRegions"
+          ng-attr-style="<[$ctrl.getRegionLabelStyle($index)]>"
+          ng-attr-x="<[labeledRegion.region.area[0][0] * $ctrl.getImageWidth() + 6]>"
+          ng-attr-y="<[labeledRegion.region.area[0][1] * $ctrl.getImageHeight() + 18]>">
       <[labeledRegion.label]>
     </text>
   </svg>
 
-  <input type="text" ng-if="selectedRegion !== null"
+  <input type="text" ng-if="$ctrl.selectedRegion !== null"
          class="oppia-image-with-regions-region-label-editor"
-         ng-attr-style="<[getRegionLabelEditorStyle()]>"
-         ng-mouseup="regionLabelEditorMouseUp()"
-         ng-model="regionLabelGetterSetter(selectedRegion)"
+         ng-attr-style="<[$ctrl.getRegionLabelEditorStyle()]>"
+         ng-mouseup="$ctrl.regionLabelEditorMouseUp()"
+         ng-model="$ctrl.regionLabelGetterSetter($ctrl.selectedRegion)"
          ng-model-options="{getterSetter: true}">
 
-  <div style="color: red; margin-bottom: 4px"><[errorText]></div>
-  <button type="button" class="btn btn-danger" ng-click="resetEditor()">Clear Image and Regions</button>
+  <div style="color: red; margin-bottom: 4px"><[$ctrl.errorText]></div>
+  <button type="button" class="btn btn-danger" ng-click="$ctrl.resetEditor()">Clear Image and Regions</button>
 </div>
 <style>
   input.oppia-image-with-regions-region-label-editor {

@@ -1,13 +1,13 @@
 <figure>
-  <div ng-if="!isLoadingIndicatorShown && !isTryAgainShown">
-    <img ng-src="<[imageUrl]>" alt="<[imageAltText]>" class="center-element-horizontally">
-    <figcaption style="text-align:center;"><[imageCaption]></figcaption>
+  <div ng-if="!$ctrl.isLoadingIndicatorShown && !$ctrl.isTryAgainShown">
+    <img ng-src="<[$ctrl.imageUrl]>" alt="<[$ctrl.imageAltText]>" class="center-element-horizontally">
+    <figcaption style="text-align:center;"><[$ctrl.imageCaption]></figcaption>
   </div>
-  <div ng-if="isLoadingIndicatorShown" class="oppia-image-container" ng-style="imageContainerStyle">
-    <img ng-src="<[loadingIndicatorUrl]>" class="center-element-horizontally" ng-style="loadingIndicatorStyle" alt="Loading...">
+  <div ng-if="$ctrl.isLoadingIndicatorShown" class="oppia-image-container" ng-style="$ctrl.imageContainerStyle">
+    <img ng-src="<[$ctrl.loadingIndicatorUrl]>" class="center-element-horizontally" ng-style="$ctrl.loadingIndicatorStyle" alt="Loading...">
   </div>
-  <div ng-if="isTryAgainShown" class="oppia-image-container" ng-style="imageContainerStyle">
-    <md-button ng-click="loadImage()" class="oppia-learner-reload-image-button center-element-horizontally">
+  <div ng-if="$ctrl.isTryAgainShown" class="oppia-image-container" ng-style="$ctrl.imageContainerStyle">
+    <md-button ng-click="$ctrl.loadImage()" class="oppia-learner-reload-image-button center-element-horizontally">
       <span>Reload image<i class="material-icons oppia-reload-image-symbol">&#10227;</i></span>
     </md-button>
   </div>

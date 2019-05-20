@@ -1,8 +1,8 @@
 <div>
-  <span ng-if="answer.length === 0" translate="I18N_INTERACTIONS_SET_INPUT_NO_ANSWER"></span>
-  <span ng-if="answer.length > 0">
+  <span ng-if="$ctrl.answer.length === 0" translate="I18N_INTERACTIONS_SET_INPUT_NO_ANSWER"></span>
+  <span ng-if="$ctrl.answer.length > 0">
     <ul style="padding-left: 12px">
-      <li ng-repeat="item in answer">
+      <li ng-repeat="item in $ctrl.answer">
         <[item]>
       </li>
     </ul>

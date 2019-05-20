@@ -25,10 +25,13 @@ oppia.directive('oppiaNoninteractiveTabs', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Tabs/directives/tabs_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.tabContents = HtmlEscaperService.escapedJsonToObj(
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.tabContents = HtmlEscaperService.escapedJsonToObj(
           $attrs.tabContentsWithValue);
       }]
     };

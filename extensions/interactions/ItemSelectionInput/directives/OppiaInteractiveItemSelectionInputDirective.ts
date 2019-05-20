@@ -28,63 +28,66 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
         'item_selection_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'WindowDimensionsService',
+        '$attrs', 'WindowDimensionsService',
         'UrlService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, WindowDimensionsService,
+            $attrs, WindowDimensionsService,
             UrlService, CurrentInteractionService) {
-          $scope.choices = HtmlEscaperService.escapedJsonToObj(
+          var ctrl = this;
+          ctrl.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
-          $scope.maxAllowableSelectionCount = (
+          ctrl.maxAllowableSelectionCount = (
             $attrs.maxAllowableSelectionCountWithValue);
-          $scope.minAllowableSelectionCount = (
+          ctrl.minAllowableSelectionCount = (
             $attrs.minAllowableSelectionCountWithValue);
 
           // The following is an associative array where the key is a choice
           // (html) and the value is a boolean value indicating whether the
           // choice was selected by the user (default is false).
-          $scope.userSelections = {};
+          ctrl.userSelections = {};
 
-          for (var i = 0; i < $scope.choices.length; i++) {
-            $scope.userSelections[$scope.choices[i]] = false;
+          for (var i = 0; i < ctrl.choices.length; i++) {
+            ctrl.userSelections[ctrl.choices[i]] = false;
           }
 
-          $scope.displayCheckboxes = ($scope.maxAllowableSelectionCount > 1);
+          ctrl.displayCheckboxes = (ctrl.maxAllowableSelectionCount > 1);
 
           // The following indicates that the number of answers is more than
           // maxAllowableSelectionCount.
-          $scope.preventAdditionalSelections = false;
+          ctrl.preventAdditionalSelections = false;
 
           // The following indicates that the number of answers is less than
           // minAllowableSelectionCount.
-          $scope.notEnoughSelections = ($scope.minAllowableSelectionCount > 0);
+          ctrl.notEnoughSelections = (ctrl.minAllowableSelectionCount > 0);
 
-          $scope.onToggleCheckbox = function() {
-            $scope.newQuestion = false;
-            $scope.selectionCount = Object.keys($scope.userSelections).filter(
+          ctrl.onToggleCheckbox = function() {
+            ctrl.newQuestion = false;
+            ctrl.selectionCount = Object.keys(ctrl.userSelections).filter(
               function(obj) {
-                return $scope.userSelections[obj];
+                return ctrl.userSelections[obj];
               }
             ).length;
-            $scope.preventAdditionalSelections = (
-              $scope.selectionCount >= $scope.maxAllowableSelectionCount);
-            $scope.notEnoughSelections = (
-              $scope.selectionCount < $scope.minAllowableSelectionCount);
+            ctrl.preventAdditionalSelections = (
+              ctrl.selectionCount >= ctrl.maxAllowableSelectionCount);
+            ctrl.notEnoughSelections = (
+              ctrl.selectionCount < ctrl.minAllowableSelectionCount);
           };
 
-          $scope.submitMultipleChoiceAnswer = function(index) {
-            $scope.userSelections[$scope.choices[index]] = true;
-            $scope.submitAnswer($scope.userSelections);
+          ctrl.submitMultipleChoiceAnswer = function(index) {
+            ctrl.userSelections[ctrl.choices[index]] = true;
+            ctrl.submitAnswer(ctrl.userSelections);
           };
 
-          $scope.submitAnswer = function() {
-            var answers = Object.keys($scope.userSelections).filter(
+          ctrl.submitAnswer = function() {
+            var answers = Object.keys(ctrl.userSelections).filter(
               function(obj) {
-                return $scope.userSelections[obj];
+                return ctrl.userSelections[obj];
               }
             );
 
@@ -93,10 +96,10 @@ oppia.directive('oppiaInteractiveItemSelectionInput', [
           };
 
           var validityCheckFn = function() {
-            return !$scope.notEnoughSelections;
+            return !ctrl.notEnoughSelections;
           };
           CurrentInteractionService.registerCurrentInteraction(
-            $scope.submitAnswer, validityCheckFn);
+            ctrl.submitAnswer, validityCheckFn);
         }
       ]
     };

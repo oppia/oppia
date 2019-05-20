@@ -31,11 +31,11 @@
   }
 </style>
 
-<ul ng-if="isAnswerLengthGreaterThanZero" class="drag-and-drop-sort-response-content">
-  <li ng-repeat="responses in answer">
+<ul ng-if="$ctrl.isAnswerLengthGreaterThanZero" class="drag-and-drop-sort-response-content">
+  <li ng-repeat="responses in $ctrl.answer">
     <ul ng-model="responses">
       <li ng-repeat="response in responses track by $index">
-        <div ng-if="chooseItemType($index)" ng-class="itemtype">
+        <div ng-if="$ctrl.chooseItemType($index)" ng-class="itemtype">
           <angular-html-bind html-data="response"></angular-html-bind>
         </div>
       </li>

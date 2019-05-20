@@ -21,16 +21,19 @@ oppia.directive('codeStringEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getAlwaysEditable: '&',
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/code_string_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = $scope.getAlwaysEditable();
-        $scope.getWarningText = function() {
-          if ($scope.localValue.label.indexOf('\t') !== -1) {
+        var ctrl = this;
+        ctrl.alwaysEditable = ctrl.getAlwaysEditable();
+        ctrl.getWarningText = function() {
+          if (ctrl.localValue.label.indexOf('\t') !== -1) {
             return 'Code may not contain tab characters.';
           }
           return '';
@@ -38,14 +41,14 @@ oppia.directive('codeStringEditor', [
 
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('value', function() {
-          $scope.localValue = {
-            label: $scope.value || ''
+        $scope.$watch('$ctrl.value', function() {
+          ctrl.localValue = {
+            label: ctrl.value || ''
           };
         }, true);
 
-        $scope.$watch('localValue.label', function(newValue) {
-          $scope.value = newValue;
+        $scope.$watch('$ctrl.localValue.label', function(newValue) {
+          ctrl.value = newValue;
         });
       }]
     };

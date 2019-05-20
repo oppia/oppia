@@ -21,38 +21,41 @@ oppia.directive('setOfHtmlStringEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getInitArgs: '&',
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/set_of_html_string_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.SCHEMA = {
           type: 'list',
           items: {
             type: 'html'
           }
         };
 
-        if (!$scope.value) {
-          $scope.value = [];
+        if (!ctrl.value) {
+          ctrl.value = [];
         }
-        $scope.initArgs = $scope.getInitArgs();
-        $scope.choices = $scope.initArgs.choices;
-        $scope.selections = $scope.choices.map(function(choice) {
-          return $scope.value.indexOf(choice.id) !== -1;
+        ctrl.initArgs = ctrl.getInitArgs();
+        ctrl.choices = ctrl.initArgs.choices;
+        ctrl.selections = ctrl.choices.map(function(choice) {
+          return ctrl.value.indexOf(choice.id) !== -1;
         });
 
         // The following function is necessary to insert elements into the
         // answer groups for the Item Selection Widget.
-        $scope.toggleSelection = function(choiceListIndex) {
-          var choiceHtml = $scope.choices[choiceListIndex].id;
-          var selectedChoicesIndex = $scope.value.indexOf(choiceHtml);
+        ctrl.toggleSelection = function(choiceListIndex) {
+          var choiceHtml = ctrl.choices[choiceListIndex].id;
+          var selectedChoicesIndex = ctrl.value.indexOf(choiceHtml);
           if (selectedChoicesIndex > -1) {
-            $scope.value.splice(selectedChoicesIndex, 1);
+            ctrl.value.splice(selectedChoicesIndex, 1);
           } else {
-            $scope.value.push(choiceHtml);
+            ctrl.value.push(choiceHtml);
           }
         };
       }]

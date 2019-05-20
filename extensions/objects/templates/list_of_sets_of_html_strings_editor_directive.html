@@ -17,11 +17,11 @@
 
 <div class="container-fluid">
   <p>NOTE: Two or more items may occupy the same slot.</p>
-  <div ng-repeat="choice in choices track by $index">
+  <div ng-repeat="choice in $ctrl.choices track by $index">
     <div class="row">
       <div class="col-sm-1">
-        <select ng-model="selectedRank" ng-change="selectedItem($index, selectedRank)" aria-label="choice"
-                id="{{$index}}" ng-init="selectedRank = initValues[$index]" ng-options="index for index in allowedChoices()">
+        <select ng-model="$ctrl.selectedRank" ng-change="$ctrl.selectedItem($index, $ctrl.selectedRank)" aria-label="choice"
+                id="{{$index}}" ng-init="$ctrl.selectedRank = $ctrl.initValues[$index]" ng-options="index for index in $ctrl.allowedChoices()">
         </select>
       </div>
       <div class="col-sm-10">
@@ -32,5 +32,5 @@
 </div>
 
 <div class="oppia-form-error">
-  <[getWarningText()]>
+  <[$ctrl.getWarningText()]>
 </div>

@@ -25,34 +25,37 @@ oppia.directive('oppiaInteractiveTextInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/TextInput/directives/' +
         'text_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'FocusManagerService', 'TextInputRulesService',
+        '$attrs', 'FocusManagerService', 'TextInputRulesService',
         'WindowDimensionsService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, FocusManagerService, TextInputRulesService,
+            $attrs, FocusManagerService, TextInputRulesService,
             WindowDimensionsService, CurrentInteractionService) {
-          $scope.placeholder = HtmlEscaperService.escapedJsonToObj(
+          var ctrl = this;
+          ctrl.placeholder = HtmlEscaperService.escapedJsonToObj(
             $attrs.placeholderWithValue);
-          $scope.rows = (
+          ctrl.rows = (
             HtmlEscaperService.escapedJsonToObj($attrs.rowsWithValue));
-          $scope.answer = '';
-          $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
+          ctrl.answer = '';
+          ctrl.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
-          $scope.schema = {
+          ctrl.schema = {
             type: 'unicode',
             ui_config: {}
           };
-          if ($scope.placeholder) {
-            $scope.schema.ui_config.placeholder = $scope.placeholder;
+          if (ctrl.placeholder) {
+            ctrl.schema.ui_config.placeholder = ctrl.placeholder;
           }
-          if ($scope.rows && $scope.rows !== 1) {
-            $scope.schema.ui_config.rows = $scope.rows;
+          if (ctrl.rows && ctrl.rows !== 1) {
+            ctrl.schema.ui_config.rows = ctrl.rows;
           }
 
-          $scope.submitAnswer = function(answer) {
+          ctrl.submitAnswer = function(answer) {
             if (!answer) {
               return;
             }
@@ -61,11 +64,11 @@ oppia.directive('oppiaInteractiveTextInput', [
           };
 
           var submitAnswerFn = function() {
-            $scope.submitAnswer($scope.answer);
+            ctrl.submitAnswer(ctrl.answer);
           };
 
           var validityCheckFn = function() {
-            return $scope.answer.length > 0;
+            return ctrl.answer.length > 0;
           };
 
           CurrentInteractionService.registerCurrentInteraction(

@@ -28,17 +28,20 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MultipleChoiceInput/directives/' +
         'multiple_choice_input_interaction_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'CurrentInteractionService',
-        function($scope, $attrs, CurrentInteractionService) {
-          $scope.choices = HtmlEscaperService.escapedJsonToObj(
+        '$attrs', 'CurrentInteractionService',
+        function($attrs, CurrentInteractionService) {
+          var ctrl = this;
+          ctrl.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
-          $scope.answer = null;
+          ctrl.answer = null;
 
-          $scope.submitAnswer = function(answer) {
+          ctrl.submitAnswer = function(answer) {
             if (answer === null) {
               return;
             }
