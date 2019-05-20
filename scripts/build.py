@@ -107,7 +107,7 @@ FILEPATHS_NOT_TO_RENAME = (
 # JS hashes object.
 FILEPATHS_PROVIDED_TO_FRONTEND = (
     'images/*', 'videos/*', 'i18n/*', '*_directive.html', '*.png', '*.json',
-    '.directive.html', '.template.html')
+    '*.directive.html', '*.template.html')
 
 HASH_BLOCK_SIZE = 2**20
 
