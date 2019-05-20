@@ -19,9 +19,11 @@
 require(
   'components/loading/LoadingDotsDirective.ts');
 require(
-  'components/summary_tile/ExplorationSummaryTileDirective.ts');
+  'components/summary-tile-directives/exploration-summary-tile/' +
+  'exploration-summary-tile.directive.ts');
 require(
-  'components/summary_tile/CollectionSummaryTileDirective.ts');
+  'components/summary-tile-directives/collection-summary-tile/' +
+  'collection-summary-tile.directive.ts');
 require('pages/library-page/library-footer/library-footer.controller.ts');
 require('pages/library-page/search-bar/search-bar.directive.ts');
 require('pages/library-page/search-results/search-results.directives.ts');
