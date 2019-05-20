@@ -25,13 +25,16 @@ oppia.directive('oppiaResponseContinue', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/Continue/directives/' +
         'continue_response_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'HtmlEscaperService',
-        function($scope, $attrs, HtmlEscaperService) {
-          $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        '$attrs', 'HtmlEscaperService',
+        function($attrs, HtmlEscaperService) {
+          var ctrl = this;
+          ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         }
       ]
     };
