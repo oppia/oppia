@@ -101,8 +101,8 @@ oppia.directive('hintAndSolutionButtons', [
             }
           };
 
-          $scope.displaySolutionModal = function() {
-            $scope.solutionModalIsActive = true;
+          ctrl.displaySolutionModal = function() {
+            ctrl.solutionModalIsActive = true;
             var inQuestionMode = (
               ExplorationPlayerStateService.isInQuestionMode());
             if (!_editorPreviewMode && !inQuestionMode) {
