@@ -16,6 +16,8 @@
  * @fileoverview Primary Module for the collection editor page.
  */
 
+require('pages/collection_editor/CollectionEditorStateService.ts');
+
 angular.module('collectionEditorPageModule').constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
 
@@ -25,6 +27,7 @@ angular.module('collectionEditorPageModule').constant(
 
 angular.module('collectionEditorPageModule').constant(
   'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+
 // TODO(bhenning): These constants should be provided by the backend.
 
 angular.module('collectionEditorPageModule').constant(
