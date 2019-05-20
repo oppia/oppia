@@ -48,6 +48,7 @@ angular.module('collectionSummaryTileModule').directive(
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/components/summary-tile-directives/collection-summary-tile/' +
           'collection-summary-tile.directive.html'),
+        controllerAs: '$ctrl',
         controller: [
           'DateTimeFormatService', 'UserService',
           'COLLECTION_VIEWER_URL', 'COLLECTION_EDITOR_URL', function(
