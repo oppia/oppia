@@ -1,0 +1,90 @@
+<learner-dashboard-icons ng-if="showLearnerDashboardIconsIfPossible() && userIsLoggedIn"
+                         activity-type="ACTIVITY_TYPE_EXPLORATION"
+                         activity-id="getExplorationId()"
+                         activity-title="getExplorationTitle()"
+                         container-is-narrow="isContainerNarrow()"
+                         activity-active="explorationIsCurrentlyHoveredOver"
+                         add-to-playlist-icon-is-shown="!isOwnedByCurrentUser()">
+</learner-dashboard-icons>
+
+<md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
+         style="position: relative; z-index: 5;" ng-if="!isRefresherExploration">
+  <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
+    <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
+      <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '4px', 'width': '50px'}">
+      <h3 class="activity-title protractor-test-exp-summary-tile-title" ng-style="isPlaylistTile() && {'width': '93%'}">
+        <span ng-if="isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
+        <span ng-if="!isWindowLarge"><[getExplorationTitle()|truncate:40]></span>
+      </h3>
+
+      <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
+      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars">
+        <div>
+          <circular-image ng-if="avatarsList.length > 0"
+                          src="avatarsList[0].image"
+                          link="avatarsList[0].link"
+                          uib-tooltip="<[avatarsList[0].tooltipText | truncate:16]>"
+                          tooltip-placement="bottom">
+          </circular-image>
+        </div>
+      </div>
+    </div>
+    <div ng-if="!isPlaylistTile()" class="title-section-mask"
+         ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)">
+    </div>
+    <div ng-attr-section="<[isWindowLarge ? undefined : 'right-section']>" class="summary-section">
+      <div ng-if="isWindowLarge" class="objective protractor-test-exp-summary-tile-objective">
+        <[getObjective() | truncateAndCapitalize: 95]>
+      </div>
+      <div ng-if="!getObjective()" class="objective">
+        <span translate="I18N_LIBRARY_NO_OBJECTIVE">
+        </span>
+      </div>
+      <ul ng-if="!isCollectionPreviewTile" layout="row" class="metrics" layout-align="space-between center">
+        <li>
+          <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
+            <span class="fa fa-star fa-lg" uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+              <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]></span>
+            </span>
+            <span ng-if="getAverageRating()">
+              <[getAverageRating() | number:1]>
+            </span>
+            <span ng-if="!getAverageRating()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+            </span>
+          </span>
+        </li>
+        <li>
+          <span class="fa fa-eye fa-lg" uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+            <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]></span>
+          </span>
+          <span ng-if="getNumViews()">
+            <[getNumViews() | summarizeNonnegativeNumber]>
+          </span>
+          <span ng-if="!getNumViews()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+          </span>
+        </li>
+        <li>
+          <span ng-if="getLastUpdatedDatetime()">
+            <span class="oppia-icon-accessibility-label">Last Updated</span>
+            <[getLastUpdatedDatetime()]>
+          </span>
+          <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+          </span>
+        </li>
+      </ul>
+      <button ng-if="isCollectionPreviewTile" class="oppia-learner-confirm-button md-button md-default-theme protractor-test-play-exploration-button"
+              style="display: block; margin: auto; touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+        <span translate="I18N_PLAYER_PLAY_EXPLORATION"></span>
+      </button>
+    </div>
+  </a>
+</md-card>
+<md-button class="oppia-learner-confirm-button protractor-test-return-to-parent-button"
+           style="margin-top: 12px;"
+           ng-if="isRefresherExploration"
+           ng-click="loadParentExploration()">
+  <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
+  <i class="fa fa-arrow-right"
+     style="font-size: 19px; padding-top: 1.5px;">
+  </i>
+</md-button>
