@@ -16,6 +16,8 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
+require('services/SearchService.ts');
+
 describe('Search service', function() {
   var SearchService;
 

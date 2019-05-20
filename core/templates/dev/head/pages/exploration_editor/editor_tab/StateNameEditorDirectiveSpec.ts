@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for the controller of the 'State Editor'.
  */
 
+require('App.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 describe('Sidebar state name controller', function() {
   describe('SidebarStateName', function() {
     var scope, filter, ctrl, ecs, fs, ess, rootScope, outerScope;
@@ -155,12 +162,6 @@ describe('Sidebar state name controller', function() {
           },
         }
       });
-
-      var templateHtml = $templateCache.get(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_name_editor_directive.html');
-      $compile(templateHtml, $rootScope);
-      $rootScope.$digest();
 
       outerScope = $rootScope.$new();
       var elem = angular.element(

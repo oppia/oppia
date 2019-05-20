@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for state rules stats service.
  */
 
+require('App.ts');
+require('services/StateRulesStatsService.ts');
+
 describe('State Rules Stats Service', function() {
   var StateRulesStatsService = null;
 
