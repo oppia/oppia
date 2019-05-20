@@ -25,7 +25,7 @@ require('domain/collection/CollectionValidationService.ts');
 require('domain/collection/EditableCollectionBackendApiService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection-editor-page/CollectionEditorStateService.ts');
 require('pages/exploration_editor/RouterService.ts');
 require('services/AlertsService.ts');
 
@@ -34,7 +34,7 @@ angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/collection-editor-navbar/' +
+        '/pages/collection-editor-page/collection-editor-navbar/' +
         'collection-editor-navbar.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'RouterService',
@@ -127,7 +127,7 @@ angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar
             var isPrivate = $scope.collectionRights.isPrivate();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/collection_editor/collection-editor-navbar/' +
+                '/pages/collection-editor-page/collection-editor-navbar/' +
                 'collection-editor-save-modal.directive.html'),
               backdrop: true,
               controller: [
@@ -159,7 +159,7 @@ angular.module('collectionEditorNavbarModule').directive('collectionEditorNavbar
             if (additionalMetadataNeeded) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/collection_editor/collection-editor-navbar/' +
+                  '/pages/collection-editor-page/collection-editor-navbar/' +
                   'collection-editor-pre-publish-modal.directive.html'),
                 backdrop: true,
                 controller: [

@@ -13,18 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the history tab of the collection editor.
+ * @fileoverview Controller for the settings tab of the collection editor.
  */
+
+require('pages/collection-editor-page/settings-tab/' +
+  'collection-details-editor/collection-details-editor.directive.ts');
+require('pages/collection-editor-page/settings-tab/' +
+  'collection-permissions-card/collection-permissions-card.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('collectionHistoryTabModule').directive('collectionHistoryTab', [
+angular.module('collectionSettingsTabModule').directive('collectionSettingsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/history-tab/' +
-        'collection-history-tab.directive.html'),
+        '/pages/collection-editor-page/settings-tab/' +
+        'collection-settings-tab.directive.html'),
       controller: [function() {}]
     };
   }]);

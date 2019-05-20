@@ -31,7 +31,7 @@ oppia.factory('CollectionCreationService', [
       $http, $rootScope, $timeout, $window, AlertsService,
       SiteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_COLLECTION_URL_TEMPLATE = (
-      '/collection_editor/create/<collection_id>');
+      '/collection-editor-page/create/<collection_id>');
     var collectionCreationInProgress = false;
 
     return {

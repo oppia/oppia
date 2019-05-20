@@ -170,7 +170,7 @@ describe('Collections', function() {
     general.checkForConsoleErrors([]);
 
     // Checking in a collection with two nodes.
-    browser.get('/collection_editor/create/' + collectionId);
+    browser.get('/collection-editor-page/create/' + collectionId);
     waitFor.pageToFullyLoad();
     collectionEditorPage.addExistingExploration(secondExplorationId);
     collectionEditorPage.saveDraft();
@@ -181,7 +181,7 @@ describe('Collections', function() {
     general.checkForConsoleErrors([]);
 
     // Checking in a collection with three nodes.
-    browser.get('/collection_editor/create/' + collectionId);
+    browser.get('/collection-editor-page/create/' + collectionId);
     waitFor.pageToFullyLoad();
     collectionEditorPage.addExistingExploration(thirdExplorationId);
     collectionEditorPage.saveDraft();
@@ -192,7 +192,7 @@ describe('Collections', function() {
     general.checkForConsoleErrors([]);
 
     // Checking in a collection with four nodes.
-    browser.get('/collection_editor/create/' + collectionId);
+    browser.get('/collection-editor-page/create/' + collectionId);
     waitFor.pageToFullyLoad();
     collectionEditorPage.addExistingExploration(fourthExplorationId);
     collectionEditorPage.saveDraft();

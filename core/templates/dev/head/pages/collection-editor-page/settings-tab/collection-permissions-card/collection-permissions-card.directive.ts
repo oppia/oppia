@@ -13,23 +13,28 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the settings tab of the collection editor.
+ * @fileoverview Directive for displaying the collection's owner name and
+ * permissions.
  */
 
-require('pages/collection_editor/settings-tab/' +
-  'collection-details-editor/collection-details-editor.directive.ts');
-require('pages/collection_editor/settings-tab/' +
-  'collection-permissions-card/collection-permissions-card.directive.ts');
-
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection-editor-page/CollectionEditorStateService.ts');
 
-angular.module('collectionSettingsTabModule').directive('collectionSettingsTab', [
+angular.module('collectionPermissionsCardModule').directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings-tab/' +
-        'collection-settings-tab.directive.html'),
-      controller: [function() {}]
+        '/pages/collection-editor-page/settings-tab/collection-permissions-card/' +
+        'collection-permissions-card.directive.html'),
+      controller: [
+        '$scope', 'CollectionEditorStateService',
+        function($scope, CollectionEditorStateService) {
+          $scope.collectionRights =
+            CollectionEditorStateService.getCollectionRights();
+          $scope.hasPageLoaded =
+            CollectionEditorStateService.hasLoadedCollection;
+        }
+      ]
     };
   }]);

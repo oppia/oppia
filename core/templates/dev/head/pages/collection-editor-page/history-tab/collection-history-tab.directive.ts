@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the statistics tab of the collection editor.
+ * @fileoverview Controller for the history tab of the collection editor.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('collectionStatisticsTabModule').directive('collectionStatisticsTab', [
+angular.module('collectionHistoryTabModule').directive('collectionHistoryTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/statistics-tab/' +
-        'collection-statistics-tab.directive.html'),
+        '/pages/collection-editor-page/history-tab/' +
+        'collection-history-tab.directive.html'),
       controller: [function() {}]
     };
   }]);

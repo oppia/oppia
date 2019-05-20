@@ -23,8 +23,8 @@ require('components/forms/Select2DropdownDirective.ts');
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/collection/CollectionValidationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditor.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection-editor-page/CollectionEditor.ts');
+require('pages/collection-editor-page/CollectionEditorStateService.ts');
 require('services/AlertsService.ts');
 
 angular.module('collectionDetailsEditorModule').directive('collectionDetailsEditor', [
@@ -32,7 +32,7 @@ angular.module('collectionDetailsEditorModule').directive('collectionDetailsEdit
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings-tab/collection-details-editor/' +
+        '/pages/collection-editor-page/settings-tab/collection-details-editor/' +
         'collection-details-editor.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',

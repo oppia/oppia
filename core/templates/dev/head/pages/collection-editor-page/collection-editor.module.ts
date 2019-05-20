@@ -16,7 +16,7 @@
  * @fileoverview Primary Module for the collection editor page.
  */
 
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection-editor-page/CollectionEditorStateService.ts');
 
 angular.module('collectionEditorPageModule').constant(
   'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
