@@ -16,7 +16,7 @@
  * @fileoverview The module for the maintenance page.
  */
 
-var load = require.context('./', true, /\.module\.ts$/)
+var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
 module.exports = angular.module('maintenancePageModule', []).name;
 

@@ -16,7 +16,7 @@
  * @fileoverview Module for the for the Oppia splash page.
  */
 
-var load = require.context('./', true, /\.module\.ts$/)
+var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
 module.exports = angular.module('splashPageModule', []).name;
 

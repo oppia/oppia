@@ -16,7 +16,7 @@
  * @fileoverview Module for the topics and skills dashboard.
  */
 
-var load = require.context('./', true, /\.module\.ts$/)
+var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
 module.exports = angular.module('topicsAndSkillsDashboardModule', []).name;
 

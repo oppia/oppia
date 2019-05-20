@@ -16,7 +16,7 @@
  * @fileoverview Module for suggestion modal services.
  */
 
-var load = require.context('./', true, /\.module\.ts$/)
+var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
 module.exports = angular.module('suggestionModalModule', []).name;
 
