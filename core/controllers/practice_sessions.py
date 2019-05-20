@@ -32,7 +32,6 @@ class PracticeSessionsPage(base.BaseHandler):
     def get(self, topic_name):
         """Handles GET requests."""
 
-        print "bl"
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
