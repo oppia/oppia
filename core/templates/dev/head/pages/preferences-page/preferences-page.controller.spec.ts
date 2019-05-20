@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('pages/preferences/Preferences.ts');
+require('pages/preferences-page/preferences-page.controller.ts');
 
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {

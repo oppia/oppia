@@ -16,4 +16,8 @@
  * @fileoverview Module for custom filters.
  */
 
+var load = require.context('./', true, /\.module\.ts$/);
+load.keys().forEach(load);
+module.exports = angular.module('adminPageModule', []).name;
+
 angular.module('filtersModule', ['stringUtilityFiltersModule']);
