@@ -274,7 +274,7 @@ CONFIG_FILE_PATHS = (
     'webpack.dev.config.ts',
     'webpack.prod.config.ts')
 
-CODEOWNER_FILEPATH =  '.github/CODEOWNERS'
+CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 
 # This list needs to be in sync with the important patterns in the CODEOWNERS
 # file.
@@ -2167,7 +2167,7 @@ class LintChecksManager(object):
         return summary_messages
 
     def check_for_important_rules_at_bottom_of_codeowners(
-                self, imp_rules_in_critical_section, failed):
+            self, imp_rules_in_critical_section, failed):
         """Checks that the most important rules/patterns are at the bottom
         of the CODEOWNERS file.
 
@@ -2191,10 +2191,10 @@ class LintChecksManager(object):
                     important_path_match_bool_list):
                 if not bool_value:
                     print ('%s --> The rule \'%s\' is not an important '
-                            'rule. Please place it before the critical '
-                            'files section.' % (
-                                CODEOWNER_FILEPATH,
-                                imp_rules_in_critical_section[index]))
+                           'rule. Please place it before the critical '
+                           'files section.' % (
+                               CODEOWNER_FILEPATH,
+                               imp_rules_in_critical_section[index]))
                     failed = True
         else:
             important_path_match_bool_list = ([
@@ -2207,11 +2207,11 @@ class LintChecksManager(object):
                     important_path_match_bool_list):
                 if not bool_value:
                     print ('%s --> Please ensure that the rule \'%s\' lies '
-                            'towards the bottom of the CODEOWNERS file under'
-                            ' the critical files section since it is an '
-                            'important rule.' % (
-                                CODEOWNER_FILEPATH,
-                                CODEOWNER_IMPORTANT_PATHS[index]))
+                           'towards the bottom of the CODEOWNERS file under'
+                           ' the critical files section since it is an '
+                           'important rule.' % (
+                               CODEOWNER_FILEPATH,
+                               CODEOWNER_IMPORTANT_PATHS[index]))
                     failed = True
         return failed
 
