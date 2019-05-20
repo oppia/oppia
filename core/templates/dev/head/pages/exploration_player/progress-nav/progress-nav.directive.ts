@@ -16,6 +16,15 @@
  * @fileoverview Directive for navigation in the conversation skin.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/ExplorationPlayerStateService.ts');
+require('pages/exploration_player/PlayerConstants.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 angular.module('progressNavModule').directive('progressNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

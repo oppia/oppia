@@ -16,6 +16,20 @@
  * @fileoverview Controller for the local navigation in the learner view.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/ExplorationPlayerStateService.ts');
+require('pages/exploration_player/FeedbackPopupDirective.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require(
+  'pages/suggestion_editor/ShowSuggestionModalForLearnerLocalViewService.ts');
+require('services/AlertsService.ts');
+require('services/UserService.ts');
+require('services/stateful/FocusManagerService.ts');
+
+angular.module('LearnerLocalNavModule').constant(
+  'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
+
 angular.module('LearnerLocalNavModule').controller('LearnerLocalNav', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'ExplorationEngineService', 'ExplorationPlayerStateService',

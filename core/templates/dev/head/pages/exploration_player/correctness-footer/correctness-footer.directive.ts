@@ -16,6 +16,8 @@
  * @fileoverview Directive for the correctness footer in the exploration player.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('correctnessFooterModule').directive('correctnessFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

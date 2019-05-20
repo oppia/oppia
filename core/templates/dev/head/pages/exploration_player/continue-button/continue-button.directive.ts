@@ -17,6 +17,8 @@
  * editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 angular.module('continueButtonModule').directive('continueButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

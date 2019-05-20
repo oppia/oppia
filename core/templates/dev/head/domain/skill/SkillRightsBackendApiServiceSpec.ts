@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for SkillRightsBackendApiService.
  */
 
+require('App.ts');
+require('domain/skill/SkillRightsBackendApiService.ts');
+require('pages/skill_editor/SkillEditor.ts');
+
 describe('Skill rights backend API service', function() {
   var SkillRightsBackendApiService = null;
   var $rootScope = null;

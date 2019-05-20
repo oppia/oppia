@@ -16,6 +16,26 @@
  * @fileoverview Directive for the feedback popup.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/GetAbbreviatedTextFilter.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('services/AlertsService.ts');
+require('services/UserService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/BackgroundMaskService.ts');
+require('services/stateful/FocusManagerService.ts');
+
+// This directive is unusual in that it should only be invoked indirectly, as
+// follows:
+//
+// <some-html-element popover-placement="bottom"
+//                    uib-popover-template="'<[getFeedbackPopoverUrl()]>'"
+//                    popover-trigger="click" state-name="<[STATE_NAME]>">
+// </some-html-element>
+//
+// The state-name argument is optional. If it is not provided, the feedback is
+// assumed to apply to the exploration as a whole.
 angular.module('feedbackPopupModule').directive('feedbackPopup', [
   'ExplorationEngineService', 'UrlInterpolationService',
   function(ExplorationEngineService, UrlInterpolationService) {
