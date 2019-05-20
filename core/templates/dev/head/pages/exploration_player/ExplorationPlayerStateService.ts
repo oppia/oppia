@@ -42,7 +42,6 @@ require('services/PlaythroughIssuesService.ts');
 require('services/PlaythroughService.ts');
 require('services/contextual/UrlService.ts');
 
-
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', '$rootScope', 'ContextService',
   'EditableExplorationBackendApiService',
