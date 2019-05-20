@@ -796,10 +796,11 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         commit_message = 'Migrate from translator to voice artist'
         commit_cmds = [{
             'cmd': 'change_role',
-            'assignee_ids': translator_ids,
+            'assignee_id': translator_id,
             'old_role': 'translator',
             'new_role': 'voice artist'
-        }]
+        } for translator_id in translator_ids]
+
         if len(translator_ids) > 0:
             exp_summary_model = exp_models.ExpSummaryModel.get_by_id(item.id)
 
