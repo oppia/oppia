@@ -55,6 +55,8 @@ require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
+require('pages/library-page/library-page.module.ts')
+
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 

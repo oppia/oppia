@@ -29,6 +29,7 @@ module.exports = function(config) {
       'third_party/static/angular-recorder-1.4.1/dist' +
       '/angular-audio-recorder.min.js',
       generatedJs,
+      'local_compiled_js/core/templates/dev/head/**/*module.js',
       'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -36,6 +37,9 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*Spec.ts',
       'core/templates/dev/head/*Spec.ts',
+      'core/templates/dev/head/**/*.directive.html',
+      'core/templates/dev/head/**/*.spec.ts',
+      'core/templates/dev/head/*.spec.ts',
       'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
       {

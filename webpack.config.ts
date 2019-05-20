@@ -51,7 +51,7 @@ module.exports = {
     landing: commonPrefix + '/pages/landing/TopicLandingPage.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
-    library: commonPrefix + '/pages/library/Library.ts',
+    library: commonPrefix + '/pages/library-page/library-page.controller.ts',
     maintenance: commonPrefix + '/pages/maintenance/Maintenance.ts',
     moderator: commonPrefix + '/pages/moderator/Moderator.ts',
     notifications_dashboard:
@@ -203,8 +203,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['library'],
-      filename: 'library.html',
-      template: commonPrefix + '/pages/library/library.html',
+      filename: 'library-page.mainpage.html',
+      template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
