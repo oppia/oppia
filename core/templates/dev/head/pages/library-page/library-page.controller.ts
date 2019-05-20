@@ -17,13 +17,11 @@
  */
 
 require(
-  'components/common-layout-directives/loading-dots/loading-dots.directive.ts');
+  'components/loading/LoadingDotsDirective.ts');
 require(
-  'components/summary-tile-directives/exploration-summary-tile/' +
-  'exploration-summary-tile.directive.ts');
+  'components/summary_tile/ExplorationSummaryTileDirective.ts');
 require(
-  'components/summary-tile-directives/collection-summary-tile/' +
-  'collection-summary-tile.directive.ts');
+  'components/summary_tile/CollectionSummaryTileDirective.ts');
 require('pages/library-page/library-footer/library-footer.controller.ts');
 require('pages/library-page/search-bar/search-bar.directive.ts');
 require('pages/library-page/search-results/search-results.directives.ts');
