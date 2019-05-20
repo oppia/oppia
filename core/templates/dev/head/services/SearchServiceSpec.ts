@@ -217,36 +217,6 @@ describe('Search service', function() {
     }
   );
 
-  it('should only find empty string when ampersand is not escaped anywhere',
-    function() {
-      var results = {
-        categories: {
-          description: '',
-          itemsName: 'categories',
-          masterList: [],
-          numSelections: 0,
-          selections: {},
-          summary: ''
-        },
-        languageCodes: {
-          description: '',
-          itemsName: 'languages',
-          masterList: [],
-          numSelections: 0,
-          selections: {},
-          summary: ''
-        }
-      };
-      var urlComponent = '?q=protractor&test&category=("Mathematics")' +
-                         '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error(
-        'Invalid search query url: protractor&test&category=("Mathematics")' +
-        '&language_code=("en"%20OR%20"ar")'));
-    }
-  );
-
   it('should error when category selection url component is malformed',
     function() {
       var results = {
