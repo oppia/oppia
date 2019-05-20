@@ -18,17 +18,17 @@
 
 // TODO(bhenning): These constants should be provided by the backend.
 
-require('pages/collection-editor-page/collection-editor-navbar-breadcrumb/' +
+require('pages/collection-editor-page /collection-editor-navbar-breadcrumb/' +
   'collection-editor-navbar-breadcrumb.directive.ts');
-require('pages/collection-editor-page/collection-editor-navbar/' +
+require('pages/collection-editor-page /collection-editor-navbar/' +
   'collection-editor-navbar.directive.ts');
-require('pages/collection-editor-page/editor-tab/' +
+require('pages/collection-editor-page /editor-tab/' +
   'collection-editor-tab.directive.ts');
-require('pages/collection-editor-page/history-tab/' +
+require('pages/collection-editor-page /history-tab/' +
   'collection-history-tab.directive.ts');
 require(
-  'pages/collection-editor-page/settings-tab/collection-settings-tabDirective.ts');
-require('pages/collection-editor-page/statistics-tab/' +
+  'pages/collection-editor-page /settings-tab/collection-settings-tabDirective.ts');
+require('pages/collection-editor-page /statistics-tab/' +
   'collection-statistics-tab.directive.ts');
 
 angular.module('collectionEditorPageModule').controller('CollectionEditor', [

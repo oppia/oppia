@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page/CollectionEditorStateService.ts');
+require('pages/collection-editor-page /CollectionEditorStateService.ts');
 require('pages/exploration_editor/RouterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
@@ -34,7 +34,7 @@ angular.module('collectionEditorNavbarBreadcrumbModule').directive('collectionEd
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/collection-editor-navbar-breadcrumb/' +
+        '/pages/collection-editor-page /collection-editor-navbar-breadcrumb/' +
         'collection-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', 'RouterService', 'CollectionEditorStateService',

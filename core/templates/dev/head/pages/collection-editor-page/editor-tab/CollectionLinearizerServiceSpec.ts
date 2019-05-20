@@ -18,7 +18,7 @@
 
 require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/CollectionObjectFactory.ts');
-require('pages/collection-editor-page/editor-tab/CollectionLinearizerService.ts');
+require('pages/collection-editor-page /editor-tab/CollectionLinearizerService.ts');
 
 describe('Collection linearizer service', function() {
   var CollectionObjectFactory = null;

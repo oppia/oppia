@@ -23,7 +23,7 @@ angular.module('collectionStatisticsTabModule').directive('collectionStatisticsT
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/statistics-tab/' +
+        '/pages/collection-editor-page /statistics-tab/' +
         'collection-statistics-tab.directive.html'),
       controller: [function() {}]
     };

@@ -26,7 +26,7 @@ require('services/UserService.ts');
 oppia.constant(
   'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
 oppia.constant(
-  'COLLECTION_EDITOR_URL', '/collection-editor-page/create/<collection_id>');
+  'COLLECTION_EDITOR_URL', '/collection_editor/create/<collection_id>');
 
 oppia.directive('collectionSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {

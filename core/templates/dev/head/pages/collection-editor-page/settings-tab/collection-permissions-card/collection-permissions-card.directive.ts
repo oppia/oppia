@@ -18,14 +18,14 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page/CollectionEditorStateService.ts');
+require('pages/collection-editor-page /CollectionEditorStateService.ts');
 
 angular.module('collectionPermissionsCardModule').directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/settings-tab/collection-permissions-card/' +
+        '/pages/collection-editor-page /settings-tab/collection-permissions-card/' +
         'collection-permissions-card.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService',

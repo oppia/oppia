@@ -23,7 +23,7 @@ angular.module('collectionHistoryTabModule').directive('collectionHistoryTab', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/history-tab/' +
+        '/pages/collection-editor-page /history-tab/' +
         'collection-history-tab.directive.html'),
       controller: [function() {}]
     };

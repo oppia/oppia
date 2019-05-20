@@ -298,7 +298,7 @@ oppia.controller('CreatorDashboard', [
     };
 
     $scope.getCollectionUrl = function(collectionId) {
-      return '/collection-editor-page/create/' + collectionId;
+      return '/collection_editor/create/' + collectionId;
     };
 
     $scope.setMyExplorationsView = function(newViewType) {

@@ -16,9 +16,9 @@
  * @fileoverview Controller for the settings tab of the collection editor.
  */
 
-require('pages/collection-editor-page/settings-tab/' +
+require('pages/collection-editor-page /settings-tab/' +
   'collection-details-editor/collection-details-editor.directive.ts');
-require('pages/collection-editor-page/settings-tab/' +
+require('pages/collection-editor-page /settings-tab/' +
   'collection-permissions-card/collection-permissions-card.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -28,7 +28,7 @@ angular.module('collectionSettingsTabModule').directive('collectionSettingsTab',
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/settings-tab/' +
+        '/pages/collection-editor-page /settings-tab/' +
         'collection-settings-tab.directive.html'),
       controller: [function() {}]
     };
