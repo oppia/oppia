@@ -26,7 +26,7 @@ var workflow = require('../protractor_utils/workflow.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
-describe('Exploration translation', function() {
+fdescribe('Exploration translation', function() {
   var explorationEditorMainTab = null;
   var explorationEditorPage = null;
   var explorationEditorSettingsTab = null;
@@ -39,7 +39,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab = explorationEditorPage.getTranslationTab();
   });
 
-  it('should walkthrough translation tutorial when user clicks next',
+  fit('should walkthrough translation tutorial when user clicks next',
     function() {
       users.createUser('userclicknext@translationTabTutorial.com',
         'userclicknextTranslationTabTutorial');
