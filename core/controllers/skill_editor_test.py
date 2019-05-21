@@ -315,11 +315,9 @@ class SkillEditorQuestionHandlerTests(BaseSkillEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            question_summary_dicts = self.get_json(
-                '%s/%s' %
-                (
-                    feconf.SKILL_EDITOR_QUESTION_URL,
-                    self.skill_id))['question_summary_dicts']
+            response = self.get_json(
+                '%s/%s' % (feconf.SKILL_EDITOR_QUESTION_URL, self.skill_id))
+            question_summary_dicts = response['question_summary_dicts']
 
             self.assertEqual(question_summary_dicts, [])
 
@@ -331,11 +329,9 @@ class SkillEditorQuestionHandlerTests(BaseSkillEditorControllerTests):
             question_id, self.skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            question_summary_dicts = self.get_json(
-                '%s/%s' %
-                (
-                    feconf.SKILL_EDITOR_QUESTION_URL,
-                    self.skill_id))['question_summary_dicts'][0]
+            response = self.get_json(
+                '%s/%s' % (feconf.SKILL_EDITOR_QUESTION_URL, self.skill_id))
+            question_summary_dicts = response['question_summary_dicts'][0]
 
             self.assertEqual(
                 question_summary_dicts['skill_description'], 'Description')
