@@ -322,11 +322,12 @@ def main():
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args()
-    remote = _get_remote_name()
-    remote = remote if remote else args.remote
     if args.install:
         _install_hook()
         sys.exit(0)
+
+    remote = _get_remote_name()
+    remote = remote if remote else args.remote
     refs = _get_refs()
     collected_files = _collect_files_being_pushed(refs, remote)
     # Only interfere if we actually have something to lint (prevent annoyances).
