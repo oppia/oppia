@@ -2253,32 +2253,41 @@ class LintChecksManager(object):
         or extensions folder which are not specified in
         build.JS_FILEPATHS_NOT_TO_BUILD.
         """
+
+        if self.verbose_mode_enabled:
+            print 'Starting extra js files check'
+            print '----------------------------------------'
+
         summary_messages = []
-        js_files_to_check = [
-            filepath for filepath in self.all_filepaths if (
-                filepath.endswith('.js'))]
+        failed = False
+        with _redirect_stdout(_TARGET_STDOUT):
+            js_files_to_check = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.js'))]
 
-        extra_js_files = []
-        for filename in js_files_to_check:
-            if filename.startswith(('core/templates', 'extensions')) and (
-                    filename not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
-                        not filename.endswith('protractor.js')):
-                extra_js_files.append(filename)
+            for filename in js_files_to_check:
+                if filename.startswith(('core/templates', 'extensions')) and (
+                        filename not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
+                            not filename.endswith('protractor.js')):
+                    print ('%s  --> Found extra .js file\n' % filename)
+                    failed = True
 
-        if len(extra_js_files):
-            err_msg = (
-                'You have following extra js files in your repo: %s. If you '
-                'want them to be present as js files, add them to the list '
-                'JS_FILEPATHS_NOT_TO_BUILD in build.py else rename them to .ts'
-            ) % (extra_js_files)
-            summary_message = '%s   %s' % (_MESSAGE_TYPE_FAILED, err_msg)
-        else:
-            summary_message = '%s  Extra JS files check passed' % (
-                _MESSAGE_TYPE_SUCCESS)
+            if failed:
+                err_msg = (
+                    'If you want the above files to be present as js files, '
+                    'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                    'build.py else rename them to .ts\n')
+                print (err_msg)
 
-        summary_messages.append(summary_message)
-        print summary_message
-        print ''
+            if failed:
+                summary_message = '%s  Extra JS files check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Extra JS files check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+            print ''
 
         return summary_messages
 
