@@ -48,7 +48,6 @@ class StoryEditorPage(base.BaseHandler):
 
         self.values.update({
             'story_id': story.id,
-            'story_title': story.title,
         })
 
         self.render_template('dist/story_editor.html')

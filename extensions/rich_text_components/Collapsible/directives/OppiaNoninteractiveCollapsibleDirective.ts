@@ -25,13 +25,16 @@ oppia.directive('oppiaNoninteractiveCollapsible', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Collapsible' +
         '/directives/collapsible_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.heading = HtmlEscaperService.escapedJsonToObj(
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.heading = HtmlEscaperService.escapedJsonToObj(
           $attrs.headingWithValue);
-        $scope.content = HtmlEscaperService.escapedJsonToObj(
+        ctrl.content = HtmlEscaperService.escapedJsonToObj(
           $attrs.contentWithValue);
       }]
     };
