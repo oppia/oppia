@@ -258,8 +258,8 @@ oppia.directive('audioTranslationBar', [
           // create visualizer for playing unsaved audio
           $scope.waveSurfer = WaveSurfer.create({
             container: '#visualized',
-            waveColor:"#009688",
-            progressColor:"#cccccc",
+            waveColor: '#009688',
+            progressColor: '#cccccc',
             height:38
           });
 
@@ -285,7 +285,7 @@ oppia.directive('audioTranslationBar', [
             $scope.isPlayingUnsaved = !$scope.isPlayingUnsaved;
             if ($scope.isPlayingUnsaved) {
               $scope.waveSurfer.play();
-              $scope.waveSurfer.on('finish', function(e){
+              $scope.waveSurfer.on('finish', function() {
                 $scope.isPlayingUnsaved = false;
                 $scope.$apply();
               });
