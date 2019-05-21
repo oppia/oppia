@@ -23,6 +23,7 @@ $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
 $NPM_INSTALL --only=dev
+$NPM_CMD dedupe
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires

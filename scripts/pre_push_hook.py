@@ -193,6 +193,8 @@ def _compare_to_remote(remote, local_branch, remote_branch=None):
     """
     remote_branch = remote_branch if remote_branch else local_branch
     git_remote = '%s/%s' % (remote, remote_branch)
+    # Ensure that references to the remote branches exist on the local machine.
+    _start_subprocess_for_result(['git', 'pull', remote])
     return _git_diff_name_status(git_remote, local_branch)
 
 
@@ -225,19 +227,10 @@ def _collect_files_being_pushed(ref_list, remote):
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
-    for branch, sha1 in zip(branches, hashes):
+    for branch, _ in zip(branches, hashes):
         # Get the difference to remote/develop.
-        try:
-            modified_files = _compare_to_remote(
-                remote, branch, remote_branch='develop')
-        except ValueError:
-            # Give up, return all files in repo.
-            try:
-                modified_files = _git_diff_name_status(
-                    GIT_NULL_COMMIT, sha1)
-            except ValueError as e:
-                print e.message
-                sys.exit(1)
+        modified_files = _compare_to_remote(
+            remote, branch, remote_branch='develop')
         files_to_lint = _extract_files_to_lint(modified_files)
         collected_files[branch] = (modified_files, files_to_lint)
 
@@ -329,11 +322,12 @@ def main():
     parser.add_argument('--install', action='store_true', default=False,
                         help='Install pre_push_hook to the .git/hooks dir')
     args = parser.parse_args()
-    remote = _get_remote_name()
-    remote = remote if remote else args.remote
     if args.install:
         _install_hook()
         sys.exit(0)
+
+    remote = _get_remote_name()
+    remote = remote if remote else args.remote
     refs = _get_refs()
     collected_files = _collect_files_being_pushed(refs, remote)
     # Only interfere if we actually have something to lint (prevent annoyances).
