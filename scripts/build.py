@@ -1188,6 +1188,8 @@ def compile_typescript_files(project_dir, compiled_js_dir):
     Args:
         project_dir: str. The project directory which contains the ts files
             to be compiled.
+        compiled_js_dir: str. The directory which contains the compiled js
+            files.
     """
     safe_delete_directory_tree(compiled_js_dir)
     print 'Compiling ts files...'
@@ -1196,13 +1198,18 @@ def compile_typescript_files(project_dir, compiled_js_dir):
 
 
 def compile_typescript_files_continuously(
-        project_dir, compiled_js_dir, condition):
+        project_dir, compiled_js_dir, condition=True):
     """Compiles typescript files continuously i.e enable a watcher which
     monitors any changes in js files and recompiles them to ts files.
 
     Args:
         project_dir: str. The project directory which contains the ts files
             to be compiled.
+        compiled_js_dir: str. The directory which contains the compiled js
+            files.
+        condition: bool. The variable which decides whether we need to
+            monitor tsc_output_log.txt continuously. It will be false only
+            while running the tests for build script.
     """
     kill_cmd = (
         'kill `ps aux | grep "node_modules/typescript/bin/tsc --project . '
@@ -1256,7 +1263,7 @@ def build():
     if not options.enable_watcher:
         compile_typescript_files('.', compiled_js_dir)
     else:
-        compile_typescript_files_continuously('.', compiled_js_dir, True)
+        compile_typescript_files_continuously('.', compiled_js_dir)
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.

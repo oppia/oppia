@@ -651,12 +651,14 @@ class BuildTests(test_utils.GenericTestBase):
         """Test that compiled_js_dir is deleted before a fresh
         compilation.
         """
-        def mock_check_call(cmd):
+        # pylint: disable=unused-argument
+        def mock_check_call(*arg):
             pass
-        def mock_call(cmd, shell, stdout):
+        def mock_call(*arg):
             pass
-        def mock_popen(cmd, stdout):
+        def mock_popen(*arg):
             pass
+        # pylint: enable=unused-argument
 
         compiled_js_dir = os.path.join(
             'core', 'tests', 'build_sources', 'compiled_js_dir', '')
@@ -670,7 +672,7 @@ class BuildTests(test_utils.GenericTestBase):
             subprocess, 'call', mock_call):
             os.mkdir(os.path.dirname(compiled_js_dir))
             build.compile_typescript_files_continuously(
-                '.', compiled_js_dir, False)
+                '.', compiled_js_dir, condition=False)
             self.assertFalse(os.path.exists(os.path.dirname(compiled_js_dir)))
 
 # pylint: enable=protected-access
