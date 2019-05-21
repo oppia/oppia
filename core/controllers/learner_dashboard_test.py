@@ -401,7 +401,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Welcome!',
             'new_value': new_content
-            }
+        }
 
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
