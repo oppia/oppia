@@ -287,7 +287,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE_FLAC_1},
             csrf_token=csrf_token,
-            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
         )
         self.logout()
 
@@ -309,14 +309,14 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             {'filename': mismatched_filename},
             csrf_token=csrf_token,
             expected_status_int=400,
-            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertTrue(
-            response_dict['error'].startswith(
-                'Although the filename extension indicates the file is a flac '
-                'file, it was not recognized as one. Found mime types:'))
+        self.assertIn(
+            'Although the filename extension indicates the file is a flac '
+            'file, it was not recognized as one. Found mime types:',
+            response_dict['error'])
 
     def test_detect_non_audio_file(self):
         """Test that filenames with extensions that don't match the audio are

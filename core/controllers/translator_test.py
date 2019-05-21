@@ -90,9 +90,11 @@ class TranslatorTest(BaseTranslatorControllerTests):
     def test_put_with_payload_version_different_from_exp_version_raises_error(
             self):
         state_name = feconf.DEFAULT_INIT_STATE_NAME
+
         with self.assertRaisesRegexp(
             Exception, 'Trying to update version .+ of exploration from version'
             ' 3, which is too old. Please reload the page and try again.'):
+
             self.put_json(
                 '/createhandler/translate/%s' % self.EXP_ID, {
                     'change_list': [{
