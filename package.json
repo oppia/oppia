@@ -61,7 +61,11 @@
     "karma-jasmine": "^2.0.1",
     "karma-json-fixtures-preprocessor": "^0.0.6",
     "karma-ng-html2js-preprocessor": "^1.0.0",
+<<<<<<< HEAD
     "karma-webpack": "next",
+=======
+    "karma-webpack": "^4.0.0-rc.3",
+>>>>>>> d664a5d772c2b69cbcd39bdd8b593869d44165d9
     "postcss-syntax": "^0.36.2",
     "protractor": "^5.4.2",
     "protractor-screenshot-reporter": "0.0.5",
