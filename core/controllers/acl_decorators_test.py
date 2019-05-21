@@ -1515,6 +1515,7 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.manager = user_services.UserActionsInfo(self.manager_id)
 
@@ -1522,6 +1523,9 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock/<topic_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
+        self.save_new_topic(
+            self.topic_id, self.viewer_id, 'Name', 'Description', [], [],
+            [], [], 1)
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
             self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
