@@ -55,7 +55,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     TEST_EDITOR_EMAIL = 'test.editor@example.com'
     TEST_EDITOR_USERNAME = 'testeditoruser'
 
-    class MockHandler(base.BaseHandler):
+    class MockHandlerWithInvalidReturnType(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = 'invalid_type'
 
         def get(self):
@@ -67,7 +67,7 @@ class BaseHandlerTests(test_utils.GenericTestBase):
             """
             self.render_template({'invalid_page.html'})
 
-    class MockHandler1(base.BaseHandler):
+    class MockHandlerForTestingErrorPageWithIframed(base.BaseHandler):
         def get(self):
             self.values['iframed'] = True
             self.render_template('invalid_page.html')
@@ -232,7 +232,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_get_with_invalid_return_type_logs_correct_warning(self):
         # Modify the testapp to use the mock handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            [webapp2.Route(
+                '/mock', self.MockHandlerWithInvalidReturnType,
+                name='MockHandlerWithInvalidReturnType')],
             debug=feconf.DEBUG,
         ))
 
@@ -249,7 +251,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
 
     def test_unrecognized_request_method_logs_correct_warning(self):
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            [webapp2.Route(
+                '/mock', self.MockHandlerWithInvalidReturnType,
+                name='MockHandlerWithInvalidReturnType')],
             debug=feconf.DEBUG,
         ))
 
@@ -270,10 +274,17 @@ class BaseHandlerTests(test_utils.GenericTestBase):
     def test_renders_error_page_with_iframed(self):
         # Modify the testapp to use the mock handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock1', self.MockHandler1, name='MockHandler1')],
+            [webapp2.Route(
+                '/mock_iframed', self.MockHandlerForTestingErrorPageWithIframed,
+                name='MockHandlerForTestingErrorPageWithIframed')],
             debug=feconf.DEBUG,
         ))
-        self.get_html_response('/mock1', expected_status_int=500)
+        response = self.get_html_response(
+            '/mock_iframed', expected_status_int=500)
+
+        self.assertIn(
+            'Uh-oh! The Oppia exploration you requested may have been removed '
+            'or deleted.', response.body)
 
 
 class CsrfTokenManagerTests(test_utils.GenericTestBase):
@@ -325,9 +336,10 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
                 'uid', token))
 
     def test_redirect_oppia_test_server(self):
-        self.testapp.get(
-            'https://oppiaserver.appspot.com/splash', status=301)
-        self.testapp.get(
+        # The old demo server redirects to the new server.
+        self.get_html_response(
+            'https://oppiaserver.appspot.com/splash', expected_status_int=301)
+        self.get_html_response(
             'https://oppiatestserver.appspot.com/splash')
 
 
@@ -426,13 +438,8 @@ class LogoutPageTests(test_utils.GenericTestBase):
 
     def test_logout_page_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):
-            response = self.get_html_response(
+            self.get_html_response(
                 '/logout', expected_status_int=302)
-            expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
-
-            self.assertTrue(
-                datetime.datetime.utcnow() > datetime.datetime.strptime(
-                    expiry_date[1], '%a, %d %b %Y %H:%M:%S GMT',))
 
 
 class I18nDictsTests(test_utils.GenericTestBase):
@@ -796,7 +803,7 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
 
 class IframeRestrictionTests(test_utils.GenericTestBase):
 
-    class MockHandler(base.BaseHandler):
+    class MockHandlerForTestingPageIframing(base.BaseHandler):
         def get(self):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
@@ -810,16 +817,24 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         # Modify the testapp to use the mock handler.
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock', self.MockHandler, name='MockHandler')],
+            [webapp2.Route(
+                '/mock', self.MockHandlerForTestingPageIframing,
+                name='MockHandlerForTestingPageIframing')],
             debug=feconf.DEBUG,
         ))
 
     def test_responses_with_valid_iframe_restriction(self):
         self.login(self.OWNER_EMAIL)
         self.get_html_response('/mock')
-        self.get_html_response('/mock', params={'iframe_restriction': 'DENY'})
-        self.get_html_response(
+
+        response = self.get_html_response(
+            '/mock', params={'iframe_restriction': 'DENY'})
+        self.assertEqual(response.headers['X-Frame-Options'], 'DENY')
+
+        response = self.get_html_response(
             '/mock', params={'iframe_restriction': 'SAMEORIGIN'})
+        self.assertEqual(response.headers['X-Frame-Options'], 'SAMEORIGIN')
+
         self.logout()
 
     def test_responses_with_invalid_iframe_restriction(self):

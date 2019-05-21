@@ -179,10 +179,11 @@ class ExplorationHandler(EditorHandler):
         user_settings = user_services.get_user_settings(self.user_id)
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
-        if user_settings.last_started_state_editor_tutorial:
-            has_seen_editor_tutorial = True
-        if user_settings.last_started_state_translation_tutorial:
-            has_seen_translation_tutorial = True
+        if user_settings:
+            if user_settings.last_started_state_editor_tutorial:
+                has_seen_editor_tutorial = True
+            if user_settings.last_started_state_translation_tutorial:
+                has_seen_translation_tutorial = True
 
         try:
             exploration_data = exp_services.get_user_exploration_data(
@@ -218,10 +219,12 @@ class ExplorationHandler(EditorHandler):
         user_settings = user_services.get_user_settings(self.user_id)
         has_seen_editor_tutorial = False
         has_seen_translation_tutorial = False
-        if user_settings.last_started_state_editor_tutorial:
-            has_seen_editor_tutorial = True
-        if user_settings.last_started_state_translation_tutorial:
-            has_seen_translation_tutorial = True
+
+        if user_settings:
+            if user_settings.last_started_state_editor_tutorial:
+                has_seen_editor_tutorial = True
+            if user_settings.last_started_state_translation_tutorial:
+                has_seen_translation_tutorial = True
 
         try:
             exploration_data = exp_services.get_user_exploration_data(
