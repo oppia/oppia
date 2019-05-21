@@ -26,12 +26,15 @@ oppia.directive('oppiaResponseInteractiveMap', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
         'interactive_map_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.mapOptions = {
+        ctrl.mapOptions = {
           defaults: {
             zoomControl: false,
             attributionControl: false
