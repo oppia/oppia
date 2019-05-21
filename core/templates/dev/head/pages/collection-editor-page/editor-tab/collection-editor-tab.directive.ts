@@ -22,8 +22,8 @@ require('pages/collection-editor-page /editor-tab/collection-node-editor/' +
   'collection-node-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page /CollectionEditorStateService.ts');
-require('pages/collection-editor-page /editor-tab/CollectionLinearizerService.ts');
+require('pages/collection-editor-page /collection-editor-state.service.ts');
+require('pages/collection-editor-page /editor-tab/collection-linearizer.service.ts');
 
 angular.module('collectionEditorTabModule').directive('collectionEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -20,7 +20,7 @@ require('domain/collection/CollectionNodeObjectFactory.ts');
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionRightsObjectFactory.ts');
 require('domain/collection/CollectionUpdateService.ts');
-require('pages/collection-editor-page /CollectionEditorStateService.ts');
+require('pages/collection-editor-page /collection-editor-state.service.ts');
 
 describe('Collection editor state service', function() {
   var CollectionEditorStateService = null;

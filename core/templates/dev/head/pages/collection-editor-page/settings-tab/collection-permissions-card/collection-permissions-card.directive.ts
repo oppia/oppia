@@ -18,7 +18,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page /CollectionEditorStateService.ts');
+require('pages/collection-editor-page /collection-editor-state.service.ts');
 
 angular.module('collectionPermissionsCardModule').directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {

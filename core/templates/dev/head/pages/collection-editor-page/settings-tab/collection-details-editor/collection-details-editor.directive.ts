@@ -24,7 +24,7 @@ require('domain/collection/CollectionUpdateService.ts');
 require('domain/collection/CollectionValidationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/collection-editor-page /CollectionEditor.ts');
-require('pages/collection-editor-page /CollectionEditorStateService.ts');
+require('pages/collection-editor-page /collection-editor-state.service.ts');
 require('services/AlertsService.ts');
 
 angular.module('collectionDetailsEditorModule').directive('collectionDetailsEditor', [

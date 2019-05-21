@@ -25,7 +25,7 @@ require('domain/collection/CollectionValidationService.ts');
 require('domain/collection/EditableCollectionBackendApiService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page /CollectionEditorStateService.ts');
+require('pages/collection-editor-page /collection-editor-state.service.ts');
 require('pages/exploration_editor/RouterService.ts');
 require('services/AlertsService.ts');
 

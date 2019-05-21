@@ -20,8 +20,8 @@
 
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page /CollectionEditorStateService.ts');
-require('pages/collection-editor-page /editor-tab/CollectionLinearizerService.ts');
+require('pages/collection-editor-page /collection-editor-state.service.ts');
+require('pages/collection-editor-page /editor-tab/collection-linearizer.service.ts');
 require('services/AlertsService.ts');
 
 angular.module('collectionNodeEditorModule').directive('collectionNodeEditor', [
