@@ -17,3 +17,8 @@
  */
 
 angular.module('aboutPageModule', []);
+
+var load = require.context('./', true, /\.module\.ts$/);
+load.keys().forEach(load);
+
+module.exports = angular.module('aboutPageModule').name;

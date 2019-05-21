@@ -18,11 +18,12 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('suggestionModalModule', []).name;
 
-angular.module('suggestionModalModule', [
+var moduleInit = angular.module('suggestionModalModule', [
   'showSuggestionModalForCreatorViewModule',
   'showSuggestionModalForEditorViewModule',
   'showSuggestionModalForLocalViewModule',
   'showSuggestionModalForLearnerViewModule'
 ]);
+
+module.exports = moduleInit.name;

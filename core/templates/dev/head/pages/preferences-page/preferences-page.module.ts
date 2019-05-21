@@ -18,6 +18,7 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('preferencesPageModule', []).name;
 
-angular.module('preferencesPageModule', []);
+var moduleInit = angular.module('preferencesPageModule', []);
+
+module.exports = moduleInit.name;

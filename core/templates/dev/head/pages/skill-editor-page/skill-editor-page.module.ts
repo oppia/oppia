@@ -17,9 +17,8 @@
  */
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('skillEditorModule', []).name;
 
-angular.module('skillEditorModule', [
+var moduleInit = angular.module('skillEditorModule', [
   'skillEditorMainTabModule', 'skillEditorNavbarModule',
   'skillEditorNavbarBreadcrumbModule', 'skillEditorQuestionsTabModule']);
 
@@ -38,3 +37,4 @@ angular.module('skillEditorModule').constant(
 angular.module('skillEditorModule').constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
   
+module.exports = moduleInit.name;

@@ -18,6 +18,7 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('moderatorPageModule', []).name;
 
-angular.module('moderatorPageModule', []);
+var moduleInit = angular.module('moderatorPageModule', []);
+
+module.exports = moduleInit.name;

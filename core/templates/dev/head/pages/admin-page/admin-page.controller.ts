@@ -409,8 +409,6 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.module.ts');
 
-
-
 require('I18nFooter.ts');
 require('directives/FocusOnDirective.ts');
 
@@ -527,7 +525,7 @@ require(
   'pages/admin-page/admin-page-services/admin-router/admin-router.service.ts');
 require('services/UtilsService.ts');
 
-angular.module('adminPageModule').controller('Admin', [
+oppia.controller('Admin', [
     '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
   function($http, $location, $scope, AdminRouterService, DEV_MODE) {
     $scope.userEmail = GLOBALS.USER_EMAIL;

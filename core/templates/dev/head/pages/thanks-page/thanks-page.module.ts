@@ -18,6 +18,7 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('thanksPageModule', []).name;
 
-angular.module('thanksPageModule', []);
+var moduleInit = angular.module('thanksPageModule', []);
+
+module.exports = moduleInit.name;

@@ -18,9 +18,10 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('creatorDashboardPageModule', []).name;
 
-angular.module('creatorDashboardPageModule', []);
+var moduleInit = angular.module('creatorDashboardPageModule', []);
+
+module.exports = moduleInit.name;
 
 angular.module('creatorDashboardPageModule').constant(
   'EXPLORATION_DROPDOWN_STATS', {

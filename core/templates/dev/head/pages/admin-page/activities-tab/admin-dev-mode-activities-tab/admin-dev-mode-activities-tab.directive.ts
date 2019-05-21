@@ -21,7 +21,7 @@ require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/admin-page-services/admin-task-manager/admin-task-manager.service.ts');
 
-angular.module('adminDevModeActivitiesTabModule').directive(
+oppia.directive(
   'adminDevModeActivitiesTab', [
     '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
     'ADMIN_HANDLER_URL',

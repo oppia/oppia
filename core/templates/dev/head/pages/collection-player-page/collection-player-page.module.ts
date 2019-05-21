@@ -18,12 +18,13 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('collectionPlayerPageModule', []).name;
 
-angular.module('collectionPlayerPageModule', [
+var moduleInit = angular.module('collectionPlayerPageModule', [
   'collectionFooterModule', 'collectionNodeListModule',
   'collectionLocalNavModule'
 ]);
+
+module.exports = moduleInit.name;
 
 angular.module('collectionPlayerPageModule').constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');

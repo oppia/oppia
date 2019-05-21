@@ -18,6 +18,7 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('notificationsDashboardPageModule', []).name;
 
-angular.module('notificationsDashboardPageModule', []);
+var moduleInit = angular.module('notificationsDashboardPageModule', []);
+
+module.exports = moduleInit.name;

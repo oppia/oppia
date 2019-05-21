@@ -18,7 +18,8 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('topicViewerPageModule', []).name;
 
-angular.module('topicViewerPageModule', [
+var moduleInit = angular.module('topicViewerPageModule', [
   'storiesListModule', 'topicViewerNavbarBreadcrumbModule']);
+
+module.exports = moduleInit.name;

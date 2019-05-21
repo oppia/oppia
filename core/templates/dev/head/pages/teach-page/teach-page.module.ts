@@ -18,6 +18,7 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('teachPageModule', []).name;
 
-angular.module('teachPageModule', []);
+var moduleInit = angular.module('teachPageModule', []);
+
+module.exports = moduleInit.name;

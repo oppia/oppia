@@ -24,7 +24,7 @@ require(
   'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
   'topic-editor-state.service.ts');
 
-describe('Topic editor state service', function() {
+fdescribe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var SubtopicPageObjectFactory = null;
@@ -118,6 +118,7 @@ describe('Topic editor state service', function() {
   };
 
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('topicEditorPageModule'));
   beforeEach(
     angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
   beforeEach(angular.mock.module('oppia', function($provide) {

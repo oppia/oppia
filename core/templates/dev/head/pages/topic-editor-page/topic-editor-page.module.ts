@@ -18,9 +18,8 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('topicEditorPageModule', []).name;
 
-angular.module('topicEditorPageModule', [
+var moduleInit = angular.module('topicEditorPageModule', [
   'topicEditorNavbarBreadcrumbModule', 'topicEditorNavbarModule',
   'subtopicsListTabModule', 'questionsTabModule', 'mainTopicEditorModule']);
 
@@ -48,4 +47,4 @@ angular.module('topicEditorPageModule').constant(
   'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
 angular.module('topicEditorPageModule').constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
-  
+module.exports = moduleInit.name;

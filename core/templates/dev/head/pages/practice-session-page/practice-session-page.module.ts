@@ -18,12 +18,13 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('practiceSessionPageModule', []).name;
 
-angular.module('practiceSessionPageModule', []);
+var moduleInit = angular.module('practiceSessionPageModule', []);
 
 angular.module('practiceSessionPageModule').constant('TOTAL_QUESTIONS', 20);
 
 angular.module('practiceSessionPageModule').constant(
   'PRACTICE_SESSIONS_DATA_URL',
   '/practice_session/data/<topic_name>');
+
+module.exports = moduleInit.name;

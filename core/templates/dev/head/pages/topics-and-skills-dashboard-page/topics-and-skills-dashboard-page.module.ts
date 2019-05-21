@@ -18,9 +18,8 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('topicsAndSkillsDashboardModule', []).name;
 
-angular.module('topicsAndSkillsDashboardModule', [
+var moduleInit = angular.module('topicsAndSkillsDashboardModule', [
   'selectTopicsModule', 'skillsListModule',
   'topicsAndSkillsDashboardNavbarBreadcrumbModule',
   'topicsAndSkillsDashboardNavbarModule', 'topicsListModule']);
@@ -42,3 +41,5 @@ angular.module('topicsAndSkillsDashboardModule').constant(
 angular.module('topicsAndSkillsDashboardModule').constant(
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'topicsAndSkillsDashboardReinitialized');
+
+module.exports = moduleInit.name;

@@ -18,6 +18,6 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('splashPageModule', []).name;
 
-angular.module('splashPageModule', []);
+var moduleInit = angular.module('splashPageModule', []);
+module.exports = moduleInit.name;

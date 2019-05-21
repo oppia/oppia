@@ -18,6 +18,6 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('filtersModule', []).name;
 
-angular.module('filtersModule', ['stringUtilityFiltersModule']);
+var moduleInit = angular.module('filtersModule', ['stringUtilityFiltersModule']);
+module.exports = moduleInit.name;

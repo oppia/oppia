@@ -16,25 +16,21 @@
  * @fileoverview Data and Module for the Oppia admin page.
  */
 
-var load = require.context('./', true, /\.module\.ts$/);
-load.keys().forEach(load);
-module.exports = angular.module('adminPageModule', []).name;
-
 angular.module('adminPageModule', [
   'adminNavbarModule', 'adminConfigTabModule', 'adminJobsTabModule',
   'adminMiscTabModule', 'adminRolesTabModule', 'roleGraphModule',
   'adminDevModeActivitiesTabModule', 'adminProdModeActivitiesTab']);
 
-angular.module('adminPageModule').constant('ADMIN_HANDLER_URL', '/adminhandler');
-angular.module('adminPageModule')
-  .constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
-angular.module('adminPageModule')
-  .constant('PROFILE_URL_TEMPLATE', '/profile/<username>');
-angular.module('adminPageModule').constant(
+oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
+oppia.constant(
+  'ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
+oppia.constant(
+  'PROFILE_URL_TEMPLATE', '/profile/<username>');
+oppia.constant(
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-angular.module('adminPageModule').constant(
+oppia.constant(
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
-angular.module('adminPageModule').constant('ADMIN_TAB_URLS', {
+oppia.constant('ADMIN_TAB_URLS', {
   ACTIVITIES: '#activities',
   JOBS: '#jobs',
   CONFIG: '#config',

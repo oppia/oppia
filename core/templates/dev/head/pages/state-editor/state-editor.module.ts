@@ -18,8 +18,8 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('stateEditorModule', []).name;
 
-angular.module('stateEditorModule', ['stateSolutionEditorModule',
+var moduleInit = angular.module('stateEditorModule', ['stateSolutionEditorModule',
   'stateResponsesModule', 'stateInteractionEditorModule',
   'stateHintsEditorModule', 'stateContentEditorModule']);
+module.exports = moduleInit.name;

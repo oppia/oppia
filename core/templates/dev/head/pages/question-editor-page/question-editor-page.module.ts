@@ -18,9 +18,10 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('questionEditorPageModule', []).name;
 
-angular.module('questionEditorPageModule', []);
+var moduleInit = angular.module('questionEditorPageModule', []);
 
 angular.module('questionEditorPageModule').constant(
   'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+
+module.exports = moduleInit.name;

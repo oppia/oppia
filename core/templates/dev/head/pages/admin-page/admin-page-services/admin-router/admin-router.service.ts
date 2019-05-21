@@ -17,7 +17,7 @@
  * provide routing functionality, and store all available tab states.
  */
 
-angular.module('adminPageModule').factory('AdminRouterService', [
+oppia.factory('AdminRouterService', [
   'ADMIN_TAB_URLS',
   function(ADMIN_TAB_URLS) {
     var currentTabHash = ADMIN_TAB_URLS.ACTIVITIES;

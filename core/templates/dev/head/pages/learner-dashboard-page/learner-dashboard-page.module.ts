@@ -18,9 +18,8 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('learnerDashboardPageModule', []).name;
 
-angular.module('learnerDashboardPageModule', []);
+var moduleInit = angular.module('learnerDashboardPageModule', []);
 
 angular.module('learnerDashboardPageModule').constant(
   'LEARNER_DASHBOARD_SECTION_I18N_IDS', {
@@ -81,3 +80,5 @@ angular.module('learnerDashboardPageModule').constant(
     }
   }
 );
+
+module.exports = moduleInit.name;

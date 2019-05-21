@@ -18,9 +18,8 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('libraryPageModule', []).name;
 
-angular.module('libraryPageModule', ['activityTilesInfinityGridModule',
+var moduleInit = angular.module('libraryPageModule', ['activityTilesInfinityGridModule',
   'libraryFooterModule', 'searchBarModule', 'searchResultsModule']);
 
 angular.module('libraryPageModule').constant('LIBRARY_PAGE_MODES', {
@@ -35,3 +34,5 @@ angular.module('libraryPageModule').constant('LIBRARY_PATHS_TO_MODES', {
   '/library/recently_published': 'group',
   '/search/find': 'search'
 });
+
+module.exports = moduleInit.name;

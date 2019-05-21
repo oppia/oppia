@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('adminJobsTabModule').directive('adminJobsTab', [
+oppia.directive('adminJobsTab', [
   '$http', '$timeout', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
   function(

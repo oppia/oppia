@@ -19,9 +19,8 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('explorationEditorPageModule', []).name;
 
-angular.module('explorationEditorPageModule', ['editorNavbarBreadcrumbModule',
+var moduleInit = angular.module('explorationEditorPageModule', ['editorNavbarBreadcrumbModule',
   'editorNavigationModule', 'explorationEditorTabModule',
   'explorationSaveAndPulishButtonsModule', 'explorationObjectiveEditorModule',
   'explorationTitleEditorModule',
@@ -70,4 +69,5 @@ angular.module('explorationEditorPageModule').constant(
 // will be blocked from being published until the answer is resolved.
 angular.module('explorationEditorPageModule').constant(
   'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
-  
+
+module.exports = moduleInit.name;

@@ -18,9 +18,9 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('topicLandingPageModule', []).name;
 
-angular.module('topicLandingPageModule', ['topicLandingPageStewardsModule']);
+var moduleInit = angular.module(
+  'topicLandingPageModule', ['topicLandingPageStewardsModule']);
 
 // Note: This oppia constant needs to be keep in sync with
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
@@ -45,3 +45,5 @@ angular.module('topicLandingPageModule').constant('TOPIC_LANDING_PAGE_DATA', {
     }
   }
 });
+
+module.exports = moduleInit.name;

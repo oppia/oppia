@@ -18,9 +18,9 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('storyEditorModule', []).name;
 
-angular.module('storyEditorModule', ['storyEditorNavbarBreadcrumbModule',
+var moduleInit = angular.module('storyEditorModule', [
+  'storyEditorNavbarBreadcrumbModule',
   'storyEditorNavbarModule', 'mainStoryEditorModule']);
 
 angular.module('storyEditorModule').constant('NODE_ID_PREFIX', 'node_');
@@ -28,3 +28,5 @@ angular.module('storyEditorModule').constant(
   'EVENT_STORY_INITIALIZED', 'storyInitialized');
 angular.module('storyEditorModule').constant(
   'EVENT_STORY_REINITIALIZED', 'storyReinitialized');
+
+module.exports = moduleInit.name;

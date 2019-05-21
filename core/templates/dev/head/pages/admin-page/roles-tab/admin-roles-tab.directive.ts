@@ -24,7 +24,7 @@ require(
   'pages/admin-page/admin-page-services/admin-task-manager/' +
   'admin-task-manager.service.ts');
 
-angular.module('adminRolesTabModule').directive('adminRolesTab', [
+oppia.directive('adminRolesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_ROLE_HANDLER_URL',
   function(

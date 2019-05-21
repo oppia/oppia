@@ -21,7 +21,7 @@ require(
   'pages/admin-page/admin-page-services/admin-router/admin-router.service.ts');
 require('services/UserService.ts');
 
-angular.module('adminNavbarModule').directive('adminNavbar', [
+oppia.directive('adminNavbar', [
   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
   'LOGOUT_URL', 'PROFILE_URL_TEMPLATE',
   function(

@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('maintenancePageModule').controller('Maintenance', [
+oppia.controller('Maintenance', [
   '$rootScope', '$scope', 'UrlInterpolationService', 'DEV_MODE',
   function($rootScope, $scope, UrlInterpolationService, DEV_MODE) {
     $scope.currentLang = 'en';
