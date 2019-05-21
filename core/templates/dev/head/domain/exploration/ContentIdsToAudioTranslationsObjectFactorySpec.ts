@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for ContentIdsToAudioTranslations object factory.
  */
 
+require('App.ts');
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+
 describe('ContentIdsToAudioTranslations object factory', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('LanguageUtilService', {

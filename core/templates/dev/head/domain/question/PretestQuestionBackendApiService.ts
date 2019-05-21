@@ -15,6 +15,9 @@
 /**
  * @fileoverview Service to receive questions as pretests for an exploration.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.constant(
   'PRETEST_QUESTIONS_URL_TEMPLATE',
   '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>');
