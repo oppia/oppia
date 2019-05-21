@@ -17,6 +17,7 @@
 """Tests for the appengine search api wrapper."""
 
 import datetime
+import logging
 import time
 
 from core.platform.search import gae_search_services
@@ -263,6 +264,11 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         self.assertEqual(add_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
 
+    def test_raise_error_when_document_type_is_invalid(self):
+        doc = {'abc': set('xyz')}
+        with self.assertRaises(ValueError):
+            gae_search_services.add_documents_to_index([doc], 'my_index')
+
 
 class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
     """Test deleting documents from search indexes."""
@@ -461,6 +467,36 @@ class SearchQueryTests(test_utils.GenericTestBase):
             'id': 'doc3', 'k': 'abc jkl ghi', 'rank': 3, 'language_code': 'en'
         }, result)
 
+    def test_search_when_query_string_is_invalid(self):
+        # The search result would be ([], None) if query strings contain "NOT"
+        # or a string with backslashes.
+        observed_log_messages = []
+
+        def mock_logging_function(msg, *_):
+            observed_log_messages.append(msg)
+
+        with self.swap(logging, 'exception', mock_logging_function):
+            doc = {'id': 'doc1', 'NOT': 'abc', 'rank': 3, 'language_code': 'en'}
+            gae_search_services.add_documents_to_index([doc], 'index')
+            result = gae_search_services.search('NOT:abc', 'my_index')
+            self.assertEqual(result, ([], None))
+            result = gae_search_services.search(r'\k:abc', 'my_index')
+            self.assertEqual(result, ([], None))
+
+            self.assertEqual(len(observed_log_messages), 2)
+            self.assertEqual(
+                observed_log_messages[0],
+                (
+                    'Could not parse query string NOT:abc'
+                )
+            )
+            self.assertEqual(
+                observed_log_messages[1],
+                (
+                    r'Could not parse query string \k:abc'
+                )
+            )
+
     def test_respect_search_query(self):
         doc1 = search.Document(doc_id='doc1', rank=1, language='en', fields=[
             search.TextField(name='k', value='abc def ghi')])
@@ -584,6 +620,21 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(result[1].get('id'), 'doc1')
         self.assertEqual(result[2].get('id'), 'doc2')
 
+    def test_raise_error_when_sort_starts_with_invalid_character(self):
+        doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
+        gae_search_services.add_documents_to_index([doc], 'index')
+        # Fields in the sort expression need to start with '+' or '-'
+        # to indicate sort direction. If no such indicator is there, it will
+        # raise ValueError.
+        sort_expression = 'invalid_sort_symbol'
+        with self.assertRaisesRegexp(
+            ValueError,
+            r'Fields in the sort expression must start with "\+"'
+            ' or "-" to indicate sort direction. The field %s has no such '
+            'indicator in expression "%s".'
+            % (sort_expression, sort_expression)):
+            gae_search_services.search('k:abc', 'index', sort=sort_expression)
+
     def test_search_using_multiple_sort_expressions(self):
         doc1 = {'id': 'doc1', 'k1': 2, 'k2': 'abc ghi'}
         doc2 = {'id': 'doc2', 'k1': 1, 'k2': 'abc def'}
@@ -704,3 +755,14 @@ class SearchGetFromIndexTests(test_utils.GenericTestBase):
             'my_doc', 'my_index')
         self.assertEqual(result.get('id'), 'my_doc')
         self.assertEqual(result.get('my_field'), 'value')
+
+
+class ClearIndexTests(test_utils.GenericTestBase):
+    def test_clear_index(self):
+        doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
+        gae_search_services.add_documents_to_index([doc], 'index')
+        result = gae_search_services.search('k:abc', index='index')[0]
+        self.assertEqual(result, [doc])
+        gae_search_services.clear_index('index')
+        result = gae_search_services.search('k:abc', index='index')[0]
+        self.assertEqual(result, [])
