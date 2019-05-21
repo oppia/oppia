@@ -227,7 +227,7 @@ def _collect_files_being_pushed(ref_list, remote):
     collected_files = {}
     # Git allows that multiple branches get pushed simultaneously with the "all"
     # flag. Therefore we need to loop over the ref_list provided.
-    for branch, sha1 in zip(branches, hashes):
+    for branch, _ in zip(branches, hashes):
         # Get the difference to remote/develop.
         modified_files = _compare_to_remote(
             remote, branch, remote_branch='develop')
