@@ -28,6 +28,7 @@ oppia.constant('EXPLORATION_MODE', {
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
+require('domain/question/QuestionPlayerBackendApiService.ts');
 require('pages/exploration_player/ExplorationEngineService.ts');
 require('pages/exploration_player/NumberAttemptsService.ts');
 require('pages/exploration_player/PlayerPositionService.ts');
