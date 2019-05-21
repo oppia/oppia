@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Alerts Service.
  */
 
+require('services/AlertsService.ts');
+
 describe('Alerts Service', function() {
   var AlertsService;
 

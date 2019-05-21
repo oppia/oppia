@@ -16,6 +16,18 @@
  * @fileoverview Directive for the solution editor.
  */
 
+require('components/state/SolutionExplanationEditorDirective.ts');
+require('directives/AngularHtmlBindDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('domain/exploration/SolutionObjectFactory.ts');
+require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+
 oppia.directive('solutionEditor', [
   '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationHtmlFormatterService', 'SolutionObjectFactory',
@@ -29,7 +41,8 @@ oppia.directive('solutionEditor', [
       StateSolutionService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getInteractionId: '&interactionId',
         onSaveSolution: '=',
         correctAnswerEditorHtml: '=',
@@ -38,17 +51,19 @@ oppia.directive('solutionEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/solution_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'StateSolutionService',
-        function($scope, StateSolutionService) {
-          $scope.StateSolutionService = StateSolutionService;
+        'StateSolutionService',
+        function(StateSolutionService) {
+          var ctrl = this;
+          ctrl.StateSolutionService = StateSolutionService;
 
-          $scope.EXPLANATION_FORM_SCHEMA = {
+          ctrl.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
             ui_config: {}
           };
 
-          $scope.getAnswerHtml = function() {
+          ctrl.getAnswerHtml = function() {
             return ExplorationHtmlFormatterService.getAnswerHtml(
               StateSolutionService.savedMemento.correctAnswer,
               StateInteractionIdService.savedMemento,

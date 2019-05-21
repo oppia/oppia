@@ -16,22 +16,38 @@
  * @fileoverview Unit tests for custom filters.
  */
 
+require('filters/CamelCaseToHyphensFilter.ts');
+require('filters/CapitalizeFilter.ts');
+require('filters/ConvertToPlainTextFilter.ts');
+require('filters/GetAbbreviatedTextFilter.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/ParameterizeRuleDescriptionFilter.ts');
+require('filters/ReplaceInputsWithEllipsesFilter.ts');
+require('filters/SummarizeNonnegativeNumberFilter.ts');
+require('filters/TruncateAndCapitalizeFilter.ts');
+require('filters/TruncateAtFirstEllipsisFilter.ts');
+require('filters/TruncateAtFirstLineFilter.ts');
+require('filters/TruncateFilter.ts');
+require('filters/UnderscoresToCamelCaseFilter.ts');
+require('filters/WrapTextWithEllipsisFilter.ts');
+require('pages/question_editor/QuestionEditorDirective.ts');
+
 describe('Testing filters', function() {
   var filterNames = [
-    'underscoresToCamelCase',
     'camelCaseToHyphens',
-    'truncate',
-    'truncateAtFirstLine',
-    'replaceInputsWithEllipses',
-    'truncateAtFirstEllipsis',
-    'wrapTextWithEllipsis',
-    'parameterizeRuleDescription',
-    'normalizeWhitespace',
-    'convertToPlainText',
-    'summarizeNonnegativeNumber',
-    'truncateAndCapitalize',
     'capitalize',
-    'getAbbreviatedText'
+    'convertToPlainText',
+    'getAbbreviatedText',
+    'normalizeWhitespace',
+    'parameterizeRuleDescription',
+    'replaceInputsWithEllipses',
+    'summarizeNonnegativeNumber',
+    'truncate',
+    'truncateAndCapitalize',
+    'truncateAtFirstEllipsis',
+    'truncateAtFirstLine',
+    'underscoresToCamelCase',
+    'wrapTextWithEllipsis',
   ];
 
   beforeEach(angular.mock.module('oppia'));
