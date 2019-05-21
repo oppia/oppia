@@ -236,7 +236,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
@@ -276,7 +277,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            2)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
@@ -310,7 +312,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
@@ -349,7 +352,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            2)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
@@ -383,7 +387,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            1)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
@@ -422,7 +427,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            2)
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
