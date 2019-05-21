@@ -578,7 +578,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Welcome!',
-            'new_value': new_content}
+            'new_value': new_content
+        }
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID,
@@ -616,7 +617,8 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'Welcome!',
-            'new_value': new_content}
+            'new_value': new_content
+        }
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID,
