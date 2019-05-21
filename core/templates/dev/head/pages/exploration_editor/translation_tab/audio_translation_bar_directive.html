@@ -62,6 +62,10 @@
       <div class="oppia-mp3-converting" ng-if="recorder.status().isRecording">
         Recording to mp3<loading-dots></loading-dots>
       </div>
+      <canvas-sizer id="analyser">
+        <div id="visualized" class="oppia-audio-wave-view" ng-show="!recorder.status().isRecording && !audioIsCurrentlyBeingSaved">
+        </div>
+      </canvas-sizer>
     </div>
   </div>
   <div class="oppia-content-wrapper" ng-if="recorder.status().isRecording">

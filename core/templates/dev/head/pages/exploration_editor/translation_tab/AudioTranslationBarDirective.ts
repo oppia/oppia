@@ -83,7 +83,7 @@ oppia.directive('audioTranslationBar', [
         '/pages/exploration_editor/translation_tab/' +
         'audio_translation_bar_directive.html'),
       controller: [
-        '$filter', '$interval', '$rootScope', '$scope', '$timeout', '$uibModal',
+        '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
         'IdGenerationService', 'SiteAnalyticsService',
@@ -91,7 +91,7 @@ oppia.directive('audioTranslationBar', [
         'TranslationLanguageService', 'TranslationRecordingService',
         'TranslationTabActiveContentIdService', 'RECORDING_TIME_LIMIT',
         function(
-            $filter, $interval, $rootScope, $scope, $timeout, $uibModal,
+            $filter, $interval, $rootScope, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
             IdGenerationService, SiteAnalyticsService,
@@ -120,6 +120,7 @@ oppia.directive('audioTranslationBar', [
           $scope.timerInterval = null;
           $scope.isPlayingUnsaved = false;
           $scope.unSavedAudio = null;
+          $scope.waveSurfer = null;
           document.body.onkeyup = function(e) {
             if (e.keyCode === 82 && !$scope.isAudioAvailable) {
               // 82 belongs to the keycode for 'R'
@@ -235,18 +236,6 @@ oppia.directive('audioTranslationBar', [
             $scope.audioNeedsUpdate = !$scope.audioNeedsUpdate;
           };
 
-          $scope.playAndPauseUnsavedAudio = function() {
-            $scope.isPlayingUnsaved = !$scope.isPlayingUnsaved;
-            if ($scope.isPlayingUnsaved) {
-              $scope.unSavedAudio.play();
-              $scope.unSavedAudio.onended = function() {
-                $scope.isPlayingUnsaved = false;
-                $scope.$apply();
-              };
-            } else {
-              $scope.unSavedAudio.pause();
-            }
-          };
 
           $scope.getRecorder = function() {
             $scope.recorder = TranslationRecordingService;
@@ -266,6 +255,14 @@ oppia.directive('audioTranslationBar', [
             $scope.showRecorderWarning = false;
           };
 
+          // create visualizer for playing unsaved audio
+          $scope.waveSurfer = WaveSurfer.create({
+            container: '#visualized',
+            waveColor:"#009688",
+            progressColor:"#cccccc",
+            height:38
+          });
+
           $scope.stopRecording = function() {
             $scope.recorder.stopRecord();
             $scope.recordingComplete = true;
@@ -277,13 +274,24 @@ oppia.directive('audioTranslationBar', [
               // free the browser from workers
               $scope.recorder.closeRecorder();
               // create audio play and pause for unsaved recording
-              var fileReader = new FileReader();
-              fileReader.onloadend = function() {
-                $scope.unSavedAudio = new Audio();
-                $scope.unSavedAudio.src = fileReader.result;
-              };
-              fileReader.readAsDataURL($scope.audioBlob);
+              // set visualizer
+              var url = $window.URL.createObjectURL($scope.audioBlob);
+              $scope.waveSurfer.load(url);
             });
+          };
+
+          // play and pause for unsaved recording.
+          $scope.playAndPauseUnsavedAudio = function() {
+            $scope.isPlayingUnsaved = !$scope.isPlayingUnsaved;
+            if ($scope.isPlayingUnsaved) {
+              $scope.waveSurfer.play();
+              $scope.waveSurfer.on('finish', function(e){
+                $scope.isPlayingUnsaved = false;
+                $scope.$apply();
+              });
+            } else {
+              $scope.waveSurfer.pause();
+            }
           };
 
           $scope.updateAudio = function() {
@@ -450,6 +458,7 @@ oppia.directive('audioTranslationBar', [
             // re-initialize for unsaved recording
             $scope.unSavedAudio = null;
             $scope.isPlayingUnsaved = false;
+            $scope.waveSurfer = null;
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();
             $scope.canTranslate = EditabilityService.isTranslatable();
