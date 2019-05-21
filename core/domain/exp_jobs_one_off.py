@@ -633,12 +633,24 @@ class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
                 GCS_EXTERNAL_IMAGE_ID_REGEX.match(url).group(3)
                 for url in image_urls_external])
 
+            image_filenames_internal_with_dimensions = set([])
+
+            for image_name in image_filenames_internal:
+                raw_image = fs_internal.get(
+                    'image/%s' % image_name.encode('utf-8'))
+                height, width = gae_image_services.get_image_dimensions(
+                    raw_image)
+                image_filenames_internal_with_dimensions.add(
+                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
+                        image_name, height, width))
+
             # Currently in editor.py and exp_services.py, all images are stored
             # in exploration/{{exp_id}}/ external folder. So, we only need to
             # check if all images in the internal folder are there in the
             # external folder.
-            non_existent_images = image_filenames_internal.difference(
-                image_filenames_external)
+            non_existent_images = (
+                image_filenames_internal_with_dimensions.difference(
+                    image_filenames_external))
 
             if len(non_existent_images) > 0:
                 yield (
