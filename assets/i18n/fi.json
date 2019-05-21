@@ -69,6 +69,7 @@
 	"I18N_CONTACT_PAGE_PARAGRAPH_8": "Joten, jos haluat luoda ilmaisia, tehokkaita oppitunteja opiskelijoille ympäri maailmaa, olet tullut oikeaan paikkaan. Kehotamme sinua vilkaisemaan <a href=\"https://oppia.github.io/#/CreatingAnExploration\">luomisoppaamme</a> ja <a href=\"/library\">olemassaolevat opetuksemme</a>, ja <a href=\"/get_started\">aloita oman oppituntisi luominen</a>. Sen lisäksi, jos haluat varmistaa, että opetuksillasi on suuri vaikutus, harkitse hakea <a href=\"/teach\">Teach with Oppia -ohjelmaamme</a>, missä autamme sivua luomaan, testaamaan ja kehittämään tutkimuksiasi optimaaliseen vaikutukseen.",
 	"I18N_CONTACT_PAGE_PARAGRAPH_9": "Pidät nykyisestä tutkimuksesta, mutta löysit jotain joka voisi olla paremmin? Voit ehdottaa muutoksia mihin tahansa tutkimukseen suoraan tutkimuksen sivulta. Yksinkertaisesti klikkaa lyijykynäkuvaketta oikeassa yläkulmassa, ja jaa mitä luulet voivasi parantaa. Oppitunnin luoja saa ehdotuksesi ja hänellä on mahdollisuus yhdistää ne tutkimukseen. Tämä on uskomattoman hyödyllinen tapa osallistua, etenkin jos voit perustaa ehdotuksesi <a href=\"#testing\">opiskelijoiden kokemuksiin</a> tutkimuksia suorittaessa.",
 	"I18N_CONTACT_PAGE_PARAGRAPH_9_HEADING": "Nykyisten tutkimusten parantaminen",
+	"I18N_CONTINUE_REGISTRATION": "Jatka rekisteröitymistä",
 	"I18N_CREATE_ACTIVITY_QUESTION": "Mitä haluat luoda?",
 	"I18N_CREATE_ACTIVITY_TITLE": "Luo aktiviteetti",
 	"I18N_CREATE_COLLECTION": "Luo kokoelma",

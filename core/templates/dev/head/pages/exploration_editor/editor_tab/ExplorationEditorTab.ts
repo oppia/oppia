@@ -16,6 +16,23 @@
  * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
+require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
+require(
+  'pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.ts');
+require('pages/state_editor/StateEditorDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/GraphDataService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
+
 oppia.controller('ExplorationEditorTab', [
   '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',
@@ -147,20 +164,14 @@ oppia.controller('ExplorationEditorTab', [
         angular.copy(displayedValue));
     };
 
-    $scope.saveContentIdsToAudioTranslations = function(displayedValue) {
-      ExplorationStatesService.saveContentIdsToAudioTranslations(
-        $scope.stateName, angular.copy(displayedValue));
-    };
-
     $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
         contentId) {
       var stateName = StateEditorService.getActiveStateName();
       var state = ExplorationStatesService.getState(stateName);
-      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var recordedVoiceovers = state.recordedVoiceovers;
       var writtenTranslations = state.writtenTranslations;
-      if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
-        contentId) || writtenTranslations.hasUnflaggedWrittenTranslations(
-        contentId)) {
+      if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId) ||
+          writtenTranslations.hasUnflaggedWrittenTranslations(contentId)) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/components/forms/mark_all_audio_and_translations_as_needing_' +
@@ -168,15 +179,12 @@ oppia.controller('ExplorationEditorTab', [
           backdrop: true,
           controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
         }).result.then(function() {
-          if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
-            contentId)) {
-            contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
-              contentId);
-            ExplorationStatesService.saveContentIdsToAudioTranslations(
-              stateName, contentIdsToAudioTranslations);
+          if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
+            recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(contentId);
+            ExplorationStatesService.saveRecordedVoiceovers(
+              stateName, recordedVoiceovers);
           }
-          if (writtenTranslations.hasUnflaggedWrittenTranslations(
-            contentId)) {
+          if (writtenTranslations.hasUnflaggedWrittenTranslations(contentId)) {
             writtenTranslations.markAllTranslationsAsNeedingUpdate(contentId);
             ExplorationStatesService.saveWrittenTranslations(
               stateName, writtenTranslations);
