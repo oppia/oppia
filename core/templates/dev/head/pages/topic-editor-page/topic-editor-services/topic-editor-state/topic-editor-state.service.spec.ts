@@ -24,7 +24,7 @@ require(
   'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
   'topic-editor-state.service.ts');
 
-fdescribe('Topic editor state service', function() {
+describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
   var SubtopicPageObjectFactory = null;
