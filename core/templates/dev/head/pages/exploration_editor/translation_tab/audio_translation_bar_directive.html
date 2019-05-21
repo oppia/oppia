@@ -50,6 +50,12 @@
 </div>
 <div class="oppia-audio-recording-bar" ng-show="selectedRecording  && !audioIsCurrentlyBeingSaved">
   <div class="oppia-content-wrapper">
+    <button class="btn oppia-audio-button oppia-audio-bar-button-transition protractor-test-accessibility-translation-play-recorded-audio"
+            ng-click="playAndPauseUnsavedAudio()"
+            ng-disabled="recorder.status().isRecording"
+            aria-label="Play recorded audio">
+      <i class="material-icons"><[isPlayingUnsaved ? 'pause' : 'play_arrow']></i>
+    </button>
   </div>
   <div class="oppia-content-wrapper oppia-flex-1-wrapper">
     <div class="oppia-audio-visualiser">

@@ -118,6 +118,8 @@ oppia.directive('audioTranslationBar', [
           $scope.audioIsCurrentlyBeingSaved = false;
           $scope.elapsedTime = 0;
           $scope.timerInterval = null;
+          $scope.isPlayingUnsaved = false;
+          $scope.unSavedAudio = null;
           document.body.onkeyup = function(e) {
             if (e.keyCode === 82 && !$scope.isAudioAvailable) {
               // 82 belongs to the keycode for 'R'
@@ -181,6 +183,8 @@ oppia.directive('audioTranslationBar', [
           var showPermissionAndStartRecording = function() {
             $scope.checkingMicrophonePermission = true;
             $scope.recorder.startRecord().then(function() {
+              // set temp/unsaved recording to null,
+              // have function to play and pause
               // on mic accepted and record start
               $scope.showRecorderWarning = true;
               $scope.isTranslationTabBusy = true;
@@ -231,6 +235,19 @@ oppia.directive('audioTranslationBar', [
             $scope.audioNeedsUpdate = !$scope.audioNeedsUpdate;
           };
 
+          $scope.playAndPauseUnsavedAudio = function() {
+            $scope.isPlayingUnsaved = !$scope.isPlayingUnsaved;
+            if ($scope.isPlayingUnsaved) {
+              $scope.unSavedAudio.play();
+              $scope.unSavedAudio.onended = function() {
+                $scope.isPlayingUnsaved = false;
+                $scope.$apply();
+              };
+            } else {
+              $scope.unSavedAudio.pause();
+            }
+          };
+
           $scope.getRecorder = function() {
             $scope.recorder = TranslationRecordingService;
           };
@@ -259,6 +276,13 @@ oppia.directive('audioTranslationBar', [
               $scope.audioBlob = new Blob(audio, {type: fileType});
               // free the browser from workers
               $scope.recorder.closeRecorder();
+              // create audio play and pause for unsaved recording
+              var fileReader = new FileReader();
+              fileReader.onloadend = function() {
+                $scope.unSavedAudio = new Audio();
+                $scope.unSavedAudio.src = fileReader.result;
+              };
+              fileReader.readAsDataURL($scope.audioBlob);
             });
           };
 
@@ -423,6 +447,9 @@ oppia.directive('audioTranslationBar', [
             AudioPlayerService.stop();
             AudioPlayerService.clear();
             $scope.showRecorderWarning = false;
+            // re-initialize for unsaved recording
+            $scope.unSavedAudio = null;
+            $scope.isPlayingUnsaved = false;
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();
             $scope.canTranslate = EditabilityService.isTranslatable();
