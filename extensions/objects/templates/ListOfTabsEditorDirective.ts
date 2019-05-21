@@ -21,13 +21,16 @@ oppia.directive('listOfTabsEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/list_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.SCHEMA = {
           type: 'list',
           items: {
             type: 'dict',
@@ -56,8 +59,8 @@ oppia.directive('listOfTabsEditor', [
           }
         };
 
-        if (!$scope.value) {
-          $scope.value = [];
+        if (!ctrl.value) {
+          ctrl.value = [];
         }
       }]
     };
