@@ -21,6 +21,7 @@ import StringIO
 import collections
 import os
 import random
+import shutil
 import subprocess
 import threading
 
@@ -652,16 +653,19 @@ class BuildTests(test_utils.GenericTestBase):
         compilation.
         """
         # pylint: disable=unused-argument
-        def mock_check_call(*arg):
+        def mock_check_call(cmd):
             pass
-        def mock_call(*arg):
+        def mock_call(cmd, shell, stdout):
             pass
-        def mock_popen(*arg):
+        def mock_popen(cmd, stdout):
             pass
         # pylint: enable=unused-argument
 
         compiled_js_dir = os.path.join(
             'core', 'tests', 'build_sources', 'compiled_js_dir', '')
+
+        if os.path.exists(os.path.dirname(compiled_js_dir)):
+            shutil.rmtree(compiled_js_dir)
 
         with self.swap(subprocess, 'check_call', mock_check_call):
             os.mkdir(os.path.dirname(compiled_js_dir))
