@@ -16,6 +16,29 @@
 * @fileoverview Data and controllers for the Oppia moderator page.
 */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
+require('components/forms/ConvertHtmlToUnicodeFilter.ts');
+require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/forms/ApplyValidationDirective.ts');
+require('components/forms/RequireIsFloatDirective.ts');
+require('filters/UnderscoresToCamelCaseFilter.ts');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
+
 oppia.controller('Moderator', [
   '$http', '$rootScope', '$scope', 'AlertsService', 'DateTimeFormatService',
   function($http, $rootScope, $scope, AlertsService, DateTimeFormatService) {

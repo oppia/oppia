@@ -16,6 +16,11 @@
  * @fileoverview Modal and functionality for the create story button.
  */
 
+require('domain/topic/TopicUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/topic_editor/TopicEditorStateService.ts');
+require('services/AlertsService.ts');
+
 oppia.factory('StoryCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'TopicEditorStateService', 'TopicUpdateService', 'UrlInterpolationService',

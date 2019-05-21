@@ -34,7 +34,7 @@ class EmailDashboardPage(base.BaseHandler):
     @acl_decorators.can_manage_email_dashboard
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/email_dashboard/email_dashboard.html')
+        self.render_template('dist/email_dashboard.html')
 
 
 class EmailDashboardDataHandler(base.BaseHandler):
@@ -172,7 +172,7 @@ class EmailDashboardResultPage(base.BaseHandler):
             'query_id': query_id,
         })
         self.render_template(
-            'pages/email_dashboard/email_dashboard_result.html')
+            'dist/email_dashboard_result.html')
 
     @acl_decorators.can_manage_email_dashboard
     def post(self, query_id):

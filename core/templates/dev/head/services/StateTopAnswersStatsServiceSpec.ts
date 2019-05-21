@@ -17,6 +17,10 @@
  * statistics for a particular state.
  */
 
+require('App.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('services/StateTopAnswersStatsService.ts');
+
 var joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', function() {

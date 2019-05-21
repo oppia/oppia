@@ -16,6 +16,10 @@
  * @fileoverview Directive for a schema-based editor for floats.
  */
 
+require('components/forms/validators/IsFloatFilter.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.directive('schemaBasedFloatEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
