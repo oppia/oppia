@@ -17,6 +17,8 @@
  * a state.
  */
 
+require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+
 oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(

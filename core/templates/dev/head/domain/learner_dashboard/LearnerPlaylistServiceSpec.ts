@@ -16,6 +16,9 @@
  * @fileoverview Tests for LearnerPlaylistService.js.
  */
 
+require('domain/learner_dashboard/LearnerPlaylistService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 describe('Learner playlist service factory', function() {
   var LearnerPlaylistService = null;
   var $httpBackend = null;

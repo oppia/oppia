@@ -16,6 +16,12 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
+require('domain/exploration/ParamMetadataObjectFactory.ts');
+require('expressions/ExpressionInterpolationService.ts');
+require('pages/exploration_editor/ExplorationParamChangesService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/GraphDataService.ts');
+
 oppia.constant('PARAM_ACTION_GET', 'get');
 
 oppia.constant('PARAM_ACTION_SET', 'set');

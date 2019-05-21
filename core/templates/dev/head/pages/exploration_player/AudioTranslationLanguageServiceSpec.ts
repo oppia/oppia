@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the audio translation language service.
  */
 
+require('pages/exploration_player/AudioTranslationLanguageService.ts');
+
 describe('Audio translation language service', function() {
   beforeEach(angular.mock.module('oppia'));
 

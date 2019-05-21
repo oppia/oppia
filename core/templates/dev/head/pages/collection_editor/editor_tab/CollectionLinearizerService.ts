@@ -18,6 +18,8 @@
  * retrieving the collection, saving it, and listening for changes.
  */
 
+require('domain/collection/CollectionUpdateService.ts');
+
 oppia.factory('CollectionLinearizerService', [
   'CollectionUpdateService',
   function(CollectionUpdateService) {
