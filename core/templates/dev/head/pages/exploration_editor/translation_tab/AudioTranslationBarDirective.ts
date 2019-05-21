@@ -260,7 +260,7 @@ oppia.directive('audioTranslationBar', [
             container: '#visualized',
             waveColor: '#009688',
             progressColor: '#cccccc',
-            height:38
+            height: 38
           });
 
           $scope.stopRecording = function() {
