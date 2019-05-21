@@ -18,13 +18,16 @@ oppia.directive('sanitizedUrlEditor', [
     // Editable URL directive.
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/sanitized_url_editor_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.SCHEMA = {
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.SCHEMA = {
           type: 'unicode',
           validators: [{
             id: 'is_nonempty'
