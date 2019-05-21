@@ -894,3 +894,20 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
                 {'publish_status': False}, csrf_token=csrf_token,
                 expected_status_int=401)
             self.logout()
+
+    def test_get_can_not_access_handler_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            response = self.get_html_response(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            new_topic_id = topic_services.get_new_topic_id()
+            self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_STATUS_URL_PREFIX, new_topic_id),
+                {'publish_status': True}, csrf_token=csrf_token,
+                expected_status_int=404)
+
+        self.logout()

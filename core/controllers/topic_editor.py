@@ -374,6 +374,10 @@ class TopicPublishHandler(base.BaseHandler):
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
         """Publishes or unpublishes a topic."""
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException
+
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
         publish_status = self.payload.get('publish_status')
