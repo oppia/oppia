@@ -17,25 +17,28 @@ oppia.directive('realEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/real_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
-        $scope.schema = {
+        var ctrl = this;
+        ctrl.schema = {
           type: 'float'
         };
 
-        $scope.$watch('value', function() {
-          if ($scope.value === '') {
+        $scope.$watch('$ctrl.value', function() {
+          if (ctrl.value === '') {
             // A new rule
-            $scope.value = 0.0;
+            ctrl.value = 0.0;
           }
         });
 
-        if ($scope.value === '') {
-          $scope.value = 0.0;
+        if (ctrl.value === '') {
+          ctrl.value = 0.0;
         }
       }]
     };
