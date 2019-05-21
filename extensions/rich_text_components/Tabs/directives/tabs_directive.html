@@ -1,5 +1,5 @@
 <uib-tabset>
-  <uib-tab ng-repeat="tabContent in tabContents" heading="<[tabContent.title]>">
+  <uib-tab ng-repeat="tabContent in $ctrl.tabContents" heading="<[tabContent.title]>">
     <br>
     <span>
       <angular-html-bind class="protractor-test-tab-content" html-data="tabContent.content">

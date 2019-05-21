@@ -23,12 +23,15 @@ oppia.directive('oppiaResponseNumberWithUnits', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = NumberWithUnitsObjectFactory.fromDict(
+        ctrl.answer = NumberWithUnitsObjectFactory.fromDict(
           answer).toString();
       }]
     };
