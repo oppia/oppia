@@ -18,7 +18,7 @@
 
 require('pages/exploration-editor-page/history-tab/history-tab.controller.ts');
 
-fdescribe('HistoryTab controller', function() {
+describe('HistoryTab controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('HistoryTab', function() {
