@@ -261,7 +261,7 @@ class SignupPage(base.BaseHandler):
             'meta_description': feconf.SIGNUP_PAGE_DESCRIPTION,
             'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
         })
-        self.render_template('dist/signup.html')
+        self.render_template('dist/signup-page.mainpage.html')
 
 
 class SignupHandler(base.BaseHandler):

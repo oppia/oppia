@@ -21,7 +21,7 @@ require('services/SiteAnalyticsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-oppia.controller('Stewards', [
+angular.module('topicLandingPageStewardsModule').controller('Stewards', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UrlService', 'WindowDimensionsService',
   function(

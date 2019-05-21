@@ -24,7 +24,7 @@ require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-oppia.controller('Signup', [
+angular.module('signupPageModule').controller('Signup', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'FocusManagerService',
   'SiteAnalyticsService', 'UrlInterpolationService', 'UrlService',
@@ -64,7 +64,8 @@ oppia.controller('Signup', [
     $scope.showLicenseExplanationModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/signup/licence_explanation_modal_directive.html'),
+          '/pages/signup-page/signup-page-templates/' +
+          'licence-explanation-modal.template.html'),
         backdrop: true,
         resolve: {},
         controller: [
@@ -191,7 +192,8 @@ oppia.controller('Signup', [
     $scope.showRegistrationSessionExpiredModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/signup/registration_session_expired_modal_directive.html'),
+          '/pages/signup-page/signup-page-templates/' +
+          'registration-session-expired-modal.template.html'),
         backdrop: 'static',
         keyboard: false,
         resolve: {},

@@ -48,7 +48,7 @@ module.exports = {
     exploration_player:
       commonPrefix + '/pages/exploration_player/ExplorationPlayer.ts',
     get_started: commonPrefix + '/pages/get_started/GetStarted.ts',
-    landing: commonPrefix + '/pages/landing/TopicLandingPage.ts',
+    landing: commonPrefix + '/pages/landing-page/topic-landing-page.controller.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
     library: commonPrefix + '/pages/library-page/library-page.controller.ts',
@@ -60,10 +60,10 @@ module.exports = {
       commonPrefix + '/pages/practice_session/PracticeSession.ts',
     preferences: commonPrefix + '/pages/preferences/Preferences.ts',
     profile: commonPrefix + '/pages/profile/Profile.ts',
-    signup: commonPrefix + '/pages/signup/Signup.ts',
+    signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
     splash: commonPrefix + '/pages/splash/Splash.ts',
-    stewards: commonPrefix + '/pages/landing/stewards/Stewards.ts',
+    stewards: commonPrefix + '/pages/landing-page/landing-page-stewards/landing-page-stewards.controller.ts',
     story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
     teach: commonPrefix + '/pages/teach/Teach.ts',
     thanks: commonPrefix + '/pages/thanks/Thanks.ts',
@@ -188,8 +188,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['landing'],
-      filename: 'topic_landing_page.html',
-      template: commonPrefix + '/pages/landing/topic_landing_page.html',
+      filename: 'topic-landing-page.mainpage.html',
+      template: commonPrefix + '/pages/landing-page/topic-landing-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -261,8 +261,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['signup'],
-      filename: 'signup.html',
-      template: commonPrefix + '/pages/signup/signup.html',
+      filename: 'signup-page.mainpage.html',
+      template: commonPrefix + '/pages/signup-page/signup-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -296,9 +296,9 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['stewards'],
-      filename: 'landing_page_stewards.html',
+      filename: 'landing-page-stewards.mainpage.html',
       template:
-        commonPrefix + '/pages/landing/stewards/landing_page_stewards.html',
+        commonPrefix + '/pages/landing-page/landing-page-stewards/landing-page-stewards.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
