@@ -29,6 +29,7 @@ import utils
     models.Registry.import_models([
         models.NAMES.exploration, models.NAMES.collection,
         models.NAMES.feedback, models.NAMES.user]))
+datastore_services = models.Registry.import_datastore_services()
 
 
 _LANGUAGES_TO_RESET = ['hu', 'mk', 'sv', 'tr', 'de', 'fr', 'nl', 'pt']
@@ -464,3 +465,41 @@ class UserLastExplorationActivityOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, stringified_values):
         """Implements the reduce function for this job."""
         pass
+
+
+class CleanupActivityIdsFromUserSubscriptionsModelOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One off job that removes nonexisting activity ids from
+    UserSubscriptionsModel.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Remove invalid ids in a UserSubscriptionsModel entity."""
+
+        return [user_models.UserSubscriptionsModel]
+
+    @staticmethod
+    def map(model_instance):
+        if not model_instance.deleted:
+            fetched_exploration_model_instances = (
+                datastore_services.fetch_multiple_entities_by_ids_and_models(
+                    [('ExplorationModel', model_instance.activity_ids)]))[0]
+
+            exp_ids_removed = []
+            for exp_id, exp_instance in zip(
+                    model_instance.activity_ids,
+                    fetched_exploration_model_instances):
+                if exp_instance is None or exp_instance.deleted:
+                    exp_ids_removed.append(exp_id)
+                    model_instance.activity_ids.remove(exp_id)
+            if exp_ids_removed:
+                model_instance.put()
+                yield (
+                    'Successfully cleaned up UserSubscriptionsModel %s and '
+                    'removed explorations %s' % (
+                        model_instance.id, str(exp_ids_removed)), 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, len(values))
