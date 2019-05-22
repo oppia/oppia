@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for the audio preloader service.
  */
 
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/AudioPreloaderService.ts');
+require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require('services/ContextService.ts');
+
 describe('Audio preloader service', function() {
   beforeEach(function() {
     angular.mock.module('oppia');
@@ -68,15 +74,17 @@ describe('Audio preloader service', function() {
             content_id: 'content',
             html: '<p>State 1 Content</p>'
           },
-          content_ids_to_audio_translations: {
-            content: {
-              en: {
-                filename: 'en-1.mp3',
-                file_size_bytes: 120000,
-                needs_update: false
-              }
-            },
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'en-1.mp3',
+                  file_size_bytes: 120000,
+                  needs_update: false
+                }
+              },
+              default_outcome: {}
+            }
           },
           interaction: {
             id: 'Continue',
@@ -112,12 +120,14 @@ describe('Audio preloader service', function() {
             content_id: 'content',
             html: 'Congratulations, you have finished!',
           },
-          content_ids_to_audio_translations: {
-            content: {
-              en: {
-                filename: 'en-3.mp3',
-                file_size_bytes: 120000,
-                needs_update: false
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'en-3.mp3',
+                  file_size_bytes: 120000,
+                  needs_update: false
+                }
               }
             }
           },
@@ -147,15 +157,17 @@ describe('Audio preloader service', function() {
             content_id: 'content',
             html: '<p>State 2 Content</p>'
           },
-          content_ids_to_audio_translations: {
-            content: {
-              en: {
-                filename: 'en-2.mp3',
-                file_size_bytes: 120000,
-                needs_update: false
-              }
-            },
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'en-2.mp3',
+                  file_size_bytes: 120000,
+                  needs_update: false
+                }
+              },
+              default_outcome: {}
+            }
           },
           interaction: {
             id: 'Continue',
@@ -191,16 +203,18 @@ describe('Audio preloader service', function() {
             content_id: 'content',
             html: '<p>Introduction Content</p>',
           },
-          content_ids_to_audio_translations: {
-            content: {
-              en: {
-                filename: 'en-0.mp3',
-                file_size_bytes: 120000,
-                needs_update: false
-              }
-            },
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'en-0.mp3',
+                  file_size_bytes: 120000,
+                  needs_update: false
+                }
+              },
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',

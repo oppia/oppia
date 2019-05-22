@@ -151,8 +151,8 @@ exports.config = {
       'protractor_desktop/topicsAndSkillsDashboard.js'
     ],
 
-    skillEditorPage: [
-      'protractor_desktop/skillEditorPage.js'
+    skillEditor: [
+      'protractor_desktop/skillEditor.js'
     ],
 
     users: [

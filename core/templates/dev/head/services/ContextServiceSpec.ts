@@ -17,6 +17,8 @@
  *   editor page.
  */
 
+require('services/ContextService.ts');
+
 describe('Context service', function() {
   beforeEach(angular.mock.module('oppia'));
 

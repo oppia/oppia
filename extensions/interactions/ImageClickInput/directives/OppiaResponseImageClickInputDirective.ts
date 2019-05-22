@@ -25,14 +25,17 @@ oppia.directive('oppiaResponseImageClickInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
         'image_click_input_response_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'HtmlEscaperService',
-        function($scope, $attrs, HtmlEscaperService) {
+        '$attrs', 'HtmlEscaperService',
+        function($attrs, HtmlEscaperService) {
+          var ctrl = this;
           var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-          $scope.clickRegionLabel = '(Clicks on ' + (
+          ctrl.clickRegionLabel = '(Clicks on ' + (
             _answer.clickedRegions.length > 0 ?
               '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
         }

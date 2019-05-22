@@ -16,6 +16,31 @@
  * @fileoverview Utility service for the learner's view of an exploration.
  */
 
+require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('expressions/ExpressionInterpolationService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/exploration_player/AudioPreloaderService.ts');
+require('pages/exploration_player/AudioTranslationLanguageService.ts');
+require('pages/exploration_player/ImagePreloaderService.ts');
+require('pages/exploration_player/LearnerParamsService.ts');
+require('pages/exploration_player/NumberAttemptsService.ts');
+require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration_player/StatsReportingService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/UserService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 // A service that provides a number of utility functions for JS used by
@@ -169,8 +194,7 @@ oppia.factory('ExplorationEngineService', [
       var initialCard =
         StateCardObjectFactory.createNewCard(
           currentStateName, questionHtml, interactionHtml,
-          interaction,
-          initialState.contentIdsToAudioTranslations,
+          interaction, initialState.recordedVoiceovers,
           initialState.content.getContentId());
       successCallback(initialCard, nextFocusLabel);
     };
@@ -240,7 +264,7 @@ oppia.factory('ExplorationEngineService', [
           visitedStateNames = [exploration.getInitialState().name];
           initParams(manualParamChanges);
           AudioTranslationLanguageService.init(
-            exploration.getAllAudioLanguageCodes(),
+            exploration.getAllVoiceoverLanguageCodes(),
             null,
             exploration.getLanguageCode(),
             explorationDict.auto_tts_enabled);
@@ -254,7 +278,7 @@ oppia.factory('ExplorationEngineService', [
           version = explorationVersion;
           initParams([]);
           AudioTranslationLanguageService.init(
-            exploration.getAllAudioLanguageCodes(),
+            exploration.getAllVoiceoverLanguageCodes(),
             preferredAudioLanguage,
             exploration.getLanguageCode(),
             autoTtsEnabled);
@@ -302,8 +326,7 @@ oppia.factory('ExplorationEngineService', [
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
-        var contentIdsToAudioTranslations =
-          oldState.contentIdsToAudioTranslations;
+        var recordedVoiceovers = oldState.recordedVoiceovers;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             oldStateName, oldState.interaction, answer,
@@ -349,9 +372,8 @@ oppia.factory('ExplorationEngineService', [
         var feedbackHtml =
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
         var feedbackContentId = outcome.feedback.getContentId();
-        var feedbackAudioTranslations =
-          contentIdsToAudioTranslations.getBindableAudioTranslations(
-            feedbackContentId);
+        var feedbackAudioTranslations = (
+          recordedVoiceovers.getBindableVoiceovers(feedbackContentId));
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
@@ -404,7 +426,7 @@ oppia.factory('ExplorationEngineService', [
         var nextCard = StateCardObjectFactory.createNewCard(
           nextStateName, questionHtml, nextInteractionHtml,
           exploration.getInteraction(nextStateName),
-          exploration.getState(nextStateName).contentIdsToAudioTranslations,
+          exploration.getState(nextStateName).recordedVoiceovers,
           exploration.getState(nextStateName).content.getContentId());
         successCallback(
           nextCard, refreshInteraction, feedbackHtml,

@@ -71,6 +71,8 @@ PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 NODE_FILE = os.path.join(
     PARENT_DIR, 'oppia_tools', 'node-10.15.3', 'bin', 'node')
 UGLIFY_FILE = os.path.join('node_modules', 'uglify-js', 'bin', 'uglifyjs')
+WEBPACK_FILE = os.path.join('node_modules', 'webpack', 'bin', 'webpack.js')
+WEBPACK_PROD_CONFIG = 'webpack.prod.config.ts'
 
 # Files with these extensions shouldn't be moved to build directory.
 FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
@@ -78,6 +80,7 @@ FILE_EXTENSIONS_TO_IGNORE = ('.py', '.pyc', '.stylelintrc', '.ts')
 # not be served in production. (This includes protractor.js files in
 # /extensions.)
 JS_FILENAME_SUFFIXES_TO_IGNORE = ('Spec.js', 'protractor.js')
+JS_FILENAME_SUFFIXES_NOT_TO_MINIFY = ('.bundle.js',)
 GENERAL_FILENAMES_TO_IGNORE = ('.pyc', '.stylelintrc')
 
 # These files are present in both extensions and local_compiled_js/extensions.
@@ -98,7 +101,9 @@ FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/fonts/*',
     'third_party/generated/webfonts/*',
-    'third_party/generated/js/third_party.min.js.map')
+    'third_party/generated/js/third_party.min.js.map',
+    '*.bundle.js',
+    '*.bundle.js.map')
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
@@ -519,6 +524,21 @@ def build_third_party_libs(third_party_directory_path):
             dependency_filepaths['fonts'], WEBFONTS_DIR))
 
 
+def build_using_webpack():
+    """Execute webpack build process. This takes all TypeScript files we have in
+    /templates/dev/head and generates JS bundles according the require() imports
+    and also compiles HTML pages into the /templates/dev/head/dist folder.
+
+    The settings for this are specified in webpack.prod.config.ts.
+    """
+
+    print 'Building webpack'
+
+    cmd = '%s --config %s' % (
+        WEBPACK_FILE, WEBPACK_PROD_CONFIG)
+    subprocess.check_call(cmd, shell=True)
+
+
 def hash_should_be_inserted(filepath):
     """Returns if the file should be renamed to include hash in
     the path.
@@ -735,12 +755,15 @@ def minify_func(source_path, target_path, file_hashes, filename):
         - CSS or JS files: Minify and save at target directory.
         - Other files: Copy the file from source directory to target directory.
     """
+    skip_minify = any(
+        filename.endswith(p) for p in JS_FILENAME_SUFFIXES_NOT_TO_MINIFY)
     if filename.endswith('.html'):
         print 'Building %s' % source_path
         with open(source_path, 'r+') as source_html_file:
             with open(target_path, 'w+') as minified_html_file:
                 process_html(source_html_file, minified_html_file, file_hashes)
-    elif filename.endswith('.css') or filename.endswith('.js'):
+    elif ((filename.endswith('.css') or filename.endswith('.js')) and
+          not skip_minify):
         print 'Minifying %s' % source_path
         _minify(source_path, target_path)
     else:
@@ -1246,6 +1269,7 @@ def build():
         raise Exception(
             'minify_third_party_libs_only should not be set in non-prod mode.')
     if options.prod_mode:
+        build_using_webpack()
         minify_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
         if not options.minify_third_party_libs_only:
             generate_build_directory()

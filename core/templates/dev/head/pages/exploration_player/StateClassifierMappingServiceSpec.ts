@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
+require('pages/exploration_player/StateClassifierMappingService.ts');
+
 describe('State classifier mapping service', function() {
   beforeEach(angular.mock.module('oppia'));
 
