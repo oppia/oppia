@@ -89,6 +89,14 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
 
 
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
+
+    def test_can_not_access_story_viewer_page_with_unpublished_story(self):
+        new_story_id = 'new_story_id'
+        story_domain.Story.create_default_story(new_story_id, 'Title')
+        self.get_json(
+            '%s/%s' % (feconf.STORY_DATA_HANDLER, new_story_id),
+            expected_status_int=404)
+
     def test_get(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             json_response = self.get_json(

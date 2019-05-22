@@ -215,6 +215,19 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 ), {}, csrf_token=csrf_token, expected_status_int=404)
             self.logout()
 
+    def test_post_with_guest_disallows_access(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.logout()
+
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    self.skill_id
+                ), {}, csrf_token=csrf_token, expected_status_int=401)
+
     def test_post_with_non_admin_or_topic_manager_email_disallows_access(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
             self.login(self.NEW_USER_EMAIL)
@@ -354,6 +367,31 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
             self.skill_id, self.admin_id, 'Skill Description')
         question_services.create_new_question_skill_link(
             self.question_id, self.skill_id, 0.7)
+
+    def test_get_can_not_access_handler_with_invalid_question_id(self):
+        self.login(self.ADMIN_EMAIL)
+        self.get_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, 'invalid_question_id'),
+            expected_status_int=404)
+        self.logout()
+
+    def test_delete_with_guest_does_not_allow_question_deletion(self):
+        self.delete_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+            expected_status_int=401)
+
+    def test_delete_with_new_user_does_not_allow_question_deletion(self):
+        self.login(self.NEW_USER_EMAIL)
+        response = self.delete_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+            expected_status_int=401)
+        self.assertIn(
+            'does not have enough rights to delete the question.',
+            response['error'])
+        self.logout()
 
     def test_get_with_new_structures_disabled_returns_404_status(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):

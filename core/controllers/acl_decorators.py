@@ -290,7 +290,8 @@ def can_edit_collection(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        collection_rights = rights_manager.get_collection_rights(collection_id)
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -521,9 +522,6 @@ def can_upload_exploration(handler):
             UnauthorizedUserException: The user does not have
                 credentials to upload an exploration.
         """
-        if not self.user_id:
-            raise self.NotLoggedInException
-
         if not current_user_services.is_current_user_super_admin():
             raise self.UnauthorizedUserException(
                 'You do not have credentials to upload exploration.')
@@ -931,7 +929,7 @@ def can_edit_exploration(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
+            exploration_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -977,7 +975,7 @@ def can_translate_exploration(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
+            exploration_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1209,7 +1207,7 @@ def can_publish_collection(handler):
                 credentials to publish a collection.
         """
         collection_rights = rights_manager.get_collection_rights(
-            collection_id)
+            collection_id, strict=False)
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1252,7 +1250,7 @@ def can_unpublish_collection(handler):
                 credentials to unpublish a collection.
         """
         collection_rights = rights_manager.get_collection_rights(
-            collection_id)
+            collection_id, strict=False)
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1503,7 +1501,7 @@ def can_edit_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1657,49 +1655,6 @@ def can_delete_question(handler):
     return test_can_delete_question
 
 
-def can_edit_subtopic_page(handler):
-    """Decorator to check whether the user can edit a subtopic page of a
-    topic.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that now also checks if
-            the user has permission to edit a subtopic page of a topic.
-    """
-
-    def test_can_edit(self, topic_id, **kwargs):
-        """Checks whether the user can edit the subtopic page
-        of a given topic.
-
-        Args:
-            topic_id: str. The topic id.
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the decorated function.
-
-        Raises:
-            NotLoggedInException: The user is not logged in.
-            UnauthorizedUserException: The user does not have
-                credentials to edit the subtopic pages for
-                a given topic.
-        """
-        if not self.user_id:
-            raise base.UserFacingExceptions.NotLoggedInException
-
-        if topic_services.check_can_edit_subtopic_page(self.user):
-            return handler(self, topic_id, **kwargs)
-        else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit the subtopic pages for '
-                'this topic.')
-    test_can_edit.__wrapped__ = True
-
-    return test_can_edit
-
-
 def can_add_new_story_to_topic(handler):
     """Decorator to check whether the user can add a story to a given topic.
 
@@ -1731,7 +1686,7 @@ def can_add_new_story_to_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1778,7 +1733,7 @@ def can_edit_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1963,14 +1918,10 @@ def can_publish_skill(handler):
         Returns:
             bool. Whether the given user can publish the given skill.
         """
-
-        if skill_rights is None:
-            return False
         if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
             return False
         if skill_rights.is_creator(user.user_id):
             return True
-        return False
 
     def test_can_publish_skill(self, skill_id, **kwargs):
         """Tests whether the user can publish a given skill by checking
@@ -1992,7 +1943,7 @@ def can_publish_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        skill_rights = skill_services.get_skill_rights(skill_id)
+        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
         if skill_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -2039,7 +1990,7 @@ def can_delete_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 

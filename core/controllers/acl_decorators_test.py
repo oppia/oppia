@@ -64,6 +64,12 @@ class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
+    def test_can_not_access_exploration_with_disabled_exploration_ids(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % feconf.DISABLED_EXPLORATION_IDS[0],
+                expected_status_int=404)
+
     def test_guest_can_access_published_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id)
@@ -212,6 +218,13 @@ class EditCollectionDecoratorTests(test_utils.GenericTestBase):
             exploration_id=self.private_col_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
         rights_manager.publish_collection(self.owner, self.published_col_id)
+
+    def test_can_not_edit_collection_with_invalid_collection_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % 'invalid_col_id', expected_status_int=404)
+        self.logout()
 
     def test_guest_cannot_edit_collection_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -404,6 +417,8 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_comment_on_feedback_thread decorator."""
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -417,6 +432,7 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
@@ -431,6 +447,34 @@ class CommentOnFeedbackThreadTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_can_not_comment_on_feedback_threads_with_disabled_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1'
+                % feconf.DISABLED_EXPLORATION_IDS[0],
+                expected_status_int=404)
+        self.logout()
+
+    def test_viewer_cannot_comment_on_feedback_for_private_exploration(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/exploration.%s.thread1'
+                % self.private_exp_id, expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to comment on '
+                'exploration feedback.')
+        self.logout()
+
+    def test_can_not_comment_on_feedback_threads_with_invalid_thread_id(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/invalid_thread_id', expected_status_int=400)
+            self.assertEqual(response['error'], 'Thread ID must contain a .')
+        self.logout()
 
     def test_guest_cannot_comment_on_feedback_threads_via_json_handler(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -480,6 +524,8 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_create_feedback_thread decorator."""
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -493,6 +539,7 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
@@ -507,6 +554,22 @@ class CreateFeedbackThreadTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_can_not_create_feedback_threads_with_disabled_exp_id(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % feconf.DISABLED_EXPLORATION_IDS[0],
+                expected_status_int=404)
+
+    def test_viewer_cannot_create_feedback_for_private_exploration(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.private_exp_id, expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to create '
+                'exploration feedback.')
+        self.logout()
 
     def test_guest_can_create_feedback_threads_for_public_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -535,6 +598,8 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
     """Tests for can_view_feedback_thread decorator."""
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
 
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
@@ -548,6 +613,7 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.viewer_email, self.viewer_username)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
@@ -562,6 +628,24 @@ class ViewFeedbackThreadTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_can_not_view_feedback_threads_with_disabled_exp_id(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.thread1'
+                % feconf.DISABLED_EXPLORATION_IDS[0],
+                expected_status_int=404)
+
+    def test_viewer_cannot_view_feedback_for_private_exploration(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/exploration.%s.thread1'
+                % self.private_exp_id, expected_status_int=401)
+            self.assertEqual(
+                response['error'], 'You do not have credentials to view '
+                'exploration feedback.')
+        self.logout()
 
     def test_guest_can_view_feedback_threads_for_public_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -973,6 +1057,13 @@ class EditExplorationTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
+    def test_can_not_edit_exploration_with_invalid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/invalid_exp_id', expected_status_int=404)
+        self.logout()
+
     def test_banned_user_cannot_edit_exploration(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1076,6 +1167,11 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_guest_can_not_delete_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id, expected_status_int=401)
 
     def test_owner_can_delete_owned_private_exploration(self):
         self.login(self.OWNER_EMAIL)
@@ -1278,6 +1374,13 @@ class PublishExplorationTests(test_utils.GenericTestBase):
             self.private_exp_id, self.owner_id)
         rights_manager.publish_exploration(self.owner, self.public_exp_id)
 
+    def test_cannot_publish_exploration_with_invalid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % 'invalid_exp_id', expected_status_int=404)
+        self.logout()
+
     def test_owner_can_publish_owned_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1413,6 +1516,21 @@ class CollectionPublishStatusTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
         rights_manager.publish_collection(self.owner, self.published_col_id)
 
+    def test_cannot_publish_collection_with_invalid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_publish/%s' % 'invalid_col_id', expected_status_int=404)
+        self.logout()
+
+    def test_cannot_unpublish_collection_with_invalid_exp_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_unpublish/%s' % 'invalid_col_id',
+                expected_status_int=404)
+        self.logout()
+
     def test_owner_can_publish_collection(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1526,6 +1644,13 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         topic_services.assign_role(
             self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
 
+    def test_can_not_edit_topic_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % 'invalid_topic_id', expected_status_int=404)
+        self.logout()
+
     def test_admin_can_edit_topic(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
@@ -1545,6 +1670,368 @@ class EditTopicDecoratorTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.topic_id, expected_status_int=401)
+        self.logout()
+
+
+class AddStoryToTopicTests(test_utils.GenericTestBase):
+    """Tests for decorator can_add_new_story_to_topic."""
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    topic_id = 'topic_1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_add_new_story_to_topic
+        def get(self, topic_id):
+            self.render_json({'topic_id': topic_id})
+
+    def setUp(self):
+        super(AddStoryToTopicTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.manager_email, self.manager_username)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([self.manager_username])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.manager = user_services.UserActionsInfo(self.manager_id)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<topic_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+        topic_services.assign_role(
+            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
+
+    def test_can_not_add_story_to_topic_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % 'invalid_topic_id', expected_status_int=404)
+        self.logout()
+
+    def test_admin_can_add_story_to_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.topic_id)
+        self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
+    def test_topic_manager_can_add_story_to_topic(self):
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.topic_id)
+        self.assertEqual(response['topic_id'], self.topic_id)
+        self.logout()
+
+    def test_normal_user_cannot_add_story_to_topic(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.topic_id, expected_status_int=401)
+        self.logout()
+
+    def test_guest_cannot_add_story_to_topic(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.topic_id, expected_status_int=401)
+
+
+class CreateSkillTests(test_utils.GenericTestBase):
+    """Tests for decorator can_create_skill."""
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_create_skill
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(CreateSkillTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.set_banned_users([self.banned_user])
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_admin_can_create_skill(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock')
+        self.logout()
+
+    def test_banned_user_cannot_create_skill(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock', expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to create a skill.')
+        self.logout()
+
+    def test_guest_cannot_add_create_skill(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expected_status_int=401)
+
+
+class PublishSkillTests(test_utils.GenericTestBase):
+    """Tests for decorator can_publish_skill."""
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    skill_id = '1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_publish_skill
+        def get(self, skill_id):
+            self.render_json({'skill_id': skill_id})
+
+    def setUp(self):
+        super(PublishSkillTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.viewer_email, self.viewer_username)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<skill_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        skill_services.create_new_skill_rights(self.skill_id, self.admin_id)
+
+    def test_can_not_publish_skill_with_invalid_skill_id(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % 'invalid_skill_id', expected_status_int=404)
+        self.logout()
+
+    def test_admin_can_publish_skill(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s' % self.skill_id)
+        self.logout()
+
+    def test_viewer_cannot_publish_skill(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.skill_id, expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to edit this skill.')
+        self.logout()
+
+    def test_guest_cannot_publish_skill(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.skill_id, expected_status_int=401)
+
+
+class CreateTopicTests(test_utils.GenericTestBase):
+    """Tests for decorator can_create_topic."""
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_create_topic
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(CreateTopicTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.set_banned_users([self.banned_user])
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_admin_can_create_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock')
+        self.logout()
+
+    def test_banned_user_cannot_create_topic(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock', expected_status_int=401)
+            self.assertIn(
+                'does not have enough rights to create a topic.',
+                response['error'])
+        self.logout()
+
+    def test_guest_cannot_create_topic(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expected_status_int=401)
+
+
+class ManageRightsForTopicTests(test_utils.GenericTestBase):
+    """Tests for decorator can_manage_rights_for_topic."""
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+    topic_id = 'topic_1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_manage_rights_for_topic
+        def get(self, topic_id):
+            self.render_json({'topic_id': topic_id})
+
+    def setUp(self):
+        super(ManageRightsForTopicTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.set_banned_users([self.banned_user])
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<topic_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
+
+    def test_admin_can_manage_rights(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s' % self.topic_id)
+        self.logout()
+
+    def test_banned_user_cannot_manage_rights(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.topic_id, expected_status_int=401)
+            self.assertIn(
+                'does not have enough rights to assign roles for the topic.',
+                response['error'])
+        self.logout()
+
+    def test_guest_cannot_manage_rights(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s' % self.topic_id, expected_status_int=401)
+
+
+class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
+    """Tests for decorator can_change_topic_publication_status."""
+    banned_user = 'banneduser'
+    banned_user_email = 'banned@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_change_topic_publication_status
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(ChangeTopicPublicationStatusTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.banned_user_email, self.banned_user)
+        self.set_banned_users([self.banned_user])
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_admin_can_change_topic_publication_status(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock')
+        self.logout()
+
+    def test_banned_user_cannot_change_topic_publication_status(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock', expected_status_int=401)
+            self.assertIn(
+                'does not have enough rights to publish or unpublish the '
+                'topic.', response['error'])
+        self.logout()
+
+    def test_guest_cannot_change_topic_publication_status(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expected_status_int=401)
+
+
+class PerformCronTaskTests(test_utils.GenericTestBase):
+    """Tests for decorator can_perform_cron_tasks."""
+
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_perform_cron_tasks
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(PerformCronTaskTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.viewer_email, self.viewer_username)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_super_admin_can_perform_cron_tasks(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock')
+        self.logout()
+
+    def test_normal_user_cannot_perform_cron_tasks(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock', expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have the credentials to access this page.')
         self.logout()
 
 
@@ -1586,6 +2073,13 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         skill_services.create_new_skill_rights(self.skill_id, self.admin_id)
+
+    def test_cannot_edit_skill_with_invalid_skill_id(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_custom_response(
+                '/mock/', 'text/plain', expected_status_int=404)
+        self.logout()
 
     def test_admin_can_edit_skill(self):
         self.login(self.ADMIN_EMAIL)
@@ -1668,6 +2162,18 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
         ))
         question_services.create_new_question_rights(
             self.question_id, self.ADMIN_EMAIL)
+
+    def test_guest_cannot_edit_question(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.question_id, expected_status_int=401)
+
+    def test_cannot_edit_question_with_invalid_question_id(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % 'invalid_question_id', expected_status_int=404)
+        self.logout()
 
     def test_admin_can_edit_question(self):
         self.login(self.ADMIN_EMAIL)

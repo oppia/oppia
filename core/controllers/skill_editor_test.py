@@ -169,6 +169,14 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             }]
         }
 
+    def test_guest_can_not_delete_skill(self):
+        self.get_json(self.url, expected_status_int=401)
+
+    def test_new_user_can_not_delete_skill(self):
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(self.url, expected_status_int=401)
+        self.logout()
+
     def test_editable_skill_handler_get_succeeds(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
