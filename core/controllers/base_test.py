@@ -279,6 +279,9 @@ class BaseHandlerTests(test_utils.GenericTestBase):
                 name='MockHandlerForTestingErrorPageWithIframed')],
             debug=feconf.DEBUG,
         ))
+        # The 500 is expected because the template file does not exist
+        # (so it is a legitimate server error caused by the
+        # MockHandlerForTestingErrorPageWithIframed).
         response = self.get_html_response(
             '/mock_iframed', expected_status_int=500)
 
@@ -336,7 +339,7 @@ class CsrfTokenManagerTests(test_utils.GenericTestBase):
                 'uid', token))
 
     def test_redirect_oppia_test_server(self):
-        # The old demo server redirects to the new server.
+        # The old demo server redirects to the new demo server.
         self.get_html_response(
             'https://oppiaserver.appspot.com/splash', expected_status_int=301)
         self.get_html_response(
