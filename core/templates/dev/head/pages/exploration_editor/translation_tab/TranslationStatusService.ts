@@ -17,11 +17,24 @@
  * its components.
  */
 
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require(
+  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+require(
+  'pages/exploration_editor/translation_tab/' +
+  'TranslationTabActiveModeService.ts'
+);
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+require(
+  'pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
+
 oppia.factory('TranslationStatusService', [
-  'ExplorationStatesService', 'StateContentIdsToAudioTranslationsService',
+  'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',
   'TranslationTabActiveModeService', 'INTERACTION_SPECS', function(
-      ExplorationStatesService, StateContentIdsToAudioTranslationsService,
+      ExplorationStatesService, StateRecordedVoiceoversService,
       StateWrittenTranslationsService, TranslationLanguageService,
       TranslationTabActiveModeService, INTERACTION_SPECS) {
     var AUDIO_NEEDS_UPDATE_MESSAGE = ['Audio needs update!'];
@@ -35,34 +48,25 @@ oppia.factory('TranslationStatusService', [
     var stateWiseStatusColor = {};
     var explorationContentRequiredCount = 0;
     var explorationContentNotAvailableCount = 0;
-    var contentIdsToAudioTranslations =
-        StateContentIdsToAudioTranslationsService.displayed;
+    var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
 
-    var _getVoiceOverStatus = function(
-        contentIdsToAudioTranslations, contentId) {
-      // The first value of availabilityStatus shows whether an audio is
-      // available for a contentId in a given language, whereas the last value
-      // represent whether the available audio needs update.
+    var _getVoiceOverStatus = function(recordedVoiceovers, contentId) {
       var availabilityStatus = {
         available: false,
         needsUpdate: false,
       };
-      var availableLanguages = (
-        contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
+      var availableLanguages = recordedVoiceovers.getVoiceoverLanguageCodes(
+        contentId);
       if (availableLanguages.indexOf(langCode) !== -1) {
         availabilityStatus.available = true;
-        var audioTranslation = (
-          contentIdsToAudioTranslations.getAudioTranslation(
-            contentId, langCode));
+        var audioTranslation = recordedVoiceovers.getVoiceover(
+          contentId, langCode);
         availabilityStatus.needsUpdate = audioTranslation.needsUpdate;
       }
       return availabilityStatus;
     };
 
     var _getTranslationStatus = function(writtenTranslations, contentId) {
-      // The first value of availabilityStatus shows whether a translation is
-      // available for a contentId in a given language, whereas the last value
-      // represent whether the available translation needs update.
       var availabilityStatus = {
         available: false,
         needsUpdate: false,
@@ -87,10 +91,9 @@ oppia.factory('TranslationStatusService', [
           ExplorationStatesService.getWrittenTranslationsMemento(stateName));
         return _getTranslationStatus(writtenTranslations, contentId);
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-        var contentIdsToAudioTranslations = (
-          ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
-            stateName));
-        return _getVoiceOverStatus(contentIdsToAudioTranslations, contentId);
+        var recordedVoiceovers = (
+          ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
+        return _getVoiceOverStatus(recordedVoiceovers, contentId);
       }
     };
 
@@ -99,9 +102,8 @@ oppia.factory('TranslationStatusService', [
         var writtenTranslations = StateWrittenTranslationsService.displayed;
         return _getTranslationStatus(writtenTranslations, contentId);
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-        var contentIdsToAudioTranslations = (
-          StateContentIdsToAudioTranslationsService.displayed);
-        return _getVoiceOverStatus(contentIdsToAudioTranslations, contentId);
+        var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
+        return _getVoiceOverStatus(recordedVoiceovers, contentId);
       }
     };
 
@@ -114,9 +116,9 @@ oppia.factory('TranslationStatusService', [
       if (ExplorationStatesService.isInitialized()) {
         ExplorationStatesService.getStateNames().forEach(function(stateName) {
           var noTranslationCount = 0;
-          var contentIdsToAudioTranslations = ExplorationStatesService
-            .getContentIdsToAudioTranslationsMemento(stateName);
-          var allContentId = contentIdsToAudioTranslations.getAllContentId();
+          var recordedVoiceovers = (
+            ExplorationStatesService.getRecordedVoiceoversMemento(stateName));
+          var allContentId = recordedVoiceovers.getAllContentId();
           var interactionId = ExplorationStatesService.getInteractionIdMemento(
             stateName);
           // This is used to prevent users from adding unwanted hints audio, as
@@ -165,9 +167,8 @@ oppia.factory('TranslationStatusService', [
         var writtenTranslations = StateWrittenTranslationsService.displayed;
         availableContentIds = writtenTranslations.getAllContentId();
       } else if (TranslationTabActiveModeService.isVoiceoverModeActive()) {
-        var contentIdsToAudioTranslations = (
-          StateContentIdsToAudioTranslationsService.displayed);
-        availableContentIds = contentIdsToAudioTranslations.getAllContentId();
+        var recordedVoiceovers = StateRecordedVoiceoversService.displayed;
+        availableContentIds = recordedVoiceovers.getAllContentId();
       }
 
       if (availableContentIds.length > 0) {
@@ -256,7 +257,6 @@ oppia.factory('TranslationStatusService', [
         return explorationContentNotAvailableCount;
       },
       getAllStateStatusColors: function() {
-        _computeAllStatesStatus();
         return stateWiseStatusColor;
       },
       getActiveStateComponentStatusColor: function(componentName) {

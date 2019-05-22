@@ -16,60 +16,67 @@
  * @fileoverview Directive for the solution explanation editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('services/EditabilityService.ts');
+
 oppia.directive('solutionExplanationEditor', [
   'StateSolutionService', 'UrlInterpolationService',
   function(StateSolutionService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         onSaveSolution: '=',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state/solution_explanation_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditabilityService', 'StateSolutionService',
         function($scope, EditabilityService, StateSolutionService) {
-          $scope.isEditable = EditabilityService.isEditable();
-          $scope.editSolutionForm = {};
-          $scope.explanationEditorIsOpen = false;
+          var ctrl = this;
+          ctrl.isEditable = EditabilityService.isEditable();
+          ctrl.editSolutionForm = {};
+          ctrl.explanationEditorIsOpen = false;
 
-          $scope.StateSolutionService = StateSolutionService;
+          ctrl.StateSolutionService = StateSolutionService;
 
-          $scope.EXPLANATION_FORM_SCHEMA = {
+          ctrl.EXPLANATION_FORM_SCHEMA = {
             type: 'html',
             ui_config: {}
           };
 
-          $scope.openExplanationEditor = function() {
-            if ($scope.isEditable) {
-              $scope.explanationEditorIsOpen = true;
+          ctrl.openExplanationEditor = function() {
+            if (ctrl.isEditable) {
+              ctrl.explanationEditorIsOpen = true;
             }
           };
 
-          $scope.saveThisExplanation = function() {
+          ctrl.saveThisExplanation = function() {
             var contentHasChanged = (
               StateSolutionService.displayed.explanation.getHtml() !==
               StateSolutionService.savedMemento.explanation.getHtml());
             if (contentHasChanged) {
               var solutionContentId = StateSolutionService.displayed.explanation
                 .getContentId();
-              $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired(
+              ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired(
                 solutionContentId);
             }
             StateSolutionService.saveDisplayedValue();
-            $scope.onSaveSolution(StateSolutionService.displayed);
-            $scope.explanationEditorIsOpen = false;
+            ctrl.onSaveSolution(StateSolutionService.displayed);
+            ctrl.explanationEditorIsOpen = false;
           };
 
-          $scope.cancelThisExplanationEdit = function() {
-            $scope.explanationEditorIsOpen = false;
+          ctrl.cancelThisExplanationEdit = function() {
+            ctrl.explanationEditorIsOpen = false;
           };
 
           $scope.$on('externalSave', function() {
-            if ($scope.explanationEditorIsOpen &&
-              $scope.editSolutionForm.$valid) {
-              $scope.saveThisExplanation();
+            if (ctrl.explanationEditorIsOpen &&
+              ctrl.editSolutionForm.$valid) {
+              ctrl.saveThisExplanation();
             }
           });
         }

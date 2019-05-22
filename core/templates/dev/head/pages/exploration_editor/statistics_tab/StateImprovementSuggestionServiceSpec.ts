@@ -16,6 +16,13 @@
  * @fileoverview Unit tests for statistics services.
  */
 
+require('domain/exploration/StatesObjectFactory.ts');
+require(
+  'pages/exploration_editor/statistics_tab/' +
+  'StateImprovementSuggestionService.ts'
+);
+require('pages/exploration_editor/statistics_tab/StatisticsTab.ts');
+
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -35,10 +42,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -88,10 +97,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -137,10 +148,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -190,10 +203,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',
@@ -239,10 +254,12 @@ describe('StateImprovementSuggestionService', function() {
           content_id: 'content',
           html: 'content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'RuleTest',

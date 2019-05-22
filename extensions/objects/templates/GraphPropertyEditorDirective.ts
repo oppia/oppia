@@ -22,15 +22,18 @@ oppia.directive('graphPropertyEditor', [
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         value: '='
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/graph_property_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = true;
+        var ctrl = this;
+        ctrl.alwaysEditable = true;
 
-        $scope.graphProperties = [{
+        ctrl.graphProperties = [{
           name: 'regular',
           humanReadableName: 'regular'
         }, {
@@ -43,18 +46,18 @@ oppia.directive('graphPropertyEditor', [
           name: 'weakly_connected',
           humanReadableName: 'weakly connected'
         }];
-        $scope.localValue = {
-          property: $scope.graphProperties[0]
+        ctrl.localValue = {
+          property: ctrl.graphProperties[0]
         };
 
-        for (var i = 0; i < $scope.graphProperties.length; i++) {
-          if ($scope.graphProperties[i].name === $scope.value) {
-            $scope.localValue.property = $scope.graphProperties[i];
+        for (var i = 0; i < ctrl.graphProperties.length; i++) {
+          if (ctrl.graphProperties[i].name === ctrl.value) {
+            ctrl.localValue.property = ctrl.graphProperties[i];
           }
         }
 
-        $scope.$watch('localValue.property', function() {
-          $scope.value = $scope.localValue.property.name;
+        $scope.$watch('$ctrl.localValue.property', function() {
+          ctrl.value = ctrl.localValue.property.name;
         });
       }]
     };

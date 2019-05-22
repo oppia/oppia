@@ -17,6 +17,18 @@
  * in editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 oppia.directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
