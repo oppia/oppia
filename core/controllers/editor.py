@@ -460,21 +460,6 @@ class StateYamlHandler(EditorHandler):
         })
 
 
-class ExplorationResourcesHandler(EditorHandler):
-    """Manages assets associated with an exploration."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        dir_list = fs.listdir('')
-
-        self.render_json({'filepaths': dir_list})
-
-
 class ExplorationSnapshotsHandler(EditorHandler):
     """Returns the exploration snapshot history."""
 

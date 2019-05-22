@@ -1040,7 +1040,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exp_id))
+            fs_domain.EntityFileSystem('exploration/%s' % exp_id))
         fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc2.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
@@ -1103,7 +1103,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exp_id))
+            fs_domain.EntityFileSystem('exploration/%s' % exp_id))
         fs.commit(owner_id, 'image/img.png', raw_image, mimetype='image/png')
         fs.commit(owner_id, 'image/abc3.png', raw_image, mimetype='image/png')
 

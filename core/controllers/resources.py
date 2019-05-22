@@ -76,7 +76,7 @@ class AssetDevHandler(base.BaseHandler):
                 '%s/%s' % (asset_type, file_format))
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.ExplorationFileSystem(
+                fs_domain.EntityFileSystem(
                     'exploration/%s' % exploration_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
 

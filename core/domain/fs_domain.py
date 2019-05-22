@@ -108,45 +108,47 @@ class FileStreamWithMetadata(object):
         return self._version
 
 
-class ExplorationFileSystem(object):
-    """A datastore-backed read-write file system for a single exploration.
+class EntityFileSystem(object):
+    """A datastore-backed read-write file system for a single entity.
 
-    The conceptual intention is for each exploration to have its own asset
-    folder. An asset has no meaning outside its exploration, so the assets in
+    The conceptual intention is for each entity to have its own asset
+    folder. An asset has no meaning outside its entity, so the assets in
     these asset folders should therefore not be edited directly. They should
     only be modified as side-effects of some other operation (such as adding an
-    image to an exploration).
+    image to an entity like topics, stories or explorations).
 
-    The content of an exploration should include a reference to the asset
+    The content of an entity should include a reference to the asset
     together with the version number of the asset. This allows the
-    exploration to refer to asset versions.
+    entity to refer to asset versions.
 
     In general, assets should be retrieved only within the context of the
-    exploration that contains them, and should not be retrieved outside this
+    entity that contains them, and should not be retrieved outside this
     context.
 
     Args:
-        exploration_id: str. The id of the exploration.
+        assets_path: str. The path to the assets folder of the corresponding
+            entity. It is of the form {{entity}}/{{entity_id}}
+            (eg: exploration/{{exp_id}})
     """
 
     _DEFAULT_VERSION_NUMBER = 1
 
-    def __init__(self, exploration_id):
-        """Constructs a ExplorationFileSystem object.
+    def __init__(self, assets_path):
+        """Constructs a EntityFileSystem object.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            assets_path: str. The path to the parent directory for all assets.
         """
-        self._exploration_id = exploration_id
+        self._assets_path = assets_path
 
     @property
-    def exploration_id(self):
-        """Returns the id of the exploration.
+    def assets_path(self):
+        """Returns the path of the parent folder of assets.
 
         Returns:
-            str. The exploration id.
+            str. The path.
         """
-        return self._exploration_id
+        return self._assets_path
 
     def _get_file_metadata(self, filepath, version):
         """Return the desired file metadata.
@@ -154,21 +156,21 @@ class ExplorationFileSystem(object):
         Returns None if the file does not exist.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             version: int. The version number of the file whose metadata is to be
                 returned.
 
         Returns:
             FileMetadataModel or None. The model instance representing the file
-                metadata with the given exploration_id, filepath, and version,
+                metadata with the given assets_path, filepath, and version,
                 or None if the file does not exist.
         """
         if version is None:
             return file_models.FileMetadataModel.get_model(
-                self._exploration_id, 'assets/%s' % filepath)
+                self._assets_path, 'assets/%s' % filepath)
         else:
             return file_models.FileMetadataModel.get_version(
-                self._exploration_id, 'assets/%s' % filepath, version)
+                self._assets_path, 'assets/%s' % filepath, version)
 
     def _get_file_data(self, filepath, version):
         """Return the desired file content.
@@ -176,20 +178,20 @@ class ExplorationFileSystem(object):
         Returns None if the file does not exist.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             version: int. The version number of the file to be returned.
 
         Returns:
             FileModel or None. The model instance representing the file with the
-                given exploration_id, filepath, and version; or None if the file
+                given assets_path, filepath, and version; or None if the file
                 does not exist.
         """
         if version is None:
             return file_models.FileModel.get_model(
-                self._exploration_id, 'assets/%s' % filepath)
+                self._assets_path, 'assets/%s' % filepath)
         else:
             return file_models.FileModel.get_version(
-                self._exploration_id, 'assets/%s' % filepath, version)
+                self._assets_path, 'assets/%s' % filepath, version)
 
     def _save_file(self, user_id, filepath, raw_bytes):
         """Create or update a file.
@@ -197,7 +199,7 @@ class ExplorationFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             raw_bytes: str. The content to be stored in file.
 
         Raises:
@@ -209,13 +211,13 @@ class ExplorationFileSystem(object):
         metadata = self._get_file_metadata(filepath, None)
         if not metadata:
             metadata = file_models.FileMetadataModel.create(
-                self._exploration_id, 'assets/%s' % filepath)
+                self._assets_path, 'assets/%s' % filepath)
         metadata.size = len(raw_bytes)
 
         data = self._get_file_data(filepath, None)
         if not data:
             data = file_models.FileModel.create(
-                self._exploration_id, 'assets/%s' % filepath)
+                self._assets_path, 'assets/%s' % filepath)
         data.content = raw_bytes
 
         data.commit(user_id, CHANGE_LIST_SAVE)
@@ -231,7 +233,7 @@ class ExplorationFileSystem(object):
         signature matches that of other file systems.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             version: int or None. The version number of the file. None indicates
                 the latest version of the file.
             mode: str. Unused argument.
@@ -261,7 +263,7 @@ class ExplorationFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             raw_bytes: str. The content to be stored in the file.
             unused_mimetype: str. Unused argument.
         """
@@ -273,7 +275,7 @@ class ExplorationFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
         """
 
         metadata = self._get_file_metadata(filepath, None)
@@ -288,7 +290,7 @@ class ExplorationFileSystem(object):
         """Checks the existence of a file.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
 
         Returns:
             bool. Whether the file exists.
@@ -311,7 +313,7 @@ class ExplorationFileSystem(object):
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
         prefix = '%s' % utils.vfs_construct_path(
-            '/', self._exploration_id, 'assets', dir_name)
+            '/', self._assets_path, 'assets', dir_name)
         if not prefix.endswith('/'):
             prefix += '/'
 
@@ -320,7 +322,7 @@ class ExplorationFileSystem(object):
         for metadata_model in metadata_models:
             filepath = metadata_model.id
             if filepath.startswith(prefix):
-                # Because the path is /exploration/exp_id/assets/abc.png.
+                # Because the path is /entity/entity_id/assets/abc.png.
                 result.add('/'.join(filepath.split('/')[4:]))
         return sorted(list(result))
 
@@ -332,7 +334,8 @@ class DiskBackedFileSystem(object):
 
     Attributes:
         root: str. The path to append to the oppia/ directory.
-        exploration_id: str. The id of the exploration.
+        assets_path: str. The path to the assets folder. It is of the form
+            {{entity}}/{{entity_id}} (eg: exploration/{{exp_id}})
     """
 
     def __init__(self, root):
@@ -342,22 +345,22 @@ class DiskBackedFileSystem(object):
             root: str. The path to append to the oppia/ directory.
         """
         self._root = os.path.join(os.getcwd(), root)
-        self._exploration_id = 'test'
+        self._assets_path = 'test'
 
     @property
-    def exploration_id(self):
-        """Returns the id of the exploration.
+    def assets_path(self):
+        """Returns the path to the assets folder.
 
         Returns:
-            str. The exploration id.
+            str. The path.
         """
-        return self._exploration_id
+        return self._assets_path
 
     def isfile(self, filepath):
         """Checks if a file exists.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
 
         Returns:
             bool. Whether the file exists.
@@ -368,7 +371,7 @@ class DiskBackedFileSystem(object):
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             version: int or None. The version number of the file. None indicates
                 the latest version of the file.
             mode: str. The mode with which to open the file.
@@ -387,7 +390,7 @@ class DiskBackedFileSystem(object):
 
         Args:
             user_id: str. The id of the user.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the file.
 
@@ -403,7 +406,7 @@ class DiskBackedFileSystem(object):
 
         Args:
             user_id: str. The id of the user.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
 
         Raises:
             NotImplementedError. The method is not implemented in the derived
@@ -431,31 +434,34 @@ class GcsFileSystem(object):
     This implementation ignores versioning.
 
     Attributes:
-        exploration_id: str. The id of the exploration.
+        assets_path: str. The path to the assets folder for the corresponding
+            entity. It is of the form {{entity}}/{{entity_id}}
+            (eg: exploration/{{exp_id}})
     """
 
-    def __init__(self, exploration_id):
+    def __init__(self, assets_path):
         """Constructs a GcsFileSystem object.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            assets_path: str. The path to the assets folder for the
+                corresponding entity.
         """
-        self._exploration_id = exploration_id
+        self._assets_path = assets_path
 
     @property
-    def exploration_id(self):
-        """Returns the exploration id.
+    def assets_path(self):
+        """Returns the path to the assets folder for the corresponding entity.
 
         Returns:
-            str. The exploration id.
+            str. The path.
         """
-        return self._exploration_id
+        return self._assets_path
 
     def isfile(self, filepath):
         """Checks if the file with the given filepath exists in the GCS.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
 
         Returns:
             bool. Whether the file exists in GCS.
@@ -463,10 +469,10 @@ class GcsFileSystem(object):
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 
         # Upload to GCS bucket with filepath
-        # "<bucket>/<exploration-id>/assets/<filepath>".
+        # "<bucket>/<entity>/<entity-id>/assets/<filepath>".
         gcs_file_url = (
             '/%s/%s/assets/%s' % (
-                bucket_name, self._exploration_id, filepath))
+                bucket_name, self._assets_path, filepath))
         try:
             return cloudstorage.stat(gcs_file_url, retry_params=None)
         except cloudstorage.NotFoundError:
@@ -482,7 +488,7 @@ class GcsFileSystem(object):
         signature matches that of other file systems.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             version: str. Unused argument.
             mode: str. Unused argument.
 
@@ -494,7 +500,7 @@ class GcsFileSystem(object):
             bucket_name = app_identity_services.get_gcs_resource_bucket_name()
             gcs_file_url = (
                 '/%s/%s/assets/%s' % (
-                    bucket_name, self._exploration_id, filepath))
+                    bucket_name, self._assets_path, filepath))
             gcs_file = cloudstorage.open(gcs_file_url)
             data = gcs_file.read()
             gcs_file.close()
@@ -505,17 +511,17 @@ class GcsFileSystem(object):
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
         """Args:
             unused_user_id: str. Unused argument.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the cloud file.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 
         # Upload to GCS bucket with filepath
-        # "<bucket>/<exploration-id>/assets/<filepath>".
+        # "<bucket>/<entity>/<entity-id>/assets/<filepath>".
         gcs_file_url = (
             '/%s/%s/assets/%s' % (
-                bucket_name, self._exploration_id, filepath))
+                bucket_name, self._assets_path, filepath))
         gcs_file = cloudstorage.open(
             gcs_file_url, mode='w', content_type=mimetype)
         gcs_file.write(raw_bytes)
@@ -530,12 +536,12 @@ class GcsFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         gcs_file_url = (
             '/%s/%s/assets/%s' % (
-                bucket_name, self._exploration_id, filepath))
+                bucket_name, self._assets_path, filepath))
         try:
             cloudstorage.delete(gcs_file_url)
         except cloudstorage.NotFoundError:
@@ -561,7 +567,7 @@ class GcsFileSystem(object):
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
         prefix = '%s' % utils.vfs_construct_path(
-            '/', self._exploration_id, 'assets', dir_name)
+            '/', self._assets_path, 'assets', dir_name)
         if not prefix.endswith('/'):
             prefix += '/'
         # The prefix now ends and starts with '/'.
@@ -595,13 +601,13 @@ class AbstractFileSystem(object):
         """Raises an error if a filepath is invalid.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
 
         Raises:
             IOError: Invalid filepath.
         """
         base_dir = utils.vfs_construct_path(
-            '/', self.impl.exploration_id, 'assets')
+            '/', self.impl.assets_path, 'assets')
         absolute_path = utils.vfs_construct_path(base_dir, filepath)
         normalized_path = utils.vfs_normpath(absolute_path)
 
@@ -613,7 +619,7 @@ class AbstractFileSystem(object):
         """Checks if a file exists. Similar to os.path.isfile(...).
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
 
         Returns:
             bool. Whether the file exists.
@@ -625,7 +631,7 @@ class AbstractFileSystem(object):
         """Returns a stream with the file content. Similar to open(...).
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             version: int or None. The version number of the file. None indicates
                 the latest version of the file.
             mode: str. The mode with which to open the file.
@@ -640,7 +646,7 @@ class AbstractFileSystem(object):
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             version: int or None. The version number of the file. None indicates
                 the latest version of the file.
             mode: str. The mode with which to open the file.
@@ -665,7 +671,7 @@ class AbstractFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the file.
         """
@@ -679,7 +685,7 @@ class AbstractFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the exploration.
+            filepath: str. The path to the relevant file within the entity.
         """
         self._check_filepath(filepath)
         self._impl.delete(user_id, filepath)

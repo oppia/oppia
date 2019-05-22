@@ -29,15 +29,15 @@ app_identity_services = models.Registry.import_app_identity_services()
     [models.NAMES.file])
 
 
-class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
+class EntityFileSystemUnitTests(test_utils.GenericTestBase):
     """Tests for the datastore-backed exploration file system."""
 
     def setUp(self):
-        super(ExplorationFileSystemUnitTests, self).setUp()
+        super(EntityFileSystemUnitTests, self).setUp()
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/eid'))
+            fs_domain.EntityFileSystem('exploration/eid'))
 
     def test_get_and_save(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
@@ -111,7 +111,7 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.listdir('fake_dir'), [])
 
         new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/eid2'))
+            fs_domain.EntityFileSystem('exploration/eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_versioning(self):
@@ -139,7 +139,7 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
         fs2 = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid2'))
+            fs_domain.EntityFileSystem('eid2'))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             fs2.get('abc.png')
 
@@ -260,7 +260,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/eid'))
+            fs_domain.EntityFileSystem('exploration/eid'))
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']
