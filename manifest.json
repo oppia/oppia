@@ -340,17 +340,6 @@
           "js": []
         }
       },
-      "waveSurferJs": {
-        "version": "1.0.46",
-        "downloadFormat": "files",
-        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
-        "rootDirPrefix": "waveSurfer-js-",
-        "targetDirPrefix": "wave-surfer-js-",
-        "files": ["wavesurfer.min.js"],
-        "bundle": {
-          "js": ["wavesurfer.min.js"]
-        }
-      },
       "jquery": {
         "version": "3.2.1",
         "downloadFormat": "files",
@@ -381,9 +370,9 @@
         "targetDirPrefix": "jquery-ui-touch-punch-"
       },
       "mathExpressions": {
-        "version": "1.7.0",
+        "version": "2.0.0-alpha8",
         "downloadFormat": "files",
-        "url": "https://raw.github.com/kisonecat/math-expressions/9b7a1d94329a6c73b7db6d513824be609fb1932f/build",
+        "url": "https://github.com/kisonecat/math-expressions/raw/master/build/math-expressions.js",
         "targetDirPrefix": "math-expressions-",
         "files": ["math-expressions.js"]
       },
@@ -395,9 +384,9 @@
         "targetDirPrefix": "MathJax-"
       },
       "mathJs": {
-        "version": "4.2.2",
+        "version": "5.10.3",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.2.2",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.10.3",
         "rootDirPrefix": "math-js-",
         "targetDirPrefix": "math-js-",
         "files": ["math.js", "math.min.js", "math.min.map"],
@@ -524,6 +513,17 @@
         "targetDirPrefix": "ui-utils-",
         "bundle": {
           "js": ["ui-utils.js"]
+        }
+      },
+      "waveSurferJs": {
+        "version": "1.0.46",
+        "downloadFormat": "files",
+        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
+        "rootDirPrefix": "waveSurfer-js-",
+        "targetDirPrefix": "wave-surfer-js-",
+        "files": ["wavesurfer.min.js"],
+        "bundle": {
+          "js": ["wavesurfer.min.js"]
         }
       }
     },
