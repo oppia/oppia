@@ -77,6 +77,7 @@ oppia.factory('StatsReportingService', [
     var explorationIsComplete = false;
 
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
 
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for
@@ -115,7 +116,7 @@ oppia.factory('StatsReportingService', [
         });
     };
 
-    if (!_editorPreviewMode) {
+    if (!_editorPreviewMode && !_questionPlayerMode ) {
       $interval(function() {
         postStatsToBackend();
       }, 300000);

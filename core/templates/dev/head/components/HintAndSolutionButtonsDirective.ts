@@ -103,8 +103,9 @@ oppia.directive('hintAndSolutionButtons', [
 
           ctrl.displaySolutionModal = function() {
             ctrl.solutionModalIsActive = true;
-            var inPretestMode = ExplorationPlayerStateService.isInPretestMode();
-            if (!_editorPreviewMode && !inPretestMode) {
+            var inQuestionMode = (
+              ExplorationPlayerStateService.isInQuestionMode());
+            if (!_editorPreviewMode && !inQuestionMode) {
               StatsReportingService.recordSolutionHit(
                 PlayerPositionService.getCurrentStateName());
             }
