@@ -254,6 +254,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             # The interaction directory should contain the following files:
             #  Required:
             #    * A python file called {InteractionName}.py.
+            #    * An __init__.py file used to import the Python file.
             #    * An html file called {InteractionName}.html.
             #    * A directory name 'directives' containing TS and HTML files
             #      for directives
@@ -289,7 +290,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                interaction_dir_optional_dirs_and_files_count + 4,
+                interaction_dir_optional_dirs_and_files_count + 5,
                 len(interaction_dir_contents)
             )
 
