@@ -27,7 +27,7 @@ var commonPrefix = './core/templates/dev/head';
 
 module.exports = {
   entries: {
-    about: commonPrefix + '/pages/about/About.ts',
+    about: commonPrefix + '/pages/about-page/about-page.controller.ts',
     admin: commonPrefix + '/pages/admin/Admin.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
@@ -92,8 +92,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['about'],
-      filename: 'about.html',
-      template: commonPrefix + '/pages/about/about.html',
+      filename: 'about-page.mainpage.html',
+      template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -59,6 +59,7 @@ require('pages/library-page/library-page.module.ts');
 require('pages/signup-page/signup-page.module.ts');
 require('pages/topic-viewer-page/topic-viewer-page.module.ts');
 require('pages/topic-editor-page/topic-editor-page.module.ts');
+require('pages/about-page/about-page.module.ts');
 
 require('pages/landing-page/topic-landing-page.module.ts');
 

@@ -74,7 +74,7 @@ class AboutPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/about.html')
+        self.render_template('dist/about-page.mainpage.html')
 
 
 class GetStartedPage(base.BaseHandler):
