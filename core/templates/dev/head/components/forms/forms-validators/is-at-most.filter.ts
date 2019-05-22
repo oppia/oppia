@@ -17,7 +17,7 @@
    args.
  */
 
-angular.module('formsValidatorsModule').filter('isAtMost', [function() {
+oppia.filter('isAtMost', [function() {
   return function(input, args) {
     return (input <= args.maxValue);
   };

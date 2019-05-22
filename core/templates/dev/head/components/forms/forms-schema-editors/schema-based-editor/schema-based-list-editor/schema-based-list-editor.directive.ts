@@ -27,7 +27,7 @@ require('services/SchemaDefaultValueService.ts');
 require('services/SchemaUndefinedLastElementService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('schemaBasedListEditorModule').directive(
+oppia.directive(
   'schemaBasedListEditor', [
     'FocusManagerService', 'IdGenerationService',
     'NestedDirectivesRecursionTimeoutPreventionService',

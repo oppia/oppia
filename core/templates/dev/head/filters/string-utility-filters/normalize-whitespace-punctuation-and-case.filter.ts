@@ -20,7 +20,7 @@
 // line, and removes blank lines. Note that any spaces whose removal does not
 // result in two alphanumeric "words" being joined together are also removed,
 // so "hello ? " becomes "hello?".
-angular.module('stringUtilityFiltersModule').filter(
+oppia.filter(
   'normalizeWhitespacePunctuationAndCase', [function() {
     return function(input) {
       if (typeof input === 'string' || input instanceof String) {

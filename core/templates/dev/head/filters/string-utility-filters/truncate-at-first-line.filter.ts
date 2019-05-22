@@ -16,7 +16,7 @@
  * @fileoverview TruncateAtFirstLine filter for Oppia.
  */
 
-angular.module('stringUtilityFiltersModule').filter(
+oppia.filter(
   'truncateAtFirstLine', [function() {
     return function(input) {
       if (!input) {

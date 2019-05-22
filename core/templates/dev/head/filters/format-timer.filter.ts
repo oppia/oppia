@@ -16,7 +16,7 @@
  * @fileoverview FormatTimer filter for Oppia.
  */
 
-angular.module('filtersModule').filter('formatTimer', [function() {
+oppia.filter('formatTimer', [function() {
   return function(input) {
     var formatNum = function(n) {
       return (n < 10 ? '0' : '') + n;

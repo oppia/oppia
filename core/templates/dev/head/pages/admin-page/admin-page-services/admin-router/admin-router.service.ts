@@ -17,6 +17,14 @@
  * provide routing functionality, and store all available tab states.
  */
 
+oppia.constant('ADMIN_TAB_URLS', {
+  ACTIVITIES: '#activities',
+  JOBS: '#jobs',
+  CONFIG: '#config',
+  ROLES: '#roles',
+  MISC: '#misc'
+});  
+
 oppia.factory('AdminRouterService', [
   'ADMIN_TAB_URLS',
   function(ADMIN_TAB_URLS) {

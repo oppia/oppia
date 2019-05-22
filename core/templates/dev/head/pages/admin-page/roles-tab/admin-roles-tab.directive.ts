@@ -24,6 +24,9 @@ require(
   'pages/admin-page/admin-page-services/admin-task-manager/' +
   'admin-task-manager.service.ts');
 
+oppia.constant(
+  'ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
+  
 oppia.directive('adminRolesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_ROLE_HANDLER_URL',

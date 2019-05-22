@@ -17,7 +17,7 @@
    args.
  */
 
-angular.module('formsValidatorsModule').filter('isAtLeast', [function() {
+oppia.filter('isAtLeast', [function() {
   return function(input, args) {
     return (input >= args.minValue);
   };

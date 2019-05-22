@@ -21,6 +21,17 @@ require(
   'pages/admin-page/admin-page-services/admin-router/admin-router.service.ts');
 require('services/UserService.ts');
 
+oppia.constant(
+  'PROFILE_URL_TEMPLATE', '/profile/<username>');
+
+oppia.constant('ADMIN_TAB_URLS', {
+  ACTIVITIES: '#activities',
+  JOBS: '#jobs',
+  CONFIG: '#config',
+  ROLES: '#roles',
+  MISC: '#misc'
+});  
+  
 oppia.directive('adminNavbar', [
   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',
   'LOGOUT_URL', 'PROFILE_URL_TEMPLATE',

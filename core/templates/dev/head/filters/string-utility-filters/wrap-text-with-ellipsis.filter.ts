@@ -19,7 +19,7 @@
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/UtilsService.ts');
 
-angular.module('stringUtilityFiltersModule').filter('wrapTextWithEllipsis', [
+oppia.filter('wrapTextWithEllipsis', [
   '$filter', 'UtilsService', function($filter, UtilsService) {
     return function(input, characterCount) {
       if (UtilsService.isString(input)) {

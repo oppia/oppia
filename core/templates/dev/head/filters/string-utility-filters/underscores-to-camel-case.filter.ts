@@ -16,7 +16,7 @@
  * @fileoverview UnderscoresToCamelCase filter for Oppia.
  */
 
-angular.module('stringUtilityFiltersModule').filter(
+oppia.filter(
   'underscoresToCamelCase', [function() {
     return function(input) {
       return input.replace(/_+(.)/g, function(match, group1) {

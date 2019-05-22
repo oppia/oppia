@@ -22,7 +22,7 @@
    eg: <p>Sample1 <oppia-noninteractive-math></oppia-noninteractive-math>
         Sample2 </p>
    will give as output: Sample1 [Math] Sample2 */
-angular.module('filtersModule').filter(
+oppia.filter(
   'formatRtePreview', ['$filter', function($filter) {
     return function(html) {
       html = html.replace(/&nbsp;/ig, ' ');

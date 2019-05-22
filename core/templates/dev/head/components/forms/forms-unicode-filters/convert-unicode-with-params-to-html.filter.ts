@@ -24,7 +24,7 @@
 require(
   'components/forms/forms-unicode-filters/convert-unicode-to-html.filter.ts');
 
-angular.module('formsUnicodeFiltersModule').filter(
+oppia.filter(
   'convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
     var assert = function(text) {
       if (!text) {

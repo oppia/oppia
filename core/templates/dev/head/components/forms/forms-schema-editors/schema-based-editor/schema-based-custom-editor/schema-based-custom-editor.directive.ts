@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-angular.module('schemaBasedCustomEditorModule').directive(
+oppia.directive(
   'schemaBasedCustomEditor', [
     'NestedDirectivesRecursionTimeoutPreventionService',
     'UrlInterpolationService',

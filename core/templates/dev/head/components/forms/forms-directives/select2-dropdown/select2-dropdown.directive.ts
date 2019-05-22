@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('select2DropdownModule').directive('select2Dropdown', [
+oppia.directive('select2Dropdown', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     // Directive for incorporating select2 dropdowns.
     return {

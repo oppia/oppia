@@ -16,7 +16,7 @@
  * @fileoverview Converts HTML to unicode.
  */
 
-angular.module('formsUnicodeFiltersModule').filter(
+oppia.filter(
   'convertHtmlToUnicode', [function() {
     return function(html) {
       return angular.element('<div>' + html + '</div>').text();

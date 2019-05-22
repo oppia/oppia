@@ -24,7 +24,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/IdGenerationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-angular.module('schemaBasedDictEditorModule').directive(
+oppia.directive(
   'schemaBasedDictEditor', [
     'NestedDirectivesRecursionTimeoutPreventionService',
     'UrlInterpolationService',

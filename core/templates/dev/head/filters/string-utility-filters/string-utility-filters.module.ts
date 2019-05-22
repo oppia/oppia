@@ -18,9 +18,9 @@
 
 angular.module('stringUtilityFiltersModule', []);
 
-angular.module('stringUtilityFiltersModule').constant(
+oppia.constant(
   'RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
 
-angular.module('stringUtilityFiltersModule').constant(
+oppia.constant(
   'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
   constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);

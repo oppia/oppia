@@ -21,6 +21,8 @@ require(
   'pages/admin-page/admin-page-services/admin-task-manager/' +
   'admin-task-manager.service.ts');
 
+oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
+
 oppia.directive('adminConfigTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', function($http, AdminTaskManagerService,

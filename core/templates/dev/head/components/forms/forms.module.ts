@@ -18,8 +18,9 @@
 
 var load = require.context('./', true, /\.module\.ts$/);
 load.keys().forEach(load);
-module.exports = angular.module('formsModule', []).name;
 
-angular.module('formsModule', ['formsSchemaEditorsModule',
+var moduleInit = angular.module('formsModule', ['formsSchemaEditorsModule',
   'formsDirectivesModule', 'formsUnicodeFiltersModule', 'formsValidatorsModule'
 ]);
+
+module.exports = moduleInit.name;

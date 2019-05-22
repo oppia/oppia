@@ -22,7 +22,7 @@
 require('components/forms/forms-validators/is-float.filter.ts');
 
 /* eslint-disable angular/directive-restrict */
-angular.module('requireIsFloatModule').directive(
+oppia.directive(
   'requireIsFloat', ['$filter', function($filter) {
     return {
       require: 'ngModel',

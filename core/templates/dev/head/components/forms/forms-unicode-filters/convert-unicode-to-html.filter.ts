@@ -18,7 +18,7 @@
 
 require('services/HtmlEscaperService.ts');
 
-angular.module('formsUnicodeFiltersModule').filter('convertUnicodeToHtml', [
+oppia.filter('convertUnicodeToHtml', [
   '$sanitize', 'HtmlEscaperService',
   function($sanitize, HtmlEscaperService) {
     return function(text) {

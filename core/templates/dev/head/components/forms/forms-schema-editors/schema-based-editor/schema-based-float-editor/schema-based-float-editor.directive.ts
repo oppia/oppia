@@ -20,7 +20,7 @@ require('components/forms/forms-validators/is-float.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('schemaBasedFloatEditorModule').directive(
+oppia.directive(
   'schemaBasedFloatEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

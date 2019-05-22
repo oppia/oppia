@@ -16,7 +16,7 @@
  * @fileoverview RemoveDuplicatesInArray filter for Oppia.
  */
 
-angular.module('filtersModule').filter('removeDuplicatesInArray', [function() {
+oppia.filter('removeDuplicatesInArray', [function() {
   return function(input) {
     return input.filter(function(val, pos) {
       return input.indexOf(val) === pos;

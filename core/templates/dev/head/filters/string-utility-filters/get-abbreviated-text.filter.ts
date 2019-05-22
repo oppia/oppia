@@ -16,7 +16,7 @@
  * @fileoverview GetAbbreviatedText filter for Oppia.
  */
 
-angular.module('stringUtilityFiltersModule').filter(
+oppia.filter(
   'getAbbreviatedText', [function() {
     return function(text, characterCount) {
       if (text.length > characterCount) {

@@ -16,7 +16,7 @@
  * @fileoverview Service for computing the average rating.
  */
 
-angular.module('ratingsModule').factory(
+oppia.factory(
   'RatingComputationService', [function() {
     var areRatingsShown = function(ratingFrequencies) {
       var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;

@@ -22,7 +22,7 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/DeviceInfoService.ts');
 
-angular.module('schemaBasedUnicodeEditorModule').directive(
+oppia.directive(
   'schemaBasedUnicodeEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

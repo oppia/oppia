@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/IdGenerationService.ts');
 
-angular.module('imageUploaderModule').directive('imageUploader', [
+oppia.directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {
     return {

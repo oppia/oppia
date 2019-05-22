@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/IdGenerationService.ts');
 
-angular.module('audioFileUploaderModule').directive('audioFileUploader', [
+oppia.directive('audioFileUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {
     return {

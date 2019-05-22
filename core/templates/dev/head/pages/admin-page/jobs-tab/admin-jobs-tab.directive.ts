@@ -18,6 +18,10 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+oppia.constant(
+  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
+oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
+
 oppia.directive('adminJobsTab', [
   '$http', '$timeout', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',

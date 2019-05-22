@@ -17,7 +17,7 @@
  */
 
 // Filter that truncates a string at the first '...'.
-angular.module('stringUtilityFiltersModule').filter(
+oppia.filter(
   'truncateAtFirstEllipsis', [function() {
     var pattern = /\.\.\./g;
     return function(input) {

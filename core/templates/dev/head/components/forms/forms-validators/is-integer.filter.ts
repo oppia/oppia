@@ -16,7 +16,7 @@
  * @fileoverview Validator to check if input is integer.
  */
 
-angular.module('formsValidatorsModule').filter('isInteger', [function() {
+oppia.filter('isInteger', [function() {
   return function(input) {
     return Number.isInteger(Number(input));
   };

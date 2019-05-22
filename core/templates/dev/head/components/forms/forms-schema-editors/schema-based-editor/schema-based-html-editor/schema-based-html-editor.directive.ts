@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('schemaBasedHtmlEditorModule').directive(
+oppia.directive(
   'schemaBasedHtmlEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

@@ -405,8 +405,7 @@ require('pages/topic-viewer-page/topic-viewer-page.module.ts');
 //   'pages/topics-and-skills-dashboard-page/topics-list/topics-list.module.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.module.ts');
-
+  'topics-and-skills-dashboard-page.module.ts');  
 
 require('I18nFooter.ts');
 require('directives/FocusOnDirective.ts');
