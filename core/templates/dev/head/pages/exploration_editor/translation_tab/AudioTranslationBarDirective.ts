@@ -255,14 +255,6 @@ oppia.directive('audioTranslationBar', [
             $scope.showRecorderWarning = false;
           };
 
-          // create visualizer for playing unsaved audio
-          $scope.waveSurfer = WaveSurfer.create({
-            container: '#visualized',
-            waveColor: '#009688',
-            progressColor: '#cccccc',
-            height: 38
-          });
-
           $scope.stopRecording = function() {
             $scope.recorder.stopRecord();
             $scope.recordingComplete = true;
@@ -276,6 +268,13 @@ oppia.directive('audioTranslationBar', [
               // create audio play and pause for unsaved recording
               // set visualizer
               var url = $window.URL.createObjectURL($scope.audioBlob);
+              // create visualizer for playing unsaved audio
+              $scope.waveSurfer = $window.WaveSurfer.create({
+                container: '#visualized',
+                waveColor: '#009688',
+                progressColor: '#cccccc',
+                height: 38
+              });
               $scope.waveSurfer.load(url);
             });
           };
