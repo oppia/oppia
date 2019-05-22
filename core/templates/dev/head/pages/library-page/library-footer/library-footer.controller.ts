@@ -16,7 +16,9 @@
  * @fileoverview Data and controllers for the Oppia library footer.
  */
 
-angular.module('libraryFooterModule').controller('LibraryFooter', [
+require('pages/library-page/library-page.constants.ts');
+
+oppia.controller('LibraryFooter', [
   '$scope', '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
   function($scope, $window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
     var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];

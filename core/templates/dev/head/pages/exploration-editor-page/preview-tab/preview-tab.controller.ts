@@ -54,7 +54,7 @@ require(
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 
-angular.module('previewTabModule').controller('PreviewTab', [
+oppia.controller('PreviewTab', [
   '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
   'EditableExplorationBackendApiService', 'ExplorationCategoryService',
   'ExplorationDataService', 'ExplorationEngineService',

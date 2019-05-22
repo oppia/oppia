@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('emailDashboardResultModule').controller(
+oppia.controller(
   'EmailDashboardResult', [
     '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
     function($http, $scope, $timeout, $window, UrlInterpolationService) {

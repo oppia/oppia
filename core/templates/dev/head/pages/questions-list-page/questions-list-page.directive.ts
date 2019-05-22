@@ -38,7 +38,7 @@ require(
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('questionsListPageModule').directive('questionsList', [
+oppia.directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

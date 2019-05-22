@@ -19,7 +19,7 @@
 require('domain/question/QuestionPlayerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('questionPlayerPageModule').directive('questionPlayer', [
+oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',
   function(
       $http, UrlInterpolationService) {

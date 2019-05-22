@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('explorationTitleEditorModule').directive(
+oppia.directive(
   'explorationTitleEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

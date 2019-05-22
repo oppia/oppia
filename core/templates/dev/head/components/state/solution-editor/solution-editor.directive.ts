@@ -32,7 +32,7 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
-angular.module('solutionEditorModule').directive('solutionEditor', [
+oppia.directive('solutionEditor', [
   '$uibModal', 'AlertsService', 'ContextService',
   'ExplorationHtmlFormatterService', 'SolutionObjectFactory',
   'SolutionVerificationService', 'StateCustomizationArgsService',

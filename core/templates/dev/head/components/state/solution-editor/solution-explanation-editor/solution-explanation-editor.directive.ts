@@ -22,7 +22,7 @@ require(
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 
-angular.module('solutionExplanationEditorModule').directive(
+oppia.directive(
   'solutionExplanationEditor', [
     'StateSolutionService', 'UrlInterpolationService',
     function(StateSolutionService, UrlInterpolationService) {

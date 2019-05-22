@@ -23,7 +23,9 @@ require(
   'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
   'skill-editor-state.service.ts');
 
-angular.module('skillDescriptionEditorModule').directive(
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
+oppia.directive(
   'skillDescriptionEditor', [
     'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
     'UrlInterpolationService',

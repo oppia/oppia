@@ -24,7 +24,7 @@ require(
   'pages/state-editor/state-editor-properties-services/state-property/' +
   'state-property.service.ts');
 
-angular.module('outcomeEditorModule').directive('outcomeEditor', [
+oppia.directive('outcomeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

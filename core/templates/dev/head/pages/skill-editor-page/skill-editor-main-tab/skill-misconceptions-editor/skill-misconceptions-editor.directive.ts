@@ -29,7 +29,9 @@ require(
   'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
   'skill-editor-state.service.ts');
 
-angular.module('skillMisconceptionsEditorModule').directive(
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
+oppia.directive(
   'skillMisconceptionsEditor', [
     'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
     function(

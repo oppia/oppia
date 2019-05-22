@@ -41,7 +41,9 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
-angular.module('questionEditorPageModule').directive('questionEditor', [
+require('pages/question-editor-page/question-editor-page.constants.ts');
+
+oppia.directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

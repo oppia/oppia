@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-angular.module('multipleIncorrectIssueModule').directive(
+oppia.directive(
   'multipleIncorrectIssue', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

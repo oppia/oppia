@@ -21,9 +21,7 @@ require(
   'pages/admin-page/admin-page-services/admin-task-manager/' +
   'admin-task-manager.service.ts');
 
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
-oppia.constant(
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
+require('pages/admin-page/admin-page.constants.ts');
 
 oppia.directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',

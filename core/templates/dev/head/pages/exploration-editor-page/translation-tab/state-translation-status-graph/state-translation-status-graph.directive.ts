@@ -43,7 +43,7 @@ require(
   'pages/state-editor/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
-angular.module('stateTranslationStatusGraphModule').directive(
+oppia.directive(
   'stateTranslationStatusGraph', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

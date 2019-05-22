@@ -34,7 +34,9 @@ require(
   'skill-editor-state.service.ts');
 require('services/GenerateContentIdService.ts');
 
-angular.module('skillConceptCardEditorModule').directive(
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
+oppia.directive(
   'skillConceptCardEditor', [
     'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
     'SubtitledHtmlObjectFactory', 'UrlInterpolationService',

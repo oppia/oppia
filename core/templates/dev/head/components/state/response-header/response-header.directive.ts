@@ -25,7 +25,7 @@ require(
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 
-angular.module('responseHeaderModule').directive('responseHeader', [
+oppia.directive('responseHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

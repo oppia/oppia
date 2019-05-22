@@ -29,7 +29,7 @@ require(
   'pages/exploration-editor-page/history-tab/history-tab-services/' +
   'version-tree/version-tree.service.ts');
 
-angular.module('historyTabModule').factory('CompareVersionsService', [
+oppia.factory('CompareVersionsService', [
   '$http', '$q', 'ExplorationDataService', 'ExplorationDiffService',
   'ReadOnlyExplorationBackendApiService', 'StateObjectFactory',
   'StatesObjectFactory', 'VersionTreeService',

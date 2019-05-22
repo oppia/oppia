@@ -25,6 +25,8 @@ require(
   'topic-editor-state.service.ts');
 require('services/contextual/UrlService.ts');
 
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
+
 angular.module('mainTopicEditorStoriesListModule').directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

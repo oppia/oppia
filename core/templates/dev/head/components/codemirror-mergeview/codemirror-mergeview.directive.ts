@@ -16,7 +16,7 @@
  * @fileoverview Directive for the codemirror mergeview component.
  */
 
-angular.module('codemirrorMergeviewModule').directive('codemirrorMergeview', [
+oppia.directive('codemirrorMergeview', [
   function() {
     return {
       restrict: 'E',

@@ -18,7 +18,7 @@
 
 require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
 
-angular.module('showSuggestionModalForLearnerViewModule').controller(
+oppia.controller(
   'showSuggestionModalForLearnerViewModule', [
     '$scope', '$uibModalInstance', 'SuggestionModalService', 'description',
     'newContent', 'oldContent',

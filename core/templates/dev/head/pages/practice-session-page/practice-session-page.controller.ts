@@ -24,7 +24,9 @@ require('pages/question-player-page/question-player-page.directive.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('practiceSessionPageModule').controller('PracticeSession', [
+require('pages/practice-session-page/practice-session-page.constants.ts');
+
+oppia.controller('PracticeSession', [
   '$http', '$rootScope', '$scope', 'AlertsService',
   'UrlInterpolationService', 'UrlService',
   'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL', 'TOTAL_QUESTIONS',

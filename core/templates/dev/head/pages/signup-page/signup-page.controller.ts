@@ -24,7 +24,7 @@ require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('signupPageModule').controller('Signup', [
+oppia.controller('Signup', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'FocusManagerService',
   'SiteAnalyticsService', 'UrlInterpolationService', 'UrlService',

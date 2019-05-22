@@ -25,7 +25,9 @@ require(
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('storyEditorNavbarModule').directive('storyEditorNavbar', [
+require('pages/story-editor-page/story-editor-page.constants.ts');
+
+oppia.directive('storyEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -17,7 +17,7 @@
  * tree.
  */
 
-angular.module('historyTabModule').factory('VersionTreeService', [function() {
+oppia.factory('VersionTreeService', [function() {
   var _snapshots = null;
   var _treeParents = null;
   return {

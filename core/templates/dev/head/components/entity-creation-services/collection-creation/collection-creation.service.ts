@@ -24,7 +24,7 @@ require('services/SiteAnalyticsService.ts');
 // duplicated code between CollectionCreationService and
 // ExplorationCreationService.
 
-angular.module('entityCreationServicesModule').factory(
+oppia.factory(
   'CollectionCreationService', [
     '$http', '$rootScope', '$timeout', '$window', 'AlertsService',
     'SiteAnalyticsService', 'UrlInterpolationService',

@@ -22,7 +22,9 @@ require(
   'exploration-states/exploration-states.service.ts');
 require('pages/exploration_player/CurrentInteractionService.ts');
 
-angular.module('testInteractionPanelModule').directive('testInteractionPanel', [
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+oppia.directive('testInteractionPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

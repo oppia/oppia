@@ -26,7 +26,7 @@ require(
   'exploration-rights/exploration-rights.service.ts');
 require('services/ValidatorsService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'ExplorationTitleService', [
     '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
     'ValidatorsService',

@@ -26,7 +26,7 @@ require('pages/exploration_player/StatsReportingService.ts');
 require('services/ContextService.ts');
 require('services/contextual/DeviceInfoService.ts');
 
-angular.module('hintAndSolutionButtonsModule').directive(
+oppia.directive(
   'hintAndSolutionButtons', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

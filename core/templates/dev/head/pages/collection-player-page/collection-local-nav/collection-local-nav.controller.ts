@@ -16,7 +16,7 @@
  * @fileoverview Controller for the local navigation in the collection view.
  */
 
-angular.module('collectionLocalNavModule').controller(
+oppia.controller(
   'CollectionLocalNav', ['$scope', function($scope) {
     $scope.canEdit = GLOBALS.canEdit;
   }]

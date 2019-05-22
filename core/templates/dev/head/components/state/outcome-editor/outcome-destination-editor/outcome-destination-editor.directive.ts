@@ -28,7 +28,7 @@ require('services/EditabilityService.ts');
 require('services/UserService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('outcomeDestinationEditorModule').directive(
+oppia.directive(
   'outcomeDestinationEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

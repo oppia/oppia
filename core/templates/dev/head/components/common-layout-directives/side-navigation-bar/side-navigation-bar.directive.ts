@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('sideNavigationBarModule').directive('sideNavigationBar', [
+oppia.directive('sideNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

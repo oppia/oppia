@@ -23,7 +23,7 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('visualDiffVisualizationModule').directive(
+oppia.directive(
   'versionDiffVisualization', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

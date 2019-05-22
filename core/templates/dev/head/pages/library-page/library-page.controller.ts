@@ -40,7 +40,9 @@ require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('libraryPageModule').controller('Library', [
+require('pages/library-page/library-page.constants.ts');
+
+oppia.controller('Library', [
   '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'ConstructTranslationIdsService',
   'LearnerDashboardActivityIdsObjectFactory',

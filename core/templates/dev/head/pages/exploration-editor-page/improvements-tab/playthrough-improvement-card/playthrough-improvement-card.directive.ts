@@ -15,7 +15,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-angular.module('playthroughImprovementCardModule').directive(
+oppia.directive(
   'playthroughImprovementCard', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

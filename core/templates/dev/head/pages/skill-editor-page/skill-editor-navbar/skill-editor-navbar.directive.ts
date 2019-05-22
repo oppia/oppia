@@ -29,7 +29,9 @@ require(
   'skill-editor-state.service.ts');
 require('services/AlertsService.ts');
 
-angular.module('skillEditorNavbarModule').directive('skillEditorNavbar', [
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
+oppia.directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

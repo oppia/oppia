@@ -16,7 +16,7 @@
  * @fileoverview A data service that stores the written translations.
  */
 
-angular.module('stateEditorModule').factory(
+oppia.factory(
   'StateWrittenTranslationsService', [
     'StatePropertyService', function(StatePropertyService) {
       var child = Object.create(StatePropertyService);

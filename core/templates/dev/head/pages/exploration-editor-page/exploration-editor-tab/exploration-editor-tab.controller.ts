@@ -50,7 +50,7 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 
-angular.module('explorationEditorTabModule').controller(
+oppia.controller(
   'ExplorationEditorTab', [
     '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
     'ExplorationCorrectnessFeedbackService', 'ExplorationFeaturesService',

@@ -38,7 +38,7 @@ require(
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
-angular.module('paramsChangesEditorModule').directive('paramChangesEditor', [
+oppia.directive('paramChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

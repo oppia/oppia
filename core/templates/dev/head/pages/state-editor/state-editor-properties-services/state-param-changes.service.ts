@@ -18,7 +18,7 @@
  */
 
 // TODO(sll): Add validation.
-angular.module('stateEditorModule').factory('StateParamChangesService', [
+oppia.factory('StateParamChangesService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveStateParamChanges';

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the training panel in the state editor.
  */
 
-angular.module('trainingPanelModule').directive('trainingPanel', [
+oppia.directive('trainingPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

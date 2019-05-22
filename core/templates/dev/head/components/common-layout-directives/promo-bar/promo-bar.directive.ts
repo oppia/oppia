@@ -21,7 +21,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PromoBarService.ts');
 
-angular.module('promoBarModule').directive('promoBar', [
+oppia.directive('promoBar', [
   'PromoBarService', 'UrlInterpolationService',
   function(PromoBarService, UrlInterpolationService) {
     return {

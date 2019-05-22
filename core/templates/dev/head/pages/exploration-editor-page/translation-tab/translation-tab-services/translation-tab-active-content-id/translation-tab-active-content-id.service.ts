@@ -23,7 +23,7 @@ require(
   'pages/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'TranslationTabActiveContentIdService', [
     '$log', '$rootScope', 'StateRecordedVoiceoversService',
     function($log, $rootScope, StateRecordedVoiceoversService) {

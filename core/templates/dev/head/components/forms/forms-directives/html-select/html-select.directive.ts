@@ -23,7 +23,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 // Attribute 'val' is presented to the user. After user selection, the
 // corresponding attribute 'id' is assigned to 'selection'
 
-angular.module('htmlSelectModule').directive('htmlSelect', [
+oppia.directive('htmlSelect', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

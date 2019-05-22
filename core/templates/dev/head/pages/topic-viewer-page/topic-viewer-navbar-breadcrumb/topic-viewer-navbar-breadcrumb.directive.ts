@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('topicViewerNavbarBreadcrumbModule').directive(
+oppia.directive(
   'topicViewerNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

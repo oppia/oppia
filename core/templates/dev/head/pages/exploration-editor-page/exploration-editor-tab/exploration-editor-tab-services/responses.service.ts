@@ -39,7 +39,7 @@ require(
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 
-angular.module('explorationEditorTabModule').factory('ResponsesService', [
+oppia.factory('ResponsesService', [
   '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
   'ContextService', 'OutcomeObjectFactory',
   'SolutionValidityService', 'SolutionVerificationService',

@@ -26,7 +26,7 @@ require(
   'exploration-data/exploration-data.service.ts');
 require('services/LocalStorageService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'AutosaveInfoModalsService', [
     '$log', '$timeout', '$uibModal', '$window',
     'ChangesInHumanReadableFormService', 'ExplorationDataService',

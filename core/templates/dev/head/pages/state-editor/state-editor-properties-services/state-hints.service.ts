@@ -16,7 +16,7 @@
  * @fileoverview A data service that stores the current interaction hints.
  */
 
-angular.module('stateEditorModule').factory('StateHintsService', [
+oppia.factory('StateHintsService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveHints';

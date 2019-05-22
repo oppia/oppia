@@ -22,7 +22,7 @@ require(
   'pages/state-editor/state-editor-properties-services/state-property/' +
   'state-property.service.ts');
 
-angular.module('ruleTypeSelectorModule').directive(
+oppia.directive(
   'ruleTypeSelector', [function() {
     return {
       restrict: 'E',

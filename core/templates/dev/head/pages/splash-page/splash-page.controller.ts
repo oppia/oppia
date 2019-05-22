@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 
-angular.module('splashPageModule').controller('Splash', [
+oppia.controller('Splash', [
   '$rootScope', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UserService',
   function($rootScope, $scope, $timeout, $window, SiteAnalyticsService,

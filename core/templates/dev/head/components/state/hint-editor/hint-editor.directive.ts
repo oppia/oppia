@@ -27,7 +27,7 @@ require(
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 
-angular.module('hintEditorModule').directive('hintEditor', [
+oppia.directive('hintEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

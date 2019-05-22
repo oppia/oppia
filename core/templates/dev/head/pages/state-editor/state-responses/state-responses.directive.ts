@@ -66,7 +66,7 @@ require('services/ExplorationHtmlFormatterService.ts');
 require('services/GenerateContentIdService.ts');
 require('services/HtmlEscaperService.ts');
 
-angular.module('stateResponsesModule').directive('stateResponses', [
+oppia.directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

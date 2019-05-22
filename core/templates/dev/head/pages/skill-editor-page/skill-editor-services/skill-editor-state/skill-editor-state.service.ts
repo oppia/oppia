@@ -24,7 +24,9 @@ require('domain/skill/SkillRightsBackendApiService.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 
-angular.module('skillEditorModule').factory('SkillEditorStateService', [
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
+oppia.factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
   'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',

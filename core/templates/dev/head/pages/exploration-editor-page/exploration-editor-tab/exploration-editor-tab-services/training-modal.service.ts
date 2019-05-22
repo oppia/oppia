@@ -51,7 +51,7 @@ require(
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 
-angular.module('explorationEditorTabModule').factory('TrainingModalService', [
+oppia.factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {

@@ -35,7 +35,9 @@ require(
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+oppia.factory(
   'ExplorationWarningsService', [
     '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
     'ExpressionInterpolationService', 'GraphDataService', 'ImprovementsService',

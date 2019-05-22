@@ -22,7 +22,7 @@ require(
   'exploration-editor-tab-services/solution-validity/' +
   'solution-validity.service.ts');
 
-angular.module('stateEditorModule').factory('StateEditorService', [
+oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(
       $log, SolutionValidityService) {

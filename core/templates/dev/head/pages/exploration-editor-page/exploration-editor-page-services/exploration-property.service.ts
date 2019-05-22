@@ -23,7 +23,7 @@ require(
   'change-list.service.ts');
 require('services/AlertsService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'ExplorationPropertyService', [
     '$log', '$rootScope', 'AlertsService', 'ChangeListService',
     function($log, $rootScope, AlertsService, ChangeListService) {

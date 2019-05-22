@@ -16,6 +16,8 @@
  * @fileoverview CamelCaseToHyphens filter for Oppia.
  */
 
+require('filters/string-utility-filters/string-utility-filters.constants.ts');
+
 oppia.filter(
   'camelCaseToHyphens', [function() {
     return function(input) {

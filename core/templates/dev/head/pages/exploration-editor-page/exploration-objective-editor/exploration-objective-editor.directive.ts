@@ -21,7 +21,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-objective.service.ts');
 
-angular.module('explorationObjectiveEditorModule').directive(
+oppia.directive(
   'explorationObjectiveEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

@@ -22,7 +22,7 @@ require(
   'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
   'skill-editor-state.service.ts');
 
-angular.module('misconceptionEditorModule').directive('misconceptionEditor', [
+oppia.directive('misconceptionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       retrict: 'E',

@@ -50,7 +50,7 @@ require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('explorationEditorTabModule').factory(
+oppia.factory(
   'TrainingDataEditorPanelService', [
     '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
     function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {

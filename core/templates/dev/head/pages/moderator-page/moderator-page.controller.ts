@@ -57,7 +57,7 @@ require(
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 
-angular.module('moderatorPageModule').controller('Moderator', [
+oppia.controller('Moderator', [
   '$http', '$rootScope', '$scope', 'AlertsService', 'DateTimeFormatService',
   function($http, $rootScope, $scope, AlertsService, DateTimeFormatService) {
     $rootScope.loadingMessage = 'Loading';

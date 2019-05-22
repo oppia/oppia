@@ -30,7 +30,9 @@ require(
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('topicEditorNavbarModule').directive('topicEditorNavbar', [
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
+
+oppia.directive('topicEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

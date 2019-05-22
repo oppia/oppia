@@ -17,7 +17,7 @@
  * mark_all_audio_and_translations_as_needing_update modal.
  */
 
-angular.module('markAllAudioAndTranslationsAsNeedingUpdateModule').controller(
+oppia.controller(
   'MarkAllAudioAndTranslationsAsNeedingUpdateController', [
     '$scope', '$uibModalInstance',
     function($scope, $uibModalInstance) {

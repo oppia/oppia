@@ -16,7 +16,9 @@
  * @fileoverview Service for computing diffs of explorations.
  */
 
-angular.module('explorationEditorPageModule').factory(
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+oppia.factory(
   'ExplorationDiffService', [
     'INTERACTION_SPECS', function(INTERACTION_SPECS) {
       var STATE_PROPERTY_ADDED = 'added';

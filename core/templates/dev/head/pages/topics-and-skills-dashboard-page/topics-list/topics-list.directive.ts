@@ -19,8 +19,11 @@
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ts');
 
-angular.module('topicsListModule').directive('topicsList', [
+oppia.directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

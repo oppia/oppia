@@ -19,7 +19,7 @@
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('outcomeFeedbackEditorModule').directive(
+oppia.directive(
   'outcomeFeedbackEditor', [
     'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
     function(SubtitledHtmlObjectFactory, UrlInterpolationService) {

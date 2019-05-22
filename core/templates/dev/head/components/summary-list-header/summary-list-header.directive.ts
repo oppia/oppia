@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('summaryListHeaderModule').directive('summaryListHeader', [
+oppia.directive('summaryListHeader', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

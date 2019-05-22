@@ -23,7 +23,7 @@ require(
   'show-suggestion-modal-for-learner-local-view.controller.ts');
 require('services/AlertsService.ts');
 
-angular.module('showSuggestionModalForLocalViewModule').factory(
+oppia.factory(
   'ShowSuggestionModalForLearnerLocalViewService', [
     '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
     function($http, $uibModal, AlertsService, UrlInterpolationService) {

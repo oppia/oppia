@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('backgroundBannerModule').directive('backgroundBanner', [
+oppia.directive('backgroundBanner', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

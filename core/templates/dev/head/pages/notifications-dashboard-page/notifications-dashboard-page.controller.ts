@@ -18,7 +18,7 @@
 
 require('services/DateTimeFormatService.ts');
 
-angular.module('notificationsDashboardPageModule').controller(
+oppia.controller(
   'NotificationsDashboard', ['$http', '$rootScope', '$scope',
     'DateTimeFormatService',
     function($http, $rootScope, $scope, DateTimeFormatService) {

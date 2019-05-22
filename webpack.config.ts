@@ -34,7 +34,7 @@ module.exports = {
       commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
     collection_player:
       commonPrefix + '/pages/collection-player-page/collection-player-page.controller.ts',
-    contact: commonPrefix + '/pages/contact-page/Contact.ts',
+    contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/creator-dashboard-page.controller.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
@@ -47,8 +47,8 @@ module.exports = {
       commonPrefix + '/pages/exploration-editor-page/exploration-editor-page.controller.ts',
     exploration_player:
       commonPrefix + '/pages/exploration_player/ExplorationPlayer.ts',
-    get_started: commonPrefix + '/pages/get_started/GetStarted.ts',
-    landing: commonPrefix + '/pages/topic-landing-page/topic-landing-page.controller.ts',
+    get_started: commonPrefix + '/pages/get-started-page/get-started-page.script.ts',
+    landing: commonPrefix + '/pages/landing-pages/topic-landing-page/topic-landing-page.controller.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/learner-dashboard-page.controller.ts',
     library: commonPrefix + '/pages/library-page/library-page.controller.ts',
@@ -63,7 +63,10 @@ module.exports = {
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor: commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
     splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
-    stewards: commonPrefix + '/pages/topic-landing-page/topic-landing-page-stewards/topic-landing-page-stewards.controller.ts',
+    stewards: (
+      commonPrefix +
+      '/pages/landing-pages/stewards-landing-page/' +
+      'topic-landing-page-stewards.controller.ts'),
     story_editor: commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
@@ -181,7 +184,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['get_started'],
       filename: 'get-started-page.mainpage.html',
-      template: commonPrefix + '/pages/get_started/get-started-page.mainpage.html',
+      template: commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

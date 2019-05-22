@@ -23,7 +23,7 @@ require(
   'topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 
-angular.module('entityCreationServicesModule').factory('StoryCreationService', [
+oppia.factory('StoryCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'TopicEditorStateService', 'TopicUpdateService', 'UrlInterpolationService',
   function(

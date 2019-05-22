@@ -24,7 +24,7 @@ require(
   'exploration-states/exploration-states.service.ts');
 require('services/ComputeGraphService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'GraphDataService', [
     'ComputeGraphService', 'ExplorationInitStateNameService',
     'ExplorationStatesService',

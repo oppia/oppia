@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('selectTopicsModule').directive('selectTopics', [
+oppia.directive('selectTopics', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

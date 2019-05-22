@@ -22,7 +22,7 @@ require(
   'exploration-data/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'UserEmailPreferencesService', [
     '$http', '$q', 'AlertsService', 'ExplorationDataService',
     'UrlInterpolationService',

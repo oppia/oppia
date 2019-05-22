@@ -17,7 +17,7 @@
  * status label for a thread in the feedback tab of the exploration editor.
  */
 
-angular.module('feedbackTabModule').factory(
+oppia.factory(
   'ThreadStatusDisplayService', [function() {
     var _STATUS_CHOICES = [{
       id: 'open',

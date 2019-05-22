@@ -18,7 +18,7 @@
 
 require('services/AlertsService.ts');
 
-angular.module('alertMessageModule').directive('alertMessage', [function() {
+oppia.directive('alertMessage', [function() {
   return {
     restrict: 'E',
     scope: {

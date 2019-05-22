@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('socialButtonsModule').directive('socialButtons', [
+oppia.directive('socialButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

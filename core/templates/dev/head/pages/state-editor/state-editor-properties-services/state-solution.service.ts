@@ -16,7 +16,7 @@
  * @fileoverview A data service that stores the current interaction solution.
  */
 
-angular.module('stateEditorModule').factory('StateSolutionService', [
+oppia.factory('StateSolutionService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveSolution';

@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('showSuggestionModalForLearnerViewModule').factory(
+oppia.factory(
   'ShowSuggestionModalForLearnerViewService', [
     '$rootScope', '$uibModal',
     'UrlInterpolationService',

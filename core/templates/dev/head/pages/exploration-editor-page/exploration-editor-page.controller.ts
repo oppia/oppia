@@ -291,7 +291,7 @@ require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
-angular.module('explorationEditorPageModule').controller('ExplorationEditor', [
+oppia.controller('ExplorationEditor', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',
   '$uibModal', '$window', 'AutosaveInfoModalsService', 'ChangeListService',
   'ContextService', 'EditabilityService',

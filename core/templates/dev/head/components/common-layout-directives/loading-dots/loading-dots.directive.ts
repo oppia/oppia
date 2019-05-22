@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('loadingDotsModule').directive('loadingDots', [
+oppia.directive('loadingDots', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

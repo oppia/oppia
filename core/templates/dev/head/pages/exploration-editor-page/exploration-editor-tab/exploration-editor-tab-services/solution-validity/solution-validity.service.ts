@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Service for keeping track of solution validity.
-angular.module('explorationEditorTabModule').factory(
+oppia.factory(
   'SolutionValidityService', [
     function() {
       return {

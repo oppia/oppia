@@ -41,7 +41,7 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-angular.module('feedbackTabModule').controller('FeedbackTab', [
+oppia.controller('FeedbackTab', [
   '$log', '$q', '$rootScope', '$scope', '$uibModal',
   'AlertsService', 'ChangeListService', 'DateTimeFormatService',
   'ExplorationDataService', 'ExplorationStatesService',

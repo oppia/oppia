@@ -23,7 +23,7 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('storiesListModule').directive('storiesList', [
+oppia.directive('storiesList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

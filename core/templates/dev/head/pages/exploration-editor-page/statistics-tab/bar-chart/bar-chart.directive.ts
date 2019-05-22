@@ -16,7 +16,7 @@
  * @fileoverview Directive for bar chart visualization.
  */
 
-angular.module('barChartModule').directive('barChart', [function() {
+oppia.directive('barChart', [function() {
   return {
     restrict: 'E',
     scope: {

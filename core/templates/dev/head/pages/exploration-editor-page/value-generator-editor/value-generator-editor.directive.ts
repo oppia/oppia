@@ -19,7 +19,7 @@
 // Individual value generator directives can be found in
 // extensions/value_generators/templates.
 
-angular.module('valueGeneratorEditorModule').directive(
+oppia.directive(
   'valueGeneratorEditor', ['$compile', function($compile) {
     return {
       restrict: 'E',

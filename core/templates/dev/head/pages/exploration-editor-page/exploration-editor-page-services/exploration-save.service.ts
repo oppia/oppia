@@ -69,7 +69,7 @@ require('services/ContextService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'ExplorationSaveService', [
     '$log', '$q', '$rootScope', '$timeout', '$uibModal',
     'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',

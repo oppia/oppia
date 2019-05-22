@@ -167,7 +167,9 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-angular.module('creatorDashboardPageModule').controller('CreatorDashboard', [
+require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
+
+oppia.controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
   'ExplorationCreationService', 'QuestionObjectFactory',

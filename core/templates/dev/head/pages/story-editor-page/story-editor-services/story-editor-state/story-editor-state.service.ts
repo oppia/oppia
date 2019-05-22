@@ -23,7 +23,9 @@ require('domain/story/EditableStoryBackendApiService.ts');
 require('domain/story/StoryObjectFactory.ts');
 require('services/AlertsService.ts');
 
-angular.module('storyEditorModule').factory('StoryEditorStateService', [
+require('pages/story-editor-page/story-editor-page.constants.ts');
+
+oppia.factory('StoryEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
   'StoryObjectFactory', 'UndoRedoService',
   'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',

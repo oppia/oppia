@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('topicsAndSkillsDashboardNavbarBreadcrumbModule').directive(
+oppia.directive(
   'topicsAndSkillsDashboardNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

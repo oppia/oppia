@@ -16,7 +16,7 @@
  * @fileoverview Service to handle common code for suggestion modal display.
  */
 
-angular.module('suggestionModalModule').factory(
+oppia.factory(
   'SuggestionModalService', [function() {
     return {
       SUGGESTION_ACCEPTED_MSG: 'This suggestion has already been ' +

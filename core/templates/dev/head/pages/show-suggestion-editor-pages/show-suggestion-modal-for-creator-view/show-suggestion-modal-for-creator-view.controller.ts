@@ -18,7 +18,7 @@
 
 require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
 
-angular.module('showSuggestionModalForCreatorViewModule').controller(
+oppia.controller(
   'ShowSuggestionModalForCreatorView', [
     '$scope', '$uibModalInstance', 'SuggestionModalService',
     'canReviewActiveThread', 'description', 'newContent',

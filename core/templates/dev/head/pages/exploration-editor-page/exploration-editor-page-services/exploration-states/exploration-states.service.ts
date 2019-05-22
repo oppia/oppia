@@ -33,7 +33,7 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ValidatorsService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'ExplorationStatesService', [
     '$filter', '$injector', '$location', '$log', '$q', '$rootScope',
     '$uibModal','AlertsService', 'AngularNameService',

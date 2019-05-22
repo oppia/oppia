@@ -16,7 +16,7 @@
  * @fileoverview Directive for the state translation editor.
  */
 
-angular.module('stateTranslationEditorModule').directive(
+oppia.directive(
   'stateTranslationEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

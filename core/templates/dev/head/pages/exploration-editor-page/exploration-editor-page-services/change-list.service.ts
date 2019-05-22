@@ -25,7 +25,7 @@ require(
   'exploration-data/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
-angular.module('explorationEditorPageModule').factory('ChangeListService', [
+oppia.factory('ChangeListService', [
   '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
   'ExplorationDataService',
   function(

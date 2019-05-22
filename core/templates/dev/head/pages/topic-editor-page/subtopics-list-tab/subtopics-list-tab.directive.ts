@@ -24,7 +24,9 @@ require(
   'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
   'topic-editor-state.service.ts');
 
-angular.module('subtopicsListTabModule').directive('subtopicsListTab', [
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
+
+oppia.directive('subtopicsListTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

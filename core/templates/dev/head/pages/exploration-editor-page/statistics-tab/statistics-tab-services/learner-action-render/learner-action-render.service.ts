@@ -26,7 +26,7 @@
  * learner actions and then returns a giant HTML string.
  */
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'LearnerActionRenderService', [
     '$sce', 'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
     'ACTION_TYPE_EXPLORATION_START',

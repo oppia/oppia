@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('entityCreationServicesModule').factory(
+oppia.factory(
   'QuestionCreationService', [
     '$http', '$q', 'UrlInterpolationService',
     function($http, $q, UrlInterpolationService) {

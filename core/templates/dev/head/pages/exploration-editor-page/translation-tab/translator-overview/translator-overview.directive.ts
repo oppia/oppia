@@ -26,7 +26,7 @@ require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
   'translation-status/translation-status.service.ts');
 
-angular.module('translatorOverviewModule').directive('translatorOverview', [
+oppia.directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

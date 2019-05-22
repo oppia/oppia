@@ -20,7 +20,7 @@
  * editor is initialized.
  */
 
-angular.module('explorationEditorTabModule').factory(
+oppia.factory(
   'InteractionDetailsCacheService', [function() {
     var _cache = {};
     return {

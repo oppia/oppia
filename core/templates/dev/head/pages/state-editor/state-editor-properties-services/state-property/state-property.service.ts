@@ -18,7 +18,7 @@
 
 require('services/AlertsService.ts');
 
-angular.module('stateEditorModule').factory('StatePropertyService', [
+oppia.factory('StatePropertyService', [
   '$log', 'AlertsService',
   function($log, AlertsService) {
     // Public base API for data services corresponding to state properties

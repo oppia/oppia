@@ -39,7 +39,9 @@ require(
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('questionsTabModule').directive('topicEditorQuestionsTab', [
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
+
+oppia.directive('topicEditorQuestionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -35,7 +35,7 @@ require(
   'exploration-warnings.service.ts');
 require('services/EditabilityService.ts');
 
-angular.module('explorationSaveAndPulishButtonsModule').directive(
+oppia.directive(
   'explorationSaveAndPublishButtons', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

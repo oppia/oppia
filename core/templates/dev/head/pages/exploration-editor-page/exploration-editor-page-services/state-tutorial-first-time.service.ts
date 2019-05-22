@@ -20,7 +20,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'editor-first-time-events.service.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'StateTutorialFirstTimeService', [
     '$http', '$rootScope', 'EditorFirstTimeEventsService',
     function($http, $rootScope, EditorFirstTimeEventsService) {

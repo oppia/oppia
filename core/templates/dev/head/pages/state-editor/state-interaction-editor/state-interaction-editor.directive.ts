@@ -50,7 +50,7 @@ require('services/EditabilityService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/HtmlEscaperService.ts');
 
-angular.module('stateInteractionEditorModule').directive(
+oppia.directive(
   'stateInteractionEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

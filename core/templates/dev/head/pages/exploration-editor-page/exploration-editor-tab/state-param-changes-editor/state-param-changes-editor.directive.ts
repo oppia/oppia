@@ -25,7 +25,7 @@ require(
   'pages/state-editor/state-editor-properties-services/state-property/' +
   'state-property.service.ts');
 
-angular.module('stateParamChangesEditorModule').directive(
+oppia.directive(
   'stateParamChangesEditor', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

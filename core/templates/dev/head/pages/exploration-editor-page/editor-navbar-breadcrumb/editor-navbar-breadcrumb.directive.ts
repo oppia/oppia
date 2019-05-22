@@ -26,7 +26,7 @@ require(
   'router.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('editorNavbarBreadcrumbModule').directive(
+oppia.directive(
   'editorNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

@@ -25,7 +25,7 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/ImprovementCardService.ts');
 
-angular.module('improvementsTabModule').directive('improvementsTab', [
+oppia.directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -28,7 +28,9 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'graph-data.service.ts');
 
-angular.module('explorationEditorPageModule').factory(
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+oppia.factory(
   'ParameterMetadataService', [
     'ExplorationParamChangesService', 'ExplorationStatesService',
     'ExpressionInterpolationService', 'GraphDataService',

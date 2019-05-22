@@ -55,7 +55,7 @@ require('services/EditabilityService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/GenerateContentIdService.ts');
 
-angular.module('stateSolutionEditorModule').directive('stateSolutionEditor', [
+oppia.directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

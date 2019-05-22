@@ -22,7 +22,7 @@ require('pages/exploration_player/PlayerPositionService.ts');
 require('pages/exploration_player/PlayerTranscriptService.ts');
 require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
 
-angular.module('showSuggestionModalForLocalViewModule').controller(
+oppia.controller(
   'ShowSuggestionModalForLearnerLocalView', [
     '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
     'PlayerPositionService', 'PlayerTranscriptService',

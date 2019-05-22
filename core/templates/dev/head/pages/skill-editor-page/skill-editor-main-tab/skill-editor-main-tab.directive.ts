@@ -31,7 +31,7 @@ require(
   'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
   'skill-editor-state.service.ts');
 
-angular.module('skillEditorMainTabModule').directive('skillEditorMainTab', [
+oppia.directive('skillEditorMainTab', [
   'SkillEditorStateService', 'UrlInterpolationService',
   function(SkillEditorStateService, UrlInterpolationService) {
     return {

@@ -28,7 +28,7 @@ require(
   'version-tree/version-tree.service.ts');
 require('services/DateTimeFormatService.ts');
 
-angular.module('historyTabModule').controller('HistoryTab', [
+oppia.controller('HistoryTab', [
   '$http', '$log', '$rootScope', '$scope',
   '$uibModal', 'CompareVersionsService',
   'DateTimeFormatService', 'ExplorationDataService',

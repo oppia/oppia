@@ -22,7 +22,9 @@ require(
   'topic-editor-state.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('topicEditorNavbarBreadcrumbModule').directive(
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
+
+oppia.directive(
   'topicEditorNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

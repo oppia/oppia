@@ -20,7 +20,7 @@
 
 require('services/SiteAnalyticsService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'EditorFirstTimeEventsService', [
     'SiteAnalyticsService',
     function(SiteAnalyticsService) {

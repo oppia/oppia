@@ -43,7 +43,9 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-angular.module('learnerDashboardPageModule').controller('LearnerDashboard', [
+require('pages/learner-dashboard-page/learner-dashboard-page.constants.ts');
+
+oppia.controller('LearnerDashboard', [
   '$scope', '$rootScope', '$q', '$window', '$http', '$uibModal',
   'AlertsService', 'EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS',
   'SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', 'FATAL_ERROR_CODES',

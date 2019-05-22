@@ -33,7 +33,7 @@ require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/UtilsService.ts');
 
-angular.module('preferencesPageModule').controller('Preferences', [
+oppia.controller('Preferences', [
   '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate', '$uibModal',
   'AlertsService', 'LanguageUtilService', 'UrlInterpolationService',
   'UserService', 'UtilsService', 'DASHBOARD_TYPE_CREATOR',

@@ -47,7 +47,7 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
-angular.module('topicsAndSkillsDashboardModule').controller(
+oppia.controller(
   'TopicsAndSkillsDashboard', [
     '$http', '$rootScope', '$scope', '$uibModal', '$window',
     'AlertsService', 'SkillCreationService',

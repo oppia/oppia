@@ -27,7 +27,7 @@ require('services/contextual/UrlService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 
-angular.module('createActivityButtonModule').directive('createActivityButton', [
+oppia.directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

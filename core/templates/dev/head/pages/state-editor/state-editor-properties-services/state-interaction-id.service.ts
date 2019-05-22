@@ -17,7 +17,7 @@
  */
 
 // TODO(sll): Add validation.
-angular.module('stateEditorModule').factory('StateInteractionIdService', [
+oppia.factory('StateInteractionIdService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveInteractionId';

@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('showSuggestionModalForCreatorViewModule').factory(
+oppia.factory(
   'ShowSuggestionModalForCreatorViewService', [
     '$http', '$log', '$rootScope',
     '$uibModal', 'UrlInterpolationService',

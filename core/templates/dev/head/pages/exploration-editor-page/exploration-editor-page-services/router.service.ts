@@ -27,7 +27,7 @@ require(
   'exploration-editor-tab-services/responses.service.ts');
 require('services/ExplorationFeaturesService.ts');
 
-angular.module('explorationEditorPageModule').factory('RouterService', [
+oppia.factory('RouterService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   'ExplorationFeaturesService', 'ExplorationInitStateNameService',
   'ExplorationStatesService', 'StateEditorService',

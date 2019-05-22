@@ -117,7 +117,7 @@ require(
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('storyEditorModule').controller('StoryEditor', [
+oppia.controller('StoryEditor', [
   '$scope', '$uibModal', '$window', 'PageTitleService',
   'StoryEditorStateService', 'UndoRedoService',
   'UrlInterpolationService', 'UrlService',

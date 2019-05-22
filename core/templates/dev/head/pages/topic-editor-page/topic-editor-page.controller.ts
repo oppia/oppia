@@ -129,7 +129,7 @@ require(
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('topicEditorPageModule').controller('TopicEditor', [
+oppia.controller('TopicEditor', [
   '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',
   'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
   function($scope, PageTitleService, TopicEditorStateService, UrlService,

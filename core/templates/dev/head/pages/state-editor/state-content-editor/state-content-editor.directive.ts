@@ -30,7 +30,7 @@ require(
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 
-angular.module('stateContentEditorModule').directive('stateContentEditor', [
+oppia.directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

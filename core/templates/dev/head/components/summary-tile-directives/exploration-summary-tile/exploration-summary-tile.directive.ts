@@ -31,7 +31,7 @@ require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('explorationSummaryTileModule').directive(
+oppia.directive(
   'explorationSummaryTile', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

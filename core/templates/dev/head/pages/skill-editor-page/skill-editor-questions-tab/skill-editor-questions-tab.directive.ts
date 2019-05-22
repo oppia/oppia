@@ -35,7 +35,9 @@ require(
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('skillEditorQuestionsTabModule').directive('questionsTab', [
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
+oppia.directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

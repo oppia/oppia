@@ -23,7 +23,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/SiteAnalyticsService.ts');
 
-angular.module('sharingLinksModule').directive('sharingLinks', [
+oppia.directive('sharingLinks', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -23,7 +23,7 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('collectionFooterModule').directive('collectionFooter', [
+oppia.directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

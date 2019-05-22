@@ -43,7 +43,9 @@ require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/IdGenerationService.ts');
 
-angular.module('audioTranslationBarModule').directive('audioTranslationBar', [
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+oppia.directive('audioTranslationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

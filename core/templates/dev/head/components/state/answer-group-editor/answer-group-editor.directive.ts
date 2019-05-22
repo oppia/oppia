@@ -36,7 +36,7 @@ require(
   'state-property.service.ts');
 require('services/AlertsService.ts');
 
-angular.module('answerGroupEditorModule').directive('answerGroupEditor', [
+oppia.directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

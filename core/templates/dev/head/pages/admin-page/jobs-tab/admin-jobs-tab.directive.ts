@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
+require('pages/admin-page/admin-page.constants.ts');
 
 oppia.directive('adminJobsTab', [
   '$http', '$timeout', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',

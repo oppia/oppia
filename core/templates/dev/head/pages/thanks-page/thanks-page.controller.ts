@@ -21,7 +21,7 @@ require(
   'background-banner.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('thanksPageModule').controller('Thanks', [
+oppia.controller('Thanks', [
   '$scope', 'UrlInterpolationService',
   function(
       $scope, UrlInterpolationService) {

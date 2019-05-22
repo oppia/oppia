@@ -28,7 +28,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');
 require('services/DateTimeFormatService.ts');
 
-angular.module('profilePageModule').controller('Profile', [
+oppia.controller('Profile', [
   '$http', '$log', '$rootScope', '$scope', '$window', 'DateTimeFormatService',
   'UrlInterpolationService', 'UserService',
   function($http, $log, $rootScope, $scope, $window, DateTimeFormatService,

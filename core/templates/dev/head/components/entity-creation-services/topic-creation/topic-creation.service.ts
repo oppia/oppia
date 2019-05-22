@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
-angular.module('entityCreationServicesModule').factory('TopicCreationService', [
+oppia.factory('TopicCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window', 'AlertsService',
   'UrlInterpolationService',
   function(

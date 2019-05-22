@@ -27,7 +27,7 @@ require('domain/topic/TopicRightsBackendApiService.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 
-angular.module('topicEditorPageModule').factory('TopicEditorStateService', [
+oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
   'SubtopicPageObjectFactory',

@@ -16,7 +16,7 @@
  * @fileoverview A service that maps IDs to Angular names.
  */
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'AngularNameService', [function() {
     var angularName = null;
 

@@ -24,7 +24,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 
-angular.module('explorationEditorTabModule').factory(
+oppia.factory(
   'SolutionVerificationService', [
     '$injector', 'AngularNameService', 'AnswerClassificationService',
     'StateEditorService',

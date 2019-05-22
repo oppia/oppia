@@ -33,6 +33,8 @@ require('services/EditabilityService.ts');
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
 angular.module('unresolvedAnswersOverviewModule').directive(
   'unresolvedAnswersOverview', [
     'UrlInterpolationService', function(UrlInterpolationService) {

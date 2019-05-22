@@ -19,7 +19,7 @@
 
 require('domain/utilities/LanguageUtilService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'TranslationLanguageService', [
     '$log', '$rootScope', 'LanguageUtilService',
     function($log, $rootScope, LanguageUtilService) {

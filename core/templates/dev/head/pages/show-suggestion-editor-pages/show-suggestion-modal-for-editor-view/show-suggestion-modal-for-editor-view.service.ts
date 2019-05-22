@@ -32,7 +32,7 @@ require(
   'show-suggestion-modal-for-editor-view.controller.ts');
 require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
 
-angular.module('showSuggestionModalForEditorViewModule').factory(
+oppia.factory(
   'ShowSuggestionModalForEditorViewService', [
     '$log', '$rootScope', '$uibModal',
     'ExplorationDataService', 'ExplorationStatesService',

@@ -24,7 +24,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 
-angular.module('searchResultsModule').directive('searchResults', [
+oppia.directive('searchResults', [
   '$q', 'UrlInterpolationService', function($q, UrlInterpolationService) {
     return {
       restrict: 'E',

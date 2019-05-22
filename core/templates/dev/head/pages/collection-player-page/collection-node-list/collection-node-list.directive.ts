@@ -19,7 +19,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('collectionNodeListModule').directive('collectionNodeList', [
+oppia.directive('collectionNodeList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('circularImageModule').directive('circularImage', [
+oppia.directive('circularImage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

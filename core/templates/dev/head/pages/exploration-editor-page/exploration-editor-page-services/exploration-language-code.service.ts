@@ -18,7 +18,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-property.service.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'ExplorationLanguageCodeService', [
     'ExplorationPropertyService', function(ExplorationPropertyService) {
       var child = Object.create(ExplorationPropertyService);

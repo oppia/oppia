@@ -34,7 +34,7 @@ require('services/ValidatorsService.ts');
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
-angular.module('ruleEditorModule').directive('ruleEditor', [
+oppia.directive('ruleEditor', [
   '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
     return {
       restrict: 'E',

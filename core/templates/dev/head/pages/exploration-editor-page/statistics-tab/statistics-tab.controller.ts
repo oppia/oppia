@@ -40,7 +40,9 @@ require('services/DateTimeFormatService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/StateRulesStatsService.ts');
 
-angular.module('statisticsTabModule').controller('StatisticsTab', [
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+oppia.controller('StatisticsTab', [
   '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
   'DateTimeFormatService', 'ExplorationDataService',
   'ExplorationFeaturesService',

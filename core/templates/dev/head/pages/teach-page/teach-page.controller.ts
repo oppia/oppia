@@ -22,7 +22,7 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 
-angular.module('teachPageModule').controller('Teach', [
+oppia.controller('Teach', [
   '$scope', '$timeout', '$window', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(

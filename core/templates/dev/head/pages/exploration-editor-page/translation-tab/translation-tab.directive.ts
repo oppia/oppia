@@ -52,7 +52,7 @@ require(
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 
-angular.module('translationTabModule').directive('translationTab', [
+oppia.directive('translationTab', [
   'ContextService', 'ExplorationDataService', 'ExplorationStatesService',
   'StateEditorService', 'StateRecordedVoiceoversService',
   'StateTutorialFirstTimeService', 'UrlInterpolationService',

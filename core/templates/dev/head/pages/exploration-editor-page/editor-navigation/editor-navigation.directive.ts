@@ -39,7 +39,7 @@ require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('editorNavigationModule').directive('editorNavigation', [
+oppia.directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

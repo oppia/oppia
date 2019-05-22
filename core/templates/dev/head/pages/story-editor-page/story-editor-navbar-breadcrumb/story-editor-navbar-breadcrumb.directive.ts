@@ -26,7 +26,9 @@ require(
   'main-story-editor.directive.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('storyEditorNavbarBreadcrumbModule').directive(
+require('pages/story-editor-page/story-editor-page.constants.ts');
+
+oppia.directive(
   'storyEditorNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

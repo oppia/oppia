@@ -16,7 +16,7 @@
  * @fileoverview Service that handles routing for the topic editor page.
  */
 
-angular.module('topicEditorPageModule').factory('TopicEditorRoutingService', [
+oppia.factory('TopicEditorRoutingService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   function(
       $interval, $location, $rootScope, $timeout, $window) {

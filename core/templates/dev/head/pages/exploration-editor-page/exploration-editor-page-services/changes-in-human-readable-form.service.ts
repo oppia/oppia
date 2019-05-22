@@ -18,7 +18,7 @@
 
 require('services/UtilsService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'ChangesInHumanReadableFormService', [
     'UtilsService', function(UtilsService) {
       var CMD_ADD_STATE = 'add_state';

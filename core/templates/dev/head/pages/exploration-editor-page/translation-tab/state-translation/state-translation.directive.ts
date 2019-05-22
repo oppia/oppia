@@ -51,7 +51,9 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 
-angular.module('stateTranslationModule').directive('stateTranslation', [
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

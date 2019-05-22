@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PageTitleService.ts');
 
-angular.module('errorPageModule').controller('Error', [
+oppia.controller('Error', [
   '$scope', 'PageTitleService', 'UrlInterpolationService',
   function(
       $scope, UrlInterpolationService) {

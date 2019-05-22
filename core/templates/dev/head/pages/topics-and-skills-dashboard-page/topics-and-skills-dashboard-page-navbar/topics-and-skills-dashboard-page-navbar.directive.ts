@@ -24,8 +24,11 @@ require(
   'topic-creation.service.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ts');
 
-angular.module('topicsAndSkillsDashboardNavbarModule').directive(
+oppia.directive(
   'topicsAndSkillsDashboardNavbar', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

@@ -25,7 +25,7 @@ require(
   'exploration-data/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
-angular.module('feedbackTabModule').factory('ThreadDataService', [
+oppia.factory('ThreadDataService', [
   '$http', '$log', '$q', 'AlertsService', 'ExplorationDataService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
   'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION',

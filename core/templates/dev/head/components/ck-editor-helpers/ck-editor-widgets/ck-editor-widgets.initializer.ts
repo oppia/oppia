@@ -20,7 +20,7 @@
 require('services/HtmlEscaperService.ts');
 require('services/RteHelperService.ts');
 
-angular.module('ckEditorWidgetsModule').run([
+oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
   'HtmlEscaperService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,

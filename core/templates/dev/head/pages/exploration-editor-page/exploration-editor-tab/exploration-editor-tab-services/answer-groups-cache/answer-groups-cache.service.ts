@@ -19,7 +19,7 @@
 * This cache should be reset each time the state editor is initialized.
 */
 
-angular.module('explorationEditorTabModule').factory(
+oppia.factory(
   'AnswerGroupsCacheService', [function() {
     var _cache = {};
     return {

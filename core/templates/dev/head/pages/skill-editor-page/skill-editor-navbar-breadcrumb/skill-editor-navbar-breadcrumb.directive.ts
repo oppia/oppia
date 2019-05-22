@@ -21,7 +21,7 @@ require(
   'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
   'skill-editor-state.service.ts');
 
-angular.module('skillEditorNavbarBreadcrumbModule').directive(
+oppia.directive(
   'skillEditorNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

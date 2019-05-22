@@ -31,7 +31,7 @@ require(
 require('services/EditabilityService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-angular.module('stateNameEditorModule').directive('stateNameEditor', [
+oppia.directive('stateNameEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

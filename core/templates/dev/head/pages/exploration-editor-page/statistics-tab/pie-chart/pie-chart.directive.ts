@@ -16,7 +16,7 @@
  * @fileoverview Directive for pie chart visualization.
  */
 
-angular.module('pieChartModule').directive('pieChart', [function() {
+oppia.directive('pieChart', [function() {
   return {
     restrict: 'E',
     scope: {

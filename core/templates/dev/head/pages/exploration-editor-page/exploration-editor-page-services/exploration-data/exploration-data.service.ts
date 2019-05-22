@@ -23,7 +23,7 @@ require('services/AlertsService.ts');
 require('services/LocalStorageService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('explorationEditorPageModule').factory(
+oppia.factory(
   'ExplorationDataService', [
     '$http', '$log', '$q', '$window', 'AlertsService',
     'EditableExplorationBackendApiService', 'LocalStorageService',

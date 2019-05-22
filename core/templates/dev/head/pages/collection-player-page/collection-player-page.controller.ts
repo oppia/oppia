@@ -46,10 +46,9 @@ require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
-angular.module('collectionPlayerPageModule').constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+require('pages/collection-player-page/collection-player-page.constants.ts');
 
-angular.module('collectionPlayerPageModule').controller('CollectionPlayer', [
+oppia.controller('CollectionPlayer', [
   '$anchorScroll', '$http', '$location', '$scope',
   'AlertsService', 'CollectionObjectFactory',
   'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
@@ -314,4 +313,15 @@ angular.module('collectionPlayerPageModule').controller('CollectionPlayer', [
       }
     });
   }
-]);
+]).animation(
+  '.oppia-collection-animate-slide', function() {
+    return {
+      enter: function(element) {
+        element.hide().slideDown();
+      },
+      leave: function(element) {
+        element.slideUp();
+      }
+    };
+  }
+);

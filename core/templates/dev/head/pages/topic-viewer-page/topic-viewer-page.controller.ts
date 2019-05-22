@@ -29,7 +29,7 @@ require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-angular.module('topicViewerPageModule').controller('TopicViewer', [
+oppia.controller('TopicViewer', [
   '$rootScope', '$scope', '$window', 'AlertsService',
   'PageTitleService', 'TopicViewerBackendApiService',
   'UrlService', 'FATAL_ERROR_CODES',

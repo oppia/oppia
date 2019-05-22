@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-angular.module('storySummaryTileModule').directive('storySummaryTile', [
+oppia.directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

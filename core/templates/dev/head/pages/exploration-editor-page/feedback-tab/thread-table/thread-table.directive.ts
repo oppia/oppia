@@ -25,7 +25,7 @@ require(
   'thread-status-display/thread-status-display.service.ts');
 require('services/DateTimeFormatService.ts');
 
-angular.module('threadTableModule').directive('threadTable', [
+oppia.directive('threadTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

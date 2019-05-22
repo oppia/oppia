@@ -71,7 +71,9 @@ require(
 require('services/AlertsService.ts');
 require('services/ExplorationFeaturesService.ts');
 
-angular.module('settingsTabModule').controller('SettingsTab', [
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
+oppia.controller('SettingsTab', [
   '$http', '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
   'ChangeListService', 'EditableExplorationBackendApiService',
   'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',

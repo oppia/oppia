@@ -23,7 +23,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-angular.module('collectionSummaryTileModule').directive(
+oppia.directive(
   'collectionSummaryTile', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

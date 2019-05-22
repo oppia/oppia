@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-angular.module('earlyQuitIssueModule').directive('earlyQuitIssue', [
+oppia.directive('earlyQuitIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

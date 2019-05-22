@@ -21,7 +21,7 @@ require(
   'pages/state-editor/state-editor-properties-services/state-property/' +
   'state-property.service.ts');
 
-angular.module('stateEditorModule').factory('StateRecordedVoiceoversService', [
+oppia.factory('StateRecordedVoiceoversService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveRecordedVoiceovers';
