@@ -56,31 +56,19 @@ oppia.directive('translatorOverview', [
           $scope.VOICEOVER_MODE = 'Voiceover';
           $scope.TRANSLATION_MODE = 'Translate';
 
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.languageCode =
             allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
               prevLanguageCode : DEFAULT_AUDIO_LANGUAGE;
           TranslationLanguageService.setActiveLanguageCode(
             $scope.languageCode);
+          // We need to refresh the status service once the active language is
+          // set.
+          TranslationStatusService.refresh();
           $scope.inTranslationMode = false;
           $scope.inVoiceoverMode = false;
           $scope.canShowTabModeSwitcher = function() {
             return ($scope.languageCode !== (
               ExplorationLanguageCodeService.displayed));
-          };
-
-          $scope.canShowModeSwitchHelperImage = function() {
-            var alreadyShown = $window.localStorage.getItem(
-              'mode_switch_helper_image_shown');
-            if (alreadyShown !== 'true') {
-              $timeout(function() {
-                $window.localStorage.setItem(
-                  'mode_switch_helper_image_shown', true);
-              }, 15000);
-              return true;
-            } else {
-              return false;
-            }
           };
 
           var refreshDirectiveScope = function() {
@@ -115,6 +103,7 @@ oppia.directive('translatorOverview', [
               TranslationTabActiveModeService.activateTranslationMode();
             }
             refreshDirectiveScope();
+            TranslationStatusService.refresh();
           };
 
           $scope.getTranslationProgressStyle = function() {
@@ -137,6 +126,7 @@ oppia.directive('translatorOverview', [
             }
             TranslationLanguageService.setActiveLanguageCode(
               $scope.languageCode);
+            TranslationStatusService.refresh();
 
             $window.localStorage.setItem(
               LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);

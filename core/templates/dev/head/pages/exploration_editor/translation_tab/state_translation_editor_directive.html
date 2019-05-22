@@ -17,7 +17,7 @@
            ng-class="{'oppia-prevent-selection': isEditable()}"
            title="Translated Content">
         <span  class="oppia-placeholder" ng-if="!activeWrittenTranslation || activeWrittenTranslation.getHtml() === ''">
-          No translation available. Click to add new!
+          This section has not been translated yet. Click to add a translation!
         </span>
         <span ng-if="activeWrittenTranslation">
           <angular-html-bind html-data="activeWrittenTranslation.getHtml()"
