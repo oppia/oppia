@@ -291,7 +291,7 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
             url = '%s/non-existing-id' % (feconf.SKILL_PUBLISH_URL_PREFIX)
             self.put_json(
                 url, {'version': 1}, csrf_token=csrf_token,
-                expected_status_int=500)
+                expected_status_int=404)
 
             # Check that the status is 401 when call to publish_skill raises an
             # exception.
