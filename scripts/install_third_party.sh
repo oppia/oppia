@@ -23,11 +23,8 @@ $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
 $NPM_INSTALL --only=dev
-<<<<<<< HEAD
-=======
 # This line removes the "npm ERR! missing:" messages. For reference, see this
 # thread: https://github.com/npm/npm/issues/19393#issuecomment-374076889
->>>>>>> 6ffbb6a8fd3367da293193945c80c2388cfb9622
 $NPM_CMD dedupe
 
 # Download and install Skulpt. Skulpt is built using a Python script included
