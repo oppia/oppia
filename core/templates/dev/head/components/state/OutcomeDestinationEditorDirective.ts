@@ -48,7 +48,6 @@ oppia.directive('outcomeDestinationEditor', [
           var ctrl = this;
           var currentStateName = null;
           ctrl.canAddPrerequisiteSkill = (
-            constants.ENABLE_NEW_STRUCTURE_EDITORS &&
             constants.ENABLE_PREREQUISITE_SKILLS &&
             StateEditorService.isExplorationWhitelisted());
 
