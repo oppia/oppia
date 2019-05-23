@@ -494,6 +494,10 @@ oppia.controller('ExplorationEditor', [
           explorationData.show_state_editor_tutorial_on_load,
           $scope.explorationId);
 
+        if (explorationData.show_state_translation_tutorial_on_load) {
+          StateTutorialFirstTimeService.markTranslationTutorialNotSeenBefore();
+        }
+
         if (ExplorationRightsService.isPublic()) {
           // Stats are loaded asynchronously after the exploration data because
           // they are not needed to interact with the editor.

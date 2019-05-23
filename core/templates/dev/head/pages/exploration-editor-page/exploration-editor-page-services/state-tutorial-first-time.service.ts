@@ -16,73 +16,74 @@
  * @fileoverview Service for all tutorials to be run only for the first time.
  */
 
-require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'editor-first-time-events.service.ts');
+require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 
-oppia.factory(
-  'StateTutorialFirstTimeService', [
-    '$http', '$rootScope', 'EditorFirstTimeEventsService',
-    function($http, $rootScope, EditorFirstTimeEventsService) {
-      // Whether this is the first time the tutorial has been seen by this user.
-      var _currentlyInEditorFirstVisit = true;
-      var STARTED_EDITOR_TUTORIAL_EVENT_URL = '/createhandler/' +
-      'started_tutorial_event';
-      var _currentlyInTranslationFirstVisit = true;
-      var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
-      'started_translation_tutorial_event';
+oppia.factory('StateTutorialFirstTimeService', [
+  '$http', '$rootScope', 'EditorFirstTimeEventsService',
+  function($http, $rootScope, EditorFirstTimeEventsService) {
+    // Whether this is the first time the tutorial has been seen by this user.
+    var _currentlyInEditorFirstVisit = true;
+    var STARTED_EDITOR_TUTORIAL_EVENT_URL = '/createhandler/' +
+    'started_tutorial_event';
+    var _currentlyInTranslationFirstVisit = true;
+    var _translationTutorialNotSeenBefore = false;
+    var STARTED_TRANSLATION_TUTORIAL_EVENT_URL = '/createhandler/' +
+    'started_translation_tutorial_event';
 
-      return {
-        initEditor: function(firstTime, expId) {
-          // After the first call to it in a client session, this does nothing.
-          if (!firstTime || !_currentlyInEditorFirstVisit) {
-            _currentlyInEditorFirstVisit = false;
-          }
-
-          if (_currentlyInEditorFirstVisit) {
-            $rootScope.$broadcast('enterEditorForTheFirstTime');
-            EditorFirstTimeEventsService.initRegisterEvents(expId);
-            $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).error(
-              function() {
-                console.error('Warning: could not record editor tutorial ' +
-                'start event.');
-              });
-          }
-        },
-        markEditorTutorialFinished: function() {
-          if (_currentlyInEditorFirstVisit) {
-            $rootScope.$broadcast('openPostTutorialHelpPopover');
-            EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
-          }
-
+    return {
+      initEditor: function(firstTime, expId) {
+        // After the first call to it in a client session, this does nothing.
+        if (!firstTime || !_currentlyInEditorFirstVisit) {
           _currentlyInEditorFirstVisit = false;
-        },
-        initTranslation: function(firstTime, expId) {
-          // After the first call to it in a client session, this does nothing.
-          if (!firstTime || !_currentlyInTranslationFirstVisit) {
-            _currentlyInTranslationFirstVisit = false;
-          }
+        }
 
-          if (_currentlyInTranslationFirstVisit) {
-            $rootScope.$broadcast('enterTranslationForTheFirstTime');
-            EditorFirstTimeEventsService.initRegisterEvents(expId);
-            $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
-              .error(function() {
-                console.error(
-                  'Warning: could not record translation tutorial start event.'
-                );
-              });
-          }
-        },
-        markTranslationTutorialFinished: function() {
-          if (_currentlyInTranslationFirstVisit) {
-            $rootScope.$broadcast('openPostTutorialHelpPopover');
-            EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
-          }
+        if (_currentlyInEditorFirstVisit) {
+          $rootScope.$broadcast('enterEditorForTheFirstTime');
+          EditorFirstTimeEventsService.initRegisterEvents(expId);
+          $http.post(STARTED_EDITOR_TUTORIAL_EVENT_URL + '/' + expId).error(
+            function() {
+              console.error('Warning: could not record editor tutorial ' +
+              'start event.');
+            });
+        }
+      },
+      markEditorTutorialFinished: function() {
+        if (_currentlyInEditorFirstVisit) {
+          $rootScope.$broadcast('openPostTutorialHelpPopover');
+          EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
+        }
 
+        _currentlyInEditorFirstVisit = false;
+      },
+      markTranslationTutorialNotSeenBefore: function() {
+        _translationTutorialNotSeenBefore = true;
+      },
+      initTranslation: function(expId) {
+        // After the first call to it in a client session, this does nothing.
+        if (!_translationTutorialNotSeenBefore ||
+            !_currentlyInTranslationFirstVisit) {
           _currentlyInTranslationFirstVisit = false;
-        },
-      };
-    }
-  ]
-);
+        }
+
+        if (_currentlyInTranslationFirstVisit) {
+          $rootScope.$broadcast('enterTranslationForTheFirstTime');
+          EditorFirstTimeEventsService.initRegisterEvents(expId);
+          $http.post(STARTED_TRANSLATION_TUTORIAL_EVENT_URL + '/' + expId)
+            .error(function() {
+              console.error(
+                'Warning: could not record translation tutorial start event.'
+              );
+            });
+        }
+      },
+      markTranslationTutorialFinished: function() {
+        if (_currentlyInTranslationFirstVisit) {
+          $rootScope.$broadcast('openPostTutorialHelpPopover');
+          EditorFirstTimeEventsService.registerEditorFirstEntryEvent();
+        }
+
+        _currentlyInTranslationFirstVisit = false;
+      },
+    };
+  }
+]);
