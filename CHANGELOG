@@ -1,5 +1,67 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.8.2 (23 May 2019)
+------------------------
+Improvements to editors and players
+* Fix #6468: Fix the improper alignment of tick mark in the library page (#6552)
+* Fix #6200: Fix inconsistent spacing with the lists (#6554)
+* Fix #6542: Add card name to the title of the exploration feedback (#6580)
+* Fix #6623: Add title to sharing link icons (#6624)
+
+New structures
+* Modify topic viewer page and few UI changes on topic editor page (#6455)
+
+Bug fixes
+* Fix #6418: Add validation checks to avoid infinite loops explained in issue and comments (#6520)
+* Fix #3819: Fix strange dragging behaviour of play later list in learner dashboard (#6544)
+* Fix #6229: Reordering Hints and Worked Examples in Safari  (#6547)
+* Fix #6561: Corrected the "About-->Get Involved" link on the top navigation bar (#6567)
+* Fix part of #6159: Fix revert exploration method (#6575)
+* Fix broken interaction previews in the exploration editor (#6627)
+* Fix lint issue by adding a space after colon (#6631)
+* Fix #6667: Renamed e2e test file to fix the issue. (#6668)
+
+Updates to static pages
+* Add NOTICE file, per Section 4(d) of the Apache license. (#6568)
+* Fix #6562: Removed G+ from the footer and Readme.md (#6569)
+* Fix #6581: Remove alternative versions of splash page (#6594)
+* Add a checkpoint to check for codeowners to the PR checklist (#6603)
+* Add a note regarding changelog labels to PR checklist (#6608)
+
+Translations
+* Add proper validation for written translations to allow translation in hinglish (#6588)
+
+Infrastructural changes
+* Migrate codebase to typescript (#6530)
+* Add a new one off job for validating production models. (#6541)
+* Fix part of #5914: Adds unimplemented extract_data method in the BaseModel (#6573)
+
+Code health
+* Fix part of #6387: Remove globals ALLOWED_INTERACTIONS_CATEGORIES (#6472)
+* Rename states_schema_version to state_schema_version. (#6589)
+* Fix part of #6565: Made error page and library page to use PageTitleService (#6595)
+* Update pylint to version 1.9.4 (#6626)
+* Update pycodestyle to version 2.5.0 (#6637)
+* Use package.json to install node modules; upgrade node module versions. (#6659)
+
+Development workflow
+* Adds codeowner to core.domain files (#6545)
+* Removing the timeout multiplier, to get in sync with linting files (#6559)
+* Fix part of #6555: Fix existing lint issues in develop branch (#6563)
+* Add removal of app.yaml version field to deploy script (#6564)
+* Fix release info script: fix imports, and sort PRs in descending order (#6607)
+* Moves lint test from CircleCI to Travis CI.  (#6647)
+* Introduce `linter_utils` module (#6650)
+* Add a comment to explain setting of node path (#6681)
+
+Testing coverage
+* Fix part of #5134: Increase coverage from 82% to 100% for core.platform.email.gae_email_services.py (#6335)
+* Fix part of #6240: Add e2e test for adding user bio in preferences page (#6512)
+* Fix Part of #6240: Add e2e tests for editing exploration properties in coreEditorAndPlayerFeatures.js (#6557)
+* Fix part of #6550: Raise code coverage of core.storage.question.gae_models to 100% (#6558)
+* Fix part of #6550: Increase backend test coverage to 100% in multiple files. (#6648)
+
+
 v2.8.1 (26 April 2019)
 ------------------------
 Improvements to editors and players
