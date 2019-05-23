@@ -182,7 +182,7 @@ skip_files:
 - third_party/static/angular-scroll-1.0.0
 - third_party/static/angular-toastr-1.7.0
 - third_party/static/bower-material-0.6.0-rc1
-- third_party/static/font-awesome-4.7.0
+- third_party/static/font-awesome-5.8.1
 - third_party/static/guppy-b5055b/site
 - third_party/static/guppy-b5055b/test
 - third_party/static/MathJax-2.6.0/docs

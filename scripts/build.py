@@ -43,6 +43,7 @@ MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
     'css', 'third_party.min.css')
 
 FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
+WEBFONTS_RELATIVE_DIRECTORY_PATH = os.path.join('webfonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
     'dev_dir': os.path.join('extensions', ''),
@@ -99,6 +100,7 @@ JS_FILEPATHS_NOT_TO_BUILD = (
 FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/fonts/*',
+    'third_party/generated/webfonts/*',
     'third_party/generated/js/third_party.min.js.map',
     '*.bundle.js',
     '*.bundle.js.map')
@@ -113,7 +115,6 @@ HASH_BLOCK_SIZE = 2**20
 
 def _minify(source_path, target_path):
     """Runs the given file through a minifier and outputs it to target_path.
-
     Args:
         source_path: str. Absolute path to file to be minified.
         target_path: str. Absolute path to location where to copy
@@ -126,7 +127,6 @@ def _minify(source_path, target_path):
 
 def write_to_file_stream(file_stream, content):
     """Write to a file object using provided content.
-
     Args:
         file_stream: file. A stream handling object to do write operation on.
         content: str. String content to write to file object.
@@ -136,7 +136,6 @@ def write_to_file_stream(file_stream, content):
 
 def _join_files(source_paths, target_file_stream):
     """Writes multiple files into one file.
-
     Args:
         source_paths: list(str). Paths to files to join together.
         target_file_stream: file. A stream object of target file.
@@ -149,7 +148,6 @@ def _join_files(source_paths, target_file_stream):
 def _minify_and_create_sourcemap(source_path, target_file_path):
     """Minifies and generates source map for a JS file. This function is only
     meant to be used with third_party.min.js.
-
     Args:
         source_path: str. Path to JS file to minify.
         target_file_path: str. Path to location of the minified file.
@@ -164,11 +162,9 @@ def _minify_and_create_sourcemap(source_path, target_file_path):
 
 def _generate_copy_tasks_for_fonts(source_paths, target_path):
     """Queue up a copy task for each font file.
-
     Args:
         source_paths: list(str). Paths to fonts.
         target_path: str. Path where the fonts should be copied.
-
     Returns:
         deque(Thread). A deque that contains all copy tasks queued
             to be processed.
@@ -184,11 +180,9 @@ def _generate_copy_tasks_for_fonts(source_paths, target_path):
 
 def _insert_hash(filepath, file_hash):
     """Inserts hash into filepath before the file extension.
-
     Args:
         filepath: str. Path where the hash should be inserted.
         file_hash: str. Hash to be inserted into the path.
-
     Returns:
         str. Filepath with hash inserted.
     """
@@ -198,7 +192,6 @@ def _insert_hash(filepath, file_hash):
 
 def ensure_directory_exists(filepath):
     """Ensures if directory tree exists, if not creates the directories.
-
     Args:
         filepath: str. Path to file located in directory that we want to
             ensure exists.
@@ -211,7 +204,6 @@ def ensure_directory_exists(filepath):
 def safe_delete_directory_tree(directory_path):
     """Recursively delete a directory tree. If directory tree does not exist,
     create the directories first then delete the directory tree.
-
     Args:
         directory_path: str. Directory path to be deleted.
     """
@@ -221,10 +213,8 @@ def safe_delete_directory_tree(directory_path):
 
 def _ensure_files_exist(filepaths):
     """Ensures that files exist at the given filepaths.
-
     Args:
         filepaths: list(str). Paths to files that we want to ensure exist.
-
     Raises:
         OSError: One or more of the files does not exist.
     """
@@ -237,7 +227,6 @@ def safe_copy_file(source_filepath, target_filepath):
     """Copy a file (no metadata) after ensuring the file exists at the given
     source filepath.
     NOTE: shutil.copyfile does not accept directory path as arguments.
-
     Args:
         source_filepath: str. Path to source file that we want to copy from.
         target_filepath: str. Path to target file that we want to copy to.
@@ -248,7 +237,6 @@ def safe_copy_file(source_filepath, target_filepath):
 
 def safe_delete_file(filepath):
     """Delete a file after ensuring the provided file actually exists.
-
     Args:
         filepath: str. Filepath to be deleted.
     """
@@ -260,10 +248,8 @@ def get_file_count(directory_path):
     """Count total number of file in the given directory, ignoring any files
     with extensions in FILE_EXTENSIONS_TO_IGNORE or files that should not be
     built.
-
     Args:
         directory_path: str. Directory to be walked.
-
     Returns:
         int. Total number of files minus ignored files.
     """
@@ -282,11 +268,9 @@ def _compare_file_count(
         first_dir_list, second_dir_list):
     """Ensure that the total count of files in all directories in the first
     list matches the count of files in all the directories in the second list.
-
     Args:
        first_dir_list: list(str). List of directories to compare.
        second_dir_list: list(str). List of directories to compare.
-
     Raises:
         ValueError: The source directory list does not have the same file
             count as the target directory list.
@@ -307,7 +291,6 @@ def _compare_file_count(
 def process_html(source_file_stream, target_file_stream, file_hashes):
     """Remove whitespaces and add hashes to filepaths in the HTML file stream
     object.
-
     Args:
         source_file_stream: file. The stream object of the HTML file to be
             read from.
@@ -345,11 +328,9 @@ def process_html(source_file_stream, target_file_stream, file_hashes):
 
 def get_dependency_directory(dependency):
     """Get dependency directory from dependecy dictionary.
-
     Args:
         dependency: dict(str, str). Dictionary representing single dependency
             from manifest.json.
-
     Returns:
         str. Dependency directory.
     """
@@ -362,7 +343,6 @@ def get_dependency_directory(dependency):
 
 def get_css_filepaths(dependency_bundle, dependency_dir):
     """Gets dependency css filepaths.
-
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
             - 'js': List of paths to js files that need to be copied.
@@ -371,7 +351,6 @@ def get_css_filepaths(dependency_bundle, dependency_dir):
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
-
     Returns:
         list(str). List of paths to css files that need to be copied.
     """
@@ -381,7 +360,6 @@ def get_css_filepaths(dependency_bundle, dependency_dir):
 
 def get_js_filepaths(dependency_bundle, dependency_dir):
     """Gets dependency js filepaths.
-
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
             - 'js': List of paths to js files that need to be copied.
@@ -390,7 +368,6 @@ def get_js_filepaths(dependency_bundle, dependency_dir):
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
-
     Returns:
         list(str). List of paths to js files that need to be copied.
     """
@@ -400,7 +377,6 @@ def get_js_filepaths(dependency_bundle, dependency_dir):
 
 def get_font_filepaths(dependency_bundle, dependency_dir):
     """Gets dependency font filepaths.
-
     Args:
         dependency_bundle: dict(str, list(str) | str). The dict has three keys:
             - 'js': List of paths to js files that need to be copied.
@@ -409,7 +385,6 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
                 copied.
         dependency_dir: str. Path to directory where the files that need to
             be copied are located.
-
     Returns:
         list(str). List of paths to font files that need to be copied.
     """
@@ -432,7 +407,6 @@ def get_font_filepaths(dependency_bundle, dependency_dir):
 def get_dependencies_filepaths():
     """Extracts dependencies filepaths from manifest.json file into
     a dictionary.
-
     Returns:
         dict(str, list(str)). A dict mapping file types to lists of filepaths.
             The dict has three keys: 'js', 'css' and 'fonts'. Each of the
@@ -499,6 +473,8 @@ def build_third_party_libs(third_party_directory_path):
         third_party_directory_path, THIRD_PARTY_CSS_RELATIVE_FILEPATH)
     FONTS_DIR = os.path.join(
         third_party_directory_path, FONTS_RELATIVE_DIRECTORY_PATH)
+    WEBFONTS_DIR = os.path.join(
+        third_party_directory_path, WEBFONTS_RELATIVE_DIRECTORY_PATH)
 
     dependency_filepaths = get_dependencies_filepaths()
     ensure_directory_exists(THIRD_PARTY_JS_FILEPATH)
@@ -514,12 +490,16 @@ def build_third_party_libs(third_party_directory_path):
         _generate_copy_tasks_for_fonts(
             dependency_filepaths['fonts'], FONTS_DIR))
 
+    ensure_directory_exists(WEBFONTS_DIR)
+    _execute_tasks(
+        _generate_copy_tasks_for_fonts(
+            dependency_filepaths['fonts'], WEBFONTS_DIR))
+
 
 def build_using_webpack():
     """Execute webpack build process. This takes all TypeScript files we have in
     /templates/dev/head and generates JS bundles according the require() imports
     and also compiles HTML pages into the /templates/dev/head/dist folder.
-
     The settings for this are specified in webpack.prod.config.ts.
     """
 
@@ -533,10 +513,8 @@ def build_using_webpack():
 def hash_should_be_inserted(filepath):
     """Returns if the file should be renamed to include hash in
     the path.
-
     Args:
         filepath: str. Path relative to directory we are currently building.
-
     Returns:
         bool. True if filepath should contain hash else False.
     """
@@ -554,10 +532,8 @@ def should_file_be_built(filepath):
         - TS files: Returns False.
         - Other files: Returns False if filepath matches with pattern in
         GENERAL_FILENAMES_TO_IGNORE, else returns True.
-
     Args:
         filepath: str. Path relative to file we are currently building.
-
     Returns:
         bool. True if filepath should be built, else False.
     """
@@ -578,7 +554,6 @@ def generate_copy_tasks_to_copy_from_source_to_target(
     """Generate copy task for each file in source directory, excluding files
     with extensions in FILE_EXTENSIONS_TO_IGNORE. Insert hash from hash dict
     into the destination filename.
-
     Args:
         source: str. Path relative to /oppia directory of directory
             containing files and directories to be copied.
@@ -586,7 +561,6 @@ def generate_copy_tasks_to_copy_from_source_to_target(
             to copy the files and directories.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
-
     Returns:
         deque(Thread). A deque that contains all copy tasks queued
             to be processed.
@@ -619,10 +593,8 @@ def generate_copy_tasks_to_copy_from_source_to_target(
 
 def is_file_hash_provided_to_frontend(filepath):
     """Returns if the hash for the filepath should be provided to the frontend.
-
     Args:
         filepath: str. Relative path to the file.
-
     Returns:
         bool. True if file hash should be provided to the frontend else False.
     """
@@ -632,10 +604,8 @@ def is_file_hash_provided_to_frontend(filepath):
 
 def generate_md5_hash(filepath):
     """Returns md5 hash of file.
-
     Args:
         filepath: str. Absolute path to the file.
-
     Returns:
         str. Hexadecimal hash of specified file.
     """
@@ -652,11 +622,9 @@ def generate_md5_hash(filepath):
 def get_filepaths_by_extensions(source_dir, file_extensions):
     """Return list of filepaths in a directory with certain extensions,
     excluding filepaths that should not be built.
-
     Args:
         source_dir: str. Root directory to be walked.
         file_extensions: tuple(str). Tuple of file extensions.
-
     Returns:
         list(str). List of filepaths with specified extensions.
     """
@@ -674,10 +642,8 @@ def get_filepaths_by_extensions(source_dir, file_extensions):
 def get_file_hashes(directory_path):
     """Returns hashes of all files in directory tree, excluding files with
     extensions in FILE_EXTENSIONS_TO_IGNORE or files that should not be built.
-
     Args:
         directory_path: str. Root directory of the tree.
-
     Returns:
         dict(str, str). Dictionary with keys specifying file paths and values
             specifying file hashes.
@@ -705,11 +671,9 @@ def get_file_hashes(directory_path):
 def filter_hashes(file_hashes):
     """Filters hashes that should be provided to the frontend
     and prefixes "/" in front of the keys.
-
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
-
     Returns:
         dict(str, str). Filtered dictionary of only filepaths that should be
             provided to the frontend.
@@ -723,11 +687,9 @@ def filter_hashes(file_hashes):
 
 def get_hashes_json_file_contents(file_hashes):
     """Return JS code that loads hashes needed for frontend into variable.
-
     Args:
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
-
     Returns:
         str. JS code loading hashes as JSON into variable.
     """
@@ -764,7 +726,6 @@ def minify_func(source_path, target_path, file_hashes, filename):
 
 def _execute_tasks(tasks, batch_size=24):
     """Starts all tasks and checks the results.
-
     Runs no more than 'batch_size' tasks at a time.
     """
     remaining_tasks = collections.deque(tasks)
@@ -788,7 +749,6 @@ def generate_build_tasks_to_build_all_files_in_directory(
         source, target, file_hashes):
     """This function queues up tasks to build all files in a directory,
     excluding files that should not be built.
-
     Args:
         source: str.  Path relative to /oppia of directory containing source
             files and directories to be built.
@@ -796,7 +756,6 @@ def generate_build_tasks_to_build_all_files_in_directory(
             and directories will be saved to.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
-
     Returns:
         deque(Thread). A deque that contains all build tasks queued
             to be processed.
@@ -824,7 +783,6 @@ def generate_build_tasks_to_build_files_from_filepaths(
         source_path, target_path, filepaths, file_hashes):
     """This function queues up build tasks to build files from a list of
     filepaths, excluding files that should not be built.
-
     Args:
         source_path: str. Path relative to /oppia directory of directory
             containing files and directories to be copied.
@@ -833,7 +791,6 @@ def generate_build_tasks_to_build_files_from_filepaths(
         filepaths: list(str). List of filepaths to be built.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
-
     Returns:
         deque(Thread). A deque that contains all build tasks queued
             to be processed.
@@ -858,13 +815,11 @@ def generate_delete_tasks_to_remove_deleted_files(
     remove files that are not in the hash dict i.e. remaining files in staging
     directory that have since been deleted from source directory. Files with
     extensions in FILE_EXTENSIONS_TO_IGNORE will be excluded.
-
     Args:
         source_dir_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
         staging_directory: str. Path relative to /oppia directory of directory
             containing files and directories to be walked.
-
     Returns:
         deque(Thread). A deque that contains all delete tasks
             queued to be processed.
@@ -894,12 +849,10 @@ def get_recently_changed_filenames(source_dir_hashes, out_dir):
     """Compare hashes of source files and built files. Return a list of
     filenames that were recently changed. Skips files that are not supposed to
     built or already built.
-
     Args:
         source_dir_hashes: dict(str, str). Dictionary of hashes of files
             to be built.
         out_dir: str. Path relative to /oppia where built files are located.
-
     Returns:
         list(str). List of filenames expected to be re-hashed.
     """
@@ -930,7 +883,6 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
     """This function queues up build tasks to build all files in source
     directory if there is no existing staging directory. Otherwise, selectively
     queue up build tasks to build recently changed files.
-
     Args:
         dirnames_dict: dict(str, str). This dict should contain three keys,
             with corresponding values as follows:
@@ -943,7 +895,6 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
                 inserted into filenames.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
-
     Returns:
         deque(Thread). A deque that contains all build tasks queued
             to be processed.
@@ -1016,12 +967,10 @@ def generate_build_tasks_to_build_directory(dirnames_dict, file_hashes):
 def _verify_filepath_hash(relative_filepath, file_hashes):
     """Ensure that hashes in filepaths match with the hash entries in hash
     dict.
-
     Args:
         relative_filepath: str. Filepath that is relative from /build.
         file_hashes: dict(str, str). Dictionary with filepaths as keys and
             hashes of file content as values.
-
     Raises:
         ValueError: The hash dict is empty.
         ValueError: Filepath has less than 2 partitions after splitting by '.'
@@ -1054,7 +1003,6 @@ def _verify_hashes(output_dirnames, file_hashes):
         1) The hashes in filenames belongs to the hash dict.
         2) hashes.js, third_party.min.css and third_party.min.js are built and
         hashes are inserted.
-
     Args:
         output_dirnames: list(str). List of directory paths that contain
             built files.
@@ -1184,7 +1132,6 @@ def generate_build_directory():
 def compile_typescript_files(project_dir):
     """Compiles typescript files to produce javascript files in
     local_compiled_js folder.
-
     Args:
         project_dir: str. The project directory which contains the ts files
             to be compiled.
@@ -1197,7 +1144,6 @@ def compile_typescript_files(project_dir):
 def compile_typescript_files_continuously(project_dir):
     """Compiles typescript files continuously i.e enable a watcher which
     monitors any changes in js files and recompiles them to ts files.
-
     Args:
         project_dir: str. The project directory which contains the ts files
             to be compiled.
@@ -1231,7 +1177,6 @@ def compile_typescript_files_continuously(project_dir):
 
 def build():
     """The main method of this script.
-
     Creates a third-party directory where all the JS and CSS dependencies are
     built and stored. Depending on the options passed to the script, might also
     minify third-party libraries and/or generate a build directory.
