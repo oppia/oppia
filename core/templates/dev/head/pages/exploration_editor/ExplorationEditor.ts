@@ -156,6 +156,7 @@ require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
 require('services/ExplorationFeaturesService.ts');
+require('services/PageTitleService.ts');
 require('services/PlaythroughIssuesService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
@@ -194,6 +195,7 @@ oppia.controller('ExplorationEditor', [
   'ExplorationParamSpecsService', 'ExplorationRightsService',
   'ExplorationStatesService', 'ExplorationTagsService',
   'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
+  'PageTitleService',
   'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
   'StateClassifierMappingService', 'StateEditorService',
@@ -212,6 +214,7 @@ oppia.controller('ExplorationEditor', [
       ExplorationParamSpecsService, ExplorationRightsService,
       ExplorationStatesService, ExplorationTagsService,
       ExplorationTitleService, ExplorationWarningsService, GraphDataService,
+      PageTitleService,
       ParamChangesObjectFactory, ParamSpecsObjectFactory,
       PlaythroughIssuesService, RouterService, SiteAnalyticsService,
       StateClassifierMappingService, StateEditorService,
@@ -232,6 +235,18 @@ oppia.controller('ExplorationEditor', [
       '/createhandler/download/' + $scope.explorationId);
     $scope.revertExplorationUrl = (
       '/createhandler/revert/' + $scope.explorationId);
+
+    var setPageTitle = function() {
+      if (ExplorationTitleService.savedMemento) {
+        PageTitleService.setPageTitle(
+          ExplorationTitleService.savedMemento + ' - Oppia Editor');
+      } else {
+        PageTitleService.setPageTitle(
+          'Untitled Exploration - Oppia Editor');
+      }
+    };
+
+    $scope.$on('explorationPropertyChanged', setPageTitle);
 
     $scope.getActiveTabName = RouterService.getActiveTabName;
 

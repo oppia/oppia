@@ -102,7 +102,7 @@ class ExplorationPage(EditorHandler):
                 iframe_restriction=None)
             return
 
-        (exploration, exploration_rights) = (
+        (_, exploration_rights) = (
             exp_services.get_exploration_and_exploration_rights_by_id(
                 exploration_id))
 
@@ -151,7 +151,6 @@ class ExplorationPage(EditorHandler):
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
-            'title': exploration.title,
             'visualizations_html': jinja2.utils.Markup(visualizations_html),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
