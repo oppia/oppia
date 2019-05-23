@@ -301,6 +301,10 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
 
+            # Check that __init__.py file exists.
+            init_file = os.path.join(interaction_dir, '__init__.py')
+            self.assertTrue(os.path.isfile(init_file))
+
             # Check that the directives subdirectory exists.
             directives_dir = os.path.join(
                 interaction_dir, 'directives')

@@ -72,6 +72,8 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params=params)
         user_query_jobs_one_off.UserQueryOneOffJob.register_start(job_id)
+
+        # This swap is required so that query failure email can be sent.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             user_query_jobs_one_off.UserQueryOneOffJob.register_failure(
                 job_id, 'error')

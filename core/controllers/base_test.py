@@ -17,7 +17,6 @@
 """Tests for generic controller behavior."""
 
 import datetime
-import importlib
 import inspect
 import json
 import os
@@ -711,51 +710,6 @@ class ControllerClassNameTests(test_utils.GenericTestBase):
                                         msg=error_message)
 
         self.assertGreater(num_handlers_checked, 150)
-
-
-class ValueGeneratorNameTests(test_utils.GenericTestBase):
-
-    def _get_all_python_files(self):
-        """Recursively collects all Python files in the core/ and extensions/
-        directory.
-
-        Returns:
-            a list of Python files.
-        """
-        current_dir = os.getcwd()
-        files_in_directory = []
-        for _dir, _, files in os.walk(current_dir):
-            for file_name in files:
-                filepath = os.path.relpath(
-                    os.path.join(_dir, file_name), current_dir)
-                if filepath.endswith('.py') and (
-                        filepath.startswith('core/') or (
-                            filepath.startswith('extensions/'))):
-                    module = filepath[:-3].replace('/', '.')
-                    files_in_directory.append(module)
-        return files_in_directory
-
-    def test_value_generator_names(self):
-        """This function checks for duplicate value generators."""
-
-        error_message = 'Duplicate value generator found: %s'
-        all_python_files = self._get_all_python_files()
-        all_value_generators = []
-
-        for file_name in all_python_files:
-            python_module = importlib.import_module(file_name)
-            for name, clazz in inspect.getmembers(
-                    python_module, predicate=inspect.isclass):
-                all_base_classes = [base_class.__name__ for base_class in
-                                    (inspect.getmro(clazz))]
-                # Check that it is a subclass of 'BaseValueGenerator'.
-                if 'BaseValueGenerator' in all_base_classes:
-                    all_value_generators.append(name)
-
-        for value_generator in all_value_generators:
-            self.assertEqual(
-                all_value_generators.count(value_generator), 1,
-                msg=(error_message % value_generator))
 
 
 class SignUpTests(test_utils.GenericTestBase):

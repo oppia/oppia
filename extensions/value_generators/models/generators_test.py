@@ -32,8 +32,7 @@ class ValueGeneratorUnitTests(test_utils.GenericTestBase):
             {}, **{'value': '{{a}}', 'parse_with_jinja': False}), '{{a}}')
         self.assertEqual(generator.generate_value(
             {'a': 'b'}, **{'value': '{{a}}', 'parse_with_jinja': True}), 'b')
-        self.assertTrue(generator.get_html_template().startswith(
-            '<span style='))
+        self.assertIn('<object-editor obj-type=', generator.get_html_template())
         self.assertTrue(generator.get_js_template().startswith(
             '// Copyright 2014 The Oppia Authors. All Rights Reserved.'))
 
