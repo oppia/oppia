@@ -27,7 +27,6 @@ from core.domain import search_services
 from core.domain import summary_services
 from core.platform import models
 import feconf
-import utils
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -78,32 +77,14 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def _require_valid_version(self, version_from_payload, collection_version):
-        """Check that the payload version matches the given collection
-        version.
-        """
-        if version_from_payload is None:
-            raise base.BaseHandler.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
-
-        if version_from_payload != collection_version:
-            raise base.BaseHandler.InvalidInputException(
-                'Trying to update version %s of collection from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (collection_version, version_from_payload))
-
     @acl_decorators.can_edit_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
 
-        try:
-            # Try to retrieve collection.
-            collection_dict = (
-                summary_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user,
-                    allow_invalid_explorations=True))
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        collection_dict = (
+            summary_services.get_learner_collection_dict_by_id(
+                collection_id, self.user,
+                allow_invalid_explorations=True))
 
         self.values.update({
             'collection': collection_dict
@@ -117,16 +98,13 @@ class EditableCollectionDataHandler(CollectionEditorHandler):
 
         collection = collection_services.get_collection_by_id(collection_id)
         version = self.payload.get('version')
-        self._require_valid_version(version, collection.version)
+        _require_valid_version(version, collection.version)
 
         commit_message = self.payload.get('commit_message')
         change_list = self.payload.get('change_list')
 
-        try:
-            collection_services.update_collection(
-                self.user_id, collection_id, change_list, commit_message)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        collection_services.update_collection(
+            self.user_id, collection_id, change_list, commit_message)
 
         collection_dict = (
             summary_services.get_learner_collection_dict_by_id(
@@ -180,12 +158,9 @@ class CollectionPublishHandler(base.BaseHandler):
         version = self.payload.get('version')
         _require_valid_version(version, collection.version)
 
-        try:
-            collection.validate(strict=True)
-            collection_services.validate_exps_in_collection_are_public(
-                collection)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+        collection.validate(strict=True)
+        collection_services.validate_exps_in_collection_are_public(
+            collection)
 
         collection_services.publish_collection_and_update_user_profiles(
             self.user, collection_id)
