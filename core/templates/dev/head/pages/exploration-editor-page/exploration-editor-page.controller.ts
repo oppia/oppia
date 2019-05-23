@@ -208,8 +208,8 @@ require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
-require('pages/exploration-player-page/ConversationSkinDirective.ts');
-require('pages/exploration-player-page/ExplorationFooterDirective.ts');
+require('pages/exploration-player-page/conversation-skin/conversation-skin.directive.ts');
+require('pages/exploration-player-page/exploration-footer/exploration-footer.directive.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
