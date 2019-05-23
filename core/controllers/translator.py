@@ -131,7 +131,7 @@ class AudioUploadHandler(base.BaseHandler):
         # in production.
         file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            'exploration/%s' % exploration_id))
+            'exploration', exploration_id))
         fs.commit(
             self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)

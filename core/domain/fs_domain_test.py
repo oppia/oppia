@@ -37,7 +37,7 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration/eid'))
+            fs_domain.EntityFileSystem('exploration', 'eid'))
 
     def test_get_and_save(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
@@ -111,7 +111,7 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.listdir('fake_dir'), [])
 
         new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration/eid2'))
+            fs_domain.EntityFileSystem('exploration', 'eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_versioning(self):
@@ -139,41 +139,9 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
         fs2 = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('eid2'))
+            fs_domain.EntityFileSystem('eid2', None))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             fs2.get('abc.png')
-
-
-class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
-    """Tests for the disk-backed file system."""
-
-    def setUp(self):
-        super(DiskBackedFileSystemUnitTests, self).setUp()
-        self.user_email = 'abc@example.com'
-        self.user_id = self.get_user_id_from_email(self.user_email)
-        self.fs = fs_domain.AbstractFileSystem(fs_domain.DiskBackedFileSystem(
-            feconf.TESTS_DATA_DIR))
-
-    def test_get(self):
-        self.assertTrue(self.fs.get('img.png'))
-        with self.assertRaisesRegexp(IOError, 'No such file or directory'):
-            self.fs.get('non_existent_file.png')
-
-    def test_commit(self):
-        with self.assertRaises(NotImplementedError):
-            self.fs.commit(self.user_id, 'abc.png', 'file_contents')
-
-    def test_isfile(self):
-        self.assertTrue(self.fs.isfile('img.png'))
-        self.assertFalse(self.fs.isfile('fake.png'))
-
-    def test_delete(self):
-        with self.assertRaises(NotImplementedError):
-            self.fs.delete(self.user_id, 'img.png')
-
-    def test_listdir(self):
-        with self.assertRaises(NotImplementedError):
-            self.fs.listdir('')
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
@@ -184,7 +152,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem('exploration/eid'))
+            fs_domain.GcsFileSystem('exploration', 'eid'))
 
     def test_get_and_save(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -246,7 +214,7 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.fs.listdir('fake_dir'), [])
 
             new_fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/eid2'))
+                fs_domain.GcsFileSystem('exploration', 'eid2'))
             self.assertEqual(new_fs.listdir('assets'), [])
 
 
@@ -260,7 +228,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration/eid'))
+            fs_domain.EntityFileSystem('exploration', 'eid'))
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']

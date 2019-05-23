@@ -572,7 +572,7 @@ class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
         if not constants.DEV_MODE:
             exp_id = exp_model.id
             fs_old = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
+                fs_domain.GcsFileSystem(exp_id, None))
             # We have to make sure we pass the dir name without starting or
             # ending with '/'.
             image_urls = fs_old.listdir('image')
@@ -617,9 +617,9 @@ class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if not constants.DEV_MODE:
             exp_id = exp_model.id
             fs_internal = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
+                fs_domain.GcsFileSystem(exp_id, None))
             fs_external = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/' + exp_id))
+                fs_domain.GcsFileSystem('exploration', exp_id))
             # We have to make sure we pass the dir name without starting or
             # ending with '/'.
             image_urls_internal = fs_internal.listdir('image')
@@ -684,7 +684,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
         if not constants.DEV_MODE:
             exp_id = exp_model.id
             fs_old = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
+                fs_domain.GcsFileSystem(exp_id, None))
             # We have to make sure we pass the dir name without starting or
             # ending with '/'.
             image_urls = fs_old.listdir('image')
@@ -735,7 +735,7 @@ class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
                 filetype = audio_filename[audio_filename.rfind('.') + 1:]
                 raw_data = fs_old.get('audio/%s' % audio_filename)
                 fs = fs_domain.AbstractFileSystem(
-                    fs_domain.GcsFileSystem('exploration/%s' % exp_id))
+                    fs_domain.GcsFileSystem('exploration', exp_id))
                 fs.commit(
                     'Admin', 'audio/%s' % audio_filename,
                     raw_data, mimetype='audio/%s' % filetype)

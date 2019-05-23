@@ -63,7 +63,7 @@ def mock_save_original_and_compressed_versions_of_image(
     micro_image_filepath = 'image/%s' % micro_image_filename
 
     fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
-        'exploration/%s' % exp_id))
+        'exploration', exp_id))
 
     if not fs.isfile(filepath.encode('utf-8')):
         fs.commit(
@@ -1966,7 +1966,7 @@ class VerifyAllUrlsMatchGcsIdRegexJobTests(test_utils.GenericTestBase):
                 self.VALID_EXP_ID, title='title', category='category')
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(self.VALID_EXP_ID))
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID, None))
 
             with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
                 raw_image = f.read()
@@ -2053,7 +2053,7 @@ class CopyToNewDirectoryJobTests(test_utils.GenericTestBase):
                 self.VALID_EXP_ID, title='title', category='category')
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(self.VALID_EXP_ID))
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID, None))
 
             with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
                 raw_image = f.read()
@@ -2120,9 +2120,9 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
                 self.VALID_EXP_ID_2, title='title', category='category')
 
             fs_internal = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(self.VALID_EXP_ID_1))
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID_1, None))
             fs_external = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID_1))
+                fs_domain.GcsFileSystem('exploration', self.VALID_EXP_ID_1))
 
             with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
                 raw_image = f.read()
@@ -2182,9 +2182,9 @@ class ImagesAuditJobTests(test_utils.GenericTestBase):
             )
 
             fs_internal = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(self.VALID_EXP_ID_2))
+                fs_domain.GcsFileSystem(self.VALID_EXP_ID_2, None))
             fs_external = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/' + self.VALID_EXP_ID_2))
+                fs_domain.GcsFileSystem('exploration', self.VALID_EXP_ID_2))
 
             with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
                 raw_image = f.read()

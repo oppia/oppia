@@ -17,7 +17,6 @@
 """Domain objects representing a file system and a file stream."""
 
 import logging
-import os
 
 from core.platform import models
 import feconf
@@ -111,35 +110,39 @@ class FileStreamWithMetadata(object):
 class EntityFileSystem(object):
     """A datastore-backed read-write file system for a single entity.
 
-    The conceptual intention is for each entity to have its own asset
-    folder. An asset has no meaning outside its entity, so the assets in
-    these asset folders should therefore not be edited directly. They should
-    only be modified as side-effects of some other operation (such as adding an
-    image to an entity like topics, stories or explorations).
-
-    The content of an entity should include a reference to the asset
-    together with the version number of the asset. This allows the
-    entity to refer to asset versions.
+    The conceptual intention is for each entity type to have its own parent
+    folder. In this, each individual object will have its own folder with the
+    corresponding ID as the folder name. These folders will then have the assets
+    folder inside which stores images, audio etc (example path:
+    story/story_id/assets/).An asset has no meaning outside its entity, so the
+    assets in these asset folders should therefore not be edited directly. They
+    should only be modified as side-effects of some other operation (such as
+    adding an image to an entity like topics, stories or explorations).
 
     In general, assets should be retrieved only within the context of the
     entity that contains them, and should not be retrieved outside this
     context.
 
     Args:
-        assets_path: str. The path to the assets folder of the corresponding
-            entity. It is of the form {{entity}}/{{entity_id}}
-            (eg: exploration/{{exp_id}})
+        entity_name: str. The name of the entity (eg: exploration, topic etc).
+        entity_id: str. The ID of the corresponding entity.
     """
 
     _DEFAULT_VERSION_NUMBER = 1
 
-    def __init__(self, assets_path):
+    def __init__(self, entity_name, entity_id):
         """Constructs a EntityFileSystem object.
 
         Args:
-            assets_path: str. The path to the parent directory for all assets.
+        entity_name: str. The name of the entity (eg: exploration, topic etc).
+        entity_id: str or None. The ID of the corresponding entity. None is to
+            accommodate tests in some files and some older exp jobs where a
+            single exp_id is used to initialize class.
         """
-        self._assets_path = assets_path
+        if entity_id is None:
+            self._assets_path = entity_name
+        else:
+            self._assets_path = entity_name + '/' + entity_id
 
     @property
     def assets_path(self):
@@ -156,7 +159,8 @@ class EntityFileSystem(object):
         Returns None if the file does not exist.
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             version: int. The version number of the file whose metadata is to be
                 returned.
 
@@ -178,7 +182,8 @@ class EntityFileSystem(object):
         Returns None if the file does not exist.
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             version: int. The version number of the file to be returned.
 
         Returns:
@@ -199,7 +204,8 @@ class EntityFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             raw_bytes: str. The content to be stored in file.
 
         Raises:
@@ -233,7 +239,8 @@ class EntityFileSystem(object):
         signature matches that of other file systems.
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             version: int or None. The version number of the file. None indicates
                 the latest version of the file.
             mode: str. Unused argument.
@@ -263,7 +270,8 @@ class EntityFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             raw_bytes: str. The content to be stored in the file.
             unused_mimetype: str. Unused argument.
         """
@@ -275,7 +283,8 @@ class EntityFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
         """
 
         metadata = self._get_file_metadata(filepath, None)
@@ -290,7 +299,8 @@ class EntityFileSystem(object):
         """Checks the existence of a file.
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
 
         Returns:
             bool. Whether the file exists.
@@ -322,110 +332,9 @@ class EntityFileSystem(object):
         for metadata_model in metadata_models:
             filepath = metadata_model.id
             if filepath.startswith(prefix):
-                # Because the path is /entity/entity_id/assets/abc.png.
+                # Because the path is /<entity>/<entity_id>/assets/abc.png.
                 result.add('/'.join(filepath.split('/')[4:]))
         return sorted(list(result))
-
-
-class DiskBackedFileSystem(object):
-    """Implementation for a disk-backed file system.
-
-    This implementation ignores versioning and is used only by tests.
-
-    Attributes:
-        root: str. The path to append to the oppia/ directory.
-        assets_path: str. The path to the assets folder. It is of the form
-            {{entity}}/{{entity_id}} (eg: exploration/{{exp_id}})
-    """
-
-    def __init__(self, root):
-        """Constructor for this class.
-
-        Args:
-            root: str. The path to append to the oppia/ directory.
-        """
-        self._root = os.path.join(os.getcwd(), root)
-        self._assets_path = 'test'
-
-    @property
-    def assets_path(self):
-        """Returns the path to the assets folder.
-
-        Returns:
-            str. The path.
-        """
-        return self._assets_path
-
-    def isfile(self, filepath):
-        """Checks if a file exists.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity.
-
-        Returns:
-            bool. Whether the file exists.
-        """
-        return os.path.isfile(os.path.join(self._root, filepath))
-
-    def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
-        """Returns a bytestring with the file content, but no metadata.
-
-        Args:
-            filepath: str. The path to the relevant file within the entity.
-            version: int or None. The version number of the file. None indicates
-                the latest version of the file.
-            mode: str. The mode with which to open the file.
-
-        Returns:
-            FileStreamWithMetadata. A FileStreamWithMetadata domain object that
-                contains only the content of the file, but no metadata.
-        """
-        content = utils.get_file_contents(
-            os.path.join(self._root, filepath), raw_bytes=True, mode=mode)
-        return FileStreamWithMetadata(content, None, None)
-
-    def commit(self, user_id, filepath, raw_bytes, mimetype):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
-
-        Args:
-            user_id: str. The id of the user.
-            filepath: str. The path to the relevant file within the entity.
-            raw_bytes: str. The content to be stored in the file.
-            mimetype: str. The content-type of the file.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
-
-    def delete(self, user_id, filepath):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
-
-        Args:
-            user_id: str. The id of the user.
-            filepath: str. The path to the relevant file within the entity.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
-
-    def listdir(self, dir_name):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
-
-        Args:
-            dir_name: str. The name of the directory.
-
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
-        """
-        raise NotImplementedError
 
 
 class GcsFileSystem(object):
@@ -434,19 +343,24 @@ class GcsFileSystem(object):
     This implementation ignores versioning.
 
     Attributes:
-        assets_path: str. The path to the assets folder for the corresponding
-            entity. It is of the form {{entity}}/{{entity_id}}
-            (eg: exploration/{{exp_id}})
+        entity_name: str. The name of the entity (eg: exploration, topic etc).
+        entity_id: str. The ID of the corresponding entity.
     """
 
-    def __init__(self, assets_path):
+    def __init__(self, entity_name, entity_id):
         """Constructs a GcsFileSystem object.
 
         Args:
-            assets_path: str. The path to the assets folder for the
-                corresponding entity.
+            entity_name: str. The name of the entity
+                (eg: exploration, topic etc).
+            entity_id: str or None. The ID of the corresponding entity. None is
+                to accommodate tests in some files and some older exp jobs where
+                a single exp_id is used to initialize class.
         """
-        self._assets_path = assets_path
+        if entity_id is None:
+            self._assets_path = entity_name
+        else:
+            self._assets_path = entity_name + '/' + entity_id
 
     @property
     def assets_path(self):
@@ -461,7 +375,8 @@ class GcsFileSystem(object):
         """Checks if the file with the given filepath exists in the GCS.
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
 
         Returns:
             bool. Whether the file exists in GCS.
@@ -488,7 +403,8 @@ class GcsFileSystem(object):
         signature matches that of other file systems.
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             version: str. Unused argument.
             mode: str. Unused argument.
 
@@ -511,7 +427,8 @@ class GcsFileSystem(object):
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
         """Args:
             unused_user_id: str. Unused argument.
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the cloud file.
         """
@@ -536,7 +453,8 @@ class GcsFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         gcs_file_url = (
@@ -601,7 +519,8 @@ class AbstractFileSystem(object):
         """Raises an error if a filepath is invalid.
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
 
         Raises:
             IOError: Invalid filepath.
@@ -619,7 +538,8 @@ class AbstractFileSystem(object):
         """Checks if a file exists. Similar to os.path.isfile(...).
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
 
         Returns:
             bool. Whether the file exists.
@@ -631,7 +551,8 @@ class AbstractFileSystem(object):
         """Returns a stream with the file content. Similar to open(...).
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             version: int or None. The version number of the file. None indicates
                 the latest version of the file.
             mode: str. The mode with which to open the file.
@@ -646,7 +567,8 @@ class AbstractFileSystem(object):
         """Returns a bytestring with the file content, but no metadata.
 
         Args:
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             version: int or None. The version number of the file. None indicates
                 the latest version of the file.
             mode: str. The mode with which to open the file.
@@ -671,7 +593,8 @@ class AbstractFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
             raw_bytes: str. The content to be stored in the file.
             mimetype: str. The content-type of the file.
         """
@@ -685,7 +608,8 @@ class AbstractFileSystem(object):
         Args:
             user_id: str. The user_id of the user who wants to create or update
                 a file.
-            filepath: str. The path to the relevant file within the entity.
+            filepath: str. The path to the relevant file within the entity's
+                assets folder.
         """
         self._check_filepath(filepath)
         self._impl.delete(user_id, filepath)
