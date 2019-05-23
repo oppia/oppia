@@ -210,12 +210,19 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         # viewer is changed to 'de' to test if the preference returned is user's
         # preference.
         self.login(self.VIEWER_EMAIL)
-        response = self.get_html_response('/preferences')
+        # Check if the language preference is default.
+        response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertDictContainsSubset({
+            'activity_summary_dicts_by_category': [],
+            'preferred_language_codes': ['en'],
+        }, response_dict)
+
+        response = self.get_html_response(feconf.PREFERENCES_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Change the user's preferred language to de.
         self.put_json(
-            '/preferenceshandler/data',
+            feconf.PREFERENCES_DATA_URL,
             {'update_type': 'preferred_language_codes', 'data': ['de']},
             csrf_token=csrf_token)
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
@@ -224,7 +231,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['de'],
         }, response_dict)
 
-    def test_library_index_handler_for_top_rated(self):
+    def test_library_index_handler_update_top_rated_activity_summary_dict(self):
         """Test the handler for top rated explorations."""
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
@@ -236,6 +243,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
         rating_services.assign_rating_to_exploration('user', '0', 2)
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+
         self.assertEqual(
             len(response_dict['activity_summary_dicts_by_category']), 1)
         self.assertDictContainsSubset({
@@ -251,6 +259,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
             'protractor_id': 'top-rated',
         }, activity_summary_dicts_by_category)
+
         activity_summary_dicts = (
             activity_summary_dicts_by_category['activity_summary_dicts'])
         self.assertEqual(
@@ -264,7 +273,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, activity_summary_dicts[0])
 
-    def test_library_index_handler_for_featured(self):
+    def test_library_index_handler_updates_featured_activity_summary_dict(self):
         """Test the handler for featured explorations."""
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
         self.assertDictContainsSubset({
@@ -279,6 +288,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         activity_services.update_featured_activity_references([exploration_ref])
 
         response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+
         self.assertEqual(
             len(response_dict['activity_summary_dicts_by_category']), 1)
         self.assertDictContainsSubset({
@@ -286,6 +296,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
         }, response_dict)
         activity_summary_dicts_by_category = (
             response_dict['activity_summary_dicts_by_category'][0])
+
         self.assertDictContainsSubset({
             'categories': [],
             'header_i18n_id': (
@@ -293,8 +304,10 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'has_full_results_page': False,
             'full_results_url': None,
         }, activity_summary_dicts_by_category)
+
         activity_summary_dicts = (
             activity_summary_dicts_by_category['activity_summary_dicts'])
+
         self.assertEqual(
             len(activity_summary_dicts), 1)
         self.assertDictContainsSubset({
@@ -326,12 +339,21 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
         # viewer is changed to 'de' to test if the preference returned is user's
         # preference.
         self.login(self.VIEWER_EMAIL)
-        response = self.get_html_response('/preferences')
+        # Check if the language preference is default.
+        response_dict = self.get_json(feconf.LIBRARY_INDEX_DATA_URL)
+        self.assertDictContainsSubset({
+            'activity_summary_dicts_by_category': [],
+            'preferred_language_codes': ['en'],
+        }, response_dict)
+
+        response = self.get_html_response(feconf.PREFERENCES_URL)
         csrf_token = self.get_csrf_token_from_response(response)
+
         self.put_json(
-            '/preferenceshandler/data',
+            feconf.PREFERENCES_DATA_URL,
             {'update_type': 'preferred_language_codes', 'data': ['de']},
             csrf_token=csrf_token)
+
         response_dict = self.get_json(
             feconf.LIBRARY_GROUP_DATA_URL,
             params={'group_name': feconf.LIBRARY_GROUP_RECENTLY_PUBLISHED})
@@ -574,15 +596,15 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
 class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
     """Test Collection Summaries Handler."""
-    def test_access_empty_collection(self):
+    def test_access_collection(self):
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,
-            params={'stringified_collection_ids': json.dumps('1')})
+            params={'stringified_collection_ids': json.dumps('0')})
         self.assertDictContainsSubset({
             'summaries': [],
         }, response_dict)
 
-    def test_access_non_empty_collection(self):
+        # Load a collection.
         collection_services.load_demo('0')
         response_dict = self.get_json(
             feconf.COLLECTION_SUMMARIES_DATA_URL,
