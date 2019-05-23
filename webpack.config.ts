@@ -300,7 +300,7 @@ module.exports = {
       chunks: ['stewards'],
       filename: 'topic-landing-page-stewards.mainpage.html',
       template:
-        commonPrefix + '/pages/topic-landing-page/topic-landing-page-stewards/topic-landing-page-stewards.mainpage.html',
+        commonPrefix + '/pages/landing-pages/stewards-landing-page/topic-landing-page-stewards.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

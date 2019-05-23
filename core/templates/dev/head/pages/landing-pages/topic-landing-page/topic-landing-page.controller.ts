@@ -18,7 +18,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/capitalize.filter.ts');
-require('pages/topic-landing-page/topic-landing-page.controller.ts'); 
+require(
+  'pages/landing-pages/topic-landing-page/topic-landing-page.controller.ts'); 
 require('services/PageTitleService.ts');
 require('services/SiteAnalyticsService.ts');
 

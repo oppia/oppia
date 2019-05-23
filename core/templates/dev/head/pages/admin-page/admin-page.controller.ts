@@ -18,10 +18,6 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('pages/admin-page/admin-page.module.ts');
-require('components/forms/forms.module.ts');
-require('filters/filters.module.ts');
-
 require('directives/FocusOnDirective.ts');
 require('components/forms/forms-validators/is-at-least.filter.ts');
 require('components/forms/forms-validators/is-at-most.filter.ts');
