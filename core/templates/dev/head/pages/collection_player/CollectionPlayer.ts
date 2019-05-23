@@ -33,6 +33,7 @@ require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
+require('services/PageTitleService.ts');
 
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
@@ -52,12 +53,14 @@ oppia.controller('CollectionPlayer', [
   '$anchorScroll', '$http', '$location', '$scope',
   'AlertsService', 'CollectionObjectFactory',
   'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
+  'PageTitleService',
   'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $anchorScroll, $http, $location, $scope,
       AlertsService, CollectionObjectFactory,
       CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
+      PageTitleService,
       ReadOnlyCollectionBackendApiService, UrlInterpolationService,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     $scope.collection = null;
@@ -248,6 +251,9 @@ oppia.controller('CollectionPlayer', [
       function(collectionBackendObject) {
         $scope.collection = CollectionObjectFactory.create(
           collectionBackendObject);
+
+        PageTitleService.setPageTitle(
+          $scope.collection.getTitle() + ' - Oppia');
 
         // Load the user's current progress in the collection. If the user is a
         // guest, then either the defaults from the server will be used or the

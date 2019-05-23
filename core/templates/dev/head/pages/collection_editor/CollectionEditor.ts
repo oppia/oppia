@@ -26,6 +26,7 @@ require(
   'pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.ts');
 
 require('pages/collection_editor/CollectionEditorStateService.ts');
+require('services/PageTitleService.ts');
 
 // TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(
@@ -47,9 +48,23 @@ oppia.constant(
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.controller('CollectionEditor', [
-  'CollectionEditorStateService',
-  function(CollectionEditorStateService) {
+  '$scope', 'CollectionEditorStateService', 'PageTitleService',
+  'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
+  function($scope, CollectionEditorStateService, PageTitleService,
+      EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED) {
     // Load the collection to be edited.
     CollectionEditorStateService.loadCollection(GLOBALS.collectionId);
+    var setTitle = function() {
+      if (CollectionEditorStateService.getCollection().getTitle()) {
+        PageTitleService.setPageTitle(CollectionEditorStateService
+          .getCollection().getTitle() + ' - Oppia Editor');
+      } else {
+        PageTitleService.setPageTitle(
+          'Untitled Collection - Oppia Editor');
+      }
+    };
+
+    $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
+    $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
   }
 ]);
