@@ -135,6 +135,7 @@ def _get_exploration_player_data(
         'can_edit': can_edit,
         'dependencies_html': jinja2.utils.Markup(
             dependencies_html),
+        'exploration_title': exploration.title,
         'exploration_version': version,
         'collection_id': collection_id,
         'collection_title': collection_title,
