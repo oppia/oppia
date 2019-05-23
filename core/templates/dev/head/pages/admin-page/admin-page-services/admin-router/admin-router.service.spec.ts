@@ -19,7 +19,7 @@
 require(
   'pages/admin-page/admin-page-services/admin-router/admin-router.service.ts');
 
-fdescribe('Admin router service', function() {
+describe('Admin router service', function() {
   var AdminRouterService = null;
 
   beforeEach(angular.mock.module('oppia'));
@@ -28,7 +28,7 @@ fdescribe('Admin router service', function() {
     AdminRouterService = $injector.get('AdminRouterService');
   }));
 
-  fit('should initially be routed to the activities tab', function() {
+  it('should initially be routed to the activities tab', function() {
     expect(AdminRouterService.isActivitiesTabOpen()).toBe(true);
     expect(AdminRouterService.isConfigTabOpen()).toBe(false);
     expect(AdminRouterService.isRolesTabOpen()).toBe(false);
