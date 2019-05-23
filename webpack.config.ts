@@ -191,7 +191,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['landing'],
       filename: 'topic-landing-page.mainpage.html',
-      template: commonPrefix + '/pages/topic-landing-page/topic-landing-page.mainpage.html',
+      template: (
+        commonPrefix + '/pages/landing-pages/topic-landing-page/' +
+        'topic-landing-page.mainpage.html'),
       minify: htmlMinifyConfig,
       inject: false
     }),
