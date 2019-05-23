@@ -20,10 +20,10 @@ require('components/ratings/rating-display/rating-display.directive.ts');
 require('components/summary-tile-directives/exploration-summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile-directives/collection-summary-tile/collection-summary-tile.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
-require('pages/exploration-player-page/CorrectnessFooterDirective.ts');
-require('pages/exploration-player-page/ProgressNavDirective.ts');
-require('pages/exploration-player-page/SupplementalCardDirective.ts');
-require('pages/exploration-player-page/TutorCardDirective.ts');
+require('pages/exploration-player-page/correctness-footer/correctness-footer.directive.ts');
+require('pages/exploration-player-page/progress-nav/progress-nav.directive.ts');
+require('pages/exploration-player-page/supplement-card/supplemental-card.directive.ts');
+require('pages/exploration-player-page/tutor-card/tutor-card.directive.ts');
 
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/exploration/EditableExplorationBackendApiService.ts');
@@ -39,7 +39,7 @@ require('pages/exploration-player-page/exploration-player-page-services/explorat
 require('pages/exploration-player-page/exploration-player-page-services/exploration-player-state.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/exploration-recommendations.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/fatigue-detection.service.ts');
-require('pages/exploration-player-page/FeedbackPopupDirective.ts');
+require('pages/exploration-player-page/feedback-popup/feedback-popup.directive.ts');
 require('pages/exploration-player-page/exploration-player-page-services/hints-and-solution-manager/hints-and-solution-manager.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/image-preloader/image-preloader.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/learner-params/learner-params.service.ts');

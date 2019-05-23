@@ -17,8 +17,8 @@
  */
 
 require('directives/AngularHtmlBindDirective.ts');
-require('pages/exploration-player-page/AudioBarDirective.ts');
-require('pages/exploration-player-page/InputResponsePairDirective.ts');
+require('pages/exploration-player-page/audio-bar/audio-bar.directive.ts');
+require('pages/exploration-player-page/input-response-pair/input-response-pair.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/exploration-player-page-services/audio-preloader/audio-preloader.service.ts');
