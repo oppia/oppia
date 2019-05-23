@@ -22,6 +22,7 @@ import datetime
 import os
 import zipfile
 
+from constants import constants
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -1219,6 +1220,51 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
             fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
         self.assertEqual(
             fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
+
+    def test_save_original_and_compressed_versions_of_image_with_dev_mode_off(
+            self):
+        dev_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        max_resize_dimension_px_swap = self.swap(
+            gae_image_services, 'MAX_RESIZE_DIMENSION_PX', 20)
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            original_image_content = f.read()
+
+        with dev_mode_swap, max_resize_dimension_px_swap:
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    'exploration/%s' % self.EXPLORATION_ID))
+
+            self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
+            self.assertEqual(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
+            self.assertEqual(
+                fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
+
+            exp_services.save_original_and_compressed_versions_of_image(
+                self.USER, self.FILENAME, self.EXPLORATION_ID,
+                original_image_content)
+
+            # The scaling factor changes if the dimensions of the image is
+            # greater than MAX_RESIZE_DIMENSION_PX.
+            width, height = gae_image_services.get_image_dimensions(
+                original_image_content)
+            new_scaling_factor = gae_image_services.MAX_RESIZE_DIMENSION_PX / (
+                float(max(width, height)))
+            new_width = int(width * new_scaling_factor)
+            new_height = int(height * new_scaling_factor)
+
+            self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
+            self.assertEqual(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
+            self.assertEqual(
+                fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
+
+            compressed_image_content = fs.get(
+                'image/%s' % self.COMPRESSED_IMAGE_FILENAME)
+
+            new_dimensions = gae_image_services.get_image_dimensions(
+                compressed_image_content)
+            self.assertEqual(new_dimensions, (new_width, new_height))
 
 
 # pylint: disable=protected-access

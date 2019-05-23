@@ -174,14 +174,14 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
-echo Checking if PIL is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
-  echo Installing PIL
+echo Checking if Pillow is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/Pillow-6.0.0" ]; then
+  echo Installing Pillow
 
-  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
+  pip_install Pillow==6.0.0 --target="$TOOLS_DIR/Pillow-6.0.0"
 
   if [[ $? != 0 && ${OS} == "Darwin" ]]; then
-    echo "  PIL install failed. See troubleshooting instructions at:"
+    echo "  Pillow install failed. See troubleshooting instructions at:"
     echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
   fi
 fi

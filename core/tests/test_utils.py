@@ -1717,6 +1717,7 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_files_stub()
         self.testbed.init_blobstore_stub()
         self.testbed.init_search_stub()
+        self.testbed.init_images_stub()
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
