@@ -27,6 +27,8 @@ require('domain/topic/TopicRightsBackendApiService.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
+
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
