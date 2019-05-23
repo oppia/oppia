@@ -37,7 +37,8 @@ class FileMetadataSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
 class FileMetadataModel(base_models.VersionedModel):
     """File metadata model, keyed by the path to the assets folder
-    (eg: exploration/<exp_id>) and absolute file name."""
+    (eg: exploration/<exp_id>) and absolute file name.
+    """
     # The class which stores the commit history of the metadata snapshots.
     SNAPSHOT_METADATA_CLASS = FileMetadataSnapshotMetadataModel
     # The class which stores the content of the metadata snapshots.
@@ -173,7 +174,8 @@ class FileSnapshotContentModel(base_models.BaseSnapshotContentModel):
 
 class FileModel(base_models.VersionedModel):
     """File data model, keyed by path to the assets folder and absolute file
-    name."""
+    name.
+    """
 
     # The class which stores the commit history of the file snapshots.
     SNAPSHOT_METADATA_CLASS = FileSnapshotMetadataModel
