@@ -279,7 +279,7 @@
               </li>
 
               <li flex="50" class="protractor-test-exploration-feedback-count">
-                <span class="fa fa-comments fa-lg oppia-dashboard-card-statistic-icon"
+                <span class="fas fa-comments fa-lg oppia-dashboard-card-statistic-icon"
                       uib-tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
                       tooltip-placement="top">
                 </span>
@@ -353,9 +353,9 @@
                   ng-options="SUBSCRIPTION_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS"
                   style="width: 160px;">
           </select>
-          <span class="sort-order fa"
+          <span class="sort-order fas"
                 ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"
-                ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+                ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-alt-up': 'fa-long-arrow-alt-down'">
           </span>
         </span>
       </div>

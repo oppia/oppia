@@ -2636,7 +2636,7 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-info-card-content .card-metrics li .fa {
+.oppia-info-card-content .card-metrics li .far {
   font-size: 24px;
   margin-right: 5px;
 }
@@ -3458,7 +3458,7 @@ md-card.preview-conversation-skin-supplemental-card {
   margin-top: 12px;
 }
 
-.oppia-activity-summary-tile.small-width .metrics li .fa {
+.oppia-activity-summary-tile.small-width .metrics li .far {
   margin-bottom: 10px;
 }
 
