@@ -24,47 +24,50 @@ oppia.directive('oppiaInteractiveCodeRepl', [
     function (CodeReplRulesService, HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
         return {
             restrict: 'E',
-            scope: {
+            scope: {},
+            bindToController: {
                 getLastAnswer: '&lastAnswer',
             },
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/CodeRepl/directives/' +
                 'code_repl_interaction_directive.html'),
+            controllerAs: '$ctrl',
             controller: [
                 '$scope', '$attrs', 'WindowDimensionsService',
                 'CurrentInteractionService',
                 function ($scope, $attrs, WindowDimensionsService, CurrentInteractionService) {
-                    $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-                    $scope.$on(EVENT_NEW_CARD_AVAILABLE, function () {
-                        $scope.interactionIsActive = false;
+                    var ctrl = this;
+                    ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+                    ctrl.$on(EVENT_NEW_CARD_AVAILABLE, function () {
+                        ctrl.interactionIsActive = false;
                     });
-                    $scope.language = HtmlEscaperService.escapedJsonToObj($attrs.languageWithValue);
-                    $scope.placeholder = HtmlEscaperService.escapedJsonToObj($attrs.placeholderWithValue);
-                    $scope.preCode = HtmlEscaperService.escapedJsonToObj($attrs.preCodeWithValue);
-                    $scope.postCode = HtmlEscaperService.escapedJsonToObj($attrs.postCodeWithValue);
-                    // Make sure $scope.preCode ends with a newline:
-                    if ($scope.preCode.trim().length === 0) {
-                        $scope.preCode = '';
+                    ctrl.language = HtmlEscaperService.escapedJsonToObj($attrs.languageWithValue);
+                    ctrl.placeholder = HtmlEscaperService.escapedJsonToObj($attrs.placeholderWithValue);
+                    ctrl.preCode = HtmlEscaperService.escapedJsonToObj($attrs.preCodeWithValue);
+                    ctrl.postCode = HtmlEscaperService.escapedJsonToObj($attrs.postCodeWithValue);
+                    // Make sure ctrl.preCode ends with a newline:
+                    if (ctrl.preCode.trim().length === 0) {
+                        ctrl.preCode = '';
                     }
-                    else if ($scope.preCode.slice(-1) !== '\n') {
-                        $scope.preCode += '\n';
+                    else if (ctrl.preCode.slice(-1) !== '\n') {
+                        ctrl.preCode += '\n';
                     }
-                    // Make sure $scope.placeholder ends with a newline.
-                    if ($scope.placeholder.slice(-1) !== '\n') {
-                        $scope.placeholder += '\n';
+                    // Make sure ctrl.placeholder ends with a newline.
+                    if (ctrl.placeholder.slice(-1) !== '\n') {
+                        ctrl.placeholder += '\n';
                     }
-                    $scope.hasLoaded = false;
+                    ctrl.hasLoaded = false;
                     // Keep the code string given by the user and the stdout from the
                     // evaluation until sending them back to the server.
-                    if ($scope.interactionIsActive) {
-                        $scope.code = ($scope.preCode + $scope.placeholder + $scope.postCode);
-                        $scope.output = '';
+                    if (ctrl.interactionIsActive) {
+                        ctrl.code = (ctrl.preCode + ctrl.placeholder + ctrl.postCode);
+                        ctrl.output = '';
                     }
                     else {
-                        $scope.code = $scope.getLastAnswer().code;
-                        $scope.output = $scope.getLastAnswer().output;
+                        ctrl.code = ctrl.getLastAnswer().code;
+                        ctrl.output = ctrl.getLastAnswer().output;
                     }
-                    $scope.initCodeEditor = function (editor) {
-                        editor.setValue($scope.code);
+                    ctrl.initCodeEditor = function (editor) {
+                        editor.setValue(ctrl.code);
                         // Options for the ui-codemirror display.
                         editor.setOption('lineNumbers', true);
                         editor.setOption('indentWithTabs', true);
@@ -86,7 +89,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                             initMarkers(editor);
                         }, 200);
                         editor.on('change', function () {
-                            $scope.code = editor.getValue();
+                            ctrl.code = editor.getValue();
                         });
                         // Without this, the editor does not show up correctly on small
                         // screens when the user switches to the supplemental interaction.
@@ -96,14 +99,14 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                                 initMarkers(editor);
                             }, 200);
                         });
-                        $scope.hasLoaded = true;
+                        ctrl.hasLoaded = true;
                     };
                     // Configure Skulpt.
                     Sk.configure({
                         output: function (out) {
                             // This output function is called continuously throughout the
                             // runtime of the script.
-                            $scope.output += out;
+                            ctrl.output += out;
                         },
                         read: function (name) {
                             // This function is called when a builtin module is imported
@@ -115,35 +118,35 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                             return Sk.builtinFiles.files[name];
                         },
                         timeoutMsg: function () {
-                            $scope.sendResponse('', 'timeout');
+                            ctrl.sendResponse('', 'timeout');
                         },
                         execLimit: 10000
                     });
-                    $scope.runAndSubmitCode = function (codeInput) {
-                        $scope.runCode(codeInput, function (evaluation, err) {
-                            $scope.sendResponse(evaluation, err);
+                    ctrl.runAndSubmitCode = function (codeInput) {
+                        ctrl.runCode(codeInput, function (evaluation, err) {
+                            ctrl.sendResponse(evaluation, err);
                         });
                     };
                     var submitAnswer = function () {
-                        $scope.runAndSubmitCode($scope.code);
+                        ctrl.runAndSubmitCode(ctrl.code);
                     };
-                    $scope.runCode = function (codeInput, onFinishRunCallback) {
-                        $scope.code = codeInput;
-                        $scope.output = '';
+                    ctrl.runCode = function (codeInput, onFinishRunCallback) {
+                        ctrl.code = codeInput;
+                        ctrl.output = '';
                         // Evaluate the program asynchronously using Skulpt.
                         Sk.misceval.asyncToPromise(function () {
                             Sk.importMainWithBody('<stdin>', false, codeInput, true);
                         }).then(function () {
                             // Finished evaluating.
-                            $scope.evaluation = '';
-                            $scope.fullError = '';
+                            ctrl.evaluation = '';
+                            ctrl.fullError = '';
                             if (onFinishRunCallback) {
                                 onFinishRunCallback('', '');
                             }
                         }, function (err) {
                             if (!(err instanceof Sk.builtin.TimeLimitError)) {
-                                $scope.evaluation = '';
-                                $scope.fullError = String(err);
+                                ctrl.evaluation = '';
+                                ctrl.fullError = String(err);
                                 if (onFinishRunCallback) {
                                     onFinishRunCallback('', String(err));
                                 }
@@ -153,9 +156,9 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                     var initMarkers = function (editor) {
                         var doc = editor.getDoc();
                         // The -1 here is because prepended code ends with a newline.
-                        var preCodeNumLines = $scope.preCode.split('\n').length - 1;
-                        var postCodeNumLines = $scope.postCode.split('\n').length;
-                        var fullCodeNumLines = $scope.code.split('\n').length;
+                        var preCodeNumLines = ctrl.preCode.split('\n').length - 1;
+                        var postCodeNumLines = ctrl.postCode.split('\n').length;
+                        var fullCodeNumLines = ctrl.code.split('\n').length;
                         var userCodeNumLines = (fullCodeNumLines - preCodeNumLines - postCodeNumLines);
                         // Mark pre- and post- code as uneditable, and give it some styling.
                         var markOptions = {
@@ -164,7 +167,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                             inclusiveLeft: true,
                             inclusiveRight: true
                         };
-                        if ($scope.preCode.length !== 0) {
+                        if (ctrl.preCode.length !== 0) {
                             doc.markText({
                                 line: 0,
                                 ch: 0
@@ -178,7 +181,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                                 editor.addLineClass(i, 'text', 'code-repl-noneditable-line');
                             }
                         }
-                        if ($scope.postCode.length !== 0) {
+                        if (ctrl.postCode.length !== 0) {
                             doc.markText({
                                 line: preCodeNumLines + userCodeNumLines,
                                 ch: 0
@@ -191,13 +194,13 @@ oppia.directive('oppiaInteractiveCodeRepl', [
                             }
                         }
                     };
-                    $scope.sendResponse = function (evaluation, err) {
+                    ctrl.sendResponse = function (evaluation, err) {
                         CurrentInteractionService.onSubmit({
                             // Replace tabs with 2 spaces.
                             // TODO(sll): Change the default Python indentation to 4 spaces.
-                            code: $scope.code.replace(/\t/g, '  ') || '',
-                            output: $scope.output,
-                            evaluation: $scope.evaluation,
+                            code: ctrl.code.replace(/\t/g, '  ') || '',
+                            output: ctrl.output,
+                            evaluation: ctrl.evaluation,
                             error: (err || '')
                         }, CodeReplRulesService);
                         // Without this, the error message displayed in the user-facing

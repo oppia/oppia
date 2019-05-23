@@ -23,13 +23,16 @@ oppia.directive('oppiaInteractiveSetInput', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/SetInput/directives/' +
                 'set_input_interaction_directive.html'),
+            controllerAs: '$ctrl',
             controller: [
-                '$scope', '$attrs', '$translate', 'SetInputRulesService',
+                '$attrs', '$translate', 'SetInputRulesService',
                 'WindowDimensionsService', 'CurrentInteractionService',
-                function ($scope, $attrs, $translate, SetInputRulesService, WindowDimensionsService, CurrentInteractionService) {
-                    $scope.schema = {
+                function ($attrs, $translate, SetInputRulesService, WindowDimensionsService, CurrentInteractionService) {
+                    var ctrl = this;
+                    ctrl.schema = {
                         type: 'list',
                         items: {
                             type: 'unicode'
@@ -40,7 +43,7 @@ oppia.directive('oppiaInteractiveSetInput', [
                         }
                     };
                     // Adds an input field by default
-                    $scope.answer = [''];
+                    ctrl.answer = [''];
                     var hasDuplicates = function (answer) {
                         for (var i = 0; i < answer.length; i++) {
                             for (var j = 0; j < i; j++) {
@@ -56,23 +59,23 @@ oppia.directive('oppiaInteractiveSetInput', [
                             return (element === '');
                         });
                     };
-                    $scope.submitAnswer = function (answer) {
+                    ctrl.submitAnswer = function (answer) {
                         if (hasDuplicates(answer)) {
-                            $scope.errorMessage = ('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
+                            ctrl.errorMessage = ('I18N_INTERACTIONS_SET_INPUT_DUPLICATES_ERROR');
                         }
                         else {
-                            $scope.errorMessage = '';
+                            ctrl.errorMessage = '';
                             CurrentInteractionService.onSubmit(answer, SetInputRulesService);
                         }
                     };
-                    $scope.isAnswerValid = function () {
-                        return ($scope.answer.length > 0 &&
-                            !hasBlankOption($scope.answer));
+                    ctrl.isAnswerValid = function () {
+                        return (ctrl.answer.length > 0 &&
+                            !hasBlankOption(ctrl.answer));
                     };
                     var submitAnswerFn = function () {
-                        $scope.submitAnswer($scope.answer);
+                        ctrl.submitAnswer(ctrl.answer);
                     };
-                    CurrentInteractionService.registerCurrentInteraction(submitAnswerFn, $scope.isAnswerValid);
+                    CurrentInteractionService.registerCurrentInteraction(submitAnswerFn, ctrl.isAnswerValid);
                 }
             ]
         };

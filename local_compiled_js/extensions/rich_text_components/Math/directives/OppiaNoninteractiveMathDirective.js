@@ -24,9 +24,12 @@ oppia.directive('oppiaNoninteractiveMath', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/rich_text_components/Math/directives/math_directive.html'),
-            controller: ['$scope', '$attrs', function ($scope, $attrs) {
-                    $scope.rawLatex = HtmlEscaperService.escapedJsonToObj($attrs.rawLatexWithValue);
+            controllerAs: '$ctrl',
+            controller: ['$attrs', function ($attrs) {
+                    var ctrl = this;
+                    ctrl.rawLatex = HtmlEscaperService.escapedJsonToObj($attrs.rawLatexWithValue);
                 }]
         };
     }

@@ -341,10 +341,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 'review_message': u'Accepted'
             }, csrf_token=csrf_token, expected_status_int=400)
 
-        self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
-
     def test_reject_suggestion(self):
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/explore/%s' % self.EXP_ID)
@@ -461,26 +457,27 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         self.logout()
 
-    def test_not_found_page_error(self):
-        suggestion_to_accept = self.get_json(
-            '%s?suggestion_type=%s' % (
-                feconf.SUGGESTION_LIST_URL_PREFIX,
-                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
-            )['suggestions'][0]
+    def test_new_structure_page_not_found_error(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            suggestion_to_accept = self.get_json(
+                '%s?suggestion_type=%s' % (
+                    feconf.SUGGESTION_LIST_URL_PREFIX,
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+                )['suggestions'][0]
 
-        self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
 
-        self.put_json('%s/topic/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            'random',
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'This looks good!',
-                'skill_id': self.SKILL_ID
-            }, csrf_token=csrf_token, expected_status_int=404)
+            self.put_json('%s/topic/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                'random',
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'This looks good!',
+                    'skill_id': self.SKILL_ID
+                }, csrf_token=csrf_token, expected_status_int=404)
 
     def test_query_question_suggestions(self):
         suggestions = self.get_json(
@@ -544,7 +541,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(last_message.text, 'This looks good!')
 
-    def test_invalid_action_of_suggestion(self):
+    def test_invalid_action_on_suggestion_error(self):
         suggestion_to_accept = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
@@ -586,7 +583,7 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     'skill_id': self.SKILL_ID
                 }, csrf_token=csrf_token)
 
-    def test_accept_suggestion_on_invalid_handler(self):
+    def test_accept_suggestion_on_invalid_topic_handler(self):
         suggestion_to_accept = self.get_json(
             '%s?suggestion_type=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,

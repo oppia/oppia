@@ -19,13 +19,16 @@ oppia.directive('logicErrorCategoryEditor', [
     function (UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
         return {
             restrict: 'E',
-            scope: {
+            scope: {},
+            bindToController: {
                 value: '='
             },
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/objects/templates/logic_error_category_editor_directive.html'),
+            controllerAs: '$ctrl',
             controller: ['$scope', function ($scope) {
-                    $scope.alwaysEditable = true;
-                    $scope.errorCategories = [{
+                    var ctrl = this;
+                    ctrl.alwaysEditable = true;
+                    ctrl.errorCategories = [{
                             name: 'parsing',
                             humanReadable: 'Unparseable'
                         }, {
@@ -50,16 +53,16 @@ oppia.directive('logicErrorCategoryEditor', [
                             name: 'mistake',
                             humanReadable: 'Unspecified'
                         }];
-                    $scope.localValue = {
-                        category: $scope.errorCategories[0]
+                    ctrl.localValue = {
+                        category: ctrl.errorCategories[0]
                     };
-                    for (var i = 0; i < $scope.errorCategories.length; i++) {
-                        if ($scope.errorCategories[i].name === $scope.value) {
-                            $scope.localValue.category = $scope.errorCategories[i];
+                    for (var i = 0; i < ctrl.errorCategories.length; i++) {
+                        if (ctrl.errorCategories[i].name === ctrl.value) {
+                            ctrl.localValue.category = ctrl.errorCategories[i];
                         }
                     }
-                    $scope.$watch('localValue.category', function () {
-                        $scope.value = $scope.localValue.category.name;
+                    $scope.$watch('$ctrl.localValue.category', function () {
+                        ctrl.value = ctrl.localValue.category.name;
                     });
                 }]
         };

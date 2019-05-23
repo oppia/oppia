@@ -17,14 +17,17 @@ oppia.directive('musicPhraseEditor', [
     function (AlertsService, UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
         return {
             restrict: 'E',
-            scope: {
+            scope: {},
+            bindToController: {
                 value: '='
             },
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/objects/templates/music_phrase_editor_directive.html'),
+            controllerAs: '$ctrl',
             controller: ['$scope', function ($scope) {
+                    var ctrl = this;
                     // The maximum number of notes allowed in a music phrase.
                     var _MAX_NOTES_IN_PHRASE = 8;
-                    $scope.schema = {
+                    ctrl.schema = {
                         type: 'list',
                         items: {
                             type: 'unicode',
@@ -43,16 +46,16 @@ oppia.directive('musicPhraseEditor', [
                     };
                     // Reset the component each time the value changes (e.g. if this is part
                     // of an editable list).
-                    $scope.$watch('value', function (newValue) {
-                        // TODO(sll): Check that $scope.value is a list.
-                        $scope.localValue = [];
+                    $scope.$watch('$ctrl.value', function (newValue) {
+                        // TODO(sll): Check that $ctrl.value is a list.
+                        ctrl.localValue = [];
                         if (newValue) {
                             for (var i = 0; i < newValue.length; i++) {
-                                $scope.localValue.push(newValue[i].readableNoteName);
+                                ctrl.localValue.push(newValue[i].readableNoteName);
                             }
                         }
                     }, true);
-                    $scope.$watch('localValue', function (newValue, oldValue) {
+                    $scope.$watch('$ctrl.localValue', function (newValue, oldValue) {
                         if (newValue && oldValue) {
                             if (newValue.length > _MAX_NOTES_IN_PHRASE) {
                                 AlertsService.addWarning('There are too many notes on the staff.');
@@ -68,7 +71,7 @@ oppia.directive('musicPhraseEditor', [
                                         }
                                     });
                                 }
-                                $scope.value = parentValues;
+                                ctrl.value = parentValues;
                             }
                         }
                     }, true);

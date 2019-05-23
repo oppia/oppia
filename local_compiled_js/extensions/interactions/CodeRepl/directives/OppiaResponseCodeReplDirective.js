@@ -24,15 +24,18 @@ oppia.directive('oppiaResponseCodeRepl', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/CodeRepl/directives/' +
                 'code_repl_response_directive.html'),
+            controllerAs: '$ctrl',
             controller: [
-                '$scope', '$attrs', 'FocusManagerService',
-                function ($scope, $attrs, FocusManagerService) {
-                    $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-                    if ($scope.answer.error) {
-                        $scope.errorFocusLabel = FocusManagerService.generateFocusLabel();
-                        FocusManagerService.setFocus($scope.errorFocusLabel);
+                '$attrs', 'FocusManagerService',
+                function ($attrs, FocusManagerService) {
+                    var ctrl = this;
+                    ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+                    if (ctrl.answer.error) {
+                        ctrl.errorFocusLabel = FocusManagerService.generateFocusLabel();
+                        FocusManagerService.setFocus(ctrl.errorFocusLabel);
                     }
                 }
             ]

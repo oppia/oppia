@@ -23,25 +23,28 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
     function (HtmlEscaperService, UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE) {
         return {
             restrict: 'E',
-            scope: {
+            scope: {},
+            bindToController: {
                 getLastAnswer: '&lastAnswer'
             },
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/PencilCodeEditor/directives/' +
                 'pencil_code_editor_interaction_directive.html'),
+            controllerAs: '$ctrl',
             controller: [
                 '$scope', '$attrs', '$element', '$timeout', '$uibModal',
                 'FocusManagerService', 'PencilCodeEditorRulesService',
                 'CurrentInteractionService',
                 function ($scope, $attrs, $element, $timeout, $uibModal, FocusManagerService, PencilCodeEditorRulesService, CurrentInteractionService) {
-                    $scope.interactionIsActive = ($scope.getLastAnswer() === null);
-                    $scope.initialCode = $scope.interactionIsActive ?
+                    var ctrl = this;
+                    ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
+                    ctrl.initialCode = ctrl.interactionIsActive ?
                         HtmlEscaperService.escapedJsonToObj($attrs.initialCodeWithValue) :
-                        $scope.getLastAnswer().code;
+                        ctrl.getLastAnswer().code;
                     var iframeDiv = $element.find('.pencil-code-editor-iframe').get(0);
                     var pce = new PencilCodeEmbed(iframeDiv);
-                    pce.beginLoad($scope.initialCode);
+                    pce.beginLoad(ctrl.initialCode);
                     $scope.$on(EVENT_NEW_CARD_AVAILABLE, function () {
-                        $scope.interactionIsActive = false;
+                        ctrl.interactionIsActive = false;
                         pce.hideMiddleButton();
                         pce.hideToggleButton();
                         pce.setReadOnly();
@@ -71,7 +74,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                             }]);
                         pce.showEditor();
                         pce.hideToggleButton();
-                        if ($scope.interactionIsActive) {
+                        if (ctrl.interactionIsActive) {
                             pce.setEditable();
                         }
                         else {
@@ -82,7 +85,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                         // it.
                         FocusManagerService.clearFocus();
                     });
-                    $scope.reset = function () {
+                    ctrl.reset = function () {
                         $uibModal.open({
                             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/PencilCodeEditor/directives/' +
                                 'pencil_code_reset_confirmation_directive.html'),
@@ -100,7 +103,7 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                                 }
                             ]
                         }).result.then(function () {
-                            pce.setCode($scope.initialCode);
+                            pce.setCode(ctrl.initialCode);
                         });
                     };
                     var getNormalizedCode = function () {

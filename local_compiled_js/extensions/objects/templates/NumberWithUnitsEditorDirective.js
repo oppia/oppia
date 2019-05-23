@@ -17,31 +17,34 @@ oppia.directive('numberWithUnitsEditor', [
     function (NumberWithUnitsObjectFactory, UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
         return {
             restrict: 'E',
-            scope: {
+            scope: {},
+            bindToController: {
                 value: '='
             },
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/objects/templates/number_with_units_editor_directive.html'),
+            controllerAs: '$ctrl',
             controller: ['$scope', function ($scope) {
+                    var ctrl = this;
                     var errorMessage = '';
                     var numberWithUnitsString = '';
-                    if ($scope.value !== null) {
-                        var defaultNumberWithUnits = NumberWithUnitsObjectFactory.fromDict($scope.value);
+                    if (ctrl.value !== null) {
+                        var defaultNumberWithUnits = NumberWithUnitsObjectFactory.fromDict(ctrl.value);
                         numberWithUnitsString = defaultNumberWithUnits.toString();
                     }
-                    $scope.localValue = {
+                    ctrl.localValue = {
                         label: numberWithUnitsString
                     };
-                    $scope.$watch('localValue.label', function (newValue) {
+                    $scope.$watch('$ctrl.localValue.label', function (newValue) {
                         try {
                             var numberWithUnits = NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-                            $scope.value = numberWithUnits;
+                            ctrl.value = numberWithUnits;
                             errorMessage = '';
                         }
                         catch (parsingError) {
                             errorMessage = parsingError.message;
                         }
                     });
-                    $scope.getWarningText = function () {
+                    ctrl.getWarningText = function () {
                         return errorMessage;
                     };
                 }]

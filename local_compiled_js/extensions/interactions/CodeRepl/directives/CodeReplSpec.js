@@ -42,7 +42,7 @@ describe('CodeRepl interaction', function () {
         });
         it('loads the code template', function () {
             expect(elt.html()).toContain('code-repl-input-box');
-            expect(elt.html()).toContain('runCode(code)');
+            expect(elt.html()).toContain('$ctrl.runCode($ctrl.code)');
         });
     });
 });

@@ -24,10 +24,13 @@ oppia.directive('oppiaResponseSetInput', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/SetInput/directives/' +
                 'set_input_response_directive.html'),
-            controller: ['$scope', '$attrs', function ($scope, $attrs) {
-                    $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+            controllerAs: '$ctrl',
+            controller: ['$attrs', function ($attrs) {
+                    var ctrl = this;
+                    ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
                 }]
         };
     }

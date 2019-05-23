@@ -24,15 +24,18 @@ oppia.directive('oppiaShortResponseMultipleChoiceInput', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/MultipleChoiceInput/directives/' +
                 'multiple_choice_input_short_response_directive.html'),
+            controllerAs: '$ctrl',
             controller: [
-                '$scope', '$attrs', '$filter',
-                function ($scope, $attrs, $filter) {
+                '$attrs', '$filter',
+                function ($attrs, $filter) {
+                    var ctrl = this;
                     var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
                     var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
                     var response = $filter('convertToPlainText')(_choices[_answer]);
-                    $scope.response = $filter('truncateAtFirstLine')(response);
+                    ctrl.response = $filter('truncateAtFirstLine')(response);
                 }
             ]
         };

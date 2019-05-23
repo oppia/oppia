@@ -22,6 +22,9 @@ oppia.directive('oppiaShortResponseEndExploration', [function () {
         return {
             restrict: 'E',
             scope: {},
-            template: ''
+            bindToController: {},
+            template: '',
+            controllerAs: '$ctrl',
+            controller: [function () { }]
         };
     }]);

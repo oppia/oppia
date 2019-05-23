@@ -24,11 +24,14 @@ oppia.directive('oppiaShortResponseSetInput', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/SetInput/directives/' +
                 'set_input_short_response_directive.html'),
-            controller: ['$scope', '$attrs', function ($scope, $attrs) {
+            controllerAs: '$ctrl',
+            controller: ['$attrs', function ($attrs) {
+                    var ctrl = this;
                     var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-                    $scope.displayedAnswer = (_answer.length > 0 ? _answer.join(', ') :
+                    ctrl.displayedAnswer = (_answer.length > 0 ? _answer.join(', ') :
                         'I18N_INTERACTIONS_SET_INPUT_NO_ANSWER');
                 }]
         };

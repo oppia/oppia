@@ -22,20 +22,23 @@ oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/visualizations/enumerated_frequency_table_directive.html'),
+            controllerAs: '$ctrl',
             controller: [
-                '$scope', '$attrs', 'HtmlEscaperService',
-                function ($scope, $attrs, HtmlEscaperService) {
-                    $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-                    $scope.options =
+                '$attrs', 'HtmlEscaperService',
+                function ($attrs, HtmlEscaperService) {
+                    var ctrl = this;
+                    ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+                    ctrl.options =
                         HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-                    $scope.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
-                    $scope.answerVisible = $scope.data.map(function (_, i) {
+                    ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+                    ctrl.answerVisible = ctrl.data.map(function (_, i) {
                         // First element is shown while all others are hidden by default.
                         return i === 0;
                     });
-                    $scope.toggleAnswerVisibility = function (i) {
-                        $scope.answerVisible[i] = !$scope.answerVisible[i];
+                    ctrl.toggleAnswerVisibility = function (i) {
+                        ctrl.answerVisible[i] = !ctrl.answerVisible[i];
                     };
                 }
             ]

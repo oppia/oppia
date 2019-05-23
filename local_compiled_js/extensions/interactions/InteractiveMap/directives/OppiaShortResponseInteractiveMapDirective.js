@@ -24,15 +24,18 @@ oppia.directive('oppiaShortResponseInteractiveMap', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/InteractiveMap/directives/' +
                 'interactive_map_short_response_directive.html'),
-            controller: ['$scope', '$attrs', function ($scope, $attrs) {
+            controllerAs: '$ctrl',
+            controller: ['$attrs', function ($attrs) {
+                    var ctrl = this;
                     var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-                    $scope.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
-                    $scope.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
-                    $scope.formattedCoords += ', ';
-                    $scope.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
-                    $scope.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
+                    ctrl.formattedCoords = Math.abs(_answer[0]).toFixed(3) + '° ';
+                    ctrl.formattedCoords += (_answer[0] >= 0 ? 'N' : 'S');
+                    ctrl.formattedCoords += ', ';
+                    ctrl.formattedCoords += Math.abs(_answer[1]).toFixed(3) + '° ';
+                    ctrl.formattedCoords += (_answer[1] >= 0 ? 'E' : 'W');
                 }]
         };
     }

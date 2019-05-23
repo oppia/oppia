@@ -16,26 +16,29 @@ oppia.directive('dragAndDropPositiveIntEditor', [
     function (UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
         return {
             restrict: 'E',
-            scope: {
+            scope: {},
+            bindToController: {
                 getInitArgs: '&',
                 value: '='
             },
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/objects/templates/drag_and_drop_positive_int_editor_directive.html'),
-            controller: ['$scope', function ($scope) {
-                    if (!parseInt($scope.value)) {
-                        $scope.value = 1;
+            controllerAs: '$ctrl',
+            controller: [function () {
+                    var ctrl = this;
+                    if (!parseInt(ctrl.value)) {
+                        ctrl.value = 1;
                     }
-                    if (!$scope.selectedRank) {
-                        $scope.selectedRank = '';
+                    if (!ctrl.selectedRank) {
+                        ctrl.selectedRank = '';
                     }
-                    $scope.allowedRanks = [];
-                    $scope.initArgs = $scope.getInitArgs();
-                    $scope.choices = $scope.initArgs.choices;
-                    for (var i = 0; i < $scope.choices.length; i++) {
-                        $scope.allowedRanks.push(i + 1);
+                    ctrl.allowedRanks = [];
+                    ctrl.initArgs = ctrl.getInitArgs();
+                    ctrl.choices = ctrl.initArgs.choices;
+                    for (var i = 0; i < ctrl.choices.length; i++) {
+                        ctrl.allowedRanks.push(i + 1);
                     }
-                    $scope.selection = function (selectedRank) {
-                        $scope.value = parseInt(selectedRank);
+                    ctrl.selection = function (selectedRank) {
+                        ctrl.value = parseInt(selectedRank);
                     };
                 }]
         };

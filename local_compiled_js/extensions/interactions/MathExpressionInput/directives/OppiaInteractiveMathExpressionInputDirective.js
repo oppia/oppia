@@ -25,13 +25,16 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/MathExpressionInput/directives/' +
                 'math_expression_input_interaction_directive.html'),
+            controllerAs: '$ctrl',
             controller: [
                 '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
                 'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
                 'CurrentInteractionService',
                 function ($scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS, DebouncerService, DeviceInfoService, WindowDimensionsService, CurrentInteractionService) {
+                    var ctrl = this;
                     var guppyDivElt = $element[0].querySelector('.guppy-div');
                     // Dynamically assigns a unique id to the guppy-div
                     guppyDivElt.setAttribute('id', 'guppy_' + Math.floor(Math.random() * 100000000));
@@ -73,7 +76,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                         positionButtonOverlay();
                         // The focus() call must be in a click event handler and on a text
                         // field to make the mobile keyboard appear.
-                        $scope.startMobileMathInput = function () {
+                        ctrl.startMobileMathInput = function () {
                             guppyInstance.activate();
                             var fakeInputElement = document.querySelector('#fakeInputForMathExpression');
                             fakeInputElement.focus();
@@ -122,7 +125,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                         },
                         events: {
                             done: function (e) {
-                                $scope.submitAnswer();
+                                ctrl.submitAnswer();
                             },
                             change: function (e) {
                                 // Need to manually trigger the digest cycle
@@ -132,7 +135,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                             ready: function () {
                                 if (DeviceInfoService.isMobileUserAgent() &&
                                     DeviceInfoService.hasTouchEvents()) {
-                                    $scope.mobileOverlayIsShown = true;
+                                    ctrl.mobileOverlayIsShown = true;
                                     // Wait for the scope change to apply. Since we interact with
                                     // the DOM elements, they need to be added by angular before
                                     // the function is called. Timeout of 0 to wait
@@ -162,7 +165,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                         ascii: '',
                         latex: ''
                     };
-                    $scope.isCurrentAnswerValid = function () {
+                    ctrl.isCurrentAnswerValid = function () {
                         var latexAnswer = guppyInstance.latex();
                         try {
                             MathExpression.fromLatex(latexAnswer);
@@ -172,15 +175,15 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                         }
                         return true;
                     };
-                    $scope.submitAnswer = function () {
-                        if (!$scope.isCurrentAnswerValid()) {
+                    ctrl.submitAnswer = function () {
+                        if (!ctrl.isCurrentAnswerValid()) {
                             return;
                         }
                         answer.latex = guppyInstance.latex();
                         answer.ascii = guppyInstance.text();
                         CurrentInteractionService.onSubmit(answer, MathExpressionInputRulesService);
                     };
-                    CurrentInteractionService.registerCurrentInteraction($scope.submitAnswer, $scope.isCurrentAnswerValid);
+                    CurrentInteractionService.registerCurrentInteraction(ctrl.submitAnswer, ctrl.isCurrentAnswerValid);
                 }
             ]
         };

@@ -24,12 +24,15 @@ oppia.directive('oppiaResponseMultipleChoiceInput', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/MultipleChoiceInput/directives/' +
                 'multiple_choice_input_response_directive.html'),
-            controller: ['$scope', '$attrs', function ($scope, $attrs) {
+            controllerAs: '$ctrl',
+            controller: ['$attrs', function ($attrs) {
+                    var ctrl = this;
                     var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
                     var _choices = HtmlEscaperService.escapedJsonToObj($attrs.choices);
-                    $scope.response = _choices[_answer];
+                    ctrl.response = _choices[_answer];
                 }]
         };
     }

@@ -24,13 +24,16 @@ oppia.directive('oppiaResponseNumericInput', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/NumericInput/directives/' +
                 'numeric_input_response_directive.html'),
-            controller: ['$scope', '$attrs', function ($scope, $attrs) {
-                    $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+            controllerAs: '$ctrl',
+            controller: ['$attrs', function ($attrs) {
+                    var ctrl = this;
+                    ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
                     // If the answer is an integer, omit the fractional part.
-                    if ($scope.answer % 1 === 0) {
-                        $scope.answer = Math.round($scope.answer);
+                    if (ctrl.answer % 1 === 0) {
+                        ctrl.answer = Math.round(ctrl.answer);
                     }
                 }]
         };

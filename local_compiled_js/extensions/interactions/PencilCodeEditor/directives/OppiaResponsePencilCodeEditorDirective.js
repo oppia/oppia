@@ -24,10 +24,13 @@ oppia.directive('oppiaResponsePencilCodeEditor', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/PencilCodeEditor/directives/' +
                 'pencil_code_editor_response_directive.html'),
-            controller: ['$scope', '$attrs', function ($scope, $attrs) {
-                    $scope.answerCode = HtmlEscaperService.escapedJsonToObj($attrs.answer).code;
+            controllerAs: '$ctrl',
+            controller: ['$attrs', function ($attrs) {
+                    var ctrl = this;
+                    ctrl.answerCode = HtmlEscaperService.escapedJsonToObj($attrs.answer).code;
                 }]
         };
     }

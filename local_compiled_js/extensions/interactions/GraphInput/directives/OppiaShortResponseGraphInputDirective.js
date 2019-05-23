@@ -24,13 +24,16 @@ oppia.directive('oppiaShortResponseGraphInput', [
         return {
             restrict: 'E',
             scope: {},
+            bindToController: {},
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/interactions/GraphInput/directives/' +
                 'graph_input_short_response_directive.html'),
-            controller: ['$scope', '$attrs', function ($scope, $attrs) {
+            controllerAs: '$ctrl',
+            controller: ['$attrs', function ($attrs) {
+                    var ctrl = this;
                     // TODO(bhenning): Improve this short response by using a small version
                     // of the graph image instead of an arbitrary label of vertices and
                     // edges.
-                    $scope.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+                    ctrl.graph = HtmlEscaperService.escapedJsonToObj($attrs.answer);
                 }]
         };
     }

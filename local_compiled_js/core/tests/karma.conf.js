@@ -1,4 +1,6 @@
 var argv = require('yargs').argv;
+var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+var path = require('path');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (argv.prodEnv) {
     generatedJs = ('third_party/generated/js/third_party.min.js');
@@ -25,12 +27,14 @@ module.exports = function (config) {
             'third_party/static/angular-recorder-1.4.1/dist' +
                 '/angular-audio-recorder.min.js',
             generatedJs,
-            'local_compiled_js/core/templates/dev/head/*.js',
+            'local_compiled_js/core/templates/dev/head/AppInit.js',
             // Note that unexpected errors occur ("Cannot read property 'num' of
             // undefined" in MusicNotesInput.js) if the order of core/templates/...
             // and extensions/... are switched. The test framework may be flaky.
-            'local_compiled_js/core/templates/dev/head/**/*.js',
             'core/templates/dev/head/**/*_directive.html',
+            'core/templates/dev/head/**/*Spec.ts',
+            'core/templates/dev/head/*Spec.ts',
+            'local_compiled_js/core/templates/dev/head/**/*.js',
             'local_compiled_js/extensions/**/*.js',
             {
                 pattern: 'extensions/**/*.png',
@@ -51,7 +55,19 @@ module.exports = function (config) {
         exclude: [
             'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
             'local_compiled_js/extensions/**/protractor.js',
-            'backend_prod_files/extensions/**'
+            'backend_prod_files/extensions/**',
+            // TODO(vojtechjelinek): add these back after the templateCache
+            // is repaired, the templateCache is broken due to the fact that
+            // webpack is not yet implemented for /extensions (#6732)
+            'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
+            ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
+                'SolutionVerificationServiceSpec.ts'),
+            ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
+                'StateNameEditorDirectiveSpec.ts'),
+            ('core/templates/dev/head/pages/state_editor/' +
+                'StateContentEditorDirectiveSpec.ts'),
+            ('core/templates/dev/head/pages/state_editor/' +
+                'StateInteractionEditorDirectiveSpec.ts'),
         ],
         proxies: {
             // Karma serves files under the /base directory.
@@ -61,10 +77,12 @@ module.exports = function (config) {
             '/extensions/': '/base/extensions/'
         },
         preprocessors: {
-            'local_compiled_js/core/templates/dev/head/!(*Spec).js': ['coverage'],
-            'local_compiled_js/core/templates/dev/head/**/!(*Spec).js': ['coverage'],
-            'local_compiled_js/extensions/!(*Spec).js': ['coverage'],
-            'local_compiled_js/extensions/**/!(*Spec).js': ['coverage'],
+            'core/templates/dev/head/*.ts': ['webpack'],
+            'core/templates/dev/head/**/*.ts': ['webpack'],
+            'core/templates/dev/head/!(*Spec).js': ['coverage'],
+            'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+            'extensions/!(*Spec).js': ['coverage'],
+            'extensions/**/!(*Spec).js': ['coverage'],
             // Note that these files should contain only directive templates, and no
             // Jinja expressions. They should also be specified within the 'files'
             // list above.
@@ -106,7 +124,8 @@ module.exports = function (config) {
             'karma-chrome-launcher',
             'karma-ng-html2js-preprocessor',
             'karma-json-fixtures-preprocessor',
-            'karma-coverage'
+            'karma-coverage',
+            'karma-webpack'
         ],
         ngHtml2JsPreprocessor: {
             moduleName: 'directiveTemplates',
@@ -121,6 +140,31 @@ module.exports = function (config) {
         },
         jsonFixturesPreprocessor: {
             variableName: '__fixtures__'
+        },
+        webpack: {
+            mode: 'development',
+            resolve: {
+                modules: ['core/templates/dev/head'],
+            },
+            module: {
+                rules: [{
+                        test: /\.ts$/,
+                        use: [
+                            'cache-loader',
+                            'thread-loader',
+                            {
+                                loader: 'ts-loader',
+                                options: {
+                                    // this is needed for thread-loader to work correctly
+                                    happyPackMode: true
+                                }
+                            }
+                        ]
+                    }]
+            },
+            plugins: [
+                new ForkTsCheckerWebpackPlugin({ checkSyntacticErrors: true })
+            ]
         }
     });
 };

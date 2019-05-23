@@ -15,16 +15,18 @@ oppia.directive('coordTwoDimEditor', [
     'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
     function (UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
         return {
+            controllerAs: '$ctrl',
             controller: ['$scope', function ($scope) {
-                    $scope.mapCenter = {
-                        lat: $scope.value[0],
-                        lng: $scope.value[1],
+                    var ctrl = this;
+                    ctrl.mapCenter = {
+                        lat: ctrl.value[0],
+                        lng: ctrl.value[1],
                         zoom: 0
                     };
-                    $scope.mapMarkers = {
+                    ctrl.mapMarkers = {
                         mainMarker: {
-                            lat: $scope.value[0],
-                            lng: $scope.value[1],
+                            lat: ctrl.value[0],
+                            lng: ctrl.value[1],
                             focus: true,
                             draggable: true,
                             icon: {
@@ -45,7 +47,7 @@ oppia.directive('coordTwoDimEditor', [
                             }
                         }
                     };
-                    $scope.mapEvents = {
+                    ctrl.mapEvents = {
                         map: {
                             enable: ['click'],
                             logic: 'emit'
@@ -58,19 +60,20 @@ oppia.directive('coordTwoDimEditor', [
                     $scope.$on('leafletDirectiveMap.coordTwoDimEditor.click', function (evt, args) {
                         var newLat = args.leafletEvent.latlng.lat;
                         var newLng = args.leafletEvent.latlng.lng;
-                        $scope.value = [newLat, newLng];
+                        ctrl.value = [newLat, newLng];
                         updateMarker(newLat, newLng);
                     });
                     $scope.$on('leafletDirectiveMarker.coordTwoDimEditor.dragend', function (evt, args) {
-                        $scope.value = [args.model.lat, args.model.lng];
+                        ctrl.value = [args.model.lat, args.model.lng];
                     });
                     var updateMarker = function (lat, lng) {
-                        $scope.mapMarkers.mainMarker.lat = lat;
-                        $scope.mapMarkers.mainMarker.lng = lng;
+                        ctrl.mapMarkers.mainMarker.lat = lat;
+                        ctrl.mapMarkers.mainMarker.lng = lng;
                     };
                 }],
             restrict: 'E',
-            scope: {
+            scope: {},
+            bindToController: {
                 value: '='
             },
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/objects/templates/coord_two_dim_editor_directive.html'),

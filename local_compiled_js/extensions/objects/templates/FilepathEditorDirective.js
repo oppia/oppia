@@ -19,11 +19,14 @@ oppia.directive('filepathEditor', [
     function ($http, $sce, AlertsService, AssetsBackendApiService, ContextService, UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
         return {
             restrict: 'E',
-            scope: {
+            scope: {},
+            bindToController: {
                 value: '='
             },
             templateUrl: UrlInterpolationService.getExtensionResourceUrl('/objects/templates/filepath_editor_directive.html'),
+            controllerAs: '$ctrl',
             controller: ['$scope', function ($scope) {
+                    var ctrl = this;
                     var MODE_EMPTY = 1;
                     var MODE_UPLOADED = 2;
                     var MODE_SAVED = 3;
@@ -151,43 +154,43 @@ oppia.directive('filepathEditor', [
                         return Math.min(Math.max(min, value), max);
                     };
                     var handleMouseMoveWhileDraggingCropArea = function (x, y) {
-                        var xDown = $scope.lastMouseDownEventCoordinates.x;
-                        var yDown = $scope.lastMouseDownEventCoordinates.y;
-                        var x1WhenDown = $scope.cropAreaXWhenLastDown;
-                        var y1WhenDown = $scope.cropAreaYWhenLastDown;
+                        var xDown = ctrl.lastMouseDownEventCoordinates.x;
+                        var yDown = ctrl.lastMouseDownEventCoordinates.y;
+                        var x1WhenDown = ctrl.cropAreaXWhenLastDown;
+                        var y1WhenDown = ctrl.cropAreaYWhenLastDown;
                         // Calculate new position of the crop area.
                         var x1 = x1WhenDown + (x - xDown);
                         var y1 = y1WhenDown + (y - yDown);
                         // Correct for boundaries.
-                        var dimensions = $scope.calculateTargetImageDimensions();
-                        var cropWidth = $scope.cropArea.x2 - $scope.cropArea.x1;
-                        var cropHeight = $scope.cropArea.y2 - $scope.cropArea.y1;
+                        var dimensions = ctrl.calculateTargetImageDimensions();
+                        var cropWidth = ctrl.cropArea.x2 - ctrl.cropArea.x1;
+                        var cropHeight = ctrl.cropArea.y2 - ctrl.cropArea.y1;
                         x1 = clamp(x1, 0, dimensions.width - cropWidth);
                         y1 = clamp(y1, 0, dimensions.height - cropHeight);
                         // Update crop area coordinates.
-                        $scope.cropArea.x1 = x1;
-                        $scope.cropArea.y1 = y1;
-                        $scope.cropArea.x2 = x1 + cropWidth;
-                        $scope.cropArea.y2 = y1 + cropHeight;
+                        ctrl.cropArea.x1 = x1;
+                        ctrl.cropArea.y1 = y1;
+                        ctrl.cropArea.x2 = x1 + cropWidth;
+                        ctrl.cropArea.y2 = y1 + cropHeight;
                     };
                     var handleMouseMoveWhileResizingCropArea = function (x, y) {
-                        var dimensions = $scope.calculateTargetImageDimensions();
-                        var direction = $scope.cropAreaResizeDirection;
+                        var dimensions = ctrl.calculateTargetImageDimensions();
+                        var direction = ctrl.cropAreaResizeDirection;
                         var adjustResizeLeft = function (x) {
                             // Update crop area x1 value, correcting for boundaries.
-                            $scope.cropArea.x1 = clamp(x, 0, $scope.cropArea.x2 - CROP_AREA_MIN_WIDTH_PX);
+                            ctrl.cropArea.x1 = clamp(x, 0, ctrl.cropArea.x2 - CROP_AREA_MIN_WIDTH_PX);
                         };
                         var adjustResizeRight = function (x) {
                             // Update crop area x2 value, correcting for boundaries.
-                            $scope.cropArea.x2 = clamp(x, CROP_AREA_MIN_WIDTH_PX + $scope.cropArea.x1, dimensions.width);
+                            ctrl.cropArea.x2 = clamp(x, CROP_AREA_MIN_WIDTH_PX + ctrl.cropArea.x1, dimensions.width);
                         };
                         var adjustResizeTop = function (y) {
                             // Update crop area y1 value, correcting for boundaries.
-                            $scope.cropArea.y1 = clamp(y, 0, $scope.cropArea.y2 - CROP_AREA_MIN_HEIGHT_PX);
+                            ctrl.cropArea.y1 = clamp(y, 0, ctrl.cropArea.y2 - CROP_AREA_MIN_HEIGHT_PX);
                         };
                         var adjustResizeBottom = function (y) {
                             // Update crop area y2 value, correcting for boundaries.
-                            $scope.cropArea.y2 = clamp(y, CROP_AREA_MIN_HEIGHT_PX + $scope.cropArea.y1, dimensions.height);
+                            ctrl.cropArea.y2 = clamp(y, CROP_AREA_MIN_HEIGHT_PX + ctrl.cropArea.y1, dimensions.height);
                         };
                         switch (direction) {
                             case MOUSE_TOP_LEFT:
@@ -222,10 +225,10 @@ oppia.directive('filepathEditor', [
                     };
                     var updatePositionWithinCropArea = function (x, y) {
                         var margin = CROP_BORDER_MARGIN_PX;
-                        var cx1 = $scope.cropArea.x1;
-                        var cy1 = $scope.cropArea.y1;
-                        var cx2 = $scope.cropArea.x2;
-                        var cy2 = $scope.cropArea.y2;
+                        var cx1 = ctrl.cropArea.x1;
+                        var cy1 = ctrl.cropArea.y1;
+                        var cx2 = ctrl.cropArea.x2;
+                        var cy2 = ctrl.cropArea.y2;
                         var xOnLeftBorder = x > cx1 - margin && x < cx1 + margin;
                         var xOnRightBorder = x > cx2 - margin && x < cx2 + margin;
                         var yOnTopBorder = y > cy1 - margin && y < cy1 + margin;
@@ -238,141 +241,141 @@ oppia.directive('filepathEditor', [
                         // which case we want to recognize the corner.
                         if (xOnLeftBorder && yOnTopBorder) {
                             // Upper left corner.
-                            $scope.mousePositionWithinCropArea = MOUSE_TOP_LEFT;
+                            ctrl.mousePositionWithinCropArea = MOUSE_TOP_LEFT;
                         }
                         else if (xOnRightBorder && yOnTopBorder) {
                             // Upper right corner.
-                            $scope.mousePositionWithinCropArea = MOUSE_TOP_RIGHT;
+                            ctrl.mousePositionWithinCropArea = MOUSE_TOP_RIGHT;
                         }
                         else if (xOnLeftBorder && yOnBottomBorder) {
                             // Lower left corner.
-                            $scope.mousePositionWithinCropArea = MOUSE_BOTTOM_LEFT;
+                            ctrl.mousePositionWithinCropArea = MOUSE_BOTTOM_LEFT;
                         }
                         else if (xOnRightBorder && yOnBottomBorder) {
                             // Lower right corner.
-                            $scope.mousePositionWithinCropArea = MOUSE_BOTTOM_RIGHT;
+                            ctrl.mousePositionWithinCropArea = MOUSE_BOTTOM_RIGHT;
                         }
                         else if (yOnTopBorder) {
                             // Top border.
-                            $scope.mousePositionWithinCropArea = MOUSE_TOP;
+                            ctrl.mousePositionWithinCropArea = MOUSE_TOP;
                         }
                         else if (xOnLeftBorder) {
                             // Left border.
-                            $scope.mousePositionWithinCropArea = MOUSE_LEFT;
+                            ctrl.mousePositionWithinCropArea = MOUSE_LEFT;
                         }
                         else if (xOnRightBorder) {
                             // Right border.
-                            $scope.mousePositionWithinCropArea = MOUSE_RIGHT;
+                            ctrl.mousePositionWithinCropArea = MOUSE_RIGHT;
                         }
                         else if (yOnBottomBorder) {
                             // Bottom border.
-                            $scope.mousePositionWithinCropArea = MOUSE_BOTTOM;
+                            ctrl.mousePositionWithinCropArea = MOUSE_BOTTOM;
                         }
                         else if (xInside && yInside) {
                             // Inside the crop area.
-                            $scope.mousePositionWithinCropArea = MOUSE_INSIDE;
+                            ctrl.mousePositionWithinCropArea = MOUSE_INSIDE;
                         }
                         else {
-                            $scope.mousePositionWithinCropArea = null;
+                            ctrl.mousePositionWithinCropArea = null;
                         }
                     };
                     var getTrustedResourceUrlForImageFileName = function (imageFileName) {
                         var encodedFilepath = window.encodeURIComponent(imageFileName);
-                        return $sce.trustAsResourceUrl(AssetsBackendApiService.getImageUrlForPreview($scope.explorationId, encodedFilepath));
+                        return $sce.trustAsResourceUrl(AssetsBackendApiService.getImageUrlForPreview(ctrl.explorationId, encodedFilepath));
                     };
                     /** Scope variables and functions (visibles to the view) */
                     // Reset the component each time the value changes
                     // (e.g. if this is part of an editable list).
-                    $scope.$watch('value', function (newValue) {
+                    $scope.$watch('$ctrl.value', function (newValue) {
                         if (newValue) {
-                            $scope.setSavedImageFilename(newValue, false);
+                            ctrl.setSavedImageFilename(newValue, false);
                         }
                     });
-                    $scope.resetFilePathEditor = function () {
-                        $scope.data = {
+                    ctrl.resetFilePathEditor = function () {
+                        ctrl.data = {
                             mode: MODE_EMPTY,
                             metadata: {}
                         };
-                        $scope.imageResizeRatio = 1;
+                        ctrl.imageResizeRatio = 1;
                     };
-                    $scope.validate = function (data) {
+                    ctrl.validate = function (data) {
                         return data.mode === MODE_SAVED &&
                             data.metadata.savedImageFilename &&
                             data.metadata.savedImageFilename.length > 0;
                     };
-                    $scope.isUserCropping = function () {
-                        var dimensions = $scope.calculateTargetImageDimensions();
-                        var cropWidth = $scope.cropArea.x2 - $scope.cropArea.x1;
-                        var cropHeight = $scope.cropArea.y2 - $scope.cropArea.y1;
+                    ctrl.isUserCropping = function () {
+                        var dimensions = ctrl.calculateTargetImageDimensions();
+                        var cropWidth = ctrl.cropArea.x2 - ctrl.cropArea.x1;
+                        var cropHeight = ctrl.cropArea.y2 - ctrl.cropArea.y1;
                         return cropWidth < dimensions.width || cropHeight < dimensions.height;
                     };
-                    $scope.onMouseMoveOnImageArea = function (e) {
+                    ctrl.onMouseMoveOnImageArea = function (e) {
                         e.preventDefault();
                         var coords = getEventCoorindatesRelativeToImageContainer(e);
-                        if ($scope.userIsDraggingCropArea) {
+                        if (ctrl.userIsDraggingCropArea) {
                             handleMouseMoveWhileDraggingCropArea(coords.x, coords.y);
                         }
-                        else if ($scope.userIsResizingCropArea) {
+                        else if (ctrl.userIsResizingCropArea) {
                             handleMouseMoveWhileResizingCropArea(coords.x, coords.y);
                         }
                         else {
                             updatePositionWithinCropArea(coords.x, coords.y);
                         }
-                        $scope.mouseLastKnownCoordinates = { x: coords.x, y: coords.y };
+                        ctrl.mouseLastKnownCoordinates = { x: coords.x, y: coords.y };
                     };
-                    $scope.onMouseDownOnCropArea = function (e) {
+                    ctrl.onMouseDownOnCropArea = function (e) {
                         e.preventDefault();
                         var coords = getEventCoorindatesRelativeToImageContainer(e);
-                        var position = $scope.mousePositionWithinCropArea;
+                        var position = ctrl.mousePositionWithinCropArea;
                         if (position === MOUSE_INSIDE) {
-                            $scope.lastMouseDownEventCoordinates = { x: coords.x, y: coords.y };
-                            $scope.cropAreaXWhenLastDown = $scope.cropArea.x1;
-                            $scope.cropAreaYWhenLastDown = $scope.cropArea.y1;
-                            $scope.userIsDraggingCropArea = true;
+                            ctrl.lastMouseDownEventCoordinates = { x: coords.x, y: coords.y };
+                            ctrl.cropAreaXWhenLastDown = ctrl.cropArea.x1;
+                            ctrl.cropAreaYWhenLastDown = ctrl.cropArea.y1;
+                            ctrl.userIsDraggingCropArea = true;
                         }
                         else if (position !== null) {
-                            $scope.lastMouseDownEventCoordinates = { x: coords.x, y: coords.y };
-                            $scope.userIsResizingCropArea = true;
-                            $scope.cropAreaResizeDirection = position;
+                            ctrl.lastMouseDownEventCoordinates = { x: coords.x, y: coords.y };
+                            ctrl.userIsResizingCropArea = true;
+                            ctrl.cropAreaResizeDirection = position;
                         }
                     };
-                    $scope.onMouseUpOnCropArea = function (e) {
+                    ctrl.onMouseUpOnCropArea = function (e) {
                         e.preventDefault();
-                        $scope.userIsDraggingCropArea = false;
-                        $scope.userIsResizingCropArea = false;
+                        ctrl.userIsDraggingCropArea = false;
+                        ctrl.userIsResizingCropArea = false;
                     };
-                    $scope.getMainContainerDynamicStyles = function () {
+                    ctrl.getMainContainerDynamicStyles = function () {
                         var width = OUTPUT_IMAGE_MAX_WIDTH_PX;
                         return 'width: ' + width + 'px';
                     };
-                    $scope.getImageContainerDynamicStyles = function () {
-                        if ($scope.data.mode === MODE_EMPTY) {
+                    ctrl.getImageContainerDynamicStyles = function () {
+                        if (ctrl.data.mode === MODE_EMPTY) {
                             return 'border: 1px dotted #888';
                         }
                         else {
                             return 'border: none';
                         }
                     };
-                    $scope.getToolbarDynamicStyles = function () {
-                        if ($scope.isUserCropping()) {
+                    ctrl.getToolbarDynamicStyles = function () {
+                        if (ctrl.isUserCropping()) {
                             return 'visibility: hidden';
                         }
                         else {
                             return 'visibility: visible';
                         }
                     };
-                    $scope.getCropButtonBarDynamicStyles = function () {
-                        return 'left: ' + $scope.cropArea.x2 + 'px;' +
-                            'top: ' + $scope.cropArea.y1 + 'px;';
+                    ctrl.getCropButtonBarDynamicStyles = function () {
+                        return 'left: ' + ctrl.cropArea.x2 + 'px;' +
+                            'top: ' + ctrl.cropArea.y1 + 'px;';
                     };
-                    $scope.getCropAreaDynamicStyles = function () {
-                        var cropWidth = $scope.cropArea.x2 - $scope.cropArea.x1;
-                        var cropHeight = $scope.cropArea.y2 - $scope.cropArea.y1;
-                        var position = $scope.mousePositionWithinCropArea;
+                    ctrl.getCropAreaDynamicStyles = function () {
+                        var cropWidth = ctrl.cropArea.x2 - ctrl.cropArea.x1;
+                        var cropHeight = ctrl.cropArea.y2 - ctrl.cropArea.y1;
+                        var position = ctrl.mousePositionWithinCropArea;
                         // Position, size, cursor and background.
                         var styles = {
-                            left: $scope.cropArea.x1 + 'px',
-                            top: $scope.cropArea.y1 + 'px',
+                            left: ctrl.cropArea.x1 + 'px',
+                            top: ctrl.cropArea.y1 + 'px',
                             width: cropWidth + 'px',
                             height: cropHeight + 'px',
                             cursor: CROP_CURSORS[position],
@@ -382,13 +385,13 @@ oppia.directive('filepathEditor', [
                             styles.cursor = 'default';
                         }
                         // Translucent background layer.
-                        if ($scope.isUserCropping()) {
-                            var data = 'url(' + $scope.data.metadata.uploadedImageData + ')';
+                        if (ctrl.isUserCropping()) {
+                            var data = 'url(' + ctrl.data.metadata.uploadedImageData + ')';
                             styles.background = data + ' no-repeat';
-                            var x = $scope.cropArea.x1 + 3; // Add crop area border.
-                            var y = $scope.cropArea.y1 + 3; // Add crop area border.
+                            var x = ctrl.cropArea.x1 + 3; // Add crop area border.
+                            var y = ctrl.cropArea.y1 + 3; // Add crop area border.
                             styles['background-position'] = '-' + x + 'px -' + y + 'px';
-                            var dimensions = $scope.calculateTargetImageDimensions();
+                            var dimensions = ctrl.calculateTargetImageDimensions();
                             styles['background-size'] = dimensions.width + 'px ' +
                                 dimensions.height + 'px';
                         }
@@ -396,93 +399,93 @@ oppia.directive('filepathEditor', [
                             return key + ': ' + styles[key];
                         }).join('; ');
                     };
-                    $scope.getUploadedImageDynamicStyles = function () {
-                        var dimensions = $scope.calculateTargetImageDimensions();
+                    ctrl.getUploadedImageDynamicStyles = function () {
+                        var dimensions = ctrl.calculateTargetImageDimensions();
                         var w = dimensions.width;
                         var h = dimensions.height;
                         return 'width: ' + w + 'px; height: ' + h + 'px;';
                     };
-                    $scope.confirmCropImage = function () {
+                    ctrl.confirmCropImage = function () {
                         // Find coordinates of the cropped area within original image scale.
-                        var dimensions = $scope.calculateTargetImageDimensions();
-                        var r = $scope.data.metadata.originalWidth / dimensions.width;
-                        var x1 = $scope.cropArea.x1 * r;
-                        var y1 = $scope.cropArea.y1 * r;
-                        var width = ($scope.cropArea.x2 - $scope.cropArea.x1) * r;
-                        var height = ($scope.cropArea.y2 - $scope.cropArea.y1) * r;
+                        var dimensions = ctrl.calculateTargetImageDimensions();
+                        var r = ctrl.data.metadata.originalWidth / dimensions.width;
+                        var x1 = ctrl.cropArea.x1 * r;
+                        var y1 = ctrl.cropArea.y1 * r;
+                        var width = (ctrl.cropArea.x2 - ctrl.cropArea.x1) * r;
+                        var height = (ctrl.cropArea.y2 - ctrl.cropArea.y1) * r;
                         // Generate new image data and file.
-                        var newImageData = getCroppedImageData($scope.data.metadata.uploadedImageData, x1, y1, width, height);
+                        var newImageData = getCroppedImageData(ctrl.data.metadata.uploadedImageData, x1, y1, width, height);
                         var newImageFile = convertImageDataToImageFile(newImageData);
                         // Update image data.
-                        $scope.data.metadata.uploadedFile = newImageFile;
-                        $scope.data.metadata.uploadedImageData = newImageData;
-                        $scope.data.metadata.originalWidth = width;
-                        $scope.data.metadata.originalHeight = height;
+                        ctrl.data.metadata.uploadedFile = newImageFile;
+                        ctrl.data.metadata.uploadedImageData = newImageData;
+                        ctrl.data.metadata.originalWidth = width;
+                        ctrl.data.metadata.originalHeight = height;
                         // Re-calculate the dimensions of the base image and reset the
                         // coordinates of the crop area to the boundaries of the image.
-                        var dimensions = $scope.calculateTargetImageDimensions();
-                        $scope.cropArea = {
+                        var dimensions = ctrl.calculateTargetImageDimensions();
+                        ctrl.cropArea = {
                             x1: 0,
                             y1: 0,
                             x2: dimensions.width,
                             y2: dimensions.height
                         };
                     };
-                    $scope.cancelCropImage = function () {
-                        var dimensions = $scope.calculateTargetImageDimensions();
-                        $scope.cropArea.x1 = 0;
-                        $scope.cropArea.y1 = 0;
-                        $scope.cropArea.x2 = dimensions.width;
-                        $scope.cropArea.y2 = dimensions.height;
+                    ctrl.cancelCropImage = function () {
+                        var dimensions = ctrl.calculateTargetImageDimensions();
+                        ctrl.cropArea.x1 = 0;
+                        ctrl.cropArea.y1 = 0;
+                        ctrl.cropArea.x2 = dimensions.width;
+                        ctrl.cropArea.y2 = dimensions.height;
                     };
-                    $scope.getImageSizeHelp = function () {
-                        var imageWidth = $scope.data.metadata.originalWidth;
-                        if ($scope.imageResizeRatio === 1 &&
+                    ctrl.getImageSizeHelp = function () {
+                        var imageWidth = ctrl.data.metadata.originalWidth;
+                        if (ctrl.imageResizeRatio === 1 &&
                             imageWidth > OUTPUT_IMAGE_MAX_WIDTH_PX) {
                             return 'This image has been automatically downsized to ensure ' +
                                 'that it will fit in the card.';
                         }
                         return null;
                     };
-                    $scope.isNoImageUploaded = function () {
-                        return $scope.data.mode === MODE_EMPTY;
+                    ctrl.isNoImageUploaded = function () {
+                        return ctrl.data.mode === MODE_EMPTY;
                     };
-                    $scope.isImageUploaded = function () {
-                        return $scope.data.mode === MODE_UPLOADED;
+                    ctrl.isImageUploaded = function () {
+                        return ctrl.data.mode === MODE_UPLOADED;
                     };
-                    $scope.isImageSaved = function () {
-                        return $scope.data.mode === MODE_SAVED;
+                    ctrl.isImageSaved = function () {
+                        return ctrl.data.mode === MODE_SAVED;
                     };
-                    $scope.getCurrentResizePercent = function () {
-                        return Math.round(100 * $scope.imageResizeRatio);
+                    ctrl.getCurrentResizePercent = function () {
+                        return Math.round(100 * ctrl.imageResizeRatio);
                     };
-                    $scope.decreaseResizePercent = function (amount) {
+                    ctrl.decreaseResizePercent = function (amount) {
                         // Do not allow to decrease size below 10%.
-                        $scope.imageResizeRatio = Math.max(0.1, $scope.imageResizeRatio - amount / 100);
+                        ctrl.imageResizeRatio = Math.max(0.1, ctrl.imageResizeRatio - amount / 100);
                     };
-                    $scope.increaseResizePercent = function (amount) {
+                    ctrl.increaseResizePercent = function (amount) {
                         // Do not allow to increase size above 100% (only downsize allowed).
-                        $scope.imageResizeRatio = Math.min(1, $scope.imageResizeRatio + amount / 100);
+                        ctrl.imageResizeRatio = Math.min(1, ctrl.imageResizeRatio + amount / 100);
                     };
-                    $scope.calculateTargetImageDimensions = function () {
-                        var width = $scope.data.metadata.originalWidth;
-                        var height = $scope.data.metadata.originalHeight;
+                    ctrl.calculateTargetImageDimensions = function () {
+                        var width = ctrl.data.metadata.originalWidth;
+                        var height = ctrl.data.metadata.originalHeight;
                         if (width > OUTPUT_IMAGE_MAX_WIDTH_PX) {
                             var aspectRatio = width / height;
                             width = OUTPUT_IMAGE_MAX_WIDTH_PX;
                             height = width / aspectRatio;
                         }
                         return {
-                            width: Math.round(width * $scope.imageResizeRatio),
-                            height: Math.round(height * $scope.imageResizeRatio)
+                            width: Math.round(width * ctrl.imageResizeRatio),
+                            height: Math.round(height * ctrl.imageResizeRatio)
                         };
                     };
-                    $scope.setUploadedFile = function (file) {
+                    ctrl.setUploadedFile = function (file) {
                         var reader = new FileReader();
                         reader.onload = function (e) {
                             var img = new Image();
                             img.onload = function () {
-                                $scope.data = {
+                                ctrl.data = {
                                     mode: MODE_UPLOADED,
                                     metadata: {
                                         uploadedFile: file,
@@ -491,21 +494,21 @@ oppia.directive('filepathEditor', [
                                         originalHeight: img.naturalHeight
                                     }
                                 };
-                                var dimensions = $scope.calculateTargetImageDimensions();
-                                $scope.cropArea = {
+                                var dimensions = ctrl.calculateTargetImageDimensions();
+                                ctrl.cropArea = {
                                     x1: 0,
                                     y1: 0,
                                     x2: dimensions.width,
                                     y2: dimensions.height
                                 };
-                                $scope.$apply();
+                                ctrl.$apply();
                             };
                             img.src = (e.target.result);
                         };
                         reader.readAsDataURL(file);
                     };
-                    $scope.setSavedImageFilename = function (filename, updateParent) {
-                        $scope.data = {
+                    ctrl.setSavedImageFilename = function (filename, updateParent) {
+                        ctrl.data = {
                             mode: MODE_SAVED,
                             metadata: {
                                 savedImageFilename: filename,
@@ -514,24 +517,24 @@ oppia.directive('filepathEditor', [
                         };
                         if (updateParent) {
                             AlertsService.clearWarnings();
-                            $scope.value = filename;
+                            ctrl.value = filename;
                         }
                     };
-                    $scope.onFileChanged = function (file, filename) {
-                        $scope.setUploadedFile(file);
+                    ctrl.onFileChanged = function (file, filename) {
+                        ctrl.setUploadedFile(file);
                         $scope.$apply();
                     };
-                    $scope.discardUploadedFile = function () {
-                        $scope.resetFilePathEditor();
+                    ctrl.discardUploadedFile = function () {
+                        ctrl.resetFilePathEditor();
                     };
-                    $scope.saveUploadedFile = function () {
+                    ctrl.saveUploadedFile = function () {
                         AlertsService.clearWarnings();
-                        if (!$scope.data.metadata.uploadedFile) {
+                        if (!ctrl.data.metadata.uploadedFile) {
                             AlertsService.addWarning('No image file detected.');
                             return;
                         }
-                        var dimensions = $scope.calculateTargetImageDimensions();
-                        var resampledImageData = getResampledImageData($scope.data.metadata.uploadedImageData, dimensions.width, dimensions.height);
+                        var dimensions = ctrl.calculateTargetImageDimensions();
+                        var resampledImageData = getResampledImageData(ctrl.data.metadata.uploadedImageData, dimensions.width, dimensions.height);
                         var resampledFile = convertImageDataToImageFile(resampledImageData);
                         if (resampledFile === null) {
                             AlertsService.addWarning('Could not get resampled file.');
@@ -540,11 +543,11 @@ oppia.directive('filepathEditor', [
                         var form = new FormData();
                         form.append('image', resampledFile);
                         form.append('payload', JSON.stringify({
-                            filename: $scope.generateImageFilename(dimensions.height, dimensions.width)
+                            filename: ctrl.generateImageFilename(dimensions.height, dimensions.width)
                         }));
                         form.append('csrf_token', GLOBALS.csrf_token);
                         $.ajax({
-                            url: '/createhandler/imageupload/' + $scope.explorationId,
+                            url: '/createhandler/imageupload/' + ctrl.explorationId,
                             data: form,
                             processData: false,
                             contentType: false,
@@ -559,7 +562,7 @@ oppia.directive('filepathEditor', [
                             // Pre-load image before marking the image as saved.
                             var img = new Image();
                             img.onload = function () {
-                                $scope.setSavedImageFilename(data.filename, true);
+                                ctrl.setSavedImageFilename(data.filename, true);
                                 $scope.$apply();
                             };
                             img.src = getTrustedResourceUrlForImageFileName(data.filename);
@@ -571,7 +574,7 @@ oppia.directive('filepathEditor', [
                             $scope.$apply();
                         });
                     };
-                    $scope.generateImageFilename = function (height, width) {
+                    ctrl.generateImageFilename = function (height, width) {
                         var date = new Date();
                         return 'img_' +
                             date.getFullYear() +
@@ -616,23 +619,23 @@ oppia.directive('filepathEditor', [
                     //       savedImageFilename: <File name of the resource for the image>
                     //       savedImageUrl: <Trusted resource Url for the image>
                     //     }
-                    $scope.data = { mode: MODE_EMPTY, metadata: {} };
+                    ctrl.data = { mode: MODE_EMPTY, metadata: {} };
                     // Resizing properties.
-                    $scope.imageResizeRatio = 1;
+                    ctrl.imageResizeRatio = 1;
                     // Cropping properties.
-                    $scope.cropArea = { x1: 0, y1: 0, x2: 0, y2: 0 };
-                    $scope.mousePositionWithinCropArea = null;
-                    $scope.mouseLastKnownCoordinates = { x: 0, y: 0 };
-                    $scope.lastMouseDownEventCoordinates = { x: 0, y: 0 };
-                    $scope.userIsDraggingCropArea = false;
-                    $scope.userIsResizingCropArea = false;
-                    $scope.cropAreaResizeDirection = null;
-                    $scope.explorationId = ContextService.getExplorationId();
-                    $scope.resetFilePathEditor();
+                    ctrl.cropArea = { x1: 0, y1: 0, x2: 0, y2: 0 };
+                    ctrl.mousePositionWithinCropArea = null;
+                    ctrl.mouseLastKnownCoordinates = { x: 0, y: 0 };
+                    ctrl.lastMouseDownEventCoordinates = { x: 0, y: 0 };
+                    ctrl.userIsDraggingCropArea = false;
+                    ctrl.userIsResizingCropArea = false;
+                    ctrl.cropAreaResizeDirection = null;
+                    ctrl.explorationId = ContextService.getExplorationId();
+                    ctrl.resetFilePathEditor();
                     window.addEventListener('mouseup', function (e) {
                         e.preventDefault();
-                        $scope.userIsDraggingCropArea = false;
-                        $scope.userIsResizingCropArea = false;
+                        ctrl.userIsDraggingCropArea = false;
+                        ctrl.userIsResizingCropArea = false;
                     }, false);
                 }]
         };
