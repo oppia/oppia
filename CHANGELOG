@@ -6,7 +6,7 @@ Improvements to editors and players
 * Fix #6468: Fix the improper alignment of tick mark in the library page (#6552)
 * Fix #6200: Fix inconsistent spacing with the lists (#6554)
 * Fix #6542: Add card name to the title of the exploration feedback (#6580)
-* Fixes #6623: Add title to sharing link icons (#6624)
+* Fix #6623: Add title to sharing link icons (#6624)
 
 New structures
 * Modify topic viewer page and few UI changes on topic editor page (#6455)
