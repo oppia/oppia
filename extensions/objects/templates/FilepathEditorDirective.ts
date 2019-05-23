@@ -576,7 +576,7 @@ oppia.directive('filepathEditor', [
                 x2: dimensions.width,
                 y2: dimensions.height
               };
-              ctrl.$apply();
+              $scope.$apply();
             };
             img.src = <string>((<FileReader>e.target).result);
           };
