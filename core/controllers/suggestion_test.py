@@ -320,6 +320,49 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             )['suggestions']
         self.assertEqual(len(suggestions), 2)
 
+    def test_invalid_action_type_of_suggestion(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions'][0]
+
+        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_accept['target_id'],
+            suggestion_to_accept['suggestion_id']), {
+                'action': u'invalid',
+                'commit_message': u'commit message',
+                'review_message': u'Accepted'
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+    def test_reject_suggestion(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        suggestion_to_reject = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions'][0]
+
+        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json('%s/exploration/%s/%s' % (
+            feconf.SUGGESTION_ACTION_URL_PREFIX,
+            suggestion_to_reject['target_id'],
+            suggestion_to_reject['suggestion_id']), {
+                'action': u'reject',
+                'commit_message': u'commit message',
+                'review_message': u'rejected'
+            }, csrf_token=csrf_token)
+        self.logout()
+
     def test_resubmit_rejected_suggestion(self):
 
         self.login(self.EDITOR_EMAIL)
@@ -414,6 +457,28 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             }, csrf_token=csrf_token)
         self.logout()
 
+    def test_new_structure_page_not_found_error(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            suggestion_to_accept = self.get_json(
+                '%s?suggestion_type=%s' % (
+                    feconf.SUGGESTION_LIST_URL_PREFIX,
+                    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+                )['suggestions'][0]
+
+            self.login(self.ADMIN_EMAIL)
+            response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            self.put_json('%s/topic/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                'random',
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'This looks good!',
+                    'skill_id': self.SKILL_ID
+                }, csrf_token=csrf_token, expected_status_int=404)
+
     def test_query_question_suggestions(self):
         suggestions = self.get_json(
             '%s?suggestion_type=%s' % (
@@ -475,3 +540,110 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             suggestion_to_accept['suggestion_id'])
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(last_message.text, 'This looks good!')
+
+    def test_invalid_action_on_suggestion_error(self):
+        suggestion_to_accept = self.get_json(
+            '%s?suggestion_type=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+            )['suggestions'][0]
+
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.put_json('%s/topic/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'invalid',
+                    'commit_message': u'commit message',
+                    'review_message': u'This looks good!',
+                    'skill_id': self.SKILL_ID
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+    def test_reject_suggestion(self):
+        suggestion_to_reject = self.get_json(
+            '%s?suggestion_type=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+            )['suggestions'][0]
+
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.put_json('%s/topic/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_reject['target_id'],
+                suggestion_to_reject['suggestion_id']), {
+                    'action': u'reject',
+                    'commit_message': u'commit message',
+                    'review_message': u'rejected',
+                    'skill_id': self.SKILL_ID
+                }, csrf_token=csrf_token)
+
+    def test_accept_suggestion_on_invalid_topic_handler(self):
+        suggestion_to_accept = self.get_json(
+            '%s?suggestion_type=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+            )['suggestions'][0]
+
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.put_json('%s/exploration/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'This looks good!',
+                    'skill_id': self.SKILL_ID
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+    def test_accept_suggestion_on_invalid_exploration_id(self):
+        suggestion_to_accept = self.get_json(
+            '%s?suggestion_type=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
+            )['suggestions'][0]
+
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.put_json('%s/topic/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                'random',
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'This looks good!',
+                    'skill_id': self.SKILL_ID
+                }, csrf_token=csrf_token, expected_status_int=400)
+
+
+class SuggestionListHandlerTests(test_utils.GenericTestBase):
+
+    def test_suggestion_list_handler(self):
+        params = {
+            'target_type': 'exploration',
+            'target_id': 'exp_id'
+        }
+        response = self.get_json(
+            '/suggestionlisthandler', params=params)
+        expected_response = {'additional_angular_modules': [],
+                             'suggestions': [], 'is_super_admin': False,
+                             'is_moderator': False, 'iframed': False,
+                             'is_admin': False, 'is_topic_manager': False}
+        self.assertEqual(expected_response, response)
+
+    def test_invalid_suggestion_list_handler(self):
+        params = {
+            'invalid_query': 'random'
+        }
+        self.get_json(
+            '/suggestionlisthandler', params=params, expected_status_int=500)
