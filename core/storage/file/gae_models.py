@@ -67,70 +67,73 @@ class FileMetadataModel(base_models.VersionedModel):
             feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def _construct_id(cls, exploration_id, filepath):
+    def _construct_id(cls, assets_path, filepath):
         """Constructs and returns an id string uniquely identifying the given
         exploration and filepath.
 
         Args:
-            exploration_id: str. The id of the exploration.
+            assets_path: str. The path to the assets folder for an entity.
             filepath: str. The path to the relevant file within the
-                exploration.
+                assets folder of the corresponding entity.
 
         Returns:
             str. Uniquely identifying string for the given exploration and
             filepath (concatenation of exploration id and filepath).
         """
-        return utils.vfs_construct_path('/', exploration_id, filepath)
+        return utils.vfs_construct_path('/', assets_path, filepath)
 
     @classmethod
-    def create(cls, exploration_id, filepath):
+    def create(cls, assets_path, filepath):
         """Creates and returns a FileMetadataModel instance describing the given
         exploration and filepath.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            filepath: str. The path to the relevant file within the exploration.
+            assets_path: str. The path to the assets folder for an entity.
+            filepath: str. The path to the relevant file within the
+                assets folder of the corresponding entity.
 
         Returns:
             FileMetadataModel. An instance of this class.
         """
-        model_id = cls._construct_id(exploration_id, filepath)
+        model_id = cls._construct_id(assets_path, filepath)
         return cls(id=model_id, deleted=False)
 
     @classmethod
-    def get_model(cls, exploration_id, filepath, strict=False):
+    def get_model(cls, assets_path, filepath, strict=False):
         """Returns the newest version of an existing FileMetadataModel instance
         describing the given exploration and filepath.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            filepath: str. The path to the relevant file within the exploration.
+            assets_path: str. The path to the assets folder for an entity.
+            filepath: str. The path to the relevant file within the
+                assets folder of the corresponding entity.
             strict: bool. Whether to fail noisily if no exploration
                 with the given id exists in the datastore.
 
         Returns:
             FileMetadataModel. An instance of this class, uniquely
-            identified by exploration_id and filepath.
+            identified by assets_path and filepath.
         """
-        model_id = cls._construct_id(exploration_id, filepath)
+        model_id = cls._construct_id(assets_path, filepath)
         return super(FileMetadataModel, cls).get(model_id, strict=strict)
 
     @classmethod
-    def get_version(cls, exploration_id, filepath, version_number):
+    def get_version(cls, assets_path, filepath, version_number):
         """Returns the specified version of an existing FileMetadataModel
         instance describing the given exploration and filepath.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            filepath: str. The path to the relevant file within the exploration.
+            assets_path: str. The path to the assets folder for an entity.
+            filepath: str. The path to the relevant file within the
+                assets folder of the corresponding entity.
             version_number: int. The version number of the instance to
                 be returned.
 
         Returns:
             FileMetadataModel. An instance of this class, uniquely identified
-            by exploration_id, filepath, and version_number.
+            by assets_path, filepath, and version_number.
         """
-        model_id = cls._construct_id(exploration_id, filepath)
+        model_id = cls._construct_id(assets_path, filepath)
         return super(FileMetadataModel, cls).get_version(
             model_id, version_number)
 
@@ -212,51 +215,54 @@ class FileModel(base_models.VersionedModel):
         raise NotImplementedError
 
     @classmethod
-    def _construct_id(cls, exploration_id, filepath):
+    def _construct_id(cls, assets_path, filepath):
         """Constructs and returns an id string uniquely identifying the given
         exploration and filepath.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            filepath: str. The path to the relevant file within the exploration.
+            assets_path: str. The path to the assets folder for an entity.
+            filepath: str. The path to the relevant file within the
+                assets folder of the corresponding entity.
 
         Returns:
             str. Uniquely identifying string for the given exploration and
             filepath.
         """
-        return utils.vfs_construct_path('/', exploration_id, filepath)
+        return utils.vfs_construct_path('/', assets_path, filepath)
 
     @classmethod
-    def create(cls, exploration_id, filepath):
+    def create(cls, assets_path, filepath):
         """Creates and returns a FileModel instance specified by the given
         exploration and filepath.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            filepath: str. The path to the relevant file within the exploration.
+            assets_path: str. The path to the assets folder for an entity.
+            filepath: str. The path to the relevant file within the
+                assets folder of the corresponding entity.
 
         Returns:
             FileModel. An instance of this class.
         """
-        model_id = cls._construct_id(exploration_id, filepath)
+        model_id = cls._construct_id(assets_path, filepath)
         return cls(id=model_id, deleted=False)
 
     @classmethod
-    def get_model(cls, exploration_id, filepath, strict=False):
+    def get_model(cls, assets_path, filepath, strict=False):
         """Returns the newest version of an existing FileModel instance
         specified by the given exploration and filepath.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            filepath: str. The path to the relevant file within the exploration.
+            assets_path: str. The path to the assets folder for an entity.
+            filepath: str. The path to the relevant file within the
+                assets folder of the corresponding entity.
             strict: bool. Whether to fail noisily if no exploration
                 with the given id exists in the datastore.
 
         Returns:
             FileModel. An instance of this class, uniquely
-            identified by exploration_id and filepath.
+            identified by assets_path and filepath.
         """
-        model_id = cls._construct_id(exploration_id, filepath)
+        model_id = cls._construct_id(assets_path, filepath)
         return super(FileModel, cls).get(model_id, strict=strict)
 
     def commit(self, committer_id, commit_cmds):
@@ -277,19 +283,20 @@ class FileModel(base_models.VersionedModel):
         super(FileModel, self).commit(committer_id, '', commit_cmds)
 
     @classmethod
-    def get_version(cls, exploration_id, filepath, version_number):
+    def get_version(cls, assets_path, filepath, version_number):
         """Returns the chosen version of an existing FileModel instance
         specified by the given exploration and filepath.
 
         Args:
-            exploration_id: str. The id of the exploration.
-            filepath: str. The path to the relevant file within the exploration.
+            assets_path: str. The path to the assets folder for an entity.
+            filepath: str. The path to the relevant file within the
+                assets folder of the corresponding entity.
             version_number: int. The version number of the instance to
                 be returned.
 
         Returns:
             FileModel. An instance of this class, uniquely
-                identified by exploration_id, filepath, and version_number.
+                identified by assets_path, filepath, and version_number.
         """
-        model_id = cls._construct_id(exploration_id, filepath)
+        model_id = cls._construct_id(assets_path, filepath)
         return super(FileModel, cls).get_version(model_id, version_number)
