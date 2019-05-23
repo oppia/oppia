@@ -85,4 +85,5 @@ class ValueGeneratorNameTests(test_utils.GenericTestBase):
         expected_value_generators = ['BaseValueGenerator', 'Copier',
                                      'RandomSelector']
 
-        self.assertEqual(all_value_generators, expected_value_generators)
+        self.assertEqual(
+            sorted(all_value_generators), sorted(expected_value_generators))
