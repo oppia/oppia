@@ -41,7 +41,7 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/training-data/training-data.service.ts');
-require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/exploration-player-page/exploration-player-page-services/answer-classification/answer-classification.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');

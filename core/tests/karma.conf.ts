@@ -31,7 +31,6 @@ module.exports = function(config) {
       generatedJs,
       // The module files have to be loaded before App.js since it depends
       // on the other modules.
-      'local_compiled_js/core/templates/dev/head/**/*.module.js',
       'local_compiled_js/core/templates/dev/head/*.js',
       'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
@@ -39,6 +38,7 @@ module.exports = function(config) {
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
+      'core/templates/dev/head/**/*.template.html',
       'core/templates/dev/head/**/*.spec.ts',
       'core/templates/dev/head/*.spec.ts',
       'core/templates/dev/head/**/*Spec.ts',
@@ -89,10 +89,10 @@ module.exports = function(config) {
     preprocessors: {
       'core/templates/dev/head/*.ts': ['webpack'],
       'core/templates/dev/head/**/*.ts': ['webpack'],
-      'core/templates/dev/head/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'local_compiled_js/core/templates/dev/head/!(*\.spec).js': ['coverage'],
       'local_compiled_js/core/templates/dev/head/**/!(*\.spec).js': ['coverage'],
+      'core/templates/dev/head/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no

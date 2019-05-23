@@ -69,7 +69,8 @@ oppia.directive('stateInteractionEditor', [
         recomputeGraph: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_interaction_editor_directive.html'),
+        '/pages/state-editor/state-interaction-editor/' +
+        'state-interaction-editor.directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'HtmlEscaperService', 'StateEditorService',
@@ -217,8 +218,9 @@ oppia.directive('stateInteractionEditor', [
 
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration_editor/editor_tab/' +
-                  'customize_interaction_modal_directive.html'),
+                  '/pages/exploration-editor-page/exploration-editor-tab/' +
+                  'exploration-editor-tab-templates/' +
+                  'customize-interaction-modal.template.html'),
                 backdrop: true,
                 resolve: {},
                 controller: [
@@ -415,8 +417,9 @@ oppia.directive('stateInteractionEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_interaction_modal_directive.html'),
+                '/pages/exploration-editor-page/exploration-editor-tab/' +
+                'exploration-editor-tab-templates/' +
+                'delete-interaction-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', function(

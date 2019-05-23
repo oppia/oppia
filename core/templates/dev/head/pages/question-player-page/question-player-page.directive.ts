@@ -96,10 +96,10 @@ require(
 require(
   'components/common-layout-directives/background-banner/' +
   'background-banner.directive.ts');
-require('pages/exploration_player/ConversationSkinDirective.ts');
-require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/LearnerLocalNav.ts');
-require('pages/exploration_player/LearnerViewInfo.ts');
+require('pages/exploration-player-page/ConversationSkinDirective.ts');
+require('pages/exploration-player-page/ExplorationFooterDirective.ts');
+require('pages/exploration-player-page/LearnerLocalNav.ts');
+require('pages/exploration-player-page/LearnerViewInfo.ts');
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',

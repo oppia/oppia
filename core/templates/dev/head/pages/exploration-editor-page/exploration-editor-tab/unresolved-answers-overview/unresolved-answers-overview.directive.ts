@@ -35,7 +35,7 @@ require('services/StateTopAnswersStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-angular.module('unresolvedAnswersOverviewModule').directive(
+oppia.directive(
   'unresolvedAnswersOverview', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {

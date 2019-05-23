@@ -17,9 +17,9 @@
  */
 
 
-require('pages/exploration_player/ExplorationEngineService.ts');
-require('pages/exploration_player/PlayerPositionService.ts');
-require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/exploration-player-page/exploration-player-page-services/exploration-engine.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/player-position/player-position.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/player-transcript/player-transcript.service.ts');
 require('pages/show-suggestion-editor-pages/suggestion-modal.service.ts');
 
 oppia.controller(

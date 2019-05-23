@@ -64,8 +64,9 @@ oppia.factory(
           });
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_player/' +
-              'learner_suggestion_submitted_modal_directive.html'),
+              '/pages/exploration-player-page/' +
+              'exploration-player-page-templates/' +
+              'learner-suggestion-submitted-modal.template.html'),
             backdrop: true,
             resolve: {},
             controller: [

@@ -18,7 +18,7 @@ require('domain/utilities/UrlInterpolationService.ts');
  * @fileoverview Controllers for the about page.
  */
 
-angular.module('aboutPageModule').controller('About', [
+oppia.controller('About', [
   '$scope', 'UrlInterpolationService',
   function($scope, UrlInterpolationService) {
     // Define constants

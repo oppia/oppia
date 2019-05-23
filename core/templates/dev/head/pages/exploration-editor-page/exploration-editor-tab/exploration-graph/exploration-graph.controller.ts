@@ -32,7 +32,7 @@ require(
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
-angular.module('explorationGraphModule').controller('ExplorationGraph', [
+oppia.controller('ExplorationGraph', [
   '$scope', '$uibModal', 'AlertsService', 'EditabilityService',
   'ExplorationStatesService', 'GraphDataService', 'RouterService',
   'StateEditorService', 'UrlInterpolationService',

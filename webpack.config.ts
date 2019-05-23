@@ -42,16 +42,23 @@ module.exports = {
     email_dashboard:
       commonPrefix + '/pages/email-dashboard-page/email-dashboard-page.controller.ts',
     email_dashboard_result:
-      commonPrefix + '/pages/email-dashboard-page/email-dashboard-result/email-dashboard-result.controller.ts',
+      commonPrefix + '/pages/email-dashboard-page/email-dashboard-result/' +
+      'email-dashboard-result.controller.ts',
     error: commonPrefix + '/pages/error-page/error-page.controller.ts',
     exploration_editor:
-      commonPrefix + '/pages/exploration-editor-page/exploration-editor-page.controller.ts',
+      commonPrefix + '/pages/exploration-editor-page/' +
+      'exploration-editor-page.controller.ts',
     exploration_player:
-      commonPrefix + '/pages/exploration_player/ExplorationPlayer.ts',
-    get_started: commonPrefix + '/pages/get-started-page/get-started-page.script.ts',
-    landing: commonPrefix + '/pages/landing-pages/topic-landing-page/topic-landing-page.controller.ts',
+      commonPrefix + '/pages/exploration-player-page/' +
+      'exploration-player-page.controller.ts',
+    get_started:
+      commonPrefix + '/pages/get-started-page/get-started-page.script.ts',
+    landing:
+      commonPrefix + '/pages/landing-pages/topic-landing-page/' +
+      'topic-landing-page.controller.ts',
     learner_dashboard:
-      commonPrefix + '/pages/learner-dashboard-page/learner-dashboard-page.controller.ts',
+      commonPrefix + '/pages/learner-dashboard-page/' +
+      'learner-dashboard-page.controller.ts',
     library: commonPrefix + '/pages/library-page/library-page.controller.ts',
     maintenance: commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
     moderator: commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
@@ -176,9 +183,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_player'],
-      filename: 'exploration_player.html',
+      filename: 'exploration-player-page.mainpage.html',
       template:
-        commonPrefix + '/pages/exploration_player/exploration_player.html',
+        commonPrefix + '/pages/exploration-player-page/' +
+        'exploration-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

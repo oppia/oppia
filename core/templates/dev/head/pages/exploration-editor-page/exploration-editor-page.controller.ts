@@ -208,9 +208,9 @@ require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
-require('pages/exploration_player/ConversationSkinDirective.ts');
-require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/PlayerConstants.ts');
+require('pages/exploration-player-page/ConversationSkinDirective.ts');
+require('pages/exploration-player-page/ExplorationFooterDirective.ts');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
@@ -269,7 +269,7 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'router.service.ts');
-require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration-player-page/exploration-player-page-services/state-classifier-mapping/state-classifier-mapping.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'state-tutorial-first-time.service.ts');
