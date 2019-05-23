@@ -29,7 +29,7 @@ require('domain/collection/CollectionValidationService.ts');
 require('domain/collection/EditableCollectionBackendApiService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection-editor-page/collection-editor-page-services/collection-editor-state/collection-editor-state.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'router.service.ts');
@@ -40,7 +40,8 @@ oppia.directive('collectionEditorNavbar', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/collection_editor_navbar_directive.html'),
+        '/pages/collection-editor-page/collection-editor-navbar/' +
+        'collection-editor-navbar.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'RouterService',
         'UndoRedoService', 'CollectionEditorStateService',
@@ -132,8 +133,9 @@ oppia.directive('collectionEditorNavbar', [
             var isPrivate = $scope.collectionRights.isPrivate();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/collection_editor/' +
-                'collection_editor_save_modal_directive.html'),
+                '/pages/collection-editor-page/' +
+                'collection-editor-page-templates/' +
+                'collection-editor-save-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -164,8 +166,9 @@ oppia.directive('collectionEditorNavbar', [
             if (additionalMetadataNeeded) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/collection_editor/' +
-                  'collection_editor_pre_publish_modal_directive.html'),
+                  '/pages/collection-editor-page/' +
+                  'collection-editor-page-templates/' +
+                  'collection-editor-pre-publish-modal.directive.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance', 'CollectionEditorStateService',

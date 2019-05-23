@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the history tab of the collection editor.
+ * @fileoverview Controller for the statistics tab of the collection editor.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive('collectionHistoryTab', [
+oppia.directive('collectionStatisticsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/history_tab/' +
-        'collection_history_tab_directive.html'),
+        '/pages/collection-editor-page/statistics-tab/' +
+        'collection-statistics-tab.directive.html'),
       controller: [function() {}]
     };
   }]);

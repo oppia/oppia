@@ -25,8 +25,10 @@ require(
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/collection/CollectionValidationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditor.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection-editor-page/collection-editor-page.controller.ts');
+require(
+  'pages/collection-editor-page/collection-editor-page-services/'+
+  'collection-editor-state/collection-editor-state.service.ts');
 require('services/AlertsService.ts');
 
 oppia.directive('collectionDetailsEditor', [
@@ -34,8 +36,8 @@ oppia.directive('collectionDetailsEditor', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings_tab/' +
-        'collection_details_editor_directive.html'),
+        '/pages/collection-editor-page/settings-tab/collection-details-editor/' +
+        'collection-details-editor.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',

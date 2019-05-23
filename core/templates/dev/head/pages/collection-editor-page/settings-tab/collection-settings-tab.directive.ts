@@ -16,10 +16,10 @@
  * @fileoverview Controller for the settings tab of the collection editor.
  */
 
-require(
-  'pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.ts');
-require(
-  'pages/collection_editor/settings_tab/CollectionPermissionsCardDirective.ts');
+require('pages/collection-editor-page/settings-tab/' +
+  'collection-details-editor/collection-details-editor.directive.ts');
+require('pages/collection-editor-page/settings-tab/' +
+  'collection-permissions-card/collection-permissions-card.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 
@@ -28,8 +28,8 @@ oppia.directive('collectionSettingsTab', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings_tab/' +
-        'collection_settings_tab_directive.html'),
+        '/pages/collection-editor-page/settings-tab/' +
+        'collection-settings-tab.directive.html'),
       controller: [function() {}]
     };
   }]);

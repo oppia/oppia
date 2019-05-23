@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require(
+  'pages/collection-editor-page/collection-editor-page-services/' +
+  'collection-editor-state/collection-editor-state.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'router.service.ts');
@@ -29,14 +31,15 @@ require('services/stateful/FocusManagerService.ts');
 // support both displaying the current title of the collection (or untitled if
 // it does not yet have one) or setting a new title in the case of an untitled
 // collection.
+
 oppia.directive('collectionEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/' +
-        'collection_editor_navbar_breadcrumb_directive.html'),
+        '/pages/collection-editor-page/collection-editor-navbar-breadcrumb/' +
+        'collection-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', 'RouterService', 'CollectionEditorStateService',
         'FocusManagerService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',

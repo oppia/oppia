@@ -16,16 +16,20 @@
  * @fileoverview Primary controller for the collection editor page.
  */
 
-require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
-require('pages/collection_editor/CollectionEditorNavbarDirective.ts');
-require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.ts');
-require('pages/collection_editor/history_tab/CollectionHistoryTabDirective.ts');
-require(
-  'pages/collection_editor/settings_tab/CollectionSettingsTabDirective.ts');
-require(
-  'pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.ts');
+// TODO(bhenning): These constants should be provided by the backend.
 
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection-editor-page/collection-editor-navbar-breadcrumb/' +
+  'collection-editor-navbar-breadcrumb.directive.ts');
+require('pages/collection-editor-page/collection-editor-navbar/' +
+  'collection-editor-navbar.directive.ts');
+require('pages/collection-editor-page/editor-tab/' +
+  'collection-editor-tab.directive.ts');
+require('pages/collection-editor-page/history-tab/' +
+  'collection-history-tab.directive.ts');
+require(
+  'pages/collection-editor-page/settings-tab/collection-settings-tab.directive.ts');
+require('pages/collection-editor-page/statistics-tab/' +
+  'collection-statistics-tab.directive.ts');
 
 // TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(

@@ -18,15 +18,17 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require(
+  'pages/collection-editor-page/collection-editor-page-services/' +
+  'collection-editor-state/collection-editor-state.service.ts');
 
 oppia.directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings_tab/' +
-        'collection_permissions_card_directive.html'),
+        '/pages/collection-editor-page/settings-tab/collection-permissions-card/' +
+        'collection-permissions-card.directive.html'),
       controller: [
         '$scope', 'CollectionEditorStateService',
         function($scope, CollectionEditorStateService) {

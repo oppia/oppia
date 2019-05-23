@@ -22,8 +22,12 @@ require('domain/collection/SearchExplorationsBackendApiService.ts');
 require('domain/summary/ExplorationSummaryBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require(
+  'pages/collection-editor-page/collection-editor-page-services/' +
+  'collection-editor-state/collection-editor-state.service.ts');
+require(
+  'pages/collection-editor-page/collection-editor-page-services/' +
+  'collection-linearizer/collection-linearizer.service.ts');
 require('services/AlertsService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/ValidatorsService.ts');
@@ -33,8 +37,8 @@ oppia.directive('collectionNodeCreator', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/editor_tab/' +
-        'collection_node_creator_directive.html'),
+        '/pages/collection-editor-page/editor-tab/collection-node-creator/' +
+        'collection-node-creator.directive.html'),
       controller: [
         '$scope', '$http', '$window', '$filter', 'AlertsService',
         'ValidatorsService', 'CollectionEditorStateService',
