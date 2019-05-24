@@ -18,7 +18,6 @@
 
 import urllib
 
-from constants import constants
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import question_services
@@ -2493,23 +2492,10 @@ def get_decorator_for_accepting_suggestion(decorator):
             user_actions_info = user_services.UserActionsInfo(self.user_id)
 
             if len(suggestion_id.split('.')) != 3:
-                raise self.InvalidInputException('Invalid format for suggestion_id.'
-                                             ' It must contain 3 parts'
-                                             ' separated by \'.\'')
-
-            if suggestion_id.split('.')[1] != target_id:
-                if suggestion_id.split('.')[0] == 'exploration':
-                    raise self.InvalidInputException('The exploration id provided does '
-                                 'not match the exploration id '
-                                 'present as part of the '
-                                 'suggestion_id')
-                elif suggestion_id.split('.')[0] == 'topic':
-                    if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-                        raise self.PageNotFoundException
-                    else:
-                        raise self.InvalidInputException(
-                                'The topic id provided does not match the topic id present as '
-                                'part of the suggestion_id')
+                raise self.InvalidInputException('Invalid format for ' +
+                                                 'suggestion_id. It must ' +
+                                                 'contain 3 parts separated ' +
+                                                 'by \'.\'')
 
             if (
                     role_services.ACTION_ACCEPT_ANY_SUGGESTION in
@@ -2518,8 +2504,9 @@ def get_decorator_for_accepting_suggestion(decorator):
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             if suggestion.author_id == self.user_id:
-                raise self.UnauthorizedUserException('You cannot accept/reject your'
-                                                 ' own suggestion.')
+                raise self.UnauthorizedUserException('You cannot accept/' +
+                                                     'reject your own' +
+                                                     'suggestion.')
 
             if suggestion_services.check_user_can_review_in_category(
                     self.user_id, suggestion.score_category):

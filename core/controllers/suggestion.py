@@ -53,6 +53,12 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             raise self.InvalidInputException('This handler allows actions only'
                                              ' on suggestions to explorations.')
 
+        if suggestion_id.split('.')[1] != target_id:
+            raise self.InvalidInputException('The exploration id provided does '
+                                             'not match the exploration id '
+                                             'present as part of the '
+                                             'suggestion_id')
+
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
@@ -92,9 +98,17 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_topic)
     def put(self, target_id, suggestion_id):
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
         if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_TOPIC:
             raise self.InvalidInputException(
                 'This handler allows actions only on suggestions to topics.')
+
+        if suggestion_id.split('.')[1] != target_id:
+            raise self.InvalidInputException(
+                'The topic id provided does not match the topic id present as '
+                'part of the suggestion_id')
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
