@@ -64,15 +64,17 @@ module.exports = function(config) {
       // TODO(vojtechjelinek): add these back after the templateCache
       // is repaired, the templateCache is broken due to the fact that
       // webpack is not yet implemented for /extensions (#6732)
-      'core/templates/dev/head/components/ratings/rating-display/rating-display.directive.spec.ts',
-      ('pages/exploration-editor-page/exploration-editor-tab/' +
-       'exploration-editor-tab-services/solution-verification/' +
-       'solution-verification.service.spec.ts'),
-      ('pages/exploration-editor-page/exploration-editor-tab/' +
-       'state-name-editor/state-name-editor.directive.spec.ts'),
-      ('pages/state-editor/state-content-editor/' +
+      ('core/templates/dev/head/components/ratings/rating-display/' +
+       'rating-display.directive.spec.ts'),
+      ('core/templates/dev/head/pages/exploration-editor-page/' +
+       'exploration-editor-tab/exploration-editor-tab-services/' +
+       'solution-verification/solution-verification.service.spec.ts'),
+      ('core/templates/dev/head/pages/exploration-editor-page/' +
+       'exploration-editor-tab/state-name-editor/' +
+       'state-name-editor.directive.spec.ts'),
+      ('core/templates/dev/head/pages/state-editor/state-content-editor/' +
        'state-content-editor.directive.spec.ts'),
-      ('pages/state-editor/state-interaction-editor/' +
+      ('core/templates/dev/head/pages/state-editor/state-interaction-editor/' +
        'state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {
