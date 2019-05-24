@@ -469,28 +469,6 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(self._get_all_incomplete_collection_ids(
             self.user_id), [])
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def test_get_all_completed_exp_ids(self):
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [])
@@ -896,6 +874,156 @@ class LearnerProgressTests(test_utils.GenericTestBase):
         self.assertEqual(
             incomplete_collection_summaries[0].id, '0_arch_bridges_in_england')
         self.assertEqual(len(incomplete_collection_summaries), 1)
+
+    def test_unpublishing_exploration_filters_it_out_from_playlist(self):
+        # Add activities to the playlist section.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0)
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_1)
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
+
+        # Unpublish EXP_ID_1 to change status to ACTIVITY_STATUS_PRIVATE.
+        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.unpublish_exploration(system_user, self.EXP_ID_1)
+        private_exploration = exp_services.get_exploration_summary_by_id(
+            self.EXP_ID_1)
+        self.assertEqual(
+            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        exploration_playlist = (
+            all_filtered_summaries.exploration_playlist_summaries)
+
+        # Test that exploration_playlist doesn't include private exploration.
+        self.assertEqual(
+            exploration_playlist[0].id, '0_en_arch_bridges_in_england')
+        self.assertEqual(len(exploration_playlist), 1)
+
+    def test_republishing_exploration_keeps_it_in_exploration_playlist(self):
+        # Add activity to the playlist section.
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0)
+        self.assertEqual(
+            learner_playlist_services.get_all_exp_ids_in_learner_playlist(
+                self.user_id), [self.EXP_ID_0])
+
+        # Unpublish EXP_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
+        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.unpublish_exploration(system_user, self.EXP_ID_0)
+        private_exploration = exp_services.get_exploration_summary_by_id(
+            self.EXP_ID_0)
+        self.assertEqual(
+            private_exploration.status, constants.ACTIVITY_STATUS_PRIVATE)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        exploration_playlist = (
+            all_filtered_summaries.exploration_playlist_summaries)
+        # Test that exploration_playlist doesn't include private exploration.
+        self.assertEqual(len(exploration_playlist), 0)
+
+        # Republish EXP_ID_0 to change status back to ACTIVITY_STATUS_PUBLIC.
+        self.publish_exploration(self.owner_id, self.EXP_ID_0)
+        learner_progress_services.add_exp_to_learner_playlist(
+            self.user_id, self.EXP_ID_0)
+        public_exploration = exp_services.get_exploration_summary_by_id(
+            self.EXP_ID_0)
+        self.assertEqual(
+            public_exploration.status, constants.ACTIVITY_STATUS_PUBLIC)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        exploration_playlist = (
+            all_filtered_summaries.exploration_playlist_summaries)
+        # Test that exploration_playlist includes original EXP_ID_0.
+        self.assertEqual(
+            exploration_playlist[0].id, '0_en_arch_bridges_in_england')
+        self.assertEqual(len(exploration_playlist), 1)
+
+    def test_unpublishing_collection_filters_it_out_from_playlist(self):
+        # Add activities to the playlist section.
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_0)
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_1)
+        self.assertEqual(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
+                self.user_id), [self.COL_ID_0, self.COL_ID_1])
+
+        # Unpublish COL_ID_1 to change status to ACTIVITY_STATUS_PRIVATE.
+        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.unpublish_collection(system_user, self.COL_ID_1)
+        private_collection = collection_services.get_collection_summary_by_id(
+            self.COL_ID_1)
+        self.assertEqual(
+            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        collection_playlist = (
+            all_filtered_summaries.collection_playlist_summaries)
+
+        # Test that collection_playlist doesn't include private collection.
+        self.assertEqual(
+            collection_playlist[0].id, '0_arch_bridges_in_england')
+        self.assertEqual(len(collection_playlist), 1)
+
+    def test_republishing_collection_keeps_it_in_collection_playlist(self):
+        # Add activity to the playlist section.
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_0)
+        self.assertEqual(
+            learner_playlist_services.get_all_collection_ids_in_learner_playlist( # pylint: disable=line-too-long
+                self.user_id), [self.COL_ID_0])
+
+        # Unpublish COL_ID_0 to change status to ACTIVITY_STATUS_PRIVATE.
+        system_user = user_services.UserActionsInfo(feconf.SYSTEM_COMMITTER_ID)
+        rights_manager.unpublish_collection(system_user, self.COL_ID_0)
+        private_collection = collection_services.get_collection_summary_by_id(
+            self.COL_ID_0)
+        self.assertEqual(
+            private_collection.status, constants.ACTIVITY_STATUS_PRIVATE)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        collection_playlist = (
+            all_filtered_summaries.collection_playlist_summaries)
+        # Test that collection_playlist doesn't include private collection.
+        self.assertEqual(len(collection_playlist), 0)
+
+        # Republish COL_ID_0 to change status back to ACTIVITY_STATUS_PUBLIC.
+        self.publish_collection(self.owner_id, self.COL_ID_0)
+        learner_progress_services.add_collection_to_learner_playlist(
+            self.user_id, self.COL_ID_0)
+        public_collection = collection_services.get_collection_summary_by_id(
+            self.COL_ID_0)
+        self.assertEqual(
+            public_collection.status, constants.ACTIVITY_STATUS_PUBLIC)
+
+        # Call get_activity_progress to get filtered progress.
+        user_activity = learner_progress_services.get_activity_progress(
+            self.user_id)
+        all_filtered_summaries = user_activity[0]
+        collection_playlist = (
+            all_filtered_summaries.collection_playlist_summaries)
+        # Test that collection_playlist includes original COL_ID_0.
+        self.assertEqual(
+            collection_playlist[0].id, '0_arch_bridges_in_england')
+        self.assertEqual(len(collection_playlist), 1)
 
     def test_get_ids_of_activities_in_learner_dashboard(self):
         # Add activities to the completed section.
