@@ -155,7 +155,7 @@ class TermsPage(base.BaseHandler):
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
 
-        self.render_template('dist/terms.html')
+        self.render_template('dist/terms-page.mainpage.html')
 
 
 class PrivacyPage(base.BaseHandler):

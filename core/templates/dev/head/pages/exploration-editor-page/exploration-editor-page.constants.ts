@@ -43,4 +43,5 @@ oppia.constant(
 
 oppia.constant(
   'IMPROVE_TYPE_INCOMPLETE', 'incomplete');
-  
+
+oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');

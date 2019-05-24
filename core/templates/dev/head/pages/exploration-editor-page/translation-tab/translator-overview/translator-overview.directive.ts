@@ -26,6 +26,8 @@ require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
   'translation-status/translation-status.service.ts');
 
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
 oppia.directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

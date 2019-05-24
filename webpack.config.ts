@@ -334,8 +334,8 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'terms.html',
-      template: commonPrefix + '/pages/terms/terms.html',
+      filename: 'terms-page.mainpage.html',
+      template: commonPrefix + '/pages/terms-page/terms-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

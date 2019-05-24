@@ -17,12 +17,20 @@
  */
 
 require('components/ratings/rating-display/rating-display.directive.ts');
-require('components/summary-tile-directives/exploration-summary-tile/exploration-summary-tile.directive.ts');
-require('components/summary-tile-directives/collection-summary-tile/collection-summary-tile.directive.ts');
+require(
+  'components/summary-tile-directives/exploration-summary-tile/' +
+  'exploration-summary-tile.directive.ts');
+require(
+  'components/summary-tile-directives/collection-summary-tile/' +
+  'collection-summary-tile.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
-require('pages/exploration-player-page/correctness-footer/correctness-footer.directive.ts');
+require(
+  'pages/exploration-player-page/correctness-footer/' +
+  'correctness-footer.directive.ts');
 require('pages/exploration-player-page/progress-nav/progress-nav.directive.ts');
-require('pages/exploration-player-page/supplement-card/supplemental-card.directive.ts');
+require(
+  'pages/exploration-player-page/supplemental-card/' +
+  'supplemental-card.directive.ts');
 require('pages/exploration-player-page/tutor-card/tutor-card.directive.ts');
 
 require('domain/collection/GuestCollectionProgressService.ts');
@@ -33,27 +41,63 @@ require('domain/skill/ConceptCardBackendApiService.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration-player-page/exploration-player-page-services/audio-translation-manager/audio-translation-manager.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/current-interaction./current-interaction.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/exploration-engine.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/exploration-player-state.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/exploration-recommendations.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/fatigue-detection.service.ts');
-require('pages/exploration-player-page/feedback-popup/feedback-popup.directive.ts');
-require('pages/exploration-player-page/exploration-player-page-services/hints-and-solution-manager/hints-and-solution-manager.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/image-preloader/image-preloader.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/learner-params/learner-params.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/learner-view-rating.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/number-attempts/number-attempts.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/exploration-player-page/exploration-player-page-services/player-correctness-feedback-enabled.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/player-position/player-position.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/player-transcript/player-transcript.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/pretest-engine.service.ts');
 require(
-  'pages/exploration-player-page/exploration-player-page-services/refresher-exploration-confirmation-modal.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/state-classifier-mapping/state-classifier-mapping.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/stats-reporting.service.ts');
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'audio-translation-manager/audio-translation-manager.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'current-interaction/current-interaction.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'exploration-engine.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'exploration-player-state.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'exploration-recommendations.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'fatigue-detection.service.ts');
+require(
+  'pages/exploration-player-page/feedback-popup/feedback-popup.directive.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'hints-and-solution-manager/hints-and-solution-manager.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'image-preloader/image-preloader.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'learner-params/learner-params.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'learner-view-rating.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'number-attempts/number-attempts.service.ts');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'player-correctness-feedback-enabled.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'player-position/player-position.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'player-transcript/player-transcript.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'pretest-engine.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'refresher-exploration-confirmation-modal.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'state-classifier-mapping/state-classifier-mapping.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'stats-reporting.service.ts');
 require('services/AlertsService.ts');
 require('services/AutogeneratedAudioPlayerService.ts');
 require('services/ContextService.ts');
