@@ -20,29 +20,26 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-property.service.ts');
 
-oppia.factory('ExplorationTagsService', [
-  'ExplorationPropertyService',
-  function(ExplorationPropertyService) {
+oppia.factory('ExplorationLanguageCodeService', [
+  'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'tags';
-    child._normalize = function(value) {
-      for (var i = 0; i < value.length; i++) {
-        value[i] = value[i].trim().replace(/\s+/g, ' ');
-      }
-      // TODO(sll): Prevent duplicate tags from being added.
-      return value;
+    child.propertyName = 'language_code';
+    child.getAllLanguageCodes = function() {
+      return constants.ALL_LANGUAGE_CODES;
     };
-    child._isValid = function(value) {
-      // Every tag should match the TAG_REGEX.
-      for (var i = 0; i < value.length; i++) {
-        var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
-        if (!value[i].match(tagRegex)) {
-          return false;
+    child.getCurrentLanguageDescription = function() {
+      for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
+        if (constants.ALL_LANGUAGE_CODES[i].code === child.displayed) {
+          return constants.ALL_LANGUAGE_CODES[i].description;
         }
       }
-
-      return true;
+    };
+    child._isValid = function(value) {
+      return constants.ALL_LANGUAGE_CODES.some(function(elt) {
+        return elt.code === value;
+      });
     };
     return child;
   }
 ]);
+  

@@ -16,7 +16,7 @@
  * @fileoverview Directive for displaying Role graph.
  */
 
-require('components/StateGraphLayoutService.ts');
+require('components/component-services/state-graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
