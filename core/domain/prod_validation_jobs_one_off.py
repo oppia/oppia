@@ -15,13 +15,24 @@
 # limitations under the License.
 
 """One-off jobs for validating prod models."""
-from core import jobs
-from core.platform import models
 
-(user_models, exp_models, collection_models, feedback_models) = (
-    models.Registry.import_models([
-        models.NAMES.user, models.NAMES.exploration,
-        models.NAMES.collection, models.NAMES.feedback]))
+import datetime
+import re
+
+from constants import constants
+from core import jobs
+from core.domain import activity_domain
+from core.platform import models
+import feconf
+import schema_utils
+
+(
+    activity_models, user_models, exp_models, collection_models,
+    feedback_models) = (
+        models.Registry.import_models([
+            models.NAMES.activity,
+            models.NAMES.user, models.NAMES.exploration,
+            models.NAMES.collection, models.NAMES.feedback]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -33,6 +44,82 @@ class BaseModelValidator(object):
     # of the model class and a list of (external_key, external_model_instance)
     # tuples.
     external_models = {}
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        """Defines a regex for model id.
+
+        Returns:
+            str. A regex pattern to be followed by the model id.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _validate_model_id(cls, item):
+        """Checks whether the id of model matches the regex specified for
+        the model.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        regex_string = cls._get_model_id_regex(item)
+        if not re.compile(regex_string).match(str(item.id)):
+            cls.errors['model id check'] = (
+                'Model id %s: Model id does not match regex pattern') % item.id
+
+    @classmethod
+    def _get_json_properties_schema(cls):
+        """Defines a schema for model properties.
+
+        Returns:
+            dict(str, dict). A dictionary whose keys are names of model
+            properties and values are schema for these properties.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _validate_model_json_properties(cls, item):
+        """Checks that the properties defined in the model follow a specified
+        schema.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        properties_schema_dict = cls._get_json_properties_schema()
+
+        for property_name, property_schema in (
+                properties_schema_dict.iteritems()):
+            try:
+                schema_utils.normalize_against_schema(
+                    getattr(item, property_name), property_schema)
+            except Exception as e:
+                cls.errors['%s schema check' % property_name] = (
+                    'Model id %s: Property does not match the schema '
+                    'with the error %s' % (item.id, e))
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        """Defines a domain object instance created from the model.
+
+        Returns:
+            A domain object instance.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _validate_model_domain_object_instances(cls, item):
+        """Checks that model instance passes the validation of the domain
+        object for model.
+        """
+        model_domain_object_instances = cls._get_model_domain_object_instances(
+            item)
+        for model_domain_object_instance in model_domain_object_instances:
+            try:
+                model_domain_object_instance.validate()
+            except Exception as e:
+                cls.errors['domain object check'] = (
+                    'Model id %s: Model fails domain validation with the '
+                    'error %s' % (item.id, e))
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -91,6 +178,24 @@ class BaseModelValidator(object):
                 model_class, zip(field_values, external_models))
 
     @classmethod
+    def _validate_model_time_fields(cls, item):
+        """Checks the following relation for the model:
+        model.created_on <= model.last_updated <= current time.
+        """
+        if item.created_on > item.last_updated:
+            cls.errors['time field relation check'] = (
+                'Model id %s: The created_on field has a value %s which is '
+                'greater than the value %s of last_updated field'
+                ) % (item.id, item.created_on, item.last_updated)
+
+        current_datetime = datetime.datetime.utcnow()
+        if item.last_updated > current_datetime:
+            cls.errors['current time check'] = (
+                'Model id %s: The last_updated field has a value %s which is '
+                'greater than the time when the job was run'
+                ) % (item.id, item.last_updated)
+
+    @classmethod
     def _get_validation_functions(cls):
         """Returns the list of validation function to run.
 
@@ -110,13 +215,108 @@ class BaseModelValidator(object):
         cls.external_models.clear()
         cls._fetch_external_models(item)
 
+        cls._validate_model_id(item)
+        cls._validate_model_time_fields(item)
+        cls._validate_model_json_properties(item)
+        cls._validate_model_domain_object_instances(item)
         cls._validate_external_id_relationships(item)
         for func in cls._get_validation_functions():
             func(item)
 
 
+class ActivityReferencesModelValidator(BaseModelValidator):
+    """Class for validating ActivityReferencesModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        regex_list = [
+            item + '$' for item in feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES]
+        regex_string = '|'.join(regex_list)
+        return regex_string
+
+    @classmethod
+    def _get_json_properties_schema(cls):
+        activity_references_dict_schema = {
+            'type': 'dict',
+            'properties': [{
+                'name': 'type',
+                'schema': {
+                    'type': 'unicode',
+                },
+            }, {
+                'name': 'id',
+                'schema': {
+                    'type': 'unicode'
+                }
+            }]
+        }
+        activity_references_schema = {
+            'type': 'list',
+            'items': activity_references_dict_schema
+        }
+
+        return {
+            'activity_references': activity_references_schema
+        }
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        model_domain_object_instances = []
+
+        try:
+            for obj in item.activity_references:
+                model_domain_object_instances.append(
+                    activity_domain.ActivityReference(obj['type'], obj['id']))
+        except Exception as e:
+            cls.errors['fetch properties'] = (
+                'Model id %s: Model properties cannot be fetched completely '
+                'with the error %s') % (item.id, e)
+            return []
+
+        return model_domain_object_instances
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        exploration_ids = []
+        collection_ids = []
+
+        try:
+            for obj in item.activity_references:
+                if obj['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
+                    exploration_ids.append(obj['id'])
+                elif obj['type'] == constants.ACTIVITY_TYPE_COLLECTION:
+                    collection_ids.append(obj['id'])
+        except Exception as e:
+            cls.errors['fetch properties'] = (
+                'Model id %s: Model properties cannot be fetched completely '
+                'with the error %s') % (item.id, e)
+            return {}
+
+        return {
+            'exploration_ids': (exp_models.ExplorationModel, exploration_ids),
+            'collection_ids': (
+                collection_models.CollectionModel, collection_ids),
+        }
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return []
+
+
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -139,6 +339,18 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
 
 class ExplorationModelValidator(BaseModelValidator):
     """Class for validating ExplorationModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -186,6 +398,7 @@ class ExplorationModelValidator(BaseModelValidator):
 
 
 MODEL_TO_VALIDATOR_MAPPING = {
+    activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
     exp_models.ExplorationModel: ExplorationModelValidator,
 }
