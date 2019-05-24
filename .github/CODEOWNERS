@@ -104,7 +104,7 @@
 /core/storage/exploration/ @aks681
 /core/templates/dev/head/components/ExplorationCreationService*.ts @DubeySandeep
 /core/templates/dev/head/components/HintAndSolutionButtonsDirective*.ts @aks681
-/core/templates/dev/head/components/hint_and_solution_buttons_directive.html @aks681
+/core/templates/dev/head/components/button-directives/hint-and-solution-buttons/hint-and-solution-buttons.directive.html @aks681
 /core/templates/dev/head/components/state/ @aks681
 /core/templates/dev/head/components/StateGraphLayoutService*.ts @DubeySandeep
 /core/templates/dev/head/components/version_diff_visualization_directive.html @DubeySandeep
