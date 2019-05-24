@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the LogicProof Interaction.
+ * @fileoverview Directive for the LogicProof Interaction.
  */
 
 oppia.directive('oppiaInteractiveLogicProof', [

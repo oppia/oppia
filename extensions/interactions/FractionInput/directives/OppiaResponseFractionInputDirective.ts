@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the FractionInput response.
+ * @fileoverview Directive for the FractionInput response.
  */
 
 oppia.directive('oppiaResponseFractionInput', [

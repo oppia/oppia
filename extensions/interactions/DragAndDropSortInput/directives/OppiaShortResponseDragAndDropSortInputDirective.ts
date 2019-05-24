@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the DragAndDropSortInput short response.
+ * @fileoverview Directive for the DragAndDropSortInput short response.
  */
 
 oppia.directive('oppiaShortResponseDragAndDropSortInput', [

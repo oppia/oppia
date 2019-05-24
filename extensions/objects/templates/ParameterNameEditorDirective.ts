@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for parameter name editor.
+ */
+
 // NOTE TO DEVELOPERS: This editor requires ExplorationParamSpecsService to be
 // available in the context in which it is used.
 

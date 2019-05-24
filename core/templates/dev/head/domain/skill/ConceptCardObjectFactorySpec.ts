@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for ConceptCardObjectFactory.
-*/
+ * @fileoverview Unit tests for ConceptCardObjectFactory.
+ */
 
 require('App.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');

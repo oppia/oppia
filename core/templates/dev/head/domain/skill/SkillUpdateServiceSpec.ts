@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SkillUpdateService.
-*/
+ * @fileoverview Unit tests for SkillUpdateService.
+ */
 
 require('App.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');

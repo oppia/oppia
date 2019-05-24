@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for boolean editor.
+ */
+
 // The value for this editor is always editable.
 
 oppia.directive('booleanEditor', [

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for music phrase editor.
+ */
+
 // This directive is always editable.
 
 oppia.directive('musicPhraseEditor', [

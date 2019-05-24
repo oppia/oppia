@@ -13,11 +13,11 @@
 // limitations under the License.
 
 /**
-* @fileoverview End-to-end tests for additional features of the exploration
-* editor and player. Additional features include those features without which
-* an exploration can still be published. These include hints, solutions,
-* refresher explorations, state parameters, etc.
-*/
+ * @fileoverview End-to-end tests for additional features of the exploration
+ * editor and player. Additional features include those features without which
+ * an exploration can still be published. These include hints, solutions,
+ * refresher explorations, state parameters, etc.
+ */
 
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');

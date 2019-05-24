@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the LogicProof short response.
+ * @fileoverview Directive for the LogicProof short response.
  */
 
 oppia.directive('oppiaShortResponseLogicProof', [

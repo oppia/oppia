@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for item selection input validation service.
+ */
+
 describe('ItemSelectionInputValidationService', function() {
   var WARNING_TYPES, validatorService;
 

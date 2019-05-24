@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service for managing the state of the skill being edited
-* in the skill editor.
-*/
+ * @fileoverview Service for managing the state of the skill being edited
+ * in the skill editor.
+ */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');

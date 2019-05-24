@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for multiple choice input validation service.
+ */
+
 describe('MultipleChoiceInputValidationService', function() {
   var WARNING_TYPES;
 

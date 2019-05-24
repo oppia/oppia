@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * TextInput interaction prediction functions.
+ * @fileoverview TextInput interaction prediction functions.
  *
  * IMPORTANT NOTE: The prediction function uses the classifier data
  * of trained model (text classifier model) for inference. These functions

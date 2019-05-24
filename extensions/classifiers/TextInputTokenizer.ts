@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Tokenizer for TextInput.
+ * @fileoverview Tokenizer for TextInput.
  *
  * Note: This is a simple tokenizer for tokenizing text input. The parameter
  * n_grams is used for deciding if we need to add n_gram tokens other than

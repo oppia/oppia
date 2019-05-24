@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Dev environment config file for Webpack.
+ */
 
 var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');

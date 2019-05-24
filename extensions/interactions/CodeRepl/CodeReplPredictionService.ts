@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * CodeRepl interaction prediction functions.
+ * @fileoverview CodeRepl interaction prediction functions.
  *
  * IMPORTANT NOTE: The prediction function uses the classifier data
  * of trained model (code classifier model) for inference. These functions

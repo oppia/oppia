@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SkillEditorStateService.js
-*/
+ * @fileoverview Unit tests for SkillEditorStateService.js
+ */
 
 require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
