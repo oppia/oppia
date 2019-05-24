@@ -181,6 +181,7 @@ oppia.constant(
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+oppia.constant('EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
 
 
 oppia.controller('ExplorationEditor', [
@@ -195,13 +196,13 @@ oppia.controller('ExplorationEditor', [
   'ExplorationParamSpecsService', 'ExplorationRightsService',
   'ExplorationStatesService', 'ExplorationTagsService',
   'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
-  'PageTitleService',
-  'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+  'PageTitleService', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
   'StateClassifierMappingService', 'StateEditorService',
   'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
   'StateTutorialFirstTimeService', 'ThreadDataService',
   'UrlInterpolationService', 'UserEmailPreferencesService',
+  'EXPLORATION_PROPERTY_CHANGED',
   function(
       $http, $log, $q, $rootScope, $scope, $templateCache, $timeout,
       $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
@@ -214,13 +215,13 @@ oppia.controller('ExplorationEditor', [
       ExplorationParamSpecsService, ExplorationRightsService,
       ExplorationStatesService, ExplorationTagsService,
       ExplorationTitleService, ExplorationWarningsService, GraphDataService,
-      PageTitleService,
-      ParamChangesObjectFactory, ParamSpecsObjectFactory,
+      PageTitleService, ParamChangesObjectFactory, ParamSpecsObjectFactory,
       PlaythroughIssuesService, RouterService, SiteAnalyticsService,
       StateClassifierMappingService, StateEditorService,
       StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
       StateTutorialFirstTimeService, ThreadDataService,
-      UrlInterpolationService, UserEmailPreferencesService) {
+      UrlInterpolationService, UserEmailPreferencesService,
+      EXPLORATION_PROPERTY_CHANGED) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 
@@ -241,12 +242,11 @@ oppia.controller('ExplorationEditor', [
         PageTitleService.setPageTitle(
           ExplorationTitleService.savedMemento + ' - Oppia Editor');
       } else {
-        PageTitleService.setPageTitle(
-          'Untitled Exploration - Oppia Editor');
+        PageTitleService.setPageTitle('Untitled Exploration - Oppia Editor');
       }
     };
 
-    $scope.$on('explorationPropertyChanged', setPageTitle);
+    $scope.$on(EXPLORATION_PROPERTY_CHANGED, setPageTitle);
 
     $scope.getActiveTabName = RouterService.getActiveTabName;
 

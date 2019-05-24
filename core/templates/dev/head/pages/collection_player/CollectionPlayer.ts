@@ -53,15 +53,15 @@ oppia.controller('CollectionPlayer', [
   '$anchorScroll', '$http', '$location', '$scope',
   'AlertsService', 'CollectionObjectFactory',
   'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
-  'PageTitleService',
-  'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
+  'PageTitleService', 'ReadOnlyCollectionBackendApiService',
+  'UrlInterpolationService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $anchorScroll, $http, $location, $scope,
       AlertsService, CollectionObjectFactory,
       CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
-      PageTitleService,
-      ReadOnlyCollectionBackendApiService, UrlInterpolationService,
+      PageTitleService, ReadOnlyCollectionBackendApiService,
+      UrlInterpolationService,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     $scope.collection = null;
     $scope.collectionPlaythrough = null;

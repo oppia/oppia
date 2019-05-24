@@ -56,11 +56,8 @@ class CollectionEditorPage(CollectionEditorHandler):
     def get(self, collection_id):
         """Handles GET requests."""
 
-        collection = collection_services.get_collection_by_id(
-            collection_id, strict=False)
-
         self.values.update({
-            'collection_id': collection.id,
+            'collection_id': collection_id,
             'SHOW_COLLECTION_NAVIGATION_TAB_HISTORY': (
                 feconf.SHOW_COLLECTION_NAVIGATION_TAB_HISTORY),
             'SHOW_COLLECTION_NAVIGATION_TAB_STATS': (

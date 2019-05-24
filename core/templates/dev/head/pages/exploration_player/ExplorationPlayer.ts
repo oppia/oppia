@@ -67,13 +67,13 @@ require('services/ContextService.ts');
 require('services/PageTitleService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 
-oppia.controller('ExplorationPlayer', ['ContextService', 'PageTitleService',
-  'ReadOnlyExplorationBackendApiService',
-  function(ContextService, PageTitleService,
-      ReadOnlyExplorationBackendApiService) {
+oppia.controller('ExplorationPlayer', [
+  'ContextService', 'PageTitleService', 'ReadOnlyExplorationBackendApiService',
+  function(
+      ContextService, PageTitleService, ReadOnlyExplorationBackendApiService) {
     var explorationId = ContextService.getExplorationId();
-    ReadOnlyExplorationBackendApiService.fetchExploration(explorationId,
-      null).then(function(response) {
+    ReadOnlyExplorationBackendApiService.fetchExploration(
+      explorationId, null).then(function(response) {
       PageTitleService.setPageTitle(response.exploration.title + ' - Oppia');
     });
   }

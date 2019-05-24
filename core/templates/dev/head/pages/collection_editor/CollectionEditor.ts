@@ -56,11 +56,11 @@ oppia.controller('CollectionEditor', [
     CollectionEditorStateService.loadCollection(GLOBALS.collectionId);
     var setTitle = function() {
       if (CollectionEditorStateService.getCollection().getTitle()) {
-        PageTitleService.setPageTitle(CollectionEditorStateService
-          .getCollection().getTitle() + ' - Oppia Editor');
-      } else {
         PageTitleService.setPageTitle(
-          'Untitled Collection - Oppia Editor');
+          CollectionEditorStateService.getCollection().getTitle() + (
+            ' - Oppia Editor'));
+      } else {
+        PageTitleService.setPageTitle('Untitled Collection - Oppia Editor');
       }
     };
 
