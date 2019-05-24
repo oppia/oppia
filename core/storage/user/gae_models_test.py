@@ -51,43 +51,23 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual('user@example.com', user_data['email'])
         self.assertEqual(feconf.ROLE_ID_ADMIN, user_data['role'])
         self.assertEqual(None, user_data['username'])
-        self.assertEqual(
-            None,
-            user_data['normalized_username'])
-        self.assertEqual(
-            None,
-            user_data['last_agreed_to_terms'])
-        self.assertEqual(
-            None,
-            user_data['last_started_state_editor_tutorial'])
+        self.assertEqual(None, user_data['normalized_username'])
+        self.assertEqual(None, user_data['last_agreed_to_terms'])
+        self.assertEqual(None, user_data['last_started_state_editor_tutorial'])
         self.assertEqual(
             None,
             user_data['last_started_state_translation_tutorial'])
         self.assertEqual(None, user_data['last_logged_in'])
-        self.assertEqual(
-            None,
-            user_data['last_edited_an_exploration'])
-        self.assertEqual(
-            None,
-            user_data['profile_picture_data_url'])
+        self.assertEqual(None, user_data['last_edited_an_exploration'])
+        self.assertEqual(None, user_data['profile_picture_data_url'])
         self.assertEqual('learner', user_data['default_dashboard'])
-        self.assertEqual(
-            'card',
-            user_data['creator_dashboard_display_pref'])
+        self.assertEqual('card', user_data['creator_dashboard_display_pref'])
         self.assertEqual(None, user_data['user_bio'])
         self.assertEqual([], user_data['subject_interests'])
-        self.assertEqual(
-            None,
-            user_data['first_contribution_msec'])
-        self.assertEqual(
-            [],
-            user_data['preferred_language_codes'])
-        self.assertEqual(
-            None,
-            user_data['preferred_site_language_code'])
-        self.assertEqual(
-            None,
-            user_data['preferred_audio_language_code'])
+        self.assertEqual(None, user_data['first_contribution_msec'])
+        self.assertEqual([], user_data['preferred_language_codes'])
+        self.assertEqual(None, user_data['preferred_site_language_code'])
+        self.assertEqual(None, user_data['preferred_audio_language_code'])
 
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
