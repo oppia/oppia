@@ -47,29 +47,14 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
-        if len(suggestion_id.split('.')) != 3:
-            raise self.InvalidInputException('Invalid format for suggestion_id.'
-                                             ' It must contain 3 parts'
-                                             ' separated by \'.\'')
-
         if (
                 suggestion_id.split('.')[0] !=
                 suggestion_models.TARGET_TYPE_EXPLORATION):
             raise self.InvalidInputException('This handler allows actions only'
                                              ' on suggestions to explorations.')
 
-        if suggestion_id.split('.')[1] != target_id:
-            raise self.InvalidInputException('The exploration id provided does '
-                                             'not match the exploration id '
-                                             'present as part of the '
-                                             'suggestion_id')
-
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-
-        if suggestion.author_id == self.user_id:
-            raise self.UnauthorizedUserException('You cannot accept/reject your'
-                                                 ' own suggestion.')
 
         if action == suggestion_models.ACTION_TYPE_ACCEPT:
             suggestion_services.accept_suggestion(
@@ -90,9 +75,6 @@ class ResubmitSuggestionHandler(base.BaseHandler):
     @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if not suggestion:
-            raise self.InvalidInputException(
-                'No suggestion found with given suggestion id')
         new_change = self.payload.get('change')
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change)
@@ -110,22 +92,9 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_topic)
     def put(self, target_id, suggestion_id):
-        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
-            raise self.PageNotFoundException
-
-        if len(suggestion_id.split('.')) != 3:
-            raise self.InvalidInputException(
-                'Invalid format for suggestion_id. It must contain 3 parts'
-                ' separated by \'.\'')
-
         if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_TOPIC:
             raise self.InvalidInputException(
                 'This handler allows actions only on suggestions to topics.')
-
-        if suggestion_id.split('.')[1] != target_id:
-            raise self.InvalidInputException(
-                'The topic id provided does not match the topic id present as '
-                'part of the suggestion_id')
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)

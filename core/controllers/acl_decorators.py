@@ -18,6 +18,7 @@
 
 import urllib
 
+from constants import constants
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import question_services
@@ -1126,6 +1127,10 @@ def can_resubmit_suggestion(handler):
             UnauthorizedUserException: The user does not have
                 credentials to edit this suggestion.
         """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if not suggestion:
+            raise self.InvalidInputException(
+                'No suggestion found with given suggestion id')
         if suggestion_services.check_can_resubmit_suggestion(
                 suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
@@ -2486,12 +2491,36 @@ def get_decorator_for_accepting_suggestion(decorator):
             if not self.user_id:
                 raise base.UserFacingExceptions.NotLoggedInException
             user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+            if len(suggestion_id.split('.')) != 3:
+                raise self.InvalidInputException('Invalid format for suggestion_id.'
+                                             ' It must contain 3 parts'
+                                             ' separated by \'.\'')
+
+            if suggestion_id.split('.')[1] != target_id:
+                if suggestion_id.split('.')[0] == 'exploration':
+                    raise self.InvalidInputException('The exploration id provided does '
+                                 'not match the exploration id '
+                                 'present as part of the '
+                                 'suggestion_id')
+                elif suggestion_id.split('.')[0] == 'topic':
+                    if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+                        raise self.PageNotFoundException
+                    else:
+                        raise self.InvalidInputException(
+                                'The topic id provided does not match the topic id present as '
+                                'part of the suggestion_id')
+
             if (
                     role_services.ACTION_ACCEPT_ANY_SUGGESTION in
                     user_actions_info.actions):
                 return handler(self, target_id, suggestion_id, **kwargs)
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            if suggestion.author_id == self.user_id:
+                raise self.UnauthorizedUserException('You cannot accept/reject your'
+                                                 ' own suggestion.')
+
             if suggestion_services.check_user_can_review_in_category(
                     self.user_id, suggestion.score_category):
                 return handler(self, target_id, suggestion_id, **kwargs)
