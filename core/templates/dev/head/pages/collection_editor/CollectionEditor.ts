@@ -55,10 +55,9 @@ oppia.controller('CollectionEditor', [
     // Load the collection to be edited.
     CollectionEditorStateService.loadCollection(GLOBALS.collectionId);
     var setTitle = function() {
-      if (CollectionEditorStateService.getCollection().getTitle()) {
-        PageTitleService.setPageTitle(
-          CollectionEditorStateService.getCollection().getTitle() + (
-            ' - Oppia Editor'));
+      var title = CollectionEditorStateService.getCollection().getTitle();
+      if (title) {
+        PageTitleService.setPageTitle(title + ' - Oppia Editor');
       } else {
         PageTitleService.setPageTitle('Untitled Collection - Oppia Editor');
       }

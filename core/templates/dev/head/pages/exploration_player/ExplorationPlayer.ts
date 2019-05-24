@@ -72,9 +72,9 @@ oppia.controller('ExplorationPlayer', [
   function(
       ContextService, PageTitleService, ReadOnlyExplorationBackendApiService) {
     var explorationId = ContextService.getExplorationId();
-    ReadOnlyExplorationBackendApiService.fetchExploration(
-      explorationId, null).then(function(response) {
-      PageTitleService.setPageTitle(response.exploration.title + ' - Oppia');
-    });
+    ReadOnlyExplorationBackendApiService.fetchExploration(explorationId, null)
+      .then(function(response) {
+        PageTitleService.setPageTitle(response.exploration.title + ' - Oppia');
+      });
   }
 ]);
