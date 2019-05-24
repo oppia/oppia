@@ -35,7 +35,7 @@
     <button type="submit" class="btn btn-success btn-sm">Add</button>
     <md-card class="destination-node-id"
              ng-repeat="skillId in getPrerequisiteSkillIds()">
-      <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank"><[skillId]></a>
+      <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillId]></a>
       <span style="float: right;" ng-click="removePrerequisiteSkillId(skillId)" aria-hidden="true">
         <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
       </span>
@@ -47,7 +47,7 @@
     <button type="submit" class="btn btn-success btn-sm">Add</button>
     <md-card class="destination-node-id"
              ng-repeat="skillId in getAcquiredSkillIds()">
-      <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank"><[skillId]></a>
+      <a ng-href="<[getSkillEditorUrl(skillId)]>" target="_blank" rel="noopener"><[skillId]></a>
       <span style="float: right;" ng-click="removeAcquiredSkillId(skillId)" aria-hidden="true">
         <i class="material-icons md-18" style="color: red;">&#xE14C;</i>
       </span>

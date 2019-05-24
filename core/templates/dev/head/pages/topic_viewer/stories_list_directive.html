@@ -37,10 +37,10 @@
 
 <div ng-if="topicViewerWindowIsNarrow" class="oppia-topic-viewer-low-width">
   <md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
-    <canonical-story-summary-tile story-id="canonicalStory.id"
-                                  title="canonicalStory.title"
-                                  description="canonicalStory.description">
-    </canonical-story-summary-tile>
+    <story-summary-tile story-id="canonicalStory.id"
+                        title="canonicalStory.title"
+                        description="canonicalStory.description">
+    </story-summary-tile>
   </md-card>
 </div>
 
@@ -90,7 +90,7 @@
   stories-list div .oppia-topic-viewer-carousel {
     float: left;
     height: 430px;
-    max-width: 1070px;
+    max-width: 1420px;
     overflow: hidden;
     position: relative;
     width: auto;
