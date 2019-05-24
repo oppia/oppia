@@ -24,7 +24,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab.controller.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-content.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +

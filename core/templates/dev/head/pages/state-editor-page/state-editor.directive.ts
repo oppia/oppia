@@ -17,15 +17,15 @@
  */
 
 require(
-  'pages/state-editor/state-content-editor/state-content-editor.directive.ts');
+  'pages/state-editor-page/state-content-editor/state-content-editor.directive.ts');
 require(
-  'pages/state-editor/state-hints-editor/state-hints-editor.directive.ts');
+  'pages/state-editor-page/state-hints-editor/state-hints-editor.directive.ts');
 require(
-  'pages/state-editor/state-interaction-editor/' +
+  'pages/state-editor-page/state-interaction-editor/' +
   'state-interaction-editor.directive.ts');
-require('pages/state-editor/state-responses/state-responses.directive.ts');
+require('pages/state-editor-page/state-responses/state-responses.directive.ts');
 require(
-  'pages/state-editor/state-solution-editor/' +
+  'pages/state-editor-page/state-solution-editor/' +
   'state-solution-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -33,7 +33,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'pages/state-editor-page/state-editor-properties-services/state-property/' +
   'state-property.service.ts');
 
 oppia.directive('stateEditor', [
@@ -57,7 +57,7 @@ oppia.directive('stateEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor/state-editor.directive.html'),
+        '/pages/state-editor-page/state-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
         'StateContentService', 'StateHintsService', 'StateSolutionService',

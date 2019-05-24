@@ -27,16 +27,16 @@ require(
   'exploration-editor-tab-services/interaction-details-cache/' +
   'interaction-details-cache.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-content.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 
 describe('State Interaction controller', function() {
@@ -205,7 +205,7 @@ describe('State Interaction controller', function() {
       });
 
       var templateHtml = $templateCache.get(
-        '/pages/state-editor/state-interaction-editor/' +
+        '/pages/state-editor-page/state-interaction-editor/' +
         'state-interaction-editor.directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();

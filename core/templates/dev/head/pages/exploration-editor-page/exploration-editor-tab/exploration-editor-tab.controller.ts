@@ -22,7 +22,7 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'state-param-changes-editor/state-param-changes-editor.directive.ts');
-require('pages/state-editor/state-editor.directive.ts');
+require('pages/state-editor-page/state-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(

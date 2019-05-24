@@ -26,12 +26,12 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/state-hints.service.ts');
+  'pages/state-editor-page/state-editor-properties-services/state-hints.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
@@ -47,7 +47,7 @@ oppia.directive('stateHintsEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor/state-hints-editor/' +
+        '/pages/state-editor-page/state-hints-editor/' +
         'state-hints-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',

@@ -30,13 +30,13 @@ require(
   'exploration-editor-tab-services/solution-verification/' +
   'solution-verification.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 
 describe('Solution Verification Service', function() {

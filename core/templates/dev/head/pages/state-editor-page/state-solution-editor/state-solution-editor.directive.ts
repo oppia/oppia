@@ -34,20 +34,20 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/solution-verification/' +
   'solution-verification.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/current-interaction./current-interaction.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/current-interaction/current-interaction.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/state-hints.service.ts');
+  'pages/state-editor-page/state-editor-properties-services/state-hints.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
@@ -65,7 +65,7 @@ oppia.directive('stateSolutionEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor/state-solution-editor/' +
+        '/pages/state-editor-page/state-solution-editor/' +
         'state-solution-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'StateEditorService',

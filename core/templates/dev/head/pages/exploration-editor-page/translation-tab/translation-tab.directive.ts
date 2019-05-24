@@ -44,10 +44,10 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'pages/state-editor-page/state-editor-properties-services/state-property/' +
   'state-property.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');

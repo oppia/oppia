@@ -29,21 +29,21 @@ require(
   'exploration-editor-tab-services/interaction-details-cache/' +
   'interaction-details-cache.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-content.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/state-editor/' +
+  'pages/state-editor-page/state-editor-properties-services/state-editor/' +
   'state-editor.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/state-hints.service.ts');
+  'pages/state-editor-page/state-editor-properties-services/state-hints.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
@@ -69,7 +69,7 @@ oppia.directive('stateInteractionEditor', [
         recomputeGraph: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state-editor/state-interaction-editor/' +
+        '/pages/state-editor-page/state-interaction-editor/' +
         'state-interaction-editor.directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',

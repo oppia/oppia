@@ -23,7 +23,7 @@ require('pages/exploration-player-page/input-response-pair/input-response-pair.d
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/exploration-player-page-services/audio-preloader/audio-preloader.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/audio-translation-manager/audio-translation-manager.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/current-interaction./current-interaction.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/current-interaction/current-interaction.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/exploration-engine.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/exploration-player-state.service.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');

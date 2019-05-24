@@ -116,7 +116,7 @@
 /core/templates/dev/head/domain/state_card/ @aks681
 /core/templates/dev/head/pages/exploration-editor-page/ @DubeySandeep
 /core/templates/dev/head/pages/exploration-player-page/ @aks681
-/core/templates/dev/head/pages/state-editor/ @aks681
+/core/templates/dev/head/pages/state-editor-page/ @aks681
 /core/templates/dev/head/components/state/ @aks681
 /core/templates/dev/head/pages/exploration-player-page/ @aks681
 /core/templates/dev/head/services/ComputeGraphService.ts @DubeySandeep

@@ -26,10 +26,10 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-states/exploration-states.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-content.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
 require('services/EditabilityService.ts');
 
@@ -233,7 +233,7 @@ describe('State content editor directive', function() {
       });
 
       var templateHtml = $templateCache.get(
-        '/pages/state-editor/state-content-editor/' +
+        '/pages/state-editor-page/state-content-editor/' +
         'state-content-editor.directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();

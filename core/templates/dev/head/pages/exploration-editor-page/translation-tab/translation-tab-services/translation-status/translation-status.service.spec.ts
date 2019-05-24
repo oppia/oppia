@@ -29,7 +29,7 @@ require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
   'translation-tab-active-mode/translation-tab-active-mode.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
 describe('Translation status service', function() {

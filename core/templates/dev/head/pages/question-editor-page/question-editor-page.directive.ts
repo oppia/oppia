@@ -16,7 +16,7 @@
  * @fileoverview Controller for the questions editor directive.
  */
 
-require('pages/state-editor/state-editor.directive.ts');
+require('pages/state-editor-page/state-editor.directive.ts');
 
 require(
   'components/entity-creation-services/question-creation/' +

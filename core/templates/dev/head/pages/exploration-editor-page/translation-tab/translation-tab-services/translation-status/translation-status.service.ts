@@ -28,13 +28,13 @@ require(
   'translation-tab-active-mode/translation-tab-active-mode.service.ts'
 );
 require(
-  'pages/state-editor/state-editor-properties-services/state-property/' +
+  'pages/state-editor-page/state-editor-properties-services/state-property/' +
   'state-property.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
 require(
-  'pages/state-editor/state-editor-properties-services/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');

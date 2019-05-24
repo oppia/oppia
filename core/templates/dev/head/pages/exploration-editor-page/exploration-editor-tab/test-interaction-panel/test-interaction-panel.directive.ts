@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-states/exploration-states.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/current-interaction./current-interaction.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/current-interaction/current-interaction.service.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
