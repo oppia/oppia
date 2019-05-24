@@ -12,37 +12,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Service for keeping track of solution validity.
-oppia.factory(
-  'SolutionValidityService', [
-    function() {
-      return {
-        init: function(stateNames) {
-          this.solutionValidities = {};
-          var self = this;
-          stateNames.forEach(function(stateName) {
-            self.solutionValidities[stateName] = true;
-          });
-        },
-        onRenameState: function(newStateName, oldStateName) {
-          this.solutionValidities[newStateName] =
-            this.solutionValidities[oldStateName];
-          this.deleteSolutionValidity(oldStateName);
-        },
-        updateValidity: function(stateName, solutionIsValid) {
-          this.solutionValidities[stateName] = solutionIsValid;
-        },
-        isSolutionValid: function(stateName) {
-          if (this.solutionValidities.hasOwnProperty(stateName)) {
-            return this.solutionValidities[stateName];
-          }
-        },
-        deleteSolutionValidity: function(stateName) {
-          delete this.solutionValidities[stateName];
-        },
-        getAllValidities: function() {
-          return this.solutionValidities;
+/**
+ * @fileoverview Service for keeping track of solution validity.
+ */
+
+oppia.factory('SolutionValidityService', [
+  function() {
+    return {
+      init: function(stateNames) {
+        this.solutionValidities = {};
+        var self = this;
+        stateNames.forEach(function(stateName) {
+          self.solutionValidities[stateName] = true;
+        });
+      },
+      onRenameState: function(newStateName, oldStateName) {
+        this.solutionValidities[newStateName] =
+          this.solutionValidities[oldStateName];
+        this.deleteSolutionValidity(oldStateName);
+      },
+      updateValidity: function(stateName, solutionIsValid) {
+        this.solutionValidities[stateName] = solutionIsValid;
+      },
+      isSolutionValid: function(stateName) {
+        if (this.solutionValidities.hasOwnProperty(stateName)) {
+          return this.solutionValidities[stateName];
         }
-      };
-    }]
-);
+      },
+      deleteSolutionValidity: function(stateName) {
+        delete this.solutionValidities[stateName];
+      },
+      getAllValidities: function() {
+        return this.solutionValidities;
+      }
+    };
+  }]);

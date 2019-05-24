@@ -7,6 +7,11 @@
  * 3. All values and keys must be constant, you can't use any JavaScript
  *    functions.
  */
+
+/**
+ * @fileoverview Definitions for rich text components.
+ */
+
 var richTextComponents = {
   "Collapsible": {
     "backend_id": "Collapsible",

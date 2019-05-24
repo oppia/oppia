@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for the Preferences page.
+ */
+
 require('pages/preferences-page/preferences-page.controller.ts');
 
 describe('Preferences Controller', function() {

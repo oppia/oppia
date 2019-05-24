@@ -12,33 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @fileoverview A data service that stores the exploration language code. */
+/**
+ * @fileoverview A data service that stores tags for the exploration.
+ */
 
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-property.service.ts');
 
-oppia.factory(
-  'ExplorationLanguageCodeService', [
-    'ExplorationPropertyService', function(ExplorationPropertyService) {
-      var child = Object.create(ExplorationPropertyService);
-      child.propertyName = 'language_code';
-      child.getAllLanguageCodes = function() {
-        return constants.ALL_LANGUAGE_CODES;
-      };
-      child.getCurrentLanguageDescription = function() {
-        for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
-          if (constants.ALL_LANGUAGE_CODES[i].code === child.displayed) {
-            return constants.ALL_LANGUAGE_CODES[i].description;
-          }
+oppia.factory('ExplorationTagsService', [
+  'ExplorationPropertyService',
+  function(ExplorationPropertyService) {
+    var child = Object.create(ExplorationPropertyService);
+    child.propertyName = 'tags';
+    child._normalize = function(value) {
+      for (var i = 0; i < value.length; i++) {
+        value[i] = value[i].trim().replace(/\s+/g, ' ');
+      }
+      // TODO(sll): Prevent duplicate tags from being added.
+      return value;
+    };
+    child._isValid = function(value) {
+      // Every tag should match the TAG_REGEX.
+      for (var i = 0; i < value.length; i++) {
+        var tagRegex = new RegExp(GLOBALS.TAG_REGEX);
+        if (!value[i].match(tagRegex)) {
+          return false;
         }
-      };
-      child._isValid = function(value) {
-        return constants.ALL_LANGUAGE_CODES.some(function(elt) {
-          return elt.code === value;
-        });
-      };
-      return child;
-    }
-  ]
-);
+      }
+
+      return true;
+    };
+    return child;
+  }
+]);

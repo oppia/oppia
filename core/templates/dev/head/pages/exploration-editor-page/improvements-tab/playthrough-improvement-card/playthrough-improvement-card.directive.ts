@@ -12,31 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Playthrough Improvement card directive.
+ */
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-oppia.directive(
-  'playthroughImprovementCard', [
-    'UrlInterpolationService', function(UrlInterpolationService) {
-      return {
-        restrict: 'E',
-        scope: {
-          getData: '&data',
-        },
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration-editor-page/improvements-tab/' +
-          'playthrough-improvement-card/' +
-          'playthrough-improvement-card.directive.html'),
-        controller: [
-          '$scope', 'PlaythroughIssuesService',
-          function($scope, PlaythroughIssuesService) {
-            $scope.openPlaythroughModal = function(playthroughId, index) {
-              PlaythroughIssuesService.openPlaythroughModal(
-                playthroughId, index);
-            };
-          }
-        ]
-      };
-    }
-  ]
-);
+oppia.directive('playthroughImprovementCard', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getData: '&data',
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration-editor-page/improvements-tab/' +
+        'playthrough-improvement-card/' +
+        'playthrough-improvement-card.directive.html'),
+    controller: [
+        '$scope', 'PlaythroughIssuesService',
+        function($scope, PlaythroughIssuesService) {
+          $scope.openPlaythroughModal = function(playthroughId, index) {
+            PlaythroughIssuesService.openPlaythroughModal(playthroughId, index);
+          };
+        }
+      ]
+    };
+  }
+]);

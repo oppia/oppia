@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Data and controllers for the Oppia moderator page.
-*/
+ * @fileoverview Data and controllers for the Oppia moderator page.
+ */
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
