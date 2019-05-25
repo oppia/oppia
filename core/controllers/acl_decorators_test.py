@@ -1343,6 +1343,85 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
+    """Tests for get_decorator_for_accepting_suggestion decorator."""
+    owner_username = 'owner'
+    owner_email = 'owner@example.com'
+    author_username = 'author'
+    author_email = 'author@example.com'
+    username = 'user'
+    user_email = 'user@example.com'
+    TARGET_TYPE = 'exploration'
+    SUGGESTION_TYPE = 'edit_exploration_state_content'
+    exploration_id = 'exp_id'
+    target_version_id = 1
+    change_dict = {
+        'cmd': 'edit_state_property',
+        'property_name': 'content',
+        'state_name': 'Introduction',
+        'new_value': ''
+    }
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.get_decorator_for_accepting_suggestion(
+            acl_decorators.can_edit_exploration)
+        def get(self, target_id, suggestion_id):
+            self.render_json({
+                'target_id': target_id,
+                'suggestion_id': suggestion_id
+            })
+
+    def setUp(self):
+        super(DecoratorForAcceptingSuggestionTests, self).setUp()
+        self.signup(self.author_email, self.author_username)
+        self.signup(self.user_email, self.username)
+        self.signup(self.owner_email, self.owner_username)
+        self.author_id = self.get_user_id_from_email(self.author_email)
+        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route(
+                '/mock/<target_id>/<suggestion_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_default_exploration(self.exploration_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.exploration_id)
+        suggestion_services.create_suggestion(
+            self.SUGGESTION_TYPE, self.TARGET_TYPE,
+            self.exploration_id, self.target_version_id,
+            self.author_id,
+            self.change_dict, '', None)
+        suggestion = suggestion_services.query_suggestions(
+            [('author_id', self.author_id),
+             ('target_id', self.exploration_id)])[0]
+        self.suggestion_id = suggestion.suggestion_id
+
+    def test_guest_cannot_accept_suggestion(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s/%s' % (self.exploration_id, self.suggestion_id),
+                expected_status_int=401)
+
+    def test_owner_can_accept_suggestion(self):
+        self.login(self.owner_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s/%s' % (self.exploration_id, self.suggestion_id))
+        self.assertEqual(response['suggestion_id'], self.suggestion_id)
+        self.assertEqual(response['target_id'], self.exploration_id)
+        self.logout()
+
+    def test_user_cannot_accept_suggestion(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s/%s' % (self.exploration_id, self.suggestion_id),
+                expected_status_int=401)
+        self.logout()
+
+
 class PublishExplorationTests(test_utils.GenericTestBase):
     """Tests for can_publish_exploration decorator."""
     private_exp_id = 'exp_0'
@@ -1842,6 +1921,62 @@ class PublishSkillTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_cannot_publish_skill(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.skill_id, expected_status_int=401)
+
+
+class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
+    """Tests for decorator can_manage_question_skill_status."""
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    skill_id = '1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_manage_question_skill_status
+        def get(self, skill_id):
+            self.render_json({'skill_id': skill_id})
+
+    def setUp(self):
+        super(ManageQuestionSkillStatusTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.signup(self.viewer_email, self.viewer_username)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<skill_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.question_id = question_services.get_new_question_id()
+        self.question = self.save_new_question(
+            self.question_id, self.admin_id,
+            self._create_valid_question_data('ABC'))
+        question_services.create_new_question_skill_link(
+            self.question_id, self.skill_id, 0.5)
+
+    def test_admin_can_manage_question_skill_status(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.skill_id)
+            self.assertEqual(response['skill_id'], self.skill_id)
+        self.logout()
+
+    def test_viewer_cannot_manage_question_skill_status(self):
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock/%s' % self.skill_id, expected_status_int=401)
+            self.assertEqual(
+                response['error'],
+                'You do not have credentials to publish a question.')
+        self.logout()
+
+    def test_guest_cannot_manage_question_skill_status(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.skill_id, expected_status_int=401)

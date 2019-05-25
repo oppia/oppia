@@ -188,28 +188,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 3)
         self.logout()
 
-    def test_guest_can_not_accept_suggestion(self):
-        self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        suggestion_to_accept = self.get_json(
-            '%s?author_id=%s' % (
-                feconf.SUGGESTION_LIST_URL_PREFIX,
-                self.author_id))['suggestions'][0]
-
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.logout()
-        self.put_json('%s/exploration/%s/%s' % (
-            feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token=csrf_token, expected_status_int=401)
-
     def test_accept_suggestion(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 

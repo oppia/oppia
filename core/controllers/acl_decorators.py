@@ -1771,8 +1771,6 @@ def can_edit_skill(handler):
             bool. Whether the given user can edit the given skill.
         """
 
-        if skill_rights is None:
-            return False
         if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
             if not skill_rights.is_private():
                 return True

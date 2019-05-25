@@ -184,18 +184,6 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             self.question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'))
 
-    def test_post_with_guest_disallows_access(self):
-        self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.logout()
-
-        self.post_json(
-            '%s/%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                self.skill_id
-            ), {}, csrf_token=csrf_token, expected_status_int=401)
-
     def test_post_with_non_admin_or_topic_manager_email_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
