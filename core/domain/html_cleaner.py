@@ -38,7 +38,6 @@ def filter_a(tag, name, value):
     Returns:
         bool. Whether the given attribute should be whitelisted.
     """
-
     if name in ('title', 'target'):
         return True
     if name == 'href':
