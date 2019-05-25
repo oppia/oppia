@@ -80,7 +80,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'content': {},
                     'default_outcome': {}
                 }
-            }
+            },
+            'image_assets' : {
+                'image_assets_mapping' : {
+
+                }
+            },
         }
         self.assertEqual(expected_dict, state_dict)
 
