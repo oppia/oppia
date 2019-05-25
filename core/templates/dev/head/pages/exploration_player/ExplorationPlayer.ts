@@ -63,9 +63,9 @@ require('pages/exploration_player/ExplorationFooterDirective.ts');
 require('pages/exploration_player/LearnerLocalNav.ts');
 require('pages/exploration_player/LearnerViewInfo.ts');
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 
 oppia.controller('ExplorationPlayer', [
   'ContextService', 'PageTitleService', 'ReadOnlyExplorationBackendApiService',

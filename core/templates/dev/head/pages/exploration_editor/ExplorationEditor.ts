@@ -181,7 +181,8 @@ oppia.constant(
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
-oppia.constant('EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
+oppia.constant(
+  'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
 
 
 oppia.controller('ExplorationEditor', [
@@ -202,7 +203,7 @@ oppia.controller('ExplorationEditor', [
   'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
   'StateTutorialFirstTimeService', 'ThreadDataService',
   'UrlInterpolationService', 'UserEmailPreferencesService',
-  'EXPLORATION_PROPERTY_CHANGED',
+  'EVENT_EXPLORATION_PROPERTY_CHANGED',
   function(
       $http, $log, $q, $rootScope, $scope, $templateCache, $timeout,
       $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
@@ -221,7 +222,7 @@ oppia.controller('ExplorationEditor', [
       StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
       StateTutorialFirstTimeService, ThreadDataService,
       UrlInterpolationService, UserEmailPreferencesService,
-      EXPLORATION_PROPERTY_CHANGED) {
+      EVENT_EXPLORATION_PROPERTY_CHANGED) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 
@@ -246,7 +247,7 @@ oppia.controller('ExplorationEditor', [
       }
     };
 
-    $scope.$on(EXPLORATION_PROPERTY_CHANGED, setPageTitle);
+    $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
 
     $scope.getActiveTabName = RouterService.getActiveTabName;
 
