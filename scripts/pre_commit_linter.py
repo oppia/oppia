@@ -361,7 +361,7 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
     os.path.join('third_party', 'mutagen-1.38'),
-    os.path.join('third_party', 'soupsieve-1.8'),
+    os.path.join('third_party', 'soupsieve-1.9.1'),
     os.path.join('third_party', 'six-1.12.0'),
     os.path.join('third_party', 'webencodings-0.5.1'),
     os.path.join('third_party', 'callbacks-0.3.0'),

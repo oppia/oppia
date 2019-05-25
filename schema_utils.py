@@ -250,7 +250,7 @@ class Normalizers(object):
             urllib.quote(component) for component in url_components)
         raw = urlparse.urlunsplit(quoted_url_components)
 
-        acceptable = html_cleaner.filter_a('','href', obj)
+        acceptable = html_cleaner.filter_a('', 'href', obj)
         assert acceptable, (
             'Invalid URL: Sanitized URL should start with '
             '\'http://\' or \'https://\'; received %s' % raw)
