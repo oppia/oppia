@@ -45,15 +45,12 @@ def _check_size_in_dir(dir_path):
     """
     number_of_files_in_dir = 0
     for name in os.listdir(dir_path):
+        if os.path.join(dir_path, name) in skip_files:
+            continue
         if os.path.isfile(os.path.join(dir_path, name)):
-            if dir_path in skip_files:
-                continue
             number_of_files_in_dir += 1
         else:
             if os.path.isdir(os.path.join(dir_path, name)):
-                if dir_path in skip_files:
-                    print(dir_path)
-                    continue
                 number_of_files_in_dir += _check_size_in_dir(
                     os.path.join(dir_path, name))
     return number_of_files_in_dir
