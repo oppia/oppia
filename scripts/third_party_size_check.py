@@ -32,7 +32,6 @@ with open("./app.yaml", 'r') as app_yaml:
         app_yaml_dict=yaml.safe_load(app_yaml)
     except yaml.YAMLError as exc:
         print(exc)
-
 skip_files = app_yaml_dict.get("skip_files")
 
 # This adds cwd to to all the skip_files directory.  
@@ -54,14 +53,12 @@ def _check_size_in_dir(dir_path):
             if dir_path in skip_files:
                 print dir_path
                 continue
-
             number_of_files_in_dir += 1
         else:
             if os.path.isdir(os.path.join(dir_path, name)):
                 if dir_path in skip_files:
                     print dir_path
                     continue
-
                 number_of_files_in_dir += _check_size_in_dir(
                     os.path.join(dir_path, name))
     return number_of_files_in_dir
