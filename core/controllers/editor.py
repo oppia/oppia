@@ -216,23 +216,9 @@ class ExplorationHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        user_settings = user_services.get_user_settings(self.user_id)
-        has_seen_editor_tutorial = False
-        has_seen_translation_tutorial = False
-
-        if user_settings is not None:
-            if user_settings.last_started_state_editor_tutorial:
-                has_seen_editor_tutorial = True
-            if user_settings.last_started_state_translation_tutorial:
-                has_seen_translation_tutorial = True
-
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id)
-            exploration_data['show_state_editor_tutorial_on_load'] = (
-                self.user_id and not has_seen_editor_tutorial)
-            exploration_data['show_state_translation_tutorial_on_load'] = (
-                self.user_id and not has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
         self.values.update(exploration_data)
