@@ -14,7 +14,6 @@
 
 """Tests for the skill editor page."""
 
-from constants import constants
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import topic_services
@@ -53,10 +52,9 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         """Gets the csrf token."""
         csrf_token = None
         url_prefix = feconf.SKILL_EDITOR_URL_PREFIX
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.get_html_response(
-                '%s/%s' % (url_prefix, self.skill_id))
-            csrf_token = self.get_csrf_token_from_response(response)
+        response = self.get_html_response(
+            '%s/%s' % (url_prefix, self.skill_id))
+        csrf_token = self.get_csrf_token_from_response(response)
         return csrf_token
 
     def _delete_skill_model_and_memcache(self, user_id, skill_id):
@@ -94,28 +92,23 @@ class SkillEditorTest(BaseSkillEditorControllerTests):
     def test_access_skill_editor_page(self):
         """Test access to editor pages for the sample skill."""
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            # Check that non-admins cannot access the editor page.
-            self.login(self.NEW_USER_EMAIL)
-            self.get_html_response(
-                self.url, expected_status_int=401)
-            self.logout()
+        # Check that non-admins cannot access the editor page.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            self.url, expected_status_int=401)
+        self.logout()
 
-            # Check that admins can access and edit in the editor page.
-            self.login(self.ADMIN_EMAIL)
-            self.get_html_response(self.url)
-            self.logout()
+        # Check that admins can access and edit in the editor page.
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(self.url)
+        self.logout()
 
     def test_skill_editor_page_fails(self):
         self.login(self.ADMIN_EMAIL)
-        # Check GET returns 404 when new strutures' pages are not enabled.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.get_html_response(self.url, expected_status_int=404)
 
         # Check GET returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            self.get_html_response(self.url, expected_status_int=404)
+        self.get_html_response(self.url, expected_status_int=404)
         self.logout()
 
 
@@ -179,80 +172,60 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def test_editable_skill_handler_get_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            # Check that admins can access the editable skill data.
-            json_response = self.get_json(self.url)
-            self.assertEqual(self.skill_id, json_response['skill']['id'])
+        # Check that admins can access the editable skill data.
+        json_response = self.get_json(self.url)
+        self.assertEqual(self.skill_id, json_response['skill']['id'])
         self.logout()
 
     def test_editable_skill_handler_get_fails(self):
         self.login(self.ADMIN_EMAIL)
-        # Check GET returns 404 when new strutures' pages are not enabled.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.get_json(self.url, expected_status_int=404)
         # Check GET returns 404 when cannot get skill by id.
         self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            self.get_json(self.url, expected_status_int=404)
+        self.get_json(self.url, expected_status_int=404)
         self.logout()
 
     def test_editable_skill_handler_put_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            csrf_token = self._get_csrf_token_for_put()
-            # Check that admins can edit a skill.
-            json_response = self.put_json(
-                self.url, self.put_payload, csrf_token=csrf_token)
-            self.assertEqual(self.skill_id, json_response['skill']['id'])
-            self.assertEqual(
-                'New Description', json_response['skill']['description'])
+        csrf_token = self._get_csrf_token_for_put()
+        # Check that admins can edit a skill.
+        json_response = self.put_json(
+            self.url, self.put_payload, csrf_token=csrf_token)
+        self.assertEqual(self.skill_id, json_response['skill']['id'])
+        self.assertEqual(
+            'New Description', json_response['skill']['description'])
         self.logout()
 
     def test_editable_skill_handler_put_fails(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            csrf_token = self._get_csrf_token_for_put()
-            # Check PUT returns 404 when new strutures' pages are not enabled.
-            with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-                self.put_json(
-                    self.url, self.put_payload, csrf_token=csrf_token,
-                    expected_status_int=404)
-            # Check PUT returns 400 when an exception is raised updating the
-            # skill.
-            update_skill_swap = self.swap(
-                skill_services, 'update_skill',
-                self._mock_update_skill_raise_exception)
-            with update_skill_swap:
-                self.put_json(
-                    self.url, self.put_payload, csrf_token=csrf_token,
-                    expected_status_int=400)
-            # Check PUT returns 404 when cannot get skill by id.
-            self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        csrf_token = self._get_csrf_token_for_put()
+        # Check PUT returns 400 when an exception is raised updating the
+        # skill.
+        update_skill_swap = self.swap(
+            skill_services, 'update_skill',
+            self._mock_update_skill_raise_exception)
+        with update_skill_swap:
             self.put_json(
-                self.url, {}, csrf_token=csrf_token, expected_status_int=404)
+                self.url, self.put_payload, csrf_token=csrf_token,
+                expected_status_int=400)
+        # Check PUT returns 404 when cannot get skill by id.
+        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.put_json(
+            self.url, {}, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
     def test_editable_skill_handler_delete_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            # Check that admins can delete a skill.
-            self.delete_json(self.url)
+        # Check that admins can delete a skill.
+        self.delete_json(self.url)
         self.logout()
 
     def test_editable_skill_handler_delete_fails(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            # Check DELETE returns 404 when new strutures' pages are not
-            # enabled.
-            with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-                self.delete_json(self.url, expected_status_int=404)
         # Check DELETE returns 500 when the skill still has associated
         # questions.
-        constants_swap = self.swap(
-            constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
         skill_has_questions_swap = self.swap(
             skill_services, 'skill_has_associated_questions', lambda x: True)
-        with constants_swap, skill_has_questions_swap:
+        with skill_has_questions_swap:
             self.delete_json(self.url, expected_status_int=500)
         self.logout()
 
@@ -266,41 +239,39 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
 
     def test_skill_publish_handler_succeeds(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            # Check that an admin can publish a skill.
-            csrf_token = self._get_csrf_token_for_put()
-            self.put_json(self.url, {'version': 1}, csrf_token=csrf_token)
+        # Check that an admin can publish a skill.
+        csrf_token = self._get_csrf_token_for_put()
+        self.put_json(self.url, {'version': 1}, csrf_token=csrf_token)
         self.logout()
 
     def test_skill_publish_handler_fails(self):
 
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            csrf_token = self._get_csrf_token_for_put()
-            # Check that a skill cannot be published when the payload has no
-            # version.
-            self.put_json(
-                self.url, {}, csrf_token=csrf_token,
-                expected_status_int=400)
-            # Check that a skill cannot be published when the payload's version
-            # is different from the skill's version.
-            self.put_json(
-                self.url, {'version': -1}, csrf_token=csrf_token,
-                expected_status_int=400)
-            # Check that a non-existing skill cannot be published.
-            url = '%s/non-existing-id' % (feconf.SKILL_PUBLISH_URL_PREFIX)
-            self.put_json(
-                url, {'version': 1}, csrf_token=csrf_token,
-                expected_status_int=404)
+        csrf_token = self._get_csrf_token_for_put()
+        # Check that a skill cannot be published when the payload has no
+        # version.
+        self.put_json(
+            self.url, {}, csrf_token=csrf_token,
+            expected_status_int=400)
+        # Check that a skill cannot be published when the payload's version
+        # is different from the skill's version.
+        self.put_json(
+            self.url, {'version': -1}, csrf_token=csrf_token,
+            expected_status_int=400)
+        # Check that a non-existing skill cannot be published.
+        url = '%s/non-existing-id' % (feconf.SKILL_PUBLISH_URL_PREFIX)
+        self.put_json(
+            url, {'version': 1}, csrf_token=csrf_token, expected_status_int=404)
 
-            # Check that the status is 401 when call to publish_skill raises an
-            # exception.
-            skill_services_swap = self.swap(
-                skill_services, 'publish_skill',
-                self._mock_publish_skill_raise_exception)
-            with skill_services_swap:
-                csrf_token = self._get_csrf_token_for_put()
-                self.put_json(
-                    self.url, {'version': 1}, csrf_token=csrf_token,
-                    expected_status_int=401)
+        # Check that the status is 401 when call to publish_skill raises an
+        # exception.
+        skill_services_swap = self.swap(
+            skill_services, 'publish_skill',
+            self._mock_publish_skill_raise_exception)
+        with skill_services_swap:
+            csrf_token = self._get_csrf_token_for_put()
+            self.put_json(
+                self.url, {'version': 1}, csrf_token=csrf_token,
+                expected_status_int=401)
+
         self.logout()
