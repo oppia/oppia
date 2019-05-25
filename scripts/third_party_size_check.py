@@ -26,19 +26,28 @@ import yaml
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 7000
 
-with open("./app.yaml", 'r') as app_yaml:
-    try:
-        app_yaml_dict=yaml.safe_load(app_yaml)
-    except yaml.YAMLError as exc:
-        print(exc)
-skip_files = app_yaml_dict.get("skip_files")
 
-skip_files = [os.getcwd() + '/' + skip_files_dir  for skip_files_dir in skip_files]
+def _get_skip_files_list():
+    """This lists the directories which should be skipped."""
+    with open('./app.yaml', 'r') as app_yaml:
+        try:
+            app_yaml_dict = yaml.safe_load(app_yaml)
+        except yaml.YAMLError as exc:
+            print exc
+        skip_files = app_yaml_dict.get('skip_files')
 
-def _check_size_in_dir(dir_path):
+        skip_files = [os.getcwd() + '/' + skip_files_dir
+                      for skip_files_dir in skip_files]
+
+    return skip_files
+
+
+
+def _check_size_in_dir(skip_files, dir_path):
     """Recursive method that checks the number of files inside the given
     directory.
     Args:
+         skip_files: str. The directory which files will not be counted.
          dir_path: str. The directory which files will be counted.
     Returns:
         The number of files inside the given directory.
@@ -52,13 +61,15 @@ def _check_size_in_dir(dir_path):
         else:
             if os.path.isdir(os.path.join(dir_path, name)):
                 number_of_files_in_dir += _check_size_in_dir(
-                    os.path.join(dir_path, name))
+                    skip_files, os.path.join(dir_path, name))
     return number_of_files_in_dir
 
 
 def _check_third_party_size():
     """Checks if the third-party size limit has been exceeded."""
-    number_of_files_in_third_party = _check_size_in_dir(THIRD_PARTY_PATH)
+    skip_files = _get_skip_files_list()
+    number_of_files_in_third_party = _check_size_in_dir(
+        skip_files, THIRD_PARTY_PATH)
     print ''
     print '------------------------------------------------------'
     print '    Number of files in third-party folder: %d' % (
