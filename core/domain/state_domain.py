@@ -862,12 +862,14 @@ class WrittenTranslation(object):
 
 class ImageAssets(object):
     def __init__(self, image_assets_mapping):
+        print("     "*100)
+        print(" yeh call hua")
         self.image_assets_mapping = image_assets_mapping
 
-    def validate(self);
+    def validate(self):
         pass
 
-    def to_dict(self);
+    def to_dict(self):
         image_assets_mapping = {}
         for image_id in self.image_assets_mapping:
             image_assets_mapping[image_id] = {}
@@ -877,10 +879,11 @@ class ImageAssets(object):
         return image_assets_mapping
 
     @classmethod
-    def from_dict(self, image_assets_mapping):
-        for image_id in self.image_assets_mapping:
+    def from_dict(cls, default_image_assets_mapping):
+        image_assets_mapping = {}
+        for image_id in default_image_assets_mapping:
             image_assets_mapping[image_id] = {}
-            image = self.image_assets_mapping[image_id]
+            image = default_image_assets_mapping[image_id]
             for info in image:
                 image_assets_mapping[image_id][info] = image[info]
         return cls(image_assets_mapping)
@@ -1907,7 +1910,8 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
-            ImageAssets.from_dict(copy.deepcopy(feconf.DEFAULT_IMAGE_ASSETS))
+            ImageAssets.from_dict(copy.deepcopy(
+                feconf.DEFAULT_IMAGE_ASSETS)),
             RecordedVoiceovers.from_dict(copy.deepcopy(
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
