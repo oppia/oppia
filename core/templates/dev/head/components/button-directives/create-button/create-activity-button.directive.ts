@@ -26,6 +26,7 @@ require('domain/utilities/BrowserCheckerService.ts');
 require('services/contextual/UrlService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('createActivityButton', [
   'UrlInterpolationService', function(UrlInterpolationService) {
