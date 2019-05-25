@@ -26,7 +26,6 @@ import yaml
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 7000
 
-# Reads all the which needs to be skipped from app.yaml.
 with open("./app.yaml", 'r') as app_yaml:
     try:
         app_yaml_dict=yaml.safe_load(app_yaml)
@@ -34,16 +33,13 @@ with open("./app.yaml", 'r') as app_yaml:
         print(exc)
 skip_files = app_yaml_dict.get("skip_files")
 
-# This adds cwd to to all the skip_files directory.  
 skip_files = [os.getcwd() + '/' + skip_files_dir  for skip_files_dir in skip_files]
 
 def _check_size_in_dir(dir_path):
     """Recursive method that checks the number of files inside the given
     directory.
-
     Args:
          dir_path: str. The directory which files will be counted.
-
     Returns:
         The number of files inside the given directory.
     """
@@ -56,6 +52,7 @@ def _check_size_in_dir(dir_path):
         else:
             if os.path.isdir(os.path.join(dir_path, name)):
                 if dir_path in skip_files:
+                    print(dir_path)
                     continue
                 number_of_files_in_dir += _check_size_in_dir(
                     os.path.join(dir_path, name))
