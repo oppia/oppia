@@ -64,7 +64,10 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
     def _run_one_off_job_resulting_in_failure(self, query_id):
-        """Runs the one-off MapReduce job and fails it."""
+        """Runs the one-off MapReduce job and fails it. After failing the job,
+        a failure email is sent to the initiator of the query. To achieve this,
+        we need to turn feconf.CAN_SEND_EMAILS True.
+        """
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
         params = {
             'query_id': query_id,
