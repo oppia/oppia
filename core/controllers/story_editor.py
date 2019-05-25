@@ -14,7 +14,6 @@
 
 """Controllers for the story editor."""
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import story_domain
@@ -30,10 +29,6 @@ class StoryEditorPage(base.BaseHandler):
     @acl_decorators.can_edit_story
     def get(self, topic_id, story_id):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
@@ -74,9 +69,6 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_story
     def get(self, topic_id, story_id):
         """Populates the data on the individual story page."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
@@ -98,9 +90,6 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_story
     def put(self, topic_id, story_id):
         """Updates properties of the given story."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
         story = story_services.get_story_by_id(story_id, strict=False)
@@ -134,9 +123,6 @@ class EditableStoryDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_story
     def delete(self, topic_id, story_id):
         """Handles Delete requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         story_domain.Story.require_valid_story_id(story_id)
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
