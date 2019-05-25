@@ -21,11 +21,22 @@
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('pages/exploration-editor-page/exploration-editor-page-services/angular-name/angular-name.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page-services/change-list.service.ts');
-require('pages/exploration-editor-page/exploration-editor-page-services/exploration-init-state-name.service.ts');
-require('pages/exploration-editor-page/exploration-editor-tab/exploration-editor-tab-services/solution-validity/solution-validity.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/answer-classification/answer-classification.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'angular-name/angular-name.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'change-list.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'exploration-editor-tab-services/solution-validity/' +
+  'solution-validity.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'answer-classification/answer-classification.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');

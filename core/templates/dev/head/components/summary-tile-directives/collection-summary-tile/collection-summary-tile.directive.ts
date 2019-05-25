@@ -23,6 +23,10 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
+require(
+  'components/summary-tile-directives/collection-summary-tile/' +
+  'collection-summary-tile.constants.ts');
+
 oppia.directive(
   'collectionSummaryTile', [
     'UrlInterpolationService', function(UrlInterpolationService) {
