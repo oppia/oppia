@@ -74,8 +74,8 @@ module.exports = function(config) {
        'state-name-editor.directive.spec.ts'),
       ('core/templates/dev/head/pages/state-editor-page/state-content-editor/' +
        'state-content-editor.directive.spec.ts'),
-      ('core/templates/dev/head/pages/state-editor-page/state-interaction-editor/' +
-       'state-interaction-editor.directive.spec.ts'),
+      ('core/templates/dev/head/pages/state-editor-page/' +
+       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {
       // Karma serves files under the /base directory.

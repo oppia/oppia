@@ -24,7 +24,9 @@ require(
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-states/exploration-states.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/answer-classification/answer-classification.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'answer-classification/answer-classification.service.ts');
 require('services/ContextService.ts');
 
 oppia.factory('StateTopAnswersStatsService', [

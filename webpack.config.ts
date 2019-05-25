@@ -38,13 +38,16 @@ module.exports = {
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.controller.ts',
     collection_player:
-      commonPrefix + '/pages/collection-player-page/collection-player-page.controller.ts',
+      commonPrefix + '/pages/collection-player-page/' +
+      'collection-player-page.controller.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
-      commonPrefix + '/pages/creator-dashboard-page/creator-dashboard-page.controller.ts',
+      commonPrefix + '/pages/creator-dashboard-page/' +
+      'creator-dashboard-page.controller.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
     email_dashboard:
-      commonPrefix + '/pages/email-dashboard-page/email-dashboard-page.controller.ts',
+      commonPrefix + '/pages/email-dashboard-page/' +
+      'email-dashboard-page.controller.ts',
     email_dashboard_result:
       commonPrefix + '/pages/email-dashboard-page/email-dashboard-result/' +
       'email-dashboard-result.controller.ts',
@@ -64,30 +67,40 @@ module.exports = {
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.controller.ts',
     library: commonPrefix + '/pages/library-page/library-page.controller.ts',
-    maintenance: commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
-    moderator: commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
+    maintenance:
+      commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
+    moderator:
+      commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
     notifications_dashboard:
-      commonPrefix + '/pages/notifications-dashboard-page/notifications-dashboard-page.controller.ts',
+      commonPrefix + '/pages/notifications-dashboard-page/' +
+      'notifications-dashboard-page.controller.ts',
     practice_session:
-      commonPrefix + '/pages/practice-session-page/practice-session-page.controller.ts',
-    preferences: commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
+      commonPrefix + '/pages/practice-session-page/' +
+      'practice-session-page.controller.ts',
+    preferences:
+      commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
-    skill_editor: commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
+    skill_editor:
+      commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
     splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
     stewards: (
       commonPrefix +
       '/pages/landing-pages/stewards-landing-page/' +
       'topic-landing-page-stewards.controller.ts'),
-    story_editor: commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
+    story_editor:
+      commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
-    topic_editor: commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
+    topic_editor:
+      commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
-      '/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.controller.ts'
+      '/pages/topics-and-skills-dashboard-page/' +
+      'topics-and-skills-dashboard-page.controller.ts'
     ),
-    topic_viewer: commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.controller.ts',
+    topic_viewer:
+      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.controller.ts',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -115,7 +128,8 @@ module.exports = {
       chunks: ['collection_editor'],
       filename: 'collection-editor-page.mainpage.html',
       template:
-        commonPrefix + '/pages/collection-editor-page/collection-editor-page.mainpage.html',
+        commonPrefix + '/pages/collection-editor-page/' +
+        'collection-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -123,7 +137,8 @@ module.exports = {
       chunks: ['collection_player'],
       filename: 'collection-player-page.mainpage.html',
       template:
-        commonPrefix + '/pages/collection-player-page/collection-player-page.mainpage.html',
+        commonPrefix + '/pages/collection-player-page/' +
+        'collection-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -144,7 +159,8 @@ module.exports = {
       chunks: ['creator_dashboard'],
       filename: 'creator-dashboard-page.mainpage.html',
       template:
-        commonPrefix + '/pages/creator-dashboard-page/creator-dashboard-page.mainpage.html',
+        commonPrefix + '/pages/creator-dashboard-page/' +
+        'creator-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -158,7 +174,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['email_dashboard'],
       filename: 'email-dashboard-page.mainpage.html',
-      template: commonPrefix + '/pages/email-dashboard-page/email-dashboard-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/email-dashboard-page/' +
+        'email-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -166,7 +184,8 @@ module.exports = {
       chunks: ['email_dashboard_result'],
       filename: 'email-dashboard-result.mainpage.html',
       template:
-        commonPrefix + '/pages/email-dashboard-page/email-dashboard-result/email-dashboard-result.mainpage.html',
+        commonPrefix + '/pages/email-dashboard-page/email-dashboard-result/' +
+        'email-dashboard-result.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -181,7 +200,8 @@ module.exports = {
       chunks: ['exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
       template:
-        commonPrefix + '/pages/exploration-editor-page/exploration-editor-page.mainpage.html',
+        commonPrefix + '/pages/exploration-editor-page/' +
+        'exploration-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -197,7 +217,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['get_started'],
       filename: 'get-started-page.mainpage.html',
-      template: commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -214,7 +235,8 @@ module.exports = {
       chunks: ['learner_dashboard'],
       filename: 'learner-dashboard-page.mainpage.html',
       template:
-        commonPrefix + '/pages/learner-dashboard-page/learner-dashboard-page.mainpage.html',
+        commonPrefix + '/pages/learner-dashboard-page/' +
+        'learner-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -228,14 +250,16 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['app', 'maintenance'],
       filename: 'maintenance-page.mainpage.html',
-      template: commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['moderator'],
       filename: 'moderator-page.mainpage.html',
-      template: commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -250,7 +274,8 @@ module.exports = {
       filename: 'notifications-dashboard-page.mainpage.html',
       template: (
         commonPrefix +
-        '/pages/notifications-dashboard-page/notifications-dashboard-page.mainpage.html'
+        '/pages/notifications-dashboard-page/' +
+        'notifications-dashboard-page.mainpage.html'
       ),
       minify: htmlMinifyConfig,
       inject: false
@@ -258,14 +283,17 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['practice_session'],
       filename: 'practice-session-page.mainpage.html',
-      template: commonPrefix + '/pages/practice-session-page/practice-session-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/practice-session-page/' +
+        'practice-session-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['preferences'],
       filename: 'preferences-page.mainpage.html',
-      template: commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -286,7 +314,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['skill_editor'],
       filename: 'skill-editor-page.mainpage.html',
-      template: commonPrefix + '/pages/skill-editor-page/skill-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/skill-editor-page/' +
+        'skill-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -315,14 +345,17 @@ module.exports = {
       chunks: ['stewards'],
       filename: 'topic-landing-page-stewards.mainpage.html',
       template:
-        commonPrefix + '/pages/landing-pages/stewards-landing-page/topic-landing-page-stewards.mainpage.html',
+        commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
+        'topic-landing-page-stewards.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['story_editor'],
       filename: 'story-editor-page.mainpage.html',
-      template: commonPrefix + '/pages/story-editor-page/story-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/story-editor-page/' +
+        'story-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -349,7 +382,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['topic_editor'],
       filename: 'topic-editor-page.mainpage.html',
-      template: commonPrefix + '/pages/topic-editor-page/topic-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/topic-editor-page/' +
+        'topic-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -358,7 +393,8 @@ module.exports = {
       filename: 'topics-and-skills-dashboard-page.mainpage.html',
       template: (
         commonPrefix +
-        '/pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.mainpage.html'
+        '/pages/topics-and-skills-dashboard-page/' +
+        'topics-and-skills-dashboard-page.mainpage.html'
       ),
       minify: htmlMinifyConfig,
       inject: false
@@ -366,7 +402,9 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['topic_viewer'],
       filename: 'topic-viewer-page.mainpage.html',
-      template: commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/topic-viewer-page/' +
+        'topic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

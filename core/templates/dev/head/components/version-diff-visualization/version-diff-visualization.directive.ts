@@ -221,8 +221,8 @@ oppia.directive(
               newStateName, oldStateName, stateProperty) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/' +
-                'state_diff_modal_directive.html'),
+                '/components/version-diff-visualization/' +
+                'version-diff-visualization.directive.html'),
               backdrop: true,
               windowClass: 'state-diff-modal',
               resolve: {
