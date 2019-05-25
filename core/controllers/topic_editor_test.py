@@ -64,111 +64,71 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
-    def test_get_can_not_access_handler_with_new_structure_editors_disabled(
-            self):
-        self.login(self.ADMIN_EMAIL)
-
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.get_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
-                expected_status_int=404)
-
-        self.logout()
-
     def test_handler_updates_story_summary_dicts(self):
         self.login(self.ADMIN_EMAIL)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            topic_id = topic_services.get_new_topic_id()
-            canonical_story_id = story_services.get_new_story_id()
-            additional_story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        canonical_story_id = story_services.get_new_story_id()
+        additional_story_id = story_services.get_new_story_id()
 
-            # 'self.topic_id' does not contain any canonical_story_summary_dicts
-            # or additional_story_summary_dicts.
-            response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id))
+        # 'self.topic_id' does not contain any canonical_story_summary_dicts
+        # or additional_story_summary_dicts.
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id))
 
-            self.assertEqual(response['canonical_story_summary_dicts'], [])
-            self.assertEqual(response['additional_story_summary_dicts'], [])
+        self.assertEqual(response['canonical_story_summary_dicts'], [])
+        self.assertEqual(response['additional_story_summary_dicts'], [])
 
-            self.save_new_story(
-                canonical_story_id, self.admin_id, 'title', 'description',
-                'note')
-            self.save_new_story(
-                additional_story_id, self.admin_id, 'another title',
-                'another description', 'another note')
-            self.save_new_topic(
-                topic_id, self.admin_id, 'New name', 'New description',
-                [canonical_story_id], [additional_story_id], [self.skill_id],
-                [], 1)
+        self.save_new_story(
+            canonical_story_id, self.admin_id, 'title', 'description',
+            'note')
+        self.save_new_story(
+            additional_story_id, self.admin_id, 'another title',
+            'another description', 'another note')
+        self.save_new_topic(
+            topic_id, self.admin_id, 'New name', 'New description',
+            [canonical_story_id], [additional_story_id], [self.skill_id],
+            [], 1)
 
-            response = self.get_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
-            canonical_story_summary_dicts = response[
-                'canonical_story_summary_dicts'][0]
-            additional_story_summary_dicts = response[
-                'additional_story_summary_dicts'][0]
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
+        canonical_story_summary_dicts = response[
+            'canonical_story_summary_dicts'][0]
+        additional_story_summary_dicts = response[
+            'additional_story_summary_dicts'][0]
 
-            self.assertEqual(
-                canonical_story_summary_dicts['description'], 'description')
-            self.assertEqual(canonical_story_summary_dicts['title'], 'title')
-            self.assertEqual(
-                canonical_story_summary_dicts['id'], canonical_story_id)
-            self.assertEqual(
-                additional_story_summary_dicts['description'],
-                'another description')
-            self.assertEqual(
-                additional_story_summary_dicts['title'], 'another title')
-            self.assertEqual(
-                additional_story_summary_dicts['id'], additional_story_id)
-
-        self.logout()
-
-    def test_post_can_not_access_handler_with_new_structure_editors_disabled(
-            self):
-        self.login(self.ADMIN_EMAIL)
-
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.post_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
-                {'title': 'Story title'},
-                csrf_token=csrf_token, expected_status_int=404)
+        self.assertEqual(
+            canonical_story_summary_dicts['description'], 'description')
+        self.assertEqual(canonical_story_summary_dicts['title'], 'title')
+        self.assertEqual(
+            canonical_story_summary_dicts['id'], canonical_story_id)
+        self.assertEqual(
+            additional_story_summary_dicts['description'],
+            'another description')
+        self.assertEqual(
+            additional_story_summary_dicts['title'], 'another title')
+        self.assertEqual(
+            additional_story_summary_dicts['id'], additional_story_id)
 
         self.logout()
 
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
-            json_response = self.post_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
-                {'title': 'Story title'},
-                csrf_token=csrf_token)
-            story_id = json_response['storyId']
-            self.assertEqual(len(story_id), 12)
-            self.assertIsNotNone(
-                story_services.get_story_by_id(story_id, strict=False))
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        json_response = self.post_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
+            {'title': 'Story title'},
+            csrf_token=csrf_token)
+        story_id = json_response['storyId']
+        self.assertEqual(len(story_id), 12)
+        self.assertIsNotNone(
+            story_services.get_story_by_id(story_id, strict=False))
         self.logout()
 
 
 class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
-
-    def test_get_can_not_access_handler_with_new_structure_editors_disabled(
-            self):
-        self.login(self.ADMIN_EMAIL)
-
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.get_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id),
-                expected_status_int=404)
-
-        self.logout()
 
     def test_get(self):
         # Create 5 questions linked to the same skill.
@@ -180,263 +140,221 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
             question_services.create_new_question_skill_link(
                 question_id, self.skill_id, 0.5)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            self.login(self.ADMIN_EMAIL)
-            with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
-                json_response = self.get_json(
-                    '%s/%s?cursor=' % (
-                        feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                    ))
-                question_summary_dicts = json_response['question_summary_dicts']
-                self.assertEqual(len(question_summary_dicts), 1)
-                next_start_cursor = json_response['next_start_cursor']
-                json_response = self.get_json(
-                    '%s/%s?cursor=%s' % (
-                        feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id,
-                        next_start_cursor
-                    ))
-                question_summary_dicts_2 = (
-                    json_response['question_summary_dicts'])
-                self.assertEqual(len(question_summary_dicts_2), 1)
-                self.assertEqual(
-                    question_summary_dicts[0]['skill_description'],
-                    'Skill Description')
-                self.assertNotEqual(
-                    question_summary_dicts[0]['summary']['id'],
-                    question_summary_dicts_2[0]['summary']['id'])
-            self.logout()
-
-            self.login(self.TOPIC_MANAGER_EMAIL)
-            self.get_json(
-                '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
-            self.logout()
-
-            topic_services.assign_role(
-                self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-                self.topic_id)
-
-            self.login(self.TOPIC_MANAGER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
             json_response = self.get_json(
-                '%s/%s' % (
+                '%s/%s?cursor=' % (
                     feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
                 ))
             question_summary_dicts = json_response['question_summary_dicts']
-            self.assertEqual(len(question_summary_dicts), 3)
-            self.logout()
+            self.assertEqual(len(question_summary_dicts), 1)
+            next_start_cursor = json_response['next_start_cursor']
+            json_response = self.get_json(
+                '%s/%s?cursor=%s' % (
+                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id,
+                    next_start_cursor
+                ))
+            question_summary_dicts_2 = (
+                json_response['question_summary_dicts'])
+            self.assertEqual(len(question_summary_dicts_2), 1)
+            self.assertEqual(
+                question_summary_dicts[0]['skill_description'],
+                'Skill Description')
+            self.assertNotEqual(
+                question_summary_dicts[0]['summary']['id'],
+                question_summary_dicts_2[0]['summary']['id'])
+        self.logout()
 
-            self.login(self.NEW_USER_EMAIL)
-            self.get_json(
-                '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                ), expected_status_int=401)
-            self.logout()
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        self.get_json(
+            '%s/%s?cursor=' % (
+                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
+        self.logout()
+
+        topic_services.assign_role(
+            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
+            self.topic_id)
+
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
+            ))
+        question_summary_dicts = json_response['question_summary_dicts']
+        self.assertEqual(len(question_summary_dicts), 3)
+        self.logout()
+
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/%s?cursor=' % (
+                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
+            ), expected_status_int=401)
+        self.logout()
 
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
-    def test_get_can_not_access_handler_with_new_structure_editors_disabled(
-            self):
-        self.login(self.ADMIN_EMAIL)
-
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, 1), expected_status_int=404)
-
-        self.logout()
-
     def test_get_can_not_access_handler_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, topic_services.get_new_topic_id()),
-                expected_status_int=404)
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, topic_services.get_new_topic_id()),
+            expected_status_int=404)
 
         self.logout()
 
     def test_editable_subtopic_page_get(self):
         # Check that non-admins and non-topic managers cannot access the
         # editable subtopic data.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            self.login(self.NEW_USER_EMAIL)
-            self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, 1), expected_status_int=401)
-            self.logout()
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1), expected_status_int=401)
+        self.logout()
 
-            # Check that topic managers not assigned to this topic can
-            # access its subtopic pages.
-            self.login(self.TOPIC_MANAGER_EMAIL)
-            json_response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, 1))
-            self.assertEqual({
-                'subtitled_html': {
-                    'html': '',
-                    'content_id': 'content'
-                },
-                'content_ids_to_audio_translations': {
+        # Check that topic managers not assigned to this topic can
+        # access its subtopic pages.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual({
+            'subtitled_html': {
+                'html': '',
+                'content_id': 'content'
+            },
+            'content_ids_to_audio_translations': {
+                'content': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
                     'content': {}
-                },
-                'written_translations': {
-                    'translations_mapping': {
-                        'content': {}
-                    }
                 }
-            }, json_response['subtopic_page']['page_contents'])
-            self.logout()
+            }
+        }, json_response['subtopic_page']['page_contents'])
+        self.logout()
 
-            topic_services.assign_role(
-                self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-                self.topic_id)
+        topic_services.assign_role(
+            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
+            self.topic_id)
 
-            # Check that topic managers can access the subtopic page.
-            self.login(self.TOPIC_MANAGER_EMAIL)
-            json_response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, 1))
-            self.assertEqual({
-                'subtitled_html': {
-                    'html': '',
-                    'content_id': 'content'
-                },
-                'content_ids_to_audio_translations': {
+        # Check that topic managers can access the subtopic page.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual({
+            'subtitled_html': {
+                'html': '',
+                'content_id': 'content'
+            },
+            'content_ids_to_audio_translations': {
+                'content': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
                     'content': {}
-                },
-                'written_translations': {
-                    'translations_mapping': {
-                        'content': {}
-                    }
-                },
-            }, json_response['subtopic_page']['page_contents'])
-            self.logout()
-
-            # Check that admins can access the editable subtopic data.
-            self.login(self.ADMIN_EMAIL)
-            json_response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, 1))
-            self.assertEqual({
-                'subtitled_html': {
-                    'html': '',
-                    'content_id': 'content'
-                },
-                'content_ids_to_audio_translations': {
-                    'content': {}
-                },
-                'written_translations': {
-                    'translations_mapping': {
-                        'content': {}
-                    }
                 }
-            }, json_response['subtopic_page']['page_contents'])
-            self.logout()
+            },
+        }, json_response['subtopic_page']['page_contents'])
+        self.logout()
+
+        # Check that admins can access the editable subtopic data.
+        self.login(self.ADMIN_EMAIL)
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual({
+            'subtitled_html': {
+                'html': '',
+                'content_id': 'content'
+            },
+            'content_ids_to_audio_translations': {
+                'content': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {}
+                }
+            }
+        }, json_response['subtopic_page']['page_contents'])
+        self.logout()
 
 
 class TopicEditorTests(BaseTopicEditorControllerTests):
 
-    def test_get_can_not_access_topic_page_with_new_structure_editors_disabled(
-            self):
-        self.login(self.ADMIN_EMAIL)
-
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
-                expected_status_int=404)
-
-        self.logout()
-
     def test_get_can_not_access_topic_page_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_URL_PREFIX,
-                    topic_services.get_new_topic_id()), expected_status_int=404)
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
 
     def test_access_topic_editor_page(self):
         """Test access to editor pages for the sample topic."""
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            # Check that non-admin and topic_manager cannot access the editor
-            # page.
-            self.login(self.NEW_USER_EMAIL)
-            self.get_html_response(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
-                expected_status_int=401)
-            self.logout()
+        # Check that non-admin and topic_manager cannot access the editor
+        # page.
+        self.login(self.NEW_USER_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.logout()
 
-            # Check that admins can access the editor page.
-            self.login(self.ADMIN_EMAIL)
-            self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            self.logout()
+        # Check that admins can access the editor page.
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        self.logout()
 
-            # Check that any topic manager can access the editor page.
-            self.login(self.TOPIC_MANAGER_EMAIL)
-            self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            self.logout()
+        # Check that any topic manager can access the editor page.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        self.logout()
 
 
     def test_editable_topic_handler_get(self):
         # Check that non-admins cannot access the editable topic data.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            self.login(self.NEW_USER_EMAIL)
-            self.get_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                expected_status_int=401)
-            self.logout()
+        self.login(self.NEW_USER_EMAIL)
+        self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.logout()
 
-            # Check that admins can access the editable topic data.
-            self.login(self.ADMIN_EMAIL)
+        # Check that admins can access the editable topic data.
+        self.login(self.ADMIN_EMAIL)
 
-            json_response = self.get_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-            self.assertEqual(
-                'Skill Description',
-                json_response['skill_id_to_description_dict'][self.skill_id])
-            self.logout()
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
+        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+        self.assertEqual(
+            'Skill Description',
+            json_response['skill_id_to_description_dict'][self.skill_id])
+        self.logout()
 
-            # Check that editable topic handler is accessed only when a topic id
-            # passed has an associated topic.
-            self.login(self.ADMIN_EMAIL)
+        # Check that editable topic handler is accessed only when a topic id
+        # passed has an associated topic.
+        self.login(self.ADMIN_EMAIL)
 
-            self.get_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                    topic_services.get_new_topic_id()), expected_status_int=404)
+        self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
 
-            self.logout()
-
-        # Check that editable topic handler is not accessible when new structure
-        # editors is disabled.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.login(self.ADMIN_EMAIL)
-
-            self.get_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                expected_status_int=404)
-
-            self.logout()
+        self.logout()
 
     def test_editable_topic_handler_put(self):
         # Check that admins can edit a topic.
@@ -500,127 +418,113 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
 
-            json_response = self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                change_cmd, csrf_token=csrf_token)
-            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-            self.assertEqual('A new name', json_response['topic_dict']['name'])
-            self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
-            self.assertEqual(
-                'Skill Description',
-                json_response['skill_id_to_description_dict'][self.skill_id])
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token)
+        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+        self.assertEqual('A new name', json_response['topic_dict']['name'])
+        self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
+        self.assertEqual(
+            'Skill Description',
+            json_response['skill_id_to_description_dict'][self.skill_id])
 
-            # Test if the corresponding subtopic pages were created.
-            json_response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, 1))
-            self.assertEqual({
-                'subtitled_html': {
-                    'html': '<p>New Data</p>',
-                    'content_id': 'content'
-                },
-                'content_ids_to_audio_translations': {
+        # Test if the corresponding subtopic pages were created.
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 1))
+        self.assertEqual({
+            'subtitled_html': {
+                'html': '<p>New Data</p>',
+                'content_id': 'content'
+            },
+            'content_ids_to_audio_translations': {
+                'content': {}
+            },
+            'written_translations': {
+                'translations_mapping': {
                     'content': {}
-                },
-                'written_translations': {
-                    'translations_mapping': {
-                        'content': {}
+                }
+            }
+        }, json_response['subtopic_page']['page_contents'])
+        json_response = self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, 2))
+        self.assertEqual({
+            'subtitled_html': {
+                'html': '<p>New Value</p>',
+                'content_id': 'content'
+            },
+            'content_ids_to_audio_translations': {
+                'content': {
+                    'en': {
+                        'file_size_bytes': 100,
+                        'filename': 'test.mp3',
+                        'needs_update': False
                     }
                 }
-            }, json_response['subtopic_page']['page_contents'])
-            json_response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
-                    self.topic_id, 2))
-            self.assertEqual({
-                'subtitled_html': {
-                    'html': '<p>New Value</p>',
-                    'content_id': 'content'
-                },
-                'content_ids_to_audio_translations': {
-                    'content': {
-                        'en': {
-                            'file_size_bytes': 100,
-                            'filename': 'test.mp3',
-                            'needs_update': False
-                        }
-                    }
-                },
-                'written_translations': {
-                    'translations_mapping': {
-                        'content': {}
-                    }
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    'content': {}
                 }
-            }, json_response['subtopic_page']['page_contents'])
-            self.logout()
+            }
+        }, json_response['subtopic_page']['page_contents'])
+        self.logout()
 
-            # Test that any topic manager cannot edit the topic.
-            self.login(self.TOPIC_MANAGER_EMAIL)
-            self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                change_cmd, csrf_token=csrf_token, expected_status_int=401)
-            self.logout()
+        # Test that any topic manager cannot edit the topic.
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=401)
+        self.logout()
 
-            # Check that non-admins and non-topic managers cannot edit a topic.
-            self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                change_cmd, csrf_token=csrf_token, expected_status_int=401)
+        # Check that non-admins and non-topic managers cannot edit a topic.
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=401)
 
-            # Check that topic can not be edited when version is None.
-            self.login(self.ADMIN_EMAIL)
-
-            json_response = self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                {'version': None}, csrf_token=csrf_token,
-                expected_status_int=400)
-            self.assertEqual(
-                json_response['error'],
-                'Invalid POST request: a version must be specified.')
-
-            self.logout()
-
-            # Check topic can not be edited when payload version differs from
-            # topic version.
-            self.login(self.ADMIN_EMAIL)
-
-            topic_id_1 = topic_services.get_new_topic_id()
-            self.save_new_topic(
-                topic_id_1, self.admin_id, 'Name 1', 'Description 1', [], [],
-                [self.skill_id], [], 1)
-
-            json_response = self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, topic_id_1),
-                {'version': '3'}, csrf_token=csrf_token,
-                expected_status_int=400)
-
-            self.assertEqual(
-                json_response['error'],
-                'Trying to update version 1 of topic from version 3, '
-                'which is too old. Please reload the page and try again.')
-
-            self.logout()
-
-        # Check topic can not be edited when new structure editors is disabled.
+        # Check that topic can not be edited when version is None.
         self.login(self.ADMIN_EMAIL)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            {'version': None}, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Invalid POST request: a version must be specified.')
 
-            self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                {}, csrf_token=csrf_token,
-                expected_status_int=404)
+        self.logout()
+
+        # Check topic can not be edited when payload version differs from
+        # topic version.
+        self.login(self.ADMIN_EMAIL)
+
+        topic_id_1 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.admin_id, 'Name 1', 'Description 1', [], [],
+            [self.skill_id], [], 1)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, topic_id_1),
+            {'version': '3'}, csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Trying to update version 1 of topic from version 3, '
+            'which is too old. Please reload the page and try again.')
 
         self.logout()
 
@@ -690,58 +594,44 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             self.topic_id)
 
         self.login(self.TOPIC_MANAGER_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
-            # Check that the topic manager can edit the topic now.
-            json_response = self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                change_cmd, csrf_token=csrf_token)
-            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
-            self.assertEqual('A new name', json_response['topic_dict']['name'])
-            self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
-            self.logout()
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        # Check that the topic manager can edit the topic now.
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token)
+        self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+        self.assertEqual('A new name', json_response['topic_dict']['name'])
+        self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
+        self.logout()
 
     def test_editable_topic_handler_delete(self):
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            # Check that admins can delete a topic.
-            self.login(self.ADMIN_EMAIL)
-            self.delete_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                expected_status_int=200)
-            self.logout()
+        # Check that admins can delete a topic.
+        self.login(self.ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=200)
+        self.logout()
 
-            # Check that non-admins cannot delete a topic.
-            self.login(self.NEW_USER_EMAIL)
-            self.delete_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                expected_status_int=401)
-            self.logout()
+        # Check that non-admins cannot delete a topic.
+        self.login(self.NEW_USER_EMAIL)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.logout()
 
-            # Check that topic can not be deleted when the topic id passed does
-            # not have a topic associated with it.
-            self.login(self.ADMIN_EMAIL)
-
-            self.delete_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
-                    topic_services.get_new_topic_id()), expected_status_int=404)
-
-            self.logout()
-
-        # Check that topic can not be deleted when new structure editors is
-        # disabled.
+        # Check that topic can not be deleted when the topic id passed does
+        # not have a topic associated with it.
         self.login(self.ADMIN_EMAIL)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.delete_json(
-                '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
-                expected_status_int=404)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
 
         self.logout()
 
@@ -751,34 +641,33 @@ class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
     def test_assign_topic_manager_role(self):
         """Test the assign topic manager role for a topic functionality."""
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
 
-            # Test for when assignee does not have sufficient rights to become a
-            # manager for a topic.
-            self.put_json(
-                '%s/%s/%s' % (
-                    feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                    self.new_user_id),
-                {}, csrf_token=csrf_token, expected_status_int=401)
+        # Test for when assignee does not have sufficient rights to become a
+        # manager for a topic.
+        self.put_json(
+            '%s/%s/%s' % (
+                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
+                self.new_user_id),
+            {}, csrf_token=csrf_token, expected_status_int=401)
 
-            # Test for valid case.
-            self.put_json(
-                '%s/%s/%s' % (
-                    feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                    self.topic_manager_id),
-                {}, csrf_token=csrf_token)
-            self.logout()
+        # Test for valid case.
+        self.put_json(
+            '%s/%s/%s' % (
+                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
+                self.topic_manager_id),
+            {}, csrf_token=csrf_token)
+        self.logout()
 
-            # Test for when committer doesn't have sufficient rights to assign
-            # someone as manager.
-            self.put_json(
-                '%s/%s/%s' % (
-                    feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                    self.new_user_id),
-                {}, csrf_token=csrf_token, expected_status_int=401)
+        # Test for when committer doesn't have sufficient rights to assign
+        # someone as manager.
+        self.put_json(
+            '%s/%s/%s' % (
+                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
+                self.new_user_id),
+            {}, csrf_token=csrf_token, expected_status_int=401)
 
 
 class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
@@ -810,35 +699,33 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
     def test_get_topic_rights(self):
         """Test the get topic rights functionality."""
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            # Test whether admin can access topic rights.
-            json_response = self.get_json(
-                '%s/%s' % (
-                    feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id))
-            self.assertEqual(json_response['published'], False)
-            self.assertEqual(json_response['can_publish_topic'], True)
-            self.logout()
+        # Test whether admin can access topic rights.
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id))
+        self.assertEqual(json_response['published'], False)
+        self.assertEqual(json_response['can_publish_topic'], True)
+        self.logout()
 
-            self.login(self.NEW_USER_EMAIL)
-            # Test that other users cannot access topic rights.
-            self.get_json(
-                '%s/%s' % (
-                    feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id),
-                expected_status_int=401)
-            self.logout()
+        self.login(self.NEW_USER_EMAIL)
+        # Test that other users cannot access topic rights.
+        self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.logout()
 
     def test_can_not_get_topic_rights_when_topic_id_has_no_associated_topic(
             self):
         self.login(self.ADMIN_EMAIL)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            json_response = self.get_json(
-                '%s/%s' % (
-                    feconf.TOPIC_RIGHTS_URL_PREFIX,
-                    topic_services.get_new_topic_id()), expected_status_int=400)
-            self.assertEqual(
-                json_response['error'],
-                'Expected a valid topic id to be provided.')
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_RIGHTS_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Expected a valid topic id to be provided.')
 
         self.logout()
 
@@ -848,66 +735,62 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_get_can_not_access_handler_with_invalid_publish_status(self):
         self.login(self.ADMIN_EMAIL)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
-            response = self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
-                {'publish_status': 'invalid_status'}, csrf_token=csrf_token,
-                expected_status_int=400)
-            self.assertEqual(
-                response['error'],
-                'Publish status should only be true or false.')
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': 'invalid_status'}, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Publish status should only be true or false.')
 
         self.logout()
 
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""
         self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
-            # Test whether admin can publish and unpublish a topic.
-            self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
-                {'publish_status': True}, csrf_token=csrf_token)
-            topic_rights = topic_services.get_topic_rights(self.topic_id)
-            self.assertTrue(topic_rights.topic_is_published)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        # Test whether admin can publish and unpublish a topic.
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': True}, csrf_token=csrf_token)
+        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        self.assertTrue(topic_rights.topic_is_published)
 
-            self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
-                {'publish_status': False}, csrf_token=csrf_token)
-            topic_rights = topic_services.get_topic_rights(self.topic_id)
-            self.assertFalse(topic_rights.topic_is_published)
-            self.logout()
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': False}, csrf_token=csrf_token)
+        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        self.assertFalse(topic_rights.topic_is_published)
+        self.logout()
 
-            self.login(self.NEW_USER_EMAIL)
-            # Test that other users cannot access topic rights.
-            self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
-                {'publish_status': False}, csrf_token=csrf_token,
-                expected_status_int=401)
-            self.logout()
+        self.login(self.NEW_USER_EMAIL)
+        # Test that other users cannot access topic rights.
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': False}, csrf_token=csrf_token,
+            expected_status_int=401)
+
+        self.logout()
 
     def test_get_can_not_access_handler_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response = self.get_html_response(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
 
-            new_topic_id = topic_services.get_new_topic_id()
-            self.put_json(
-                '%s/%s' % (
-                    feconf.TOPIC_STATUS_URL_PREFIX, new_topic_id),
-                {'publish_status': True}, csrf_token=csrf_token,
-                expected_status_int=404)
-
-        self.logout()
+        new_topic_id = topic_services.get_new_topic_id()
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, new_topic_id),
+            {'publish_status': True}, csrf_token=csrf_token,
+            expected_status_int=404)

@@ -12,7 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Adds pre plugin to CKEditor RTE.
+/**
+ * @fileoverview Adds pre plugin to CKEditor RTE.
+ */
+
 CKEDITOR.plugins.add('pre', {
   icons: 'pre',
 
