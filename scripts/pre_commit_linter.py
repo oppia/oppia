@@ -89,6 +89,29 @@ _PARSER.add_argument(
     help='verbose mode. All details will be printed.',
     action='store_true')
 
+EXCLUDED_PHRASES = [
+    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+
+EXCLUDED_PATHS = (
+    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
+
+GENERATED_FILE_PATHS = (
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
+    'extensions/interactions/LogicProof/static/js/generatedParser.js',
+    'core/templates/dev/head/expressions/ExpressionParserService.js')
+
+CONFIG_FILE_PATHS = (
+    'core/tests/.browserstack.env.example',
+    'core/tests/protractor.conf.js',
+    'core/tests/karma.conf.ts',
+    'core/templates/dev/head/mathjaxConfig.ts',
+    'assets/constants.js',
+    'assets/rich_text_components_definitions.js')
+
 BAD_PATTERNS = {
     '__author__': {
         'message': 'Please remove author tags from this file.',
@@ -189,6 +212,29 @@ BAD_PATTERNS_JS_REGEXP = [
         'excluded_files': (),
         'excluded_dirs': ('core/tests/')
     },
+]
+
+MANDATORY_PATTERNS_REGEXP = [
+    {
+        'regexp': r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.',
+        'message': 'Please ensure this file should contain a proper '
+                   'copyright notice.',
+        'included_types': ('.py', '.js', '.sh', '.ts'),
+        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
+            '__init__.py', ),
+        'excluded_dirs': EXCLUDED_PATHS
+    }
+]
+
+MANDATORY_PATTERNS_JS_REGEXP = [
+    {
+        'regexp': r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+',
+        'message': 'Please ensure this file should contain a file '
+                   'overview i.e. a short description of the file.',
+        'included_types': ('.js', '.ts'),
+        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS,
+        'excluded_dirs': EXCLUDED_PATHS
+    }
 ]
 
 BAD_LINE_PATTERNS_HTML_REGEXP = [
@@ -1049,7 +1095,7 @@ class LintChecksManager(object):
             try:
                 # Use esprima to parse a JS or TS file.
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                    file_content)
+                    file_content, comment=True)
             except Exception as e:
                 # Compile typescript file which has syntax not valid for JS
                 # file.
@@ -1421,6 +1467,84 @@ class LintChecksManager(object):
 
             print ''
             return summary_messages
+
+    def _check_for_mandatory_pattern_in_file(
+            self, pattern_list, filepath, failed):
+        """Checks for a given mandatory pattern in a file.
+
+        Args:
+            pattern_list: list(dict). The list of the mandatory patterns list to
+                be checked for in the file.
+            filepath: str. The path to the file to be linted.
+            failed: bool. Status of failure of the check.
+
+        Returns:
+            bool. The failure status of the check.
+        """
+        # This boolean list keeps track of the regex matches
+        # found in the file.
+        pattern_found_list = []
+        file_content = FileCache.readlines(filepath)
+        for index, regexp_to_check in enumerate(
+                pattern_list):
+            if (any([filepath.endswith(
+                    allowed_type) for allowed_type in (
+                        regexp_to_check['included_types'])]) and (
+                            not any([
+                                filepath.endswith(
+                                    pattern) for pattern in (
+                                        regexp_to_check[
+                                            'excluded_files'] +
+                                        regexp_to_check[
+                                            'excluded_dirs'])]))):
+                pattern_found_list.append(False)
+                for line in file_content:
+                    if re.search(regexp_to_check['regexp'], line):
+                        pattern_found_list[index] = True
+                        break
+        if not all(pattern_found_list):
+            failed = True
+            for index, pattern_found in enumerate(
+                    pattern_found_list):
+                if not pattern_found:
+                    print '%s --> %s' % (
+                        filepath,
+                        pattern_list[index]['message'])
+        return failed
+
+    def _check_mandatory_patterns(self):
+        """This function checks that all files contain the mandatory
+        patterns.
+        """
+        if self.verbose_mode_enabled:
+            print 'Starting mandatory patterns check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            sets_of_patterns_to_match = [
+                MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
+            for filepath in self.all_filepaths:
+                for pattern_list in sets_of_patterns_to_match:
+                    failed = self._check_for_mandatory_pattern_in_file(
+                        pattern_list, filepath, failed)
+
+            if failed:
+                summary_message = (
+                    '%s  Mandatory pattern check failed' % (
+                        _MESSAGE_TYPE_FAILED))
+            else:
+                summary_message = (
+                    '%s  Mandatory pattern check passed' % (
+                        _MESSAGE_TYPE_SUCCESS))
+            print summary_message
+
+        print ''
+
+        summary_messages.append(summary_message)
+        return summary_messages
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -2091,62 +2215,6 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def _check_for_copyright_notice(self):
-        """This function checks whether the copyright notice
-        is present at the beginning of files.
-        """
-        if self.verbose_mode_enabled:
-            print 'Starting copyright notice check'
-            print '----------------------------------------'
-        js_and_ts_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith((
-                '.js', '.ts')) and (
-                    not filepath.endswith(GENERATED_FILE_PATHS)) and (
-                        not filepath.endswith(CONFIG_FILE_PATHS))]
-        py_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.py') and (not filepath.endswith('__init__.py'))]
-        sh_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.sh')]
-        all_files_to_check = (
-            js_and_ts_files_to_check + py_files_to_check + sh_files_to_check)
-        regexp_to_check = (
-            r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
-
-        failed = False
-        summary_messages = []
-
-        with _redirect_stdout(_TARGET_STDOUT):
-            for filepath in all_files_to_check:
-                has_copyright_notice = False
-                for line in FileCache.readlines(filepath)[:5]:
-                    if re.search(regexp_to_check, line):
-                        has_copyright_notice = True
-                        break
-
-                if not has_copyright_notice:
-                    failed = True
-                    print (
-                        '%s --> Please add a proper copyright notice to this '
-                        'file.' % (filepath))
-                    print ''
-
-            if failed:
-                summary_message = '%s   Copyright notice check failed' % (
-                    _MESSAGE_TYPE_FAILED)
-                print summary_message
-                summary_messages.append(summary_message)
-            else:
-                summary_message = '%s  Copyright notice check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
-                print summary_message
-                summary_messages.append(summary_message)
-
-            print ''
-
-        return summary_messages
-
     def _check_codeowner_file(self):
         """Checks the CODEOWNERS file for any uncovered dirs/files and also
         checks that every pattern in the CODEOWNERS file matches at least one
@@ -2259,6 +2327,7 @@ class LintChecksManager(object):
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
+        mandatory_patterns_messages = self._check_mandatory_patterns()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
         controller_dependency_messages = (
@@ -2274,17 +2343,15 @@ class LintChecksManager(object):
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
         pattern_messages = self._check_bad_patterns()
-        copyright_notice_messages = (
-            self._check_for_copyright_notice())
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
             html_directive_name_messages + import_order_messages +
-            docstring_messages + comment_messages +
-            html_tag_and_attribute_messages +
+            mandatory_patterns_messages + docstring_messages +
+            comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
-            copyright_notice_messages + codeowner_messages)
+            codeowner_messages)
         return all_messages
 
 
