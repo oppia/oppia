@@ -87,16 +87,16 @@ done
 
 if [[ "$FORCE_PROD_MODE" == "True" ]]; then
   constants_env_variable="\"DEV_MODE\": false"
-  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
   $PYTHON_CMD scripts/build.py --prod_env --enable_watcher
 else
   constants_env_variable="\"DEV_MODE\": true"
-  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.ts
   $PYTHON_CMD scripts/build.py --enable_watcher
 fi
 
 # Delete the modified feconf.py file(-i.bak)
-rm assets/constants.js.bak
+rm assets/constants.ts.bak
 
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.
