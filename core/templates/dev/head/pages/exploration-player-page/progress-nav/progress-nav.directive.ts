@@ -17,11 +17,22 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration-player-page/exploration-player-page-services/exploration-engine.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/exploration-player-state.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'exploration-engine.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'exploration-player-state.service.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
-require('pages/exploration-player-page/exploration-player-page-services/player-position/player-position.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/player-transcript/player-transcript.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'player-position/player-position.service.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page-services/' +
+  'player-transcript/player-transcript.service.ts');
+
+require(
+  'pages/exploration-player-page/continue-button/continue-button.directive.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
