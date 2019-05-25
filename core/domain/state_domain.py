@@ -860,6 +860,51 @@ class WrittenTranslation(object):
                 self.needs_update)
 
 
+class ImageAssets(object):
+    def __init__(self, image_assets_mapping):
+        self.image_assets_mapping = image_assets_mapping
+
+    def validate(self);
+        pass
+
+    def to_dict(self);
+        image_assets_mapping = {}
+        for image_id in self.image_assets_mapping:
+            image_assets_mapping[image_id] = {}
+            image = self.image_assets_mapping[image_id]
+            for info in image:
+                image_assets_mapping[image_id][info] = image[info]
+        return image_assets_mapping
+
+    @classmethod
+    def from_dict(self, image_assets_mapping):
+        for image_id in self.image_assets_mapping:
+            image_assets_mapping[image_id] = {}
+            image = self.image_assets_mapping[image_id]
+            for info in image:
+                image_assets_mapping[image_id][info] = image[info]
+        return cls(image_assets_mapping)
+
+    def add_default_image(self, image_id):
+        self.image_assets_mapping[image_id] = {}
+        image = self.image_assets_mapping[image_id]
+        image['src'] = ''
+        image['is_placeholder'] = True
+        image['author_id'] = ''
+
+    def delete_image(self, image_id):
+        del self.image_assets_mapping[image_id]
+        return
+
+    def update_image(self, image_id, image_info):
+        image_to_update = self.image_assets_mapping[image_id]
+        for info in image_info:
+            image_to_update[info] = image_info[info]
+
+    def get_image_ids_of_state(self):
+        return self.image_assets_mapping.keys()
+
+
 class WrittenTranslations(object):
     """Value object representing a content translations which stores
     translated contents of all state contents (like hints, feedback etc.) in
@@ -1366,8 +1411,9 @@ class State(object):
     """Domain object for a state."""
 
     def __init__(
-            self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, classifier_model_id=None):
+            self, content, param_changes, interaction, image_assets,
+            recorded_voiceovers, written_translations,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1377,6 +1423,8 @@ class State(object):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
+            image_assets: ImageAssetsInstance. The images for the state
+                contents.
             recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the state contents and translations.
             written_translations: WrittenTranslations. The written translations
@@ -1398,6 +1446,7 @@ class State(object):
             interaction.confirmed_unclassified_answers,
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
+        self.image_assets = image_assets
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
 
@@ -1461,6 +1510,7 @@ class State(object):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
 
+        self.image_assets.validate()
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
 
@@ -1811,6 +1861,7 @@ class State(object):
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
+            'image_assets': self.image_assets.to_dict(),
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict()
         }
@@ -1830,6 +1881,7 @@ class State(object):
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
+            ImageAssets.from_dict(state_dict['image_assets']),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['classifier_model_id'])
@@ -1855,6 +1907,7 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
+            ImageAssets.from_dict(copy.deepcopy(feconf.DEFAULT_IMAGE_ASSETS))
             RecordedVoiceovers.from_dict(copy.deepcopy(
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
