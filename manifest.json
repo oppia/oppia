@@ -64,9 +64,9 @@
         "targetDirPrefix": "requests-"
       },
       "simpleJson": {
-        "version": "3.7.1",
+        "version": "3.16.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/source/s/simplejson/simplejson-3.7.1.tar.gz#md5=c76c2d11b87e9fb501bd0b2b72091653",
+        "url": "https://files.pythonhosted.org/packages/e3/24/c35fb1c1c315fc0fffe61ea00d3f88e85469004713dab488dee4f35b0aff/simplejson-3.16.0.tar.gz",
         "tarRootDirPrefix": "simplejson-",
         "rootDirPrefix": "simplejson-",
         "targetDirPrefix": "simplejson-"

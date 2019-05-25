@@ -50,7 +50,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
     os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
     os.path.join(THIRD_PARTY_DIR, 'requests-2.10.0'),
-    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.7.1'),
+    os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
     os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
     os.path.join(THIRD_PARTY_DIR, 'mutagen-1.38'),
     os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
