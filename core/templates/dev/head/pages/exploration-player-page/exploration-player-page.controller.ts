@@ -94,7 +94,17 @@ require(
 require(
   'components/common-layout-directives/background-banner/' +
   'background-banner.directive.ts');
-require('pages/exploration-player-page/conversation-skin/conversation-skin.directive.ts');
-require('pages/exploration-player-page/exploration-footer/exploration-footer.directive.ts');
-require('pages/exploration-player-page/learner-local-nav/learner-local-nav.controller.ts');
-require('pages/exploration-player-page/learner-view-info/learner-view-info.controller.ts');
+require(
+  'pages/exploration-player-page/continue-button/continue-button.directive.ts');
+require(
+  'pages/exploration-player-page/conversation-skin/' +
+  'conversation-skin.directive.ts');
+require(
+  'pages/exploration-player-page/exploration-footer/' +
+  'exploration-footer.directive.ts');
+require(
+  'pages/exploration-player-page/learner-local-nav/' +
+  'learner-local-nav.controller.ts');
+require(
+  'pages/exploration-player-page/learner-view-info/' +
+  'learner-view-info.controller.ts');
