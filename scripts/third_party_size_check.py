@@ -42,7 +42,6 @@ def _get_skip_files_list():
     return skip_files
 
 
-
 def _check_size_in_dir(skip_files, dir_path):
     """Recursive method that checks the number of files inside the given
     directory.
