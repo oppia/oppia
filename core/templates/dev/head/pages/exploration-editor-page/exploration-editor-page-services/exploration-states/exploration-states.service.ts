@@ -29,6 +29,9 @@ require('pages/exploration-player-page/exploration-player-page-services/answer-c
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
+require(
+  'pages/state-editor-page/state-editor-properties-services/state-editor/' +
+  'state-editor.service.ts')
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ValidatorsService.ts');
