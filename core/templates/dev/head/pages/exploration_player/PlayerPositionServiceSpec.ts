@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for the player position service.
-*/
+ * @fileoverview Unit tests for the player position service.
+ */
 
 require('domain/state_card/StateCardObjectFactory.ts');
 require('pages/exploration_player/PlayerPositionService.ts');
