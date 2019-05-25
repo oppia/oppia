@@ -37,7 +37,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-fdescribe('Full exploration editor', function() {
+describe('Full exploration editor', function() {
   var collectionEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorPage = null;
@@ -70,7 +70,7 @@ fdescribe('Full exploration editor', function() {
     }
   );
 
-  fit('should prevent going back when help card is shown', function() {
+  it('should prevent going back when help card is shown', function() {
     users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
     users.login('user2@editorAndPlayer.com');
     workflow.createExploration();
