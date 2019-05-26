@@ -22,7 +22,7 @@ require('services/PageTitleService.ts');
 oppia.controller('Error', [
   '$scope', 'PageTitleService', 'UrlInterpolationService',
   function(
-      $scope, UrlInterpolationService) {
+      $scope, PageTitleService, UrlInterpolationService) {
     $scope.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/oops_mint.png');
 
