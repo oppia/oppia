@@ -32,7 +32,7 @@ def _get_skip_files_list():
     Oppia is deployed to GAE.
 
     Returns:
-        The list of skip_files directories.
+        list. The list of skip_files directories.
     """
     with open('./app.yaml', 'r') as app_yaml:
         try:
@@ -53,10 +53,11 @@ def _check_size_in_dir(dir_path, skip_files_list):
 
     Args:
          dir_path: str. The directory which files will be counted.
-         skip_files_list: list. The directories which files will not be counted.
+         skip_files_list: list. The list of files which are to be skipped
+         from the file count.
 
     Returns:
-        The number of files inside the given directory.
+        int. The number of files inside the given directory.
     """
     number_of_files_in_dir = 0
     for name in os.listdir(dir_path):
