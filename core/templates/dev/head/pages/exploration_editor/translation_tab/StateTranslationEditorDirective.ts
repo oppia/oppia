@@ -27,11 +27,13 @@ oppia.directive('stateTranslationEditor', [
       controller: [
         '$scope', '$uibModal', 'EditabilityService', 'ExplorationStatesService',
         'StateEditorService', 'StateWrittenTranslationsService',
-        'TranslationLanguageService', 'TranslationTabActiveContentIdService',
+        'TranslationLanguageService', 'TranslationStatusService',
+        'TranslationTabActiveContentIdService',
         'WrittenTranslationObjectFactory', function(
             $scope, $uibModal, EditabilityService, ExplorationStatesService,
             StateEditorService, StateWrittenTranslationsService,
-            TranslationLanguageService, TranslationTabActiveContentIdService,
+            TranslationLanguageService, TranslationStatusService,
+            TranslationTabActiveContentIdService,
             WrittenTranslationObjectFactory) {
           $scope.HTML_SCHEMA = {
             type: 'html',
@@ -127,6 +129,7 @@ oppia.directive('stateTranslationEditor', [
               ExplorationStatesService.saveWrittenTranslations(
                 stateName, StateWrittenTranslationsService.displayed);
               StateWrittenTranslationsService.saveDisplayedValue();
+              TranslationStatusService.refresh();
             }
             $scope.translationEditorIsOpen = false;
           };
