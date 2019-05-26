@@ -94,6 +94,14 @@
         "tarRootDirPrefix": "soupsieve-",
         "rootDirPrefix": "soupsieve-",
         "targetDirPrefix": "soupsieve-"
+      },
+      "Pillow": {
+        "version": "6.0.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/81/1a/6b2971adc1bca55b9a53ed1efa372acff7e8b9913982a396f3fa046efaf8/Pillow-6.0.0.tar.gz",
+        "tarRootDirPrefix": "Pillow-",
+        "rootDirPrefix": "Pillow-",
+        "targetDirPrefix": "Pillow-"
       }
     },
     "frontend": {

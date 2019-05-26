@@ -174,18 +174,6 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
-echo Checking if Pillow is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/Pillow-6.0.0" ]; then
-  echo Installing Pillow
-
-  pip_install Pillow==6.0.0 --target="$TOOLS_DIR/Pillow-6.0.0"
-
-  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
-    echo "  Pillow install failed. See troubleshooting instructions at:"
-    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
-  fi
-fi
-
 echo Checking if PyGithub is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
   echo Installing PyGithub
