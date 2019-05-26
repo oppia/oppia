@@ -5,11 +5,6 @@ language: python
 python:
 - 2.7
 
-addons:
-  browserstack:
-    username: $USERNAME
-    access_key: $ACCESS_KEY
-
 branches:
   only:
   - master
@@ -54,15 +49,6 @@ env:
 matrix:
   allow_failures: []
   fast_finish: true
-
-jobs:
-  include:
-    # The mobile end-to-end tests are run only for the develop branch as the
-    # BrowserStack credentials are stored as encrypted Travis environment
-    # variables and are therefore not available for forks of the repository.
-    # For more details, refer to https://docs.travis-ci.com/user/environment-variables#encrypting-environment-variables
-    if: branch = develop AND type = push
-    env: RUN_E2E_TESTS_MOBILE=true
 
 notifications:
   email:
@@ -139,8 +125,6 @@ script:
 - if [ "$RUN_E2E_TESTS_TOPICS_AND_SKILLS_DASHBOARD" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicsAndSkillsDashboard" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_TOPIC_AND_STORY_EDITOR" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="topicAndStoryEditor" --prod_env; fi
 - if [ "$RUN_E2E_TESTS_USERS" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
-# Run e2e tests for mobile in dev mode since the demo explorations and collections are only available in the dev mode and not in production mode.
-- if [ "$RUN_E2E_TESTS_MOBILE" == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --browserstack; fi
 
 # These lines are commented out because these checks are being run on CircleCI
 # here: https://circleci.com/gh/oppia/oppia
