@@ -864,8 +864,6 @@ class ImageAssets(object):
     """Value object representing the images for the state.
     """
     def __init__(self, image_assets_mapping):
-        print("     "*100)
-        print(" yeh call hua")
         self.image_assets_mapping = image_assets_mapping
 
     def validate(self):
