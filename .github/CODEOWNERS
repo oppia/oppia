@@ -104,7 +104,7 @@
 /core/storage/exploration/ @aks681
 /core/templates/dev/head/components/ExplorationCreationService*.ts @DubeySandeep
 /core/templates/dev/head/components/HintAndSolutionButtonsDirective*.ts @aks681
-/core/templates/dev/head/components/button-directives/hint-and-solution-buttons/hint-and-solution-buttons.directive.html @aks681
+/core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive.html @aks681
 /core/templates/dev/head/components/state/ @aks681
 /core/templates/dev/head/components/StateGraphLayoutService*.ts @DubeySandeep
 /core/templates/dev/head/components/version_diff_visualization_directive.html @DubeySandeep
@@ -145,12 +145,14 @@
 /core/templates/dev/head/components/common-layout-directives/alert-message/ @ankita240796
 /core/templates/dev/head/components/common-layout-directives/attribution-guide/ @ankita240796
 /core/templates/dev/head/components/common-layout-directives/background-banner/ @ankita240796
-/core/templates/dev/head/components/button-directives/exploration-embed-modal/ @ankita240796
+/core/templates/dev/head/components/button-directives/exploration-embed-modal.directive.html @ankita240796
+/core/templates/dev/head/components/button-directives/exploration-embed-modal.directive.ts @ankita240796
 /core/templates/dev/head/components/common-layout-directives/loading-dots/ @ankita240796
 /core/templates/dev/head/components/profile-link-directives/ @ankita240796
 /core/templates/dev/head/components/common-layout-directives/promo-bar/ @ankita240796
 /core/templates/dev/head/components/common-layout-directives/sharing-links/ @ankita240796
-/core/templates/dev/head/components/button-directives/social-buttons/ @ankita240796
+/core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
+/core/templates/dev/head/components/button-directives/social-buttons.directive.ts @ankita240796
 /core/templates/dev/head/components/summary-tile-directives/ @ankita240796
 /core/templates/dev/head/directives/FocusOnDirective*.ts @ankita240796
 /core/templates/dev/head/directives/AngularHtmlBindDirective*.ts @ankita240796
@@ -233,7 +235,8 @@
 
 # Navigation bar project.
 /core/templates/dev/head/domain/sidebar/ @nithusha21
-/core/templates/dev/head/components/button-directives/create-button/ @nithusha21
+/core/templates/dev/head/components/button-directives/create-activity-button.directive.html @nithusha21
+/core/templates/dev/head/components/button-directives/create-activity-button.directive.ts @nithusha21
 /core/templates/dev/head/components/common-layout-directives/side-navigation-bar/ @nithusha21
 /core/templates/dev/head/components/common-layout-directives/top-navigation-bar/ @nithusha21
 /core/templates/dev/head/services/NavigationService*.ts @nithusha21
@@ -339,7 +342,7 @@
 
 # Rich text editor team.
 /core/domain/rte_component_registry*.py @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte/ck-editor-rte.directive.ts @AllanYangZhou @bansalnitish
+/core/templates/dev/head/components/ck-editor-helpers/ck-editor-rte.directive.ts @AllanYangZhou @bansalnitish
 /core/templates/dev/head/directives/MathjaxBindDirective.ts @AllanYangZhou @bansalnitish
 /core/templates/dev/head/mathjaxConfig.ts @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish

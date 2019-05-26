@@ -16,7 +16,7 @@
  * @fileoverview Directive for the solution editor.
  */
 
-require('components/state/solution-editor/solution-explanation-editor/solution-explanation-editor.directive.ts');
+require('components/state/solution-editor/solution-explanation-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

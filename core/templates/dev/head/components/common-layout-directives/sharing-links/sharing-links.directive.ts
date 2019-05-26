@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/button-directives/exploration-embed-modal/' +
+  'components/button-directives/' +
   'exploration-embed-button.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');

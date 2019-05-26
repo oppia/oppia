@@ -34,7 +34,7 @@ oppia.directive(
           showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/components/state/solution-editor/solution-explanation-editor/' +
+          '/components/state/solution-editor/' +
           'solution-explanation-editor.directive.html'),
         controllerAs: '$ctrl',
         controller: [

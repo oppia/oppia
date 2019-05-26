@@ -46,7 +46,7 @@ require(
   'components/common-layout-directives/alert-message/' +
   'alert-message.directive.ts');
 require(
-  'components/button-directives/create-button/' +
+  'components/button-directives/' +
   'create-activity-button.directive.ts');
 
 require(
@@ -56,7 +56,7 @@ require(
   'components/common-layout-directives/side-navigation-bar/' +
   'side-navigation-bar.directive.ts');
 require(
-  'components/button-directives/social-buttons/social-buttons.directive.ts');
+  'components/button-directives/social-buttons.directive.ts');
 require(
   'components/common-layout-directives/top-navigation-bar/' +
   'top-navigation-bar.directive.ts');

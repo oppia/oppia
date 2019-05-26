@@ -19,9 +19,9 @@
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require(
-  'components/ck-editor-helpers/ck-editor-rte/ck-editor-rte.directive.ts');
+  'components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require(
-  'components/ck-editor-helpers/ck-editor-widgets/' +
+  'components/ck-editor-helpers/' +
   'ck-editor-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');

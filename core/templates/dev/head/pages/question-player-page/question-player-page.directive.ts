@@ -21,9 +21,9 @@ require('domain/question/QuestionPlayerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 require(
-  'components/ck-editor-helpers/ck-editor-rte/ck-editor-rte.directive.ts');
+  'components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require(
-  'components/ck-editor-helpers/ck-editor-widgets/' +
+  'components/ck-editor-helpers/' +
   'ck-editor-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');

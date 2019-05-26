@@ -18,7 +18,7 @@
  */
 
 require(
-  'components/button-directives/hint-and-solution-buttons/' +
+  'components/button-directives/' +
   'hint-and-solution-buttons.directive.ts');
 
 require('domain/summary/ExplorationSummaryBackendApiService.ts');

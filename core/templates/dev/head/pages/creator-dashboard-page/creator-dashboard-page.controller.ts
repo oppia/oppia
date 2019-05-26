@@ -123,7 +123,7 @@ require('components/state/rule-editor/rule-editor.directive.ts');
 require('components/state/rule-type-selector/rule-type-selector.directive.ts');
 require('components/state/solution-editor/solution-editor.directive.ts');
 require(
-  'components/state/solution-editor/solution-explanation-editor/' +
+  'components/state/solution-editor/' +
   'solution-explanation-editor.directive.ts');
 require(
   'components/forms/forms-directives/html-select/html-select.directive.ts');

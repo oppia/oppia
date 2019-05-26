@@ -19,9 +19,9 @@
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require(
-  'components/ck-editor-helpers/ck-editor-rte/ck-editor-rte.directive.ts');
+  'components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require(
-  'components/ck-editor-helpers/ck-editor-widgets/' +
+  'components/ck-editor-helpers/' +
   'ck-editor-widgets.initializer.ts');
 require('components/state/answer-group-editor/answer-group-editor.directive.ts');
 require('components/state/outcome-editor/outcome-editor.directive.ts');
@@ -35,7 +35,7 @@ require('components/state/rule-editor/rule-editor.directive.ts');
 require('components/state/rule-type-selector/rule-type-selector.directive.ts');
 require('components/state/solution-editor/solution-editor.directive.ts');
 require(
-  'components/state/solution-editor/solution-explanation-editor/' +
+  'components/state/solution-editor/' +
   'solution-explanation-editor.directive.ts');
 require(
   'components/forms/forms-directives/html-select/html-select.directive.ts');

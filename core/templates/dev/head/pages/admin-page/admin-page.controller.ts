@@ -69,10 +69,10 @@ require(
 
 require('pages/admin-page/admin-navbar/admin-navbar.directive.ts');
 require(
-  'pages/admin-page/activities-tab/admin-dev-mode-activities-tab/' +
+  'pages/admin-page/activities-tab/' +
   'admin-dev-mode-activities-tab.directive.ts');
 require(
-  'pages/admin-page/activities-tab/admin-prod-mode-activities-tab/' +
+  'pages/admin-page/activities-tab/' +
   'admin-prod-mode-activities-tab.directive.ts');
 require('pages/admin-page/config-tab/admin-config-tab.directive.ts');
 require('pages/admin-page/jobs-tab/admin-jobs-tab.directive.ts');
