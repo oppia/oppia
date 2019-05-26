@@ -218,9 +218,9 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
-# Default image assets dict for a default state template
+# Default image assets dict for a default state template.
 DEFAULT_IMAGE_ASSETS = {
-    'image_assets_mapping' : {
+    'image_assets_mapping': {
 
     }
 }

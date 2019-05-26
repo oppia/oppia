@@ -81,8 +81,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'default_outcome': {}
                 }
             },
-            'image_assets' : {
-                'image_assets_mapping' : {
+            'image_assets': {
+                'image_assets_mapping': {
 
                 }
             },
