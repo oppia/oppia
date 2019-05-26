@@ -200,13 +200,12 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_skill_links_and_skill_descriptions(
-            cls, question_skill_count, skill_ids, start_cursor):
+            cls, question_count, skill_ids, start_cursor):
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
 
         Args:
-            question_skill_count: int. The number of question skill links that
-                should be fetched from datastore.
+            question_count: int. The number of questions to be returned.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
             start_cursor: str. The starting point from which the batch of
@@ -219,6 +218,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 used for the next page (or None if no more pages are left). The
                 returned next cursor value is urlsafe.
         """
+        question_skill_count = min(
+            len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
+        ) * question_count
+
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(

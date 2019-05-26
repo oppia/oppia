@@ -90,7 +90,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         })
 
 
-class TopicEditorQuestionHandler(base.BaseHandler):
+'''class TopicEditorQuestionHandler(base.BaseHandler):
     """Manages the creation of a question and receiving of all question
     summaries for display in topic editor page.
     """
@@ -120,7 +120,7 @@ class TopicEditorQuestionHandler(base.BaseHandler):
             'question_summary_dicts': return_dicts,
             'next_start_cursor': next_start_cursor
         })
-        self.render_json(self.values)
+        self.render_json(self.values)'''
 
 
 class TopicEditorPage(base.BaseHandler):

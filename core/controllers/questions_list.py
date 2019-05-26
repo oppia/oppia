@@ -39,9 +39,7 @@ class QuestionsListHandler(base.BaseHandler):
 
         question_summaries, skill_descriptions_list, next_start_cursor = (
             question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE *
-                constants.MAX_SKILLS_PER_QUESTION,
-                skill_ids, start_cursor)
+                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
         )
         return_dicts = []
         for index, summary in enumerate(question_summaries):

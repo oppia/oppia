@@ -47,6 +47,7 @@ oppia.factory('NewService', ['$rootScope', 'QuestionsListBackendApiService',
       }
       _questionSummaries = _questionSummaries.concat(
         angular.copy(newQuestionSummaries));
+      console.log(_questionSummaries);
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
     };
     var _setNextQuestionsCursor = function(nextCursor) {

@@ -325,7 +325,7 @@ def update_skill_ids_of_questions(
 
 
 def get_question_summaries_and_skill_descriptions(
-        question_skill_count, skill_ids, start_cursor):
+        question_count, skill_ids, start_cursor):
     """Returns the list of question summaries and corresponding skill
     descriptions linked to all the skills given by skill_ids.
 
@@ -357,7 +357,7 @@ def get_question_summaries_and_skill_descriptions(
             'time is not supported currently.')
     question_skill_link_models, skill_descriptions, next_cursor = (
         question_models.QuestionSkillLinkModel.get_question_skill_links_and_skill_descriptions( #pylint: disable=line-too-long
-            question_skill_count, skill_ids, start_cursor))
+            question_count, skill_ids, start_cursor))
 
     # Deduplicate question_ids and group skill_descriptions that are linked to
     # the same question.

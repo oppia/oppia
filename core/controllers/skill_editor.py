@@ -141,7 +141,7 @@ class SkillRightsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SkillEditorQuestionHandler(base.BaseHandler):
+'''class SkillEditorQuestionHandler(base.BaseHandler):
     """Manages the creation of a question and receiving of all question
     summaries for display in skill editor page.
     """
@@ -169,7 +169,7 @@ class SkillEditorQuestionHandler(base.BaseHandler):
             'question_summary_dicts': return_dicts,
             'next_start_cursor': next_start_cursor
         })
-        self.render_json(self.values)
+        self.render_json(self.values)'''
 
 
 class EditableSkillDataHandler(base.BaseHandler):
