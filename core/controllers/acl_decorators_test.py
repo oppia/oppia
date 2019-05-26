@@ -1345,17 +1345,15 @@ class ResubmitSuggestionDecoratorsTests(test_utils.GenericTestBase):
 
 class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     """Tests for get_decorator_for_accepting_suggestion decorator."""
-    owner_username = 'owner'
-    owner_email = 'owner@example.com'
-    author_username = 'author'
-    author_email = 'author@example.com'
-    username = 'user'
-    user_email = 'user@example.com'
+    AUTHOR_USERNAME = 'author'
+    AUTHOR_EMAIL = 'author@example.com'
+    USERNAME = 'user'
+    USER_EMAIL = 'user@example.com'
     TARGET_TYPE = 'exploration'
     SUGGESTION_TYPE = 'edit_exploration_state_content'
-    exploration_id = 'exp_id'
-    target_version_id = 1
-    change_dict = {
+    EXPLORATION_ID = 'exp_id'
+    TARGET_VERSION_ID = 1
+    CHANGE_DICT = {
         'cmd': 'edit_state_property',
         'property_name': 'content',
         'state_name': 'Introduction',
@@ -1375,49 +1373,49 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DecoratorForAcceptingSuggestionTests, self).setUp()
-        self.signup(self.author_email, self.author_username)
-        self.signup(self.user_email, self.username)
-        self.signup(self.owner_email, self.owner_username)
-        self.author_id = self.get_user_id_from_email(self.author_email)
-        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
+        self.signup(self.USER_EMAIL, self.USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
                 '/mock/<target_id>/<suggestion_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        self.save_new_default_exploration(self.exploration_id, self.owner_id)
-        rights_manager.publish_exploration(self.owner, self.exploration_id)
+        self.save_new_default_exploration(self.EXPLORATION_ID, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.EXPLORATION_ID)
         suggestion_services.create_suggestion(
             self.SUGGESTION_TYPE, self.TARGET_TYPE,
-            self.exploration_id, self.target_version_id,
+            self.EXPLORATION_ID, self.TARGET_VERSION_ID,
             self.author_id,
-            self.change_dict, '', None)
+            self.CHANGE_DICT, '', None)
         suggestion = suggestion_services.query_suggestions(
             [('author_id', self.author_id),
-             ('target_id', self.exploration_id)])[0]
+             ('target_id', self.EXPLORATION_ID)])[0]
         self.suggestion_id = suggestion.suggestion_id
 
     def test_guest_cannot_accept_suggestion(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s/%s' % (self.exploration_id, self.suggestion_id),
+                '/mock/%s/%s' % (self.EXPLORATION_ID, self.suggestion_id),
                 expected_status_int=401)
 
     def test_owner_can_accept_suggestion(self):
-        self.login(self.owner_email)
+        self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
-                '/mock/%s/%s' % (self.exploration_id, self.suggestion_id))
+                '/mock/%s/%s' % (self.EXPLORATION_ID, self.suggestion_id))
         self.assertEqual(response['suggestion_id'], self.suggestion_id)
-        self.assertEqual(response['target_id'], self.exploration_id)
+        self.assertEqual(response['target_id'], self.EXPLORATION_ID)
         self.logout()
 
     def test_user_cannot_accept_suggestion(self):
-        self.login(self.user_email)
+        self.login(self.USER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s/%s' % (self.exploration_id, self.suggestion_id),
+                '/mock/%s/%s' % (self.EXPLORATION_ID, self.suggestion_id),
                 expected_status_int=401)
         self.logout()
 
