@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Winnowing preprocessing functions.
+ * @fileoverview Winnowing preprocessing functions.
  *
  * IMPORTANT NOTE: The preprocessing functions are implemented according to
  * winnowing preprocessing functions used on Oppia-ml. These functions
