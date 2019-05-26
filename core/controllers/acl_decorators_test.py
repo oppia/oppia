@@ -16,6 +16,8 @@
 
 """Tests for core.domain.acl_decorators."""
 
+import json
+
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
@@ -32,7 +34,7 @@ import webapp2
 import webtest
 
 
-class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
+'''class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for play exploration decorator."""
     user_email = 'user@example.com'
     username = 'user'
@@ -1630,6 +1632,105 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.skill_id, expected_status_int=401)
+        self.logout()'''
+
+
+class EditSkillsDecoratorTests(test_utils.GenericTestBase):
+    """Tests permissions for editing multiple skills."""
+    second_admin_username = 'adm2'
+    second_admin_email = 'adm2@example.com'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    first_skill_id = '1'
+    second_skill_id = '2'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_skills
+        def get(self, skill_ids):
+            self.render_json({'skill_ids': skill_ids})
+
+    def setUp(self):
+        super(EditSkillsDecoratorTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.second_admin_email, self.second_admin_username)
+        self.signup(self.manager_email, self.manager_username)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_admins([self.ADMIN_USERNAME, self.second_admin_username])
+        self.set_topic_managers([self.manager_username])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.second_admin_id = self.get_user_id_from_email(
+            self.second_admin_email)
+        self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.manager = user_services.UserActionsInfo(self.manager_id)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<skill_ids>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        skill_services.create_new_skill_rights(self.first_skill_id, self.admin_id)
+        skill_services.create_new_skill_rights(self.second_skill_id, self.admin_id)
+
+    def test_admin_can_edit_multiple_public_skills(self):
+        skill_services.publish_skill(self.first_skill_id, self.admin_id)
+        skill_services.publish_skill(self.second_skill_id, self.admin_id)
+        self.login(self.second_admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % json.dumps(
+                [self.first_skill_id, self.second_skill_id]))
+        print(json.loads(response['skill_ids']))
+        self.assertEqual(len(json.loads(response['skill_ids'])), 2)
+        self.assertEqual(json.loads(response['skill_ids'])[0], self.first_skill_id)
+        self.assertEqual(json.loads(response['skill_ids'])[1], self.second_skill_id)
+        self.logout()
+
+    def test_admin_can_not_edit_when_skills_list_contains_private_skill(self):
+        skill_services.publish_skill(self.first_skill_id, self.admin_id)
+        self.login(self.second_admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % json.dumps(
+                    [self.first_skill_id, self.second_skill_id]),
+                    expected_status_int=401)
+        self.logout()
+
+    def test_topic_manager_can_not_edit_when_contains_private_skill(self):
+        skill_services.publish_skill(self.first_skill_id, self.admin_id)
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % json.dumps(
+                    [self.first_skill_id, self.second_skill_id]),
+                    expected_status_int=401)
+        self.logout()
+
+    def test_topic_manager_can_edit_multiple_public_skills(self):
+        skill_services.publish_skill(self.first_skill_id, self.admin_id)
+        skill_services.publish_skill(self.second_skill_id, self.admin_id)
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % json.dumps(
+                [self.first_skill_id, self.second_skill_id]))
+        self.assertEqual(len(json.loads(response['skill_ids'])), 2)
+        self.assertEqual(json.loads(response['skill_ids'])[0], self.first_skill_id)
+        self.assertEqual(json.loads(response['skill_ids'])[1], self.second_skill_id)
+        self.logout()
+
+    def test_normal_user_can_not_edit_multiple_public_skills(self):
+        skill_services.publish_skill(self.first_skill_id, self.admin_id)
+        skill_services.publish_skill(self.second_skill_id, self.admin_id)
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % json.dumps(
+                    [self.first_skill_id, self.second_skill_id]),
+                    expected_status_int=401)
+        self.logout()
 
 
 class EditQuestionDecoratorTests(test_utils.GenericTestBase):

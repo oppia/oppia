@@ -13,16 +13,18 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service for managing the state of the skill being edited
-* in the skill editor.
-*/
+ * @fileoverview Service for managing the state of the skill being edited
+ * in the skill editor.
+ */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/QuestionsListBackendApiService.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillRightsBackendApiService.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('services/AlertsService.ts');
+require('services/NewService.ts');
 
 oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
 oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
@@ -31,22 +33,24 @@ oppia.constant(
 
 oppia.factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
+  'QuestionsListBackendApiService',
   'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+  'ACTIVITY_TYPE', 'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'NewService',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
       $rootScope, AlertsService, EditableSkillBackendApiService,
+      QuestionsListBackendApiService,
       SkillObjectFactory, SkillRightsBackendApiService,
       SkillRightsObjectFactory, UndoRedoService,
-      EVENT_QUESTION_SUMMARIES_INITIALIZED,
+      ACTIVITY_TYPE, EVENT_QUESTION_SUMMARIES_INITIALIZED, NewService,
       EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
-    var _questionSummaries = [];
+    //var _questionSummaries = [];
     var _nextCursorForQuestions = '';
 
     var _setSkill = function(skill) {
@@ -73,13 +77,13 @@ oppia.factory('SkillEditorStateService', [
         newBackendSkillRightsObject));
     };
 
-    var _setQuestionSummaries = function(questionSummaries) {
+    /*var _setQuestionSummaries = function(questionSummaries) {
       _questionSummaries.push(angular.copy(questionSummaries));
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
     };
     var _setNextQuestionsCursor = function(nextCursor) {
       _nextCursorForQuestions = nextCursor;
-    };
+    };*/
 
     return {
       loadSkill: function(skillId) {
@@ -88,11 +92,12 @@ oppia.factory('SkillEditorStateService', [
           skillId).then(
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
-            EditableSkillBackendApiService.fetchQuestions(
-              skillId, _nextCursorForQuestions).then(
+            _nextCursorForQuestions = NewService.getNextCursor();
+            QuestionsListBackendApiService.fetchQuestions(
+              ACTIVITY_TYPE.SKILL, skillId, _nextCursorForQuestions).then(
               function(returnObject) {
-                _setQuestionSummaries(returnObject.questionSummaries);
-                _setNextQuestionsCursor(returnObject.nextCursor);
+                NewService.setQuestionSummaries(returnObject.questionSummaries);
+                NewService.setNextQuestionsCursor(returnObject.nextCursor);
               }
             );
             _skillIsBeingLoaded = false;
@@ -116,7 +121,7 @@ oppia.factory('SkillEditorStateService', [
         return _skillIsBeingLoaded;
       },
 
-      isLastQuestionBatch: function(index) {
+      /*isLastQuestionBatch: function(index) {
         return (
           _nextCursorForQuestions === null &&
           index === _questionSummaries.length - 1);
@@ -141,7 +146,7 @@ oppia.factory('SkillEditorStateService', [
           return null;
         }
         return _questionSummaries[index];
-      },
+      },*/
 
       hasLoadedSkill: function() {
         return _skillIsInitialized;

@@ -39,6 +39,7 @@ from core.controllers import pages
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
+from core.controllers import questions_list
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
@@ -228,6 +229,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
+    get_redirect_route(
+        r'%s/<activity_type>/<activity_id>' % feconf.QUESTIONS_LIST_URL_PREFIX,
+        questions_list.QuestionsListHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),

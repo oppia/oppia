@@ -34,9 +34,6 @@ class QuestionCreationHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def post(self, skill_id):
         """Handles POST requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
         if skill is None:
@@ -75,9 +72,6 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def post(self, question_id, skill_ids):
         """Links a question to a skill."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         try:
             skill_ids = json.loads(skill_ids)
         except Exception:
@@ -105,9 +99,6 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def delete(self, question_id, skill_ids):
         """Unlinks a question from a skill."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         question_services.delete_question_skill_link(
             question_id, skill_ids)
         self.render_json(self.values)
@@ -121,10 +112,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_view_question_editor
     def get(self, question_id):
         """Gets the data for the question overview page."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         question = question_services.get_question_by_id(
             question_id, strict=False)
 
@@ -146,9 +133,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_question
     def put(self, question_id):
         """Updates properties of the given question."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         commit_message = self.payload.get('commit_message')
 
         if not commit_message:
@@ -179,9 +163,6 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_question
     def delete(self, question_id):
         """Handles Delete requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         question = question_services.get_question_by_id(
             question_id, strict=False)
         if question is None:

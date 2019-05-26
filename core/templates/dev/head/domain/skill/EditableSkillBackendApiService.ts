@@ -95,7 +95,7 @@ oppia.factory('EditableSkillBackendApiService', [
       });
     };
 
-    var _fetchQuestions = function(
+    /*var _fetchQuestions = function(
         skillId, cursor, successCallback, errorCallback) {
       var questionsDataUrl = UrlInterpolationService.interpolateUrl(
         SKILL_EDITOR_QUESTION_URL_TEMPLATE, {
@@ -117,7 +117,7 @@ oppia.factory('EditableSkillBackendApiService', [
           errorCallback(errorResponse.data);
         }
       });
-    };
+    };*/
 
     var _deleteSkill = function(skillId, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
@@ -155,11 +155,11 @@ oppia.factory('EditableSkillBackendApiService', [
             resolve, reject);
         });
       },
-      fetchQuestions: function(skillId, cursor) {
+      /*fetchQuestions: function(skillId, cursor) {
         return $q(function(resolve, reject) {
           _fetchQuestions(skillId, cursor, resolve, reject);
         });
-      },
+      },*/
       deleteSkill: function(skillId) {
         return $q(function(resolve, reject) {
           _deleteSkill(skillId, resolve, reject);

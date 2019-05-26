@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Expression syntax tree service.
+ */
+
 require('expressions/ExpressionParserService.js');
 
 oppia.factory('ExpressionSyntaxTreeService', [

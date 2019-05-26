@@ -65,10 +65,6 @@ class SkillEditorPage(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
@@ -154,8 +150,6 @@ class SkillEditorQuestionHandler(base.BaseHandler):
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
         start_cursor = self.request.get('cursor')
@@ -186,8 +180,6 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skills
     def get(self, skill_ids):
         """Populates the data on the individual skill page."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
 
         try:
             skill_ids = json.loads(skill_ids)
@@ -213,8 +205,6 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_skills
     def put(self, skill_ids):
         """Updates properties of the given skill."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
 
         skill_id = json.loads(skill_ids)[0]
         skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -249,8 +239,6 @@ class EditableSkillDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_skill
     def delete(self, skill_ids):
         """Handles Delete requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
 
         skill_id = json.loads(skill_ids)[0]
         skill_domain.Skill.require_valid_skill_id(skill_id)

@@ -19,6 +19,7 @@
  */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/QuestionsListBackendApiService.ts');
 require('domain/story/EditableStoryBackendApiService.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
@@ -26,30 +27,33 @@ require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicRightsBackendApiService.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
+require('services/NewService.ts');
 
 oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
 oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
 oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
 oppia.constant(
   'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
-oppia.constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
+//oppia.constant(
+  //'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'SubtopicPageObjectFactory',
+  'QuestionsListBackendApiService',
+  'SubtopicPageObjectFactory', 'NewService',
   'TopicObjectFactory', 'TopicRightsBackendApiService',
   'TopicRightsObjectFactory', 'UndoRedoService',
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
+  'ACTIVITY_TYPE', 'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
   'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      SubtopicPageObjectFactory,
+      QuestionsListBackendApiService,
+      SubtopicPageObjectFactory, NewService,
       TopicObjectFactory, TopicRightsBackendApiService,
       TopicRightsObjectFactory, UndoRedoService,
-      EVENT_QUESTION_SUMMARIES_INITIALIZED, EVENT_STORY_SUMMARIES_INITIALIZED,
+      ACTIVITY_TYPE, EVENT_QUESTION_SUMMARIES_INITIALIZED, EVENT_STORY_SUMMARIES_INITIALIZED,
       EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
       EVENT_TOPIC_REINITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
@@ -66,7 +70,7 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
-    var _questionSummaries = [];
+    //var _questionSummaries = [];
     var _nextCursorForQuestions = '';
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
@@ -121,7 +125,7 @@ oppia.factory('TopicEditorStateService', [
       _canonicalStorySummaries = angular.copy(canonicalStorySummaries);
       $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
-    var _setQuestionSummaries = function(newQuestionSummaries) {
+    /*var _setQuestionSummaries = function(newQuestionSummaries) {
       if (_questionSummaries.length > 0) {
         newQuestionSummaries = _deduplicateQuestionSummaries(
           newQuestionSummaries);
@@ -146,7 +150,7 @@ oppia.factory('TopicEditorStateService', [
         newQuestionSummaries = newQuestionSummaries.slice(1);
       }
       return newQuestionSummaries;
-    };
+    };*/
 
     return {
       /**
@@ -167,11 +171,12 @@ oppia.factory('TopicEditorStateService', [
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
               });
-            EditableTopicBackendApiService.fetchQuestions(
-              topicId, _nextCursorForQuestions).then(
+            _nextCursorForQuestions = NewService.getNextCursor();
+            QuestionsListBackendApiService.fetchQuestions(
+              ACTIVITY_TYPE.TOPIC, topicId, _nextCursorForQuestions).then(
               function(returnObject) {
-                _setQuestionSummaries(returnObject.questionSummaries);
-                _setNextQuestionsCursor(returnObject.nextCursor);
+                NewService.setQuestionSummaries(returnObject.questionSummaries);
+                NewService.setNextQuestionsCursor(returnObject.nextCursor);
               }
             );
           },
@@ -223,12 +228,12 @@ oppia.factory('TopicEditorStateService', [
         return _topicIsLoading;
       },
 
-      isLastQuestionBatch: function(index) {
+      /*isLastQuestionBatch: function(index) {
         return (
           _nextCursorForQuestions === null &&
           (index + 1) * constants.NUM_QUESTIONS_PER_PAGE >=
             _questionSummaries.length);
-      },
+      },*/
 
       /**
        * Returns whether a topic has yet been loaded using either
@@ -254,7 +259,7 @@ oppia.factory('TopicEditorStateService', [
         return _canonicalStorySummaries;
       },
 
-      fetchQuestionSummaries: function(topicId, resetHistory) {
+      /*fetchQuestionSummaries: function(topicId, resetHistory) {
         if (resetHistory) {
           _questionSummaries = [];
           _nextCursorForQuestions = '';
@@ -276,7 +281,7 @@ oppia.factory('TopicEditorStateService', [
         } else {
           return _questionSummaries.slice(index * num, (index + 1) * num);
         }
-      },
+      },*/
 
       /**
        * Returns the current subtopic page to be shared among the topic

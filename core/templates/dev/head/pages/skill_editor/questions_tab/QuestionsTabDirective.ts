@@ -29,6 +29,8 @@ require('pages/skill_editor/SkillEditorStateService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
+require('services/NewService.ts');
+
 
 oppia.directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -43,22 +45,22 @@ oppia.directive('questionsTab', [
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService',
+        'QuestionUndoRedoService', 'UndoRedoService', 'NewService',
         'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             SkillEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService,
+            QuestionUndoRedoService, UndoRedoService, NewService,
             NUM_QUESTIONS_PER_PAGE) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.getQuestionSummaries =
-            SkillEditorStateService.getQuestionSummaries;
+            NewService.getQuestionSummaries;
           $scope.fetchQuestionSummaries =
-            SkillEditorStateService.fetchQuestionSummaries;
+            NewService.fetchQuestionSummaries;
           $scope.isLastQuestionBatch =
-            SkillEditorStateService.isLastQuestionBatch;
+            NewService.isLastQuestionBatch;
         }
       ]
     };
