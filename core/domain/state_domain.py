@@ -861,13 +861,12 @@ class WrittenTranslation(object):
 
 
 class ImageAssets(object):
-    """Value object representing the images for the state.
-    """
+    """Value object representing the images for the state."""
     def __init__(self, image_assets_mapping):
         self.image_assets_mapping = image_assets_mapping
 
     def validate(self):
-        """TODO"""
+        """TODO."""
         pass
 
     def to_dict(self):
