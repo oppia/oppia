@@ -18,6 +18,8 @@ import os
 
 from constants import constants
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
@@ -278,10 +280,16 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         response = self.get_html_response('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
+        file_system_class = fs_services.get_exploration_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            'exploration/0'))
+
         with open(
             os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC_1),
             mode='rb') as f:
             raw_audio = f.read()
+
+        self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC_1))
 
         self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
@@ -289,6 +297,8 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
         )
+        self.assertTrue(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC_1))
+
         self.logout()
 
     def test_detect_non_matching_extensions(self):
