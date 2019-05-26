@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the MultipleChoiceInput interaction.
+ * @fileoverview Directive for the MultipleChoiceInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
