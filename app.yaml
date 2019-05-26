@@ -186,6 +186,7 @@ skip_files:
 - third_party/static/guppy-b5055b/site
 - third_party/static/guppy-b5055b/test
 - third_party/static/MathJax-2.7.5/docs
+- third_party/static/MathJax-2.7.5/fonts
 - third_party/static/MathJax-2.7.5/localization/ast
 - third_party/static/MathJax-2.7.5/localization/bcc
 - third_party/static/MathJax-2.7.5/localization/bg
@@ -228,6 +229,7 @@ skip_files:
 - third_party/static/MathJax-2.7.5/localization/vi
 - third_party/static/MathJax-2.7.5/localization/zh-hans
 - third_party/static/MathJax-2.7.5/test
+- third_party/static/MathJax-2.7.5/unpacked
 - third_party/static/messageformat-0.3.1
 - third_party/static/ng-img-crop-0.3.2
 - third_party/static/nginfinitescroll-1.0.0
