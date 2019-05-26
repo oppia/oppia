@@ -67,7 +67,7 @@ def _check_size_in_dir(dir_path, skip_files_list):
         else:
             if os.path.isdir(os.path.join(dir_path, name)):
                 number_of_files_in_dir += _check_size_in_dir(
-                    skip_files_list, os.path.join(dir_path, name))
+                    os.path.join(dir_path, name), skip_files_list)
     return number_of_files_in_dir
 
 
@@ -75,7 +75,7 @@ def _check_third_party_size():
     """Checks if the third-party size limit has been exceeded."""
     skip_files_list = _get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
-        skip_files_list, THIRD_PARTY_PATH)
+        THIRD_PARTY_PATH, skip_files_list)
     print ''
     print '------------------------------------------------------'
     print '    Number of files in third-party folder: %d' % (
