@@ -141,6 +141,7 @@ var SkillEditorPage = function() {
       closeSaveModalButton,
       'Close save modal button takes too long to be clickable');
     closeSaveModalButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.editConceptCard = function(explanation) {
@@ -203,7 +204,7 @@ var SkillEditorPage = function() {
   };
 
   this.expectWorkedExampleSummariesToMatch = function(examples) {
-    for (index in examples) {
+    for (var index in examples) {
       expect(workedExampleSummary(index).getText()).toMatch(examples[index]);
     }
   };

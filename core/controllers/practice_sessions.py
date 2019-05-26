@@ -17,7 +17,12 @@
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
+from core.domain import dependency_registry
+from core.domain import interaction_registry
+from core.domain import obj_services
 from core.domain import topic_services
+import feconf
+import jinja2
 
 
 class PracticeSessionsPage(base.BaseHandler):
@@ -35,9 +40,53 @@ class PracticeSessionsPage(base.BaseHandler):
         if topic is None:
             raise self.PageNotFoundException(
                 Exception('The topic with the given name doesn\'t exist.'))
+
+        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
+
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                interaction_dependency_ids))
+
+        interaction_templates = (
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
+
+        self.values.update({
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
+            'additional_angular_modules': additional_angular_modules,
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html),
+            'topic_name': topic.name,
+        })
+        self.render_template('dist/practice_session.html')
+
+
+class PracticeSessionsPageDataHandler(base.BaseHandler):
+    """Fetches relevant data for the practice sessions page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topic_viewer_page
+    def get(self, topic_name):
+
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        topic = topic_services.get_topic_by_name(topic_name)
+        skills_of_topic = topic.get_all_skill_ids()
+
+        if topic is None:
+            raise self.PageNotFoundException(
+                Exception('The topic with the given name doesn\'t exist.'))
         topic_name = topic.name
 
         self.values.update({
-            'topic_name': topic.name
+            'topic_name': topic.name,
+            'skill_list': skills_of_topic
         })
-        self.render_template('/pages/practice_session/practice_session.html')
+        self.render_json(self.values)

@@ -61,8 +61,16 @@ else:
     FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
+
+VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
+    'local_compiled_js', 'extensions', 'value_generators')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
-VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
+
+VISUALIZATIONS_DIR = os.path.join(
+    'extensions', 'visualizations')
+VISUALIZATIONS_DIR_FOR_JS = os.path.join(
+    'local_compiled_js', 'extensions', 'visualizations')
+
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
@@ -144,13 +152,11 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
-# NOTE TO DEVELOPERS: This should be in sync with the constant with the same
-# name in constants.js.
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATES_SCHEMA_VERSION = 27
+CURRENT_STATE_SCHEMA_VERSION = 28
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -212,10 +218,12 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
-# Default content_ids_to_audio_translations dict for a default state template.
-DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
-    'content': {},
-    'default_outcome': {}
+# Default recorded_voiceovers dict for a default state template.
+DEFAULT_RECORDED_VOICEOVERS = {
+    'voiceovers_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
 }
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
@@ -629,6 +637,7 @@ NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
+PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'

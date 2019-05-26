@@ -1,89 +1,89 @@
-<div ng-model="data"
-     ui-validate="'validate($value)'"
-     ng-attr-style="<[getMainContainerDynamicStyles()]>"
+<div ng-model="$ctrl.data"
+     ui-validate="'$ctrl.validate($value)'"
+     ng-attr-style="<[$ctrl.getMainContainerDynamicStyles()]>"
      class="filepath-editor-main-container">
-  <div ng-if="isImageUploaded()"
+  <div ng-if="$ctrl.isImageUploaded()"
        class="filepath-editor-img-toolbar"
-       ng-attr-style="<[getToolbarDynamicStyles()]>">
+       ng-attr-style="<[$ctrl.getToolbarDynamicStyles()]>">
     <div class="filepath-editor-img-toolbar-resize">
       Resize to:
       <span class="filepath-editor-button filepath-editor-decrease-size"
-            ng-click="decreaseResizePercent(10)">-
+            ng-click="$ctrl.decreaseResizePercent(10)">-
       </span>
       <span class="filepath-editor-resize-input">
-        <[getCurrentResizePercent()]> %
+        <[$ctrl.getCurrentResizePercent()]> %
       </span>
       <span class="filepath-editor-button filepath-editor-increase-size"
-            ng-click="increaseResizePercent(10)">+
+            ng-click="$ctrl.increaseResizePercent(10)">+
       </span>
     </div>
     <div class="filepath-editor-img-toolbar-size">
       Image Size:
-      <span><[calculateTargetImageDimensions().width]></span>
+      <span><[$ctrl.calculateTargetImageDimensions().width]></span>
       &times;
-      <span><[calculateTargetImageDimensions().height]></span>
+      <span><[$ctrl.calculateTargetImageDimensions().height]></span>
       <i class="material-icons"
-         ng-if="getImageSizeHelp() !== null"
-         title="<[getImageSizeHelp()]>">
+         ng-if="$ctrl.getImageSizeHelp() !== null"
+         title="<[$ctrl.getImageSizeHelp()]>">
         &#xE887;
       </i>
     </div>
   </div>
   <div class="filepath-editor-image-container"
-       ng-attr-style="<[getImageContainerDynamicStyles()]>">
-    <div ng-if="isNoImageUploaded()">
-      <image-uploader on-file-changed="onFileChanged">
+       ng-attr-style="<[$ctrl.getImageContainerDynamicStyles()]>">
+    <div ng-if="$ctrl.isNoImageUploaded()">
+      <image-uploader on-file-changed="$ctrl.onFileChanged">
       </image-uploader>
     </div>
-    <div ng-if="isImageUploaded()"
+    <div ng-if="$ctrl.isImageUploaded()"
          class="filepath-editor-image-crop-container"
-         ng-mousemove="onMouseMoveOnImageArea($event)">
-      <div ng-if="isUserCropping()"
+         ng-mousemove="$ctrl.onMouseMoveOnImageArea($event)">
+      <div ng-if="$ctrl.isUserCropping()"
            class="filepath-editor-image-shade-overlay">
       </div>
       <div class="filepath-editor-crop-area"
-           ng-if="imageResizeRatio === 1"
-           ng-attr-style="<[getCropAreaDynamicStyles()]>"
-           ng-mousedown="onMouseDownOnCropArea($event)"
-           ng-mouseup="onMouseUpOnCropArea($event)">
+           ng-if="$ctrl.imageResizeRatio === 1"
+           ng-attr-style="<[$ctrl.getCropAreaDynamicStyles()]>"
+           ng-mousedown="$ctrl.onMouseDownOnCropArea($event)"
+           ng-mouseup="$ctrl.onMouseUpOnCropArea($event)">
       </div>
-      <div ng-if="isUserCropping()"
+      <div ng-if="$ctrl.isUserCropping()"
            class="filepath-editor-image-crop-button-bar"
-           ng-attr-style="<[getCropButtonBarDynamicStyles()]>">
+           ng-attr-style="<[$ctrl.getCropButtonBarDynamicStyles()]>">
         <div class="filepath-editor-button filepath-editor-crop-button"
-             ng-click="confirmCropImage()">
+             ng-click="$ctrl.confirmCropImage()">
           Crop
         </div>
         <div class="filepath-editor-button filepath-editor-crop-button"
-             ng-click="cancelCropImage()">
+             ng-click="$ctrl.cancelCropImage()">
           Cancel
         </div>
       </div>
-      <img ng-src="<[data.metadata.uploadedImageData]>"
-           ng-attr-style="<[getUploadedImageDynamicStyles()]>">
+      <img ng-src="<[$ctrl.data.metadata.uploadedImageData]>"
+           ng-attr-style="<[$ctrl.getUploadedImageDynamicStyles()]>">
     </div>
-    <div ng-if="isImageSaved()">
+    <div ng-if="$ctrl.isImageSaved()">
       <div class="filepath-editor-saved-image-container">
         <i class="material-icons filepath-editor-trash"
-           ng-click="resetFilePathEditor()"
+           ng-click="$ctrl.resetFilePathEditor()"
            title="Delete this image">
           &#xE872;
         </i>
-        <img ng-src="<[data.metadata.savedImageUrl]>">
+        <img ng-src="<[$ctrl.data.metadata.savedImageUrl]>">
       </div>
     </div>
   </div>
-  <div ng-if="isImageUploaded()" class="filepath-editor-save-box">
+  <div ng-if="$ctrl.isImageUploaded()" class="filepath-editor-save-box">
     <button type="button"
             class="btn btn-success filepath-editor-use"
-            ng-click="saveUploadedFile()"
-            ng-disabled="isUserCropping()">
+            ng-click="$ctrl.saveUploadedFile()"
+            ng-disabled="$ctrl.isUserCropping()">
       Use This Image
     </button>
     <button type="button"
             class="btn btn-default filepath-editor-discard"
-            ng-click="discardUploadedFile()"
-            ng-disabled="isUserCropping()">
+            ng-click="$ctrl.discardUploadedFile()"
+            ng-disabled="$ctrl.isUserCropping()">
       Discard
     </button>
   </div>

@@ -628,6 +628,8 @@ class Outcome(object):
                     'received %s' % self.refresher_exploration_id)
 
 
+# TODO(DubeySandeep): Remove AudioTranslation class after removing
+# content_ids_to_audio_translations from Skill class.
 class AudioTranslation(object):
     """Value object representing an audio translation."""
 
@@ -683,6 +685,92 @@ class AudioTranslation(object):
 
         Raises:
             ValidationError: One or more attributes of the AudioTranslation are
+            invalid.
+        """
+        if not isinstance(self.filename, basestring):
+            raise utils.ValidationError(
+                'Expected audio filename to be a string, received %s' %
+                self.filename)
+        dot_index = self.filename.rfind('.')
+        if dot_index == -1 or dot_index == 0:
+            raise utils.ValidationError(
+                'Invalid audio filename: %s' % self.filename)
+        extension = self.filename[dot_index + 1:]
+        if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
+            raise utils.ValidationError(
+                'Invalid audio filename: it should have one of '
+                'the following extensions: %s. Received: %s'
+                % (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
+
+        if not isinstance(self.file_size_bytes, int):
+            raise utils.ValidationError(
+                'Expected file size to be an int, received %s' %
+                self.file_size_bytes)
+        if self.file_size_bytes <= 0:
+            raise utils.ValidationError(
+                'Invalid file size: %s' % self.file_size_bytes)
+
+        if not isinstance(self.needs_update, bool):
+            raise utils.ValidationError(
+                'Expected needs_update to be a bool, received %s' %
+                self.needs_update)
+
+
+class Voiceover(object):
+    """Value object representing an voiceover."""
+
+    def to_dict(self):
+        """Returns a dict representing this Voiceover domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of Voiceover instance.
+        """
+        return {
+            'filename': self.filename,
+            'file_size_bytes': self.file_size_bytes,
+            'needs_update': self.needs_update,
+        }
+
+    @classmethod
+    def from_dict(cls, voiceover_dict):
+        """Return a Voiceover domain object from a dict.
+
+        Args:
+            voiceover_dict: dict. The dict representation of
+                Voiceover object.
+
+        Returns:
+            Voiceover. The corresponding Voiceover domain object.
+        """
+        return cls(
+            voiceover_dict['filename'],
+            voiceover_dict['file_size_bytes'],
+            voiceover_dict['needs_update'])
+
+    def __init__(self, filename, file_size_bytes, needs_update):
+        """Initializes a Voiceover domain object.
+
+        Args:
+            filename: str. The corresponding voiceover file path.
+            file_size_bytes: int. The file size, in bytes. Used to display
+                potential bandwidth usage to the learner before they download
+                the file.
+            needs_update: bool. Whether voiceover is marked for needing review.
+        """
+        # str. The corresponding audio file path, e.g.
+        # "content-en-2-h7sjp8s.mp3".
+        self.filename = filename
+        # int. The file size, in bytes. Used to display potential bandwidth
+        # usage to the learner before they download the file.
+        self.file_size_bytes = file_size_bytes
+        # bool. Whether audio is marked for needing review.
+        self.needs_update = needs_update
+
+    def validate(self):
+        """Validates properties of the Voiceover.
+
+        Raises:
+            ValidationError: One or more attributes of the Voiceover are
             invalid.
         """
         if not isinstance(self.filename, basestring):
@@ -862,7 +950,12 @@ class WrittenTranslations(object):
                     raise utils.ValidationError(
                         'Expected language_code to be a string, received %s'
                         % language_code)
-                if not utils.is_valid_language_code(language_code):
+                # Currently, we assume written translations are used by the
+                # voice-artist to voiceover the translated text so written
+                # translations can be in supported audio/voiceover languages.
+                allowed_language_codes = [language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)]
+                if language_code not in allowed_language_codes:
                     raise utils.ValidationError(
                         'Invalid language_code: %s' % language_code)
 
@@ -912,6 +1005,159 @@ class WrittenTranslations(object):
                 'The content_id %s does not exist.' % content_id)
         else:
             self.translations_mapping.pop(content_id, None)
+
+
+class RecordedVoiceovers(object):
+    """Value object representing a recorded voiceovers which stores voiceover of
+    all state contents (like hints, feedback etc.) in different languages linked
+    through their content_id.
+    """
+
+    def __init__(self, voiceovers_mapping):
+        """Initializes a RecordedVoiceovers domain object."""
+        self.voiceovers_mapping = voiceovers_mapping
+
+    def to_dict(self):
+        """Returns a dict representing this RecordedVoiceovers domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of RecordedVoiceovers instance.
+        """
+        voiceovers_mapping = {}
+        for (content_id, language_code_to_voiceover) in (
+                self.voiceovers_mapping.iteritems()):
+            voiceovers_mapping[content_id] = {}
+            for (language_code, voiceover) in (
+                    language_code_to_voiceover.iteritems()):
+                voiceovers_mapping[content_id][language_code] = (
+                    voiceover.to_dict())
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': voiceovers_mapping
+        }
+
+        return recorded_voiceovers_dict
+
+    @classmethod
+    def from_dict(cls, recorded_voiceovers_dict):
+        """Return a RecordedVoiceovers domain object from a dict.
+
+        Args:
+            recorded_voiceovers_dict: dict. The dict representation of
+                RecordedVoiceovers object.
+
+        Returns:
+            RecordedVoiceovers. The corresponding RecordedVoiceovers domain
+            object.
+        """
+        voiceovers_mapping = {}
+        for (content_id, language_code_to_voiceover) in (
+                recorded_voiceovers_dict['voiceovers_mapping'].iteritems()):
+            voiceovers_mapping[content_id] = {}
+            for (language_code, voiceover) in (
+                    language_code_to_voiceover.iteritems()):
+                voiceovers_mapping[content_id][language_code] = (
+                    Voiceover.from_dict(voiceover))
+
+        return cls(voiceovers_mapping)
+
+    def validate(self, expected_content_id_list):
+        """Validates properties of the RecordedVoiceovers.
+
+        Args:
+            expected_content_id_list: A list of content id which are expected to
+            be inside they RecordedVoiceovers.
+
+        Raises:
+            ValidationError: One or more attributes of the RecordedVoiceovers
+            are invalid.
+        """
+        if expected_content_id_list is not None:
+            if not set(self.voiceovers_mapping.keys()) == (
+                    set(expected_content_id_list)):
+                raise utils.ValidationError(
+                    'Expected state recorded_voiceovers to match the listed '
+                    'content ids %s, found %s' % (
+                        expected_content_id_list,
+                        self.voiceovers_mapping.keys())
+                    )
+
+        for (content_id, language_code_to_voiceover) in (
+                self.voiceovers_mapping.iteritems()):
+            if not isinstance(content_id, basestring):
+                raise utils.ValidationError(
+                    'Expected content_id to be a string, received %s'
+                    % content_id)
+            if not isinstance(language_code_to_voiceover, dict):
+                raise utils.ValidationError(
+                    'Expected content_id value to be a dict, received %s'
+                    % language_code_to_voiceover)
+            for (language_code, voiceover) in (
+                    language_code_to_voiceover.iteritems()):
+                if not isinstance(language_code, basestring):
+                    raise utils.ValidationError(
+                        'Expected language_code to be a string, received %s'
+                        % language_code)
+                allowed_language_codes = [language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)]
+                if language_code not in allowed_language_codes:
+                    raise utils.ValidationError(
+                        'Invalid language_code: %s' % language_code)
+
+                voiceover.validate()
+
+    def get_content_ids_for_voiceovers(self):
+        """Returns a list of content_id available for voiceover.
+
+        Returns:
+            list(str). A list of content id available for voiceover.
+        """
+        return self.voiceovers_mapping.keys()
+
+    def strip_all_existing_voiceovers(self):
+        """Strips all existing voiceovers from the voiceovers_mapping."""
+        for content_id in self.voiceovers_mapping.keys():
+            self.voiceovers_mapping[content_id] = {}
+
+    def add_content_id_for_voiceover(self, content_id):
+        """Adds a content id as a key for the voiceover into the
+        voiceovers_mapping dict.
+
+        Args:
+            content_id: str. The id representing a subtitled html.
+
+        Raises:
+            Exception: The content id isn't a string.
+            Exception: The content id already exist in the voiceovers_mapping
+                dict.
+        """
+        if not isinstance(content_id, basestring):
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id)
+        if content_id in self.voiceovers_mapping:
+            raise Exception(
+                'The content_id %s already exist.' % content_id)
+
+        self.voiceovers_mapping[content_id] = {}
+
+    def delete_content_id_for_voiceover(self, content_id):
+        """Deletes a content id from the voiceovers_mapping dict.
+
+        Args:
+            content_id: str. The id representing a subtitled html.
+
+        Raises:
+            Exception: The content id isn't a string.
+            Exception: The content id does not exist in the voiceovers_mapping
+                dict.
+        """
+        if not isinstance(content_id, basestring):
+            raise Exception(
+                'Expected content_id to be a string, received %s' % content_id)
+        if content_id not in self.voiceovers_mapping:
+            raise Exception(
+                'The content_id %s does not exist.' % content_id)
+        else:
+            self.voiceovers_mapping.pop(content_id, None)
 
 
 class RuleSpec(object):
@@ -1120,9 +1366,8 @@ class State(object):
     """Domain object for a state."""
 
     def __init__(
-            self, content, param_changes, interaction,
-            content_ids_to_audio_translations, written_translations,
-            classifier_model_id=None):
+            self, content, param_changes, interaction, recorded_voiceovers,
+            written_translations, classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1132,8 +1377,8 @@ class State(object):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
-            content_ids_to_audio_translations: dict. A dict representing audio
-                translations for corresponding content_id.
+            recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
+                the state contents and translations.
             written_translations: WrittenTranslations. The written translations
                 for the state contents.
             classifier_model_id: str or None. The classifier model ID
@@ -1153,8 +1398,7 @@ class State(object):
             interaction.confirmed_unclassified_answers,
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
-        self.content_ids_to_audio_translations = (
-            content_ids_to_audio_translations)
+        self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
@@ -1216,50 +1460,9 @@ class State(object):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
-        available_content_ids_in_audio_translations = (
-            self.content_ids_to_audio_translations.keys())
 
         self.written_translations.validate(content_id_list)
-
-        if not set(content_id_list) == set(
-                available_content_ids_in_audio_translations):
-            raise utils.ValidationError(
-                'Expected state content_ids_to_audio_translations to match the '
-                'listed content ids %s, found %s' % (
-                    content_id_list,
-                    available_content_ids_in_audio_translations))
-
-        if not isinstance(self.content_ids_to_audio_translations, dict):
-            raise utils.ValidationError(
-                'Expected state content_ids_to_audio_translations to be a dict,'
-                'received %s' % self.content_ids_to_audio_translations)
-
-        for (content_id, audio_translations) in (
-                self.content_ids_to_audio_translations.iteritems()):
-
-            if not isinstance(content_id, basestring):
-                raise utils.ValidationError(
-                    'Expected content_id to be a string, received: %s' %
-                    content_id)
-            if not isinstance(audio_translations, dict):
-                raise utils.ValidationError(
-                    'Expected audio_translations to be a dict, received %s'
-                    % audio_translations)
-
-            allowed_audio_language_codes = [
-                language['id'] for language in (
-                    constants.SUPPORTED_AUDIO_LANGUAGES)]
-            for language_code, translation in audio_translations.iteritems():
-                if not isinstance(language_code, basestring):
-                    raise utils.ValidationError(
-                        'Expected language code to be a string, received: %s' %
-                        language_code)
-
-                if language_code not in allowed_audio_language_codes:
-                    raise utils.ValidationError(
-                        'Unrecognized language code: %s' % language_code)
-
-                translation.validate()
+        self.recorded_voiceovers.validate(content_id_list)
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
@@ -1319,7 +1522,7 @@ class State(object):
 
     def _update_content_ids_in_assets(self, old_ids_list, new_ids_list):
         """Adds or deletes content ids in assets i.e, other parts of state
-        object such as content_ids_to_audio_translations.
+        object such as recorded_voiceovers and written_translations.
 
         Args:
             old_ids_list: list(str). A list of content ids present earlier
@@ -1333,31 +1536,35 @@ class State(object):
         content_ids_to_add = set(new_ids_list) - set(old_ids_list)
         content_ids_for_text_translations = (
             self.written_translations.get_content_ids_for_text_translation())
+        content_ids_for_voiceovers = (
+            self.recorded_voiceovers.get_content_ids_for_voiceovers())
         for content_id in content_ids_to_delete:
-            if not content_id in self.content_ids_to_audio_translations:
+            if not content_id in content_ids_for_voiceovers:
                 raise Exception(
-                    'The content_id %s does not exist in '
-                    'content_ids_to_audio_translations.' % content_id)
+                    'The content_id %s does not exist in recorded_voiceovers.'
+                    % content_id)
             elif not content_id in content_ids_for_text_translations:
                 raise Exception(
                     'The content_id %s does not exist in written_translations.'
                     % content_id)
             else:
-                self.content_ids_to_audio_translations.pop(content_id)
+                self.recorded_voiceovers.delete_content_id_for_voiceover(
+                    content_id)
                 self.written_translations.delete_content_id_for_translation(
                     content_id)
 
         for content_id in content_ids_to_add:
-            if content_id in self.content_ids_to_audio_translations:
+            if content_id in content_ids_for_voiceovers:
                 raise Exception(
-                    'The content_id %s already exists in '
-                    'content_ids_to_audio_translations.' % content_id)
+                    'The content_id %s already exists in recorded_voiceovers'
+                    % content_id)
             elif content_id in content_ids_for_text_translations:
                 raise Exception(
                     'The content_id %s does not exist in written_translations.'
                     % content_id)
             else:
-                self.content_ids_to_audio_translations[content_id] = {}
+                self.recorded_voiceovers.add_content_id_for_voiceover(
+                    content_id)
                 self.written_translations.add_content_id_for_translation(
                     content_id)
 
@@ -1574,23 +1781,14 @@ class State(object):
         self._update_content_ids_in_assets(
             old_content_id_list, new_content_id_list)
 
-    def update_content_ids_to_audio_translations(
-            self, content_ids_to_audio_translations_dict):
-        """Update the content_ids_to_audio_translations of a state.
+    def update_recorded_voiceovers(self, recorded_voiceovers):
+        """Update the recorded_voiceovers of a state.
 
         Args:
-            content_ids_to_audio_translations_dict: dict. The dict
-                representation of content_ids_to_audio_translations.
+            recorded_voiceovers: RecordedVoiceovers. The new RecordedVoiceovers
+                object for the state.
         """
-        self.content_ids_to_audio_translations = {
-            content_id: {
-                language_code: AudioTranslation.from_dict(
-                    audio_translation_dict)
-                for language_code, audio_translation_dict in
-                audio_translations.iteritems()
-            } for content_id, audio_translations in (
-                content_ids_to_audio_translations_dict.iteritems())
-        }
+        self.recorded_voiceovers = recorded_voiceovers
 
     def update_written_translations(self, written_translations):
         """Update the written_translations of a state.
@@ -1607,24 +1805,13 @@ class State(object):
         Returns:
             dict. A dict mapping all fields of State instance.
         """
-        content_ids_to_audio_translations_dict = {}
-        for content_id, audio_translations in (
-                self.content_ids_to_audio_translations.iteritems()):
-            audio_translations_dict = {}
-            for lang_code, audio_translation in audio_translations.iteritems():
-                audio_translations_dict[lang_code] = (
-                    AudioTranslation.to_dict(audio_translation))
-            content_ids_to_audio_translations_dict[content_id] = (
-                audio_translations_dict)
-
         return {
             'content': self.content.to_dict(),
             'param_changes': [param_change.to_dict()
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
-            'content_ids_to_audio_translations': (
-                content_ids_to_audio_translations_dict),
+            'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict()
         }
 
@@ -1638,22 +1825,12 @@ class State(object):
         Returns:
             State. The corresponding State domain object.
         """
-        content_ids_to_audio_translations = {}
-        for content_id, audio_translations_dict in (
-                state_dict['content_ids_to_audio_translations'].iteritems()):
-            audio_translations = {}
-            for lang_code, audio_translation in (
-                    audio_translations_dict.iteritems()):
-                audio_translations[lang_code] = (
-                    AudioTranslation.from_dict(audio_translation))
-            content_ids_to_audio_translations[content_id] = (
-                audio_translations)
         return cls(
             SubtitledHtml.from_dict(state_dict['content']),
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
-            content_ids_to_audio_translations,
+            RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
             state_dict['classifier_model_id'])
 
@@ -1678,7 +1855,8 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
-            copy.deepcopy(feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS),
+            RecordedVoiceovers.from_dict(copy.deepcopy(
+                feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)))
 
