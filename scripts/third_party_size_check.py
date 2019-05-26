@@ -30,6 +30,7 @@ THIRD_PARTY_SIZE_LIMIT = 7000
 def _get_skip_files_list():
     """This function returns the list of the files which are skipped when
     Oppia is deployed to GAE.
+    
     Returns:
         The list of skip_files directories.
     """
@@ -49,9 +50,11 @@ def _get_skip_files_list():
 def _check_size_in_dir(dir_path, skip_files_list):
     """Recursive method that checks the number of files inside the given
     directory.
+
     Args:
          dir_path: str. The directory which files will be counted.
          skip_files_list: list. The directories which files will not be counted.
+
     Returns:
         The number of files inside the given directory.
     """
