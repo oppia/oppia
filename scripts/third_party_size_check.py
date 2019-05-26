@@ -32,13 +32,13 @@ def _get_skip_files_list():
     Oppia is deployed to GAE.
 
     Returns:
-        list. The list of skip_files directories.
+        list. The list of files which are to be skipped.
     """
     with open('./app.yaml', 'r') as app_yaml:
         try:
             app_yaml_dict = yaml.safe_load(app_yaml)
-        except yaml.YAMLError as exc:
-            print exc
+        except yaml.YAMLError as yaml_exception:
+            print yaml_exception
         skip_files_list = app_yaml_dict.get('skip_files')
 
         skip_files_list = [os.getcwd() + '/' + skip_files_dir
