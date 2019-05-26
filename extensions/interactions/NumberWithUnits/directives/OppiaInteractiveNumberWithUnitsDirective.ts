@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the NumberWithUnits interaction.
+ * @fileoverview Directive for the NumberWithUnits interaction.
  */
 
 oppia.directive('oppiaInteractiveNumberWithUnits', [

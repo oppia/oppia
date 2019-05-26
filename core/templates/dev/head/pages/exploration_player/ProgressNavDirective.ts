@@ -67,7 +67,7 @@ oppia.directive('progressNav', [
               $scope.displayedCardIndex);
             $scope.conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
-              !ExplorationPlayerStateService.isInPretestMode());
+              !ExplorationPlayerStateService.isInQuestionMode());
             var interaction = $scope.displayedCard.getInteraction();
             if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
@@ -100,6 +100,7 @@ oppia.directive('progressNav', [
               PlayerPositionService.setDisplayedCardIndex(index);
               $rootScope.$broadcast('updateActiveStateIfInEditor',
                 PlayerPositionService.getCurrentStateName());
+              $rootScope.$broadcast('currentQuestionChanged', index);
             } else {
               throw Error('Target card index out of bounds.');
             }

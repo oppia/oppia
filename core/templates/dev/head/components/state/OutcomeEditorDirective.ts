@@ -49,9 +49,8 @@ oppia.directive('outcomeEditor', [
           ctrl.editOutcomeForm = {};
           ctrl.isInQuestionMode = StateEditorService.isInQuestionMode;
           ctrl.canAddPrerequisiteSkill =
-            constants.ENABLE_NEW_STRUCTURE_EDITORS &&
-              constants.ENABLE_PREREQUISITE_SKILLS &&
-                StateEditorService.isExplorationWhitelisted();
+            constants.ENABLE_PREREQUISITE_SKILLS &&
+              StateEditorService.isExplorationWhitelisted();
           ctrl.feedbackEditorIsOpen = false;
           ctrl.destinationEditorIsOpen = false;
           ctrl.correctnessLabelEditorIsOpen = false;

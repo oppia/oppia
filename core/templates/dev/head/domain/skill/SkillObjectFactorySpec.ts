@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SkillObjectFactory.
-*/
+ * @fileoverview Unit tests for SkillObjectFactory.
+ */
 
 require('App.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');

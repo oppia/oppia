@@ -14,7 +14,6 @@
 
 """Controllers for the feedback thread page."""
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import feedback_services
@@ -67,9 +66,6 @@ class ThreadListHandlerForTopicsHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         self.values.update({
             'suggestion_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(
