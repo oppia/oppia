@@ -861,15 +861,23 @@ class WrittenTranslation(object):
 
 
 class ImageAssets(object):
+    """Value object representing the images for the state.
+    """
     def __init__(self, image_assets_mapping):
         print("     "*100)
         print(" yeh call hua")
         self.image_assets_mapping = image_assets_mapping
 
     def validate(self):
+        """TODO"""
         pass
 
     def to_dict(self):
+        """Returns a dict representing this ImageAssets domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of ImageAssets instance.
+        """
         image_assets_mapping = {}
         for image_id in self.image_assets_mapping:
             image_assets_mapping[image_id] = {}
@@ -879,16 +887,31 @@ class ImageAssets(object):
         return image_assets_mapping
 
     @classmethod
-    def from_dict(cls, default_image_assets_mapping):
+    def from_dict(cls, image_assets_dict):
+        """Return a ImageAssets domain object from a dict.
+
+        Args:
+            image_assets_dict: dict. The dict representation of
+                ImageAssets object.
+
+        Returns:
+            ImageAssets. The corresponding ImageAssets domain
+            object.
+        """
         image_assets_mapping = {}
-        for image_id in default_image_assets_mapping:
+        for image_id in image_assets_dict:
             image_assets_mapping[image_id] = {}
-            image = default_image_assets_mapping[image_id]
+            image = image_assets_dict[image_id]
             for info in image:
                 image_assets_mapping[image_id][info] = image[info]
         return cls(image_assets_mapping)
 
     def add_default_image(self, image_id):
+        """Adds default image object in state.
+
+        Args:
+            image_id: str. ID of an image.
+        """
         self.image_assets_mapping[image_id] = {}
         image = self.image_assets_mapping[image_id]
         image['src'] = ''
@@ -896,15 +919,31 @@ class ImageAssets(object):
         image['author_id'] = ''
 
     def delete_image(self, image_id):
+        """Deletes an image from the state.
+
+        Args:
+            image_id: str. ID of an image.
+        """
         del self.image_assets_mapping[image_id]
-        return
 
     def update_image(self, image_id, image_info):
+        """Updates image info of the existing image.
+
+        Args:
+            image_id: str. ID of an image.
+            image_info: dict. A dict having respective image info of the
+                given id.
+        """
         image_to_update = self.image_assets_mapping[image_id]
         for info in image_info:
             image_to_update[info] = image_info[info]
 
     def get_image_ids_of_state(self):
+        """Returns all image ids of images in the state.
+
+        Returns:
+            set. Set of image ids of all the images present in the state.
+        """
         return self.image_assets_mapping.keys()
 
 
