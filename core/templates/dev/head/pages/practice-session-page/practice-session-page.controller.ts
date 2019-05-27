@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/element-templates/' +
+  'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('pages/question-player-page/question-player-page.directive.ts');
 

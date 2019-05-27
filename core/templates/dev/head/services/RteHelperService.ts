@@ -82,7 +82,7 @@ oppia.factory('RteHelperService', [
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/components-templates/' +
+            '/components/ck-editor-helpers/' +
             'customize-rte-component-modal.template.html'),
           backdrop: 'static',
           resolve: {},

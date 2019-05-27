@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/element-templates/' +
+  'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
@@ -41,8 +41,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'state-tutorial-first-time.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-property.service.ts');

@@ -17,5 +17,5 @@
  */
 
 require(
-    'components/common-layout-directives/element-templates/' +
+    'components/common-layout-directives/common-elements/' +
     'background-banner.directive.ts');

@@ -17,7 +17,7 @@
  */
 
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'pages/exploration-editor-page/editor-tab/' +
   'state-graph-visualization/state-graph-visualization.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -31,8 +31,8 @@ require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
   'translation-status.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-property.service.ts');

@@ -19,38 +19,38 @@
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require(
-  'components/forms/forms-unicode-filters/' +
+  'filters/' +
   'convert-unicode-with-params-to-html.filter.ts');
 require(
-  'components/forms/forms-unicode-filters/convert-html-to-unicode.filter.ts');
+  'filters/convert-html-to-unicode.filter.ts');
 require(
-  'components/forms/forms-unicode-filters/convert-unicode-to-html.filter.ts');
-require('components/forms/forms-validators/is-at-least.filter.ts');
-require('components/forms/forms-validators/is-at-most.filter.ts');
-require('components/forms/forms-validators/is-float.filter.ts');
-require('components/forms/forms-validators/is-integer.filter.ts');
-require('components/forms/forms-validators/is-nonempty.filter.ts');
+  'filters/convert-unicode-to-html.filter.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
 require(
-  'components/forms/forms-directives/' +
+  'components/forms/custom-forms-directives/' +
   'apply-validation.directive.ts');
 require(
-  'components/forms/forms-directives/' +
+  'components/forms/custom-forms-directives/' +
   'require-is-float.directive.ts');
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-choices-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-dict-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-list-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 

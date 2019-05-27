@@ -24,13 +24,13 @@ require(
 // ^^^ this block of requires should be removed ^^^
 
 require(
-  'components/common-layout-directives/element-templates/' +
+  'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
-  'components/common-layout-directives/element-templates/' +
+  'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require(
-  'components/summary-tile-directives/exploration-summary-tile/' +
+  'components/summary-tile-directives/' +
   'exploration-summary-tile.directive.ts');
 require(
   'pages/collection-player-page/collection-footer/' +

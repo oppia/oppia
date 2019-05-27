@@ -26,10 +26,10 @@ require(
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-player-page/exploration-player-page-services/' +
-  'player-position/player-position.service.ts');
+  'player-position.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page-services/' +
-  'player-transcript/player-transcript.service.ts');
+  'player-transcript.service.ts');
 
 require(
   'pages/exploration-player-page/continue-button/continue-button.directive.ts');

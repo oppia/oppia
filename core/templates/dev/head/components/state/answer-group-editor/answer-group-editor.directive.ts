@@ -23,10 +23,10 @@ require('directives/AngularHtmlBindDirective.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/RuleObjectFactory.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
+  'pages/exploration-editor-page/editor-tab/' +
   'training-panel/training-data-editor-panel.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +

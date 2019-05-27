@@ -19,7 +19,7 @@
  */
 
 require(
-  'components/forms/forms-directives/' +
+  'components/forms/custom-forms-directives/' +
   'select2-dropdown.directive.ts');
 
 require('domain/collection/CollectionUpdateService.ts');

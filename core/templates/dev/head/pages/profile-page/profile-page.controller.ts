@@ -17,10 +17,10 @@
  */
 
 require(
-  'components/common-layout-directives/element-templates/' +
+  'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require(
-  'components/summary-tile-directives/exploration-summary-tile/' +
+  'components/summary-tile-directives/' +
   'exploration-summary-tile.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 

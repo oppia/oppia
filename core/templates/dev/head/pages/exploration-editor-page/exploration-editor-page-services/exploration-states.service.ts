@@ -31,15 +31,15 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-init-state-name.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/' +
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/' +
   'solution-validity.service.ts');
 require(
   'pages/exploration-player-page/exploration-player-page-services/' +
-  'answer-classification/answer-classification.service.ts');
+  'answer-classification.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-editor.service.ts')
@@ -423,8 +423,8 @@ oppia.factory(
 
           return $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration-editor-page/exploration-editor-tab/' +
-              'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
+              '/pages/exploration-editor-page/editor-tab/' +
+              'editor-tab-templates/modal-templates/' +
               'confirm-delete-state-modal.template.html'),
             backdrop: true,
             resolve: {

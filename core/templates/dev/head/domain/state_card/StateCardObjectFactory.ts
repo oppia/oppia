@@ -19,7 +19,7 @@
 
 require(
   'pages/exploration-player-page/exploration-player-page-services/' +
-  'audio-translation-language/audio-translation-language.service.ts');
+  'audio-translation-language.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
 oppia.factory('StateCardObjectFactory', [

@@ -18,8 +18,8 @@
  */
 
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/' +
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/' +
   'solution-validity.service.ts');
 
 oppia.factory('StateEditorService', [

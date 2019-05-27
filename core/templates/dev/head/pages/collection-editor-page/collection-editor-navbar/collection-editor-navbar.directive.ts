@@ -17,10 +17,10 @@
  */
 
 require(
-  'components/forms/forms-directives/' +
+  'components/forms/custom-forms-directives/' +
   'select2-dropdown.directive.ts');
 require(
-  'components/common-layout-directives/element-templates/' +
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
 require('domain/collection/CollectionRightsBackendApiService.ts');

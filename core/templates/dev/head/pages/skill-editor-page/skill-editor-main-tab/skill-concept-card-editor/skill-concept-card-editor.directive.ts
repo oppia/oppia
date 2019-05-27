@@ -18,7 +18,7 @@
 
 require('components/state/answer-group-editor/summary-list-header.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require(

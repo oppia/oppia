@@ -32,57 +32,57 @@ require(
   'components/state/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
 require('components/state/rule-editor/rule-editor.directive.ts');
-require('components/state/rule-type-selector/rule-type-selector.directive.ts');
+require('components/state/rule-editor/rule-type-selector.directive.ts');
 require('components/state/solution-editor/solution-editor.directive.ts');
 require(
   'components/state/solution-editor/' +
   'solution-explanation-editor.directive.ts');
 require(
-  'components/forms/forms-directives/html-select.directive.ts');
+  'components/forms/custom-forms-directives/html-select.directive.ts');
 require(
-  'components/forms/forms-unicode-filters/' +
+  'filters/' +
   'convert-unicode-with-params-to-html.filter.ts');
 require(
-  'components/forms/forms-unicode-filters/convert-html-to-unicode.filter.ts');
+  'filters/convert-html-to-unicode.filter.ts');
 require(
-  'components/forms/forms-unicode-filters/convert-unicode-to-html.filter.ts');
-require('components/forms/forms-validators/is-at-least.filter.ts');
-require('components/forms/forms-validators/is-at-most.filter.ts');
-require('components/forms/forms-validators/is-float.filter.ts');
-require('components/forms/forms-validators/is-integer.filter.ts');
-require('components/forms/forms-validators/is-nonempty.filter.ts');
+  'filters/convert-unicode-to-html.filter.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
 require(
-  'components/forms/forms-directives/' +
+  'components/forms/custom-forms-directives/' +
   'apply-validation.directive.ts');
 require(
-  'components/forms/forms-directives/' +
+  'components/forms/custom-forms-directives/' +
   'require-is-float.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-custom-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-dict-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-expression-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-expression-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-float-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-html-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-int-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-list-editor.directive.ts');
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
 require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');

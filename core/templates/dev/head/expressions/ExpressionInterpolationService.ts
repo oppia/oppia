@@ -17,8 +17,7 @@
  */
 
 require(
-  'components/forms/forms-unicode-filters/' +
-  'convert-html-to-unicode.filter.ts');
+  'filters/convert-html-to-unicode.filter.ts');
 require('expressions/ExpressionEvaluatorService.ts');
 require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');

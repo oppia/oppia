@@ -18,10 +18,10 @@
  */
 
 require(
-  'components/forms/forms-directives/' +
+  'components/forms/custom-forms-directives/' +
   'select2-dropdown.directive.ts');
 require(
-  'pages/exploration-editor-page/value-generator-editor/' +
+  'pages/exploration-editor-page/param-changes-editor/' +
   'value-generator-editor.directive.ts');
 
 require('domain/exploration/ParamChangeObjectFactory.ts');
@@ -33,8 +33,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-states.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 

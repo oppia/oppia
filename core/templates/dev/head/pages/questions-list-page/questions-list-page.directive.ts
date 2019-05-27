@@ -33,8 +33,8 @@ require(
   'pages/topic-editor-page/topic-editor-services/' +
   'topic-editor-state.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 

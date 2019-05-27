@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/summary-tile-directives/story-summary-tile/' +
+  'components/summary-tile-directives/' +
   'story-summary-tile.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

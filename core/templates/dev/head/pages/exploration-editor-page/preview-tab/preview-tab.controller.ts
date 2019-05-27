@@ -45,12 +45,12 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'parameter-metadata.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/exploration-engine.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/learner-params/learner-params.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/number-attempts/number-attempts.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/learner-params.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/number-attempts.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/player-correctness-feedback-enabled.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 

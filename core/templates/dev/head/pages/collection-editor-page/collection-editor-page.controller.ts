@@ -18,7 +18,7 @@
 
 // TODO(bhenning): These constants should be provided by the backend.
 
-require('pages/collection-editor-page/collection-editor-navbar-breadcrumb/' +
+require('pages/collection-editor-page/collection-editor-navbar/' +
   'collection-editor-navbar-breadcrumb.directive.ts');
 require('pages/collection-editor-page/collection-editor-navbar/' +
   'collection-editor-navbar.directive.ts');

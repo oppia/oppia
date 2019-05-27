@@ -30,8 +30,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'parameter-metadata.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/solution-validity.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/solution-validity.service.ts');
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 

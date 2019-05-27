@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/forms/forms-unicode-filters/' +
+  'filters/' +
   'convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 

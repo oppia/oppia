@@ -51,7 +51,7 @@ module.exports = {
     email_dashboard_result:
       commonPrefix + '/pages/email-dashboard-page/' +
       'email-dashboard-result.controller.ts',
-    error: commonPrefix + '/pages/error-page/error-page.controller.ts',
+    error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.controller.ts',
@@ -192,7 +192,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['error'],
       filename: 'error-page.mainpage.html',
-      template: commonPrefix + '/pages/error-page/error-page.mainpage.html',
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

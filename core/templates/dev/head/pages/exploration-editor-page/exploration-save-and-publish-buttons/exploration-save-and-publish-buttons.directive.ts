@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/element-templates/' +
+  'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

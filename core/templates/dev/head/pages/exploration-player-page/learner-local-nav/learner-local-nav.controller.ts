@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/exploration-player-page-services/exploration-engine.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/exploration-player-state.service.ts');
 require('pages/exploration-player-page/feedback-popup/feedback-popup.directive.ts');
-require('pages/exploration-player-page/exploration-player-page-services/player-position/player-position.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/player-position.service.ts');
 require(
   'pages/show-suggestion-editor-pages/' +
   'show-suggestion-modal-for-learner-local-view/' +

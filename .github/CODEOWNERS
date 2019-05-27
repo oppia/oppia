@@ -142,15 +142,15 @@
 /main_taskqueue.py @seanlip
 
 # Global components.
-/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
-/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
-/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/ @ankita240796
 /core/templates/dev/head/components/button-directives/exploration-embed-modal.directive.html @ankita240796
 /core/templates/dev/head/components/button-directives/exploration-embed-modal.directive.ts @ankita240796
-/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/ @ankita240796
 /core/templates/dev/head/components/profile-link-directives/ @ankita240796
-/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
-/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/ @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons.directive.ts @ankita240796
 /core/templates/dev/head/components/summary-tile-directives/ @ankita240796
@@ -208,7 +208,7 @@
 /core/domain/stats*.py @brianrodri
 /core/domain/visualization_registry*.py @brianrodri
 /core/storage/statistics/ @brianrodri
-/core/templates/dev/head/components/components-templates/confirmation-modal.template.html @brianrodri
+/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
 /core/templates/dev/head/domain/statistics/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
@@ -237,8 +237,8 @@
 /core/templates/dev/head/domain/sidebar/ @nithusha21
 /core/templates/dev/head/components/button-directives/create-activity-button.directive.html @nithusha21
 /core/templates/dev/head/components/button-directives/create-activity-button.directive.ts @nithusha21
-/core/templates/dev/head/components/common-layout-directives/bar-layouts/ @nithusha21
-/core/templates/dev/head/components/common-layout-directives/bar-layouts/ @nithusha21
+/core/templates/dev/head/components/common-layout-directives/navigation-bars/ @nithusha21
+/core/templates/dev/head/components/common-layout-directives/navigation-bars/ @nithusha21
 /core/templates/dev/head/services/NavigationService*.ts @nithusha21
 
 
@@ -347,7 +347,7 @@
 /core/templates/dev/head/mathjaxConfig.ts @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish
 /core/templates/dev/head/components/CkEditorWidgetsInitializer.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/components-templates/rich-text-components.template.html @AllanYangZhou @bansalnitish
+/core/templates/dev/head/components/ck-editor-helpers/rich-text-components.template.html @AllanYangZhou @bansalnitish
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @AllanYangZhou @bansalnitish
 /core/templates/dev/head/services/RteHelperService*.ts @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
@@ -379,7 +379,7 @@
 /core/controllers/custom_landing_pages*.py @vojtechjelinek
 /core/templates/dev/head/pages/contact-page/ @vojtechjelinek
 /core/templates/dev/head/pages/donate-page/ @vojtechjelinek
-/core/templates/dev/head/pages/error-page/ @vojtechjelinek
+/core/templates/dev/head/pages/error-pages/ @vojtechjelinek
 /core/templates/dev/head/pages/get_started/ @vojtechjelinek
 /core/templates/dev/head/pages/topic-landing-page/ @vojtechjelinek
 /core/templates/dev/head/pages/maintenance-page/ @vojtechjelinek

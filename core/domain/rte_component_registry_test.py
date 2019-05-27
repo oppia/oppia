@@ -180,7 +180,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
                 component_specs['customization_arg_specs'])  # pylint: disable=protected-access
 
     def test_html_contains_all_imports(self):
-        """Test that the components-templates/rich-text-components.template.html file contains script-imports
+        """Test that the ck-editor-helpers/rich-text-components.template.html file contains script-imports
         for all directives of all RTE components.
         """
 
@@ -204,7 +204,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         rtc_html_file = os.path.join(
             feconf.FRONTEND_TEMPLATES_DIR, 'components',
-            'components-templates/rich-text-components.template.html')
+            'ck-editor-helpers/rich-text-components.template.html')
         with open(rtc_html_file, 'r') as f:
             rtc_html_file_contents = f.read()
 

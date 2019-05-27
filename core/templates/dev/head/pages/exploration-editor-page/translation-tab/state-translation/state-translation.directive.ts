@@ -48,8 +48,8 @@ require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
   'translation-tab-active-content-id.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 

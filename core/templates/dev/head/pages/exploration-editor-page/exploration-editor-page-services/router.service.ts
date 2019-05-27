@@ -23,8 +23,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-states.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require('services/ExplorationFeaturesService.ts');
 
 oppia.factory('RouterService', [

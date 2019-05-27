@@ -23,8 +23,8 @@ require('components/state/response-header/response-header.directive.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/state-hints.service.ts');
 require(
@@ -138,8 +138,8 @@ oppia.directive('stateHintsEditor', [
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
+                '/pages/exploration-editor-page/editor-tab/' +
+                'editor-tab-templates/modal-templates/' +
                 'add-hint-modal.template.html'),
               backdrop: 'static',
               controller: [
@@ -207,8 +207,8 @@ oppia.directive('stateHintsEditor', [
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
+                '/pages/exploration-editor-page/editor-tab/' +
+                'editor-tab-templates/modal-templates/' +
                 'delete-last-hint-modal.template.html'),
               backdrop: true,
               controller: [
@@ -247,8 +247,8 @@ oppia.directive('stateHintsEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
+                '/pages/exploration-editor-page/editor-tab/' +
+                'editor-tab-templates/modal-templates/' +
                 'delete-hint-modal.template.html'),
               backdrop: true,
               controller: [

@@ -35,12 +35,12 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'editor-first-time-events.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/' +
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/' +
   'interaction-details-cache.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-content.service.ts');
@@ -48,8 +48,8 @@ require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-hints.service.ts');
@@ -334,8 +334,8 @@ oppia.directive('stateResponses', [
             var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
+                '/pages/exploration-editor-page/editor-tab/' +
+                'editor-tab-templates/modal-templates/' +
                 'add-answer-group-modal.template.html'),
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
@@ -456,8 +456,8 @@ oppia.directive('stateResponses', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
+                '/pages/exploration-editor-page/editor-tab/' +
+                'editor-tab-templates/modal-templates/' +
                 'delete-answer-group-modal.template.html'),
               backdrop: true,
               controller: [

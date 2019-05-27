@@ -23,8 +23,8 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-states.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/' +
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/' +
   'interaction-details-cache.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
@@ -33,8 +33,8 @@ require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-interaction-id.service.ts');

@@ -24,23 +24,23 @@ require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/' +
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/' +
   'solution-validity.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/' +
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/' +
   'solution-verification.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/current-interaction/current-interaction.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/current-interaction.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/responses.service.ts');
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/state-hints.service.ts');
 require(
@@ -150,8 +150,8 @@ oppia.directive('stateSolutionEditor', [
             $scope.inlineSolutionEditorIsActive = false;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
+                '/pages/exploration-editor-page/editor-tab/' +
+                'editor-tab-templates/modal-templates/' +
                 'add-or-update-solution-modal.template.html'),
               backdrop: 'static',
               controller: [
@@ -265,8 +265,8 @@ oppia.directive('stateSolutionEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
+                '/pages/exploration-editor-page/editor-tab/' +
+                'editor-tab-templates/modal-templates/' +
                 'delete-solution-modal.template.html'),
               backdrop: true,
               controller: [

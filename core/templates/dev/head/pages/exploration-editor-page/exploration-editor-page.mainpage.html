@@ -73,7 +73,7 @@
       </div>
 
       <div ng-show="getActiveTabName() === 'main'">
-        {% include 'pages/exploration-editor-page/exploration-editor-tab/exploration-editor-tab-templates/editor-tab.template.html' %}
+        {% include 'pages/exploration-editor-page/editor-tab/editor-tab-templates/editor-tab.template.html' %}
       </div>
 
       <div ng-if="getActiveTabName() === 'translation'">
@@ -179,7 +179,7 @@
       <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
-  {% include 'components/components-templates/rich-text-components.template.html' %}
+  {% include 'components/ck-editor-helpers/rich-text-components.template.html' %}
   {{ interaction_templates }}
   {{ visualizations_html }}
   {{ dependencies_html }}

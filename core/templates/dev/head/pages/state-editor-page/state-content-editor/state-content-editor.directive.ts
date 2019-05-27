@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/forms/forms-schema-editors/schema-based-editor/' +
+  'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 

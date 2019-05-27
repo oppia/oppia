@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 require('pages/exploration-player-page/exploration-player-page-services/exploration-engine.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/player-position/player-position.service.ts');
+require('pages/exploration-player-page/exploration-player-page-services/player-position.service.ts');
 require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
