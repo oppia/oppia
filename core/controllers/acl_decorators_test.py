@@ -34,7 +34,7 @@ import webapp2
 import webtest
 
 
-'''class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
+class PlayExplorationDecoratorTests(test_utils.GenericTestBase):
     """Tests for play exploration decorator."""
     user_email = 'user@example.com'
     username = 'user'
@@ -1632,7 +1632,7 @@ class EditSkillDecoratorTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.skill_id, expected_status_int=401)
-        self.logout()'''
+        self.logout()
 
 
 class EditSkillsDecoratorTests(test_utils.GenericTestBase):
@@ -1683,7 +1683,6 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % json.dumps(
                 [self.first_skill_id, self.second_skill_id]))
-        print(json.loads(response['skill_ids']))
         self.assertEqual(len(json.loads(response['skill_ids'])), 2)
         self.assertEqual(json.loads(response['skill_ids'])[0], self.first_skill_id)
         self.assertEqual(json.loads(response['skill_ids'])[1], self.second_skill_id)

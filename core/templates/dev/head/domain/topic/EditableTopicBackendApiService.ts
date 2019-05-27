@@ -79,31 +79,6 @@ oppia.factory('EditableTopicBackendApiService', [
       });
     };
 
-    /*var _fetchQuestions = function(
-        topicId, cursor, successCallback, errorCallback) {
-      var questionsDataUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_EDITOR_QUESTION_URL_TEMPLATE, {
-          topic_id: topicId,
-          cursor: cursor ? cursor : ''
-        });
-
-      $http.get(questionsDataUrl).then(function(response) {
-        var questionSummaries = angular.copy(
-          response.data.question_summary_dicts);
-        var nextCursor = response.data.next_start_cursor;
-        if (successCallback) {
-          successCallback({
-            questionSummaries: questionSummaries,
-            nextCursor: nextCursor
-          });
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };*/
-
     var _fetchSubtopicPage = function(
         topicId, subtopicId, successCallback, errorCallback) {
       var subtopicPageDataUrl = UrlInterpolationService.interpolateUrl(
@@ -183,12 +158,6 @@ oppia.factory('EditableTopicBackendApiService', [
           _fetchStories(topicId, resolve, reject);
         });
       },
-
-      /*fetchQuestions: function(topicId, cursor) {
-        return $q(function(resolve, reject) {
-          _fetchQuestions(topicId, cursor, resolve, reject);
-        });
-      },*/
 
       fetchSubtopicPage: function(topicId, subtopicId) {
         return $q(function(resolve, reject) {

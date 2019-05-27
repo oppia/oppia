@@ -500,6 +500,11 @@ var constants = {
   "ACTIVITY_STATUS_PRIVATE": "private",
   "ACTIVITY_STATUS_PUBLIC": "public",
 
+  "ACTIVITY_TYPE": {
+    "skill": "skill",
+    "topic": "topic"
+  },
+
   "SITE_FEEDBACK_FORM_URL": "",
 
   "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],

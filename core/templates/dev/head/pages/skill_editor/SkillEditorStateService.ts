@@ -24,7 +24,7 @@ require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillRightsBackendApiService.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('services/AlertsService.ts');
-require('services/NewService.ts');
+require('services/QuestionsListService.ts');
 
 oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
 oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
@@ -33,24 +33,23 @@ oppia.constant(
 
 oppia.factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
-  'QuestionsListBackendApiService',
+  'QuestionsListBackendApiService', 'QuestionsListService',
   'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',
-  'ACTIVITY_TYPE', 'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'NewService',
+  'ACTIVITY_TYPE', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
       $rootScope, AlertsService, EditableSkillBackendApiService,
-      QuestionsListBackendApiService,
+      QuestionsListBackendApiService, QuestionsListService,
       SkillObjectFactory, SkillRightsBackendApiService,
       SkillRightsObjectFactory, UndoRedoService,
-      ACTIVITY_TYPE, EVENT_QUESTION_SUMMARIES_INITIALIZED, NewService,
+      ACTIVITY_TYPE, EVENT_QUESTION_SUMMARIES_INITIALIZED,
       EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
-    //var _questionSummaries = [];
     var _nextCursorForQuestions = '';
 
     var _setSkill = function(skill) {
@@ -76,15 +75,6 @@ oppia.factory('SkillEditorStateService', [
       _setSkillRights(SkillRightsObjectFactory.createFromBackendDict(
         newBackendSkillRightsObject));
     };
-
-    /*var _setQuestionSummaries = function(questionSummaries) {
-      _questionSummaries.push(angular.copy(questionSummaries));
-      $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
-    };
-    var _setNextQuestionsCursor = function(nextCursor) {
-      _nextCursorForQuestions = nextCursor;
-    };*/
-
     return {
       loadSkill: function(skillId) {
         _skillIsBeingLoaded = true;
@@ -92,12 +82,12 @@ oppia.factory('SkillEditorStateService', [
           skillId).then(
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
-            _nextCursorForQuestions = NewService.getNextCursor();
+            _nextCursorForQuestions = QuestionsListService.getNextCursor();
             QuestionsListBackendApiService.fetchQuestions(
-              ACTIVITY_TYPE.SKILL, skillId, _nextCursorForQuestions).then(
+              ACTIVITY_TYPE.skill, skillId, _nextCursorForQuestions).then(
               function(returnObject) {
-                NewService.setQuestionSummaries(returnObject.questionSummaries);
-                NewService.setNextQuestionsCursor(returnObject.nextCursor);
+                QuestionsListService.setQuestionSummaries(returnObject.questionSummaries);
+                QuestionsListService.setNextQuestionsCursor(returnObject.nextCursor);
               }
             );
             _skillIsBeingLoaded = false;
@@ -120,33 +110,6 @@ oppia.factory('SkillEditorStateService', [
       isLoadingSkill: function() {
         return _skillIsBeingLoaded;
       },
-
-      /*isLastQuestionBatch: function(index) {
-        return (
-          _nextCursorForQuestions === null &&
-          index === _questionSummaries.length - 1);
-      },
-
-      fetchQuestionSummaries: function(skillId, resetHistory) {
-        if (resetHistory) {
-          _questionSummaries = [];
-          _nextCursorForQuestions = '';
-        }
-        EditableSkillBackendApiService.fetchQuestions(
-          skillId, _nextCursorForQuestions).then(
-          function(returnObject) {
-            _setQuestionSummaries(returnObject.questionSummaries);
-            _setNextQuestionsCursor(returnObject.nextCursor);
-          }
-        );
-      },
-
-      getQuestionSummaries: function(index, fetchMore) {
-        if (index >= _questionSummaries.length) {
-          return null;
-        }
-        return _questionSummaries[index];
-      },*/
 
       hasLoadedSkill: function() {
         return _skillIsInitialized;

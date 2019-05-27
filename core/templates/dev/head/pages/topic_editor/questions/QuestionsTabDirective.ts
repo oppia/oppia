@@ -32,7 +32,7 @@ require('pages/state_editor/state_properties/StateEditorService.ts');
 require('pages/topic_editor/TopicEditorStateService.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
-require('services/NewService.ts');
+require('services/QuestionsListService.ts');
 
 oppia.directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -45,8 +45,8 @@ oppia.directive('questionsTab', [
         '$scope', '$http', '$log', '$q', '$uibModal', '$window',
         'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',
         'UrlService', 'EditableQuestionBackendApiService',
-        'EditableSkillBackendApiService', 'NewService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
+        'QuestionObjectFactory', 'QuestionsListService',
         'QuestionSuggestionObjectFactory', 'SuggestionThreadObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService',
@@ -54,19 +54,19 @@ oppia.directive('questionsTab', [
             $scope, $http, $log, $q, $uibModal, $window,
             AlertsService, TopicEditorStateService, QuestionCreationService,
             UrlService, EditableQuestionBackendApiService,
-            EditableSkillBackendApiService, NewService,
-            MisconceptionObjectFactory, QuestionObjectFactory,
+            EditableSkillBackendApiService, MisconceptionObjectFactory,
+            QuestionObjectFactory, QuestionsListService,
             QuestionSuggestionObjectFactory, SuggestionThreadObjectFactory,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
             QuestionUndoRedoService, UndoRedoService,
             NUM_QUESTIONS_PER_PAGE) {
           $scope.currentPage = 0;
           $scope.getQuestionSummaries =
-            NewService.getQuestionSummaries;
+            QuestionsListService.getQuestionSummaries;
           $scope.fetchQuestionSummaries =
-            NewService.fetchQuestionSummaries;
+            QuestionsListService.fetchQuestionSummaries;
           $scope.isLastQuestionBatch =
-            NewService.isLastQuestionBatch;
+            QuestionsListService.isLastQuestionBatch;
 
           var _initTab = function() {
             $scope.question = null;

@@ -12,19 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Service to fetch questions and returns questions to the
+ * questions list in editors.
+ */
+
 require('domain/question/QuestionsListBackendApiService.ts');
 require('services/ContextService.ts');
-
-oppia.constant('ACTIVITY_TYPE', {
-  SKILL: 'skill',
-  TOPIC: 'topic',
-  PRETEST: 'pretest'
-});
 
 oppia.constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
-oppia.factory('NewService', ['$rootScope', 'QuestionsListBackendApiService',
+oppia.factory('QuestionsListService', ['$rootScope', 'QuestionsListBackendApiService',
   'ACTIVITY_TYPE', 'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'ContextService', function(
       $rootScope, QuestionsListBackendApiService,
       ACTIVITY_TYPE, EVENT_QUESTION_SUMMARIES_INITIALIZED, ContextService) {
@@ -35,9 +34,9 @@ oppia.factory('NewService', ['$rootScope', 'QuestionsListBackendApiService',
 
     var _getActivityType = function() {
       if (_isInSkillEditorPage) {
-        return ACTIVITY_TYPE.SKILL;
+        return ACTIVITY_TYPE.skill;
       } else if (_isInTopicEditorPage) {
-        return ACTIVITY_TYPE.TOPIC;
+        return ACTIVITY_TYPE.topic;
       }
     };
     var _setQuestionSummaries = function(newQuestionSummaries) {
@@ -47,7 +46,6 @@ oppia.factory('NewService', ['$rootScope', 'QuestionsListBackendApiService',
       }
       _questionSummaries = _questionSummaries.concat(
         angular.copy(newQuestionSummaries));
-      console.log(_questionSummaries);
       $rootScope.$broadcast(EVENT_QUESTION_SUMMARIES_INITIALIZED);
     };
     var _setNextQuestionsCursor = function(nextCursor) {

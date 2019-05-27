@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Service to receive questions for editors given activity type
+ * and activity id.
+ */
+
 oppia.constant(
     'QUESTIONS_LIST_URL_TEMPLATE',
     '/questions_list_handler/<activity_type>/<activity_id>?cursor=<cursor>');

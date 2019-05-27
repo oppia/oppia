@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Controllers for the questions list in topic editors and skill editors."""
 
 from constants import constants
+from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
 from core.domain import skill_domain
@@ -26,14 +28,17 @@ class QuestionsListHandler(base.BaseHandler):
     """
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
+    @acl_decorators.open_access
     def get(self, activity_type, activity_id):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
 
-        if activity_type == 'topic':
+        if activity_type not in constants.ACTIVITY_TYPE:
+            raise self.PageNotFoundException
+        elif activity_type == constants.ACTIVITY_TYPE['topic']:
             topic = topic_services.get_topic_by_id(activity_id)
             skill_ids = topic.get_all_skill_ids()
-        elif activity_type == 'skill':
+        elif activity_type == constants.ACTIVITY_TYPE['skill']:
             skill_domain.Skill.require_valid_skill_id(activity_id)
             skill_ids = [activity_id]
 

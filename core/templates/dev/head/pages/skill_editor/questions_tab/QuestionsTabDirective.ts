@@ -29,7 +29,7 @@ require('pages/skill_editor/SkillEditorStateService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
-require('services/NewService.ts');
+require('services/QuestionsListService.ts');
 
 
 oppia.directive('questionsTab', [
@@ -44,23 +44,23 @@ oppia.directive('questionsTab', [
         'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService', 'NewService',
+        'QuestionsListService', 'EVENT_QUESTION_SUMMARIES_INITIALIZED', 
+        'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
         'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             SkillEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService, NewService,
+            QuestionsListService, EVENT_QUESTION_SUMMARIES_INITIALIZED, 
+            StateEditorService, QuestionUndoRedoService, UndoRedoService,
             NUM_QUESTIONS_PER_PAGE) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.getQuestionSummaries =
-            NewService.getQuestionSummaries;
+            QuestionsListService.getQuestionSummaries;
           $scope.fetchQuestionSummaries =
-            NewService.fetchQuestionSummaries;
+            QuestionsListService.fetchQuestionSummaries;
           $scope.isLastQuestionBatch =
-            NewService.isLastQuestionBatch;
+           QuestionsListService.isLastQuestionBatch;
         }
       ]
     };

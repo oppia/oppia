@@ -141,37 +141,6 @@ class SkillRightsHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-'''class SkillEditorQuestionHandler(base.BaseHandler):
-    """Manages the creation of a question and receiving of all question
-    summaries for display in skill editor page.
-    """
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_edit_skill
-    def get(self, skill_id):
-        """Handles GET requests."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-
-        start_cursor = self.request.get('cursor')
-
-        question_summaries, skill_descriptions, next_start_cursor = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE, [skill_id], start_cursor)
-        )
-        return_dicts = []
-        for index, summary in enumerate(question_summaries):
-            return_dicts.append({
-                'summary': summary.to_dict(),
-                'skill_description': skill_descriptions[index]
-            })
-
-        self.values.update({
-            'question_summary_dicts': return_dicts,
-            'next_start_cursor': next_start_cursor
-        })
-        self.render_json(self.values)'''
-
-
 class EditableSkillDataHandler(base.BaseHandler):
     """A data handler for skills which supports writing."""
 

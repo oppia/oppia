@@ -246,15 +246,6 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
-    def test_delete_with_new_structures_disabled_returns_404_status(self):
-        self.login(self.ADMIN_EMAIL)
-        self.delete_json(
-            '%s/%s/%s' % (
-                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                self.skill_id
-            ), expected_status_int=404)
-        self.logout()
-
     def test_delete_with_non_admin_or_topic_manager_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)
         self.delete_json(

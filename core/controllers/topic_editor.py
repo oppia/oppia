@@ -90,39 +90,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
         })
 
 
-'''class TopicEditorQuestionHandler(base.BaseHandler):
-    """Manages the creation of a question and receiving of all question
-    summaries for display in topic editor page.
-    """
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_view_any_topic_editor
-    def get(self, topic_id):
-        """Handles GET requests."""
-        start_cursor = self.request.get('cursor')
-        topic = topic_services.get_topic_by_id(topic_id)
-        skill_ids = topic.get_all_skill_ids()
-
-        question_summaries, skill_descriptions_list, next_start_cursor = (
-            question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE *
-                constants.MAX_SKILLS_PER_QUESTION,
-                skill_ids, start_cursor)
-        )
-        return_dicts = []
-        for index, summary in enumerate(question_summaries):
-            return_dicts.append({
-                'summary': summary.to_dict(),
-                'skill_descriptions': skill_descriptions_list[index]
-            })
-
-        self.values.update({
-            'question_summary_dicts': return_dicts,
-            'next_start_cursor': next_start_cursor
-        })
-        self.render_json(self.values)'''
-
-
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
