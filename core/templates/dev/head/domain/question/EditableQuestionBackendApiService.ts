@@ -16,6 +16,17 @@
  * @fileoverview Service to send and receive changes to a question in the
  *  backend.
  */
+
+require('domain/collection/GuestCollectionProgressService.ts');
+require('domain/exploration/AnswerGroupObjectFactory.ts');
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/ParamSpecObjectFactory.ts');
+require('domain/exploration/WrittenTranslationObjectFactory.ts');
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.constant(
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   '/question_editor_handler/data/<question_id>');

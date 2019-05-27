@@ -13,14 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the content ids
- * to audio translations.
+ * @fileoverview File to import necessary scripts for contact page.
  */
 
-oppia.factory('StateContentIdsToAudioTranslationsService', [
-  'StatePropertyService', function(StatePropertyService) {
-    var child = Object.create(StatePropertyService);
-    child.setterMethodKey = 'saveContentIdsToAudioTranslations';
-    return child;
-  }
-]);
+require('components/background/BackgroundBannerDirective.ts');

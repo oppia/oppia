@@ -17,6 +17,11 @@
  * domain objects.
  */
 
+require('domain/exploration/ParamChangesObjectFactory.ts');
+require('domain/exploration/ParamSpecsObjectFactory.ts');
+require('domain/exploration/StatesObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.factory('ExplorationObjectFactory', [
   '$log', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'StatesObjectFactory', 'UrlInterpolationService',
@@ -134,33 +139,32 @@ oppia.factory('ExplorationObjectFactory', [
       return this.getState(stateName).content.getHtml();
     };
 
-    Exploration.prototype.getAudioTranslations = function(stateName) {
+    Exploration.prototype.getVoiceovers = function(stateName) {
       var state = this.getState(stateName);
-      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var recordedVoiceovers = state.recordedVoiceovers;
       var contentId = state.content.getContentId();
-      return contentIdsToAudioTranslations.getBindableAudioTranslations(
+      return recordedVoiceovers.getBindableVoiceovers(
         contentId);
     };
 
-    Exploration.prototype.getAudioTranslation = function(
+    Exploration.prototype.getVoiceover = function(
         stateName, languageCode) {
       var state = this.getState(stateName);
-      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var recordedVoiceovers = state.recordedVoiceovers;
       var contentId = state.content.getContentId();
-      return contentIdsToAudioTranslations.getAudioTranslation(
-        contentId, languageCode);
+      return recordedVoiceovers.getVoiceover(contentId, languageCode);
     };
 
-    Exploration.prototype.getAllAudioTranslations = function(languageCode) {
-      return this.states.getAllAudioTranslations(languageCode);
+    Exploration.prototype.getAllVoiceovers = function(languageCode) {
+      return this.states.getAllVoiceovers(languageCode);
     };
 
     Exploration.prototype.getLanguageCode = function() {
       return this.languageCode;
     };
 
-    Exploration.prototype.getAllAudioLanguageCodes = function() {
-      return this.states.getAllAudioLanguageCodes();
+    Exploration.prototype.getAllVoiceoverLanguageCodes = function() {
+      return this.states.getAllVoiceoverLanguageCodes();
     };
 
     // Static class methods. Note that "this" is not available in

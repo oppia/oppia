@@ -16,6 +16,15 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require(
+  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require('pages/state_editor/state_properties/StateContentService.ts');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+
 describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
     beforeEach(function() {
@@ -75,10 +84,12 @@ describe('State Interaction controller', function() {
             content_id: 'content',
             html: 'First State Content'
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',
@@ -121,10 +132,12 @@ describe('State Interaction controller', function() {
             content_id: 'content',
             html: ''
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           interaction: {
             id: 'TextInput',

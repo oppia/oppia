@@ -23,6 +23,9 @@ $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
 $NPM_INSTALL --only=dev
+# This line removes the "npm ERR! missing:" messages. For reference, see this
+# thread: https://github.com/npm/npm/issues/19393#issuecomment-374076889
+$NPM_CMD dedupe
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -187,7 +190,7 @@ echo Checking if PyGithub is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
   echo Installing PyGithub
 
-  pip install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
+  pip_install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
 fi
 
 # install pre-push script

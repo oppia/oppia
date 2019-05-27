@@ -16,6 +16,8 @@
  * @fileoverview Description of this file.
  */
 
+require('domain/exploration/ParamTypeObjectFactory.ts');
+
 describe('ParamType objects', function() {
   var ParamType = null;
 

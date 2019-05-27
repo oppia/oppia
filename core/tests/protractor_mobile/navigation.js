@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview  End-to-end tests for testing navigation
+ * @fileoverview End-to-end tests for testing navigation
  * on mobile as a guest and check for any console errors.
  */
 

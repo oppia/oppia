@@ -25,15 +25,18 @@ oppia.directive('oppiaVisualizationFrequencyTable', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/visualizations/frequency_table_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$attrs', 'HtmlEscaperService',
-        function($scope, $attrs, HtmlEscaperService) {
-          $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
-          $scope.options =
+        '$attrs', 'HtmlEscaperService',
+        function($attrs, HtmlEscaperService) {
+          var ctrl = this;
+          ctrl.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+          ctrl.options =
             HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
-          $scope.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+          ctrl.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
         }
       ]
     };

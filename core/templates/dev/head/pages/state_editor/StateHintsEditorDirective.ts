@@ -16,6 +16,20 @@
  * @fileoverview Directive for the add and view hints section of the state
  * editor.
  */
+
+require('components/state/HintEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
+
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateHintsService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+require('pages/state_editor/state_properties/StateSolutionService.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+require('services/GenerateContentIdService.ts');
+
 oppia.directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

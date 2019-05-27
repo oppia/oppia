@@ -16,6 +16,8 @@
  * @fileoverview Directive for a schema-based editor for HTML.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('schemaBasedHtmlEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
