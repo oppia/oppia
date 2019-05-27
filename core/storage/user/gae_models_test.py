@@ -45,6 +45,28 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
 
+class StoryProgressModelTests(test_utils.GenericTestBase):
+
+    def test_get_multi(self):
+        model = user_models.StoryProgressModel.create(
+            'user_id', 'story_id_1')
+        model.user_id = 'user_id'
+        model.story_id = 'story_id_1'
+        model.put()
+
+        model = user_models.StoryProgressModel.create(
+            'user_id', 'story_id_2')
+        model.user_id = 'user_id'
+        model.story_id = 'story_id_2'
+        model.put()
+
+        story_progress_models = user_models.StoryProgressModel.get_multi(
+            'user_id', ['story_id_1', 'story_id_2'])
+        self.assertEqual(len(story_progress_models), 2)
+        self.assertEqual(story_progress_models[0].user_id, 'user_id')
+        self.assertEqual(story_progress_models[0].user_id, 'user_id')
+
+
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     """Tests for ExpUserLastPlaythroughModel class."""
 
@@ -172,6 +194,11 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             query_model.edited_at_least_n_exps, edited_at_least_n_exps)
         self.assertEqual(
             query_model.edited_fewer_than_n_exps, edited_fewer_than_n_exps)
+
+        query_models, _, _ = user_models.UserQueryModel.fetch_page(
+            1, None)
+        self.assertEqual(len(query_models), 1)
+        self.assertEqual(query_models[0].submitter_id, 'submitter')
 
 
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):

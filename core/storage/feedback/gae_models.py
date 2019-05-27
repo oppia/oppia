@@ -299,12 +299,8 @@ class GeneralFeedbackMessageModel(base_models.BaseModel):
             GeneralFeedbackMessageModel. Last message in the thread.
         """
         thread = GeneralFeedbackThreadModel.get_by_id(thread_id)
-        if thread.message_count:
-            most_recent_message = cls.get(thread_id, thread.message_count - 1)
-            return most_recent_message
-        else:
-            return cls.get_all().filter(
-                cls.thread_id == thread_id).order(-cls.last_updated).get()
+        most_recent_message = cls.get(thread_id, thread.message_count - 1)
+        return most_recent_message
 
     @classmethod
     def get_message_count(cls, thread_id):
