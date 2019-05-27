@@ -31,7 +31,8 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/exploration_graph.html'),
+        '/pages/exploration_editor/editor_tab/' +
+        'exploration_graph_directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$uibModal', 'AlertsService', 'EditabilityService',
