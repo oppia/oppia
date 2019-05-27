@@ -67,6 +67,7 @@ ONE_OFF_JOB_MANAGERS = [
     stats_jobs_one_off.StatisticsAudit,
     story_jobs_one_off.StoryMigrationOneOffJob,
     topic_jobs_one_off.TopicMigrationOneOffJob,
+    user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
     user_jobs_one_off.LongUserBiosOneOffJob,
     user_jobs_one_off.UserContributionsOneOffJob,

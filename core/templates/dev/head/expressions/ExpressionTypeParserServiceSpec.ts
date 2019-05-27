@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for Expression Type Parser Service.
+ */
+
 require('App.ts');
 require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');
