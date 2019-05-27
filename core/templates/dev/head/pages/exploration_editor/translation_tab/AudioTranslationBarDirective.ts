@@ -94,10 +94,10 @@ oppia.directive('audioTranslationBar', [
             $filter, $interval, $rootScope, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
-            IdGenerationService, SiteAnalyticsService, StateEditorService,
-            StateRecordedVoiceoversService, TranslationLanguageService,
-            TranslationTabActiveContentIdService, RECORDING_TIME_LIMIT,
-            VoiceoverRecordingService) {
+            IdGenerationService, SiteAnalyticsService,
+            StateEditorService, StateRecordedVoiceoversService,
+            TranslationLanguageService, TranslationTabActiveContentIdService,
+            RECORDING_TIME_LIMIT, VoiceoverRecordingService) {
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
           $scope.voiceoverRecorder = null;
@@ -418,7 +418,8 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.initAudioBar = function() {
-            // This stops the voiceoverRecorder when user navigate while recording.
+            // This stops the voiceoverRecorder when user navigates
+            // while recording.
             if ($scope.voiceoverRecorder) {
               if ($scope.voiceoverRecorder.status().isRecording &&
                 $scope.showRecorderWarning) {
