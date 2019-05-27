@@ -62,7 +62,8 @@ oppia.factory('VoiceoverRecordingService', ['$log', '$q', '$window',
 
     var _initRecorder = function() {
       // Browser agnostic AudioContext API check.
-      audioContextAvailable = $window.AudioContext || $window.webkitAudioContext;
+      audioContextAvailable = $window.AudioContext ||
+        $window.webkitAudioContext;
       if (audioContextAvailable) {
         // Promise required because angular is async with worker.
         defer = $q.defer();
@@ -151,7 +152,7 @@ oppia.factory('VoiceoverRecordingService', ['$log', '$q', '$window',
         return navigator;
       },
       stopRecord: function() {
-        if (mp3Worker != null) {
+        if (mp3Worker !== null) {
           _stopRecord();
         }
       },
