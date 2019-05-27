@@ -296,6 +296,50 @@ class StatisticsServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             exploration_stats.state_stats_mapping.keys(), ['Home', 'End'])
 
+    def test_revert_exploration_creates_stats(self):
+        """Test that the revert_exploration method creates stats
+        for the newest exploration version.
+        """
+        # Create exploration object in datastore.
+        exp_id = 'exp_id'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        # Save stats for version 1.
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exp_id, 1)
+        exploration_stats.num_starts_v2 = 3
+        exploration_stats.num_actual_starts_v2 = 2
+        exploration_stats.num_completions_v2 = 1
+        stats_services.save_stats_model_transactional(exploration_stats)
+
+        # Update exploration to next version 2 and its stats.
+        exp_services.update_exploration(
+            'committer_id_v2', exploration.id, [], 'Updated')
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exp_id, 2)
+        exploration_stats.num_starts_v2 = 4
+        exploration_stats.num_actual_starts_v2 = 3
+        exploration_stats.num_completions_v2 = 2
+        stats_services.save_stats_model_transactional(exploration_stats)
+
+        # Revert to an older version.
+        exp_services.revert_exploration(
+            'committer_id_v3', exp_id, current_version=2, revert_to_version=1)
+        exploration_stats = stats_services.get_exploration_stats_by_id(
+            exp_id, 3
+        )
+        self.assertIsNotNone(exploration_stats)
+        self.assertEqual(exploration_stats.num_starts_v2, 3)
+        self.assertEqual(exploration_stats.num_actual_starts_v2, 2)
+        self.assertEqual(exploration_stats.num_completions_v2, 1)
+
     def test_handle_stats_creation_for_new_exp_version(self):
         """Test the handle_stats_creation_for_new_exp_version method."""
         # Create exploration object in datastore.
