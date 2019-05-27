@@ -27,12 +27,12 @@ import feconf
 import schema_utils
 
 (
-    activity_models, audit_models, user_models, exp_models, collection_models,
-    feedback_models) = (
+    activity_models, audit_models, collection_models, email_models, exp_models,
+    feedback_models, user_models,) = (
         models.Registry.import_models([
-            models.NAMES.activity, models.NAMES.audit,
-            models.NAMES.user, models.NAMES.exploration,
-            models.NAMES.collection, models.NAMES.feedback]))
+            models.NAMES.activity, models.NAMES.audit, models.NAMES.collection,
+            models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+            models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -343,6 +343,204 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
         return [cls._validate_user_id_belongs_to_admin]
 
 
+class SentEmailModelValidator(BaseModelValidator):
+    """Class for validating SentEmailModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        regex_string = '%s\\.\\..*$' % item.intent
+        return regex_string
+
+    @classmethod
+    def _get_json_properties_schema(cls):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'recipient_id': (
+                user_models.UserSettingsModel, [item.recipient_id]),
+            'sender_id': (user_models.UserSettingsModel, [item.sender_id]),
+        }
+
+    @classmethod
+    def _validate_sent_datetime(cls, item):
+        """Validate that sent_datetime of model is less than current time.
+
+        Args:
+            item: SentEmailModel to validate.
+        """
+        current_datetime = datetime.datetime.utcnow()
+        if item.sent_datetime > current_datetime:
+            cls.errors['sent datetime check'] = (
+                'Model id %s: The sent_datetime field has a value %s which is '
+                'greater than the time when the job was run'
+                ) % (item.id, item.sent_datetime)
+
+    @classmethod
+    def _validate_sender_email(cls, item):
+        """Validate that sender email corresponds to email of user obtained
+        by using the sender_id.
+
+        Args:
+            item: SentEmailModel to validate.
+        """
+        _, sender_models = (cls.external_models['sender_id'])
+        sender_model = sender_models[0][1]
+        if sender_model and not sender_model.deleted:
+            if sender_model.email != item.sender_email:
+                cls.errors['sender email check'] = (
+                    'Model id %s: Sender email %s in model does not match '
+                    'with email %s of user obtained through sender id') % (
+                        item.id, item.sender_email, sender_model.email)
+
+    @classmethod
+    def _validate_recipient_email(cls, item):
+        """Validate that recipient email corresponds to email of user obtained
+        by using the recipient_id.
+
+        Args:
+            item: SentEmailModel to validate.
+        """
+        _, recipient_models = (cls.external_models['recipient_id'])
+        recipient_model = recipient_models[0][1]
+        if recipient_model and not recipient_model.deleted:
+            if recipient_model.email != item.recipient_email:
+                cls.errors['recipient email check'] = (
+                    'Model id %s: Recipient email %s in model does not match '
+                    'with email %s of user obtained through recipient id') % (
+                        item.id, item.recipient_email, recipient_model.email)
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [
+            cls._validate_sent_datetime, cls._validate_sender_email,
+            cls._validate_recipient_email]
+
+
+class BulkEmailModelValidator(BaseModelValidator):
+    """Class for validating BulkEmailModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'recipient_id': (
+                user_models.UserSettingsModel, item.recipient_ids),
+            'sender_id': (user_models.UserSettingsModel, [item.sender_id]),
+        }
+
+    @classmethod
+    def _validate_id_length(cls, item):
+        """Validate that model id has length 12.
+
+        Args:
+            item: BulkEmailModel to validate.
+        """
+        if len(item.id) != 12:
+            cls.errors['model id length check'] = (
+                'Model id %s: Model id should be of length 12 but instead has '
+                'length %s' % (item.id, len(item.id)))
+
+    @classmethod
+    def _validate_sent_datetime(cls, item):
+        """Validate that sent_datetime of model is less than current time.
+
+        Args:
+            item: BulkEmailModel to validate.
+        """
+        current_datetime = datetime.datetime.utcnow()
+        if item.sent_datetime > current_datetime:
+            cls.errors['sent datetime check'] = (
+                'Model id %s: The sent_datetime field has a value %s which is '
+                'greater than the time when the job was run'
+                ) % (item.id, item.sent_datetime)
+
+    @classmethod
+    def _validate_sender_email(cls, item):
+        """Validate that sender email corresponds to email of user obtained
+        by using the sender_id.
+
+        Args:
+            item: BulkEmailModel to validate.
+        """
+        _, sender_models = (cls.external_models['sender_id'])
+        sender_model = sender_models[0][1]
+        if sender_model and not sender_model.deleted:
+            if sender_model.email != item.sender_email:
+                cls.errors['sender email check'] = (
+                    'Model id %s: Sender email %s in model does not match '
+                    'with email %s of user obtained through sender id') % (
+                        item.id, item.sender_email, sender_model.email)
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [
+            cls._validate_id_length, cls._validate_sent_datetime,
+            cls._validate_sender_email]
+
+
+class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
+    """Class for validating GeneralFeedbackEmailReplyToIdModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'item.id.user_id': (
+                user_models.UserSettingsModel, [
+                    item.id[:item.id.find('.')]]),
+            'item.id.thread_id': (
+                feedback_models.GeneralFeedbackThreadModel, [
+                    item.id[item.id.find('.') + 1:]]),
+        }
+
+    @classmethod
+    def _validate_reply_to_id_length(cls, item):
+        """Validate that reply_to_id length is less than or equal to
+        REPLY_TO_ID_LENGTH.
+
+        Args:
+            item: GeneralFeedbackEmailReplyToIdModel to validate.
+        """
+        if len(item.reply_to_id) > email_models.REPLY_TO_ID_LENGTH:
+            cls.errors['reply_to_id length check'] = (
+                'Model id %s: reply_to_id %s should have length less than or '
+                'equal to %s but instead has length %s' % (
+                    item.id, item.reply_to_id, email_models.REPLY_TO_ID_LENGTH,
+                    len(item.reply_to_id)))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_reply_to_id_length]
+
+
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
 
@@ -440,8 +638,12 @@ class ExplorationModelValidator(BaseModelValidator):
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
-    user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
+    email_models.SentEmailModel: SentEmailModelValidator,
+    email_models.BulkEmailModel: BulkEmailModelValidator,
+    email_models.GeneralFeedbackEmailReplyToIdModel: (
+        GeneralFeedbackEmailReplyToIdModelValidator),
     exp_models.ExplorationModel: ExplorationModelValidator,
+    user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
 }
 
 

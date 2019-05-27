@@ -20,6 +20,7 @@ import datetime
 import math
 import random
 import time
+import types
 
 from constants import constants
 from core.domain import collection_domain
@@ -43,10 +44,13 @@ gae_search_services = models.Registry.import_search_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(activity_models, audit_models, base_models, user_models, exp_models) = (
-    models.Registry.import_models([
-        models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
-        models.NAMES.user, models.NAMES.exploration]))
+(
+    activity_models, audit_models, base_models, email_models, exp_models,
+    feedback_models, user_models,) = (
+        models.Registry.import_models([
+            models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
+            models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+            models.NAMES.user]))
 
 
 def run_job_and_check_output(
@@ -71,8 +75,8 @@ def run_job_and_check_output(
 
 class MockModelValidator(prod_validation_jobs_one_off.BaseModelValidator):
     """Class for validating mock models. The mock models are used to validate
-    invalid model ids and last_updated properties since these properties
-    cannot be altered in other models.
+    last_updated properties since this property cannot be altered in other
+    models.
     """
 
     MOCK_MODEL_ID_REGEX_STRING = '.'
@@ -204,7 +208,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             '[u"Model id featured: Model properties cannot be fetched '
             'completely with the error \'id\'"]]')]
 
-        run_job_and_check_output(self, expected_output)
+        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_type_in_activity_references(self):
         self.model_instance.activity_references = [{
@@ -244,7 +248,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             'ActivityReferencesModel\', '
             '[u\'Model id random: Model id does not match regex pattern\']]'
         )]
-        run_job_and_check_output(self, expected_output)
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
@@ -322,7 +326,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             'RoleQueryAuditModel\', '
             '[u\'Model id %s: User id %s in model does not belong to an '
             'admin\']]') % (model_id_with_non_admin_user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output)
+        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_id(self):
         model_invalid_id = '%s.%s.%s.%s' % (
@@ -339,6 +343,347 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             'RoleQueryAuditModel\', '
             '[u\'Model id %s: Model id does not match regex pattern\']]'
         ) % model_invalid_id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class SentEmailModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(SentEmailModelValidatorTests, self).setUp()
+
+        def mock_generate_hash(
+                unused_cls, unused_recipient_id, unused_email_subject,
+                unused_email_body):
+            return 'Email Hash'
+
+        self.sender_email = 'sender@email.com'
+        self.sender_id = 'sender'
+        self.sender_model = user_models.UserSettingsModel(
+            id=self.sender_id, email=self.sender_email)
+        self.sender_model.put()
+
+        self.recipient_email = 'recipient@email.com'
+        self.recipient_id = 'recipient'
+        self.recipient_model = user_models.UserSettingsModel(
+            id=self.recipient_id, email=self.recipient_email)
+        self.recipient_model.put()
+
+        with self.swap(
+            email_models.SentEmailModel, '_generate_hash',
+            types.MethodType(mock_generate_hash, email_models.SentEmailModel)):
+            email_models.SentEmailModel.create(
+                self.recipient_id, self.recipient_email, self.sender_id,
+                self.sender_email, feconf.EMAIL_INTENT_SIGNUP,
+                'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+        self.model_instance = email_models.SentEmailModel.get_by_hash(
+            'Email Hash')[0]
+
+        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
+            email_models.SentEmailModel:
+                prod_validation_jobs_one_off.SentEmailModelValidator,
+        }
+
+    def test_standard_model(self):
+        expected_output = [u'[u\'fully-validated SentEmailModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of SentEmailModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_sender_id(self):
+        self.sender_model.delete()
+        expected_output = [(
+            u'[u\'failed validation check for sender_id field check of '
+            'SentEmailModel\', '
+            '[u"Model id %s: based on field sender_id having value '
+            '%s, expect model UserSettingsModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.sender_id, self.sender_id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_recipient_id(self):
+        self.recipient_model.delete()
+        expected_output = [(
+            u'[u\'failed validation check for recipient_id field check of '
+            'SentEmailModel\', '
+            '[u"Model id %s: based on field recipient_id having value '
+            '%s, expect model UserSettingsModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.recipient_id, self.recipient_id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_sender_email(self):
+        self.sender_model.email = 'random@email.com'
+        self.sender_model.put()
+        expected_output = [(
+            u'[u\'failed validation check for sender email check of '
+            'SentEmailModel\', '
+            '[u\'Model id %s: Sender email %s in model does not match with '
+            'email %s of user obtained through sender id\']]') % (
+                self.model_instance.id, self.model_instance.sender_email,
+                self.sender_model.email)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_recipient_email(self):
+        self.recipient_model.email = 'random@email.com'
+        self.recipient_model.put()
+        expected_output = [(
+            u'[u\'failed validation check for recipient email check of '
+            'SentEmailModel\', '
+            '[u\'Model id %s: Recipient email %s in model does not match with '
+            'email %s of user obtained through recipient id\']]') % (
+                self.model_instance.id, self.model_instance.recipient_email,
+                self.recipient_model.email)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_sent_datetime_greater_than_current_time(self):
+        self.model_instance.sent_datetime = (
+            datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for sent datetime check of '
+            'SentEmailModel\', '
+            '[u\'Model id %s: The sent_datetime field has a value %s '
+            'which is greater than the time when the job was run\']]') % (
+                self.model_instance.id, self.model_instance.sent_datetime)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_id(self):
+        model_instance_with_invalid_id = email_models.SentEmailModel(
+            id='random', recipient_id=self.recipient_id,
+            recipient_email=self.recipient_email, sender_id=self.sender_id,
+            sender_email=self.sender_email, intent=feconf.EMAIL_INTENT_SIGNUP,
+            subject='Email Subject', html_body='Email Body',
+            sent_datetime=datetime.datetime.utcnow())
+        model_instance_with_invalid_id.put()
+        expected_output = [(
+            u'[u\'fully-validated SentEmailModel\', 1]'
+        ), (
+            u'[u\'failed validation check for model id check of '
+            'SentEmailModel\', '
+            '[u\'Model id %s: Model id does not match regex pattern\']]'
+        ) % 'random']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(BulkEmailModelValidatorTests, self).setUp()
+
+        self.sender_email = 'sender@email.com'
+        self.sender_id = 'sender'
+        self.sender_model = user_models.UserSettingsModel(
+            id=self.sender_id, email=self.sender_email)
+        self.sender_model.put()
+
+        self.recipient_ids = ['recipient1', 'recipient2']
+        self.recipient_model_1 = user_models.UserSettingsModel(
+            id=self.recipient_ids[0], email='recipient1@email.com')
+        self.recipient_model_1.put()
+        self.recipient_model_2 = user_models.UserSettingsModel(
+            id=self.recipient_ids[1], email='recipient2@email.com')
+        self.recipient_model_2.put()
+
+        self.model_id = 'bulkemailid1'
+        email_models.BulkEmailModel.create(
+            self.model_id, self.recipient_ids, self.sender_id,
+            self.sender_email, feconf.BULK_EMAIL_INTENT_MARKETING,
+            'Email Subject', 'Email Body', datetime.datetime.utcnow())
+        self.model_instance = email_models.BulkEmailModel.get_by_id(
+            self.model_id)
+
+        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
+            email_models.BulkEmailModel:
+                prod_validation_jobs_one_off.BulkEmailModelValidator,
+        }
+
+    def test_standard_model(self):
+        expected_output = [u'[u\'fully-validated BulkEmailModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of BulkEmailModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_sender_id(self):
+        self.sender_model.delete()
+        expected_output = [(
+            u'[u\'failed validation check for sender_id field check of '
+            'BulkEmailModel\', '
+            '[u"Model id %s: based on field sender_id having value '
+            '%s, expect model UserSettingsModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.sender_id, self.sender_id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_recipient_id(self):
+        self.recipient_model_1.delete()
+        expected_output = [(
+            u'[u\'failed validation check for recipient_id field check of '
+            'BulkEmailModel\', '
+            '[u"Model id %s: based on field recipient_id having value '
+            '%s, expect model UserSettingsModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.recipient_ids[0],
+                self.recipient_ids[0])]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_sender_email(self):
+        self.sender_model.email = 'random@email.com'
+        self.sender_model.put()
+        expected_output = [(
+            u'[u\'failed validation check for sender email check of '
+            'BulkEmailModel\', '
+            '[u\'Model id %s: Sender email %s in model does not match with '
+            'email %s of user obtained through sender id\']]') % (
+                self.model_instance.id, self.model_instance.sender_email,
+                self.sender_model.email)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_sent_datetime_greater_than_current_time(self):
+        self.model_instance.sent_datetime = (
+            datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for sent datetime check of '
+            'BulkEmailModel\', '
+            '[u\'Model id %s: The sent_datetime field has a value %s '
+            'which is greater than the time when the job was run\']]') % (
+                self.model_instance.id, self.model_instance.sent_datetime)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_id(self):
+        model_instance_with_invalid_id = email_models.BulkEmailModel(
+            id='random', recipient_ids=self.recipient_ids,
+            sender_id=self.sender_id, sender_email=self.sender_email,
+            intent=feconf.BULK_EMAIL_INTENT_MARKETING,
+            subject='Email Subject', html_body='Email Body',
+            sent_datetime=datetime.datetime.utcnow())
+        model_instance_with_invalid_id.put()
+        expected_output = [(
+            u'[u\'fully-validated BulkEmailModel\', 1]'
+        ), (
+            u'[u\'failed validation check for model id length check of '
+            'BulkEmailModel\', '
+            '[u\'Model id %s: Model id should be of length 12 but instead has '
+            'length 6\']]'
+        ) % 'random']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class GeneralFeedbackEmailReplyToIdModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(GeneralFeedbackEmailReplyToIdModelValidatorTests, self).setUp()
+
+        self.thread_id = feedback_services.create_thread(
+            'exploration', 'exp_id', None, 'a subject', 'some text')
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        self.model_instance = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                self.user_id, self.thread_id))
+        self.model_instance.put()
+
+        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
+            email_models.GeneralFeedbackEmailReplyToIdModel:
+                prod_validation_jobs_one_off.
+                GeneralFeedbackEmailReplyToIdModelValidator,
+        }
+
+    def test_standard_model(self):
+        expected_output = [(
+            u'[u\'fully-validated GeneralFeedbackEmailReplyToIdModel\', 1]')]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of GeneralFeedbackEmailReplyToIdModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_user_id(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [(
+            u'[u\'failed validation check for item.id.user_id field check of '
+            'GeneralFeedbackEmailReplyToIdModel\', '
+            '[u"Model id %s: based on field item.id.user_id having value '
+            '%s, expect model UserSettingsModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.user_id, self.user_id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_thread_id(self):
+        feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id).delete()
+        expected_output = [(
+            u'[u\'failed validation check for item.id.thread_id field check of '
+            'GeneralFeedbackEmailReplyToIdModel\', '
+            '[u"Model id %s: based on field item.id.thread_id having value '
+            '%s, expect model GeneralFeedbackThreadModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.thread_id, self.thread_id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_reply_to_id(self):
+        while len(
+                self.model_instance.reply_to_id) < (
+                    email_models.REPLY_TO_ID_LENGTH):
+            self.model_instance.reply_to_id = (
+                self.model_instance.reply_to_id + 'random')
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for reply_to_id length check of '
+            'GeneralFeedbackEmailReplyToIdModel\', '
+            '[u\'Model id %s: reply_to_id %s should have length less than or '
+            'equal to %s but instead has length %s\']]'
+        ) % (
+            self.model_instance.id, self.model_instance.reply_to_id,
+            email_models.REPLY_TO_ID_LENGTH,
+            len(self.model_instance.reply_to_id))]
         run_job_and_check_output(self, expected_output)
 
 
