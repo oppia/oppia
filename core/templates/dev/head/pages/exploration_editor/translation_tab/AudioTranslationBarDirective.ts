@@ -422,7 +422,7 @@ oppia.directive('audioTranslationBar', [
             if ($scope.voiceoverRecorder) {
               if ($scope.voiceoverRecorder.status().isRecording &&
                 $scope.showRecorderWarning) {
-                $scope.voiceoverRecorder.stopRecording();
+                $scope.voiceoverRecorder.stopRecord();
                 cancelTimer();
                 $scope.voiceoverRecorder.closeRecorder();
               }
