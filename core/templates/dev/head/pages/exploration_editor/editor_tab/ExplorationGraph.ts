@@ -46,8 +46,8 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
         ctrl.getGraphData = GraphDataService.getGraphData;
         ctrl.isEditable = EditabilityService.isEditable;
 
-        // We hide the graph at the outset in order not to confuse new exploration
-        // creators.
+        // We hide the graph at the outset in order not to confuse new
+        // exploration creators.
         ctrl.isGraphShown = function() {
           return Boolean(ExplorationStatesService.isInitialized() &&
             ExplorationStatesService.getStateNames().length > 1);
@@ -84,7 +84,8 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
               'GraphDataService', 'isEditable',
               function($scope, $uibModalInstance, StateEditorService,
                   GraphDataService, isEditable) {
-                $scope.currentStateName = StateEditorService.getActiveStateName();
+                $scope.currentStateName = StateEditorService
+                  .getActiveStateName();
                 $scope.graphData = GraphDataService.getGraphData();
                 $scope.isEditable = isEditable;
 
