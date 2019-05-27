@@ -17,10 +17,10 @@
  */
 
 require(
-  'components/common-layout-directives/background-banner/' +
+  'components/common-layout-directives/element-templates/' +
   'background-banner.directive.ts');
 require(
-  'components/common-layout-directives/loading-dots/loading-dots.directive.ts');
+  'components/common-layout-directives/element-templates/loading-dots.directive.ts');
 require(
   'components/summary-tile-directives/collection-summary-tile/'+
   'collection-summary-tile.directive.ts');
@@ -34,7 +34,7 @@ require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
-  'thread-status-display/thread-status-display.service.ts');
+  'thread-status-display.service.ts');
 require(
   'pages/show-suggestion-editor-pages/show-suggestion-modal-for-learner-view/' +
   'show-suggestion-modal-for-learner-view.service.ts');

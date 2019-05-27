@@ -17,10 +17,10 @@
  */
 
 require(
-  'components/forms/forms-directives/select2-dropdown/' +
+  'components/forms/forms-directives/' +
   'select2-dropdown.directive.ts');
 require(
-  'components/common-layout-directives/loading-dots/' +
+  'components/common-layout-directives/element-templates/' +
   'loading-dots.directive.ts');
 
 require('domain/collection/CollectionRightsBackendApiService.ts');
@@ -29,7 +29,7 @@ require('domain/collection/CollectionValidationService.ts');
 require('domain/collection/EditableCollectionBackendApiService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page/collection-editor-page-services/collection-editor-state/collection-editor-state.service.ts');
+require('pages/collection-editor-page/collection-editor-page-services/collection-editor-state.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'router.service.ts');

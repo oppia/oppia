@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/attribution-guide/' +
+  'components/common-layout-directives/element-templates/' +
   'attribution-guide.directive.ts');
 require(
   'pages/exploration-editor-page/translation-tab/state-translation/' +
@@ -33,10 +33,10 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-data/exploration-data.service.ts');
+  'exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'state-tutorial-first-time.service.ts');

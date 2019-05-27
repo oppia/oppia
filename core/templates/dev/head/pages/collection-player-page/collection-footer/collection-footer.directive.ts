@@ -18,7 +18,7 @@
  */
 
 require(
-  'components/common-layout-directives/sharing-links/' +
+  'components/common-layout-directives/element-templates/' +
   'sharing-links.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

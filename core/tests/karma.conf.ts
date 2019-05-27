@@ -68,7 +68,7 @@ module.exports = function(config) {
        'rating-display.directive.spec.ts'),
       ('core/templates/dev/head/pages/exploration-editor-page/' +
        'exploration-editor-tab/exploration-editor-tab-services/' +
-       'solution-verification/solution-verification.service.spec.ts'),
+       'solution-verification.service.spec.ts'),
       ('core/templates/dev/head/pages/exploration-editor-page/' +
        'exploration-editor-tab/state-name-editor/' +
        'state-name-editor.directive.spec.ts'),

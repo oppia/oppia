@@ -23,16 +23,16 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-data/exploration-data.service.ts');
+  'exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'router.service.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab-services/' +
-  'state-improvement-suggestion/state-improvement-suggestion.service.ts'
+  'state-improvement-suggestion.service.ts'
 );
 require('services/AlertsService.ts');
 require('services/ComputeGraphService.ts');

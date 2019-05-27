@@ -17,10 +17,10 @@
  */
 
 require(
-  'components/entity-creation-services/skill-creation/' +
+  'components/entity-creation-services/' +
   'skill-creation.service.ts');
 require(
-  'components/entity-creation-services/topic-creation/' +
+  'components/entity-creation-services/' +
   'topic-creation.service.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');

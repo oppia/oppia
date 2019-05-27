@@ -26,7 +26,7 @@ require(
   'editor-first-time-events.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/interaction-details-cache/' +
+  'exploration-editor-tab-services/' +
   'interaction-details-cache.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
@@ -219,7 +219,7 @@ oppia.directive('stateInteractionEditor', [
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/exploration-editor-tab/' +
-                  'exploration-editor-tab-templates/' +
+                  'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
                   'customize-interaction-modal.template.html'),
                 backdrop: true,
                 resolve: {},
@@ -418,7 +418,7 @@ oppia.directive('stateInteractionEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/' +
+                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
                 'delete-interaction-modal.template.html'),
               backdrop: true,
               controller: [

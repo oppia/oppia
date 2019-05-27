@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/profile-link-directives/circular-image/' +
+  'components/profile-link-directives/' +
   'circular-image.directive.ts');
 require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
 require('filters/summarize-nonnegative-number.filter.ts');

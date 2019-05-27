@@ -21,7 +21,7 @@ require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
-require('pages/exploration-editor-page/exploration-editor-tab/exploration-editor-tab-services/solution-verification/solution-verification.service.ts');
+require('pages/exploration-editor-page/exploration-editor-tab/exploration-editor-tab-services/solution-verification.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');

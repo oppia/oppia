@@ -17,9 +17,9 @@
  */
 
 require('pages/collection-editor-page/settings-tab/' +
-  'collection-details-editor/collection-details-editor.directive.ts');
+  'collection-details-editor.directive.ts');
 require('pages/collection-editor-page/settings-tab/' +
-  'collection-permissions-card/collection-permissions-card.directive.ts');
+  'collection-permissions-card.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 

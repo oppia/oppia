@@ -19,7 +19,7 @@
 require('filters/format-timer.filter.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
   'translation-language/translation-language.service.ts');

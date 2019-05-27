@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'graph-data.service.ts');
@@ -68,7 +68,7 @@ oppia.controller('ExplorationGraph', [
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/exploration-editor-page/exploration-editor-tab/' +
-          'exploration-editor-tab-templates/' +
+          'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
           'exploration-graph-modal.template.html'),
         backdrop: true,
         resolve: {

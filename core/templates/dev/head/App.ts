@@ -43,22 +43,22 @@ require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
 
 require(
-  'components/common-layout-directives/alert-message/' +
+  'components/common-layout-directives/element-templates/' +
   'alert-message.directive.ts');
 require(
   'components/button-directives/' +
   'create-activity-button.directive.ts');
 
 require(
-  'components/forms/forms-directives/object-editor/object-editor.directive.ts');
-require('components/common-layout-directives/promo-bar/promo-bar.directive.ts');
+  'components/forms/forms-directives/object-editor.directive.ts');
+require('components/common-layout-directives/element-templates/promo-bar.directive.ts');
 require(
-  'components/common-layout-directives/side-navigation-bar/' +
+  'components/common-layout-directives/bar-layouts/' +
   'side-navigation-bar.directive.ts');
 require(
   'components/button-directives/social-buttons.directive.ts');
 require(
-  'components/common-layout-directives/top-navigation-bar/' +
+  'components/common-layout-directives/bar-layouts/' +
   'top-navigation-bar.directive.ts');
 
 require('domain/sidebar/SidebarStatusService.ts');

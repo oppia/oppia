@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/loading-dots/' +
+  'components/common-layout-directives/element-templates/' +
   'loading-dots.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -26,7 +26,7 @@ require(
   'change-list.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-rights/exploration-rights.service.ts');
+  'exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-save.service.ts');

@@ -20,15 +20,15 @@
 require('domain/exploration/OutcomeObjectFactory.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/answer-groups-cache/' +
+  'exploration-editor-tab-services/' +
   'answer-groups-cache.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/solution-validity/' +
+  'exploration-editor-tab-services/' +
   'solution-validity.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/solution-verification/' +
+  'exploration-editor-tab-services/' +
   'solution-verification.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +

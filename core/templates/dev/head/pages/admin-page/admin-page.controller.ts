@@ -25,26 +25,26 @@ require('components/forms/forms-validators/is-float.filter.ts');
 require('components/forms/forms-validators/is-integer.filter.ts');
 require('components/forms/forms-validators/is-nonempty.filter.ts');
 require(
-  'components/forms/forms-directives/apply-validation/' +
+  'components/forms/forms-directives/' +
   'apply-validation.directive.ts');
 require(
-  'components/forms/forms-directives/object-editor/' +
+  'components/forms/forms-directives/' +
   'object-editor.directive.ts');
 require(
-  'components/forms/forms-directives/require-is-float/' +
+  'components/forms/forms-directives/' +
   'require-is-float.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-bool-editor/schema-based-bool-editor.directive.ts');
+  'schema-based-bool-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-choices-editor/schema-based-choices-editor.directive.ts');
+  'schema-based-choices-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-custom-editor/schema-based-custom-editor.directive.ts');
+  'schema-based-custom-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+  'schema-based-dict-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
   'schema-based-editor.directive.ts');
@@ -52,19 +52,19 @@ require(
   'components/forms/forms-schema-editors/schema-based-expression-editor/schema-based-expression-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-float-editor/schema-based-float-editor.directive.ts');
+  'schema-based-float-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-html-editor/schema-based-html-editor.directive.ts');
+  'schema-based-html-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-int-editor/schema-based-int-editor.directive.ts');
+  'schema-based-int-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+  'schema-based-list-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+  'schema-based-unicode-editor.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('pages/admin-page/admin-navbar/admin-navbar.directive.ts');
@@ -82,7 +82,7 @@ require('pages/admin-page/roles-tab/admin-roles-tab.directive.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/admin-page/admin-page-services/admin-router/admin-router.service.ts');
+  'pages/admin-page/admin-page-services/admin-router.service.ts');
 require('services/UtilsService.ts');
 
 oppia.controller('Admin', [

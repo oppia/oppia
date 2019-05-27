@@ -18,7 +18,7 @@
  */
 
 require(
-  'components/common-layout-directives/loading-dots/' +
+  'components/common-layout-directives/element-templates/' +
   'loading-dots.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -220,7 +220,7 @@ oppia.directive('versionDiffVisualization', [
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/' +
-              'exploration-editor-page-templates/' +
+              'exploration-editor-page-modal-templates/' +
               'state-diff-modal.template.html'),
             backdrop: true,
             windowClass: 'state-diff-modal',

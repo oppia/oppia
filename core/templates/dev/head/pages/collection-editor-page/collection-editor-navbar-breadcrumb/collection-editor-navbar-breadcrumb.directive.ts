@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/collection-editor-page/collection-editor-page-services/' +
-  'collection-editor-state/collection-editor-state.service.ts');
+  'collection-editor-state.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'router.service.ts');

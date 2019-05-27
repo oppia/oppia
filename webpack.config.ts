@@ -49,7 +49,7 @@ module.exports = {
       commonPrefix + '/pages/email-dashboard-page/' +
       'email-dashboard-page.controller.ts',
     email_dashboard_result:
-      commonPrefix + '/pages/email-dashboard-page/email-dashboard-result/' +
+      commonPrefix + '/pages/email-dashboard-page/' +
       'email-dashboard-result.controller.ts',
     error: commonPrefix + '/pages/error-page/error-page.controller.ts',
     exploration_editor:
@@ -184,7 +184,7 @@ module.exports = {
       chunks: ['email_dashboard_result'],
       filename: 'email-dashboard-result.mainpage.html',
       template:
-        commonPrefix + '/pages/email-dashboard-page/email-dashboard-result/' +
+        commonPrefix + '/pages/email-dashboard-page/' +
         'email-dashboard-result.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false

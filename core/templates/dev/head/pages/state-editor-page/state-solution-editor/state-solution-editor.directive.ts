@@ -28,11 +28,11 @@ require(
   'exploration-editor-tab-services/responses.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/solution-validity/' +
+  'exploration-editor-tab-services/' +
   'solution-validity.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/solution-verification/' +
+  'exploration-editor-tab-services/' +
   'solution-verification.service.ts');
 require('pages/exploration-player-page/exploration-player-page-services/current-interaction/current-interaction.service.ts');
 require(
@@ -151,7 +151,7 @@ oppia.directive('stateSolutionEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/' +
+                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
                 'add-or-update-solution-modal.template.html'),
               backdrop: 'static',
               controller: [
@@ -266,7 +266,7 @@ oppia.directive('stateSolutionEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/' +
+                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
                 'delete-solution-modal.template.html'),
               backdrop: true,
               controller: [

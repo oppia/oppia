@@ -23,7 +23,7 @@ require(
   'changes-in-human-readable-form.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-data/exploration-data.service.ts');
+  'exploration-data.service.ts');
 require('services/LocalStorageService.ts');
 
 oppia.factory(
@@ -47,7 +47,7 @@ oppia.factory(
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/' +
-              'exploration-editor-page-templates/' +
+              'exploration-editor-page-modal-templates/' +
               'save-validation-fail-modal.template.html'),
             // Prevent modal from closing when the user clicks outside it.
             backdrop: 'static',
@@ -75,7 +75,7 @@ oppia.factory(
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/' +
-              'exploration-editor-page-templates/' +
+              'exploration-editor-page-modal-templates/' +
               'save-version-mismatch-modal.template.html'),
             // Prevent modal from closing when the user clicks outside it.
             backdrop: 'static',
@@ -111,7 +111,7 @@ oppia.factory(
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/' +
-              'exploration-editor-page-templates/' +
+              'exploration-editor-page-modal-templates/' +
               'lost-changes-modal.template.html'),
             // Prevent modal from closing when the user clicks outside it.
             backdrop: 'static',

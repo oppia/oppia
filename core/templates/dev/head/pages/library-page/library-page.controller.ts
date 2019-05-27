@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/loading-dots/loading-dots.directive.ts');
+  'components/common-layout-directives/element-templates/loading-dots.directive.ts');
 require(
   'components/summary-tile-directives/exploration-summary-tile/' +
   'exploration-summary-tile.directive.ts');

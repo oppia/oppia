@@ -18,31 +18,31 @@
 
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-bool-editor/schema-based-bool-editor.directive.ts');
+  'schema-based-bool-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-choices-editor/schema-based-choices-editor.directive.ts');
+  'schema-based-choices-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-custom-editor/schema-based-custom-editor.directive.ts');
+  'schema-based-custom-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+  'schema-based-dict-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-float-editor/schema-based-float-editor.directive.ts');
+  'schema-based-float-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-html-editor/schema-based-html-editor.directive.ts');
+  'schema-based-html-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-int-editor/schema-based-int-editor.directive.ts');
+  'schema-based-int-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+  'schema-based-list-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+  'schema-based-unicode-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 

@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/admin-page/admin-page-services/admin-router/admin-router.service.ts');
+  'pages/admin-page/admin-page-services/admin-router.service.ts');
 require('services/UserService.ts');
 
 require('pages/admin-page/admin-page.constants.ts');

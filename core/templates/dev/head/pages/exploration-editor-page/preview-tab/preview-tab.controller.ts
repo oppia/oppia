@@ -25,7 +25,7 @@ require(
   'exploration-category.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-data/exploration-data.service.ts');
+  'exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-init-state-name.service.ts');
@@ -37,7 +37,7 @@ require(
   'exploration-param-specs.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-title.service.ts');

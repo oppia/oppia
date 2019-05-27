@@ -19,10 +19,10 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-rights/exploration-rights.service.ts');
+  'exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
@@ -105,7 +105,7 @@ oppia.directive(
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/exploration-editor-page/exploration-editor-tab/' +
-                  'exploration-editor-tab-templates/' +
+                  'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
                   'teach-oppia-modal.template.html'),
                 backdrop: true,
                 controller: [

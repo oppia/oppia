@@ -82,7 +82,7 @@ oppia.factory('RteHelperService', [
         $document[0].execCommand('enableObjectResizing', false, false);
         var modalDialog = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/forms/forms-templates/' +
+            '/components/components-templates/' +
             'customize-rte-component-modal.template.html'),
           backdrop: 'static',
           resolve: {},

@@ -22,7 +22,7 @@ require(
   'exploration-param-changes.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'graph-data.service.ts');
@@ -31,7 +31,7 @@ require(
   'parameter-metadata.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/solution-validity/solution-validity.service.ts');
+  'exploration-editor-tab-services/solution-validity.service.ts');
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 

@@ -36,19 +36,19 @@ require('components/forms/forms-validators/is-float.filter.ts');
 require('components/forms/forms-validators/is-integer.filter.ts');
 require('components/forms/forms-validators/is-nonempty.filter.ts');
 require(
-  'components/forms/forms-directives/apply-validation/' +
+  'components/forms/forms-directives/' +
   'apply-validation.directive.ts');
 require(
-  'components/forms/forms-directives/require-is-float/' +
+  'components/forms/forms-directives/' +
   'require-is-float.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-custom-editor/schema-based-custom-editor.directive.ts');
+  'schema-based-custom-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+  'schema-based-dict-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
   'schema-based-editor.directive.ts');
@@ -57,19 +57,19 @@ require(
   'schema-based-expression-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-float-editor/schema-based-float-editor.directive.ts');
+  'schema-based-float-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-html-editor/schema-based-html-editor.directive.ts');
+  'schema-based-html-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-int-editor/schema-based-int-editor.directive.ts');
+  'schema-based-int-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+  'schema-based-list-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+  'schema-based-unicode-editor.directive.ts');
 require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
@@ -86,7 +86,7 @@ require('services/SchemaUndefinedLastElementService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 require('services/GenerateContentIdService.ts');
 require(
-  'components/common-layout-directives/loading-dots/' +
+  'components/common-layout-directives/element-templates/' +
   'loading-dots.directive.ts');
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');

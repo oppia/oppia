@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/sharing-links/' +
+  'components/common-layout-directives/element-templates/' +
   'sharing-links.directive.ts');
 
 require('domain/exploration/StatesObjectFactory.ts');
@@ -33,7 +33,7 @@ require(
   'exploration-category.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-data/exploration-data.service.ts');
+  'exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-diff.service.ts');
@@ -48,10 +48,10 @@ require(
   'exploration-objective.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-rights/exploration-rights.service.ts');
+  'exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-tags.service.ts');
@@ -135,7 +135,7 @@ oppia.factory(
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/' +
-            'exploration-editor-page-templates/' +
+            'exploration-editor-page-modal-templates/' +
             'post-publish-modal.template.html'),
           backdrop: true,
           controller: [
@@ -178,7 +178,7 @@ oppia.factory(
         var publishModalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/' +
-            'exploration-editor-page-templates/' +
+            'exploration-editor-page-modal-templates/' +
             'exploration-publish-modal.template.html'),
           backdrop: 'static',
           controller: [
@@ -280,7 +280,7 @@ oppia.factory(
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/' +
-              'exploration-editor-page-templates/' +
+              'exploration-editor-page-modal-templates/' +
               'confirm-discard-changes-modal.template.html'),
             backdrop: 'static',
             keyboard: false,
@@ -302,7 +302,7 @@ oppia.factory(
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/' +
-                'exploration-editor-page-templates/' +
+                'exploration-editor-page-modal-templates/' +
                 'editor-reloading-modal.template.html'),
               backdrop: 'static',
               keyboard: false,
@@ -344,7 +344,7 @@ oppia.factory(
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/' +
-                'exploration-editor-page-templates/' +
+                'exploration-editor-page-modal-templates/' +
                 'exploration-metadata-modal.template.html'),
               backdrop: 'static',
               controller: [
@@ -573,7 +573,7 @@ oppia.factory(
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/' +
-                'exploration-editor-page-templates/' +
+                'exploration-editor-page-modal-templates/' +
                 'exploration-save-modal.template.html'),
               backdrop: true,
               resolve: {

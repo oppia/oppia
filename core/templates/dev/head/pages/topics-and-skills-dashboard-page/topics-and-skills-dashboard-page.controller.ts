@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/background-banner/' +
+  'components/common-layout-directives/element-templates/' +
   'background-banner.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/skills-list/' +
@@ -35,10 +35,10 @@ require(
   'topics-list.directive.ts');
 
 require(
-  'components/entity-creation-services/skill-creation/' +
+  'components/entity-creation-services/' +
   'skill-creation.service.ts');
 require(
-  'components/entity-creation-services/topic-creation/' +
+  'components/entity-creation-services/' +
   'topic-creation.service.ts');
 require(
   'domain/topics_and_skills_dashboard/' +

@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/forms/forms-directives/apply-validation/' +
+  'components/forms/forms-directives/' +
   'apply-validation.directive.ts');
 require(
   'components/forms/forms-unicode-filters/' +
@@ -29,7 +29,7 @@ require(
   'components/forms/forms-unicode-filters/' +
   'convert-unicode-with-params-to-html.filter.ts');
 require(
-  'components/forms/forms-directives/require-is-float/' +
+  'components/forms/forms-directives/' +
   'require-is-float.directive.ts');
 require('components/forms/forms-validators/is-at-least.filter.ts');
 require('components/forms/forms-validators/is-at-most.filter.ts');

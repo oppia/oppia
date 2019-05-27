@@ -24,10 +24,10 @@ require(
 // ^^^ this block of requires should be removed ^^^
 
 require(
-  'components/common-layout-directives/attribution-guide/' +
+  'components/common-layout-directives/element-templates/' +
   'attribution-guide.directive.ts');
 require(
-  'components/common-layout-directives/background-banner/' +
+  'components/common-layout-directives/element-templates/' +
   'background-banner.directive.ts');
 require(
   'components/summary-tile-directives/exploration-summary-tile/' +

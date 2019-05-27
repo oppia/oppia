@@ -17,10 +17,10 @@
  */
 
 require(
-  'components/entity-creation-services/collection-creation/' +
+  'components/entity-creation-services/' +
   'collection-creation.service.ts');
 require(
-  'components/entity-creation-services/exploration-creation/' +
+  'components/entity-creation-services/' +
   'exploration-creation.service.ts');
 require('domain/utilities/BrowserCheckerService.ts');
 require('services/contextual/UrlService.ts');
@@ -88,7 +88,7 @@ oppia.directive('createActivityButton', [
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/creator-dashboard-page/' +
-                  'creator-dashboard-page-templates/' +
+                  'creator-dashboard-page-modal-templates/' +
                   'create-activity-modal.directive.html'),
                 backdrop: true,
                 controller: [

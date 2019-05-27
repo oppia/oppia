@@ -22,7 +22,7 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
-  'thread-status-display/thread-status-display.service.ts');
+  'thread-status-display.service.ts');
 require('services/DateTimeFormatService.ts');
 
 oppia.directive('threadTable', [

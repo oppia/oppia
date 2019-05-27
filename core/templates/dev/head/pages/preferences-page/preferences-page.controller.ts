@@ -17,13 +17,13 @@
  */
 
 require(
-  'components/forms/forms-directives/select2-dropdown/' +
+  'components/forms/forms-directives/' +
   'select2-dropdown.directive.ts');
 require(
-  'components/forms/forms-directives/image-uploader/' +
+  'components/forms/forms-directives/' +
   'image-uploader.directive.ts');
 require(
-  'components/common-layout-directives/background-banner/' +
+  'components/common-layout-directives/element-templates/' +
   'background-banner.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 

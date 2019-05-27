@@ -23,7 +23,7 @@ require(
   'exploration-property.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-rights/exploration-rights.service.ts');
+  'exploration-rights.service.ts');
 require('services/ValidatorsService.ts');
 
 oppia.factory(

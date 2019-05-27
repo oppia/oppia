@@ -25,10 +25,10 @@ require(
   'components/ck-editor-helpers/' +
   'ck-editor-widgets.initializer.ts');
 require(
-  'components/forms/forms-directives/apply-validation/' +
+  'components/forms/forms-directives/' +
   'apply-validation.directive.ts');
 require(
-  'components/forms/forms-directives/audio-file-uploader/' +
+  'components/forms/forms-directives/' +
   'audio-file-uploader.directive.ts');
 require(
   'components/forms/forms-unicode-filters/' +
@@ -38,25 +38,25 @@ require(
 require(
   'components/forms/forms-unicode-filters/convert-unicode-to-html.filter.ts');
 require(
-  'components/forms/forms-directives/require-is-float/' +
+  'components/forms/forms-directives/' +
   'require-is-float.directive.ts');
 require(
-  'components/forms/forms-directives/image-uploader/' +
+  'components/forms/forms-directives/' +
   'image-uploader.directive.ts');
 require(
-  'components/forms/forms-directives/html-select/html-select.directive.ts');
+  'components/forms/forms-directives/html-select.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-bool-editor/schema-based-bool-editor.directive.ts');
+  'schema-based-bool-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-choices-editor/schema-based-choices-editor.directive.ts');
+  'schema-based-choices-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-custom-editor/schema-based-custom-editor.directive.ts');
+  'schema-based-custom-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+  'schema-based-dict-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
   'schema-based-editor.directive.ts');
@@ -65,19 +65,19 @@ require(
   'schema-based-expression-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-float-editor/schema-based-float-editor.directive.ts');
+  'schema-based-float-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-html-editor/schema-based-html-editor.directive.ts');
+  'schema-based-html-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-int-editor/schema-based-int-editor.directive.ts');
+  'schema-based-int-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+  'schema-based-list-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+  'schema-based-unicode-editor.directive.ts');
 require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
@@ -96,10 +96,10 @@ require(
 require('components/state/hint-editor/hint-editor.directive.ts');
 require('components/state/outcome-editor/outcome-editor.directive.ts');
 require(
-  'components/state/outcome-editor/outcome-destination-editor/' +
+  'components/state/outcome-editor/' +
   'outcome-destination-editor.directive.ts');
 require(
-  'components/state/outcome-editor/outcome-feedback-editor/' +
+  'components/state/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
 require('components/state/response-header/response-header.directive.ts');
 require('components/state/rule-editor/rule-editor.directive.ts');
@@ -108,7 +108,8 @@ require('components/state/solution-editor/solution-editor.directive.ts');
 require(
   'components/state/solution-editor/' +
   'solution-explanation-editor.directive.ts');
-require('components/codemirror-mergeview/codemirror-mergeview.directive.ts');
+require(
+  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
@@ -138,7 +139,7 @@ require(
   'mark-all-audio-and-translations-as-needing-update.controller.ts'
 );
 require(
-  'pages/exploration-editor-page/statistics-tab/bar-chart/' +
+  'pages/exploration-editor-page/statistics-tab/chart/' +
   'bar-chart.directive.ts');
 require(
   'pages/show-suggestion-editor-pages/show-suggestion-modal-for-editor-view/' +
@@ -151,16 +152,16 @@ require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
 require(
-  'components/common-layout-directives/attribution-guide/' +
+  'components/common-layout-directives/element-templates/' +
   'attribution-guide.directive.ts');
 require(
-  'components/forms/forms-directives/select2-dropdown/' +
+  'components/forms/forms-directives/' +
   'select2-dropdown.directive.ts');
 require(
-  'components/profile-link-directives/profile-link-text/' +
+  'components/profile-link-directives/' +
   'profile-link-text.directive.ts');
 require(
-  'pages/exploration-editor-page/editor-navbar-breadcrumb/' +
+  'pages/exploration-editor-page/editor-navigation/' +
   'editor-navbar-breadcrumb.directive.ts');
 require(
   'pages/exploration-editor-page/editor-navigation/' +
@@ -199,10 +200,10 @@ require(
 require('pages/exploration-editor-page/preview-tab/preview-tab.controller.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.controller.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/pie-chart/' +
+  'pages/exploration-editor-page/statistics-tab/chart/' +
   'pie-chart.directive.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/playthrough-issues/' +
+  'pages/exploration-editor-page/statistics-tab/issues/' +
   'playthrough-issues.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
@@ -232,7 +233,7 @@ require(
   'exploration-correctness-feedback.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-data/exploration-data.service.ts');
+  'exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-init-state-name.service.ts');
@@ -250,10 +251,10 @@ require(
   'exploration-param-specs.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-rights/exploration-rights.service.ts');
+  'exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-tags.service.ts');
@@ -278,7 +279,7 @@ require(
   'user-email-preferences.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
-  'thread-data/thread-data.service.ts');
+  'thread-data.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
@@ -696,7 +697,7 @@ oppia.controller('ExplorationEditor', [
     $scope.showWelcomeExplorationModal = function() {
       var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration-editor-page/exploration-editor-page-templates/' +
+          '/pages/exploration-editor-page/exploration-editor-page-modal-templates/' +
           'welcome-modal.template.html'),
         backdrop: true,
         controller: [

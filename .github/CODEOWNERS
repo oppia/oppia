@@ -142,15 +142,15 @@
 /main_taskqueue.py @seanlip
 
 # Global components.
-/core/templates/dev/head/components/common-layout-directives/alert-message/ @ankita240796
-/core/templates/dev/head/components/common-layout-directives/attribution-guide/ @ankita240796
-/core/templates/dev/head/components/common-layout-directives/background-banner/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
 /core/templates/dev/head/components/button-directives/exploration-embed-modal.directive.html @ankita240796
 /core/templates/dev/head/components/button-directives/exploration-embed-modal.directive.ts @ankita240796
-/core/templates/dev/head/components/common-layout-directives/loading-dots/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
 /core/templates/dev/head/components/profile-link-directives/ @ankita240796
-/core/templates/dev/head/components/common-layout-directives/promo-bar/ @ankita240796
-/core/templates/dev/head/components/common-layout-directives/sharing-links/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/element-templates/ @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons.directive.ts @ankita240796
 /core/templates/dev/head/components/summary-tile-directives/ @ankita240796
@@ -237,8 +237,8 @@
 /core/templates/dev/head/domain/sidebar/ @nithusha21
 /core/templates/dev/head/components/button-directives/create-activity-button.directive.html @nithusha21
 /core/templates/dev/head/components/button-directives/create-activity-button.directive.ts @nithusha21
-/core/templates/dev/head/components/common-layout-directives/side-navigation-bar/ @nithusha21
-/core/templates/dev/head/components/common-layout-directives/top-navigation-bar/ @nithusha21
+/core/templates/dev/head/components/common-layout-directives/bar-layouts/ @nithusha21
+/core/templates/dev/head/components/common-layout-directives/bar-layouts/ @nithusha21
 /core/templates/dev/head/services/NavigationService*.ts @nithusha21
 
 

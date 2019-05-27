@@ -31,27 +31,27 @@ require('components/forms/forms-validators/is-float.filter.ts');
 require('components/forms/forms-validators/is-integer.filter.ts');
 require('components/forms/forms-validators/is-nonempty.filter.ts');
 require(
-  'components/forms/forms-directives/apply-validation/' +
+  'components/forms/forms-directives/' +
   'apply-validation.directive.ts');
 require(
-  'components/forms/forms-directives/require-is-float/' +
+  'components/forms/forms-directives/' +
   'require-is-float.directive.ts');
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-choices-editor/schema-based-choices-editor.directive.ts');
+  'schema-based-choices-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+  'schema-based-dict-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
   'schema-based-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+  'schema-based-list-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+  'schema-based-unicode-editor.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('services/AlertsService.ts');

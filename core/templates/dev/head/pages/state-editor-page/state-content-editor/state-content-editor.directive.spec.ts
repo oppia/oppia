@@ -24,7 +24,7 @@ require(
   'change-list.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-content.service.ts');

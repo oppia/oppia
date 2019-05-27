@@ -19,7 +19,7 @@
 require('App.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab.controller.ts');

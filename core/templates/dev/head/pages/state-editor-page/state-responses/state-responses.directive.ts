@@ -36,7 +36,7 @@ require(
   'editor-first-time-events.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/interaction-details-cache/' +
+  'exploration-editor-tab-services/' +
   'interaction-details-cache.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
@@ -335,7 +335,7 @@ oppia.directive('stateResponses', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/' +
+                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
                 'add-answer-group-modal.template.html'),
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
@@ -457,7 +457,7 @@ oppia.directive('stateResponses', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/exploration-editor-tab/' +
-                'exploration-editor-tab-templates/' +
+                'exploration-editor-tab-templates/exploration-editor-tab-modal-templates/' +
                 'delete-answer-group-modal.template.html'),
               backdrop: true,
               controller: [

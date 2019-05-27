@@ -17,7 +17,7 @@
  */
 
 require(
-  'components/common-layout-directives/loading-dots/loading-dots.directive.ts');
+  'components/common-layout-directives/element-templates/loading-dots.directive.ts');
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/TopicRightsBackendApiService.ts');

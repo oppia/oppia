@@ -19,7 +19,7 @@
 require('pages/state-editor-page/state-editor.directive.ts');
 
 require(
-  'components/entity-creation-services/question-creation/' +
+  'components/entity-creation-services/' +
   'question-creation.service.ts');
 require('domain/question/EditableQuestionBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
@@ -29,7 +29,7 @@ require(
   'exploration-editor-tab-services/responses.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
-  'exploration-editor-tab-services/solution-validity/' +
+  'exploration-editor-tab-services/' +
   'solution-validity.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +

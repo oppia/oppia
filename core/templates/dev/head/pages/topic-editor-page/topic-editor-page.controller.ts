@@ -36,25 +36,25 @@ require('components/forms/forms-validators/is-float.filter.ts');
 require('components/forms/forms-validators/is-integer.filter.ts');
 require('components/forms/forms-validators/is-nonempty.filter.ts');
 require(
-  'components/forms/forms-directives/apply-validation/' +
+  'components/forms/forms-directives/' +
   'apply-validation.directive.ts');
 require(
-  'components/forms/forms-directives/require-is-float/' +
+  'components/forms/forms-directives/' +
   'require-is-float.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-bool-editor/schema-based-bool-editor.directive.ts');
+  'schema-based-bool-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-choices-editor/schema-based-choices-editor.directive.ts');
+  'schema-based-choices-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-custom-editor/schema-based-custom-editor.directive.ts');
+  'schema-based-custom-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-dict-editor/schema-based-dict-editor.directive.ts');
+  'schema-based-dict-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
   'schema-based-editor.directive.ts');
@@ -63,19 +63,19 @@ require(
   'schema-based-expression-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-float-editor/schema-based-float-editor.directive.ts');
+  'schema-based-float-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-html-editor/schema-based-html-editor.directive.ts');
+  'schema-based-html-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-int-editor/schema-based-int-editor.directive.ts');
+  'schema-based-int-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-list-editor/schema-based-list-editor.directive.ts');
+  'schema-based-list-editor.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
-  'schema-based-unicode-editor/schema-based-unicode-editor.directive.ts');
+  'schema-based-unicode-editor.directive.ts');
 require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
@@ -85,20 +85,20 @@ require(
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
 require(
-  'components/forms/forms-directives/select2-dropdown/' +
+  'components/forms/forms-directives/' +
   'select2-dropdown.directive.ts');
 require(
-  'components/forms/forms-directives/image-uploader/' +
+  'components/forms/forms-directives/' +
   'image-uploader.directive.ts');
 require(
   'components/state/answer-group-editor/answer-group-editor.directive.ts');
 require('components/state/hint-editor/hint-editor.directive.ts');
 require('components/state/outcome-editor/outcome-editor.directive.ts');
 require(
-  'components/state/outcome-editor/outcome-destination-editor/' +
+  'components/state/outcome-editor/' +
   'outcome-destination-editor.directive.ts');
 require(
-  'components/state/outcome-editor/outcome-feedback-editor/' +
+  'components/state/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
 require('components/state/response-header/response-header.directive.ts');
 require('components/state/rule-editor/rule-editor.directive.ts');

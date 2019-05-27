@@ -18,7 +18,7 @@
  */
 
 require(
-  'components/forms/forms-directives/select2-dropdown/' +
+  'components/forms/forms-directives/' +
   'select2-dropdown.directive.ts');
 require(
   'pages/exploration-editor-page/value-generator-editor/' +
@@ -31,7 +31,7 @@ require(
   'exploration-param-specs.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-states/exploration-states.service.ts');
+  'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');

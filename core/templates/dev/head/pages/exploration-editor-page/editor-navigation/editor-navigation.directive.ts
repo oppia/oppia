@@ -20,7 +20,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-rights/exploration-rights.service.ts');
+  'exploration-rights.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'exploration-warnings.service.ts');
@@ -32,7 +32,7 @@ require(
   'state-tutorial-first-time.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
-  'thread-data/thread-data.service.ts');
+  'thread-data.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -91,7 +91,7 @@ oppia.directive('editorNavigation', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/' +
-                'exploration-editor-page-templates/help-modal.template.html'),
+                'exploration-editor-page-modal-templates/help-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

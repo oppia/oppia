@@ -21,7 +21,7 @@ require(
   'main-topic-editor-stories-list/main-topic-editor-stories-list.directive.ts');
 
 require(
-  'components/entity-creation-services/story-creation/' +
+  'components/entity-creation-services/' +
   'story-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/TopicUpdateService.ts');

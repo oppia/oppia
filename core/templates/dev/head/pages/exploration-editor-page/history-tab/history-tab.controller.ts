@@ -19,13 +19,13 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
-  'exploration-data/exploration-data.service.ts');
+  'exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/history-tab-services/' +
-  'compare-versions/compare-versions.service.ts');
+  'compare-versions.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/history-tab-services/' +
-  'version-tree/version-tree.service.ts');
+  'version-tree.service.ts');
 require('services/DateTimeFormatService.ts');
 
 oppia.controller('HistoryTab', [

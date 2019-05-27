@@ -19,7 +19,7 @@
 require('pages/questions-list-page/questions-list-page.directive.ts');
 
 require(
-  'components/entity-creation-services/question-creation/' +
+  'components/entity-creation-services/' +
   'question-creation.service.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
