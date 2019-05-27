@@ -27,10 +27,10 @@ import feconf
 import schema_utils
 
 (
-    activity_models, user_models, exp_models, collection_models,
+    activity_models, audit_models, user_models, exp_models, collection_models,
     feedback_models) = (
         models.Registry.import_models([
-            models.NAMES.activity,
+            models.NAMES.activity, models.NAMES.audit,
             models.NAMES.user, models.NAMES.exploration,
             models.NAMES.collection, models.NAMES.feedback]))
 datastore_services = models.Registry.import_datastore_services()
@@ -303,6 +303,46 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         return []
 
 
+class RoleQueryAuditModelValidator(BaseModelValidator):
+    """Class for validating RoleQueryAuditModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        regex_string = '%s\\.\\d*\\.%s\\.\\d*$' % (item.user_id, item.intent)
+        return regex_string
+
+    @classmethod
+    def _get_json_properties_schema(cls):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {'user_id': (user_models.UserSettingsModel, [item.user_id])}
+
+    @classmethod
+    def _validate_user_id_belongs_to_admin(cls, item):
+        """Validate that user id of model belongs to an admin.
+
+        Args:
+            item: RoleQueryAuditModel to validate.
+        """
+        _, user_id_models = (cls.external_models['user_id'])
+        user_id_model = user_id_models[0][1]
+        if user_id_model and not user_id_model.deleted:
+            if user_id_model.role != feconf.ROLE_ID_ADMIN:
+                cls.errors['admin check'] = (
+                    'Model id %s: User id %s in model does not belong '
+                    'to an admin') % (item.id, item.user_id)
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_user_id_belongs_to_admin]
+
+
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
 
@@ -399,6 +439,7 @@ class ExplorationModelValidator(BaseModelValidator):
 
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
+    audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
     user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
     exp_models.ExplorationModel: ExplorationModelValidator,
 }

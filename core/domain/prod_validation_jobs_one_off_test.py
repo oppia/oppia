@@ -17,6 +17,9 @@
 """Unit tests for core.domain.prod_validation_jobs_one_off."""
 
 import datetime
+import math
+import random
+import time
 
 from constants import constants
 from core.domain import collection_domain
@@ -31,6 +34,7 @@ from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -39,10 +43,10 @@ gae_search_services = models.Registry.import_search_services()
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
 
-(activity_models, base_models, user_models, exp_models) = (
+(activity_models, audit_models, base_models, user_models, exp_models) = (
     models.Registry.import_models([
-        models.NAMES.activity, models.NAMES.base_model, models.NAMES.user,
-        models.NAMES.exploration]))
+        models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
+        models.NAMES.user, models.NAMES.exploration]))
 
 
 def run_job_and_check_output(
@@ -240,6 +244,101 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             'ActivityReferencesModel\', '
             '[u\'Model id random: Model id does not match regex pattern\']]'
         )]
+        run_job_and_check_output(self, expected_output)
+
+
+class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(RoleQueryAuditModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
+        admin_model.role = feconf.ROLE_ID_ADMIN
+        admin_model.put()
+
+        model_id = '%s.%s.%s.%s' % (
+            self.admin_id, int(math.floor(time.time())),
+            feconf.ROLE_ACTION_UPDATE, random.randint(0, 1000))
+        self.model_instance = audit_models.RoleQueryAuditModel(
+            id=model_id, user_id=self.admin_id,
+            intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
+        self.model_instance.put()
+
+        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
+            audit_models.RoleQueryAuditModel:
+                prod_validation_jobs_one_off.RoleQueryAuditModelValidator,
+        }
+
+    def test_standard_model(self):
+        expected_output = [u'[u\'fully-validated RoleQueryAuditModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of RoleQueryAuditModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id, self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_existent_admin_id(self):
+        user_models.UserSettingsModel.get(self.admin_id).delete()
+        expected_output = [(
+            u'[u\'failed validation check for user_id field check of '
+            'RoleQueryAuditModel\', '
+            '[u"Model id %s: based on field user_id having value '
+            '%s, expect model UserSettingsModel with '
+            'id %s but it doesn\'t exist"]]') % (
+                self.model_instance.id, self.admin_id, self.admin_id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_non_admin_user_id(self):
+        model_id_with_non_admin_user_id = '%s.%s.%s.%s' % (
+            self.user_id, int(math.floor(time.time())),
+            feconf.ROLE_ACTION_UPDATE, random.randint(0, 1000))
+        model_instance_with_non_admin_user_id = (
+            audit_models.RoleQueryAuditModel(
+                id=model_id_with_non_admin_user_id, user_id=self.user_id,
+                intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d'))
+        model_instance_with_non_admin_user_id.put()
+        expected_output = [(
+            u'[u\'fully-validated RoleQueryAuditModel\', 1]'
+        ), (
+            u'[u\'failed validation check for admin check of '
+            'RoleQueryAuditModel\', '
+            '[u\'Model id %s: User id %s in model does not belong to an '
+            'admin\']]') % (model_id_with_non_admin_user_id, self.user_id)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_id(self):
+        model_invalid_id = '%s.%s.%s.%s' % (
+            'a', int(math.floor(time.time())), feconf.ROLE_ACTION_UPDATE,
+            random.randint(0, 1000))
+        model_instance_with_invalid_id = audit_models.RoleQueryAuditModel(
+            id=model_invalid_id, user_id=self.admin_id,
+            intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
+        model_instance_with_invalid_id.put()
+        expected_output = [(
+            u'[u\'fully-validated RoleQueryAuditModel\', 1]'
+        ), (
+            u'[u\'failed validation check for model id check of '
+            'RoleQueryAuditModel\', '
+            '[u\'Model id %s: Model id does not match regex pattern\']]'
+        ) % model_invalid_id]
         run_job_and_check_output(self, expected_output)
 
 
