@@ -18,7 +18,6 @@ import StringIO
 import contextlib
 import json
 import os
-import shutil
 import sys
 import tarfile
 import urllib
