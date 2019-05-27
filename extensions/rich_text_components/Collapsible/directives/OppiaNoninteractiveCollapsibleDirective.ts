@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the Collapsible rich-text component.
+ * @fileoverview Directive for the Collapsible rich-text component.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -25,13 +25,16 @@ oppia.directive('oppiaNoninteractiveCollapsible', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Collapsible' +
         '/directives/collapsible_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.heading = HtmlEscaperService.escapedJsonToObj(
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.heading = HtmlEscaperService.escapedJsonToObj(
           $attrs.headingWithValue);
-        $scope.content = HtmlEscaperService.escapedJsonToObj(
+        ctrl.content = HtmlEscaperService.escapedJsonToObj(
           $attrs.contentWithValue);
       }]
     };
