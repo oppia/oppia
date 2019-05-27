@@ -619,5 +619,3 @@ class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
             'tags': [],
             'node_count': 4,
         }, response_dict['summaries'][0])
-
-
