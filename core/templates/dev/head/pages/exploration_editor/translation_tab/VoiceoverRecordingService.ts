@@ -15,11 +15,12 @@
 /**
  * @fileoverview Service for handling microphone data and mp3 audio processing.
  */
-oppia.factory('TranslationRecordingService', ['$q', '$window',
-  function($q, $window) {
-    var AudioContext = null,
+
+oppia.factory('VoiceoverRecordingService', ['$log', '$q', '$window',
+  function($log, $q, $window) {
+    var audioContextAvailable = null,
       defer = null,
-      definedAudioContext = null, // will be defined audio context
+      definedAudioContext = null, // Will be defined audio context
       isAvailable = null,
       isRecording = false,
       microphone = null,
@@ -30,25 +31,18 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
 
     var _initWorker = function() {
       if (!$window.Worker) {
-        console.warn('Worker API not supported in this browser.');
+        $log.warn('Worker API not supported in this browser.');
         return;
       }
       if (mp3Worker === null) {
-        var url = '/third_party/static/lamejs-1.2.0/' +
+        var lameWorkerFileUrl = '/third_party/static/lamejs-1.2.0/' +
           'worker-example/worker-realtime.js';
-        // config the mp3 encoding worker
-        const config = {sampleRate: 44100, bitRate: 128};
-        mp3Worker = new Worker(url);
+        // Config the mp3 encoding worker.
+        var config = {sampleRate: 44100, bitRate: 128};
+        mp3Worker = new Worker(lameWorkerFileUrl);
         mp3Worker.onmessage = function(e) {
-          switch (e.data.cmd) {
-            case 'end':
-              // async data flow
-              defer.resolve(e.data.buf);
-              break;
-            default :
-              console.warn('Unexpected command and data type from worker.');
-              // console.warn(e);
-          }
+          // Async data flow
+          defer.resolve(e.data.buf);
         };
         mp3Worker.postMessage({cmd: 'init', config: config});
       }
@@ -61,15 +55,16 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
     var _stopWorker = function() {
       if (mp3Worker) {
         mp3Worker.terminate();
-        console.warn('Ending mp3 worker');
+        $log.log('Ending mp3 worker');
         mp3Worker = null;
       }
     };
 
     var _initRecorder = function() {
-      // promise required because angular is async with worker
-      AudioContext = $window.AudioContext || $window.webkitAudioContext;
-      if (AudioContext) {
+      // Browser agnostic AudioContext API check.
+      audioContextAvailable = $window.AudioContext || $window.webkitAudioContext;
+      if (audioContextAvailable) {
+        // Promise required because angular is async with worker.
         defer = $q.defer();
         isAvailable = true;
         _initWorker();
@@ -79,23 +74,23 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
     };
 
 
-
+    // Setup microphone inputs for mp3 audio processing.
     var _processMicAudio = function(stream) {
       definedAudioContext = new AudioContext();
       // Settings a bufferSize of 0 instructs the browser
-      // to choose the best bufferSize
+      // to choose the best bufferSize.
       processor = definedAudioContext.createScriptProcessor(0, 1, 1);
-      // process microphone to mp3 encoding
+      // Process microphone to mp3 encoding.
       processor.onaudioprocess = _onAudioProcess;
 
       microphone = definedAudioContext.createMediaStreamSource(stream);
-      // connect custom processor to microphone;
+      // Connect custom processor to microphone.
       microphone.connect(processor);
-      // connect to speakers as destination
+      // Connect to speakers as destination.
       processor.connect(definedAudioContext.destination);
     };
 
-    // convert directly from mic to mp3
+    // Convert directly from mic to mp3.
     var _onAudioProcess = function(event) {
       var array = event.inputBuffer.getChannelData(0);
       _postMessage(array);
@@ -107,13 +102,13 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
 
     var _stopRecord = function() {
       if (microphone && processor) {
-        // disconnect mic and processor and stop processing
+        // Disconnect mic and processor and stop processing.
         microphone.disconnect();
         processor.disconnect();
         processor.onaudioprocess = null;
-        // issue command to retrieve converted audio
+        // Issue command to retrieve converted audio.
         mp3Worker.postMessage({cmd: 'finish'});
-        // stop microphone stream
+        // Stop microphone stream.
         microphoneStream.getTracks().forEach(function(track) {
           track.stop();
         });
@@ -135,16 +130,20 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
           isRecording: isRecording
         };
       },
-      startRecord: function() {
+      startRecording: function() {
+        // If worker is not available then do not start recording.
+        if (mp3Worker === null) {
+          return null;
+        }
         var navigator = _startMicrophone();
         navigator.then(function(stream) {
           isRecording = true;
-          // set microphone stream will be used for stopping track
+          // Set microphone stream will be used for stopping track
           // stream in another function.
           microphoneStream = stream;
           _processMicAudio(stream);
-        }, function(error) {
-          console.warn('Microphone was not started because of' +
+        }, function() {
+          $log.warn('Microphone was not started because of' +
           'user denied permission.');
           isRecording = false;
         });
@@ -152,17 +151,15 @@ oppia.factory('TranslationRecordingService', ['$q', '$window',
         return navigator;
       },
       stopRecord: function() {
-        _stopRecord();
+        if (mp3Worker != null) {
+          _stopRecord();
+        }
       },
       getMp3Data: function() {
         return defer.promise;
       },
-      closeRecorder: function(onClose) {
-        // _stopRecord();
+      closeRecorder: function() {
         _closeRecorder();
-        if (onClose) {
-          onClose();
-        }
       }
     };
   }
