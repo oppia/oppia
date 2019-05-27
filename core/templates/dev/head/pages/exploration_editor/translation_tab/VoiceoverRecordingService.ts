@@ -76,7 +76,7 @@ oppia.factory('VoiceoverRecordingService', ['$log', '$q', '$window',
 
     // Setup microphone inputs for mp3 audio processing.
     var _processMicAudio = function(stream) {
-      definedAudioContext = new AudioContext();
+      definedAudioContext = new audioContextAvailable();
       // Settings a bufferSize of 0 instructs the browser
       // to choose the best bufferSize.
       processor = definedAudioContext.createScriptProcessor(0, 1, 1);
