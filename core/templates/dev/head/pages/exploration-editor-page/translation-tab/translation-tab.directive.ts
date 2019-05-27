@@ -44,7 +44,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/state-property/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-property.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
@@ -287,7 +287,7 @@ oppia.directive('translationTab', ['UrlInterpolationService',
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/translation-tab/' +
-                'translation-tab-templates/' +
+                'translation-tab-modal-templates/' +
                 'welcome-translation-modal.template.html'),
               backdrop: true,
               controller: [

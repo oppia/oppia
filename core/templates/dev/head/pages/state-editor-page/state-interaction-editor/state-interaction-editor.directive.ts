@@ -35,7 +35,7 @@ require(
   'pages/state-editor-page/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/state-editor/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/state-hints.service.ts');

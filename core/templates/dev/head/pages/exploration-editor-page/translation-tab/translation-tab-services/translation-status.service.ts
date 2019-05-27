@@ -22,13 +22,13 @@ require(
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-language/translation-language.service.ts');
+  'translation-language.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-tab-active-mode/translation-tab-active-mode.service.ts'
+  'translation-tab-active-mode.service.ts'
 );
 require(
-  'pages/state-editor-page/state-editor-properties-services/state-property/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-property.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +

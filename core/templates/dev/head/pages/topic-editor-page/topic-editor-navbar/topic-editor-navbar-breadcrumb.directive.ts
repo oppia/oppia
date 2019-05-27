@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,23 +13,34 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the navbar breadcrumb of the collection editor.
+ * @fileoverview Controller for the navbar breadcrumb of the topic editor.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/topic-editor-page/topic-editor-services/' +
+  'topic-editor-state.service.ts');
+require('services/stateful/FocusManagerService.ts');
+
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
 
 oppia.directive(
-  'topicsAndSkillsDashboardNavbarBreadcrumb', [
+  'topicEditorNavbarBreadcrumb', [
     'UrlInterpolationService', function(UrlInterpolationService) {
       return {
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topics-and-skills-dashboard-page/' +
-          'topics-and-skills-dashboard-page-navbar-breadcrumb/' +
-          'topics-and-skills-dashboard-page-navbar-breadcrumb.directive.html'),
+          '/pages/topic-editor-page/topic-editor-navbar/' +
+          'topic-editor-navbar-breadcrumb.directive.html'),
         controller: [
-          function() {}
+          '$scope', 'TopicEditorStateService',
+          'FocusManagerService', 'TOPIC_NAME_INPUT_FOCUS_LABEL',
+          function(
+              $scope, TopicEditorStateService,
+              FocusManagerService, TOPIC_NAME_INPUT_FOCUS_LABEL) {
+            $scope.topic = TopicEditorStateService.getTopic();
+          }
         ]
       };
     }

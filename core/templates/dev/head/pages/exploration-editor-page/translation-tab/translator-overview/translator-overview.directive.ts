@@ -21,10 +21,10 @@ require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-language/translation-language.service.ts');
+  'translation-language.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-status/translation-status.service.ts');
+  'translation-status.service.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 

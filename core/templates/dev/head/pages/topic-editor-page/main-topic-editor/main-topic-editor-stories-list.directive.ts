@@ -21,7 +21,7 @@ require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'pages/topic-editor-page/topic-editor-services/' +
   'topic-editor-state.service.ts');
 require('services/contextual/UrlService.ts');
 
@@ -37,7 +37,6 @@ oppia.directive('storiesList', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic-editor-page/main-topic-editor/' +
-        'main-topic-editor-stories-list/' +
         'main-topic-editor-stories-list.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$window',
@@ -56,7 +55,7 @@ oppia.directive('storiesList', [
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/topic-editor-templates/' +
+                  '/pages/topic-editor-page/topic-editor-modal-templates/' +
                   'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
@@ -81,7 +80,7 @@ oppia.directive('storiesList', [
           $scope.deleteCanonicalStory = function(storyId) {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/topic-editor-templates/' +
+                '/pages/topic-editor-page/topic-editor-modal-templates/' +
                 'delete-story-modal.template.html'),
               backdrop: true,
               controller: [

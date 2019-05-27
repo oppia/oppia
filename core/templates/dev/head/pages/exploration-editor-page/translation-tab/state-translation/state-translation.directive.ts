@@ -43,10 +43,10 @@ require(
   'router.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-status/translation-status.service.ts');
+  'translation-status.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-tab-active-content-id/translation-tab-active-content-id.service.ts');
+  'translation-tab-active-content-id.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');

@@ -27,7 +27,7 @@ require(
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/story/StoryUpdateService.ts');
 require(
-  'pages/story-editor-page/story-editor-services/story-editor-state/' +
+  'pages/story-editor-page/story-editor-services/' +
   'story-editor-state.service.ts');
 require('services/AlertsService.ts');
 
@@ -110,7 +110,7 @@ oppia.directive('storyEditor', [
             }
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/story-editor-templates/' +
+                '/pages/story-editor-page/story-editor-modal-templates/' +
                 'delete-chapter-modal.template.html'),
               backdrop: true,
               controller: [
@@ -137,7 +137,7 @@ oppia.directive('storyEditor', [
             });
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/story-editor-templates/' +
+                '/pages/story-editor-page/story-editor-modal-templates/' +
                 'new-chapter-title-modal.template.html'),
               backdrop: true,
               controller: [

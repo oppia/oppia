@@ -29,10 +29,10 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'training-panel/training-data-editor-panel.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/state-editor/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/state-property/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/AlertsService.ts');
 
@@ -96,7 +96,7 @@ oppia.directive('answerGroupEditor', [
           ctrl.tagAnswerGroupWithMisconception = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/topic-editor-templates/' +
+                '/pages/topic-editor-page/topic-editor-modal-templates/' +
                 'tag-misconception-modal.template.html'),
               backdrop: true,
               controller: [

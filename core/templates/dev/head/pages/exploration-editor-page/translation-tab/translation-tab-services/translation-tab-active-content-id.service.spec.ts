@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-tab-active-content-id/' +
+  '' +
   'translation-tab-active-content-id.service.ts');
 
 describe('Translation tab active content id service', function() {

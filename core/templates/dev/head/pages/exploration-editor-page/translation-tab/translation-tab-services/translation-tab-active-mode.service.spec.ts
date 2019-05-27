@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-tab-active-mode/translation-tab-active-mode.service.ts');
+  'translation-tab-active-mode.service.ts');
 
 describe('Translation tab active mode service', function() {
   beforeEach(angular.mock.module('oppia'));

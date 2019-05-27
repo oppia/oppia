@@ -16,21 +16,21 @@
  * @fileoverview Directive for the concept card editor.
  */
 
-require('components/summary-list-header/summary-list-header.directive.ts');
+require('components/state/answer-group-editor/summary-list-header.directive.ts');
 require(
   'components/forms/forms-schema-editors/schema-based-editor/' +
   'schema-based-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require(
   'pages/skill-editor-page/skill-editor-main-tab/skill-concept-card-editor/' +
-  'worked-example-editor/worked-example-editor.directive.ts');
+  'worked-example-editor.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/format-rte-preview.filter.ts');
 require(
-  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'pages/skill-editor-page/skill-editor-services/' +
   'skill-editor-state.service.ts');
 require('services/GenerateContentIdService.ts');
 
@@ -142,7 +142,7 @@ oppia.directive(
             $scope.deleteWorkedExample = function(index, evt) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill-editor-page/skill-editor-templates/' +
+                  '/pages/skill-editor-page/skill-editor-modal-templates/' +
                   'delete-worked-example-modal.directive.html'),
                 backdrop: 'static',
                 controller: [

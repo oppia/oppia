@@ -24,7 +24,7 @@ require(
   'exploration-warnings.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-status/translation-status.service.ts');
+  'translation-status.service.ts');
 
 /* eslint-disable angular/directive-restrict */
 oppia.directive(

@@ -26,7 +26,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-page-services/' +
   'editor-first-time-events.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/state-property/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 

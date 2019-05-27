@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-language/translation-language.service.ts');
+  'translation-language.service.ts');
 
 describe('Translation language service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

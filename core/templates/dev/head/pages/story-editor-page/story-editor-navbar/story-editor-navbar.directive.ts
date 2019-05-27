@@ -20,7 +20,7 @@ require('domain/editor/undo_redo/BaseUndoRedoService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/story-editor-page/story-editor-services/story-editor-state/' +
+  'pages/story-editor-page/story-editor-services/' +
   'story-editor-state.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
@@ -75,7 +75,7 @@ oppia.directive('storyEditorNavbar', [
           $scope.saveChanges = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story-editor-page/story-editor-templates/' +
+                '/pages/story-editor-page/story-editor-modal-templates/' +
                 'story-editor-save-modal.template.html'),
               backdrop: true,
               controller: [

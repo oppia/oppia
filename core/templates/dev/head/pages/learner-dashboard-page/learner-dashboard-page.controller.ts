@@ -461,7 +461,7 @@ oppia.controller('LearnerDashboard', [
         sectionNameI18nId, subsectionName, activity) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner-dashboard-page/learner-dashboard-page-templates/' +
+          '/pages/learner-dashboard-page/learner-dashboard-page-modal-templates/' +
           'remove-activity-from-learner-dashboard-modal.template.html'),
         backdrop: true,
         resolve: {

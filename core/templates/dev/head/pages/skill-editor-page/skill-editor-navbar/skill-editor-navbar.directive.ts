@@ -22,10 +22,10 @@ require(
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/skill-editor-page/skill-editor-services/skill-editor-routing/' +
+  'pages/skill-editor-page/skill-editor-services/' +
   'skill-editor-routing.service.ts');
 require(
-  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'pages/skill-editor-page/skill-editor-services/' +
   'skill-editor-state.service.ts');
 require('services/AlertsService.ts');
 
@@ -72,7 +72,7 @@ oppia.directive('skillEditorNavbar', [
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/story-editor-page/story-editor-templates/' +
+                  '/pages/story-editor-page/story-editor-modal-templates/' +
                   'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [

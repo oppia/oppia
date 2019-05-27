@@ -22,10 +22,10 @@ require(
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/TopicRightsBackendApiService.ts');
 require(
-  'pages/topic-editor-page/topic-editor-services/topic-editor-routing/' +
+  'pages/topic-editor-page/topic-editor-services/' +
   'topic-editor-routing.service.ts');
 require(
-  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'pages/topic-editor-page/topic-editor-services/' +
   'topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
@@ -71,7 +71,7 @@ oppia.directive('topicEditorNavbar', [
             if (!$scope.topicRights.canPublishTopic()) {
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/topic-editor-templates/' +
+                  '/pages/topic-editor-page/topic-editor-modal-templates/' +
                   'topic-editor-send-mail-modal.template.html'),
                 backdrop: true,
                 controller: [
@@ -139,7 +139,7 @@ oppia.directive('topicEditorNavbar', [
             var topicIsPublished = $scope.topicRights.isPublished();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/topic-editor-templates/' +
+                '/pages/topic-editor-page/topic-editor-modal-templates/' +
                 'topic-editor-save-modal.template.html'),
               backdrop: true,
               controller: [

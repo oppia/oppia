@@ -21,7 +21,7 @@ require('domain/topic/SubtopicPageObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'pages/topic-editor-page/topic-editor-services/' +
   'topic-editor-state.service.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
@@ -64,7 +64,7 @@ oppia.directive('subtopicsListTab', [
             var subtopicTitles = $scope.subtopicTitles;
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/topic-editor-templates/' +
+                '/pages/topic-editor-page/topic-editor-modal-templates/' +
                 'subtopic-editor-modal.template.html'),
               backdrop: true,
               controller: [
@@ -211,7 +211,7 @@ oppia.directive('subtopicsListTab', [
             var subtopicTitles = $scope.subtopicTitles;
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/topic-editor-templates/' +
+                '/pages/topic-editor-page/topic-editor-modal-templates/' +
                 'new-subtopic-title-modal.template.html'),
               backdrop: true,
               controller: [

@@ -21,7 +21,7 @@ require('domain/topic/TopicObjectFactory.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('domain/topic/TopicUpdateService.ts');
 require(
-  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'pages/topic-editor-page/topic-editor-services/' +
   'topic-editor-state.service.ts');
 
 describe('Topic editor state service', function() {

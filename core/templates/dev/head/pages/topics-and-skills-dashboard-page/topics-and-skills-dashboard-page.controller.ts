@@ -24,7 +24,7 @@ require(
   'skills-list.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page-navbar-breadcrumb/' +
+  'topics-and-skills-dashboard-page-navbar/' +
   'topics-and-skills-dashboard-page-navbar-breadcrumb.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +

@@ -18,7 +18,7 @@
 
 require(
   'pages/topic-editor-page/main-topic-editor/' +
-  'main-topic-editor-stories-list/main-topic-editor-stories-list.directive.ts');
+  'main-topic-editor-stories-list.directive.ts');
 
 require(
   'components/entity-creation-services/' +
@@ -27,7 +27,7 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'pages/topic-editor-page/topic-editor-services/' +
   'topic-editor-state.service.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
@@ -70,7 +70,7 @@ oppia.directive('topicEditorTab', [
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic-editor-page/topic-editor-templates/' +
+                  '/pages/topic-editor-page/topic-editor-modal-templates/' +
                   'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [

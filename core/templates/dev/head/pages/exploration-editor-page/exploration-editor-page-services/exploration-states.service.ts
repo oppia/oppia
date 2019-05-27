@@ -41,7 +41,7 @@ require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/state-editor/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-editor.service.ts')
 require('services/AlertsService.ts');
 require('services/ContextService.ts');

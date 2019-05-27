@@ -30,7 +30,7 @@ require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require(
-  'pages/topic-editor-page/topic-editor-services/topic-editor-state/' +
+  'pages/topic-editor-page/topic-editor-services/' +
   'topic-editor-state.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
@@ -170,7 +170,7 @@ oppia.directive('questionsList', [
             var allSkillSummaries = $scope.getAllSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/topic-editor-templates/' +
+                '/pages/topic-editor-page/topic-editor-modal-templates/' +
                 'select-skill-modal.template.html'),
               backdrop: true,
               controller: [
@@ -256,7 +256,7 @@ oppia.directive('questionsList', [
 
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/skill-editor-templates/' +
+                '/pages/skill-editor-page/skill-editor-modal-templates/' +
                 'question-editor-modal.directive.html'),
               backdrop: 'static',
               keyboard: false,
@@ -297,7 +297,7 @@ oppia.directive('questionsList', [
                       var modalInstance = $uibModal.open({
                         templateUrl:
                           UrlInterpolationService.getDirectiveTemplateUrl(
-                            '/pages/skill-editor-page/skill-editor-templates/' +
+                            '/pages/skill-editor-page/skill-editor-modal-templates/' +
                             'confirm-question-modal-exit-modal.directive.html'),
                         backdrop: true,
                         controller: [
@@ -348,7 +348,7 @@ oppia.directive('questionsList', [
             var allSkillSummaries = $scope.getAllSkillSummaries();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/topic-editor-templates/' +
+                '/pages/topic-editor-page/topic-editor-modal-templates/' +
                 'select-skill-modal.template.html'),
               backdrop: true,
               controller: [

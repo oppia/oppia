@@ -16,17 +16,17 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
-require('components/summary-list-header/summary-list-header.directive.ts');
+require('components/state/answer-group-editor/summary-list-header.directive.ts');
 require(
   'pages/skill-editor-page/skill-editor-main-tab/' +
-  'skill-misconceptions-editor/misconception-editor/' +
+  'skill-misconceptions-editor/' +
   'misconception-editor.directive.ts');
 
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/skill-editor-page/skill-editor-services/skill-editor-state/' +
+  'pages/skill-editor-page/skill-editor-services/' +
   'skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ts');

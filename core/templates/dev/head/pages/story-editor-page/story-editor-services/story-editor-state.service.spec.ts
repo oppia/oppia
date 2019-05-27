@@ -19,7 +19,7 @@
 require('domain/story/StoryObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
 require(
-  'pages/story-editor-page/story-editor-services/story-editor-state/' +
+  'pages/story-editor-page/story-editor-services/' +
   'story-editor-state.service.ts');
 
 describe('Story editor state service', function() {

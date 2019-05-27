@@ -22,16 +22,16 @@ require(
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-language/translation-language.service.ts');
+  'translation-language.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
-  'translation-tab-active-content-id/' +
+  '' +
   'translation-tab-active-content-id.service.ts');
 require(
   'pages/exploration-editor-page/exploration-editor-tab/' +
   'exploration-editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/state-property/' +
+  'pages/state-editor-page/state-editor-properties-services/' +
   'state-property.service.ts');
 require(
   'pages/state-editor-page/state-editor-properties-services/' +
@@ -312,7 +312,7 @@ oppia.directive('audioTranslationBar', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/translation-tab/' +
-                'translation-tab-templates/' +
+                'translation-tab-modal-templates/' +
                 'translation-tab-busy-modal.template.html'),
               backdrop: true,
               resolve: {
@@ -438,7 +438,7 @@ oppia.directive('audioTranslationBar', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/translation-tab/' +
-                'translation-tab-templates/' +
+                'translation-tab-modal-templates/' +
                 'delete-audio-translation-modal.template.html'),
               backdrop: true,
               controller: [
@@ -466,7 +466,7 @@ oppia.directive('audioTranslationBar', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/translation-tab/' +
-                'translation-tab-templates/' +
+                'translation-tab-modal-templates/' +
                 'add-audio-translation-modal.template.html'),
               backdrop: 'static',
               resolve: {
