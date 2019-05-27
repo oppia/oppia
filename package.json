@@ -36,7 +36,6 @@
     "@types/q": "^1.5.1",
     "@types/select2": "^4.0.48",
     "@types/selenium-webdriver": "^2.53.43",
-    "@types/webaudioapi": "0.0.27",
     "@typescript-eslint/parser": "^1.7.0",
     "ajv": "^6.10.0",
     "babel-eslint": "^10.0.1",
@@ -77,6 +76,5 @@
     "webpack-cli": "^3.3.1",
     "yargs": "^13.2.2"
   },
-  "keywords": [],
-  "dependencies": {}
+  "keywords": []
 }

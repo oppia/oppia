@@ -21,10 +21,10 @@ require('pages/exploration_editor/ExplorationStatesService.ts');
 require(
   'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
 require(
-  'pages/exploration_editor/translation_tab/VoiceoverRecordingService.ts');
-require(
   'pages/exploration_editor/translation_tab/' +
   'TranslationTabActiveContentIdService.ts');
+require(
+  'pages/exploration_editor/translation_tab/VoiceoverRecordingService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
 require('pages/state_editor/state_properties/StatePropertyService.ts');
 require(
