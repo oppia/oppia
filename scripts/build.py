@@ -100,7 +100,6 @@ JS_FILEPATHS_NOT_TO_BUILD = (
 FILEPATHS_NOT_TO_RENAME = (
     '*.py',
     'third_party/generated/fonts/*',
-    'third_party/generated/webfonts/*',
     'third_party/generated/js/third_party.min.js.map',
     '*.bundle.js',
     '*.bundle.js.map')
