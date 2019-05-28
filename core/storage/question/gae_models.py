@@ -198,25 +198,26 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         )
         return question_skill_link_model_instance
 
-    @classmethod 
+    @classmethod
     def get_question_skill_links_for_questions(cls, question_ids):
-        """Fetches the list of QuestionSkillLinkModels linked to the question ids.
+        """Fetches the list of QuestionSkillLinkModels
+        linked to the question ids.
 
         Args:
             question_ids: list(str). The ids of questions for which the linked
                 skill ids are to be retrieved.
-            
+
         Returns:
             list(QuestionSkillLinkModel), list(str). The
                 QuestionSkillLinkModels corresponding to given question_ids, the
                 corresponding skill descriptions of the skill ids.
         """
         question_skill_link_models = cls.query(
-                cls.question_id.IN(question_ids)
-                # Order by cls.key is needed alongside cls.last_updated so as to
-                # resolve conflicts, if any.
-                # Reference SO link: https://stackoverflow.com/q/12449197
-            ).order(-cls.last_updated, cls.key);
+            cls.question_id.IN(question_ids)
+            # Order by cls.key is needed alongside cls.last_updated so as to
+            # resolve conflicts, if any.
+            # Reference SO link: https://stackoverflow.com/q/12449197
+            ).order(-cls.last_updated, cls.key)
 
         skill_ids = [model.skill_id for model in question_skill_link_models]
         skills = skill_models.SkillModel.get_multi(skill_ids)

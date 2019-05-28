@@ -118,30 +118,32 @@ def get_questions_and_skill_descriptions_for_question_ids(question_ids):
     Args:
          question_ids: list(str). The ID of the questions for which the skill
             links are required.
-    
+
     Returns:
         dict A mapping from skill id to its corresponding list of
         linked question ids, as well its skill description.
     """
 
     question_skill_link_models, skill_descriptions = (
-        question_models.QuestionSkillLinkModel.get_question_skill_links_for_questions(
+        question_models.QuestionSkillLinkModel.get_question_skill_links_for_questions( # pylint: disable=line-too-long
             question_ids))
     question_skill_links = [
         get_question_skill_link_from_model(model, skill_descriptions[index])
         for index, model in enumerate(question_skill_link_models)]
-    skill_description_and_questions = {};
+    skill_description_and_questions = {}
     for question_skill_link in question_skill_links:
         question_id = question_skill_link.question_id
         skill_id = question_skill_link.skill_id
         skill_description = question_skill_link.skill_description
         if skill_id not in skill_description_and_questions:
             skill_description_and_questions[skill_id] = {
-            'question_ids': [],
-            'skill_description': ""
-            };
-        skill_description_and_questions[skill_id]["question_ids"].append(question_id);
-        skill_description_and_questions[skill_id]["skill_description"] = skill_description
+                'question_ids': [],
+                'skill_description': ""
+            }
+        skill_description_and_questions[skill_id]['question_ids'].append(
+            question_id)
+        skill_description_and_questions[skill_id]['skill_description'] = (
+            skill_description)
     return skill_description_and_questions
 
 

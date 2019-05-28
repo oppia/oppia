@@ -1024,10 +1024,10 @@ class QuestionSkillFetchHandler(base.BaseHandler):
 
         skill_description_and_questions = (
             question_services.get_questions_and_skill_descriptions_for_question_ids( #pylint: disable=line-too-long
-                question_ids));
+                question_ids))
         self.values.update({
             'skill_description_and_questions': skill_description_and_questions,
-            });
+            })
         self.render_json(self.values)
 
 
