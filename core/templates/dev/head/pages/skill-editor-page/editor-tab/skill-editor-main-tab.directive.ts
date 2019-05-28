@@ -38,8 +38,8 @@ oppia.directive('skillEditorMainTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill-editor-page/skill-editor-main-tab' +
-        '/skill-editor-main-tab.directive.html'),
+        '/pages/skill-editor-page/editor-tab/' +
+        'skill-editor-main-tab.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService',
         function($scope, SkillEditorStateService) {

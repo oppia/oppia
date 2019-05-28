@@ -28,8 +28,8 @@ oppia.directive(
         restrict: 'E',
         scope: {},
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/skill-editor-page/skill-editor-navbar-breadcrumb' +
-          '/skill-editor-navbar-breadcrumb.directive.html'),
+          '/pages/skill-editor-page/skill-editor-navbar/' +
+          'skill-editor-navbar-breadcrumb.directive.html'),
         controller: [
           '$scope', 'SkillEditorStateService',
           function($scope, SkillEditorStateService) {
