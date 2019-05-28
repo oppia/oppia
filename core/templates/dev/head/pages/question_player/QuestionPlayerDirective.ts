@@ -119,7 +119,7 @@ oppia.directive('questionPlayer', [
 
           var calculateScorePerSkill = function(questionSkillData,
               questionScores) {
-            var scorePerSkill = [];
+            $scope.scorePerSkill = [];
             var totalScore = 0.0;
             for (skill in questionSkillData) {
               var totalScorePerSkill = 0.0;
@@ -128,8 +128,9 @@ oppia.directive('questionPlayer', [
               for (i = 0; i < questionIds.length; i += 1) {
                 totalScorePerSkill += questionScores[questionIds[i]];
               }
-              scorePerSkill.push([description, totalScorePerSkill]);
+              $scope.scorePerSkill.push([description, totalScorePerSkill]);
             }
+            console.log("Calculated score per skill");
           };
 
 
@@ -162,6 +163,7 @@ oppia.directive('questionPlayer', [
             QuestionPlayerBackendApiService.fetchSkillsForQuestions(
               questionIds).then(function(result) {
               calculateScorePerSkill(result, questionScores);
+              $scope.resultsLoaded = true;
             });
           };
 
