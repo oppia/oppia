@@ -2377,10 +2377,10 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
             'assignee_id': self.user_a_id,
             'new_role': 'translator'
             }, {
-            'cmd': 'change_role',
-            'assignee_id': self.user_b_id,
-            'new_role': 'translator'
-        }]
+                'cmd': 'change_role',
+                'assignee_id': self.user_b_id,
+                'new_role': 'translator'
+            }]
         exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
 
         exp_summary_model = exp_models.ExpSummaryModel(
