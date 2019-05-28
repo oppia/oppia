@@ -16,7 +16,7 @@
  * @fileoverview Directives for the outcome destination editor.
  */
 
-require('components/component-services/state-graph-layout.service.ts');
+require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -44,11 +44,11 @@ oppia.directive('outcomeDestinationEditor', [
     controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditorFirstTimeEventsService', 'FocusManagerService',
-        'StateEditorService', 'StateGraphLayoutService', 'UserService',
+        'StateEditorService', 'GraphLayoutService', 'UserService',
         'EXPLORATION_AND_SKILL_ID_PATTERN', 'PLACEHOLDER_OUTCOME_DEST',
         function(
             $scope, EditorFirstTimeEventsService, FocusManagerService,
-            StateEditorService, StateGraphLayoutService, UserService,
+            StateEditorService, GraphLayoutService, UserService,
             EXPLORATION_AND_SKILL_ID_PATTERN, PLACEHOLDER_OUTCOME_DEST) {
           var ctrl = this;
           var currentStateName = null;
@@ -113,7 +113,7 @@ oppia.directive('outcomeDestinationEditor', [
             // Arrange the remaining states based on their order in the state
             // graph.
             var lastComputedArrangement = (
-              StateGraphLayoutService.getLastComputedArrangement());
+              GraphLayoutService.getLastComputedArrangement());
             var allStateNames = StateEditorService.getStateNames();
 
             // It is possible that lastComputedArrangement is null if the graph

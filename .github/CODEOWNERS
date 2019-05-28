@@ -70,7 +70,7 @@
 /core/templates/dev/head/pages/learner-dashboard-page/ @nithusha21
 /core/templates/dev/head/pages/notifications-dashboard-page/ @nithusha21
 /core/templates/dev/head/pages/creator-dashboard-page/ @nithusha21
-/core/templates/dev/head/pages/email-dashboard-page/ @nithusha21
+/core/templates/dev/head/pages/email-dashboard-pages/ @nithusha21
 
 
 # Dev workflow team.
@@ -106,7 +106,7 @@
 /core/templates/dev/head/components/HintAndSolutionButtonsDirective*.ts @aks681
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive.html @aks681
 /core/templates/dev/head/components/state/ @aks681
-/core/templates/dev/head/components/StateGraphLayoutService*.ts @DubeySandeep
+/core/templates/dev/head/components/GraphLayoutService*.ts @DubeySandeep
 /core/templates/dev/head/components/version_diff_visualization_directive.html @DubeySandeep
 /core/templates/dev/head/components/VersionDiffVisualizationDirective*.ts @DubeySandeep
 /core/templates/dev/head/domain/editor/ @DubeySandeep

@@ -46,10 +46,10 @@ module.exports = {
       'creator-dashboard-page.controller.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
     email_dashboard:
-      commonPrefix + '/pages/email-dashboard-page/' +
+      commonPrefix + '/pages/email-dashboard-pages/' +
       'email-dashboard-page.controller.ts',
     email_dashboard_result:
-      commonPrefix + '/pages/email-dashboard-page/' +
+      commonPrefix + '/pages/email-dashboard-pages/' +
       'email-dashboard-result.controller.ts',
     error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
     exploration_editor:
@@ -175,7 +175,7 @@ module.exports = {
       chunks: ['email_dashboard'],
       filename: 'email-dashboard-page.mainpage.html',
       template:
-        commonPrefix + '/pages/email-dashboard-page/' +
+        commonPrefix + '/pages/email-dashboard-pages/' +
         'email-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -184,7 +184,7 @@ module.exports = {
       chunks: ['email_dashboard_result'],
       filename: 'email-dashboard-result.mainpage.html',
       template:
-        commonPrefix + '/pages/email-dashboard-page/' +
+        commonPrefix + '/pages/email-dashboard-pages/' +
         'email-dashboard-result.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false

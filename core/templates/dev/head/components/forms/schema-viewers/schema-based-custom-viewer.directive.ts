@@ -32,8 +32,8 @@ oppia.directive('schemaBasedCustomViewer', [
         objType: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_custom_viewer_directive.html'),
+        '/components/forms/schema-viewers/' +
+        'schema-based-custom-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };

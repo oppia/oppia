@@ -16,7 +16,7 @@
  * @fileoverview Directive for displaying Role graph.
  */
 
-require('components/component-services/state-graph-layout.service.ts');
+require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
@@ -40,10 +40,10 @@ oppia.directive('roleGraph', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/roles-tab/role-graph.directive.html'),
       controller: [
-        '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
+        '$scope', '$element', '$timeout', '$filter', 'GraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
-            $scope, $element, $timeout, $filter, StateGraphLayoutService,
+            $scope, $element, $timeout, $filter, GraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var getElementDimensions = function() {
             return {
@@ -61,18 +61,18 @@ oppia.directive('roleGraph', [
             $scope.finalStateIds = finalStateIds;
             var links = angular.copy(originalLinks);
 
-            var nodeData = StateGraphLayoutService.computeLayout(
+            var nodeData = GraphLayoutService.computeLayout(
               nodes, links, initStateId, angular.copy(finalStateIds));
 
-            $scope.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
+            $scope.GRAPH_WIDTH = GraphLayoutService.getGraphWidth(
               MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
-            $scope.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
+            $scope.GRAPH_HEIGHT = GraphLayoutService.getGraphHeight(
               nodeData);
 
-            nodeData = StateGraphLayoutService.modifyPositionValues(
+            nodeData = GraphLayoutService.modifyPositionValues(
               nodeData, $scope.GRAPH_WIDTH, $scope.GRAPH_HEIGHT);
 
-            $scope.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
+            $scope.augmentedLinks = GraphLayoutService.getAugmentedLinks(
               nodeData, links);
 
             $scope.getNodeTitle = function(node) {

@@ -13,20 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based viewer for HTML.
+ * @fileoverview Directive for a schema-based viewer for primitive types.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive('schemaBasedHtmlViewer', [
+oppia.directive('schemaBasedPrimitiveViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {
         localValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_html_viewer_directive.html'),
-      restrict: 'E'
+        '/components/forms/schema-viewers/' +
+        'schema-based-primitive-viewer.directive.html'),
+      restrict: 'E',
+      controller: ['$scope', function($scope) {
+        $scope.isExpression = function(value) {
+          return angular.isString(value);
+        };
+      }]
     };
   }]);

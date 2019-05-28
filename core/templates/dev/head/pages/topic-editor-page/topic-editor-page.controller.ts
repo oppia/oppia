@@ -76,14 +76,14 @@ require(
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
-require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+require('components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
 require(
-  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 require(
   'components/forms/custom-forms-directives/' +
   'select2-dropdown.directive.ts');

@@ -13,29 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based viewer for lists.
+ * @fileoverview Directive for general schema-based viewers.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-oppia.directive('schemaBasedListViewer', [
-  'NestedDirectivesRecursionTimeoutPreventionService',
-  'UrlInterpolationService',
-  function(
-      NestedDirectivesRecursionTimeoutPreventionService,
-      UrlInterpolationService) {
+oppia.directive('schemaBasedViewer', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {
-        localValue: '=',
-        // Read-only property. The schema definition for each item in the list.
-        itemSchema: '&'
+        schema: '&',
+        localValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_list_viewer_directive.html'),
-      restrict: 'E',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
+        '/components/forms/schema-viewers/' +
+        'schema-based-viewer.directive.html'),
+      restrict: 'E'
     };
-  }
-]);
+  }]);

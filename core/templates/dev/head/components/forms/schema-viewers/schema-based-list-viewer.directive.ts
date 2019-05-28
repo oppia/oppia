@@ -13,31 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based viewer for unicode strings.
+ * @fileoverview Directive for a schema-based viewer for lists.
  */
 
-require(
-  'filters/' +
-  'convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-oppia.directive('schemaBasedUnicodeViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+oppia.directive('schemaBasedListViewer', [
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService',
+  function(
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
-        localValue: '='
+        localValue: '=',
+        // Read-only property. The schema definition for each item in the list.
+        itemSchema: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_unicode_viewer_directive.html'),
+        '/components/forms/schema-viewers/' +
+        'schema-based-list-viewer.directive.html'),
       restrict: 'E',
-      controller: [
-        '$scope', '$filter', '$sce',
-        function($scope, $filter, $sce) {
-          $scope.getDisplayedValue = function() {
-            return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
-              $scope.localValue));
-          };
-        }]
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };
-  }]);
+  }
+]);

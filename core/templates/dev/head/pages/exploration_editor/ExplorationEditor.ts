@@ -19,65 +19,28 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
+require('components/CkEditorRteDirective.ts');
+require('components/CkEditorWidgetsInitializer.ts');
+require('components/forms/ApplyValidationDirective.ts');
+require('components/forms/AudioFileUploaderDirective.ts');
+require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
+require('components/forms/ConvertHtmlToUnicodeFilter.ts');
+require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('components/forms/RequireIsFloatDirective.ts');
+require('components/forms/ImageUploaderDirective.ts');
+require('components/forms/HtmlSelectDirective.ts');
+require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
 require(
-  'components/ck-editor-helpers/ck-editor-rte.directive.ts');
-require(
-  'components/ck-editor-helpers/' +
-  'ck-editor-widgets.initializer.ts');
-require(
-  'components/forms/custom-forms-directives/' +
-  'apply-validation.directive.ts');
-require(
-  'components/forms/custom-forms-directives/' +
-  'audio-file-uploader.directive.ts');
-require(
-  'filters/' +
-  'convert-unicode-with-params-to-html.filter.ts');
-require(
-  'filters/convert-html-to-unicode.filter.ts');
-require(
-  'filters/convert-unicode-to-html.filter.ts');
-require(
-  'components/forms/custom-forms-directives/' +
-  'require-is-float.directive.ts');
-require(
-  'components/forms/custom-forms-directives/' +
-  'image-uploader.directive.ts');
-require(
-  'components/forms/custom-forms-directives/html-select.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-bool-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-choices-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-custom-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-dict-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-expression-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-float-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-html-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-int-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-list-editor.directive.ts');
-require(
-  'components/forms/schema-based-editors/' +
-  'schema-based-unicode-editor.directive.ts');
+  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
 require('components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
@@ -86,201 +49,109 @@ require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-require('components/forms/validators/is-at-least.filter.ts');
-require('components/forms/validators/is-at-most.filter.ts');
-require('components/forms/validators/is-float.filter.ts');
-require('components/forms/validators/is-integer.filter.ts');
-require('components/forms/validators/is-nonempty.filter.ts');
-require(
-  'components/state/answer-group-editor/answer-group-editor.directive.ts');
-require('components/state/hint-editor/hint-editor.directive.ts');
-require('components/state/outcome-editor/outcome-editor.directive.ts');
-require(
-  'components/state/outcome-editor/' +
-  'outcome-destination-editor.directive.ts');
-require(
-  'components/state/outcome-editor/' +
-  'outcome-feedback-editor.directive.ts');
-require('components/state/response-header/response-header.directive.ts');
-require('components/state/rule-editor/rule-editor.directive.ts');
-require('components/state/rule-editor/rule-type-selector.directive.ts');
-require('components/state/solution-editor/solution-editor.directive.ts');
-require(
-  'components/state/solution-editor/' +
-  'solution-explanation-editor.directive.ts');
-require(
-  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/state/AnswerGroupEditorDirective.ts');
+require('components/state/HintEditorDirective.ts');
+require('components/state/OutcomeEditorDirective.ts');
+require('components/state/OutcomeDestinationEditorDirective.ts');
+require('components/state/OutcomeFeedbackEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
+require('components/state/RuleEditorDirective.ts');
+require('components/state/RuleTypeSelectorDirective.ts');
+require('components/state/SolutionEditorDirective.ts');
+require('components/state/SolutionExplanationEditorDirective.ts');
+require('components/CodemirrorMergeviewDirective.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
-require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
-require('filters/string-utility-filters/capitalize.filter.ts');
-require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
-require('filters/format-rte-preview.filter.ts');
-require('filters/format-timer.filter.ts');
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('filters/CamelCaseToHyphensFilter.ts');
+require('filters/CapitalizeFilter.ts');
+require('filters/ConvertToPlainTextFilter.ts');
+require('filters/FormatRtePreviewFilter.ts');
+require('filters/FormatTimerFilter.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/NormalizeWhitespacePunctuationAndCaseFilter.ts');
+require('filters/ParameterizeRuleDescriptionFilter.ts');
+require('filters/RemoveDuplicatesInArrayFilter.ts');
+require('filters/ReplaceInputsWithEllipsesFilter.ts');
+require('filters/SummarizeNonnegativeNumberFilter.ts');
+require('filters/TruncateFilter.ts');
+require('filters/TruncateAndCapitalizeFilter.ts');
+require('filters/TruncateAtFirstEllipsisFilter.ts');
+require('filters/TruncateAtFirstLineFilter.ts');
+require('filters/TruncateInputBasedOnInteractionAnswerTypeFilter.ts');
+require('filters/UnderscoresToCamelCaseFilter.ts');
+require('filters/WrapTextWithEllipsisFilter.ts');
 require(
-  'filters/string-utility-filters/' +
-  'normalize-whitespace-punctuation-and-case.filter.ts');
-require('filters/parameterize-rule-description.filter.ts');
-require('filters/remove-duplicates-in-array.filter.ts');
-require(
-  'filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
-require('filters/summarize-nonnegative-number.filter.ts');
-require('filters/string-utility-filters/truncate.filter.ts');
-require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
-require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
-require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
-require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
-require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
-require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require(
-  'components/forms/forms-templates/' +
-  'mark-all-audio-and-translations-as-needing-update.controller.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/charts/' +
-  'bar-chart.directive.ts');
-require(
-  'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
-  'show-suggestion-modal-for-editor-view.controller.ts');
+  'pages/exploration_editor/' +
+  'MarkAllAudioAndTranslationsAsNeedingUpdateController.ts'
+);
+require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
+require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
 require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('components/VersionDiffVisualizationDirective.ts');
+require('components/attribution_guide/AttributionGuideDirective.ts');
+require('components/forms/Select2DropdownDirective.ts');
+require('components/profile_link/ProfileLinkTextDirective.ts');
+require('pages/exploration_editor/EditorNavbarBreadcrumbDirective.ts');
+require('pages/exploration_editor/EditorNavigationDirective.ts');
+require('pages/exploration_editor/ExplorationObjectiveEditorDirective.ts');
 require(
-  'components/version-diff-visualization/' +
-  'version-diff-visualization.directive.ts');
+  'pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.ts');
+require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
+require('pages/exploration_editor/ParamChangesEditorDirective.ts');
+require('pages/exploration_editor/editor_tab/ExplorationEditorTab.ts');
+require('pages/exploration_editor/editor_tab/ExplorationGraphDirective.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'attribution-guide.directive.ts');
+  'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
+require('pages/exploration_editor/feedback_tab/FeedbackTab.ts');
+require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
+require('pages/exploration_editor/history_tab/HistoryTab.ts');
 require(
-  'components/forms/custom-forms-directives/' +
-  'select2-dropdown.directive.ts');
+  'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
+require('pages/exploration_editor/preview_tab/PreviewTab.ts');
+require('pages/exploration_editor/settings_tab/SettingsTab.ts');
+require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');
 require(
-  'components/profile-link-directives/' +
-  'profile-link-text.directive.ts');
-require(
-  'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navbar-breadcrumb.directive.ts');
-require(
-  'pages/exploration-editor-page/editor-navigation/' +
-  'editor-navigation.directive.ts');
-require(
-  'pages/exploration-editor-page/exploration-objective-editor/' +
-  'exploration-objective-editor.directive.ts');
-require(
-  'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
-  'exploration-save-and-publish-buttons.directive.ts');
-require(
-  'pages/exploration-editor-page/exploration-title-editor/' +
-  'exploration-title-editor.directive.ts');
-require(
-  'pages/exploration-editor-page/param-changes-editor/' +
-  'param-changes-editor.directive.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/' + 
-  'exploration-editor-tab.controller.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/graph-directives/' +
-  'exploration-graph.controller.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/' +
-  'unresolved-answers-overview/unresolved-answers-overview.directive.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/feedback-tab.controller.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/thread-table/' +
-  'thread-table.directive.ts');
-require(
-  'pages/exploration-editor-page/history-tab/history-tab.controller.ts');
-require(
-  'pages/exploration-editor-page/improvements-tab/' +
-  'improvements-tab.directive.ts');
-require('pages/exploration-editor-page/preview-tab/preview-tab.controller.ts');
-require('pages/exploration-editor-page/settings-tab/settings-tab.controller.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/charts/' +
-  'pie-chart.directive.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/issues/' +
-  'playthrough-issues.directive.ts');
-require(
-  'pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
-require(
-  'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
-require('pages/exploration-player-page/layout-directives/conversation-skin.directive.ts');
-require('pages/exploration-player-page/layout-directives/exploration-footer.directive.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+  'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
+require('pages/exploration_editor/statistics_tab/StatisticsTab.ts');
+require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
+require('pages/exploration_player/ConversationSkinDirective.ts');
+require('pages/exploration_player/ExplorationFooterDirective.ts');
+require('pages/exploration_player/PlayerConstants.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'autosave-info-modals.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'change-list.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-automatic-text-to-speech.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-category.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-correctness-feedback.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-data.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-init-state-name.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-language-code.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-objective.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-param-changes.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-param-specs.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-rights.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-states.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-tags.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-title.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'exploration-warnings.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'graph-data.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'router.service.ts');
-require('pages/exploration-player-page/services/state-classifier-mapping.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'state-tutorial-first-time.service.ts');
-require(
-  'pages/exploration-editor-page/services/' +
-  'user-email-preferences.service.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
-  'thread-data.service.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+require('pages/exploration_editor/AutosaveInfoModalsService.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationAutomaticTextToSpeechService.ts');
+require('pages/exploration_editor/ExplorationCategoryService.ts');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationLanguageCodeService.ts');
+require('pages/exploration_editor/ExplorationObjectiveService.ts');
+require('pages/exploration_editor/ExplorationParamChangesService.ts');
+require('pages/exploration_editor/ExplorationParamSpecsService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationTagsService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/GraphDataService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
+require('pages/exploration_editor/UserEmailPreferencesService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
@@ -289,6 +160,27 @@ require('services/PlaythroughIssuesService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');
+
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+oppia.constant(
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+  'explorationTitleInputFocusLabel');
+oppia.constant(
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>');
+oppia.constant(
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>?v=<version>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>');
+oppia.constant(
+  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/translate/<exploration_id>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+
 
 oppia.controller('ExplorationEditor', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',
@@ -695,8 +587,8 @@ oppia.controller('ExplorationEditor', [
     $scope.showWelcomeExplorationModal = function() {
       var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration-editor-page/modal-templates/' +
-          'welcome-modal.template.html'),
+          '/pages/exploration_editor/' +
+          'welcome_modal_directive.html'),
         backdrop: true,
         controller: [
           '$scope', '$uibModalInstance', 'SiteAnalyticsService',

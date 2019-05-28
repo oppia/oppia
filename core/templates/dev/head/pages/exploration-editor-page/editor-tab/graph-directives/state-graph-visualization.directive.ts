@@ -16,7 +16,7 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
-require('components/component-services/state-graph-layout.service.ts');
+require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require(
@@ -86,12 +86,12 @@ oppia.directive(
           'graph-directives/state-graph-visualization.directive.html'),
         controller: [
           '$element', '$filter', '$scope', '$timeout',
-          'ExplorationWarningsService', 'StateGraphLayoutService',
+          'ExplorationWarningsService', 'GraphLayoutService',
           'TranslationStatusService', 'MAX_NODES_PER_ROW',
           'MAX_NODE_LABEL_LENGTH',
           function(
               $element, $filter, $scope, $timeout,
-              ExplorationWarningsService, StateGraphLayoutService,
+              ExplorationWarningsService, GraphLayoutService,
               TranslationStatusService, MAX_NODES_PER_ROW,
               MAX_NODE_LABEL_LENGTH) {
             var redrawGraph = function() {
@@ -146,15 +146,15 @@ oppia.directive(
               $scope.finalStateIds = finalStateIds;
               var links = angular.copy(originalLinks);
 
-              var nodeData = StateGraphLayoutService.computeLayout(
+              var nodeData = GraphLayoutService.computeLayout(
                 nodes, links, initStateId, angular.copy(finalStateIds));
 
-              $scope.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
+              $scope.GRAPH_WIDTH = GraphLayoutService.getGraphWidth(
                 MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
-              $scope.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
+              $scope.GRAPH_HEIGHT = GraphLayoutService.getGraphHeight(
                 nodeData);
 
-              nodeData = StateGraphLayoutService.modifyPositionValues(
+              nodeData = GraphLayoutService.modifyPositionValues(
                 nodeData, $scope.GRAPH_WIDTH, $scope.GRAPH_HEIGHT);
 
               // These constants correspond to the rectangle that, when clicked
@@ -166,10 +166,10 @@ oppia.directive(
               $scope.VIEWPORT_X = -Math.max(1000, $scope.GRAPH_WIDTH * 2);
               $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
 
-              var graphBounds = StateGraphLayoutService.getGraphBoundaries(
+              var graphBounds = GraphLayoutService.getGraphBoundaries(
                 nodeData);
 
-              $scope.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
+              $scope.augmentedLinks = GraphLayoutService.getAugmentedLinks(
                 nodeData, links);
 
               for (var i = 0; i < $scope.augmentedLinks.length; i++) {

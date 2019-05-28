@@ -17,7 +17,7 @@
  */
 
 require(
-  'pages/email-dashboard-page/email-dashboard-data.service.ts');
+  'pages/email-dashboard-pages/email-dashboard-data.service.ts');
 require('services/UserService.ts');
 
 oppia.controller('EmailDashboard', [

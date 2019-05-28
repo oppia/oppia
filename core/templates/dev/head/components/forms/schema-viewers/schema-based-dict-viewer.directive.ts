@@ -13,25 +13,35 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based viewer for primitive types.
+ * @fileoverview Directive for a schema-based viewer for dicts.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-oppia.directive('schemaBasedPrimitiveViewer', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+oppia.directive('schemaBasedDictViewer', [
+  'NestedDirectivesRecursionTimeoutPreventionService',
+  'UrlInterpolationService',
+  function(
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
-        localValue: '='
+        localValue: '=',
+        // Read-only property. An object whose keys and values are the dict
+        // properties and the corresponding schemas.
+        propertySchemas: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_primitive_viewer_directive.html'),
+        '/components/forms/schema-viewers/' +
+        'schema-based-dict-viewer.directive.html'),
       restrict: 'E',
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
-        $scope.isExpression = function(value) {
-          return angular.isString(value);
+        $scope.getHumanReadablePropertyDescription = function(property) {
+          return property.description || '[' + property.name + ']';
         };
       }]
     };
-  }]);
+  }
+]);
