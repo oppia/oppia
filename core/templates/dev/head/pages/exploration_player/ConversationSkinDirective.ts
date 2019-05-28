@@ -887,7 +887,8 @@ oppia.directive('conversationSkin', [
                     // the feedback, and display a 'Continue' button.
                     $scope.displayedCard.markAsCompleted();
                     if (isFinalQuestion) {
-                      if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
+                      if (ExplorationPlayerStateService.
+                        isInQuestionPlayerMode()) {
                         // We will redirect to the results page here
                         $scope.questionSessionCompleted = true;
                       }
