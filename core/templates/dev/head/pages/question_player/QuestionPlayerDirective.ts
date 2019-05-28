@@ -172,7 +172,7 @@ oppia.directive('questionPlayer', [
           $rootScope.$on('totalQuestionsReceived', function(event, result) {
             updateTotalQuestions(result);
           });
-          
+
           $rootScope.$on('questionSessionCompleted', function(event, result) {
             $location.hash(encodeURIComponent(JSON.stringify(result)));
           });
