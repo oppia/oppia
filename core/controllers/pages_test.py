@@ -26,3 +26,13 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
         response.mustcontain(
             'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING',
             'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING')
+
+    def test_splash_page_with_valid_c_value(self):
+        response = self.get_html_response('/splash', params={'c': 'at0'})
+        self.assertIn(
+            'Create fun interactive quizzes that students can do at home.',
+            response.body)
+
+    def test_splash_page_with_invalid_c_value_redirects(self):
+        self.get_html_response(
+            '/splash', params={'c': 'invalid'}, expected_status_int=302)

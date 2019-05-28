@@ -16,6 +16,9 @@
 
 """Tests for Oppia statistics models."""
 
+import logging
+import types
+
 from core.domain import exp_domain
 from core.platform import models
 from core.tests import test_utils
@@ -41,6 +44,127 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(event_model.session_id, 'session_id1')
         self.assertEqual(event_model.time_spent_in_state_secs, 0.0)
         self.assertEqual(event_model.is_feedback_useful, True)
+
+
+class StateCounterModelTests(test_utils.GenericTestBase):
+
+    def test_stat_model_gets_created(self):
+        model_instance = stat_models.StateCounterModel.get_or_create(
+            'exp_id1', 'state_name')
+        self.assertEqual(model_instance.id, 'exp_id1.state_name')
+
+
+class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
+
+    def test_create_and_get_models(self):
+        stat_models.ExplorationAnnotationsModel.create('exp_id1', '1', 5, 4, {})
+
+        model1 = stat_models.ExplorationAnnotationsModel.get('exp_id1:1')
+
+        self.assertEqual(model1.exploration_id, 'exp_id1')
+        self.assertEqual(model1.version, '1')
+        self.assertEqual(model1.num_starts, 5)
+        self.assertEqual(model1.num_completions, 4)
+        self.assertEqual(model1.state_hit_counts, {})
+
+    def test_get_versions(self):
+        stat_models.ExplorationAnnotationsModel.create('exp_id1', '1', 5, 4, {})
+        stat_models.ExplorationAnnotationsModel.create('exp_id1', '2', 5, 4, {})
+
+        versions = stat_models.ExplorationAnnotationsModel.get_versions(
+            'exp_id1')
+
+        self.assertEqual(sorted(versions), ['1', '2'])
+
+
+class StateAnswersModelTests(test_utils.GenericTestBase):
+
+    def test_insert_submitted_answers(self):
+
+        submitted_answer_list = [{'answer': 'value'}]
+
+        stat_models.StateAnswersModel.insert_submitted_answers(
+            'exp_id', 1, 'state_name', 'interaction_id',
+            submitted_answer_list)
+
+        model1 = stat_models.StateAnswersModel.get_master_model(
+            'exp_id', 1, 'state_name')
+
+        self.assertEqual(model1.exploration_id, 'exp_id')
+        self.assertEqual(model1.exploration_version, 1)
+        self.assertEqual(model1.state_name, 'state_name')
+        self.assertEqual(model1.submitted_answer_list, submitted_answer_list)
+        self.assertEqual(model1.shard_count, 0)
+
+        # Use a smaller max answer list size so fewer answers are needed to
+        # exceed a shard. This will increase the 'shard_count'.
+        with self.swap(
+            stat_models.StateAnswersModel, '_MAX_ANSWER_LIST_BYTE_SIZE', 1):
+            stat_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id',
+                submitted_answer_list)
+            stat_models.StateAnswersModel.insert_submitted_answers(
+                'exp_id', 1, 'state_name', 'interaction_id',
+                submitted_answer_list)
+
+        # 'shard_count' will not increase as number of answers are less than
+        # the max answer list size.
+        stat_models.StateAnswersModel.insert_submitted_answers(
+            'exp_id', 1, 'state_name', 'interaction_id',
+            submitted_answer_list)
+
+        model1 = stat_models.StateAnswersModel.get_master_model(
+            'exp_id', 1, 'state_name')
+
+        self.assertEqual(model1.shard_count, 2)
+
+
+class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
+
+    def test_create_and_get_models(self):
+
+        stat_models.StateAnswersCalcOutputModel.create_or_update(
+            'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
+
+        model1 = stat_models.StateAnswersCalcOutputModel.get_model(
+            'exp_id', '1', 'state_name', 'calculation_id')
+
+        self.assertEqual(model1.exploration_id, 'exp_id')
+        self.assertEqual(model1.exploration_version, '1')
+        self.assertEqual(model1.state_name, 'state_name')
+        self.assertEqual(model1.calculation_id, 'calculation_id')
+
+    def test_raise_exception_with_large_calculation_output(self):
+
+        def _mock_ndb_put():
+            """Mocks ndb.model.put() to raise an Exception. This swap is
+            required to test against large values of calculation_output.
+            """
+            raise Exception
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *_):
+            """Mocks logging.exception."""
+            observed_log_messages.append(msg)
+
+        logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+        put_swap = self.swap(
+            stat_models.StateAnswersCalcOutputModel, 'put', _mock_ndb_put)
+
+        with put_swap, logging_swap:
+            stat_models.StateAnswersCalcOutputModel.create_or_update(
+                'exp_id', '1', 'state_name', '', 'calculation_id', '', '')
+
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                (
+                    'Failed to add calculation output for exploration ID '
+                    'exp_id, version 1, state name state_name, and '
+                    'calculation ID calculation_id'
+                )
+            )
 
 
 class ExplorationActualStartEventLogEntryModelUnitTests(
@@ -275,3 +399,16 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 
         instances = stat_models.PlaythroughModel.get_multi(instance_ids)
         self.assertEqual(instances, [None, None])
+
+    def test_raise_exception_by_mocking_collision(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The id generator for PlaythroughModel is producing too '
+            'many collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                stat_models.PlaythroughModel, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    stat_models.PlaythroughModel)):
+                stat_models.PlaythroughModel.create(
+                    'exp_id1', 1, 'EarlyQuit', {}, [])
