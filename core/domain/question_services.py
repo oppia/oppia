@@ -138,7 +138,7 @@ def get_questions_and_skill_descriptions_for_question_ids(question_ids):
         if skill_id not in skill_description_and_questions:
             skill_description_and_questions[skill_id] = {
                 'question_ids': [],
-                'skill_description': ""
+                'skill_description': ''
             }
         skill_description_and_questions[skill_id]['question_ids'].append(
             question_id)
