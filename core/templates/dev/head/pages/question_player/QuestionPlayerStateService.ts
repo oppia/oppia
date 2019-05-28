@@ -25,7 +25,7 @@ oppia.constant('EXPLORATION_MODE', {
 });
 
 oppia.factory('QuestionPlayerStateService', [
-  '$log', '$q', '$rootScope'
+  '$log', '$q', '$rootScope',
   function(
       $log, $q, $rootScope) {
     var questionState = {};

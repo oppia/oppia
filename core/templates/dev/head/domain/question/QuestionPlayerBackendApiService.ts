@@ -26,7 +26,7 @@ oppia.factory('QuestionPlayerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
   'SKILLS_FOR_QUESTION_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE,
-    SKILLS_FOR_QUESTION_URL_TEMPLATE) {
+      SKILLS_FOR_QUESTION_URL_TEMPLATE) {
     var _startCursor = '';
     var _fetchQuestions = function(
         skillIds, questionCount, resetHistory, successCallback, errorCallback) {
@@ -58,7 +58,7 @@ oppia.factory('QuestionPlayerBackendApiService', [
 
     var _fetchSkillsForQuestions = function(
         questionIds, successCallback, errorCallback) {
-      if(!isListOfStrings(questionIds)) {
+      if( !isListOfStrings(questionIds)) {
         errorCallback('Question ids should be a list of strings');
         return;
       }
@@ -66,14 +66,14 @@ oppia.factory('QuestionPlayerBackendApiService', [
         SKILLS_FOR_QUESTION_URL_TEMPLATE, {
           question_ids: questionIds.join(',')
         });
-      $http.get(questionDataUrl).then(function(response){
+      $http.get(questionDataUrl).then(function(response) {
         var skillDescriptionAndQuestionDicts = (
           angular.copy(response.data.skill_description_and_questions));
         if (successCallback) {
           successCallback(skillDescriptionAndQuestionDicts);
         }
-
-      },function(errorResponse) {
+      },
+      function(errorResponse) {
         if (errorCallback) {
           errorCallback(errorResponse.data);
         }

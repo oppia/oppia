@@ -570,11 +570,13 @@ oppia.directive('conversationSkin', [
           };
 
           $rootScope.$on('hintConsumed', function(evt) {
-            QuestionPlayerStateService.hintUsed(PretestEngineService.getCurrentQuestionId());
+            QuestionPlayerStateService.hintUsed(
+              PretestEngineService.getCurrentQuestionId());
           });
 
-           $rootScope.$on('solutionViewed', function(evt, timestamp) {
-              QuestionPlayerStateService.solutionViewed(PretestEngineService.getCurrentQuestionId());
+          $rootScope.$on('solutionViewed', function(evt, timestamp) {
+            QuestionPlayerStateService.solutionViewed(
+              PretestEngineService.getCurrentQuestionId());
           });
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
@@ -790,7 +792,8 @@ oppia.directive('conversationSkin', [
                     'playerStateChange', nextCard.getStateName());
                 }
                 else {
-                  QuestionPlayerStateService.answerSubmitted(PretestEngineService.getCurrentQuestionId(),!remainOnCurrentCard);
+                  QuestionPlayerStateService.answerSubmitted(
+                    PretestEngineService.getCurrentQuestionId(), !remainOnCurrentCard);
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
@@ -986,10 +989,10 @@ oppia.directive('conversationSkin', [
               $scope.returnToExplorationAfterConceptCard();
               return;
             }
-            if($scope.questionSessionCompleted) {
+            if ($scope.questionSessionCompleted) {
               $rootScope.$broadcast(
-              'questionSessionCompleted',
-              QuestionPlayerStateService.getQuestionStateData());
+                'questionSessionCompleted',
+                QuestionPlayerStateService.getQuestionStateData());
               return;
             }
             if ($scope.moveToExploration) {

@@ -66,7 +66,7 @@ require('pages/exploration_player/LearnerLocalNav.ts');
 require('pages/exploration_player/LearnerViewInfo.ts');
 
 oppia.directive('questionPlayer', [
-  '$http', 'UrlInterpolationService', 
+  '$http', 'UrlInterpolationService',
   function(
       $http, UrlInterpolationService) {
     return {
@@ -121,16 +121,14 @@ oppia.directive('questionPlayer', [
             var scorePerSkill = [];
             var totalScore = 0.0;
             for (skill in questionSkillData) {
-              console.log("Skill ID: " + skill);
               var totalScorePerSkill = 0.0;
-              var questionIds = questionSkillData[skill]["question_ids"];
-              var description = questionSkillData[skill]["skill_description"];
-              for (i = 0; i < questionIds.length; i ++) {
+              var questionIds = questionSkillData[skill].question_ids;
+              var description = questionSkillData[skill].skill_description;
+              for (i = 0; i < questionIds.length; i += 1) {
                 totalScorePerSkill += questionScores[questionIds[i]];
               }
               scorePerSkill.push([description, totalScorePerSkill]);
             }
-            console.log("Final score: " + JSON.stringify(scorePerSkill));
           };
 
 
@@ -139,27 +137,30 @@ oppia.directive('questionPlayer', [
             $scope.showResultsView = true;
             var questionScores = {};
             var questionIds = [];
-            for(question in questionStateData) {
+            for (question in questionStateData) {
               questionIds.push(question);
               var questionData = questionStateData[question];
               var totalHintsPenalty = 0.0;
               var wrongAnswerPenalty = 0.0;
-              if(questionData["answers"]) {
-                wrongAnswerPenalty = (questionData["answers"].length - 1) * WRONG_ANSWER_PENALTY;
+              if (questionData.answers) {
+                wrongAnswerPenalty = (
+                  (questionData.answers.length - 1) * WRONG_ANSWER_PENALTY);
               }
-              if (questionData["usedHints"]) {
-               totalHintsPenalty = questionData["usedHints"].length * VIEW_HINT_PENALTY;
+              if (questionData.usedHints) {
+               totalHintsPenalty = (
+                 questionData.usedHints.length * VIEW_HINT_PENALTY);
               }
               var totalScore = 1.0;
-              if (questionData["viewedSolution"]) {
+              if (questionData.viewedSolution) {
                 totalScore = 0.0;
               } else {
                 totalScore -= (totalHintsPenalty + wrongAnswerPenalty);
               }
               questionScores[question] = totalScore;
             }
-            QuestionPlayerBackendApiService.fetchSkillsForQuestions(questionIds).then(function(result){
-              calculateScorePerSkill(result, questionScores);
+            QuestionPlayerBackendApiService.fetchSkillsForQuestions(
+              questionIds).then(function(result){
+                calculateScorePerSkill(result, questionScores);
             });
           };
 
@@ -178,7 +179,6 @@ oppia.directive('questionPlayer', [
             var resultHashString = decodeURIComponent($location.hash());
             if(resultHashString) {
               var questionStateData = JSON.parse(resultHashString);
-              console.log("Question State Data : " + questionStateData);
               calculateScores(questionStateData);
             }
           });
