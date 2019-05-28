@@ -1012,6 +1012,7 @@ class FlagExplorationHandler(base.BaseHandler):
             self.user_id)
         self.render_json(self.values)
 
+
 class QuestionSkillFetchHandler(base.BaseHandler):
     """Returns skill ids for given question ids."""
 
