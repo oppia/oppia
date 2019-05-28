@@ -15,6 +15,17 @@
 /**
  * @fileoverview Controller for the state editor directive.
  */
+
+require('pages/state_editor/StateContentEditorDirective.ts');
+require('pages/state_editor/StateHintsEditorDirective.ts');
+require('pages/state_editor/StateInteractionEditorDirective.ts');
+require('pages/state_editor/StateResponsesDirective.ts');
+require('pages/state_editor/StateSolutionEditorDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+
 oppia.directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

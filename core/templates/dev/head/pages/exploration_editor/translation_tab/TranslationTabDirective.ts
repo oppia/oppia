@@ -16,46 +16,56 @@
  * @fileoverview Directive for the translation tab.
  */
 
-oppia.directive('translationTab', [
-  'ContextService', 'ExplorationDataService', 'ExplorationStatesService',
-  'StateContentIdsToAudioTranslationsService', 'StateEditorService',
-  'StateTutorialFirstTimeService', 'UrlInterpolationService',
-  function(
-      ContextService, ExplorationDataService, ExplorationStatesService,
-      StateContentIdsToAudioTranslationsService, StateEditorService,
-      StateTutorialFirstTimeService, UrlInterpolationService) {
+require('components/attribution_guide/AttributionGuideDirective.ts');
+require(
+  'pages/exploration_editor/translation_tab/StateTranslationDirective.ts');
+require(
+  'pages/exploration_editor/translation_tab/' +
+  'StateTranslationStatusGraphDirective.ts'
+);
+require(
+  'pages/exploration_editor/translation_tab/TranslatorOverviewDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StatePropertyService.ts');
+require(
+  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+
+oppia.directive('translationTab', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      link: function() {
-        ExplorationDataService.getData().then(function(data) {
-          StateTutorialFirstTimeService.initTranslation(
-            data.show_state_translation_tutorial_on_load,
-            ContextService.getExplorationId()
-          );
-        });
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
 
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
-        'EditabilityService', 'StateTutorialFirstTimeService',
-        'StateWrittenTranslationsService', 'TranslationTabActiveModeService',
-        'UrlInterpolationService',
+        'ContextService', 'EditabilityService', 'ExplorationStatesService',
+        'StateEditorService', 'StateRecordedVoiceoversService',
+        'StateTutorialFirstTimeService', 'StateWrittenTranslationsService',
+        'TranslationTabActiveModeService',
         function($scope, $rootScope, $templateCache, $uibModal,
-            EditabilityService, StateTutorialFirstTimeService,
-            StateWrittenTranslationsService, TranslationTabActiveModeService,
-            UrlInterpolationService) {
+            ContextService, EditabilityService, ExplorationStatesService,
+            StateEditorService, StateRecordedVoiceoversService,
+            StateTutorialFirstTimeService, StateWrittenTranslationsService,
+            TranslationTabActiveModeService) {
           $rootScope.loadingMessage = 'Loading';
           $scope.isTranslationTabBusy = false;
           $scope.showTranslationTabSubDirectives = false;
 
           var initTranslationTab = function() {
+            StateTutorialFirstTimeService.initTranslation(
+              ContextService.getExplorationId());
             var stateName = StateEditorService.getActiveStateName();
-            StateContentIdsToAudioTranslationsService.init(
-              stateName,
-              ExplorationStatesService.getContentIdsToAudioTranslationsMemento(
+            StateRecordedVoiceoversService.init(
+              stateName, ExplorationStatesService.getRecordedVoiceoversMemento(
                 stateName));
             StateWrittenTranslationsService.init(stateName,
               ExplorationStatesService.getWrittenTranslationsMemento(

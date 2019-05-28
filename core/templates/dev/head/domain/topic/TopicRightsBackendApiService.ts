@@ -16,6 +16,8 @@
  * @fileoverview Service to change the rights of topic in the backend.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.factory('TopicRightsBackendApiService', [
   '$http', '$log', '$q', 'UrlInterpolationService',
   'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE', 'TOPIC_RIGHTS_URL_TEMPLATE',

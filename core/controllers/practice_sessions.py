@@ -60,10 +60,10 @@ class PracticeSessionsPage(base.BaseHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
-            'dependencies_html': jinja2.utils.Markup(dependencies_html)
+            'dependencies_html': jinja2.utils.Markup(dependencies_html),
+            'topic_name': topic.name,
         })
-
-        self.render_template('/pages/practice_session/practice_session.html')
+        self.render_template('dist/practice_session.html')
 
 
 class PracticeSessionsPageDataHandler(base.BaseHandler):

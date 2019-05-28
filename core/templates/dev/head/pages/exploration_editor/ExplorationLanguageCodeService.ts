@@ -12,7 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @fileoverview A data service that stores the exploration language code. */
+/**
+ * @fileoverview A data service that stores the exploration language code.
+ */
+
+
+require('pages/exploration_editor/ExplorationPropertyService.ts');
 
 oppia.factory('ExplorationLanguageCodeService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {

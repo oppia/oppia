@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the AudioTranslation object factory.
  */
 
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+
 describe('AudioTranslation object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

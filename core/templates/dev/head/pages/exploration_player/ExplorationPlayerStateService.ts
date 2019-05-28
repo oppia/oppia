@@ -17,12 +17,32 @@
  *  like engine service.
  */
 
+
 oppia.constant('EXPLORATION_MODE', {
   EXPLORATION: 'exploration',
   PRETEST: 'pretest',
   QUESTION_PLAYER: 'question_player',
   OTHER: 'other'
 });
+
+
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/question/PretestQuestionBackendApiService.ts');
+require('domain/question/QuestionPlayerBackendApiService.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/NumberAttemptsService.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/exploration_player/PretestEngineService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration_player/StatsReportingService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesBackendApiService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/PlaythroughIssuesService.ts');
+require('services/PlaythroughService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', '$rootScope', 'ContextService',

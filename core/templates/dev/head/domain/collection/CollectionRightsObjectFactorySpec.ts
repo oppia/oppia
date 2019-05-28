@@ -16,6 +16,8 @@
  * @fileoverview Tests for CollectionRightsObjectFactory.
  */
 
+require('domain/collection/CollectionRightsObjectFactory.ts');
+
 describe('Collection rights object factory', function() {
   var CollectionRightsObjectFactory = null;
 

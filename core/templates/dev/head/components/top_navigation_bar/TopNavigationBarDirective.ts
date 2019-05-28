@@ -18,14 +18,25 @@
  * the editor pages).
  */
 
+require('domain/sidebar/SidebarStatusService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/DebouncerService.ts');
+require('services/NavigationService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 oppia.directive('topNavigationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/top_navigation_bar/' +
         'top_navigation_bar_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
@@ -36,39 +47,40 @@ oppia.directive('topNavigationBar', [
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             SiteAnalyticsService, NavigationService, WindowDimensionsService,
             DebouncerService, DeviceInfoService, LOGOUT_URL) {
-          $scope.isModerator = null;
-          $scope.isAdmin = null;
-          $scope.isTopicManager = null;
-          $scope.isSuperAdmin = null;
-          $scope.userIsLoggedIn = null;
-          $scope.username = '';
+          var ctrl = this;
+          ctrl.isModerator = null;
+          ctrl.isAdmin = null;
+          ctrl.isTopicManager = null;
+          ctrl.isSuperAdmin = null;
+          ctrl.userIsLoggedIn = null;
+          ctrl.username = '';
           UserService.getUserInfoAsync().then(function(userInfo) {
             if (userInfo.getPreferredSiteLanguageCode()) {
               $translate.use(userInfo.getPreferredSiteLanguageCode());
             }
-            $scope.isModerator = userInfo.isModerator();
-            $scope.isAdmin = userInfo.isAdmin();
-            $scope.isTopicManager = userInfo.isTopicManager();
-            $scope.isSuperAdmin = userInfo.isSuperAdmin();
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
-            $scope.username = userInfo.getUsername();
-            if ($scope.username) {
-              $scope.profilePageUrl = UrlInterpolationService.interpolateUrl(
+            ctrl.isModerator = userInfo.isModerator();
+            ctrl.isAdmin = userInfo.isAdmin();
+            ctrl.isTopicManager = userInfo.isTopicManager();
+            ctrl.isSuperAdmin = userInfo.isSuperAdmin();
+            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+            ctrl.username = userInfo.getUsername();
+            if (ctrl.username) {
+              ctrl.profilePageUrl = UrlInterpolationService.interpolateUrl(
                 '/profile/<username>', {
-                  username: $scope.username
+                  username: ctrl.username
                 });
             }
 
-            if ($scope.userIsLoggedIn) {
+            if (ctrl.userIsLoggedIn) {
               // Show the number of unseen notifications in the navbar and page
               // title, unless the user is already on the dashboard page.
               $http.get('/notificationshandler').then(function(response) {
                 var data = response.data;
                 if ($window.location.pathname !== '/') {
-                  $scope.numUnseenNotifications = data.num_unseen_notifications;
-                  if ($scope.numUnseenNotifications > 0) {
+                  ctrl.numUnseenNotifications = data.num_unseen_notifications;
+                  if (ctrl.numUnseenNotifications > 0) {
                     $window.document.title = (
-                      '(' + $scope.numUnseenNotifications + ') ' +
+                      '(' + ctrl.numUnseenNotifications + ') ' +
                       $window.document.title);
                   }
                 }
@@ -76,22 +88,21 @@ oppia.directive('topNavigationBar', [
             }
           });
           UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-            $scope.profilePictureDataUrl = dataUrl;
+            ctrl.profilePictureDataUrl = dataUrl;
           });
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'topics_and_skills_dashboard',
             'topic_editor', 'skill_editor', 'story_editor'];
-          $scope.currentUrl = window.location.pathname.split('/')[1];
-          $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
-          $scope.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          $scope.logoutUrl = LOGOUT_URL;
-          $scope.userMenuIsShown = ($scope.currentUrl !== NAV_MODE_SIGNUP);
-          $scope.standardNavIsShown = (
-            NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.currentUrl) === -1);
+          ctrl.currentUrl = window.location.pathname.split('/')[1];
+          ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
+          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.logoutUrl = LOGOUT_URL;
+          ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
+          ctrl.standardNavIsShown = (
+            NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf(ctrl.currentUrl) === -1);
 
-          $scope.onLoginButtonClicked = function() {
+          ctrl.onLoginButtonClicked = function() {
             SiteAnalyticsService.registerStartLoginEvent('loginButton');
             UserService.getLoginUrlAsync().then(
               function(loginUrl) {
@@ -106,15 +117,15 @@ oppia.directive('topNavigationBar', [
             );
           };
 
-          $scope.googleSignInIconUrl = (
+          ctrl.googleSignInIconUrl = (
             UrlInterpolationService.getStaticImageUrl(
               '/google_signin_buttons/google_signin.svg'));
-          $scope.onLogoutButtonClicked = function() {
+          ctrl.onLogoutButtonClicked = function() {
             $window.localStorage.removeItem('last_uploaded_audio_lang');
           };
-          $scope.ACTION_OPEN = NavigationService.ACTION_OPEN;
-          $scope.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
-          $scope.KEYBOARD_EVENT_TO_KEY_CODES =
+          ctrl.ACTION_OPEN = NavigationService.ACTION_OPEN;
+          ctrl.ACTION_CLOSE = NavigationService.ACTION_CLOSE;
+          ctrl.KEYBOARD_EVENT_TO_KEY_CODES =
           NavigationService.KEYBOARD_EVENT_TO_KEY_CODES;
           /**
            * Opens the submenu.
@@ -122,25 +133,25 @@ oppia.directive('topNavigationBar', [
            * @param {String} menuName - name of menu, on which
            * open/close action to be performed (aboutMenu,profileMenu).
            */
-          $scope.openSubmenu = function(evt, menuName) {
+          ctrl.openSubmenu = function(evt, menuName) {
             // Focus on the current target before opening its submenu.
             NavigationService.openSubmenu(evt, menuName);
           };
-          $scope.blurNavigationLinks = function(evt) {
+          ctrl.blurNavigationLinks = function(evt) {
             // This is required because if about submenu is in open state
             // and when you hover on library, both will be highlighted,
             // To avoid that, blur all the a's in nav, so that only one
             // will be highlighted.
             $('nav a').blur();
           };
-          $scope.closeSubmenu = function(evt) {
+          ctrl.closeSubmenu = function(evt) {
             NavigationService.closeSubmenu(evt);
           };
-          $scope.closeSubmenuIfNotMobile = function(evt) {
+          ctrl.closeSubmenuIfNotMobile = function(evt) {
             if (DeviceInfoService.isMobileDevice()) {
               return;
             }
-            $scope.closeSubmenu(evt);
+            ctrl.closeSubmenu(evt);
           };
           /**
            * Handles keydown events on menus.
@@ -153,41 +164,41 @@ oppia.directive('topNavigationBar', [
            * @example
            *  onMenuKeypress($event, 'aboutMenu', {enter: 'open'})
            */
-          $scope.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
+          ctrl.onMenuKeypress = function(evt, menuName, eventsTobeHandled) {
             NavigationService.onMenuKeypress(evt, menuName, eventsTobeHandled);
-            $scope.activeMenuName = NavigationService.activeMenuName;
+            ctrl.activeMenuName = NavigationService.activeMenuName;
           };
 
           // Close the submenu if focus or click occurs anywhere outside of
           // the menu or outside of its parent (which opens submenu on hover).
           angular.element(document).on('click', function(evt) {
             if (!angular.element(evt.target).closest('li').length) {
-              $scope.activeMenuName = '';
+              ctrl.activeMenuName = '';
               $scope.$apply();
             }
           });
 
-          $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+          ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
           var currentWindowWidth = WindowDimensionsService.getWidth();
-          $scope.navElementsVisibilityStatus = {};
+          ctrl.navElementsVisibilityStatus = {};
           // The order of the elements in this array specifies the order in
           // which they will be hidden. Earlier elements will be hidden first.
           var NAV_ELEMENTS_ORDER = [
             'I18N_TOPNAV_DONATE', 'I18N_TOPNAV_ABOUT',
             'I18N_CREATE_EXPLORATION_CREATE', 'I18N_TOPNAV_LIBRARY'];
           for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
-            $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
+            ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] = true;
           }
 
           WindowDimensionsService.registerOnResizeHook(function() {
-            $scope.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
+            ctrl.windowIsNarrow = WindowDimensionsService.isWindowNarrow();
             $scope.$apply();
             // If window is resized larger, try displaying the hidden elements.
             if (currentWindowWidth < WindowDimensionsService.getWidth()) {
               for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
                 if (
-                  !$scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
-                  $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
+                  !ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
+                  ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
                     true;
                 }
               }
@@ -195,11 +206,11 @@ oppia.directive('topNavigationBar', [
 
             // Close the sidebar, if necessary.
             SidebarStatusService.closeSidebar();
-            $scope.sidebarIsShown = SidebarStatusService.isSidebarShown();
+            ctrl.sidebarIsShown = SidebarStatusService.isSidebarShown();
             currentWindowWidth = WindowDimensionsService.getWidth();
             truncateNavbarDebounced();
           });
-          $scope.isSidebarShown = function() {
+          ctrl.isSidebarShown = function() {
             if (SidebarStatusService.isSidebarShown()) {
               angular.element(document.body).addClass('oppia-stop-scroll');
             } else {
@@ -207,7 +218,7 @@ oppia.directive('topNavigationBar', [
             }
             return SidebarStatusService.isSidebarShown();
           };
-          $scope.toggleSidebar = function() {
+          ctrl.toggleSidebar = function() {
             SidebarStatusService.toggleSidebar();
           };
 
@@ -254,11 +265,11 @@ oppia.directive('topNavigationBar', [
               .clientHeight > 60) {
               for (var i = 0; i < NAV_ELEMENTS_ORDER.length; i++) {
                 if (
-                  $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
+                  ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]]) {
                   // Hide one element, then check again after 50ms.
                   // This gives the browser time to render the visibility
                   // change.
-                  $scope.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
+                  ctrl.navElementsVisibilityStatus[NAV_ELEMENTS_ORDER[i]] =
                     false;
                   // Force a digest cycle to hide element immediately.
                   // Otherwise it would be hidden after the next call.

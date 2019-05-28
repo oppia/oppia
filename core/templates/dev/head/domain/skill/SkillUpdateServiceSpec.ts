@@ -13,8 +13,15 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SkillUpdateService.
-*/
+ * @fileoverview Unit tests for SkillUpdateService.
+ */
+
+require('App.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/SkillObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
 
 describe('Skill update service', function() {
   var SkillUpdateService,
