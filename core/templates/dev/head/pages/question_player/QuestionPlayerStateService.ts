@@ -34,38 +34,37 @@ oppia.factory('QuestionPlayerStateService', [
       return new Date().getTime();
     };
 
-    var createNewQuestionState = function(questionId){
-      questionState[questionId] = {'answers':[], 'usedHints':[]};
-    }
+    var createNewQuestionState = function(questionId) {
+      questionState[questionId] = {answers: [], usedHints: []};
+    };
 
     var _hintUsed = function(questionId) {
-      console.log("Hint used");
-      if(!questionState[questionId]){
+      if (!questionState[questionId]) {
         createNewQuestionState(questionId);
       }
-      questionState[questionId]["usedHints"].push({'timestamp': getCurrentTime()});
+      questionState[questionId].usedHints.push({timestamp: getCurrentTime()});
     };
 
     var _solutionViewed = function(questionId) {
-      console.log("Solution viewed");
-      if(!questionState[questionId]){
+      if (!questionState[questionId]) {
         createNewQuestionState(questionId);
       }
-      questionState[questionId]["viewedSolution"] = {'timestamp': getCurrentTime()};
+      questionState[questionId].viewedSolution = {
+        timestamp: getCurrentTime()};
     };
 
     var _answerSubmitted = function(questionId, isCorrect) {
-      if(!questionState[questionId]){
+      if (!questionState[questionId]) {
         createNewQuestionState(questionId);
       }
       // Don't store a correct answer in the case where
       // the learner viewed the solution for this question.
-      if(isCorrect && questionState[questionId]["viewedSolution"]) {
+      if (isCorrect && questionState[questionId].viewedSolution) {
         return;
       }
-      questionState[questionId]["answers"].push(
-        {'isCorrect': isCorrect,
-         'timestamp':getCurrentTime()
+      questionState[questionId].answers.push(
+        {isCorrect: isCorrect,
+          timestamp: getCurrentTime()
         });
     };
 

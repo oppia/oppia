@@ -118,7 +118,7 @@ oppia.directive('questionPlayer', [
           };
 
           var calculateScorePerSkill = function(questionSkillData,
-            questionScores) {
+              questionScores) {
             var scorePerSkill = [];
             var totalScore = 0.0;
             for (skill in questionSkillData) {
@@ -167,11 +167,12 @@ oppia.directive('questionPlayer', [
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {
             updateCurrentQuestion(result + 1);
-
           });
+
           $rootScope.$on('totalQuestionsReceived', function(event, result) {
             updateTotalQuestions(result);
           });
+          
           $rootScope.$on('questionSessionCompleted', function(event, result) {
             $location.hash(encodeURIComponent(JSON.stringify(result)));
           });
