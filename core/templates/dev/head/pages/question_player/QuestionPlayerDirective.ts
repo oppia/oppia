@@ -130,7 +130,6 @@ oppia.directive('questionPlayer', [
               }
               $scope.scorePerSkill.push([description, totalScorePerSkill]);
             }
-            console.log("Calculated score per skill");
           };
 
 
