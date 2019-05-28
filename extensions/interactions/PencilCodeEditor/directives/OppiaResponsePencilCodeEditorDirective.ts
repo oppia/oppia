@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the PencilCodeEditor response.
+ * @fileoverview Directive for the PencilCodeEditor response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -26,11 +26,14 @@ oppia.directive('oppiaResponsePencilCodeEditor', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/PencilCodeEditor/directives/' +
         'pencil_code_editor_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answerCode = HtmlEscaperService.escapedJsonToObj(
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.answerCode = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).code;
       }]
     };
