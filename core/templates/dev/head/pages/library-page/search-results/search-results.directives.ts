@@ -17,7 +17,7 @@
  */
 
 require(
-  'pages/library-page/activity-tiles-infinity-grid/' +
+  'pages/library-page/search-results/' +
   'activity-tiles-infinity-grid.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

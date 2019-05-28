@@ -19,7 +19,7 @@
 require('App.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/' +

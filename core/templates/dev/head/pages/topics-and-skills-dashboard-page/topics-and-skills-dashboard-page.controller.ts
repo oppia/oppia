@@ -24,11 +24,11 @@ require(
   'skills-list.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page-navbar/' +
+  'navbar/' +
   'topics-and-skills-dashboard-page-navbar-breadcrumb.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page-navbar/' +
+  'navbar/' +
   'topics-and-skills-dashboard-page-navbar.directive.ts');
 require(
   'pages/topics-and-skills-dashboard-page/topics-list/' +
@@ -136,7 +136,7 @@ oppia.controller(
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/topics-and-skills-dashboard-page/' +
-            'topics-and-skills-dashboard-page-templates/' +
+            'templates/' +
             'create-new-skill-modal.template.html'),
           backdrop: 'static',
           controller: [

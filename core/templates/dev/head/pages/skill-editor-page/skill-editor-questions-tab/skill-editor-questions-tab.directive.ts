@@ -16,7 +16,7 @@
  * @fileoverview Controller for the questions tab.
  */
 
-require('pages/questions-list-page/questions-list-page.directive.ts');
+require('components/question-directives/questions-list/questions-list.directive.ts');
 
 require(
   'components/entity-creation-services/' +

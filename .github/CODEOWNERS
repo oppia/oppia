@@ -116,7 +116,7 @@
 /core/templates/dev/head/domain/state_card/ @aks681
 /core/templates/dev/head/pages/exploration-editor-page/ @DubeySandeep
 /core/templates/dev/head/pages/exploration-player-page/ @aks681
-/core/templates/dev/head/pages/state-editor-page/ @aks681
+/core/templates/dev/head/components/state-editor/ @aks681
 /core/templates/dev/head/components/state/ @aks681
 /core/templates/dev/head/pages/exploration-player-page/ @aks681
 /core/templates/dev/head/services/ComputeGraphService.ts @DubeySandeep
@@ -250,10 +250,10 @@
 /core/storage/question/ @aks681
 /core/templates/dev/head/components/QuestionCreationService*.ts @aks681
 /core/templates/dev/head/domain/question/ @aks681
-/core/templates/dev/head/pages/question-editor-page/ @aks681
-/core/templates/dev/head/pages/questions-list-page/ @aks681
+/core/templates/dev/head/components/question-directives/question-editor/ @aks681
+/core/templates/dev/head/components/question-directives/questions-list/ @aks681
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
-/core/templates/dev/head/pages/question-player-page/ @vinitamurthi
+/core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
 
 # Skill project.
 /core/controllers/concept_card_viewer*.py @aks681
@@ -319,7 +319,7 @@
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
-/core/templates/dev/head/pages/tests/ @seanlip
+/core/templates/dev/head/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
 /schema_utils*.py @seanlip
 /utils*.py @aks681

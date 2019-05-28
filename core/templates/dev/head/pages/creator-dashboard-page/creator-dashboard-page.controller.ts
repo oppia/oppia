@@ -105,7 +105,7 @@ require(
 require(
   'components/forms/custom-forms-directives/' +
   'audio-file-uploader.directive.ts');
-require('pages/question-editor-page/question-editor-page.directive.ts');
+require('components/question-directives/question-editor/question-editor.directive.ts');
 require(
   'components/state/answer-group-editor/answer-group-editor.directive.ts');
 require('components/state/hint-editor/hint-editor.directive.ts');
@@ -158,7 +158,7 @@ require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
   'thread-status-display.service.ts');
 require(
-  'pages/show-suggestion-editor-pages/show-suggestion-modal-for-creator-view/' +
+  'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
   'show-suggestion-modal-for-creator-view.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
@@ -480,7 +480,7 @@ oppia.controller('CreatorDashboard', [
       var topicSummaries = $scope.topicSummaries;
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/creator-dashboard-page/creator-dashboard-page-modal-templates/' +
+          '/pages/creator-dashboard-page/modal-templates/' +
           'create-question-modal.directive.html'),
         backdrop: 'static',
         keyboard: false,

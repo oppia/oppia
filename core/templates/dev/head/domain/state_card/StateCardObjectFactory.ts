@@ -18,7 +18,7 @@
  */
 
 require(
-  'pages/exploration-player-page/exploration-player-page-services/' +
+  'pages/exploration-player-page/services/' +
   'audio-translation-language.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 

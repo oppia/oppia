@@ -22,8 +22,8 @@ require('pages/collection-editor-page/editor-tab/' +
   'collection-node-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page/collection-editor-page-services/collection-editor-state.service.ts');
-require('pages/collection-editor-page/collection-editor-page-services/collection-linearizer.service.ts');
+require('pages/collection-editor-page/services/collection-editor-state.service.ts');
+require('pages/collection-editor-page/services/collection-linearizer.service.ts');
 
 oppia.directive('collectionEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

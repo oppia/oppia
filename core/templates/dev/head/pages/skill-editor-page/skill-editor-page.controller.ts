@@ -103,7 +103,7 @@ require(
   'pages/skill-editor-page/skill-editor-navbar/' +
   'skill-editor-navbar-breadcrumb.directive.ts');
 require(
-  'pages/skill-editor-page/skill-editor-main-tab/' +
+  'pages/skill-editor-page/editor-tab/' +
   'skill-editor-main-tab.directive.ts');
 require(
   'pages/skill-editor-page/skill-editor-questions-tab/' +

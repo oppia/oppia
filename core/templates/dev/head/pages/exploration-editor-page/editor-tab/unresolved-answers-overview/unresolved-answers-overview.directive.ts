@@ -18,16 +18,16 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-rights.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 require('services/ImprovementsService.ts');

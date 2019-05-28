@@ -18,7 +18,7 @@
  */
 
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
@@ -28,13 +28,13 @@ require(
   'translation-tab-active-mode.service.ts'
 );
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');

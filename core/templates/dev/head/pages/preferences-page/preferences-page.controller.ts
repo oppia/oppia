@@ -193,7 +193,7 @@ oppia.controller('Preferences', [
     $scope.showEditProfilePictureModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/preferences-page/preferences-page-modal-templates/' +
+          '/pages/preferences-page/modal-templates/' +
           'edit-profile-picture-modal.directive.html'),
         backdrop: true,
         controller: [

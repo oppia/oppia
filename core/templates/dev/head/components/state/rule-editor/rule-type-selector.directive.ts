@@ -19,7 +19,7 @@
 require('filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
 require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 
 oppia.directive(

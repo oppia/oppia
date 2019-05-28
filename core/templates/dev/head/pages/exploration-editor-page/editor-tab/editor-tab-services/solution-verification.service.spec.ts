@@ -19,7 +19,7 @@
 require('App.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
@@ -30,13 +30,13 @@ require(
   'editor-tab-services/' +
   'solution-verification.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-interaction-id.service.ts');
 
 describe('Solution Verification Service', function() {

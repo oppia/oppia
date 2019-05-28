@@ -72,9 +72,9 @@ module.exports = function(config) {
       ('core/templates/dev/head/pages/exploration-editor-page/' +
        'editor-tab/state-name-editor/' +
        'state-name-editor.directive.spec.ts'),
-      ('core/templates/dev/head/pages/state-editor-page/state-content-editor/' +
+      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
        'state-content-editor.directive.spec.ts'),
-      ('core/templates/dev/head/pages/state-editor-page/' +
+      ('core/templates/dev/head/components/state-editor/' +
        'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {

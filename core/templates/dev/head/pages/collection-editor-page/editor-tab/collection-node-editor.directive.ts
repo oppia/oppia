@@ -20,8 +20,8 @@
 
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection-editor-page/collection-editor-page-services/collection-editor-state.service.ts');
-require('pages/collection-editor-page/collection-editor-page-services/collection-linearizer.service.ts');
+require('pages/collection-editor-page/services/collection-editor-state.service.ts');
+require('pages/collection-editor-page/services/collection-linearizer.service.ts');
 require('services/AlertsService.ts');
 
 oppia.directive('collectionNodeEditor', [

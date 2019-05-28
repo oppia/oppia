@@ -17,7 +17,7 @@
  */
 
 require(
-  'pages/topics-and-skills-dashboard-page/select-topics/' +
+  'pages/topics-and-skills-dashboard-page/topic-selector/' +
   'select-topics.directive.ts');
 
 require('domain/skill/EditableSkillBackendApiService.ts');
@@ -79,7 +79,7 @@ oppia.directive('skillsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/' +
-                'topics-and-skills-dashboard-page-templates/' +
+                'templates/' +
                 'delete-skill-modal.template.html'),
               backdrop: true,
               controller: [
@@ -113,7 +113,7 @@ oppia.directive('skillsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/' +
-                'topics-and-skills-dashboard-page-templates/' +
+                'templates/' +
                 'assign-skill-to-topic-modal.template.html'),
               backdrop: true,
               controller: [
@@ -169,7 +169,7 @@ oppia.directive('skillsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/' +
-                'topics-and-skills-dashboard-page-templates/' +
+                'templates/' +
                 'merge-skill-modal.template.html'),
               backdrop: true,
               controller: [

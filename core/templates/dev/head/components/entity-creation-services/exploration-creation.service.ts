@@ -66,7 +66,7 @@ oppia.factory(
             backdrop: true,
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/creator-dashboard-page/' +
-              'creator-dashboard-page-modal-templates/' +
+              'modal-templates/' +
               'upload-activity-modal.directive.html'),
             controller: [
               '$scope', '$uibModalInstance', function(

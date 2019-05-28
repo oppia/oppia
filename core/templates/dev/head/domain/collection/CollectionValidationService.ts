@@ -20,7 +20,7 @@
  */
 
 require(
-  'pages/collection-editor-page/collection-editor-page-services/' +
+  'pages/collection-editor-page/services/' +
   'collection-linearizer.service.ts');
 
 oppia.factory('CollectionValidationService', [

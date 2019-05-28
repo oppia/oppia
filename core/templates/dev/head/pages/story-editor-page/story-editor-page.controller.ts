@@ -100,19 +100,19 @@ require('domain/story/StoryUpdateService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
-  'pages/story-editor-page/story-editor-navbar/' +
+  'pages/story-editor-page/navbar/' +
   'story-editor-navbar-breadcrumb.directive.ts');
 require(
-  'pages/story-editor-page/story-editor-navbar/' +
+  'pages/story-editor-page/navbar/' +
   'story-editor-navbar.directive.ts');
 require(
-  'pages/story-editor-page/main-story-editor/' +
-  'main-story-editor.directive.ts');
+  'pages/story-editor-page/editor-tab/' +
+  'story-editor.directive.ts');
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/story-editor-page/story-editor-services/' +
+  'pages/story-editor-page/services/' +
   'story-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
@@ -136,7 +136,7 @@ oppia.controller('StoryEditor', [
       if (UndoRedoService.getChangeCount() > 0) {
         var modalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/story-editor-page/story-editor-modal-templates/' +
+            '/pages/story-editor-page/modal-templates/' +
             'save-pending-changes-modal.template.html'),
           backdrop: true,
           controller: [

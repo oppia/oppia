@@ -21,33 +21,33 @@ require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-category.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-data.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-param-changes.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-param-specs.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-title.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'parameter-metadata.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/exploration-engine.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/learner-params.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/number-attempts.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/player-correctness-feedback-enabled.service.ts');
+require('pages/exploration-player-page/services/exploration-engine.service.ts');
+require('pages/exploration-player-page/services/learner-params.service.ts');
+require('pages/exploration-player-page/services/number-attempts.service.ts');
+require('pages/exploration-player-page/services/player-correctness-feedback-enabled.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'editor-tab-services/responses.service.ts');

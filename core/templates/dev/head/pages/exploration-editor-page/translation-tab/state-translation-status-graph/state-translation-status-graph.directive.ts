@@ -18,14 +18,14 @@
 
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'state-graph-visualization/state-graph-visualization.directive.ts');
+  'graph-directives/state-graph-visualization.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'graph-data.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab-services/' +
@@ -34,13 +34,13 @@ require(
   'pages/exploration-editor-page/editor-tab/' +
   'editor-tab-services/responses.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-written-translations.service.ts');
 
 oppia.directive(

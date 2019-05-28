@@ -140,7 +140,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/charts/' +
   'bar-chart.directive.ts');
 require(
-  'pages/show-suggestion-editor-pages/show-suggestion-modal-for-editor-view/' +
+  'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'show-suggestion-modal-for-editor-view.controller.ts');
 require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
@@ -180,7 +180,7 @@ require(
   'pages/exploration-editor-page/editor-tab/' + 
   'exploration-editor-tab.controller.ts');
 require(
-  'pages/exploration-editor-page/editor-tab/exploration-graph/' +
+  'pages/exploration-editor-page/editor-tab/graph-directives/' +
   'exploration-graph.controller.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
@@ -207,73 +207,73 @@ require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
-require('pages/exploration-player-page/conversation-skin/conversation-skin.directive.ts');
-require('pages/exploration-player-page/exploration-footer/exploration-footer.directive.ts');
+require('pages/exploration-player-page/layout-directives/conversation-skin.directive.ts');
+require('pages/exploration-player-page/layout-directives/exploration-footer.directive.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'autosave-info-modals.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'change-list.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-automatic-text-to-speech.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-category.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-data.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-language-code.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-objective.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-param-changes.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-param-specs.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-rights.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-tags.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-title.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-warnings.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'graph-data.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'router.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/state-classifier-mapping.service.ts');
+require('pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'user-email-preferences.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
@@ -695,7 +695,7 @@ oppia.controller('ExplorationEditor', [
     $scope.showWelcomeExplorationModal = function() {
       var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration-editor-page/exploration-editor-page-modal-templates/' +
+          '/pages/exploration-editor-page/modal-templates/' +
           'welcome-modal.template.html'),
         backdrop: true,
         controller: [

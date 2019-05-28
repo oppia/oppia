@@ -1,0 +1,160 @@
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Directive for the questions player directive.
+ */
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+
+require('domain/question/QuestionPlayerBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
+require(
+  'components/ck-editor-helpers/ck-editor-rte.directive.ts');
+require(
+  'components/ck-editor-helpers/' +
+  'ck-editor-widgets.initializer.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require('directives/MathjaxBindDirective.ts');
+require(
+  'filters/' +
+  'convert-unicode-with-params-to-html.filter.ts');
+require(
+  'filters/convert-html-to-unicode.filter.ts');
+require(
+  'filters/convert-unicode-to-html.filter.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
+require(
+  'components/forms/custom-forms-directives/' +
+  'apply-validation.directive.ts');
+require(
+  'components/forms/custom-forms-directives/' +
+  'require-is-float.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+require(
+  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('services/AutoplayedVideosService.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+require('pages/exploration-player-page/layout-directives/conversation-skin.directive.ts');
+require('pages/exploration-player-page/layout-directives/exploration-footer.directive.ts');
+require('pages/exploration-player-page/layout-directives/learner-local-nav.controller.ts');
+require('pages/exploration-player-page/learner-experience/learner-view-info.controller.ts');
+
+oppia.directive('questionPlayer', [
+  '$http', 'UrlInterpolationService',
+  function(
+      $http, UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {
+        getQuestionPlayerConfig: '&playerConfig',
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/components/question-directives/question-player/question-player.directive.html'),
+      controller: [
+        '$scope', '$rootScope', 'QuestionPlayerBackendApiService',
+        function(
+            $scope, $rootScope, QuestionPlayerBackendApiService) {
+          $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
+          $scope.currentQuestion = 0;
+          $scope.totalQuestions = 0;
+          $scope.currentProgress = 0;
+
+          var updateCurrentQuestion = function(currentQuestion) {
+            $scope.currentQuestion = currentQuestion;
+            updateQuestionProgression();
+          };
+
+          var updateTotalQuestions = function(totalQuestions) {
+            $scope.totalQuestions = totalQuestions;
+            updateQuestionProgression();
+          };
+
+          var updateQuestionProgression = function() {
+            if (getTotalQuestions() > 0) {
+              $scope.currentProgress = (
+                getCurrentQuestion() * 100 / getTotalQuestions());
+            } else {
+              $scope.currentProgress = 0;
+            }
+          };
+
+          var getCurrentQuestion = function() {
+            return $scope.currentQuestion;
+          };
+
+          var getTotalQuestions = function() {
+            return $scope.totalQuestions;
+          };
+
+          $rootScope.$on('currentQuestionChanged', function(event, result) {
+            updateCurrentQuestion(result + 1);
+          });
+          $rootScope.$on('totalQuestionsReceived', function(event, result) {
+            updateTotalQuestions(result);
+          });
+        }
+      ]
+    };
+  }]);

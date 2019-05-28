@@ -95,16 +95,16 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require(
-  'pages/exploration-player-page/continue-button/continue-button.directive.ts');
+  'pages/exploration-player-page/layout-directives/continue-button.directive.ts');
 require(
-  'pages/exploration-player-page/conversation-skin/' +
+  'pages/exploration-player-page/layout-directives/' +
   'conversation-skin.directive.ts');
 require(
-  'pages/exploration-player-page/exploration-footer/' +
+  'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.directive.ts');
 require(
-  'pages/exploration-player-page/learner-local-nav/' +
+  'pages/exploration-player-page/layout-directives/' +
   'learner-local-nav.controller.ts');
 require(
-  'pages/exploration-player-page/learner-view-info/' +
+  'pages/exploration-player-page/learner-experience/' +
   'learner-view-info.controller.ts');

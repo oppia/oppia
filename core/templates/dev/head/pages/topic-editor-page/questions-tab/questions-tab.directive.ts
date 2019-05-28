@@ -16,7 +16,7 @@
  * @fileoverview Controller for the questions tab.
  */
 
-require('pages/questions-list-page/questions-list-page.directive.ts');
+require('components/question-directives/questions-list/questions-list.directive.ts');
 
 require(
   'components/entity-creation-services/' +
@@ -34,7 +34,7 @@ require(
   'pages/exploration-editor-page/editor-tab/' +
   'editor-tab-services/responses.service.ts');
 require(
-  'pages/topic-editor-page/topic-editor-services/' +
+  'pages/topic-editor-page/services/' +
   'topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');

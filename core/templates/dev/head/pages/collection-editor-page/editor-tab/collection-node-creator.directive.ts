@@ -23,10 +23,10 @@ require('domain/summary/ExplorationSummaryBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require(
-  'pages/collection-editor-page/collection-editor-page-services/' +
+  'pages/collection-editor-page/services/' +
   'collection-editor-state.service.ts');
 require(
-  'pages/collection-editor-page/collection-editor-page-services/' +
+  'pages/collection-editor-page/services/' +
   'collection-linearizer.service.ts');
 require('services/AlertsService.ts');
 require('services/SiteAnalyticsService.ts');

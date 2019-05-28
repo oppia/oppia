@@ -112,19 +112,19 @@ require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
-  'pages/topic-editor-page/topic-editor-navbar/' +
+  'pages/topic-editor-page/navbar/' +
   'topic-editor-navbar-breadcrumb.directive.ts');
 require(
-  'pages/topic-editor-page/topic-editor-navbar/' +
+  'pages/topic-editor-page/navbar/' +
   'topic-editor-navbar.directive.ts');
 require(
-  'pages/topic-editor-page/main-topic-editor/main-topic-editor.directive.ts');
+  'pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
 require('pages/topic-editor-page/questions-tab/questions-tab.directive.ts');
 require(
   'pages/topic-editor-page/subtopics-list-tab/subtopics-list-tab.directive.ts');
 
 require(
-  'pages/topic-editor-page/topic-editor-services/' +
+  'pages/topic-editor-page/services/' +
   'topic-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');

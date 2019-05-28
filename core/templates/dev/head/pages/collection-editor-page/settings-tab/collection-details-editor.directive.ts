@@ -27,7 +27,7 @@ require('domain/collection/CollectionValidationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/collection-editor-page/collection-editor-page.controller.ts');
 require(
-  'pages/collection-editor-page/collection-editor-page-services/'+
+  'pages/collection-editor-page/services/'+
   'collection-editor-state.service.ts');
 require('services/AlertsService.ts');
 

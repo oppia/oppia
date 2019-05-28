@@ -30,7 +30,7 @@ require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require('pages/question-editor-page/question-editor-page.directive.ts');
+require('components/question-directives/question-editor/question-editor.directive.ts');
 
 describe('Testing filters', function() {
   var filterNames = [

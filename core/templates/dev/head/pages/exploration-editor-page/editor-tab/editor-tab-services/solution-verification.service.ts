@@ -17,9 +17,9 @@
  */
 
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'angular-name.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/answer-classification.service.ts');
+require('pages/exploration-player-page/services/answer-classification.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'editor-tab-services/responses.service.ts');

@@ -63,7 +63,7 @@ oppia.directive('topicsList', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics-and-skills-dashboard-page/' +
-                'topics-and-skills-dashboard-page-templates/' +
+                'templates/' +
                 'delete-topic-modal.template.html'),
               backdrop: true,
               controller: [

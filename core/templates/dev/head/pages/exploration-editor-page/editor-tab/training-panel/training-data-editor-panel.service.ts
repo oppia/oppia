@@ -23,10 +23,10 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'angular-name.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
@@ -37,13 +37,13 @@ require(
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'training-panel/training-modal.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/answer-classification.service.ts');
-require('pages/exploration-player-page/exploration-player-page-services/current-interaction.service.ts');
+require('pages/exploration-player-page/services/answer-classification.service.ts');
+require('pages/exploration-player-page/services/current-interaction.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');

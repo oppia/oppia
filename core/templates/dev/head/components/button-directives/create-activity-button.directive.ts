@@ -88,7 +88,7 @@ oppia.directive('createActivityButton', [
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                   '/pages/creator-dashboard-page/' +
-                  'creator-dashboard-page-modal-templates/' +
+                  'modal-templates/' +
                   'create-activity-modal.directive.html'),
                 backdrop: true,
                 controller: [

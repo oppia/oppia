@@ -18,13 +18,13 @@
 
 require('App.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.controller.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-content.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +

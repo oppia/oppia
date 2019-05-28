@@ -19,13 +19,13 @@
 require('domain/state/StateObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'change-list.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-data.service.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
@@ -34,8 +34,8 @@ require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
   'thread-status-display.service.ts');
 require(
-  'pages/show-suggestion-editor-pages/' +
-  'show-suggestion-modal-for-editor-view/' +
+  'pages/exploration-editor-page/' +
+  'suggestion-modal-for-editor-view/' +
   'show-suggestion-modal-for-editor-view.service.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');

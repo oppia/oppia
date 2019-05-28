@@ -21,7 +21,7 @@ require(
   'background-banner.directive.ts');
 require('pages/topic-viewer-page/stories-list/stories-list.directive.ts');
 require(
-  'pages/topic-viewer-page/topic-viewer-navbar-breadcrumb/' +
+  'pages/topic-viewer-page/navbar-breadcrumb/' +
   'topic-viewer-navbar-breadcrumb.directive.ts');
 
 require('domain/topic_viewer/TopicViewerBackendApiService.ts');

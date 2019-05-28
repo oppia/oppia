@@ -19,10 +19,10 @@
 require('components/component-services/state-graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'editor-first-time-events.service.ts');
 require(
-  'pages/state-editor-page/state-editor-properties-services/' +
+  'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/EditabilityService.ts');
 require('services/UserService.ts');

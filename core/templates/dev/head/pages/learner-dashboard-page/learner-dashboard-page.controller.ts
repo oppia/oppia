@@ -36,7 +36,7 @@ require(
   'pages/exploration-editor-page/feedback-tab/feedback-tab-services/' +
   'thread-status-display.service.ts');
 require(
-  'pages/show-suggestion-editor-pages/show-suggestion-modal-for-learner-view/' +
+  'pages/learner-dashboard-page/suggestion-modal-for-learner-view/' +
   'show-suggestion-modal-for-learner-view.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
@@ -461,7 +461,7 @@ oppia.controller('LearnerDashboard', [
         sectionNameI18nId, subsectionName, activity) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner-dashboard-page/learner-dashboard-page-modal-templates/' +
+          '/pages/learner-dashboard-page/modal-templates/' +
           'remove-activity-from-learner-dashboard-modal.template.html'),
         backdrop: true,
         resolve: {

@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/exploration-editor-page-services/' +
+  'pages/exploration-editor-page/services/' +
   'exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/history-tab-services/' +

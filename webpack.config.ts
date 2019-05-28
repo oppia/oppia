@@ -87,7 +87,7 @@ module.exports = {
     stewards: (
       commonPrefix +
       '/pages/landing-pages/stewards-landing-page/' +
-      'topic-landing-page-stewards.controller.ts'),
+      'stewards-landing-page.controller.ts'),
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
@@ -144,7 +144,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       filename: 'console_errors.html',
-      template: commonPrefix + '/pages/tests/console_errors.html',
+      template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -343,10 +343,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['stewards'],
-      filename: 'topic-landing-page-stewards.mainpage.html',
+      filename: 'stewards-landing-page.mainpage.html',
       template:
         commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
-        'topic-landing-page-stewards.mainpage.html',
+        'stewards-landing-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
