@@ -171,12 +171,13 @@ oppia.factory('StateCardObjectFactory', [
 
     StateCard.prototype.setLastOppiaResponse = function(response) {
       // This check is added here to ensure that this._inputReponsePairs is
-      // accessed only if there is atleast one input response pairs present.
+      // accessed only if there is atleast one input response pair present.
       // If a user clicks on restart from beginning option just after
       // submitting an answer for a card while the response is still loading,
-      // this function is called as well this_inputResponsePairs is set to null
-      // as we need to start from first card again. Adding a check here makes
-      // sure that element at index -1 is not accessed even in the above case.
+      // this function is called as well as this._inputResponsePairs is set to
+      // null as we are starting from the first card again. Adding a check here
+      // makes sure that element at index -1 is not accessed even in the
+      // above case.
       if (this._inputResponsePairs.length >= 1) {
         this._inputResponsePairs[
           this._inputResponsePairs.length - 1].oppiaResponse = response;
