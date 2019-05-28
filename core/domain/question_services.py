@@ -112,6 +112,7 @@ def delete_question_skill_link(question_id, skill_id):
         question_skill_link_id)
     question_skill_link_model.delete()
 
+
 def get_questions_and_skill_descriptions_for_question_ids(question_ids):
     """Returns the questions linked to the given skill ids.
 
