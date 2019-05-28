@@ -162,7 +162,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
-    # DEPRECATED in v2.8.1. Do not use.
+    # DEPRECATED in v2.8.2. Do not use.
     translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     def save(self, committer_id, commit_message, commit_cmds):
