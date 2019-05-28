@@ -25,7 +25,7 @@ require('components/attribution_guide/AttributionGuideDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
 require('pages/collection_player/CollectionFooterDirective.ts');
-require('pages/collection_player/CollectionLocalNav.ts');
+require('pages/collection_player/CollectionLocalNavDirective.ts');
 
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');

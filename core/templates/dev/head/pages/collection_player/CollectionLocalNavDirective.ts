@@ -16,6 +16,18 @@
  * @fileoverview Controller for the local navigation in the collection view.
  */
 
-oppia.controller('CollectionLocalNav', ['$scope', function($scope) {
-  $scope.canEdit = GLOBALS.canEdit;
+oppia.directive('collectionLocalNav', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/collection_player/collection_local_nav_directive.html'),
+    controllerAs: '$ctrl',
+    controller: [function() {
+      var ctrl = this;
+      ctrl.canEdit = GLOBALS.canEdit;
+    }]
+  };
 }]);
