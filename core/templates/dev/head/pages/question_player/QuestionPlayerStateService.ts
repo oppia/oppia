@@ -64,7 +64,7 @@ oppia.factory('QuestionPlayerStateService', [
         return;
       }
       questionState[questionId]["answers"].push(
-        {'isCorrect': isCorrect;
+        {'isCorrect': isCorrect,
          'timestamp':getCurrentTime()
         });
     };

@@ -117,7 +117,8 @@ oppia.directive('questionPlayer', [
             return $scope.totalQuestions;
           };
 
-          var calculateScorePerSkill = function(questionSkillData, questionScores) {
+          var calculateScorePerSkill = function(questionSkillData,
+            questionScores) {
             var scorePerSkill = [];
             var totalScore = 0.0;
             for (skill in questionSkillData) {
@@ -147,8 +148,8 @@ oppia.directive('questionPlayer', [
                   (questionData.answers.length - 1) * WRONG_ANSWER_PENALTY);
               }
               if (questionData.usedHints) {
-               totalHintsPenalty = (
-                 questionData.usedHints.length * VIEW_HINT_PENALTY);
+                totalHintsPenalty = (
+                  questionData.usedHints.length * VIEW_HINT_PENALTY);
               }
               var totalScore = 1.0;
               if (questionData.viewedSolution) {
@@ -159,8 +160,8 @@ oppia.directive('questionPlayer', [
               questionScores[question] = totalScore;
             }
             QuestionPlayerBackendApiService.fetchSkillsForQuestions(
-              questionIds).then(function(result){
-                calculateScorePerSkill(result, questionScores);
+              questionIds).then(function(result) {
+              calculateScorePerSkill(result, questionScores);
             });
           };
 
@@ -177,7 +178,7 @@ oppia.directive('questionPlayer', [
 
           $scope.$on('$locationChangeSuccess', function(event) {
             var resultHashString = decodeURIComponent($location.hash());
-            if(resultHashString) {
+            if (resultHashString) {
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);
             }

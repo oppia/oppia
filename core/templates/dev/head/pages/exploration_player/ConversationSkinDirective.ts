@@ -790,10 +790,10 @@ oppia.directive('conversationSkin', [
                 if (!ExplorationPlayerStateService.isInQuestionMode()) {
                   $rootScope.$broadcast(
                     'playerStateChange', nextCard.getStateName());
-                }
-                else {
+                } else {
                   QuestionPlayerStateService.answerSubmitted(
-                    PretestEngineService.getCurrentQuestionId(), !remainOnCurrentCard);
+                    PretestEngineService.getCurrentQuestionId(),
+                    !remainOnCurrentCard);
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.

@@ -58,7 +58,7 @@ oppia.factory('QuestionPlayerBackendApiService', [
 
     var _fetchSkillsForQuestions = function(
         questionIds, successCallback, errorCallback) {
-      if( !isListOfStrings(questionIds)) {
+      if ( !isListOfStrings(questionIds)) {
         errorCallback('Question ids should be a list of strings');
         return;
       }
