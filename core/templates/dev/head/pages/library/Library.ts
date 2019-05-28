@@ -19,7 +19,7 @@
 require('components/loading/LoadingDotsDirective.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
 require('components/summary_tile/CollectionSummaryTileDirective.ts');
-require('pages/library/LibraryFooter.ts');
+require('pages/library/LibraryFooterDirective.ts');
 require('pages/library/SearchBarDirective.ts');
 require('pages/library/SearchResultsDirective.ts');
 
