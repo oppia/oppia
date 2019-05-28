@@ -2370,11 +2370,15 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
             exploration.id, self.user_a_id)
         exp_rights_model = exp_models.ExplorationRightsModel.get(
             exploration.id)
-        exp_rights_model.translator_ids = [self.user_b_id]
+        exp_rights_model.translator_ids = [self.user_a_id, self.user_b_id]
         commit_message = 'Assign a translator for test'
         commit_cmds = [{
             'cmd': 'change_role',
-            'assignee_ids': self.user_b_id,
+            'assignee_id': self.user_a_id,
+            'new_role': 'translator'
+            }, {
+            'cmd': 'change_role',
+            'assignee_id': self.user_b_id,
             'new_role': 'translator'
         }]
         exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
@@ -2386,7 +2390,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
             objective='Old objective',
             language_code='en',
             community_owned=exp_rights_model.community_owned,
-            translator_ids=[self.user_b_id]
+            translator_ids=[self.user_a_id, self.user_b_id]
         )
         exp_summary_model.put()
 
@@ -2405,11 +2409,17 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
             exploration.id)
         self.assertEqual([], exp_rights_model_2.translator_ids)
-        self.assertEqual([self.user_b_id], exp_rights_model_2.voice_artist_ids)
+        self.assertEqual(
+            [self.user_a_id, self.user_b_id],
+            exp_rights_model_2.voice_artist_ids
+        )
 
         exp_summary_model_2 = exp_models.ExpSummaryModel.get(exploration.id)
         self.assertEqual([], exp_summary_model_2.translator_ids)
-        self.assertEqual([self.user_b_id], exp_summary_model_2.voice_artist_ids)
+        self.assertEqual(
+            [self.user_a_id, self.user_b_id],
+            exp_summary_model_2.voice_artist_ids
+        )
 
     def test_partial_job_is_performed_for_deleted_exploration_summary(self):
         """Tests that when ExplorationRightsModel exists but ExpSummaryModel
