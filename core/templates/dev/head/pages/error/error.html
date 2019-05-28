@@ -1,12 +1,7 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block navbar_breadcrumb %}
 {% endblock navbar_breadcrumb %}
-
-{% block maintitle %}
-  Error {{status_code}} - Oppia
-{% endblock maintitle %}
-
 
 {% block content %}
   <div class="oppia-content oppia-error-page-main-content" ng-controller="Error">
@@ -65,7 +60,15 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/pages/error/Error.js"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}
 
 {% block footer %}

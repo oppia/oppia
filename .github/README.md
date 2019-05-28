@@ -13,7 +13,7 @@ Oppia is written using Python and AngularJS, and is built on top of Google App E
   * [File an issue](https://github.com/oppia/oppia/issues/new/choose)
 
 <p align="center">
-  <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank">
+  <a href="http://www.youtube.com/watch?v=Ntcw0H0hwPU" target="_blank" rel="noopener">
     <img src="https://cloud.githubusercontent.com/assets/8845039/16814722/b219cac0-4954-11e6-9573-c37557d1b410.png">
   </a>
 </p>
@@ -64,6 +64,6 @@ The Oppia code is released under the [Apache v2 license](https://github.com/oppi
   * [Blog](https://medium.com/oppia-org)
   * [Discussion forum](http://groups.google.com/group/oppia)
   * [Announcements mailing list](http://groups.google.com/group/oppia-announce)
-  * Social media: [G+](https://plus.google.com/109898456505810251700/about), [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)
+  * Social media: [YouTube](https://www.youtube.com/channel/UC5c1G7BNDCfv1rczcBp9FPw), [FB](https://www.facebook.com/oppiaorg), [Twitter](https://twitter.com/oppiaorg)
 
 We also have public chat rooms on Gitter: [https://gitter.im/oppia/oppia-chat](https://gitter.im/oppia/oppia-chat) and the #oppia channel on Freenode IRC. Drop by and say hello!

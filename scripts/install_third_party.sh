@@ -22,48 +22,10 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
-install_node_module ajv 5.0.0
-install_node_module babel-eslint 10.0.1
-install_node_module browserstack-local 1.3.3
-install_node_module dotenv 6.0.0
-install_node_module eslint 4.19.0
-install_node_module eslint-plugin-angular 0.12.0
-install_node_module eslint-plugin-html 4.0.1
-install_node_module gulp 3.9.0
-install_node_module gulp-clean-css 2.0.2
-install_node_module gulp-concat 2.6.0
-install_node_module gulp-sourcemaps 1.6.0
-install_node_module gulp-uglify 2.0.1
-install_node_module gulp-util 3.0.7
-install_node_module htmllint 0.7.2
-install_node_module htmllint-cli 0.0.7
-install_node_module @mapbox/stylelint-processor-arbitrary-tags 0.2.0
-install_node_module postcss-syntax 0.10.0
-install_node_module stylelint 9.2.1
-install_node_module stylelint-config-standard 18.2.0
-install_node_module through2 2.0.0
-install_node_module typescript 3.3.3
-install_node_module @types/angular 1.6.54
-install_node_module @types/angular-animate 1.5.10
-install_node_module @types/angular-mocks 1.7.0
-install_node_module @types/ckeditor 4.9.2
-install_node_module @types/d3 3.5.40
-install_node_module @types/google.visualization 0.0.46
-install_node_module @types/jasmine 3.3.8
-install_node_module @types/jasmine-jquery 1.5.33
-install_node_module @types/jasminewd2 2.0.6
-install_node_module @types/jquery 3.3.29
-install_node_module @types/jqueryui 1.12.1
-install_node_module @types/leaflet 1.4.0
-install_node_module @types/mathjax 0.0.35
-install_node_module @types/mathjs 5.0.0
-install_node_module @types/mousetrap 1.6.1
-install_node_module @types/node 6.14.3
-install_node_module @types/select2 4.0.48
-install_node_module @types/q 1.5.1
-install_node_module @types/selenium-webdriver 2.53.43
-install_node_module uglify-js 3.3.11
-install_node_module yargs 3.29.0
+$NPM_INSTALL --only=dev
+# This line removes the "npm ERR! missing:" messages. For reference, see this
+# thread: https://github.com/npm/npm/issues/19393#issuecomment-374076889
+$NPM_CMD dedupe
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -142,13 +104,10 @@ function pip_install {
 }
 
 echo Checking if pylint is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/pylint-1.9.3" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   echo Installing Pylint
 
-  pip_install pylint==1.9.3 --target="$TOOLS_DIR/pylint-1.9.3"
-  # Add __init__.py file so that pylint dependency backports are resolved
-  # correctly.
-  touch $TOOLS_DIR/pylint-1.9.3/backports/__init__.py
+  pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
 fi
 
 echo Checking if pylint-quotes is installed in $TOOLS_DIR
@@ -182,12 +141,12 @@ fi
 
 # Install pycodestyle.
 echo Checking if pycodestyle is installed in third_party
-if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
+if [ ! -d "$TOOLS_DIR/pycodestyle-2.5.0" ]; then
   echo Installing pycodestyle
   # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl -o pycodestyle-2.3.1.tar.gz -L https://pypi.python.org/packages/e1/88/0e2cbf412bd849ea6f1af1f97882add46a374f4ba1d2aea39353609150ad/pycodestyle-2.3.1.tar.gz
-  tar xzf pycodestyle-2.3.1.tar.gz -C $TOOLS_DIR
-  rm pycodestyle-2.3.1.tar.gz
+  curl -o pycodestyle-2.5.0.tar.gz -L https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz
+  tar xzf pycodestyle-2.5.0.tar.gz -C $TOOLS_DIR
+  rm pycodestyle-2.5.0.tar.gz
 fi
 
 # Install esprima.
@@ -225,6 +184,13 @@ if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
     echo "  PIL install failed. See troubleshooting instructions at:"
     echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
   fi
+fi
+
+echo Checking if PyGithub is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
+  echo Installing PyGithub
+
+  pip_install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
 fi
 
 # install pre-push script

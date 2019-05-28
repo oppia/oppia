@@ -120,7 +120,7 @@ class Question(object):
 
     def __init__(
             self, question_id, question_state_data,
-            question_state_schema_version, language_code, version,
+            question_state_data_schema_version, language_code, version,
             created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
@@ -128,7 +128,7 @@ class Question(object):
             question_id: str. The unique ID of the question.
             question_state_data: State. An object representing the question
                 state data.
-            question_state_schema_version: int. The schema version of the
+            question_state_data_schema_version: int. The schema version of the
                 question states (equivalent to the states schema version of
                 explorations).
             language_code: str. The ISO 639-1 code for the language this
@@ -142,7 +142,8 @@ class Question(object):
         self.id = question_id
         self.question_state_data = question_state_data
         self.language_code = language_code
-        self.question_state_schema_version = question_state_schema_version
+        self.question_state_data_schema_version = (
+            question_state_data_schema_version)
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
@@ -156,7 +157,8 @@ class Question(object):
         return {
             'id': self.id,
             'question_state_data': self.question_state_data.to_dict(),
-            'question_state_schema_version': self.question_state_schema_version,
+            'question_state_data_schema_version': (
+                self.question_state_data_schema_version),
             'language_code': self.language_code,
             'version': self.version
         }
@@ -171,6 +173,24 @@ class Question(object):
         """
         return state_domain.State.create_default_state(
             None, is_initial_state=True)
+
+    @classmethod
+    def _convert_state_v27_dict_to_v28_dict(cls, question_state_dict):
+        """Converts from version 27 to 28. Version 28 replaces
+        content_ids_to_audio_translations with recorded_voiceovers.
+
+         Args:
+            question_state_dict: dict. The dict representation of
+                question_state_data.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        question_state_dict['recorded_voiceovers'] = {
+            'voiceovers_mapping': (
+                question_state_dict.pop('content_ids_to_audio_translations'))
+        }
+        return question_state_dict
 
     @classmethod
     def update_state_from_model(
@@ -209,10 +229,10 @@ class Question(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
 
-        if not isinstance(self.question_state_schema_version, int):
+        if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s' %
-                self.question_state_schema_version)
+                self.question_state_data_schema_version)
 
         if not isinstance(self.question_state_data, state_domain.State):
             raise utils.ValidationError(
@@ -286,7 +306,7 @@ class Question(object):
         question = cls(
             question_dict['id'],
             state_domain.State.from_dict(question_dict['question_state_data']),
-            question_dict['question_state_schema_version'],
+            question_dict['question_state_data_schema_version'],
             question_dict['language_code'], question_dict['version'])
 
         return question
@@ -305,7 +325,7 @@ class Question(object):
 
         return cls(
             question_id, default_question_state_data,
-            feconf.CURRENT_STATES_SCHEMA_VERSION,
+            feconf.CURRENT_STATE_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def update_language_code(self, language_code):
@@ -376,17 +396,20 @@ class QuestionSkillLink(object):
         skill_description: str. The description of the corresponding skill.
     """
 
-    def __init__(self, question_id, skill_id, skill_description):
+    def __init__(
+            self, question_id, skill_id, skill_description, skill_difficulty):
         """Constructs a Question Skill Link domain object.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
             skill_description: str. The description of the corresponding skill.
+            skill_difficulty: float. The difficulty between [0, 1] of the skill.
         """
         self.question_id = question_id
         self.skill_id = skill_id
         self.skill_description = skill_description
+        self.skill_difficulty = skill_difficulty
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -397,7 +420,8 @@ class QuestionSkillLink(object):
         return {
             'question_id': self.question_id,
             'skill_id': self.skill_id,
-            'skill_description': self.skill_description
+            'skill_description': self.skill_description,
+            'skill_difficulty': self.skill_difficulty,
         }
 
 

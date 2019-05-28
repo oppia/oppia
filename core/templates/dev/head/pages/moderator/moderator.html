@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Moderator Tools - Oppia
@@ -106,17 +106,13 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/filters/UnderscoresToCamelCaseFilter.js"></script>
-
-  <script src="/templates/dev/head/components/forms/FormBuilder.js"></script>
-  <script src="/templates/dev/head/services/SchemaDefaultValueService.js"></script>
-  <script src="/templates/dev/head/services/SchemaUndefinedLastElementService.js"></script>
-  <script src="/templates/dev/head/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedChoicesEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
-  <script src="/templates/dev/head/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
-
-  <script src="/templates/dev/head/pages/moderator/Moderator.js"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}

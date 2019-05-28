@@ -61,8 +61,16 @@ else:
     FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
 DEPENDENCIES_TEMPLATES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
+
+VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
+    'local_compiled_js', 'extensions', 'value_generators')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
-VISUALIZATIONS_DIR = os.path.join('extensions', 'visualizations')
+
+VISUALIZATIONS_DIR = os.path.join(
+    'extensions', 'visualizations')
+VISUALIZATIONS_DIR_FOR_JS = os.path.join(
+    'local_compiled_js', 'extensions', 'visualizations')
+
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
     'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
@@ -144,13 +152,11 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
-# NOTE TO DEVELOPERS: This should be in sync with the constant with the same
-# name in constants.js.
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATES_SCHEMA_VERSION = 27
+CURRENT_STATE_SCHEMA_VERSION = 28
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -169,6 +175,9 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+
+# The current version of page_contents dict in the subtopic page schema.
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
@@ -209,10 +218,12 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
-# Default content_ids_to_audio_translations dict for a default state template.
-DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
-    'content': {},
-    'default_outcome': {}
+# Default recorded_voiceovers dict for a default state template.
+DEFAULT_RECORDED_VOICEOVERS = {
+    'voiceovers_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
 }
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
@@ -326,6 +337,7 @@ SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
+SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
@@ -614,7 +626,7 @@ LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
-MERGE_SKILL_URL = '/merge_skill'
+MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_QUESTION_URL = '/question_editor_handler/create_new'
@@ -625,9 +637,11 @@ NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
+PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
+QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -655,6 +669,7 @@ TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
 TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
+TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
@@ -705,7 +720,7 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with app.js.
+# NOTE TO DEVELOPERS: This should be synchronized with App.js.
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False

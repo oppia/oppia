@@ -127,3 +127,12 @@ class RecentCommitsHandlerUnitTests(test_utils.GenericTestBase):
         self.assertFalse(response_dict['more'])
         self.assertEqual(len(response_dict['results']), 2)
         self.logout()
+
+    def test_get_recent_commits_with_invalid_query_type_returns_404_status(
+            self):
+        self.login(self.MODERATOR_EMAIL)
+        self.get_json(
+            feconf.RECENT_COMMITS_DATA_URL,
+            params={'query_type': 'invalid_query_type'},
+            expected_status_int=404)
+        self.logout()

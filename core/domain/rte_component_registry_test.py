@@ -151,19 +151,20 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isfile(png_file))
             self.assertTrue(os.path.isfile(protractor_file))
 
-            main_js_file = os.path.join(
-                directives_dir, '%sDirective.js' % component_id)
+            main_ts_file = os.path.join(
+                directives_dir, 'OppiaNoninteractive%sDirective.ts'
+                % component_id)
             main_html_file = os.path.join(
                 directives_dir, '%s_directive.html' % component_id.lower())
 
-            self.assertTrue(os.path.isfile(main_js_file))
+            self.assertTrue(os.path.isfile(main_ts_file))
             self.assertTrue(os.path.isfile(main_html_file))
 
-            js_file_content = utils.get_file_contents(main_js_file)
+            ts_file_content = utils.get_file_contents(main_ts_file)
             self.assertIn(
-                'oppiaNoninteractive%s' % component_id, js_file_content)
-            self.assertNotIn('<script>', js_file_content)
-            self.assertNotIn('</script>', js_file_content)
+                'oppiaNoninteractive%s' % component_id, ts_file_content)
+            self.assertNotIn('<script>', ts_file_content)
+            self.assertNotIn('</script>', ts_file_content)
 
 
             # Check that the configuration file contains the correct
@@ -183,17 +184,18 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
         for all directives of all RTE components.
         """
 
-        js_files_paths = []
+        ts_files_paths = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
             directive_filenames = os.listdir(directives_dir)
-            js_files_paths.extend(
+            ts_files_paths.extend(
                 os.path.join(directives_dir, filename) for filename
-                in directive_filenames if filename.endswith('.js'))
+                in directive_filenames if filename.endswith('.ts'))
 
-        js_files_paths.sort()
+        ts_files_paths.sort()
+        js_files_paths = [path.replace('.ts', '.js') for path in ts_files_paths]
         prefix = '<script src="/'
         suffix = '"></script>'
         html_script_tags = [

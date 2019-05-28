@@ -1,5 +1,265 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.8.2 (23 May 2019)
+------------------------
+Improvements to editors and players
+* Fix #6468: Fix the improper alignment of tick mark in the library page (#6552)
+* Fix #6200: Fix inconsistent spacing with the lists (#6554)
+* Fix #6542: Add card name to the title of the exploration feedback (#6580)
+* Fix #6623: Add title to sharing link icons (#6624)
+
+New structures
+* Modify topic viewer page and few UI changes on topic editor page (#6455)
+
+Bug fixes
+* Fix #6418: Add validation checks to avoid infinite loops explained in issue and comments (#6520)
+* Fix #3819: Fix strange dragging behaviour of play later list in learner dashboard (#6544)
+* Fix #6229: Reordering Hints and Worked Examples in Safari  (#6547)
+* Fix #6561: Corrected the "About-->Get Involved" link on the top navigation bar (#6567)
+* Fix part of #6159: Fix revert exploration method (#6575)
+* Fix broken interaction previews in the exploration editor (#6627)
+* Fix lint issue by adding a space after colon (#6631)
+* Fix #6667: Renamed e2e test file to fix the issue. (#6668)
+
+Updates to static pages
+* Add NOTICE file, per Section 4(d) of the Apache license. (#6568)
+* Fix #6562: Removed G+ from the footer and Readme.md (#6569)
+* Fix #6581: Remove alternative versions of splash page (#6594)
+* Add a checkpoint to check for codeowners to the PR checklist (#6603)
+* Add a note regarding changelog labels to PR checklist (#6608)
+
+Translations
+* Add proper validation for written translations to allow translation in hinglish (#6588)
+
+Infrastructural changes
+* Migrate codebase to typescript (#6530)
+* Add a new one off job for validating production models. (#6541)
+* Fix part of #5914: Adds unimplemented extract_data method in the BaseModel (#6573)
+
+Code health
+* Fix part of #6387: Remove globals ALLOWED_INTERACTIONS_CATEGORIES (#6472)
+* Rename states_schema_version to state_schema_version. (#6589)
+* Fix part of #6565: Made error page and library page to use PageTitleService (#6595)
+* Update pylint to version 1.9.4 (#6626)
+* Update pycodestyle to version 2.5.0 (#6637)
+* Use package.json to install node modules; upgrade node module versions. (#6659)
+
+Development workflow
+* Adds codeowner to core.domain files (#6545)
+* Removing the timeout multiplier, to get in sync with linting files (#6559)
+* Fix part of #6555: Fix existing lint issues in develop branch (#6563)
+* Add removal of app.yaml version field to deploy script (#6564)
+* Fix release info script: fix imports, and sort PRs in descending order (#6607)
+* Moves lint test from CircleCI to Travis CI.  (#6647)
+* Introduce `linter_utils` module (#6650)
+* Add a comment to explain setting of node path (#6681)
+
+Testing coverage
+* Fix part of #5134: Increase coverage from 82% to 100% for core.platform.email.gae_email_services.py (#6335)
+* Fix part of #6240: Add e2e test for adding user bio in preferences page (#6512)
+* Fix Part of #6240: Add e2e tests for editing exploration properties in coreEditorAndPlayerFeatures.js (#6557)
+* Fix part of #6550: Raise code coverage of core.storage.question.gae_models to 100% (#6558)
+* Fix part of #6550: Increase backend test coverage to 100% in multiple files. (#6648)
+
+
+v2.8.1 (26 April 2019)
+------------------------
+Improvements to editors and players
+* Fix #6285: Fixes issues while selecting an answer in the editor feedback tab. (#6532)
+* Fixed minor issue in story editor (#6529)
+* UI related to the written translation project.  (#6503)
+* Add send mail functionality for reviewing topics (#6501)
+* Fix #2125: Fix alignment of Exploration Graph legend in history tab. (#6402)
+* Fix #5802, #5590: Introduce Playthrough Improvements Cards (#6400)
+* Fix #6370: Fix Title and Goal label alignment (#6372)
+* Fix #5530: Update collection title after save and refresh (#6362)
+* Fix #6322: Add IsProperSubsetOf to item-selection interaction (#6350)
+
+New structures
+* Support question difficulty per skill (#6502)
+* Fix #6377: Create Practice Sessions Page Skeleton (#6381)
+* Question Player Backend API Service (#6373)
+
+Translations
+* Fix #5921: Adds e2e test for uploading audio in translation tab (#6340)
+* Fix #6248 : Prevent guest and unauthorized users from drag-and-drop audio in translation tab. (#6304)
+* Fix part of #5898: Aria model with test case (#6290)
+* Add written translation property in skillContents and subtopic. (#6241)
+* Fix part of #5898: Added Google Analytics for translation tab (#6166)
+* Add proper validation for written translations to allow translation in hinglish. (#6588)
+
+Infrastructural changes
+* Fix release info script: fix imports, and sort PRs in descending order (#6607)
+* Add removal of app.yaml version field to deploy script. (#6564)
+* Fix the backend issues with some new structure models (#6514)
+* Change the name of the schema_version field in story models. (#6420)
+* Make new model IDs only contain alphanumeric characters. (#6408)
+* Update release script to use SSH Git URL instead of HTTPS (#6382)
+* Fix #6294: Upgrade BeautifulSoup version from 4.6.0 to 4.7.1 (#6355)
+* Fix part of #6343: Update js files to remove typescript compile errors (#6344)
+
+Bug fixes
+* Fix broken interaction previews in the exploration editor (#6627)
+* Fix part of #6159: Fix revert exploration method (#6575)
+* Fix few translation tab related issues. (#6571)
+* Fix #6538: Adds a proper title for landing pages. (#6539)
+* Fix #6181:Removed the exception which occured during clearing search index (#6518)
+* Fix issues with New Structures (#6506)
+* Fix #6383: Added regex to validate return_url in signup page (#6498)
+* Fix #6426: Added regex check for exploration id & nodes now can be saved with null exploration ids. (#6470)
+* Fix #6461: Changing error status for missing csrf_token from 500 to 401. (#6463)
+* Fix #6452: Fix server errors (#6454)
+* Fix #4931: Fixes frozen editor tour (#6450)
+* Fix #4632: Fixes learn again-continue button (#6448)
+* Fix #6206: Fix enlargement of text in RTE (#6447)
+* Fix #6436: Adds removeDuplicatesInArray filter in exploration_player. (#6437)
+* Fix #6414: REQUIRE_PAYLOAD_CSRF_CHECK Flag Flipped in Error404Handler class. (#6435)
+* Remove unwanted validation check and related tests from exploration. (#6407)
+* Fix #6205 : Disabled the reject button, enabled only when some review is entered. (#6384)
+* Fix #6325 : modify style of active and inactive submenus on learner dashboard (#6358)
+* Fix #6199: Hint tabs failed to open when active hint deleted (#6243)
+* Fix #2306: Fixes signup issue when a new tab is opened (#6235)
+
+Code health
+* Fix #6494: Added check for style properties to have a space between the colon and the property value. (#6516)
+* Fix part of #6387: Email constant fix (#6467)
+* Fix part of issue #6316: Remove some scripts from base.html which were not needed in it. (#6466)
+* Fix part of #6343: Adds custom type definitions (#6430)
+* Fix part of #6387: Remove globals from library.html and preferences.html (#6415)
+* Fix part of #5002:  Removed iframed from GLOBALS (#6410)
+* Fix part of #5002: Remove logoutUrl from HTML (#6401)
+* Fix #6316: Refactor base.html (#6399)
+* Fix part of #5002: Moved SITE_FEEDBACK_FORM_URL from GLOBALS to constants.js. (#6365)
+* Fix part of #6254: Refactor for directives.js and filters.js (#6275)
+
+Development workflow
+* Fix #6534: make MR jobs runnable on localhost. (#6543)
+* Update pip and Skulpt installations for newer versions of Ubuntu (#6464)
+* Move lint tests to CircleCI from Travis (#6453)
+* Reorder CODEOWNERS to ensure that the most important rules are at the end. (#6438)
+* Add webhook links for Travis, CircleCI & Codecov (#6398)
+* Automate changelog generation in the release_info script (#6395)
+* Fix #6321: Added checks to validate patterns in CODEOWNERS file. (#6386)
+* Add option not to start browser window to start.sh (#6363)
+* Add issue template for server errors (#6308)
+* Add a script for updating indexes. Move gcloud functions into a separate module. (#6305)
+* Port back-end tests from Travis to CircleCI (#6234)
+* Fix #5426: Lint check to ensure that each Angular file contains exactly one service/directive/etc. inside it. (#6202)
+* Fix #6100 : Added verbose and non verbose mode in the pre submit check (#6146)
+
+Testing coverage
+* Fix part of #5134: Make test coverage of core.storage.exploration.gae_models 100% (#6540)
+* Fix part of #5134, more robust testing to schema_utils.py (#6432)
+* Fix part of #4057: Increase test coverage to 100% for HintObjectFactory.js and InteractionObjectFactory.js. (#6428)
+* Fix part of #5134: Make test coverage of core.controllers.collection_viewer 100% (#6427)
+* Add pending New Structures e2e tests (#6385)
+* Fix part of #5134 : Increasing the test coverage of subtopic_page_services.py from 64% to 100%. (#6360)
+* Fix part of #5134: Increased Coverage from 89% to 100% for core.domain.email_manager.py (#6306)
+* Add unit test for translation_tab/TranslationStatusService.js (#6261)
+
+
+v2.8.0 (30 March 2019)
+------------------------
+New structures
+* Fixed the backend issues with some new structure models (#6514)
+* Fixed issues with New Structures (#6506)
+* Support question difficulty per skill (#6502)
+* Added subtopic_viewer (SubtopicPageDataHandler), which returns page contents for a subtopic. (#6327)
+* Fixed issues from intuitiveness testing on New Structures (#6314)
+* Added story viewer backend handler  (#6237)
+* Updated the topic backend handler (#6185)
+
+Improvements to editors and players
+* Replace google-map with openStreetMap in map interaction. (#6309)
+* Fix #2584: Replace default text while inserting links with placeholder (#6286)
+
+Translations
+* Adds written translations domain object in frontend for state and question. (#6320)
+* Fixes #5784: unhandled promise in the ng-audio library. (#6280)
+* Adds written translation property in skillContents and subtopic. (#6241)
+* Added active content id service to fix translation tab issues. (#6211)
+* Fix #4278: Re-introduce 3-letter language codes for explorations and collections. (#6182)
+* Adds functionality to internally manage to add and delete content ids into assets dict. (#6171)
+* Translation Script: Adds TranslationScript and ContentTranslation object in state domain. (#6121)
+* Fix #5572: added translation help explaining translation features (#5796)
+
+Bug fixes
+* Fix #6426: Added regex check for exploration id & nodes now can be saved with null exploration ids. (#6470)
+* Fix #6436: Adds removeDuplicatesInArray filter in exploration_player. (#6437)
+* Fix #6205: Disabled the reject button, enabled only when some review is entered. (#6384)
+* Fix #6301: fixes Dev-mode label showing up for a brief amount of time on page load. (#6356)
+* Fix #6174: Address 'Promise is undefined' server error. (#6281)
+* Fix #6214: Audio bar hides for auto-generated audio (#6265)
+* Fix #6244: Fixing the cancel button in hint editor (#6250)
+* Fix #2306: Fixes signup issue when a new tab is opened (#6235)
+* Fix #5508: Feedback threads in feedback tab reorder now in real time. (#6183)
+* Fix #5487: Fix load issue with multiple same images (#6170)
+* Fix #6140: Learner answer overflow (#6154)
+* Fix #6111: Aligned checkmarks on learner's dashboard (#6147)
+* Fix part of #4231: Make the add response modal scroll visible at all times, via css (#6116)
+* Refactor for suggestion modal display (#6093)
+
+Code health
+* Moved state related components in a separate dir. (#6334)
+* Fixes #6316: Refactor base.html (#6319)
+* Fixes #6226: Moves generating CKEditor widgets from app.js to separate file. (#6288)
+* Delete old one-off jobs. (#6283)
+* Fix part of #6254: Refactor for directives.js and filters.js (#6275)
+* Removing scripts and include statements for popovers (#6270)
+* Fix #6194: Remove extraneous file. (#6196)
+
+Development workflow
+* Update pip and Skulpt installations for newer versions of Ubuntu (#6464)
+* Fix frontend tests failing occasionally. (#6371)
+* Adds QA team as a codeowner for test files. (#6352)
+* Adds codeowners related to frontend pages. (#6332)
+* Run lint tests on Travis until fixed on CircleCI (#6328)
+* Add issue template for server errors (#6308)
+* Add a script for updating indexes. Move gcloud functions into a separate module. (#6305)
+* Update deployment script to check for indexes in advance. (#6300)
+* Fix #6282: Run front-end tests in pre-push hook, only if changes are made in JS files. (#6289)
+* Add some additional pre-release checks. (#6284)
+* Fix CODEOWNER wrong dir issue. (#6277)
+* Adds code-owners for teams/projects. (#6266)
+* Fixes #6233 : Improved the error message for match line breaks controller (#6246)
+* Port back-end tests from Travis to CircleCI (#6234)
+* Fix part of #5476: Add checks to detect spaces in docstring (#6231)
+* Fix #5465: Added check for prohibited imports (#6180)
+* Fix part of #5939: Custom pylint extension for checking single character files and newline characters. (#6172)
+* Fix #6103: Add summary of errors for lint checks on Travis (#6165)
+* Fix #6004: Added a presubmit check to ensure imports of JS files are sorted (#6125)
+
+Infrastructural changes
+* Change the name of the schema_version field in story models. (#6420)
+* Make new model IDs only contain alphanumeric characters. (#6408)
+* Generalized landing page based on subject and topic. (#6357)
+* Remove google forum link. (#6333)
+* Correct comment string in UserSubscriptionsModel (#6310)
+* Adds codeowners for other projects. (#6287)
+* Fix part of #6254: Refactor to implement rule of 1 (#6267)
+* Fix #6251: Add basic typescript configuration (#6256)
+* Fix #6210: Added an exploration whitelist (#6255)
+* One off job to validate exploration migration can be carried out successfully. (#6249)
+* Fix #6213: Add application_readable to directive htmls handler (#6216)
+* Remove Open Sans and Rubik fonts (#6208)
+* Update app.yaml to improve caching (#6184)
+* Translation Script: Exploration migration including services for handling translation script.  (#6175)
+* Fix part of #5002: Remove promo bar from globals (#6169)
+
+Testing coverage
+* Added pending New Structures e2e tests (#6385)
+* New Structures e2e tests (#6315)
+* Fix part of #5134: learner_playlist_services - fix grammar and whitespace (#6291)
+* Fix part of #5134: 100% coverage for core.platform.models (#6263)
+* Fix part of #4057 Make PlayerPositionService.js 100% test coverage (#6258)
+* Fix part of #5134: Increased coverage to 100% for question_editor (#6217)
+* Added topics and skills dashboard e2e tests (#6204)
+* Fix part of #5134: Increased coverage to 100% for mailgun_email_services.py (#6133)
+* Fix #5134: Improve coverage to 89% by implementing anonymous feedback (#6086)
+* Fix part of #5134: Added test for exp one off jobs (#5972)
+* Fix part of #5134: Added test for core.storage.file.gae_models (#5960)
+
+
 v2.7.3 (16 February 2019)
 ------------------------
 Infrastructural changes

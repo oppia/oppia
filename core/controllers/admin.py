@@ -31,6 +31,7 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import search_services
 from core.domain import stats_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -110,7 +111,7 @@ class AdminPage(base.BaseHandler):
             'role_graph_data': role_services.get_role_graph_data()
         })
 
-        self.render_template('pages/admin/admin.html')
+        self.render_template('dist/admin.html')
 
 
 class AdminHandler(base.BaseHandler):
@@ -155,7 +156,8 @@ class AdminHandler(base.BaseHandler):
                     self._generate_dummy_explorations(
                         num_dummy_exps_to_generate, num_dummy_exps_to_publish)
             elif self.payload.get('action') == 'clear_search_index':
-                exp_services.clear_search_index()
+                search_services.clear_collection_search_index()
+                search_services.clear_exploration_search_index()
             elif self.payload.get('action') == 'save_config_properties':
                 new_config_property_values = self.payload.get(
                     'new_config_property_values')

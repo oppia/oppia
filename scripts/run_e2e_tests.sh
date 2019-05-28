@@ -33,18 +33,11 @@
 #         build directory and use cache slugs.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
 # --sharding-instances) if running any tests in isolation (fit or fdescribe).
-#   --suite=suite_name Performs test for different suites.
-#   For performing a full test, no argument is required.
-#   For performing tests on accessibility, use --suite=accessibility
-#   For performing tests on collections, use --suite=collections
-#   For performing embedding tests, use --suite=embedding
-#   For performing tests on editor and player, use --suite=editorAndPlayer
-#   For performing tests on editorFeatures, use --suite=editorFeatures
-#   For performing tests on extensions, use --suite=extensions
-#   For performing tests on library, use --suite=library
-#   For performing tests on learnerDashboard, use --suite=learnerDashboard
-#   For performing tests on state editor, use --suite=stateEditor
-#   For performing users tests, use --suite=users
+#   --suite=suite_name Performs test for different suites, here suites are the
+#         name of the test files present in core/tests/protractor_desktop/ and
+#         core/test/protractor/ dirs. e.g. for the file
+#         core/tests/protractor/accessibility.js use --suite=accessibility.
+#         For performing a full test, no argument is required.
 #
 # The root folder MUST be named 'oppia'.
 #
@@ -52,12 +45,10 @@
 # single test or test suite.
 
 function cleanup {
-  # Send a kill signal to the dev server.
+  # Send a kill signal to the dev server and Selenium server. The awk command
+  # gets just the process ID from the grepped line.
   kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
-
-  # The [Pp] is to avoid the grep finding the 'grep protractor/node_modules/webdriver-manager/selenium' process
-  # as well. The awk command gets just the process ID from the grepped line.
-  kill `ps aux | grep [Pp]rotractor/node_modules/webdriver-manager/selenium | awk '{print $2}'`
+  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'`
 
   # Wait for the servers to go down; suppress "connection refused" error output
   # from nc since that is exactly what we are expecting to happen.
@@ -111,7 +102,6 @@ fi
 # the top of the file is run.
 trap cleanup EXIT
 
-
 # Argument passed to feconf.py to help choose production templates folder.
 FORCE_PROD_MODE=False
 RUN_ON_BROWSERSTACK=False
@@ -141,6 +131,13 @@ fi
 
 # Delete the modified feconf.py file(-i.bak)
 rm assets/constants.js.bak
+
+# Start a selenium server using chromedriver 2.41.
+# The 'detach' option continues the flow once the server is up and runnning.
+# The 'quiet' option prints only the necessary information about the server start-up
+# process.
+$NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
+$NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quiet
 
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.

@@ -20,6 +20,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import dependency_registry
+from core.domain import email_manager
 from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import question_services
@@ -47,9 +48,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_story_summaries = story_services.get_story_summaries_by_ids(
             topic.canonical_story_ids)
@@ -73,8 +71,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
         Currently, this only adds the story to the canonical story id list of
         the topic.
         """
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
 
@@ -103,10 +99,6 @@ class TopicEditorQuestionHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
         start_cursor = self.request.get('cursor')
         topic = topic_services.get_topic_by_id(topic_id)
         skill_ids = topic.get_all_skill_ids()
@@ -137,12 +129,6 @@ class TopicEditorPage(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
@@ -164,7 +150,6 @@ class TopicEditorPage(base.BaseHandler):
 
         self.values.update({
             'topic_id': topic.id,
-            'topic_name': topic.name,
             'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
             'additional_angular_modules': additional_angular_modules,
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
@@ -173,7 +158,7 @@ class TopicEditorPage(base.BaseHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
-        self.render_template('pages/topic_editor/topic_editor.html')
+        self.render_template('dist/topic_editor.html')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):
@@ -199,12 +184,6 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
-
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             topic_id, subtopic_id, strict=False)
 
@@ -241,11 +220,6 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
 
         if topic is None:
@@ -273,9 +247,6 @@ class EditableTopicDataHandler(base.BaseHandler):
         subtopics), while False would mean it is for a Subtopic Page (this
         includes editing its html data as of now).
         """
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:
@@ -319,9 +290,6 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_delete_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            raise self.PageNotFoundException
-
         topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:
@@ -340,8 +308,6 @@ class TopicRightsHandler(base.BaseHandler):
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Returns the TopicRights object of a topic."""
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise self.InvalidInputException(
@@ -359,6 +325,25 @@ class TopicRightsHandler(base.BaseHandler):
             'published': topic_rights.topic_is_published,
             'can_publish_topic': can_publish_topic
         })
+
+        self.render_json(self.values)
+
+
+class TopicPublishSendMailHandler(base.BaseHandler):
+    """A handler for sending mail to admins to review and publish topic."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_view_any_topic_editor
+    def put(self, topic_id):
+        """Returns the TopicRights object of a topic."""
+        topic_url = feconf.TOPIC_EDITOR_URL_PREFIX + '/' + topic_id
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_mail_to_admin(
+                'Request to review and publish a topic',
+                '%s wants to publish topic: %s at URL %s, please review'
+                ' and publish if it looks good.'
+                % (self.username, self.payload.get('topic_name'), topic_url))
 
         self.render_json(self.values)
 

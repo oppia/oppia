@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   About us - Oppia
@@ -144,6 +144,7 @@
                   <li>Alex Gower</li>
                   <li>Allan Zhou</li>
                   <li>Amanda Rodriguez</li>
+                  <li>Amey Kudari</li>
                   <li>Amit Deutsch</li>
                   <li>Ana Francisca Bernardo</li>
                   <li>Andrew Low</li>
@@ -157,12 +158,14 @@
                   <li>Anubhav Sinha</li>
                   <li>Anurag Thakur</li>
                   <li>Apurv Bajaj</li>
+                  <li>Areesha Tariq</li>
                   <li>Arpan Banerjee</li>
                   <li>Arun Kumar</li>
                   <li>Arunabh Ghosh</li>
                   <li>Ashish Verma</li>
                   <li>Ashmeet Singh</li>
                   <li>Ashutosh Singla</li>
+                  <li>Assem Yeskabyl</li>
                   <li>Aubrey Wells</li>
                   <li>Avijit Gupta</li>
                 </ul>
@@ -199,6 +202,7 @@
                   <li>Debanshu Bhaumik</li>
                   <li>Deepank Agarwal</li>
                   <li>Denis Samokhvalov</li>
+                  <li>Dharmesh Poddar</li>
                   <li>Diana Chen</li>
                   <li>Divyadeep Singh</li>
                   <li>Domenico Vitarella</li>
@@ -208,6 +212,8 @@
                 <ul>
                   <li>Edward Allison</li>
                   <li>Elizabeth Kemp</li>
+                  <li>Eric Lou</li>
+                  <li>Eric Yang</li>
                   <li>Estelle Lee</li>
                 </ul>
 
@@ -241,13 +247,14 @@
                   <li>Ian Luttrell</li>
                   <li>Ishan Singh</li>
                 </ul>
-                <br>
-                <br>
+
                 <span>J</span>
                 <ul>
                   <li>Jackson Wu</li>
                   <li>Jacob Davis</li>
+                  <li>Jacob Li Peng Cheng</li>
                   <li>Jakub Osika</li>
+                  <li>James James John</li>
                   <li>Jared Silver</li>
                   <li>Jasper Deng</li>
                   <li>Jasmine Rider</li>
@@ -257,6 +264,7 @@
                   <li>Jérôme (zolk232)</li>
                   <li>Jerry Chen</li>
                   <li>John Glennon</li>
+                  <li>John Prince Mesape</li>
                   <li>Jordan Cockles</li>
                   <li>Jordan Stapinski</li>
                   <li>Joseph Fedota</li>
@@ -293,6 +301,7 @@
                 <span>L</span>
                 <ul>
                   <li>Laura Kinkead</li>
+                  <li>Luis Ulloa</li>
                   <li>Lunrong Chen</li>
                 </ul>
                 <span>M</span>
@@ -328,6 +337,7 @@
                   <li>Nikhil Prakash</li>
                   <li>Nikhil Sangwan</li>
                   <li>Nimalen Sivapalan</li>
+                  <li>Nisheal John</li>
                   <li>Nithesh N. Hariharan</li>
                   <li>Nitish Bansal</li>
                 </ul>
@@ -397,12 +407,16 @@
                   <li>Shafqat Dulal</li>
                   <li>Shantanu Bhowmik</li>
                   <li>Sharif Shaker</li>
+                  <li>Shiqi Wu</li>
                   <li>Shitong Shou</li>
                   <li>Shiva Krishna Yadav</li>
                   <li>Shivan Trivedi</li>
                   <li>Shivansh Bajaj</li>
                   <li>Shouvik Roy</li>
                   <li>Shubha Gupta</li>
+                  <li>Shubham Bansal</li>
+                  <li>Shuta Suzuki</li>
+                  <li>Siddhant Khandelwal</li>
                   <li>Siddhant Srivastav</li>
                   <li>Soumyo Dey</li>
                   <li>Sourab Jha</li>
@@ -418,6 +432,7 @@
 
                 <span>T</span>
                 <ul>
+                  <li>Tanmay Mathur</li>
                   <li>Tarashish Mishra</li>
                   <li>Tezuesh Varshney</li>
                   <li>Timothy Cyrus</li>
@@ -432,12 +447,14 @@
 
                 <span>U</span>
                 <ul>
+                  <li>Ujjwal Gulecha</li>
                   <li>Umesh Singla</li>
                   <li>Utkarsh Dixit</li>
                 </ul>
 
                 <span>V</span>
                 <ul>
+                  <li>Varun Tandon</li>
                   <li>Vasu Tomar</li>
                   <li>Vibhor Agarwal</li>
                   <li>Viet Tran Quoc Hoang</li>
@@ -603,8 +620,15 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/pages/about/About.js"></script>
-  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
+  <!-- This code is used for inserting webpack bundles
+       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}
 
 {% block footer%}

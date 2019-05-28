@@ -389,8 +389,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             'question_state_data': self._create_valid_question_data(
                 'default_state').to_dict(),
             'language_code': 'en',
-            'question_state_schema_version': (
-                feconf.CURRENT_STATES_SCHEMA_VERSION)
+            'question_state_data_schema_version': (
+                feconf.CURRENT_STATE_SCHEMA_VERSION)
         }
         self.login(self.AUTHOR_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
