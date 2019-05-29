@@ -107,14 +107,14 @@ oppia.directive('questionsList', [
             $scope.currentPage++;
             $scope.questionSummaries = $scope.getQuestionSummariesAsync(
               $scope.currentPage, $scope.skillIdsList, true, false
-            )
+            );
           };
 
           $scope.goToPreviousPage = function() {
             $scope.currentPage--;
             $scope.questionSummaries = $scope.getQuestionSummariesAsync(
               $scope.currentPage, $scope.skillIdsList, false, false
-            )
+            );
           };
 
           $scope.getSkillDescription = function(skillDescriptions) {
@@ -140,7 +140,7 @@ oppia.directive('questionsList', [
                 $timeout(function() {
                   $scope.questionSummaries = $scope.getQuestionSummariesAsync(
                     0, $scope.skillIdsList, true, false
-                  )
+                  );
                   $scope.questionIsBeingSaved = false;
                   $scope.currentPage = 0;
                 }, 1000);
@@ -157,7 +157,7 @@ oppia.directive('questionsList', [
                     $scope.questionIsBeingSaved = false;
                     $scope.questionSummaries = $scope.getQuestionSummariesAsync(
                       $scope.currentPage, $scope.skillIdsList, true, false
-                    )
+                    );
                   }, function(error) {
                     AlertsService.addWarning(
                       error || 'There was an error saving the question.');

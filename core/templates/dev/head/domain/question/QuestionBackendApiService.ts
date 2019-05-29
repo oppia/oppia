@@ -125,7 +125,8 @@ oppia.factory('QuestionBackendApiService', [
      * of questions requested.
      */
     return {
-      fetchQuestionsForPlayers: function(skillIds, questionCount, resetHistory) {
+      fetchQuestionsForPlayers: function(
+          skillIds, questionCount, resetHistory) {
         return $q(function(resolve, reject) {
           _fetchQuestionsForPlayers(
             skillIds, questionCount, resetHistory, resolve, reject);

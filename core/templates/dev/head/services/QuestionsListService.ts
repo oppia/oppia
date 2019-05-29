@@ -23,7 +23,8 @@ require('services/ContextService.ts');
 oppia.constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
-oppia.factory('QuestionsListService', ['$rootScope', 'QuestionBackendApiService',
+oppia.factory('QuestionsListService', [
+  '$rootScope', 'QuestionBackendApiService',
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', function(
       $rootScope, QuestionBackendApiService,
       EVENT_QUESTION_SUMMARIES_INITIALIZED) {
@@ -64,7 +65,7 @@ oppia.factory('QuestionsListService', ['$rootScope', 'QuestionBackendApiService'
           (index + 1) * constants.NUM_QUESTIONS_PER_PAGE >=
             _questionSummaries.length);
       },
-      
+
       getQuestionSummariesAsync: function(
           index, skillIds, fetchMore, resetHistory) {
         if (resetHistory) {
@@ -75,16 +76,16 @@ oppia.factory('QuestionsListService', ['$rootScope', 'QuestionBackendApiService'
         var num = constants.NUM_QUESTIONS_PER_PAGE;
         if ((index + 1) * num > _questionSummaries.length &&
             _nextCursorForQuestions !== null && fetchMore) {
-              QuestionBackendApiService.fetchQuestionsForEditors(
-                skillIds, _nextCursorForQuestions).then(
-                function(returnObject) {
-                  _setQuestionSummaries(returnObject.questionSummaries);
-                  _setNextQuestionsCursor(returnObject.nextCursor);
-                }
-              );
+          QuestionBackendApiService.fetchQuestionsForEditors(
+            skillIds, _nextCursorForQuestions).then(
+            function(returnObject) {
+              _setQuestionSummaries(returnObject.questionSummaries);
+              _setNextQuestionsCursor(returnObject.nextCursor);
+            }
+          );
         }
         return _questionSummaries.slice(index * num, (index + 1) * num);
       },
-    }
+    };
   }
 ]);

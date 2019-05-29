@@ -61,7 +61,7 @@ oppia.directive('questionsTab', [
             QuestionUndoRedoService, UndoRedoService,
             NUM_QUESTIONS_PER_PAGE) {
           $scope.currentPage = 0;
-          $scope.getQuestionSummariesAsync = 
+          $scope.getQuestionSummariesAsync =
             QuestionsListService.getQuestionSummariesAsync;
           $scope.isLastQuestionBatch =
             QuestionsListService.isLastQuestionBatch;

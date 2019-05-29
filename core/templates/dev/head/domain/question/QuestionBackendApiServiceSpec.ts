@@ -297,16 +297,16 @@ describe('Question backend Api service', function() {
     }
   );
 
-it('should successfully fetch questions for editors from the backend',
+  it('should successfully fetch questions for editors from the backend',
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
         'GET', '/questions_list_handler/1?cursor=').respond(
-          sampleResponse);
+        sampleResponse);
       QuestionBackendApiService.fetchQuestionsForEditors(
-      ['1']).then(successHandler, failHandler);
+        ['1']).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith({
