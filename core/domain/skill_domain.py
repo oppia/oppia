@@ -599,7 +599,7 @@ class Skill(object):
             versioned_skill_contents['skill_contents'])
 
     @classmethod
-    def _convert_skill_contents_v1_dict_to_v2_dict(skill_contents):
+    def _convert_skill_contents_v1_dict_to_v2_dict(cls, skill_contents):
         """Converts from version 1 to 2. Version 2 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 

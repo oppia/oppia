@@ -103,7 +103,7 @@ class SubtopicPageContents(object):
     """Domain object for the contents on a subtopic page."""
 
     def __init__(
-        self, subtitled_html, recorded_voiceovers, written_translations):
+            self, subtitled_html, recorded_voiceovers, written_translations):
         """Constructs a SubtopicPageContents domain object.
 
         Args:
@@ -275,7 +275,7 @@ class SubtopicPage(object):
             versioned_page_contents['page_contents'])
 
     @classmethod
-    def _convert_page_contents_v1_dict_to_v2_dict(page_contents_dict):
+    def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents_dict):
         """Converts from version 1 to 2. Version 2 replaces
         content_ids_to_audio_translations with recorded_voiceovers.
 

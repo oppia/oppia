@@ -17,7 +17,6 @@
 """Tests for subtopic page domain objects."""
 
 from constants import constants
-from core.domain import state_domain
 from core.domain import subtopic_page_domain
 from core.tests import test_utils
 import feconf

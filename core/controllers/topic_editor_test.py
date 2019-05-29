@@ -330,7 +330,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'property_name': 'page_contents_audio',
                 'old_value': {
                     'voiceovers_mapping': {
-                      'content': {}
+                        'content': {}
                     }
                 },
                 'new_value': {
