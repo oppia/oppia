@@ -23,6 +23,28 @@ var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 
+// check if the save roles button is clickable
+var canAddRolesToUsers = function() {
+  return element(by.css('.protractor-test-save-role')).isEnabled();
+};
+
+// check if the warning message is visible when the title is ''
+var checkForAddTitleWarning = function() {
+  return element(by.className('protractor-test-title-warning')).isDisplayed();
+};
+
+// trigger onblur event for title
+var triggerTitleOnBlurEvent = function() {
+  element(by.css('.protractor-test-exploration-title-input')).click();
+  element(by.css('.protractor-test-exploration-objective-input')).click();
+};
+
+// open edit roles
+var openEditRolesForm = function() {
+  element(by.css('.protractor-test-edit-roles')).click();
+  element(by.css('.protractor-test-role-username')).sendKeys('Chuck Norris');
+};
+
 // Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = function() {
   createExplorationAndStartTutorial();
@@ -178,6 +200,10 @@ exports.createAndPublishExploration = createAndPublishExploration;
 exports.createCollectionAsAdmin = createCollectionAsAdmin;
 exports.createExplorationAsAdmin = createExplorationAsAdmin;
 
+exports.canAddRolesToUsers = canAddRolesToUsers;
+exports.checkForAddTitleWarning = checkForAddTitleWarning;
+exports.triggerTitleOnBlurEvent = triggerTitleOnBlurEvent;
+exports.openEditRolesForm = openEditRolesForm;
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
 exports.addExplorationVoiceArtist = addExplorationVoiceArtist;

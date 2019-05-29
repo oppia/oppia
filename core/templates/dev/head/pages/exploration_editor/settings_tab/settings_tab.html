@@ -286,11 +286,11 @@
                   </span>
                 </div>
 
-                <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
-                <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
-                        ng-show="isRolesFormOpen">
+                <input type="submit" class="btn btn-default protractor-test-save-role" value="Save" ng-disabled="!isTitlePresent()">
+                <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()" ng-show="isRolesFormOpen">
                   Cancel
                 </button>
+                <p ng-show="!isTitlePresent()" class="text-danger protractor-test-title-warning">Please provide a title before inviting.</p>
               </form>
             </div>
           </div>
