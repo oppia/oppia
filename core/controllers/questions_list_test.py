@@ -17,7 +17,6 @@
 from constants import constants
 from core.domain import question_services
 from core.domain import skill_services
-from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -102,4 +101,4 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
     def test_get_fails_when_skill_does_not_exist(self):
         self.get_json('%s/%s?cursor=' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),
-                  expected_status_int=404)
+                    expected_status_int=404)
