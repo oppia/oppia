@@ -24,6 +24,7 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
+
 class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -44,6 +45,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description', [], [],
             [self.skill_id, self.skill_id_2], [], 1)
+        self.skill_id_3 = skill_services.get_new_skill_id()
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -51,6 +53,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
         })]
         topic_services.update_topic_and_subtopic_pages(
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
+
 
 class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 
@@ -97,7 +100,6 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
         self.logout()
 
     def test_get_fails_when_skill_does_not_exist(self):
-        self.skill_id_3 = skill_services.get_new_skill_id()
         self.get_json('%s/%s?cursor=' % (
-                feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),
-            expected_status_int=404)
+            feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),
+                  expected_status_int=404)

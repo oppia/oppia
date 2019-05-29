@@ -22,6 +22,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 import feconf
 
+
 class QuestionsListHandler(base.BaseHandler):
     """Manages the creation of a question and receiving of all question
     summaries for display in topic editor page.

@@ -1673,8 +1673,10 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
             [webapp2.Route('/mock/<skill_ids>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        skill_services.create_new_skill_rights(self.first_skill_id, self.admin_id)
-        skill_services.create_new_skill_rights(self.second_skill_id, self.admin_id)
+        skill_services.create_new_skill_rights(
+            self.first_skill_id, self.admin_id)
+        skill_services.create_new_skill_rights(
+            self.second_skill_id, self.admin_id)
 
     def test_admin_can_edit_multiple_public_skills(self):
         skill_services.publish_skill(self.first_skill_id, self.admin_id)
@@ -1684,8 +1686,10 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json('/mock/%s' % json.dumps(
                 [self.first_skill_id, self.second_skill_id]))
         self.assertEqual(len(json.loads(response['skill_ids'])), 2)
-        self.assertEqual(json.loads(response['skill_ids'])[0], self.first_skill_id)
-        self.assertEqual(json.loads(response['skill_ids'])[1], self.second_skill_id)
+        self.assertEqual(
+            json.loads(response['skill_ids'])[0], self.first_skill_id)
+        self.assertEqual(
+            json.loads(response['skill_ids'])[1], self.second_skill_id)
         self.logout()
 
     def test_admin_can_not_edit_when_skills_list_contains_private_skill(self):
@@ -1695,7 +1699,7 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % json.dumps(
                     [self.first_skill_id, self.second_skill_id]),
-                    expected_status_int=401)
+                expected_status_int=401)
         self.logout()
 
     def test_topic_manager_can_not_edit_when_contains_private_skill(self):
@@ -1705,7 +1709,7 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % json.dumps(
                     [self.first_skill_id, self.second_skill_id]),
-                    expected_status_int=401)
+                expected_status_int=401)
         self.logout()
 
     def test_topic_manager_can_edit_multiple_public_skills(self):
@@ -1716,8 +1720,10 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
             response = self.get_json('/mock/%s' % json.dumps(
                 [self.first_skill_id, self.second_skill_id]))
         self.assertEqual(len(json.loads(response['skill_ids'])), 2)
-        self.assertEqual(json.loads(response['skill_ids'])[0], self.first_skill_id)
-        self.assertEqual(json.loads(response['skill_ids'])[1], self.second_skill_id)
+        self.assertEqual(
+            json.loads(response['skill_ids'])[0], self.first_skill_id)
+        self.assertEqual(
+            json.loads(response['skill_ids'])[1], self.second_skill_id)
         self.logout()
 
     def test_normal_user_can_not_edit_multiple_public_skills(self):
@@ -1728,7 +1734,7 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
             self.get_json(
                 '/mock/%s' % json.dumps(
                     [self.first_skill_id, self.second_skill_id]),
-                    expected_status_int=401)
+                expected_status_int=401)
         self.logout()
 
 

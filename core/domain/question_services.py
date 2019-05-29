@@ -330,8 +330,7 @@ def get_question_summaries_and_skill_descriptions(
     descriptions linked to all the skills given by skill_ids.
 
     Args:
-        question_skill_count: int. The number of question skill links to fetch
-            from datastore.
+        question_count: int. The number of questions to fetch.
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
         start_cursor: str. The starting point from which the batch of
