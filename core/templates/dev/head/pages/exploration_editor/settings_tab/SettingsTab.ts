@@ -408,5 +408,9 @@ oppia.controller('SettingsTab', [
     $scope.closeRolesForm = function() {
       $scope.isRolesFormOpen = false;
     };
+
+    $scope.isTitlePresent = function() {
+      return ExplorationTitleService.savedMemento.length > 0;
+    };
   }
 ]);
