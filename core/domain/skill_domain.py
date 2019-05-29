@@ -599,6 +599,24 @@ class Skill(object):
             versioned_skill_contents['skill_contents'])
 
     @classmethod
+    def _convert_skill_contents_v1_dict_to_v2_dict(skill_contents):
+        """Converts from version 1 to 2. Version 2 replaces
+        content_ids_to_audio_translations with recorded_voiceovers.
+
+         Args:
+            skill_contents: dict. The dict comprising the skill contents.
+
+        Returns:
+            dict. The converted skill_contents.
+        """
+        skill_contents['recorded_voiceovers'] = {
+            'voiceovers_mapping': skill_contents.pop(
+                'content_ids_to_audio_translations')
+        }
+
+        return skill_contents
+
+    @classmethod
     def update_misconceptions_from_model(
             cls, versioned_misconceptions, current_version):
         """Converts the misconceptions blob contained in the given
