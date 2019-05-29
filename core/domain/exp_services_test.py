@@ -1239,6 +1239,7 @@ schema_version: %d
 states:
   %s:
     classifier_model_id: null
+    ask_learners_for_response: false
     content:
       content_id: content
       html: ''
@@ -1273,6 +1274,7 @@ states:
         default_outcome: {}
   New state:
     classifier_model_id: null
+    ask_learners_for_response: false
     content:
       content_id: content
       html: ''
@@ -1329,6 +1331,7 @@ schema_version: %d
 states:
   %s:
     classifier_model_id: null
+    ask_learners_for_response: false
     content:
       content_id: content
       html: ''
@@ -1363,6 +1366,7 @@ states:
         default_outcome: {}
   Renamed state:
     classifier_model_id: null
+    ask_learners_for_response: false
     content:
       content_id: content
       html: ''
@@ -1545,6 +1549,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     contents.
     """
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
+ask_learners_for_response: false
 content:
   content_id: content
   html: ''
@@ -1582,6 +1587,7 @@ written_translations:
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': ("""classifier_model_id: null
+ask_learners_for_response: false
 content:
   content_id: content
   html: ''
@@ -1620,6 +1626,7 @@ written_translations:
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': ("""classifier_model_id: null
+ask_learners_for_response: false
 content:
   content_id: content
   html: ''
@@ -3087,6 +3094,7 @@ schema_version: %d
 states:
   END:
     classifier_model_id: null
+    ask_learners_for_response: false
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
@@ -3109,6 +3117,7 @@ states:
         content: {}
   %s:
     classifier_model_id: null
+    ask_learners_for_response: false
     content:
       content_id: content
       html: ''
