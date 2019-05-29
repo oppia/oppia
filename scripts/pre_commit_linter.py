@@ -943,7 +943,7 @@ def _lint_js_and_ts_files(
         return
 
     print 'Total js and ts files: ', num_js_and_ts_files
-    eslint_cmd_args = [node_path, eslint_path, '--quiet', '--fix']
+    eslint_cmd_args = [node_path, eslint_path, '--quiet']
     result_list = []
     print 'Linting JS and TS files.'
     for _, filepath in enumerate(files_to_lint):
