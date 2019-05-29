@@ -2235,12 +2235,12 @@ class LintChecksManager(object):
         return summary_messages
 
     def check_for_important_rules_at_bottom_of_codeowners(
-            self, imp_rules_in_critical_section, failed):
+            self, imp_patterns, failed):
         """Checks that the most important rules/patterns are at the bottom
         of the CODEOWNERS file.
 
         Arguments:
-            imp_rules_in_critical_section: list(str). List of the important
+            imp_patterns: list(str). List of the important
                 paths/rules for CODEOWNERS file.
             failed: bool. Current status of failure.
 
@@ -2250,11 +2250,11 @@ class LintChecksManager(object):
 
         # The following condition checks for extra rules in the critical
         # files section in the .github/CODEOWNERS file.
-        if len(imp_rules_in_critical_section) > len(
+        if len(imp_patterns) > len(
                 CODEOWNER_IMPORTANT_PATHS):
             important_path_match_bool_list = ([
                 imp_path in CODEOWNER_IMPORTANT_PATHS
-                for imp_path in imp_rules_in_critical_section])
+                for imp_path in imp_patterns])
             for index, bool_value in enumerate(
                     important_path_match_bool_list):
                 if not bool_value:
@@ -2262,11 +2262,11 @@ class LintChecksManager(object):
                            'rule. Please place it before the critical '
                            'files section.' % (
                                CODEOWNER_FILEPATH,
-                               imp_rules_in_critical_section[index]))
+                               imp_patterns[index]))
                     failed = True
         else:
             important_path_match_bool_list = ([
-                imp_path in imp_rules_in_critical_section
+                imp_path in imp_patterns
                 for imp_path in CODEOWNER_IMPORTANT_PATHS])
             # This condition checks that all the values in the boolean list
             # are True. This ensures that the critical files of the
@@ -2302,7 +2302,6 @@ class LintChecksManager(object):
             summary_messages = []
             # Checks whether every pattern in the CODEOWNERS file matches at
             # least one dir/file.
-            path_patterns = []
             critical_file_section_found = False
             imp_rules_in_critical_section = []
             file_patterns = []
@@ -2389,7 +2388,7 @@ class LintChecksManager(object):
                 summary_message = '%s   CODEOWNERS file check failed' % (
                     _MESSAGE_TYPE_FAILED)
             else:
-                summary_message = '%s   CODEOWNERS file check passed' % (
+                summary_message = '%s  CODEOWNERS file check passed' % (
                     _MESSAGE_TYPE_SUCCESS)
 
             summary_messages.append(summary_message)
