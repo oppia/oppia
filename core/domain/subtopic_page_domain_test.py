@@ -44,8 +44,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': '',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -75,8 +77,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': '',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -118,12 +122,14 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Invalid language code')
 
     def test_update_audio(self):
-        content_ids_to_audio_translations_dict = {
-            'content': {
-                'en': {
-                    'filename': 'test.mp3',
-                    'file_size_bytes': 100,
-                    'needs_update': False
+        recorded_voiceovers_dict = {
+            'voiceovers_mapping': {
+                'content': {
+                    'en': {
+                        'filename': 'test.mp3',
+                        'file_size_bytes': 100,
+                        'needs_update': False
+                    }
                 }
             }
         }
@@ -135,8 +141,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': '',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations':
-                    content_ids_to_audio_translations_dict,
+                'recorded_voiceovers': recorded_voiceovers_dict,
                 'written_translations': {
                     'translations_mapping': {
                         'content': {}
@@ -148,8 +153,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
-        self.subtopic_page.update_page_contents_audio(
-            content_ids_to_audio_translations_dict)
+        self.subtopic_page.update_page_contents_audio(recorded_voiceovers_dict)
         self.assertEqual(self.subtopic_page.to_dict(),
                          expected_subtopic_page_dict)
 
@@ -162,8 +166,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': 'hello world',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -202,8 +208,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
                     'html': '',
                     'content_id': 'content'
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'written_translations': written_translations_dict
             },
@@ -241,8 +249,10 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -253,32 +263,20 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(subtopic_page_contents.to_dict(),
                          expected_subtopic_page_contents_dict)
 
-    def test_content_ids_to_audio_translations_validation(self):
-        self.subtopic_page_contents.content_ids_to_audio_translations = 1
-        self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to be a dict')
-
-        self.subtopic_page_contents.subtitled_html = (
-            state_domain.SubtitledHtml('content', '<p>Test</p>'))
-        self.subtopic_page_contents.content_ids_to_audio_translations = {
-            'content_id_3': {}
-        }
-        self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to contain '
-            'only content_ids in the subtopic page.')
-
     def test_to_and_from_dict(self):
         subtopic_page_contents_dict = {
             'subtitled_html': {
                 'html': 'test',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {
-                    'en': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
                     }
                 }
             },

@@ -69,10 +69,12 @@ describe('Skill update service', function() {
           content_id: 'worked_example_2'
         }
       ],
-      content_ids_to_audio_translations: {
-        explanation: {},
-        worked_example_1: {},
-        worked_example_2: {}
+      recorded_voiceovers: {
+        voiceovers_mapping: {
+          explanation: {},
+          worked_example_1: {},
+          worked_example_2: {}
+        }
       }
     };
 

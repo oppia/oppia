@@ -34,7 +34,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             state_domain.SubtitledHtml(
                 '1', 'Explanation'), [
                     state_domain.SubtitledHtml('2', 'Example 1')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback')]
@@ -127,31 +129,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
 
-    def test_skill_contents_audio_validation(self):
-        self.skill.update_worked_examples([
-            {
-                'content_id': 'content_id_1',
-                'html': '<p>Hello</p>'
-            },
-            {
-                'content_id': 'content_id_2',
-                'html': '<p>Hello 2</p>'
-            }
-        ])
-        self.skill.skill_contents.content_ids_to_audio_translations = {
-            'content_id_3': {}
-        }
-        self._assert_validation_error(
-            'Expected content_ids_to_audio_translations to contain only '
-            'content_ids in worked examples and explanation.')
-
-        self.skill.skill_contents.worked_examples = [
-            state_domain.SubtitledHtml('content_id_1', '<p>Hello</p>'),
-            state_domain.SubtitledHtml('content_id_1', '<p>Hello 2</p>')
-        ]
-
-        self._assert_validation_error('Found a duplicate content id')
-
     def test_misconception_id_validation(self):
         self.skill.misconceptions = [
             skill_domain.Misconception(
@@ -185,8 +162,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                     'html': feconf.DEFAULT_SKILL_EXPLANATION,
                     'content_id': 'explanation'
                 },
-                'content_ids_to_audio_translations': {
-                    'explanation': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'explanation': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -216,7 +195,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', 'Explanation'), [
                 state_domain.SubtitledHtml('2', 'Example 1')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            state_domain.RecordedVoiceovers.from_dict(
+                {'voiceovers_mapping': {'1': {}, '2': {}}}),
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(

@@ -168,8 +168,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -194,8 +196,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -216,8 +220,10 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
                 'html': '',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -323,14 +329,18 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_audio',
                 'old_value': {
-                    'content': {}
+                    'voiceovers_mapping': {
+                      'content': {}
+                    }
                 },
                 'new_value': {
-                    'content': {
-                        'en': {
-                            'filename': 'test.mp3',
-                            'file_size_bytes': 100,
-                            'needs_update': False
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False
+                            }
                         }
                     }
                 },
@@ -363,8 +373,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'html': '<p>New Data</p>',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {}
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {}
+                }
             },
             'written_translations': {
                 'translations_mapping': {
@@ -381,12 +393,14 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'html': '<p>New Value</p>',
                 'content_id': 'content'
             },
-            'content_ids_to_audio_translations': {
-                'content': {
-                    'en': {
-                        'file_size_bytes': 100,
-                        'filename': 'test.mp3',
-                        'needs_update': False
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    'content': {
+                        'en': {
+                            'file_size_bytes': 100,
+                            'filename': 'test.mp3',
+                            'needs_update': False
+                        }
                     }
                 }
             },
@@ -458,14 +472,18 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_audio',
                 'old_value': {
-                    'content': {}
+                    'voiceovers_mapping': {
+                        'content': {}
+                    }
                 },
                 'new_value': {
-                    'content': {
-                        'en': {
-                            'filename': 'test.mp3',
-                            'file_size_bytes': 100,
-                            'needs_update': False
+                    'voiceovers_mapping': {
+                        'content': {
+                            'en': {
+                                'filename': 'test.mp3',
+                                'file_size_bytes': 100,
+                                'needs_update': False
+                            }
                         }
                     }
                 },

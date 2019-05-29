@@ -19,7 +19,6 @@
 
 require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/exploration/AnswerGroupObjectFactory.ts');
-require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/ParamSpecObjectFactory.ts');

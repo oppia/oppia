@@ -17,20 +17,20 @@
  * concept card. In the backend, this is referred to as SkillContents.
  */
 
-require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
 oppia.factory('ConceptCardObjectFactory', [
-  'ContentIdsToAudioTranslationsObjectFactory', 'SubtitledHtmlObjectFactory',
+  'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
   'COMPONENT_NAME_EXPLANATION',
   function(
-      ContentIdsToAudioTranslationsObjectFactory, SubtitledHtmlObjectFactory,
+      RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory,
       COMPONENT_NAME_EXPLANATION) {
     var ConceptCard = function(
-        explanation, workedExamples, contentIdsToAudioTranslations) {
+        explanation, workedExamples, recordedVoiceovers) {
       this._explanation = explanation;
       this._workedExamples = workedExamples;
-      this._contentIdsToAudioTranslations = contentIdsToAudioTranslations;
+      this._recordedVoiceovers = recordedVoiceovers;
     };
 
     ConceptCard.prototype.toBackendDict = function() {
@@ -39,8 +39,7 @@ oppia.factory('ConceptCardObjectFactory', [
         worked_examples: this._workedExamples.map(function(workedExample) {
           return workedExample.toBackendDict();
         }),
-        content_ids_to_audio_translations:
-          this._contentIdsToAudioTranslations.toBackendDict()
+        recorded_voiceovers: this._recordedVoiceovers.toBackendDict()
       };
     };
 
@@ -76,8 +75,8 @@ oppia.factory('ConceptCardObjectFactory', [
           conceptCardBackendDict.explanation),
         _generateWorkedExamplesFromBackendDict(
           conceptCardBackendDict.worked_examples),
-        ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict(
-          conceptCardBackendDict.content_ids_to_audio_translations));
+        RecordedVoiceoversObjectFactory.createFromBackendDict(
+          conceptCardBackendDict.recorded_voiceovers));
     };
 
     ConceptCard.prototype.getExplanation = function() {
@@ -107,16 +106,15 @@ oppia.factory('ConceptCardObjectFactory', [
         newContentIds, oldContentIds);
 
       for (var i = 0; i < contentIdsToDelete.length; i++) {
-        this._contentIdsToAudioTranslations.deleteContentId(
-          contentIdsToDelete[i]);
+        this._recordedVoiceovers.deleteContentId(contentIdsToDelete[i]);
       }
       for (var i = 0; i < contentIdsToAdd.length; i++) {
-        this._contentIdsToAudioTranslations.addContentId(contentIdsToAdd[i]);
+        this._recordedVoiceovers.addContentId(contentIdsToAdd[i]);
       }
     };
 
-    ConceptCard.prototype.getContentIdsToAudioTranslations = function() {
-      return this._contentIdsToAudioTranslations;
+    ConceptCard.prototype.getRecordedVoiceovers = function() {
+      return this._recordedVoiceovers;
     };
 
     // Create an interstitial concept card that would be displayed in the
@@ -125,13 +123,16 @@ oppia.factory('ConceptCardObjectFactory', [
     /* eslint-disable dot-notation */
     ConceptCard['createInterstitialConceptCard'] = function() {
     /* eslint-enable dot-notation */
-      var contentIdsToAudioTranslationsDict = {};
-      contentIdsToAudioTranslationsDict[COMPONENT_NAME_EXPLANATION] = {};
+      var recordedVoiceoversDict = {
+        voiceovers_mapping: {
+          COMPONENT_NAME_EXPLANATION: {}
+        }
+      };
       return new ConceptCard(
         SubtitledHtmlObjectFactory.createDefault(
           'Loading review material', COMPONENT_NAME_EXPLANATION), [],
-        ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict(
-          contentIdsToAudioTranslationsDict)
+        RecordedVoiceoversObjectFactory.createFromBackendDict(
+          recordedVoiceoversDict)
       );
     };
 

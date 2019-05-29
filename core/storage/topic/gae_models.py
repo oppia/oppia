@@ -219,7 +219,7 @@ class SubtopicPageModel(base_models.VersionedModel):
     # The topic id that this subtopic is a part of.
     topic_id = ndb.StringProperty(required=True, indexed=True)
     # The json data of the subtopic consisting of subtitled_html,
-    # content_ids_to_audio_translations and written_translations fields.
+    # recorded_voiceovers and written_translations fields.
     page_contents = ndb.JsonProperty(required=True)
     # The schema version for the page_contents field.
     page_contents_schema_version = ndb.IntegerProperty(
