@@ -61,6 +61,7 @@ oppia.factory('ChangeListService', [
 
     var ALLOWED_STATE_BACKEND_NAMES = {
       answer_groups: true,
+      ask_learners_for_response: true,
       confirmed_unclassified_answers: true,
       content: true,
       recorded_voiceovers: true,
