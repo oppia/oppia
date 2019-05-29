@@ -809,8 +809,8 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         commit_cmds = [{
             'cmd': 'change_role',
             'assignee_id': translator_id,
-            'old_role': 'translator',
             # Using magic string because ROLE_TRANSLATOR is removed.
+            'old_role': 'translator',
             'new_role': rights_manager.ROLE_VOICE_ARTIST
         } for translator_id in translator_ids]
 
