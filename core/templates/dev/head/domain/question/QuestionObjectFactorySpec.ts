@@ -43,6 +43,7 @@ describe('Question object factory', function() {
 
     _sampleQuestionBackendDict = {
       id: 'question_id',
+      ask_learners_for_response: false,
       question_state_data: {
         content: {
           html: 'Question 1',
