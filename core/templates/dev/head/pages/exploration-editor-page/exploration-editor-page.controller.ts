@@ -207,7 +207,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
-require('pages/exploration-player-page/layout-directives/conversation-skin.directive.ts');
+require('pages/exploration-player-page/learner-experience/conversation-skin.directive.ts');
 require('pages/exploration-player-page/layout-directives/exploration-footer.directive.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 

@@ -23,7 +23,7 @@ require(
 require(
   'components/state-editor/state-interaction-editor/' +
   'state-interaction-editor.directive.ts');
-require('components/state-editor/state-responses/state-responses.directive.ts');
+require('components/state-editor/state-responses-editor/state-responses.directive.ts');
 require(
   'components/state-editor/state-solution-editor/' +
   'state-solution-editor.directive.ts');

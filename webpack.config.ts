@@ -59,7 +59,7 @@ module.exports = {
       commonPrefix + '/pages/exploration-player-page/' +
       'exploration-player-page.controller.ts',
     get_started:
-      commonPrefix + '/pages/get-started-page/get-started-page.script.ts',
+      commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
       commonPrefix + '/pages/landing-pages/topic-landing-page/' +
       'topic-landing-page.controller.ts',

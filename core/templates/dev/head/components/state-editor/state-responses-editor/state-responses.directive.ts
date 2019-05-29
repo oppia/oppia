@@ -80,7 +80,7 @@ oppia.directive('stateResponses', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-editor/state-responses/' +
+        '/components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
         '$filter', '$scope', '$rootScope', '$uibModal', 'AlertsService',

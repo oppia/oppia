@@ -32,7 +32,7 @@ require(
   'player-transcript.service.ts');
 
 require(
-  'pages/exploration-player-page/layout-directives/continue-button.directive.ts');
+  'pages/exploration-player-page/layout-directives/learner-experience/continue-button.directive.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 

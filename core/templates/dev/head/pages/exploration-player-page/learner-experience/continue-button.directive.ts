@@ -30,7 +30,7 @@ oppia.directive('continueButton', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-player-page/layout-directives/' +
-        'continue-button.directive.html')
+        'learner-experience/continue-button.directive.html')
     };
   }
 ]);

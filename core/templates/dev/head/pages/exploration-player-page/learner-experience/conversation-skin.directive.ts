@@ -60,7 +60,7 @@ require(
   'pages/exploration-player-page/services/' +
   'fatigue-detection.service.ts');
 require(
-  'pages/exploration-player-page/learner-experience/feedback-popup.directive.ts');
+  'pages/exploration-player-page/layout-directives/feedback-popup.directive.ts');
 require(
   'pages/exploration-player-page/services/' +
   'hints-and-solution-manager.service.ts');
@@ -337,10 +337,10 @@ oppia.directive('conversationSkin', [
         var isIframed = UrlService.isIframed();
         scope.directiveTemplate = isIframed ?
           UrlInterpolationService.getDirectiveTemplateUrl(
-	    '/pages/exploration-player-page/layout-directives/' +
+	    '/pages/exploration-player-page/learner-experience/' +
             'conversation-skin-embed.directive.html') :
           UrlInterpolationService.getDirectiveTemplateUrl(
-	    '/pages/exploration-player-page/layout-directives/' +
+	    '/pages/exploration-player-page/learner-experience/' +
             'conversation-skin.directive.html');
       },
       template: '<div ng-include="directiveTemplate"></div>',

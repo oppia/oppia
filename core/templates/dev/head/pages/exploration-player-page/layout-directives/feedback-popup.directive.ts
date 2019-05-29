@@ -43,7 +43,7 @@ oppia.directive('feedbackPopup', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/learner-experience/' +
+        '/pages/exploration-player-page/layout-directives/' +
         'feedback-popup.directive.html'),
       controller: [
         '$scope', '$element', '$filter', '$http', '$log', '$timeout',

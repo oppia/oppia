@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/exploration-player-state.service.ts');
-require('pages/exploration-player-page/learner-experience/feedback-popup.directive.ts');
+require('pages/exploration-player-page/layout-directives/feedback-popup.directive.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require(
   'pages/exploration-player-page/' +

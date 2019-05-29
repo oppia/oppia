@@ -63,7 +63,7 @@ oppia.controller('LearnerViewInfo', [
       $uibModal.open({
         animation: true,
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/learner-experience/' +
+        '/pages/exploration-player-page/layout-directives/' +
         'information-card-modal.directive.html'),
         windowClass: 'oppia-modal-information-card',
         resolve: {
