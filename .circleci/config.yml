@@ -467,7 +467,7 @@ workflows:
       - publication_e2e_tests:
           requires:
             - setup
-      - skillEditor_e2e_tests:
+      - skillEditorPage_e2e_tests:
           requires:
             - setup
       - subscriptions_e2e_tests:
