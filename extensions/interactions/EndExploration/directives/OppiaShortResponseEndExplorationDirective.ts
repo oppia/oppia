@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the EndExploration short response.
+ * @fileoverview Directive for the EndExploration short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -24,6 +24,9 @@ oppia.directive('oppiaShortResponseEndExploration', [function() {
   return {
     restrict: 'E',
     scope: {},
-    template: ''
+    bindToController: {},
+    template: '',
+    controllerAs: '$ctrl',
+    controller: [function() {}]
   };
 }]);
