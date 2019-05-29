@@ -345,9 +345,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page.page_contents.recorded_voiceovers.to_dict(), {
                 'voiceovers_mapping': {
                     'content': {
-                        'filename': 'test.mp3',
-                        'file_size_bytes': 100,
-                        'needs_update': False
+                        'en': {
+                            'filename': 'test.mp3',
+                            'file_size_bytes': 100,
+                            'needs_update': False
+                        }
                     }
                 }
             })

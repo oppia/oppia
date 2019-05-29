@@ -127,10 +127,8 @@ class SkillMigrationOneOffJobTests(test_utils.GenericTestBase):
                 'content_id': 'explanation',
                 'html': feconf.DEFAULT_SKILL_EXPLANATION
             },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    'explanation': {}
-                }
+            'content_ids_to_audio_translations': {
+                'explanation': {}
             },
             'written_translations': {
                 'translations_mapping': {

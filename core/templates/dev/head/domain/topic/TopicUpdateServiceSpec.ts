@@ -774,15 +774,15 @@ describe('Topic update service', function() {
         }
       }
     };
-    var newSampleAudio = RecordedVoiceoversObjectFactory.createFromBackendDict(
+    var newVoiceovers = RecordedVoiceoversObjectFactory.createFromBackendDict(
       newRecordedVoiceoversDict);
     TopicUpdateService.setSubtopicPageContentsAudio(
-      _sampleSubtopicPage, 1, newRecordedVoiceoversDict);
+      _sampleSubtopicPage, 1, newVoiceovers);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_subtopic_page_property',
       property_name: 'page_contents_audio',
       subtopic_id: 1,
-      new_value: newRecordedVoiceoversDict.toBackendDict(),
+      new_value: newVoiceovers.toBackendDict(),
       old_value: {
         voiceovers_mapping: {
           content: {
