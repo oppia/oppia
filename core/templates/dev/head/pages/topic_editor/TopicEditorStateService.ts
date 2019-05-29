@@ -19,7 +19,7 @@
  */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/QuestionsListBackendApiService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('domain/story/EditableStoryBackendApiService.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/SubtopicPageObjectFactory.ts');
@@ -40,20 +40,20 @@ oppia.constant(
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',
   'EditableStoryBackendApiService', 'EditableTopicBackendApiService',
-  'QuestionsListBackendApiService', 'QuestionsListService',
+  'QuestionBackendApiService', 'QuestionsListService',
   'SubtopicPageObjectFactory',
   'TopicObjectFactory', 'TopicRightsBackendApiService',
   'TopicRightsObjectFactory', 'UndoRedoService',
-  'ACTIVITY_TYPE', 'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'EVENT_STORY_SUMMARIES_INITIALIZED',
   'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_TOPIC_INITIALIZED',
   'EVENT_TOPIC_REINITIALIZED', function(
       $rootScope, AlertsService,
       EditableStoryBackendApiService, EditableTopicBackendApiService,
-      QuestionsListBackendApiService, QuestionsListService,
+      QuestionBackendApiService, QuestionsListService,
       SubtopicPageObjectFactory,
       TopicObjectFactory, TopicRightsBackendApiService,
       TopicRightsObjectFactory, UndoRedoService,
-      ACTIVITY_TYPE, EVENT_QUESTION_SUMMARIES_INITIALIZED, EVENT_STORY_SUMMARIES_INITIALIZED,
+      EVENT_QUESTION_SUMMARIES_INITIALIZED, EVENT_STORY_SUMMARIES_INITIALIZED,
       EVENT_SUBTOPIC_PAGE_LOADED, EVENT_TOPIC_INITIALIZED,
       EVENT_TOPIC_REINITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
@@ -70,7 +70,6 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
     var _canonicalStorySummaries = [];
-    var _nextCursorForQuestions = '';
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -143,13 +142,8 @@ oppia.factory('TopicEditorStateService', [
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
               });
-            _nextCursorForQuestions = QuestionsListService.getNextCursor();
-            QuestionsListBackendApiService.fetchQuestions(
-              ACTIVITY_TYPE.topic, topicId, _nextCursorForQuestions).then(
-              function(returnObject) {
-                QuestionsListService.setQuestionSummaries(returnObject.questionSummaries);
-                QuestionsListService.setNextQuestionsCursor(returnObject.nextCursor);
-              }
+            QuestionsListService.getQuestionSummariesAsync(
+              0, _topic.getSkillIds(), true, false
             );
           },
           function(error) {

@@ -55,10 +55,8 @@ oppia.directive('questionsTab', [
             StateEditorService, QuestionUndoRedoService, UndoRedoService,
             NUM_QUESTIONS_PER_PAGE) {
           $scope.skill = SkillEditorStateService.getSkill();
-          $scope.getQuestionSummaries =
-            QuestionsListService.getQuestionSummaries;
-          $scope.fetchQuestionSummaries =
-            QuestionsListService.fetchQuestionSummaries;
+          $scope.getQuestionSummariesAsync =
+            QuestionsListService.getQuestionSummariesAsync;
           $scope.isLastQuestionBatch =
            QuestionsListService.isLastQuestionBatch;
         }

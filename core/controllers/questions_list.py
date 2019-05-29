@@ -19,7 +19,7 @@ from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
 from core.domain import skill_domain
-from core.domain import topic_services
+from core.domain import skill_services
 import feconf
 
 class QuestionsListHandler(base.BaseHandler):
@@ -29,18 +29,17 @@ class QuestionsListHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, activity_type, activity_id):
+    def get(self, skill_ids):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
+        skill_ids = skill_ids.split(',')
 
-        if activity_type not in constants.ACTIVITY_TYPE:
-            raise self.PageNotFoundException
-        elif activity_type == constants.ACTIVITY_TYPE['topic']:
-            topic = topic_services.get_topic_by_id(activity_id)
-            skill_ids = topic.get_all_skill_ids()
-        elif activity_type == constants.ACTIVITY_TYPE['skill']:
-            skill_domain.Skill.require_valid_skill_id(activity_id)
-            skill_ids = [activity_id]
+        for skill_id in skill_ids:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+            skill = skill_services.get_skill_by_id(skill_id, strict=False)
+            if skill is None:
+                raise self.PageNotFoundException(
+                    'The skill with the given id doesn\'t exist.')
 
         question_summaries, skill_descriptions_list, next_start_cursor = (
             question_services.get_question_summaries_and_skill_descriptions(

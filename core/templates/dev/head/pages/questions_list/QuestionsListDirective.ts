@@ -40,8 +40,8 @@ oppia.directive('questionsList', [
       scope: {
         getSkill: '&skill',
         getTopicId: '&topicId',
-        getQuestionSummaries: '=',
-        fetchQuestionSummaries: '=',
+        getTopicSkillIds: '&topicSkillIds',
+        getQuestionSummariesAsync: '=',
         isLastPage: '=isLastQuestionBatch',
         getAllSkillSummaries: '&allSkillSummaries',
         canEditQuestion: '&',
@@ -64,12 +64,19 @@ oppia.directive('questionsList', [
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             StateEditorService, QuestionUndoRedoService, UndoRedoService) {
           $scope.currentPage = 0;
+          $scope.skillIdsList = [];
 
           var _initTab = function() {
+            if ($scope.getSkill()) {
+              $scope.skillIdsList = [$scope.getSkill().getId()];
+            } else {
+              $scope.skillIdsList = $scope.getTopicSkillIds();
+            }
             $scope.questionEditorIsShown = false;
             $scope.question = null;
-            $scope.questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage, false);
+            $scope.questionSummaries = $scope.getQuestionSummariesAsync(
+              $scope.currentPage, $scope.skillIds, false, false
+            );
             $scope.truncatedQuestionSummaries = [];
             if ($scope.questionSummaries) {
               $scope.truncatedQuestionSummaries =
@@ -98,19 +105,16 @@ oppia.directive('questionsList', [
 
           $scope.goToNextPage = function() {
             $scope.currentPage++;
-            var questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage, true);
-            if (questionSummaries === null) {
-              $scope.fetchQuestionSummaries($scope.entityId, false);
-            } else {
-              $scope.questionSummaries = questionSummaries;
-            }
+            $scope.questionSummaries = $scope.getQuestionSummariesAsync(
+              $scope.currentPage, $scope.skillIdsList, true, false
+            )
           };
 
           $scope.goToPreviousPage = function() {
             $scope.currentPage--;
-            $scope.questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage, false);
+            $scope.questionSummaries = $scope.getQuestionSummariesAsync(
+              $scope.currentPage, $scope.skillIdsList, false, false
+            )
           };
 
           $scope.getSkillDescription = function(skillDescriptions) {
@@ -134,7 +138,9 @@ oppia.directive('questionsList', [
                 }
               }).then(function() {
                 $timeout(function() {
-                  $scope.fetchQuestionSummaries($scope.entityId, true);
+                  $scope.questionSummaries = $scope.getQuestionSummariesAsync(
+                    0, $scope.skillIdsList, true, false
+                  )
                   $scope.questionIsBeingSaved = false;
                   $scope.currentPage = 0;
                 }, 1000);
@@ -149,7 +155,9 @@ oppia.directive('questionsList', [
                   function() {
                     QuestionUndoRedoService.clearChanges();
                     $scope.questionIsBeingSaved = false;
-                    $scope.fetchQuestionSummaries($scope.entityId, true);
+                    $scope.questionSummaries = $scope.getQuestionSummariesAsync(
+                      $scope.currentPage, $scope.skillIdsList, true, false
+                    )
                   }, function(error) {
                     AlertsService.addWarning(
                       error || 'There was an error saving the question.');

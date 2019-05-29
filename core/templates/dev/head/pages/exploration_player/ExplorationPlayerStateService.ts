@@ -28,7 +28,7 @@ oppia.constant('EXPLORATION_MODE', {
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
-require('domain/question/QuestionPlayerBackendApiService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('pages/exploration_player/ExplorationEngineService.ts');
 require('pages/exploration_player/NumberAttemptsService.ts');
 require('pages/exploration_player/PlayerPositionService.ts');
@@ -51,7 +51,7 @@ oppia.factory('ExplorationPlayerStateService', [
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
   'PretestEngineService', 'PretestQuestionBackendApiService',
-  'QuestionPlayerBackendApiService',
+  'QuestionBackendApiService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
@@ -62,7 +62,7 @@ oppia.factory('ExplorationPlayerStateService', [
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
       PretestEngineService, PretestQuestionBackendApiService,
-      QuestionPlayerBackendApiService,
+      QuestionBackendApiService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
@@ -136,7 +136,7 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initQuestionPlayer = function(questionPlayerConfig, callback) {
       setQuestionPlayerMode();
-      QuestionPlayerBackendApiService.fetchQuestions(
+      QuestionBackendApiService.fetchQuestionsForPlayers(
         questionPlayerConfig.skillList,
         questionPlayerConfig.questionCount, true).then(function(questionData) {
         $rootScope.$broadcast('totalQuestionsReceived', questionData.length);

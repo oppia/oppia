@@ -54,7 +54,7 @@ class BaseQuestionsListControllerTests(test_utils.GenericTestBase):
 
 class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
 
-    def test_get_questions_in_topic_editors_succeeds(self):
+    def test_get_questions_succeeds(self):
         for _ in range(0, 4):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
@@ -68,17 +68,18 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
             json_response = self.get_json(
-                '%s/%s/%s?cursor=' % (
-                    feconf.QUESTIONS_LIST_URL_PREFIX, 'topic',
-                    self.topic_id
+                '%s/%s?cursor=' % (
+                    feconf.QUESTIONS_LIST_URL_PREFIX,
+                    self.skill_id + ',' + self.skill_id_2
                 ))
             question_summary_dicts = json_response['question_summary_dicts']
             self.assertEqual(len(question_summary_dicts), 2)
             next_start_cursor = json_response['next_start_cursor']
             json_response = self.get_json(
-                '%s/%s/%s?cursor=%s' % (
-                    feconf.QUESTIONS_LIST_URL_PREFIX, 'topic',
-                    self.topic_id, next_start_cursor
+                '%s/%s?cursor=%s' % (
+                    feconf.QUESTIONS_LIST_URL_PREFIX,
+                    self.skill_id + ',' + self.skill_id_2,
+                    next_start_cursor
                 ))
             question_summary_dicts_2 = (
                 json_response['question_summary_dicts'])
@@ -95,47 +96,8 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                 question_summary_dicts_2[0]['summary']['id'])
         self.logout()
 
-    def test_get_questions_in_skill_editors_succeeds(self):
-        for _ in range(0, 2):
-            question_id = question_services.get_new_question_id()
-            self.save_new_question(
-                question_id, self.admin_id,
-                self._create_valid_question_data('ABC'))
-            question_services.create_new_question_skill_link(
-                question_id, self.skill_id, 0.5)
-
-        self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
-            json_response = self.get_json(
-                '%s/%s/%s?cursor=' % (
-                    feconf.QUESTIONS_LIST_URL_PREFIX, 'skill',
-                    self.skill_id
-                ))
-            question_summary_dicts = json_response['question_summary_dicts']
-            self.assertEqual(len(question_summary_dicts), 1)
-            next_start_cursor = json_response['next_start_cursor']
-            json_response = self.get_json(
-                '%s/%s/%s?cursor=%s' % (
-                    feconf.QUESTIONS_LIST_URL_PREFIX, 'skill',
-                    self.skill_id, next_start_cursor
-                ))
-            question_summary_dicts_2 = (
-                json_response['question_summary_dicts'])
-            self.assertEqual(len(question_summary_dicts_2), 1)
-            self.assertEqual(
-                question_summary_dicts[0]['skill_descriptions'],
-                ['Skill Description'])
-            self.assertEqual(
-                question_summary_dicts_2[0]['skill_descriptions'],
-                ['Skill Description'])
-            self.assertNotEqual(
-                question_summary_dicts[0]['summary']['id'],
-                question_summary_dicts_2[0]['summary']['id'])
-        self.logout()
-
-    def test_get_fails_when_not_topic_or_skill(self):
-        self.get_json(
-            '%s/%s/%s?cursor=' % (
-                feconf.QUESTIONS_LIST_URL_PREFIX, 'not_topic_or_skill',
-                self.skill_id),
+    def test_get_fails_when_skill_does_not_exist(self):
+        self.skill_id_3 = skill_services.get_new_skill_id()
+        self.get_json('%s/%s?cursor=' % (
+                feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),
             expected_status_int=404)

@@ -45,6 +45,7 @@ oppia.directive('topicEditorNavbar', [
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.topicId = UrlService.getTopicIdFromUrl();
           $scope.topic = TopicEditorStateService.getTopic();
+          $scope.topicSkillIds = $scope.topic.getSkillIds();
           $scope.validationIssues = [];
           $scope.topicRights = TopicEditorStateService.getTopicRights();
           $scope.isSaveInProgress = TopicEditorStateService.isSavingTopic;

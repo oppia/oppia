@@ -17,7 +17,7 @@
  */
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
-require('domain/question/QuestionPlayerBackendApiService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 require('components/CkEditorRteDirective.ts');
@@ -77,9 +77,9 @@ oppia.directive('questionPlayer', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_player/question_player_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'QuestionPlayerBackendApiService',
+        '$scope', '$rootScope', 'QuestionBackendApiService',
         function(
-            $scope, $rootScope, QuestionPlayerBackendApiService) {
+            $scope, $rootScope, QuestionBackendApiService) {
           $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
           $scope.currentQuestion = 0;
           $scope.totalQuestions = 0;

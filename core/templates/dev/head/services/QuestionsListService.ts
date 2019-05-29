@@ -17,28 +17,19 @@
  * questions list in editors.
  */
 
-require('domain/question/QuestionsListBackendApiService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('services/ContextService.ts');
 
 oppia.constant(
   'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
 
-oppia.factory('QuestionsListService', ['$rootScope', 'QuestionsListBackendApiService',
-  'ACTIVITY_TYPE', 'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'ContextService', function(
-      $rootScope, QuestionsListBackendApiService,
-      ACTIVITY_TYPE, EVENT_QUESTION_SUMMARIES_INITIALIZED, ContextService) {
+oppia.factory('QuestionsListService', ['$rootScope', 'QuestionBackendApiService',
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', function(
+      $rootScope, QuestionBackendApiService,
+      EVENT_QUESTION_SUMMARIES_INITIALIZED) {
     var _questionSummaries = [];
     var _nextCursorForQuestions = '';
-    var _isInSkillEditorPage = ContextService.isInSkillEditorPage();
-    var _isInTopicEditorPage = ContextService.isInTopicEditorPage();
 
-    var _getActivityType = function() {
-      if (_isInSkillEditorPage) {
-        return ACTIVITY_TYPE.skill;
-      } else if (_isInTopicEditorPage) {
-        return ACTIVITY_TYPE.topic;
-      }
-    };
     var _setQuestionSummaries = function(newQuestionSummaries) {
       if (_questionSummaries.length > 0) {
         newQuestionSummaries = _deduplicateQuestionSummaries(
@@ -67,48 +58,33 @@ oppia.factory('QuestionsListService', ['$rootScope', 'QuestionsListBackendApiSer
     };
 
     return {
-      getNextCursor: function() {
-        return _nextCursorForQuestions;
-      },
-
-      setQuestionSummaries: function(newQuestionSummaries) {
-        _setQuestionSummaries(newQuestionSummaries);
-      },
-      
-      setNextQuestionsCursor: function(nextCursor) {
-        _setNextQuestionsCursor(nextCursor);
-      },
-
       isLastQuestionBatch: function(index) {
         return (
           _nextCursorForQuestions === null &&
           (index + 1) * constants.NUM_QUESTIONS_PER_PAGE >=
             _questionSummaries.length);
       },
-
-      fetchQuestionSummaries: function(activityId, resetHistory) {
+      
+      getQuestionSummariesAsync: function(
+          index, skillIds, fetchMore, resetHistory) {
         if (resetHistory) {
           _questionSummaries = [];
           _nextCursorForQuestions = '';
         }
-        QuestionsListBackendApiService.fetchQuestions(
-          _getActivityType(), activityId, _nextCursorForQuestions).then(
-          function(returnObject) {
-            _setQuestionSummaries(returnObject.questionSummaries);
-            _setNextQuestionsCursor(returnObject.nextCursor);
-          }
-        );
-      },
 
-      getQuestionSummaries: function(index, fetchMore) {
         var num = constants.NUM_QUESTIONS_PER_PAGE;
         if ((index + 1) * num > _questionSummaries.length &&
             _nextCursorForQuestions !== null && fetchMore) {
-          return null;
-        } else {
-          return _questionSummaries.slice(index * num, (index + 1) * num);
+              QuestionBackendApiService.fetchQuestionsForEditors(
+                skillIds, _nextCursorForQuestions).then(
+                function(returnObject) {
+                  _setQuestionSummaries(returnObject.questionSummaries);
+                  _setNextQuestionsCursor(returnObject.nextCursor);
+                }
+              );
         }
+        return _questionSummaries.slice(index * num, (index + 1) * num);
       },
     }
   }
-])
+]);

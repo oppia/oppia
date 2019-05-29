@@ -18,7 +18,7 @@
  */
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
-require('domain/question/QuestionsListBackendApiService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillRightsBackendApiService.ts');
@@ -33,24 +33,23 @@ oppia.constant(
 
 oppia.factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',
-  'QuestionsListBackendApiService', 'QuestionsListService',
+  'QuestionBackendApiService', 'QuestionsListService',
   'SkillObjectFactory', 'SkillRightsBackendApiService',
   'SkillRightsObjectFactory', 'UndoRedoService',
-  'ACTIVITY_TYPE', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED',
   'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
   function(
       $rootScope, AlertsService, EditableSkillBackendApiService,
-      QuestionsListBackendApiService, QuestionsListService,
+      QuestionBackendApiService, QuestionsListService,
       SkillObjectFactory, SkillRightsBackendApiService,
       SkillRightsObjectFactory, UndoRedoService,
-      ACTIVITY_TYPE, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+      EVENT_QUESTION_SUMMARIES_INITIALIZED,
       EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
-    var _nextCursorForQuestions = '';
 
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
@@ -82,13 +81,8 @@ oppia.factory('SkillEditorStateService', [
           skillId).then(
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
-            _nextCursorForQuestions = QuestionsListService.getNextCursor();
-            QuestionsListBackendApiService.fetchQuestions(
-              ACTIVITY_TYPE.skill, skillId, _nextCursorForQuestions).then(
-              function(returnObject) {
-                QuestionsListService.setQuestionSummaries(returnObject.questionSummaries);
-                QuestionsListService.setNextQuestionsCursor(returnObject.nextCursor);
-              }
+            QuestionsListService.getQuestionSummariesAsync(
+              0, [skillId], true, false
             );
             _skillIsBeingLoaded = false;
           }, function(error) {

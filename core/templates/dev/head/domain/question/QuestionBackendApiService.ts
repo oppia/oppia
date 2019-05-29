@@ -20,11 +20,17 @@ oppia.constant(
   '/question_player_handler?skill_ids=<skill_ids>&question_count' +
   '=<question_count>&start_cursor=<start_cursor>');
 
-oppia.factory('QuestionPlayerBackendApiService', [
+oppia.constant(
+  'QUESTIONS_LIST_URL_TEMPLATE',
+  '/questions_list_handler/<skill_ids>?cursor=<cursor>');
+
+oppia.factory('QuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE) {
+  'QUESTIONS_LIST_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE,
+      QUESTIONS_LIST_URL_TEMPLATE) {
     var _startCursor = '';
-    var _fetchQuestions = function(
+    var _fetchQuestionsForPlayers = function(
         skillIds, questionCount, resetHistory, successCallback, errorCallback) {
       if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
         return;
@@ -44,6 +50,31 @@ oppia.factory('QuestionPlayerBackendApiService', [
         _startCursor = response.data.next_start_cursor;
         if (successCallback) {
           successCallback(questionDicts);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchQuestionsForEditors = function(
+        skillIds, cursor, successCallback, errorCallback) {
+      var questionsDataUrl = UrlInterpolationService.interpolateUrl(
+        QUESTIONS_LIST_URL_TEMPLATE, {
+          skill_ids: skillIds.join(','),
+          cursor: cursor ? cursor : ''
+        });
+
+      $http.get(questionsDataUrl).then(function(response) {
+        var questionSummaries = angular.copy(
+          response.data.question_summary_dicts);
+        var nextCursor = response.data.next_start_cursor;
+        if (successCallback) {
+          successCallback({
+            questionSummaries: questionSummaries,
+            nextCursor: nextCursor
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -94,10 +125,16 @@ oppia.factory('QuestionPlayerBackendApiService', [
      * of questions requested.
      */
     return {
-      fetchQuestions: function(skillIds, questionCount, resetHistory) {
+      fetchQuestionsForPlayers: function(skillIds, questionCount, resetHistory) {
         return $q(function(resolve, reject) {
-          _fetchQuestions(
+          _fetchQuestionsForPlayers(
             skillIds, questionCount, resetHistory, resolve, reject);
+        });
+      },
+
+      fetchQuestionsForEditors: function(skillIds, cursor) {
+        return $q(function(resolve, reject) {
+          _fetchQuestionsForEditors(skillIds, cursor, resolve, reject);
         });
       }
     };

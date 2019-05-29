@@ -22,8 +22,6 @@ oppia.constant('PAGE_CONTEXT', {
   EXPLORATION_PLAYER: 'learner',
   QUESTION_EDITOR: 'question_editor',
   QUESTION_PLAYER: 'question_player',
-  SKILL_EDITOR: 'skill_editor',
-  TOPIC_EDITOR: 'topic_editor',
   OTHER: 'other'
 });
 
@@ -89,12 +87,6 @@ oppia.factory('ContextService', [
             } else if (pathnameArray[i] === 'practice_session') {
               pageContext = PAGE_CONTEXT.QUESTION_PLAYER;
               return PAGE_CONTEXT.QUESTION_PLAYER;
-            } else if (pathnameArray[i] === 'skill_editor') {
-              pageContext = PAGE_CONTEXT.SKILL_EDITOR;
-              return PAGE_CONTEXT.SKILL_EDITOR;
-            } else if (pathnameArray[i] === 'topic_editor') {
-              pageContext = PAGE_CONTEXT.TOPIC_EDITOR;
-              return PAGE_CONTEXT.TOPIC_EDITOR;
             }
           }
 
@@ -173,15 +165,7 @@ oppia.factory('ContextService', [
 
       isInExplorationEditorPage: function() {
         return this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR;
-      },
-
-      isInSkillEditorPage: function() {
-        return this.getPageContext() === PAGE_CONTEXT.SKILL_EDITOR;
-      },
-
-      isInTopicEditorPage: function() {
-        return this.getPageContext() === PAGE_CONTEXT.TOPIC_EDITOR;
-      },
+      }
     };
   }
 ]);
