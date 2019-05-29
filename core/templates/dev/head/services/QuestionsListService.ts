@@ -74,6 +74,11 @@ oppia.factory('QuestionsListService', [
         }
 
         var num = constants.NUM_QUESTIONS_PER_PAGE;
+
+        if (skillIds === undefined || skillIds.length === 0) {
+          return [];
+        } 
+        
         if ((index + 1) * num > _questionSummaries.length &&
             _nextCursorForQuestions !== null && fetchMore) {
           QuestionBackendApiService.fetchQuestionsForEditors(
