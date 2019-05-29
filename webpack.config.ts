@@ -15,6 +15,7 @@
 var CleanWebpackPlugin = require('clean-webpack-plugin');
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
+var constants = require('./assets/constants.js');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -24,6 +25,22 @@ var htmlMinifyConfig = {
 };
 
 var commonPrefix = './core/templates/dev/head';
+
+var getMetas = function() {
+  return {
+    referrer: 'no-referrer',
+    viewport: 'width=device-width, initial-scale=1.0, user-scalable=yes',
+    'msapplication-TileColor': '#ffffff',
+    'og:type': {
+      property: 'og:type',
+      content: 'article'
+    },
+    'og:site_name': {
+      property: 'og:site_name',
+      content: 'Oppia'
+    },
+  };
+};
 
 module.exports = {
   entries: {
@@ -180,8 +197,9 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['get_started'],
+      chunks: ['app', 'get_started'],
       filename: 'get_started.html',
+      meta: getMetas(),
       template: commonPrefix + '/pages/get_started/get_started.html',
       minify: htmlMinifyConfig,
       inject: false

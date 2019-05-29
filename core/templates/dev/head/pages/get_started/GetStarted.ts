@@ -13,3 +13,5 @@
 // limitations under the License.
 
 require('components/background/BackgroundBannerDirective.ts');
+require('base_components/BaseContent.ts');
+require('base_components/WarningLoader.ts');

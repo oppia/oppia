@@ -1,102 +1,170 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    <meta charset="UTF-8">
 
-{% block maintitle %}
-  Get Started - Oppia
-{% endblock maintitle %}
+    <!-- Tiles for Internet Explorer. -->
+    <meta name="application-name" content="<[siteName]>">
+    <meta name="msapplication-square70x70logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-tiny.png')}}">
+    <meta name="msapplication-square150x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-square.png')}}">
+    <meta name="msapplication-wide310x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-wide.png')}}">
+    <meta name="msapplication-square310x310logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-large.png')}}">
 
-{% block header_js %}
-  {{ super() }}
-{% endblock %}
+    <!-- The itemprops are for G+ sharing. -->
+    <meta itemprop="name" content="Personalized Online Learning from Oppia">
+    <meta itemprop="description" content="Learn how to get started using Oppia.">
+    <!-- The og tags are for Facebook sharing. -->
+    <meta property="og:title" content="Personalized Online Learning from Oppia">
+    <meta property="og:url" content="<[pageUrl]>">
+    <meta property="og:description" content="Learn how to get started using Oppia.">
+    <meta property="og:image" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/288x288_logo_mint.png')}}">
 
-{% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      Get Started
-    </li>
-  </ul>
-{% endblock navbar_breadcrumb %}
+    <!-- This code is used for inserting meta tags
+         https://github.com/jantimon/html-webpack-plugin#meta-tags
+         All page specific meta tags should be inserted above this -->
+    <% for (var meta in htmlWebpackPlugin.options.meta) { %>
+      <% if (typeof htmlWebpackPlugin.options.meta[meta] == 'object') { %>
+        <% var currentMeta = htmlWebpackPlugin.options.meta[meta] %>
+        <meta <%= Object.keys(currentMeta)[0] %>="<%= Object.values(currentMeta)[0] %>" <%= Object.keys(currentMeta)[1] %>="<%= Object.values(currentMeta)[1] %>" >  
+      <% } else {%>
+        <meta name="<%= meta %>" content="<%= htmlWebpackPlugin.options.meta[meta] %>">
+      <% }%>
+    <% }%>
+    <link rel="apple-touch-icon" href="/assets/images/logo/favicon.png">
 
-{% block content %}
-  <div class="oppia-static-header">
-    <h1 translate="I18N_GET_STARTED_PAGE_HEADING"></h1>
-  </div>
+    <title itemprop="name">Get Started - Oppia</title>
 
-  <background-banner></background-banner>
-  <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
-    <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
-
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_1">
-      </p>
-
-      <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_2_HEADING"></h2>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_2">
-      </p>
-
-
-      <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_3_HEADING"></h2>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_3">
-      </p>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_4">
-
-      </p>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_5">
-
-      </p>
-      <ul style="margin-left: 40px;">
-        <li><a href="https://www.oppia.org/explore/0" target="new">Welcome to Oppia</a></li>
-        <li><a href="https://www.oppia.org/collection/wqCTKpKA0LBe" target="new">Get Electrified!</a></li>
-        <li><a href="https://www.oppia.org/collection/inDXV0w8-p1C" target="new">Programming with Carla</a></li>
-      </ul>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_6">
-      </p>
-
-      <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_7_HEADING"></h2>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_7">
-      </p>
-
-      <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING"></h2>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_8">
-      </p>
-
-      <!-- todo: make it easy to get the right link to share, update this doc with that info -->
-
-      <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING"></h2>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_9">
-      </p>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_10">
-
-      </p>
-
-      <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING"></h2>
-      <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_11">
-      </p>
-    </div>
-  </div>
-  <div class="oppia-footer-padding-below-banner">
-  </div>
-  <style>
-    .oppia-get-started h2 {
-      font-size: 1.17em;
-      font-weight: bold;
-      text-align: left;
-    }
-  </style>
-{% endblock %}
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <link rel="stylesheet" type="text/css" media="screen"
+      href="https://fonts.googleapis.com/css?family=Capriola|Roboto|Material+Icons">
     <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <link rel="stylesheet" type="text/css" media="screen"
+        href="/third_party/generated/css/third_party.min.css">
     <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <link rel="stylesheet" type="text/css" media="screen"
+        href="/third_party/generated/css/third_party.css">
     <% } %>
-  <% } %>
-{% endblock footer_js %}
+    <link rel="stylesheet" type="text/css" media="screen"
+      href="/templates/dev/head/css/oppia.css">
+    <script>
+      var GLOBALS = {
+        isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
+      };
+    </script>
 
-{% block footer%}
-  {% include 'pages/footer.html' %}
-{% endblock %}
+    <script src="/assets/rich_text_components_definitions.js"></script>
+    <script src="/assets/constants.js"></script>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/assets/hashes.js"></script>
+    <% } %>
+    <script src="/third_party/static/jquery-3.2.1/jquery.min.js"></script>
+    <script src="/third_party/static/jqueryui-1.12.1/jquery-ui.min.js"></script>
+    <script src="/third_party/static/angularjs-1.5.8/angular.min.js"></script>
+    <script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
+    <script src="/third_party/static/headroom-js-0.9.4/headroom.min.js"></script>
+    <script src="/third_party/static/headroom-js-0.9.4/angular.headroom.min.js"></script>
+    <script src="/third_party/static/angular-drag-and-drop-lists-2.1.0/angular-drag-and-drop-lists.min.js"></script>
+    <script src="/third_party/static/angular-recorder-1.4.1/dist/angular-audio-recorder.min.js"></script>
+
+    {{BEFORE_END_HEAD_TAG_HOOK}}
+  </head>
+  <body>
+    <base-content>
+      <warning-loader-content>
+        <warning-loader>
+          <content>
+            <div class="oppia-static-header">
+              <h1 translate="I18N_GET_STARTED_PAGE_HEADING"></h1>
+            </div>
+            <background-banner></background-banner>
+            <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
+              <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
+
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_1">
+                </p>
+
+                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_2_HEADING"></h2>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_2">
+                </p>
+
+                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_3_HEADING"></h2>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_3">
+                </p>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_4">
+
+                </p>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_5">
+
+                </p>
+                <ul style="margin-left: 40px;">
+                  <li><a href="https://www.oppia.org/explore/0" target="new">Welcome to Oppia</a></li>
+                  <li><a href="https://www.oppia.org/collection/wqCTKpKA0LBe" target="new">Get Electrified!</a></li>
+                  <li><a href="https://www.oppia.org/collection/inDXV0w8-p1C" target="new">Programming with Carla</a></li>
+                </ul>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_6">
+                </p>
+
+                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_7_HEADING"></h2>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_7">
+                </p>
+
+                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING"></h2>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_8">
+                </p>
+
+                <!-- todo: make it easy to get the right link to share, update this doc with that info -->
+
+                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING"></h2>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_9">
+                </p>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_10">
+
+                </p>
+
+                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING"></h2>
+                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_11">
+                </p>
+              </div>
+            </div>
+            <div class="oppia-footer-padding-below-banner">
+            </div>
+          </content>
+        </warning-loader>
+      </warning-loader-content>
+
+      <navbar-breadcrumb>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            Get Started
+          </li>
+        </ul>
+      </navbar-breadcrumb>
+    </base-content>
+
+    <style>
+      .oppia-get-started h2 {
+        font-size: 1.17em;
+        font-weight: bold;
+        text-align: left;
+      }
+    </style>
+
+    <script src="/templates/dev/head/AppInit.js"></script>
+    <!-- This code is used for inserting webpack bundles
+        https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/third_party/generated/js/third_party.min.js"></script>
+    <% } else { %>
+      <script src="/third_party/generated/js/third_party.js"></script>
+    <% } %>
+
+    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+      <% if (webpackConfig.mode == 'production') { %>
+        <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <% } else { %>
+        <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+      <% } %>
+    <% } %>
+  </body>
+</html>

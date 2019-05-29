@@ -28,6 +28,7 @@ oppia.controller('Base', [
     $scope.currentLang = 'en';
     $scope.iframed = UrlService.isIframed();
     $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
+    $scope.pageUrl = UrlService.getCurrentLocation().href;
 
     $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
