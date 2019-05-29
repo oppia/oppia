@@ -1134,6 +1134,25 @@ class PlaythroughModel(base_models.BaseModel):
         cls.delete_multi(instances)
 
 
+class LearnerAnswerDetailModel(base_models.BaseModel):
+    """Model for storing the approach/response user enters when he
+    is asked for it.
+    """
+    # ID of the entity.
+    entity_id = ndb.StringProperty(required=True, indexed=True)
+    # The type of entity, that whether it is state, question, or any other
+    # object if it is added in future.
+    entity_type = ndb.StringProperty(required=True, indexed=True)
+    # ID of the response.
+    response_id = ndb.StringProperty(required=True, indexed=False)
+    # The answer entered by the learner.
+    learner_answer = ndb.StringProperty(required=True, indexed=False)
+    # The response entered by the learner.
+    learner_response = ndb.StringProperty(required=True, indexed=False)
+    # The time at which the response was created.
+    created_on = ndb.DateTimeProperty(required=True, indexed=False)
+
+
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
