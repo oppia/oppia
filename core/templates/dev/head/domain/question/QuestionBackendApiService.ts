@@ -25,10 +25,11 @@ oppia.constant(
   '/questions_list_handler/<skill_ids>?cursor=<cursor>');
 
 oppia.factory('QuestionBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
-  'QUESTIONS_LIST_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE,
-      QUESTIONS_LIST_URL_TEMPLATE) {
+  '$http', '$q', 'UrlInterpolationService', 'QUESTIONS_LIST_URL_TEMPLATE',
+  'QUESTION_PLAYER_URL_TEMPLATE',
+  function(
+      $http, $q, UrlInterpolationService, QUESTIONS_LIST_URL_TEMPLATE,
+      QUESTION_PLAYER_URL_TEMPLATE) {
     var _startCursor = '';
     var _fetchQuestionsForPlayers = function(
         skillIds, questionCount, resetHistory, successCallback, errorCallback) {
