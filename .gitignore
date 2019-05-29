@@ -14,7 +14,6 @@ core/templates/prod/*
 core/templates/dev/head/dist/*
 core/tests/.browserstack.env
 node_modules/*
-package-lock.json
 .coverage*
 .viminfo
 .vscode/*
