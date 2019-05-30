@@ -4699,7 +4699,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'html': content_str,
                 },
                 'image_assets': {
-                    'image_assets_mapping' : {},
+                    'image_assets_mapping': {},
                     'image_id_counter': 0
                 },
                 'recorded_voiceovers': {
