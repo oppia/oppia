@@ -15,6 +15,7 @@
 """Tests for the library page and associated handlers."""
 
 import json
+import logging
 import os
 
 from constants import constants
@@ -26,6 +27,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
 from core.domain import rights_manager
+from core.domain import summary_services
 from core.domain import user_services
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
@@ -195,6 +197,60 @@ class LibraryPageTests(test_utils.GenericTestBase):
             'objective': 'Objective B',
             'status': rights_manager.ACTIVITY_STATUS_PUBLIC,
         }, response_dict['activity_list'][0])
+
+    def test_library_handler_with_exceeding_query_limit_logs_error(self):
+        response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
+        self.assertEqual({
+            'iframed': False,
+            'is_admin': False,
+            'is_topic_manager': False,
+            'is_moderator': False,
+            'is_super_admin': False,
+            'activity_list': [],
+            'additional_angular_modules': [],
+            'search_cursor': None
+        }, response_dict)
+
+        # Load a public demo exploration.
+        exp_services.load_demo('0')
+
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *_):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        default_query_limit_swap = self.swap(feconf, 'DEFAULT_QUERY_LIMIT', 1)
+        # Load the search results with an empty query.
+        with default_query_limit_swap, logging_swap:
+            self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
+
+            self.assertEqual(len(observed_log_messages), 1)
+            self.assertEqual(
+                observed_log_messages[0],
+                '1 activities were fetched to load the library page. '
+                'You may be running up against the default query limits.')
+
+    def test_library_handler_with_given_category_and_language_code(self):
+        self.login(self.ADMIN_EMAIL)
+
+        exp_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.admin_id)
+        self.publish_exploration(self.admin_id, exp_id)
+        exp_services.index_explorations_given_ids([exp_id])
+        response_dict = self.get_json(
+            feconf.LIBRARY_SEARCH_DATA_URL, params={
+                'category': 'A category',
+                'language_code': 'en'
+            })
+        activity_list = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                [exp_id]))
+
+        self.assertEqual(response_dict['activity_list'], activity_list)
+
+        self.logout()
 
 
 class LibraryIndexHandlerTests(test_utils.GenericTestBase):
@@ -592,6 +648,24 @@ class ExplorationSummariesHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(summaries[0]['id'], self.PUBLIC_EXP_ID_EDITOR)
         self.assertEqual(summaries[0]['status'], 'public')
+
+    def test_handler_with_invalid_stringified_exp_ids_raises_error_404(self):
+        # 'stringified_exp_ids' should be a list.
+        self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_exp_ids': json.dumps(self.PRIVATE_EXP_ID_EDITOR)
+            }, expected_status_int=404)
+
+        # 'stringified_exp_ids' should contain exploration ids for which valid
+        # explorations are created. No exploration is created for exp id 2.
+        self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
+                'stringified_exp_ids': json.dumps([
+                    2, self.PUBLIC_EXP_ID_EDITOR,
+                    self.PRIVATE_EXP_ID_VIEWER])
+            }, expected_status_int=404)
 
 
 class CollectionSummariesHandlerTests(test_utils.GenericTestBase):
