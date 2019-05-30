@@ -175,7 +175,7 @@ class Hint(object):
 
 class ImageAssets(object):
     """Value object representing the images for the state."""
-    def __init__(self, image_assets_mapping):
+    def __init__(self, image_assets_mapping, image_id_counter):
         """Constructs a ImageAsset domain object.
 
         Args:
@@ -183,6 +183,7 @@ class ImageAssets(object):
                 ImageAssets mapping.
         """
         self.image_assets_mapping = image_assets_mapping
+        self.image_id_counter = image_id_counter
 
     def validate(self):
         """TODO."""
@@ -194,13 +195,21 @@ class ImageAssets(object):
         Returns:
             dict. A dict, mapping all fields of ImageAssets instance.
         """
+        image_assets = {}
         image_assets_mapping = {}
+        image_id_counter = 0
+
         for image_id in self.image_assets_mapping:
             image_assets_mapping[image_id] = {}
             image = self.image_assets_mapping[image_id]
             for info in image:
                 image_assets_mapping[image_id][info] = image[info]
-        return image_assets_mapping
+
+        image_id_counter = self.image_id_counter
+
+        image_assets ['image_assets_mapping'] = image_assets_mapping
+        image_assets['counter'] = image_id_counter
+        return image_assets
 
     @classmethod
     def from_dict(cls, image_assets_dict):
@@ -215,20 +224,25 @@ class ImageAssets(object):
             object.
         """
         image_assets_mapping = {}
-        for image_id in image_assets_dict:
+        for image_id in image_assets_dict['image_assets_mapping']:
             image_assets_mapping[image_id] = {}
             image = image_assets_dict[image_id]
             for info in image:
                 image_assets_mapping[image_id][info] = image[info]
-        return cls(image_assets_mapping)
+        image_id_counter = image_assets_dict['counter']
 
-    def add_image(self, image_id, image_info):
+        return cls(image_assets_mapping, image_id_counter)
+
+    def add_image(self, image_info):
         """Adds default image object in state.
 
         Args:
             image_id: str. ID of an image.
             image_info: dict. The dicts representation of image info.
         """
+        self.image_id_counter += 1
+        image_id = self.image_id_counter
+
         self.image_assets_mapping[image_id] = {}
         self.image_assets_mapping[image_id]['author_id'] = (
             image_info['author_id'])

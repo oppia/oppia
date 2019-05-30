@@ -423,6 +423,8 @@ written_translations:
 content:
   content_id: content
   html: ''
+image_assets:
+  image_assets_mapping: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []

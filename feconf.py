@@ -222,7 +222,8 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 DEFAULT_IMAGE_ASSETS = {
     'image_assets_mapping': {
 
-    }
+    },
+    'image_id_counter': 0
 }
 # Default recorded_voiceovers dict for a default state template.
 DEFAULT_RECORDED_VOICEOVERS = {
