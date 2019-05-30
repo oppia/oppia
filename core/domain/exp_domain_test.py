@@ -4668,6 +4668,9 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'html': content_str,
                 },
+                'image_assets': {
+                    'image_assets_mapping' : {}
+                },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
                         'content': {},
@@ -4701,7 +4704,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 },
                 'param_changes': [],
             }
-
         self.assertEqual(exploration.to_player_dict(), {
             'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'title': exp_title,
