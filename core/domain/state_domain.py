@@ -211,7 +211,7 @@ class ImageAssets(object):
         image_id_counter = self.image_id_counter
 
         image_assets['image_assets_mapping'] = image_assets_mapping
-        image_assets['counter'] = image_id_counter
+        image_assets['image_id_counter'] = image_id_counter
         return image_assets
 
     @classmethod
@@ -232,7 +232,8 @@ class ImageAssets(object):
             image = image_assets_dict[image_id]
             for info in image:
                 image_assets_mapping[image_id][info] = image[info]
-        image_id_counter = image_assets_dict['counter']
+
+        image_id_counter = image_assets_dict['image_id_counter']
 
         return cls(image_assets_mapping, image_id_counter)
 

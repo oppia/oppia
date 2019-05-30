@@ -3636,6 +3636,7 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups:
       - outcome:
@@ -3689,6 +3690,7 @@ states:
       html: <p>Congratulations, you have finished!</p>
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3713,6 +3715,7 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4176,6 +4179,7 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4208,6 +4212,7 @@ states:
       html: <blockquote><p>Hello, this is state1</p></blockquote>
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4251,6 +4256,7 @@ states:
       html: <p>Hello, </p><p>this <em>is </em>state2</p>
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups:
       - outcome:
@@ -4336,6 +4342,7 @@ states:
       html: <p>Hello, this is state3</p>
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups:
       - outcome:
@@ -4532,6 +4539,7 @@ states:
         this is test case to check image tag inside p tag</p>
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups:
       - outcome:
@@ -4585,6 +4593,7 @@ states:
       html: <p>Congratulations, you have finished!</p>
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4609,6 +4618,7 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4689,7 +4699,8 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'html': content_str,
                 },
                 'image_assets': {
-                    'image_assets_mapping' : {}
+                    'image_assets_mapping' : {},
+                    'image_id_counter': 0
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {

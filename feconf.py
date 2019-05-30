@@ -220,9 +220,7 @@ DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 # Default image assets dict for a default state template.
 DEFAULT_IMAGE_ASSETS = {
-    'image_assets_mapping': {
-
-    },
+    'image_assets_mapping': {},
     'image_id_counter': 0
 }
 # Default recorded_voiceovers dict for a default state template.
