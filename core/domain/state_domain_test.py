@@ -220,6 +220,15 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             state.ask_learners_for_response, True)
 
+    def test_update_ask_learners_for_response_with_non_bool_fails(self):
+        """Test updating ask_learners_for_response with non bool value."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_ask_learners_for_response('abc')
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected ask_learners_for_response to be a boolean, received')):
+            exploration.validate()
+
     def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
         state_dict = {

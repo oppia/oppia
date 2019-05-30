@@ -1468,7 +1468,7 @@ class State(object):
 
         if not isinstance(self.ask_learners_for_response, bool):
             raise utils.ValidationError(
-                'Expected ask learners for response to be a boolean, ' +
+                'Expected ask_learners_for_response to be a boolean, ' +
                 'received %s' % self.ask_learners_for_response)
 
         self.written_translations.validate(content_id_list)
