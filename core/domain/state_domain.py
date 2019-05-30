@@ -1382,8 +1382,8 @@ class State(object):
                 the state contents and translations.
             written_translations: WrittenTranslations. The written translations
                 for the state contents.
-            ask_learners_for_response: bool. The creator wants to ask
-                for response from the learner that why they picked a particular
+            ask_learners_for_response: bool. Whether the creator wants to ask
+                for response from the learner about why they picked a particular
                 answer while playing the exploration.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
