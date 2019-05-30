@@ -181,6 +181,9 @@ class ImageAssets(object):
         Args:
             image_assets_mapping: dict. The dict representation of
                 ImageAssets mapping.
+            image_id_counter: integer. The counter that is responsible
+                for creating image ids. Image Id is always <= image id
+                counter.
         """
         self.image_assets_mapping = image_assets_mapping
         self.image_id_counter = image_id_counter
@@ -207,7 +210,7 @@ class ImageAssets(object):
 
         image_id_counter = self.image_id_counter
 
-        image_assets ['image_assets_mapping'] = image_assets_mapping
+        image_assets['image_assets_mapping'] = image_assets_mapping
         image_assets['counter'] = image_id_counter
         return image_assets
 
@@ -237,7 +240,6 @@ class ImageAssets(object):
         """Adds default image object in state.
 
         Args:
-            image_id: str. ID of an image.
             image_info: dict. The dicts representation of image info.
         """
         self.image_id_counter += 1
