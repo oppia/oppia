@@ -84,6 +84,70 @@ class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object, None)
 
 
+class UserStatsModelTest(test_utils.GenericTestBase):
+    """Tests for the UserStatsModel class."""
+
+    USER_ID_1 = 1
+    USER_ID_2 = 2
+
+    USER_1_IMPACT_SCORE = 0.87
+    USER_1_TOTAL_PLAYS = 33
+    USER_1_AVERAGE_RATINGS = 4.37
+    USER_1_NUM_RATINGS = 22
+    USER_1_WEEKLY_CREATOR_STATS_LIST = [
+        {
+            ('2019-05-21'): {
+                'average_ratings': 4.00,
+                'total_plays': 5
+            }
+        },
+        {
+            ('2019-05-28'): {
+                'average_ratings': 4.95,
+                'total_plays': 10
+            }
+        }
+    ]
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserStatsModelTest, self).setUp()
+
+        user_model_1 = user_models.UserStatsModel(id=self.USER_ID_1)
+        user_model_1.impact_score = self.USER_1_IMPACT_SCORE
+        user_model_1.total_plays = self.USER_1_TOTAL_PLAYS
+        user_model_1.average_ratings = self.USER_1_AVERAGE_RATINGS
+        user_model_1.num_ratings = self.USER_1_NUM_RATINGS
+        user_model_1.weekly_creator_stats_list = (
+            self.USER_1_WEEKLY_CREATOR_STATS_LIST)
+        user_models.UserStatsModel.put(user_model_1)
+
+    def test_export_data_on_existing_user(self):
+        """Test if export_data works when user is in data store."""
+        user_data = user_models.UserStatsModel.export_data(self.USER_ID_1)
+        test_data = {
+            'impact_score': self.USER_1_IMPACT_SCORE,
+            'total_plays': self.USER_1_TOTAL_PLAYS,
+            'average_ratings': self.USER_1_AVERAGE_RATINGS,
+            'num_ratings': self.USER_1_NUM_RATINGS,
+            'weekly_creator_stats_list': self.USER_1_WEEKLY_CREATOR_STATS_LIST
+        }
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data works when user is not in data store."""
+        user_data = user_models.UserStatsModel.export_data(self.USER_ID_2)
+        test_data = {
+            'impact_score': None,
+            'total_plays': None,
+            'average_ratings': None,
+            'num_ratings': None,
+            'weekly_creator_stats_list': None
+        }
+        print(user_data) # what does empty user look like
+        self.assertEqual(user_data, test_data)
+
+
 class ExplorationUserDataModelTest(test_utils.GenericTestBase):
     """Tests for the ExplorationUserDataModel class."""
 
