@@ -739,7 +739,7 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_ASK_LEARNERS_FOR_RESPONSE):
                     if not isinstance(change.new_value, bool):
                         raise Exception(
-                            'Expected ask learners for response to be a ' +
+                            'Expected ask_learners_for_response to be a ' +
                             'bool, received %s' % change.new_value)
                     state.update_ask_learners_for_response(change.new_value)
                 elif (

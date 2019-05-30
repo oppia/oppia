@@ -2109,6 +2109,31 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.content.html, '<b>Test content</b>')
 
+    def test_update_ask_learners_for_response(self):
+        """Test updating of ask_learners_for_response."""
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_ASK_LEARNERS_FOR_RESPONSE,
+                True),
+            '')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.ask_learners_for_response, True)
+
+    def test_update_ask_learners_for_response_with_non_bool_fails(self):
+        """Test updating of ask_learners_for_response with non bool value."""
+        with self.assertRaisesRegexp(
+            Exception, (
+                'Expected ask_learners_for_response to be a bool, received ')):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_ASK_LEARNERS_FOR_RESPONSE,
+                    'abc'),
+                '')
+
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
         with self.assertRaisesRegexp(KeyError, 'content_id'):
