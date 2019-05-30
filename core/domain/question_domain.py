@@ -193,7 +193,7 @@ class Question(object):
         return question_state_dict
 
     @classmethod
-    def _convert_state_v27_dict_to_v28_dict(cls, question_state_dict):
+    def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
         """Converts from version 28 to 29. Version 29 adds
         ask_learners_for_response boolean variable to the state, which
         allows the creator to ask for response from the learner.
