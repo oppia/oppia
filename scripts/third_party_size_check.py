@@ -21,35 +21,62 @@ breaching the 10k file limit on App Engine.
 
 import os
 import sys
+import yaml
 
 THIRD_PARTY_PATH = os.path.join(os.getcwd(), 'third_party')
 THIRD_PARTY_SIZE_LIMIT = 7000
 
 
-def _check_size_in_dir(dir_path):
+def _get_skip_files_list():
+    """This function returns the list of the files which are skipped when
+    Oppia is deployed to GAE.
+
+    Returns:
+        list. The list of files which are to be skipped.
+    """
+    with open('./app.yaml', 'r') as app_yaml:
+        try:
+            app_yaml_dict = yaml.safe_load(app_yaml)
+        except yaml.YAMLError as yaml_exception:
+            print yaml_exception
+        skip_files_list = app_yaml_dict.get('skip_files')
+
+        skip_files_list = [os.getcwd() + '/' + skip_files_dir
+                           for skip_files_dir in skip_files_list]
+
+    return skip_files_list
+
+
+def _check_size_in_dir(dir_path, skip_files_list):
     """Recursive method that checks the number of files inside the given
     directory.
 
     Args:
          dir_path: str. The directory which files will be counted.
+         skip_files_list: list. The list of files which are to be skipped
+         from the file count.
 
     Returns:
-        The number of files inside the given directory.
+        int. The number of files inside the given directory.
     """
     number_of_files_in_dir = 0
     for name in os.listdir(dir_path):
+        if os.path.join(dir_path, name) in skip_files_list:
+            continue
         if os.path.isfile(os.path.join(dir_path, name)):
             number_of_files_in_dir += 1
         else:
             if os.path.isdir(os.path.join(dir_path, name)):
                 number_of_files_in_dir += _check_size_in_dir(
-                    os.path.join(dir_path, name))
+                    os.path.join(dir_path, name), skip_files_list)
     return number_of_files_in_dir
 
 
 def _check_third_party_size():
     """Checks if the third-party size limit has been exceeded."""
-    number_of_files_in_third_party = _check_size_in_dir(THIRD_PARTY_PATH)
+    skip_files_list = _get_skip_files_list()
+    number_of_files_in_third_party = _check_size_in_dir(
+        THIRD_PARTY_PATH, skip_files_list)
     print ''
     print '------------------------------------------------------'
     print '    Number of files in third-party folder: %d' % (
