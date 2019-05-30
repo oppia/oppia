@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+/**
+ * @fileoverview File to import necessary scripts for get_started page.
+ */
 require('base_components/BaseContent.ts');
 require('base_components/WarningLoader.ts');
 require('components/background/BackgroundBannerDirective.ts');

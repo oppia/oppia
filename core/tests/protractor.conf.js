@@ -1,62 +1,8 @@
 var ScreenShotReporter = require('protractor-screenshot-reporter');
+var glob = require('glob')
+var path = require('path')
 
-// A reference configuration file.
-exports.config = {
-  // ----- How to setup Selenium -----
-  //
-  // There are three ways to specify how to use Selenium. Specify one of the
-  // following:
-  //
-  // 1. seleniumServerJar - to start Selenium Standalone locally.
-  // 2. seleniumAddress - to connect to a Selenium server which is already
-  //    running.
-  // 3. sauceUser/sauceKey - to use remote Selenium servers via SauceLabs.
-  //
-  // If the chromeOnly option is specified, no Selenium server will be started,
-  // and chromeDriver will be used directly (from the location specified in
-  // chromeDriver)
-
-  // The location of the selenium standalone server .jar file, relative
-  // to the location of this config. If no other method of starting selenium
-  // is found, this will default to
-  // node_modules/protractor/selenium/selenium-server...
-  seleniumServerJar: null,
-  // The port to start the selenium server on, or null if the server should
-  // find its own unused port.
-  seleniumPort: null,
-  // Chromedriver location is used to help the selenium standalone server
-  // find chromedriver. This will be passed to the selenium jar as
-  // the system property webdriver.chrome.driver. If null, selenium will
-  // attempt to find chromedriver using PATH.
-  chromeDriver: './selenium/chromedriver',
-  // If true, only chromedriver will be started, not a standalone selenium.
-  // Tests for browsers other than chrome will not run.
-  chromeOnly: false,
-  // Additional command line options to pass to selenium. For example,
-  // if you need to change the browser timeout, use
-  // seleniumArgs: ['-browserTimeout=60'],
-  seleniumArgs: [],
-
-  // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
-  // The tests will be run remotely using SauceLabs.
-  sauceUser: null,
-  sauceKey: null,
-
-  // The address of a running selenium server. If specified, Protractor will
-  // connect to an already running instance of selenium. This usually looks like
-  // seleniumAddress: 'http://localhost:4444/wd/hub'
-  seleniumAddress: 'http://localhost:4444/wd/hub',
-
-  // The timeout for each script run on the browser. This should be longer
-  // than the maximum time your application needs to stabilize between tasks.
-  // (Note that the hint tooltip has a 60-second timeout.)
-  allScriptsTimeout: 180000,
-
-  // ----- What tests to run -----
-  //
-  // When run without a command line parameter, all suites will run. If run
-  // with --suite=smoke, only the patterns matched by that suite will run.
-  suites: {
+var suites = {
     // The tests on Travis are run individually to parallelize
     // them. Therefore, we mention the complete directory
     // in 'full'.
@@ -158,7 +104,83 @@ exports.config = {
     users: [
       'protractor_desktop/userJourneys.js',
     ],
+  };
+
+// A reference configuration file.
+exports.config = {
+  // ----- How to setup Selenium -----
+  //
+  // There are three ways to specify how to use Selenium. Specify one of the
+  // following:
+  //
+  // 1. seleniumServerJar - to start Selenium Standalone locally.
+  // 2. seleniumAddress - to connect to a Selenium server which is already
+  //    running.
+  // 3. sauceUser/sauceKey - to use remote Selenium servers via SauceLabs.
+  //
+  // If the chromeOnly option is specified, no Selenium server will be started,
+  // and chromeDriver will be used directly (from the location specified in
+  // chromeDriver)
+
+  // The location of the selenium standalone server .jar file, relative
+  // to the location of this config. If no other method of starting selenium
+  // is found, this will default to
+  // node_modules/protractor/selenium/selenium-server...
+  seleniumServerJar: null,
+  // The port to start the selenium server on, or null if the server should
+  // find its own unused port.
+  seleniumPort: null,
+  // Chromedriver location is used to help the selenium standalone server
+  // find chromedriver. This will be passed to the selenium jar as
+  // the system property webdriver.chrome.driver. If null, selenium will
+  // attempt to find chromedriver using PATH.
+  chromeDriver: './selenium/chromedriver',
+  // If true, only chromedriver will be started, not a standalone selenium.
+  // Tests for browsers other than chrome will not run.
+  chromeOnly: false,
+  // Additional command line options to pass to selenium. For example,
+  // if you need to change the browser timeout, use
+  // seleniumArgs: ['-browserTimeout=60'],
+  seleniumArgs: [],
+  beforeLaunch: function() {
+    Object.keys(suites).forEach(function(key) {
+      var patterns = suites[key];
+      for (var pattern of patterns) {
+        var fullPattern = path.resolve(__dirname, pattern);
+        var files = glob.sync(fullPattern);
+        if (files.length == 0) {
+          var errorMessage = '';
+          if (glob.hasMagic(pattern)) {
+            errorMessage = 'There are no files with the following pattern: ' + (
+              pattern);
+          } else {
+            errorMessage = pattern + ' does not exist.';
+          }
+          throw Error(errorMessage)
+        }
+      }
+    });
   },
+  // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
+  // The tests will be run remotely using SauceLabs.
+  sauceUser: null,
+  sauceKey: null,
+
+  // The address of a running selenium server. If specified, Protractor will
+  // connect to an already running instance of selenium. This usually looks like
+  // seleniumAddress: 'http://localhost:4444/wd/hub'
+  seleniumAddress: 'http://localhost:4444/wd/hub',
+
+  // The timeout for each script run on the browser. This should be longer
+  // than the maximum time your application needs to stabilize between tasks.
+  // (Note that the hint tooltip has a 60-second timeout.)
+  allScriptsTimeout: 180000,
+
+  // ----- What tests to run -----
+  //
+  // When run without a command line parameter, all suites will run. If run
+  // with --suite=smoke, only the patterns matched by that suite will run.
+  suites: suites,
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the Math rich-text component.
+ * @fileoverview Directive for the Math rich-text component.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -25,10 +25,13 @@ oppia.directive('oppiaNoninteractiveMath', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/rich_text_components/Math/directives/math_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.rawLatex = HtmlEscaperService.escapedJsonToObj(
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.rawLatex = HtmlEscaperService.escapedJsonToObj(
           $attrs.rawLatexWithValue);
       }]
     };

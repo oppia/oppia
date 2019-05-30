@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview General config file for Webpack.
+ */
+
 var CleanWebpackPlugin = require('clean-webpack-plugin');
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
