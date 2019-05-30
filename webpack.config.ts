@@ -15,7 +15,7 @@
 var CleanWebpackPlugin = require('clean-webpack-plugin');
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var Utils =  require('./webpack-utils.ts');
+var Utils = require('./webpack-utils.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -183,7 +183,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['app', 'get_started'],
       filename: 'get_started.html',
-      meta: Utils.getMetas().get_started,
+      meta: Utils.getMetas().getStarted,
       loader: 'raw-loader',
       template: commonPrefix + '/pages/get_started/get_started.html',
       minify: htmlMinifyConfig,

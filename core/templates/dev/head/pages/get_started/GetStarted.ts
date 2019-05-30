@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('components/background/BackgroundBannerDirective.ts');
 require('base_components/BaseContent.ts');
 require('base_components/WarningLoader.ts');
+require('components/background/BackgroundBannerDirective.ts');

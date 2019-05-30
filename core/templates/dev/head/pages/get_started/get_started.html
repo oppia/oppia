@@ -2,52 +2,30 @@
 <html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     <meta charset="UTF-8">
-    
+
     <!-- This code is used for inserting meta tags via webpack -->
     <% for (var meta in htmlWebpackPlugin.options.meta) { %>
       <% if (typeof htmlWebpackPlugin.options.meta[meta] == 'object') { %>
         <% var currentMeta = htmlWebpackPlugin.options.meta[meta] %>
-        <%='<meta ' + Object.keys(currentMeta)[0] + '="' + Object.values(currentMeta)[0] + '"' + Object.keys(currentMeta)[1] + '="' + Object.values(currentMeta)[1] + '"' +' >' %>  
-      <% } else {%>
+        <%='<meta ' + Object.keys(currentMeta)[0] + '="' + Object.values(currentMeta)[0] + '"' + Object.keys(currentMeta)[1] + '="' + Object.values(currentMeta)[1] + '"' +' >' %>
+      <% } else { %>
         <meta name="<%= meta %>" content="<%= htmlWebpackPlugin.options.meta[meta] %>">
-      <% }%>
-    <% }%>
+      <% } %>
+    <% } %>
     <link rel="apple-touch-icon" href="/assets/images/logo/favicon.png">
 
     <title itemprop="name">Get Started - Oppia</title>
 
-    <link rel="stylesheet" type="text/css" media="screen"
-      href="https://fonts.googleapis.com/css?family=Capriola|Roboto|Material+Icons">
-    <% if (webpackConfig.mode == 'production') { %>
-      <link rel="stylesheet" type="text/css" media="screen"
-        href="/third_party/generated/css/third_party.min.css">
-    <% } else { %>
-      <link rel="stylesheet" type="text/css" media="screen"
-        href="/third_party/generated/css/third_party.css">
-    <% } %>
-    <link rel="stylesheet" type="text/css" media="screen"
-      href="/templates/dev/head/css/oppia.css">
+    <!-- Require head styles file using webpack -->
+    @require('../header_css_libs.html')
     <script>
       var GLOBALS = {
         isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
-
-    <script src="/assets/rich_text_components_definitions.js"></script>
-    <script src="/assets/constants.js"></script>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/assets/hashes.js"></script>
-    <% } %>
-    <script src="/third_party/static/jquery-3.2.1/jquery.min.js"></script>
-    <script src="/third_party/static/jqueryui-1.12.1/jquery-ui.min.js"></script>
-    <script src="/third_party/static/angularjs-1.5.8/angular.min.js"></script>
-    <script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
-    <script src="/third_party/static/headroom-js-0.9.4/headroom.min.js"></script>
-    <script src="/third_party/static/headroom-js-0.9.4/angular.headroom.min.js"></script>
-    <script src="/third_party/static/angular-drag-and-drop-lists-2.1.0/angular-drag-and-drop-lists.min.js"></script>
-    <script src="/third_party/static/angular-recorder-1.4.1/dist/angular-audio-recorder.min.js"></script>
-
+    <!-- Require head javascript file using webpack -->
+    @require('../header_js_libs.html')
     {{BEFORE_END_HEAD_TAG_HOOK}}
   </head>
   <body>

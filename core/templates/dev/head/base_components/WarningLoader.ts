@@ -16,17 +16,20 @@
  * @fileoverview Directive for warning_loader
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
 require('base_components/PageFooter.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('warningLoader', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-  return {
-    restrict: 'E',
-    transclude: {
-      'content': 'content',
-      'footer': '?pageFooter'
-    },
-    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl('/base_components/warning_loader.html')
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      transclude: {
+        content: 'content',
+        footer: '?pageFooter'
+      },
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/base_components/warning_loader.html')
+    };
   }
-}]);
+]);
