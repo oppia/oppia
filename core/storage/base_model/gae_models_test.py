@@ -51,17 +51,6 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             base_models.BaseModel.export_data('user_id')
 
-    def test_raise_exception_by_mocking_collision(self):
-        with self.assertRaisesRegexp(
-            Exception, 'New id generator is producing too many collisions.'):
-            # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
-                base_models.BaseModel, 'get_by_id',
-                types.MethodType(
-                    lambda x, y: True,
-                    base_models.BaseModel)):
-                base_models.BaseModel.get_new_id('exploration')
-
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
 
@@ -335,3 +324,16 @@ class VersionedModelTests(test_utils.GenericTestBase):
             ValueError,
             'At least one version number is invalid'):
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2])
+
+    # Note: This test for the generic base model is written at last since some
+    # unrelated tests fail if this test is written at the beginning.
+    def test_raise_exception_by_mocking_collision(self):
+        with self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                base_models.BaseModel, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    base_models.BaseModel)):
+                base_models.BaseModel.get_new_id('exploration')
