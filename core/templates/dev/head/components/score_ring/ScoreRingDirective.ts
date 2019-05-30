@@ -34,7 +34,7 @@ oppia.directive('scoreRing', [
             circle.style.strokeDashoffset = offset;
           };
 
-          const circle = document.querySelector('.score-ring__circle');
+          const circle = document.querySelector('.score-ring-circle');
           const radius = circle.r.baseVal.value;
           const circumference = radius * 2 * Math.PI;
           circle.style.strokeDasharray = `${circumference} ${circumference}`;
