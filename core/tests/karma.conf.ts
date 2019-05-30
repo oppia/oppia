@@ -81,10 +81,10 @@ module.exports = function(config) {
     preprocessors: {
       'core/templates/dev/head/*.ts': ['webpack'],
       'core/templates/dev/head/**/*.ts': ['webpack'],
-      'core/templates/dev/head/!(*Spec).js': ['coverage'],
-      'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
-      'extensions/!(*Spec).js': ['coverage'],
-      'extensions/**/!(*Spec).js': ['coverage'],
+      'local_compiled_js/core/templates/dev/head/!(*Spec).js': ['coverage'],
+      'local_compiled_js/core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'local_compiled_js/extensions/!(*Spec).js': ['coverage'],
+      'local_compiled_js/extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
