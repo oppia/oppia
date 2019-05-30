@@ -216,6 +216,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_update_ask_learners_for_response(self):
         """Test updating ask_learners_for_response."""
         state = state_domain.State.create_default_state('state_1')
+        self.assertEqual(
+            state.ask_learners_for_response, False)
         state.update_ask_learners_for_response(True)
         self.assertEqual(
             state.ask_learners_for_response, True)

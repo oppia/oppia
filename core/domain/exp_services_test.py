@@ -2124,6 +2124,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_ask_learners_for_response_with_non_bool_fails(self):
         """Test updating of ask_learners_for_response with non bool value."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.ask_learners_for_response, False)
         with self.assertRaisesRegexp(
             Exception, (
                 'Expected ask_learners_for_response to be a bool, received ')):
