@@ -1,9 +1,5 @@
 {% extends 'dist/base.html' %}
 
-{% block maintitle %}
-  {{ exploration_title }} - Oppia
-{% endblock maintitle %}
-
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
@@ -50,7 +46,7 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <div>
+  <div ng-controller="ExplorationPlayer">
     <background-banner></background-banner>
     <conversation-skin></conversation-skin>
     <attribution-guide></attribution-guide>
