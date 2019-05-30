@@ -75,7 +75,7 @@ oppia.directive('questionsList', [
             $scope.questionEditorIsShown = false;
             $scope.question = null;
             $scope.questionSummaries = $scope.getQuestionSummariesAsync(
-              $scope.currentPage, $scope.skillIds, false, false
+              $scope.currentPage, $scope.skillIdsList, false, false
             );
             $scope.truncatedQuestionSummaries = [];
             if ($scope.questionSummaries) {
