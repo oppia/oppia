@@ -2209,7 +2209,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in states_dict.values():
+        for state_dict in states_dict.itervalues():
             state_dict['ask_learners_for_response'] = False
         return states_dict
 

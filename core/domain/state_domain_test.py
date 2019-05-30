@@ -44,8 +44,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict = exploration.states['New state'].to_dict()
         expected_dict = {
-            'classifier_model_id': None,
             'ask_learners_for_response': False,
+            'classifier_model_id': None,
             'content': {
                 'content_id': 'content',
                 'html': ''

@@ -315,11 +315,11 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""classifier_model_id: null
+        'State A': ("""ask_learners_for_response: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
-ask_learners_for_response: false
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -350,11 +350,11 @@ written_translations:
     content: {}
     default_outcome: {}
 """),
-        'State B': ("""classifier_model_id: null
+        'State B': ("""ask_learners_for_response: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
-ask_learners_for_response: false
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -385,11 +385,11 @@ written_translations:
     content: {}
     default_outcome: {}
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
+        feconf.DEFAULT_INIT_STATE_NAME: ("""ask_learners_for_response: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
-ask_learners_for_response: false
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -422,11 +422,11 @@ written_translations:
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""classifier_model_id: null
+    SAMPLE_STATE_STRING = ("""ask_learners_for_response: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
-ask_learners_for_response: false
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []

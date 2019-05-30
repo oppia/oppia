@@ -532,8 +532,8 @@ var constants = {
   "NUM_QUESTIONS_PER_PAGE": 10,
 
   "NEW_STATE_TEMPLATE": {
-      "classifier_model_id": null,
       "ask_learners_for_response": false,
+      "classifier_model_id": null,
       "content": {
           "html": "",
           "content_id": "content"
@@ -570,7 +570,7 @@ var constants = {
               "default_outcome": {}
           }
       }
-    },
+  },
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 

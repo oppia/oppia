@@ -3751,11 +3751,11 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 33
+schema_version: 34
 states:
   (untitled state):
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
@@ -3806,8 +3806,8 @@ states:
         default_outcome: {}
         feedback_1: {}
   END:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
@@ -3829,8 +3829,8 @@ states:
       translations_mapping:
         content: {}
   New state:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
@@ -3863,7 +3863,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 28
+states_schema_version: 29
 tags: []
 title: Title
 """)
@@ -4298,8 +4298,8 @@ param_specs: {}
 schema_version: 34
 states:
   Introduction:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
@@ -4329,8 +4329,8 @@ states:
         content: {}
         default_outcome: {}
   state1:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: <blockquote><p>Hello, this is state1</p></blockquote>
@@ -4371,8 +4371,8 @@ states:
         default_outcome: {}
         solution: {}
   state2:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: <p>Hello, </p><p>this <em>is </em>state2</p>
@@ -4455,8 +4455,8 @@ states:
         hint_1: {}
         hint_2: {}
   state3:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: <p>Hello, this is state3</p>
@@ -4648,8 +4648,8 @@ param_specs: {}
 schema_version: 33
 states:
   (untitled state):
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
@@ -4702,8 +4702,8 @@ states:
         default_outcome: {}
         feedback_1: {}
   END:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
@@ -4725,8 +4725,8 @@ states:
       translations_mapping:
         content: {}
   New state:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
@@ -4804,8 +4804,8 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             """Gets the default state dict of the exploration."""
             return {
-                'classifier_model_id': None,
                 'ask_learners_for_response': False,
+                'classifier_model_id': None,
                 'content': {
                     'content_id': 'content',
                     'html': content_str,

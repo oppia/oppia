@@ -1238,8 +1238,8 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
@@ -1273,8 +1273,8 @@ states:
         content: {}
         default_outcome: {}
   New state:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
@@ -1330,8 +1330,8 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
@@ -1365,8 +1365,8 @@ states:
         content: {}
         default_outcome: {}
   Renamed state:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
@@ -1548,8 +1548,8 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents.
     """
-    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
-ask_learners_for_response: false
+    _SAMPLE_INIT_STATE_CONTENT = ("""ask_learners_for_response: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1586,8 +1586,8 @@ written_translations:
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""classifier_model_id: null
-ask_learners_for_response: false
+        'New state': ("""ask_learners_for_response: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1625,8 +1625,8 @@ written_translations:
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""classifier_model_id: null
-ask_learners_for_response: false
+        'Renamed state': ("""ask_learners_for_response: false
+classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -3093,8 +3093,8 @@ param_specs: {}
 schema_version: %d
 states:
   END:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
@@ -3116,8 +3116,8 @@ states:
       translations_mapping:
         content: {}
   %s:
-    classifier_model_id: null
     ask_learners_for_response: false
+    classifier_model_id: null
     content:
       content_id: content
       html: ''
