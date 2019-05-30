@@ -425,6 +425,7 @@ content:
   html: ''
 image_assets:
   image_assets_mapping: {}
+  image_id_counter: 0
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
