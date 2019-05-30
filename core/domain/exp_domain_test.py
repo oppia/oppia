@@ -4645,7 +4645,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 33
+schema_version: 34
 states:
   (untitled state):
     ask_learners_for_response: false
