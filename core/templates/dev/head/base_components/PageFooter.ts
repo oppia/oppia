@@ -19,9 +19,9 @@
 require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('pageFooter', [
-    'UrlInterpolationService', function (UrlInterpolationService) {
-    return {
-        restrict: 'E',
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl('/base_components/footer.html')
-    }
+  'UrlInterpolationService', function (UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl('/base_components/footer.html')
+  }
 }]);

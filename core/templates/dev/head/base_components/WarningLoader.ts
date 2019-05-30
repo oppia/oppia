@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('./PageFooter.ts');
+require('base_components/PageFooter.ts');
 
 oppia.directive('warningLoader', [
   'UrlInterpolationService', function(UrlInterpolationService) {

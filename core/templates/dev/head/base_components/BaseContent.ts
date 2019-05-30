@@ -32,4 +32,3 @@ oppia.directive('baseContent', [
     }
   }
 ]);
-console.log('I should be here')

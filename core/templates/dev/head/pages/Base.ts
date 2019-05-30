@@ -29,6 +29,13 @@ oppia.controller('Base', [
     $scope.iframed = UrlService.isIframed();
     $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
     $scope.pageUrl = UrlService.getCurrentLocation().href;
+    $scope.getAssetUrl = function(path) {
+      if (DEV_MODE) {
+        return UrlService.getOrigin() + path;
+      } else {
+        return UrlService.getOrigin() + '/build' + path;
+      }
+    };
 
     $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.

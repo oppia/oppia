@@ -2,30 +2,12 @@
 <html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
     <meta charset="UTF-8">
-
-    <!-- Tiles for Internet Explorer. -->
-    <meta name="application-name" content="<[siteName]>">
-    <meta name="msapplication-square70x70logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-tiny.png')}}">
-    <meta name="msapplication-square150x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-square.png')}}">
-    <meta name="msapplication-wide310x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-wide.png')}}">
-    <meta name="msapplication-square310x310logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-large.png')}}">
-
-    <!-- The itemprops are for G+ sharing. -->
-    <meta itemprop="name" content="Personalized Online Learning from Oppia">
-    <meta itemprop="description" content="Learn how to get started using Oppia.">
-    <!-- The og tags are for Facebook sharing. -->
-    <meta property="og:title" content="Personalized Online Learning from Oppia">
-    <meta property="og:url" content="<[pageUrl]>">
-    <meta property="og:description" content="Learn how to get started using Oppia.">
-    <meta property="og:image" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/288x288_logo_mint.png')}}">
-
-    <!-- This code is used for inserting meta tags
-         https://github.com/jantimon/html-webpack-plugin#meta-tags
-         All page specific meta tags should be inserted above this -->
+    
+    <!-- This code is used for inserting meta tags via webpack -->
     <% for (var meta in htmlWebpackPlugin.options.meta) { %>
       <% if (typeof htmlWebpackPlugin.options.meta[meta] == 'object') { %>
         <% var currentMeta = htmlWebpackPlugin.options.meta[meta] %>
-        <meta <%= Object.keys(currentMeta)[0] %>="<%= Object.values(currentMeta)[0] %>" <%= Object.keys(currentMeta)[1] %>="<%= Object.values(currentMeta)[1] %>" >  
+        <%='<meta ' + Object.keys(currentMeta)[0] + '="' + Object.values(currentMeta)[0] + '"' + Object.keys(currentMeta)[1] + '="' + Object.values(currentMeta)[1] + '"' +' >' %>  
       <% } else {%>
         <meta name="<%= meta %>" content="<%= htmlWebpackPlugin.options.meta[meta] %>">
       <% }%>
