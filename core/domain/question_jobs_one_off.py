@@ -19,7 +19,6 @@
 import ast
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import question_domain
 from core.domain import question_services
@@ -48,9 +47,6 @@ class QuestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(item):
-        if not constants.ENABLE_NEW_STRUCTURE_EDITORS:
-            return
-
         if item.deleted:
             yield (QuestionMigrationOneOffJob._DELETED_KEY, 1)
             return

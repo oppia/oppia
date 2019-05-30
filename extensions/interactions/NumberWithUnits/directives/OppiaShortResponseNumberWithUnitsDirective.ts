@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the NumberWithUnits short response.
+ * @fileoverview Directive for the NumberWithUnits short response.
  */
 
 oppia.directive('oppiaShortResponseNumberWithUnits', [

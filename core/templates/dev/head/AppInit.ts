@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview File for initializing the main oppia module.
+ */
+
 var oppia = angular.module(
   'oppia', [
     'dndLists', 'headroom', 'infinite-scroll',

@@ -53,23 +53,27 @@ oppia.directive('explorationFooter', [
           });
 
           $scope.contributorNames = [];
-          ExplorationSummaryBackendApiService
-            .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
-            .then(function(summaries) {
-              var summaryBackendObject = null;
-              if (summaries.length > 0) {
-                var contributorSummary = (
-                  summaries[0].human_readable_contributors_summary);
-                $scope.contributorNames = Object.keys(contributorSummary).sort(
-                  function(contributorUsername1, contributorUsername2) {
-                    var commitsOfContributor1 = contributorSummary[
-                      contributorUsername1].num_commits;
-                    var commitsOfContributor2 = contributorSummary[
-                      contributorUsername2].num_commits;
-                    return commitsOfContributor2 - commitsOfContributor1;
-                  });
-              }
-            });
+          if (!ContextService.isInQuestionPlayerMode()) {
+            ExplorationSummaryBackendApiService
+              .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])
+              .then(function(summaries) {
+                var summaryBackendObject = null;
+                if (summaries.length > 0) {
+                  var contributorSummary = (
+                    summaries[0].human_readable_contributors_summary);
+                  $scope.contributorNames = (
+                    Object.keys(contributorSummary).sort(
+                      function(contributorUsername1, contributorUsername2) {
+                        var commitsOfContributor1 = contributorSummary[
+                          contributorUsername1].num_commits;
+                        var commitsOfContributor2 = contributorSummary[
+                          contributorUsername2].num_commits;
+                        return commitsOfContributor2 - commitsOfContributor1;
+                      })
+                  );
+                }
+              });
+          }
         }
       ]
     };
