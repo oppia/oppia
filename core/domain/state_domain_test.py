@@ -213,6 +213,13 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
+    def test_update_ask_learners_for_response(self):
+        """Test updating ask_learners_for_response."""
+        state = state_domain.State.create_default_state('state_1')
+        state.update_ask_learners_for_response(True)
+        self.assertEqual(
+            state.ask_learners_for_response, True)
+
     def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
         state_dict = {
@@ -221,6 +228,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'ask_learners_for_response': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -253,6 +261,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'ask_learners_for_response': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -285,6 +294,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'ask_learners_for_response': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -318,6 +328,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'ask_learners_for_response': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
