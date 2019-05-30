@@ -19,7 +19,7 @@
 require('services/SuggestionModalService.ts');
 
 oppia.controller(
-  'ShowSuggestionModalForCreatorView', [
+  'SuggestionModalForCreatorView', [
     '$scope', '$uibModalInstance', 'SuggestionModalService',
     'canReviewActiveThread', 'description', 'newContent',
     'oldContent', 'stateName', 'suggestionIsHandled', 'suggestionStatus',

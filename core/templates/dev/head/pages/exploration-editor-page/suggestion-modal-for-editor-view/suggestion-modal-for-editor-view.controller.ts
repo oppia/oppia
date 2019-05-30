@@ -21,7 +21,7 @@ require('services/EditabilityService.ts');
 
 // TODO(Allan): Implement ability to edit suggestions before applying.
 oppia.controller(
-  'ShowSuggestionModalForEditorView', [
+  'SuggestionModalForEditorView', [
     '$scope', '$uibModalInstance', 'EditabilityService',
     'SuggestionModalService', 'currentContent', 'description',
     'newContent', 'suggestionIsHandled', 'suggestionIsValid',

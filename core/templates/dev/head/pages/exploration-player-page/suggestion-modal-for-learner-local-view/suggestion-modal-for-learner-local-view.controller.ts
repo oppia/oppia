@@ -23,7 +23,7 @@ require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/SuggestionModalService.ts');
 
 oppia.controller(
-  'ShowSuggestionModalForLearnerLocalView', [
+  'SuggestionModalForLearnerLocalView', [
     '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
     'PlayerPositionService', 'PlayerTranscriptService',
     'SuggestionModalService',

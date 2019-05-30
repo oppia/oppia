@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.factory(
-  'ShowSuggestionModalForCreatorViewService', [
+  'SuggestionModalForCreatorViewService', [
     '$http', '$log', '$rootScope',
     '$uibModal', 'UrlInterpolationService',
     function($http, $log, $rootScope,
@@ -27,7 +27,7 @@ oppia.factory(
       var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/creator-dashboard-page/' +
         'suggestion-modal-for-creator-view/' +
-        'show-suggestion-modal-for-creator-view.directive.html'
+        'suggestion-modal-for-creator-view.directive.html'
       );
 
       var _showEditStateContentSuggestionModal = function(
@@ -63,7 +63,7 @@ oppia.factory(
               return activeThread.suggestion.suggestionType;
             }
           },
-          controller: 'ShowSuggestionModalForCreatorView'
+          controller: 'SuggestionModalForCreatorView'
         }).result.then(function(result) {
           var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
             '/suggestionactionhandler/resubmit/<suggestion_id>');

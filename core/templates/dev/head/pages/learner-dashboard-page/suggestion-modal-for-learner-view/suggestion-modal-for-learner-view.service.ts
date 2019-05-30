@@ -17,9 +17,12 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/learner-dashboard-page/suggestion-modal-for-learner-view/' +
+  'suggestion-modal-for-learner-view.controller.ts');
 
 oppia.factory(
-  'ShowSuggestionModalForLearnerViewService', [
+  'SuggestionModalForLearnerViewService', [
     '$rootScope', '$uibModal',
     'UrlInterpolationService',
     function($rootScope, $uibModal,
@@ -27,7 +30,7 @@ oppia.factory(
       var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/learner-dashboard-page/' +
         'suggestion-modal-for-learner-view/' +
-        'show-suggestion-modal-for-learner-view.directive.html'
+        'suggestion-modal-for-learner-view.directive.html'
       );
 
       var _showEditStateContentSuggestionModal = function(
@@ -46,7 +49,7 @@ oppia.factory(
               return description;
             }
           },
-          controller: 'ShowSuggestionModalForLearnerView'
+          controller: 'SuggestionModalForLearnerView'
         });
       };
 

@@ -29,11 +29,11 @@ require(
   'thread-data.service.ts');
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
-  'show-suggestion-modal-for-editor-view.controller.ts');
+  'suggestion-modal-for-editor-view.controller.ts');
 require('services/SuggestionModalService.ts');
 
 oppia.factory(
-  'ShowSuggestionModalForEditorViewService', [
+  'SuggestionModalForEditorViewService', [
     '$log', '$rootScope', '$uibModal',
     'ExplorationDataService', 'ExplorationStatesService',
     'StateObjectFactory', 'SuggestionModalService',
@@ -45,7 +45,7 @@ oppia.factory(
       var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-editor-page/' +
         'suggestion-modal-for-editor-view/' +
-        'show-suggestion-modal-for-editor-view.directive.html'
+        'suggestion-modal-for-editor-view.directive.html'
       );
 
       var _showEditStateContentSuggestionModal = function(
@@ -80,7 +80,7 @@ oppia.factory(
               return activeThread.getReplacementHtmlFromSuggestion();
             }
           },
-          controller: 'ShowSuggestionModalForEditorView'
+          controller: 'SuggestionModalForEditorView'
         }).result.then(function(result) {
           ThreadDataService.resolveSuggestion(
             activeThread.threadId, result.action, result.commitMessage,

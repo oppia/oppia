@@ -24,7 +24,7 @@ require('pages/exploration-player-page/services/player-position.service.ts');
 require(
   'pages/exploration-player-page/' +
   'suggestion-modal-for-learner-local-view/' +
-  'show-suggestion-modal-for-learner-local-view.service.ts');
+  'suggestion-modal-for-learner-local-view.service.ts');
 require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/stateful/FocusManagerService.ts');
@@ -35,13 +35,13 @@ oppia.constant(
 oppia.controller('LearnerLocalNav', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'ExplorationEngineService', 'ExplorationPlayerStateService',
-  'FocusManagerService', 'ShowSuggestionModalForLearnerLocalViewService',
+  'FocusManagerService', 'SuggestionModalForLearnerLocalViewService',
   'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
   'FLAG_EXPLORATION_URL_TEMPLATE',
   function(
       $http, $rootScope, $scope, $uibModal, AlertsService,
       ExplorationEngineService, ExplorationPlayerStateService,
-      FocusManagerService, ShowSuggestionModalForLearnerLocalViewService,
+      FocusManagerService, SuggestionModalForLearnerLocalViewService,
       UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
       FLAG_EXPLORATION_URL_TEMPLATE) {
     $scope.explorationId = ExplorationEngineService.getExplorationId();
@@ -59,7 +59,7 @@ oppia.controller('LearnerLocalNav', [
     };
 
     $scope.showLearnerSuggestionModal = function() {
-      ShowSuggestionModalForLearnerLocalViewService.showSuggestionModal(
+      SuggestionModalForLearnerLocalViewService.showSuggestionModal(
         'edit_exploration_state_content', {});
     };
     $scope.showFlagExplorationModal = function() {

@@ -19,7 +19,7 @@
 require('services/SuggestionModalService.ts');
 
 oppia.controller(
-  'showSuggestionModalForLearnerViewModule', [
+  'SuggestionModalForLearnerView', [
     '$scope', '$uibModalInstance', 'SuggestionModalService', 'description',
     'newContent', 'oldContent',
     function($scope, $uibModalInstance, SuggestionModalService, description,

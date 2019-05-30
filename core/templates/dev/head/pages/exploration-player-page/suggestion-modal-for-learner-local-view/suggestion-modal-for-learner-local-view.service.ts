@@ -20,17 +20,17 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/' +
   'suggestion-modal-for-learner-local-view/' +
-  'show-suggestion-modal-for-learner-local-view.controller.ts');
+  'suggestion-modal-for-learner-local-view.controller.ts');
 require('services/AlertsService.ts');
 
 oppia.factory(
-  'ShowSuggestionModalForLearnerLocalViewService', [
+  'SuggestionModalForLearnerLocalViewService', [
     '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
     function($http, $uibModal, AlertsService, UrlInterpolationService) {
       var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration-player-page/' +
         'suggestion-modal-for-learner-local-view/' +
-        'show-suggestion-modal-for-learner-local-view.directive.html'
+        'suggestion-modal-for-learner-local-view.directive.html'
       );
 
       var _showEditStateContentSuggestionModal = function() {
@@ -38,7 +38,7 @@ oppia.factory(
           templateUrl: _templateUrl,
           backdrop: 'static',
           resolve: {},
-          controller: 'ShowSuggestionModalForLearnerLocalView',
+          controller: 'SuggestionModalForLearnerLocalView',
         }).result.then(function(result) {
           var data = {
             suggestion_type: result.suggestion_type,

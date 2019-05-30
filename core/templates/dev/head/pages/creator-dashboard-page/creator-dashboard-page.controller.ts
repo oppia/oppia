@@ -159,19 +159,22 @@ require(
   'thread-status-display.service.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
-  'show-suggestion-modal-for-creator-view.service.ts');
+  'suggestion-modal-for-creator-view.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
-
+require(
+  'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
+  'suggestion-modal-for-creator-view.controller.ts');
+ 
 oppia.controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
   'ExplorationCreationService', 'QuestionObjectFactory',
-  'RatingComputationService', 'ShowSuggestionModalForCreatorViewService',
+  'RatingComputationService', 'SuggestionModalForCreatorViewService',
   'SuggestionObjectFactory', 'SuggestionThreadObjectFactory',
   'ThreadStatusDisplayService', 'TopicsAndSkillsDashboardBackendApiService',
   'UrlInterpolationService', 'UserService', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -182,7 +185,7 @@ oppia.controller('CreatorDashboard', [
       $http, $log, $q, $rootScope, $scope, $uibModal, $window,
       AlertsService, CreatorDashboardBackendApiService, DateTimeFormatService,
       ExplorationCreationService, QuestionObjectFactory,
-      RatingComputationService, ShowSuggestionModalForCreatorViewService,
+      RatingComputationService, SuggestionModalForCreatorViewService,
       SuggestionObjectFactory, SuggestionThreadObjectFactory,
       ThreadStatusDisplayService, TopicsAndSkillsDashboardBackendApiService,
       UrlInterpolationService, UserService, EXPLORATIONS_SORT_BY_KEYS,
@@ -442,7 +445,7 @@ oppia.controller('CreatorDashboard', [
     };
 
     $scope.showSuggestionModal = function() {
-      ShowSuggestionModalForCreatorViewService.showSuggestionModal(
+      SuggestionModalForCreatorViewService.showSuggestionModal(
         $scope.activeThread.suggestion.suggestionType,
         {
           activeThread: $scope.activeThread,

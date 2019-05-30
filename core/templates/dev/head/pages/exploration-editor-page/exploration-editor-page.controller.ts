@@ -141,7 +141,7 @@ require(
   'bar-chart.directive.ts');
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
-  'show-suggestion-modal-for-editor-view.controller.ts');
+  'suggestion-modal-for-editor-view.controller.ts');
 require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^

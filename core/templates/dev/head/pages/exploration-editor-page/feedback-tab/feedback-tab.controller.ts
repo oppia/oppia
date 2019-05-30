@@ -36,7 +36,7 @@ require(
 require(
   'pages/exploration-editor-page/' +
   'suggestion-modal-for-editor-view/' +
-  'show-suggestion-modal-for-editor-view.service.ts');
+  'suggestion-modal-for-editor-view.service.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
@@ -45,7 +45,7 @@ oppia.controller('FeedbackTab', [
   '$log', '$q', '$rootScope', '$scope', '$uibModal',
   'AlertsService', 'ChangeListService', 'DateTimeFormatService',
   'ExplorationDataService', 'ExplorationStatesService',
-  'ShowSuggestionModalForEditorViewService',
+  'SuggestionModalForEditorViewService',
   'StateObjectFactory',
   'ThreadDataService', 'ThreadStatusDisplayService',
   'UrlInterpolationService', 'UserService',
@@ -54,7 +54,7 @@ oppia.controller('FeedbackTab', [
       $log, $q, $rootScope, $scope, $uibModal,
       AlertsService, ChangeListService, DateTimeFormatService,
       ExplorationDataService, ExplorationStatesService,
-      ShowSuggestionModalForEditorViewService,
+      SuggestionModalForEditorViewService,
       StateObjectFactory,
       ThreadDataService, ThreadStatusDisplayService,
       UrlInterpolationService, UserService,
@@ -171,7 +171,7 @@ oppia.controller('FeedbackTab', [
 
     // TODO(Allan): Implement ability to edit suggestions before applying.
     $scope.showSuggestionModal = function() {
-      ShowSuggestionModalForEditorViewService.showSuggestionModal(
+      SuggestionModalForEditorViewService.showSuggestionModal(
         $scope.activeThread.suggestion.suggestionType,
         {
           activeThread: $scope.activeThread,
