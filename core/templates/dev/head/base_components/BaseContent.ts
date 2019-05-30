@@ -20,15 +20,16 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('baseContent', [
   'UrlInterpolationService',
-  function (UrlInterpolationService) {
+  function(UrlInterpolationService) {
     return {
       restrict: 'E',
       transclude: {
-        'breadcrumb': 'navbarBreadcrumb',
+        breadcrumb: 'navbarBreadcrumb',
         'nav-options': '?localTopNavOptions',
         'warning-loader': 'warningLoaderContent',
       },
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl('/base_components/base_content.html')
-    }
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/base_components/base_content.html')
+    };
   }
 ]);
