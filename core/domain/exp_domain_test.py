@@ -3869,7 +3869,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 28
+states_schema_version: 29
 tags: []
 title: Title
 """)
@@ -4528,7 +4528,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 28
+states_schema_version: 29
 tags: []
 title: title
 """)
@@ -4773,7 +4773,7 @@ states:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 28
+states_schema_version: 29
 tags: []
 title: Title
 """)

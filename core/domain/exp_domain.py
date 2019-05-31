@@ -2192,7 +2192,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
-        pass
+        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -3029,6 +3029,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v32_dict_to_v33_dict(
                 exploration_dict)
             exploration_schema_version = 33
+
+        if exploration_schema_version == 33:
+            exploration_dict = cls._convert_v33_dict_to_v34_dict(
+                exploration_dict)
+            exploration_schema_version = 34
 
         return (exploration_dict, initial_schema_version)
 

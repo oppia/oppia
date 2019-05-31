@@ -193,6 +193,11 @@ class Question(object):
         return question_state_dict
 
     @classmethod
+    def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
+        """Converts from version 28 to 29."""
+        return question_state_dict
+
+    @classmethod
     def update_state_from_model(
             cls, versioned_question_state, current_state_schema_version):
         """Converts the state object contained in the given
