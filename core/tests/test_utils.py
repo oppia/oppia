@@ -341,7 +341,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -372,7 +372,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content

@@ -45,8 +45,8 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
-STATE_PROPERTY_ASK_LEARNERS_FOR_RESPONSE = (
-    'ask_learners_for_response')
+STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = (
+    'solicit_answer_details')
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
@@ -114,7 +114,7 @@ class ExplorationChange(object):
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
-        STATE_PROPERTY_ASK_LEARNERS_FOR_RESPONSE,
+        STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
@@ -588,7 +588,7 @@ class Exploration(object):
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
 
-            state.ask_learners_for_response = sdict['ask_learners_for_response']
+            state.solicit_answer_details = sdict['solicit_answer_details']
 
             exploration.states[state_name] = state
 
@@ -2198,7 +2198,7 @@ class Exploration(object):
     @classmethod
     def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
         """Converts from version 28 to 29. Version 29 adds
-        ask_learners_for_response boolean variable to the state, which
+        solicit_answer_details boolean variable to the state, which
         allows the creator to ask for response from the learner.
 
         Args:
@@ -2210,7 +2210,7 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.itervalues():
-            state_dict['ask_learners_for_response'] = False
+            state_dict['solicit_answer_details'] = False
         return states_dict
 
 
@@ -2845,7 +2845,7 @@ class Exploration(object):
     def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
         """Converts a v33 exploration dict into a v34 exploration dict.
 
-        Adds ask_learners_for_response in state to ask learners for the
+        Adds solicit_answer_details in state to ask learners for the
         response.
         """
         exploration_dict['schema_version'] = 34

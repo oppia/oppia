@@ -1238,7 +1238,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1273,7 +1273,7 @@ states:
         content: {}
         default_outcome: {}
   New state:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1330,7 +1330,7 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1365,7 +1365,7 @@ states:
         content: {}
         default_outcome: {}
   Renamed state:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1548,7 +1548,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents.
     """
-    _SAMPLE_INIT_STATE_CONTENT = ("""ask_learners_for_response: false
+    _SAMPLE_INIT_STATE_CONTENT = ("""solicit_answer_details: false
 classifier_model_id: null
 content:
   content_id: content
@@ -1586,7 +1586,7 @@ written_translations:
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""ask_learners_for_response: false
+        'New state': ("""solicit_answer_details: false
 classifier_model_id: null
 content:
   content_id: content
@@ -1625,7 +1625,7 @@ written_translations:
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""ask_learners_for_response: false
+        'Renamed state': ("""solicit_answer_details: false
 classifier_model_id: null
 content:
   content_id: content
@@ -2109,31 +2109,31 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.content.html, '<b>Test content</b>')
 
-    def test_update_ask_learners_for_response(self):
-        """Test updating of ask_learners_for_response."""
+    def test_update_solicit_answer_details(self):
+        """Test updating of solicit_answer_details."""
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
-                exp_domain.STATE_PROPERTY_ASK_LEARNERS_FOR_RESPONSE,
+                exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
                 True),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            exploration.init_state.ask_learners_for_response, True)
+            exploration.init_state.solicit_answer_details, True)
 
-    def test_update_ask_learners_for_response_with_non_bool_fails(self):
-        """Test updating of ask_learners_for_response with non bool value."""
+    def test_update_solicit_answer_details_with_non_bool_fails(self):
+        """Test updating of solicit_answer_details with non bool value."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            exploration.init_state.ask_learners_for_response, False)
+            exploration.init_state.solicit_answer_details, False)
         with self.assertRaisesRegexp(
             Exception, (
-                'Expected ask_learners_for_response to be a bool, received ')):
+                'Expected solicit_answer_details to be a bool, received ')):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, _get_change_list(
                     self.init_state_name,
-                    exp_domain.STATE_PROPERTY_ASK_LEARNERS_FOR_RESPONSE,
+                    exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
                     'abc'),
                 '')
 
@@ -3121,7 +3121,7 @@ param_specs: {}
 schema_version: %d
 states:
   END:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3144,7 +3144,7 @@ states:
       translations_mapping:
         content: {}
   %s:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content

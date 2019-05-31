@@ -195,7 +195,7 @@ class Question(object):
     @classmethod
     def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
         """Converts from version 28 to 29. Version 29 adds
-        ask_learners_for_response boolean variable to the state, which
+        solicit_answer_details boolean variable to the state, which
         allows the creator to ask for response from the learner.
 
          Args:
@@ -205,7 +205,7 @@ class Question(object):
         Returns:
             dict. The converted question_state_dict.
         """
-        question_state_dict['ask_learners_for_response'] = False
+        question_state_dict['solicit_answer_details'] = False
         return question_state_dict
 
     @classmethod

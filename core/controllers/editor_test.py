@@ -315,7 +315,7 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""ask_learners_for_response: false
+        'State A': ("""solicit_answer_details: false
 classifier_model_id: null
 content:
   content_id: content
@@ -350,7 +350,7 @@ written_translations:
     content: {}
     default_outcome: {}
 """),
-        'State B': ("""ask_learners_for_response: false
+        'State B': ("""solicit_answer_details: false
 classifier_model_id: null
 content:
   content_id: content
@@ -385,7 +385,7 @@ written_translations:
     content: {}
     default_outcome: {}
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""ask_learners_for_response: false
+        feconf.DEFAULT_INIT_STATE_NAME: ("""solicit_answer_details: false
 classifier_model_id: null
 content:
   content_id: content
@@ -422,7 +422,7 @@ written_translations:
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""ask_learners_for_response: false
+    SAMPLE_STATE_STRING = ("""solicit_answer_details: false
 classifier_model_id: null
 content:
   content_id: content

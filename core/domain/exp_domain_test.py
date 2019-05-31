@@ -3754,7 +3754,7 @@ param_specs: {}
 schema_version: 34
 states:
   (untitled state):
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3806,7 +3806,7 @@ states:
         default_outcome: {}
         feedback_1: {}
   END:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3829,7 +3829,7 @@ states:
       translations_mapping:
         content: {}
   New state:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4298,7 +4298,7 @@ param_specs: {}
 schema_version: 34
 states:
   Introduction:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4329,7 +4329,7 @@ states:
         content: {}
         default_outcome: {}
   state1:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4371,7 +4371,7 @@ states:
         default_outcome: {}
         solution: {}
   state2:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4455,7 +4455,7 @@ states:
         hint_1: {}
         hint_2: {}
   state3:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4648,7 +4648,7 @@ param_specs: {}
 schema_version: 34
 states:
   (untitled state):
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4702,7 +4702,7 @@ states:
         default_outcome: {}
         feedback_1: {}
   END:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4725,7 +4725,7 @@ states:
       translations_mapping:
         content: {}
   New state:
-    ask_learners_for_response: false
+    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4804,7 +4804,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             """Gets the default state dict of the exploration."""
             return {
-                'ask_learners_for_response': False,
+                'solicit_answer_details': False,
                 'classifier_model_id': None,
                 'content': {
                     'content_id': 'content',

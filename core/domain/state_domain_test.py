@@ -44,7 +44,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict = exploration.states['New state'].to_dict()
         expected_dict = {
-            'ask_learners_for_response': False,
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'content': {
                 'content_id': 'content',
@@ -213,22 +213,22 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
-    def test_update_ask_learners_for_response(self):
-        """Test updating ask_learners_for_response."""
+    def test_update_solicit_answer_details(self):
+        """Test updating solicit_answer_details."""
         state = state_domain.State.create_default_state('state_1')
         self.assertEqual(
-            state.ask_learners_for_response, False)
-        state.update_ask_learners_for_response(True)
+            state.solicit_answer_details, False)
+        state.update_solicit_answer_details(True)
         self.assertEqual(
-            state.ask_learners_for_response, True)
+            state.solicit_answer_details, True)
 
-    def test_update_ask_learners_for_response_with_non_bool_fails(self):
-        """Test updating ask_learners_for_response with non bool value."""
+    def test_update_solicit_answer_details_with_non_bool_fails(self):
+        """Test updating solicit_answer_details with non bool value."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_ask_learners_for_response('abc')
+        init_state.update_solicit_answer_details('abc')
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected ask_learners_for_response to be a boolean, received')):
+            'Expected solicit_answer_details to be a boolean, received')):
             exploration.validate()
 
     def test_convert_html_fields_in_state(self):
@@ -239,7 +239,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
-            'ask_learners_for_response': False,
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -272,7 +272,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
-            'ask_learners_for_response': False,
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -305,7 +305,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
-            'ask_learners_for_response': False,
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -339,7 +339,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
-            'ask_learners_for_response': False,
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,

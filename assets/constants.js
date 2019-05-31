@@ -532,7 +532,7 @@ var constants = {
   "NUM_QUESTIONS_PER_PAGE": 10,
 
   "NEW_STATE_TEMPLATE": {
-      "ask_learners_for_response": false,
+      "solicit_answer_details": false,
       "classifier_model_id": null,
       "content": {
           "html": "",

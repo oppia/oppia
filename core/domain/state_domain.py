@@ -1367,7 +1367,7 @@ class State(object):
 
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, ask_learners_for_response=False,
+            written_translations, solicit_answer_details=False,
             classifier_model_id=None):
         """Initializes a State domain object.
 
@@ -1382,7 +1382,7 @@ class State(object):
                 the state contents and translations.
             written_translations: WrittenTranslations. The written translations
                 for the state contents.
-            ask_learners_for_response: bool. Whether the creator wants to ask
+            solicit_answer_details: bool. Whether the creator wants to ask
                 for response from the learner about why they picked a particular
                 answer while playing the exploration.
             classifier_model_id: str or None. The classifier model ID
@@ -1404,7 +1404,7 @@ class State(object):
         self.classifier_model_id = classifier_model_id
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
-        self.ask_learners_for_response = ask_learners_for_response
+        self.solicit_answer_details = solicit_answer_details
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
@@ -1466,10 +1466,10 @@ class State(object):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
 
-        if not isinstance(self.ask_learners_for_response, bool):
+        if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
-                'Expected ask_learners_for_response to be a boolean, ' +
-                'received %s' % self.ask_learners_for_response)
+                'Expected solicit_answer_details to be a boolean, ' +
+                'received %s' % self.solicit_answer_details)
 
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
@@ -1809,14 +1809,14 @@ class State(object):
         """
         self.written_translations = written_translations
 
-    def update_ask_learners_for_response(self, ask_learners_for_response):
-        """Update the ask_learners_for_response of a state.
+    def update_solicit_answer_details(self, solicit_answer_details):
+        """Update the solicit_answer_details of a state.
 
         Args:
-            ask_learners_for_response: bool. The new value of
-                ask_learners_for_response for the state.
+            solicit_answer_details: bool. The new value of
+                solicit_answer_details for the state.
         """
-        self.ask_learners_for_response = ask_learners_for_response
+        self.solicit_answer_details = solicit_answer_details
 
     def to_dict(self):
         """Returns a dict representing this State domain object.
@@ -1832,7 +1832,7 @@ class State(object):
             'classifier_model_id': self.classifier_model_id,
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
             'written_translations': self.written_translations.to_dict(),
-            'ask_learners_for_response': self.ask_learners_for_response
+            'solicit_answer_details': self.solicit_answer_details
         }
 
     @classmethod
@@ -1852,7 +1852,7 @@ class State(object):
             InteractionInstance.from_dict(state_dict['interaction']),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
-            state_dict['ask_learners_for_response'],
+            state_dict['solicit_answer_details'],
             state_dict['classifier_model_id'])
 
     @classmethod
