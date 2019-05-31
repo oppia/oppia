@@ -1049,7 +1049,8 @@ class EditExplorationTests(test_utils.GenericTestBase):
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route(
-                '/mock_publish_exploration/<exploration_id>', self.MockHandler)],
+                '/mock_publish_exploration/<exploration_id>',
+                self.MockHandler)],
             debug=feconf.DEBUG,
         ))
         self.save_new_valid_exploration(
@@ -1087,7 +1088,7 @@ class EditExplorationTests(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json(
                 '/mock_publish_exploration/%s' % self.published_exp_id)
-        self.assertEqual(response['exploration_id'],self.published_exp_id)
+        self.assertEqual(response['exploration_id'], self.published_exp_id)
         self.logout()
 
     def test_moderator_cannot_edit_private_exploration(self):
