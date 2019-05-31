@@ -1,8 +1,9 @@
 <div class="oppia-toast-container toast-top-center">
   <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index"
-    class="toast toast-warning oppia-toast">
+       class="toast toast-warning oppia-toast">
     <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)"
-      role="button">&times;</button>
+            role="button">&times;
+    </button>
     <div class="toast-message">
       <[warning.content]>
     </div>
