@@ -1,18 +1,18 @@
-<div class="oppia-editor-cards-container" ng-if="stateEditorInitialized">
-  <state-editor on-save-state-content="saveStateContent"
-                on-save-interaction-customization-args="saveInteractionCustomizationArgs"
-                on-save-interaction-id="saveInteractionId"
-                on-save-interaction-default-outcome="saveInteractionDefaultOutcome"
-                on-save-interaction-answer-groups="saveInteractionAnswerGroups"
-                on-save-solution="saveSolution"
-                on-save-hints="saveHints"
-                state-content-placeholder="getStateContentPlaceholder()"
-                show-mark-all-audio-as-needing-update-modal-if-required="showMarkAllAudioAsNeedingUpdateModalIfRequired"
-                interaction-is-shown="interactionIsShown"
-                recompute-graph="recomputeGraph"
-                navigate-to-state="navigateToState"
-                add-state="addState"
-                refresh-warnings="refreshWarnings">
+<div class="oppia-editor-cards-container" ng-if="$ctrl.stateEditorInitialized">
+  <state-editor on-save-state-content="$ctrl.saveStateContent"
+                on-save-interaction-customization-args="$ctrl.saveInteractionCustomizationArgs"
+                on-save-interaction-id="$ctrl.saveInteractionId"
+                on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
+                on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
+                on-save-solution="$ctrl.saveSolution"
+                on-save-hints="$ctrl.saveHints"
+                state-content-placeholder="$ctrl.getStateContentPlaceholder()"
+                show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
+                interaction-is-shown="$ctrl.interactionIsShown"
+                recompute-graph="$ctrl.recomputeGraph"
+                navigate-to-state="$ctrl.navigateToState"
+                add-state="$ctrl.addState"
+                refresh-warnings="$ctrl.refreshWarnings">
   </state-editor>
 </div>
 
