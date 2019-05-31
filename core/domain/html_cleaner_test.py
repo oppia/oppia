@@ -27,6 +27,20 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         super(HtmlCleanerUnitTests, self).setUp()
         self.longMessage = True
 
+    def test_filter_a(self):
+        test_data = [(
+            'a', 'href', 'http://www.google.com', True
+        ), (
+            'a', 'href', '<code>http://www.google.com', False
+        ), (
+            'p', 'style', 'http://www.google.com', False
+        )]
+
+        for datum in test_data:
+            self.assertEqual(
+                html_cleaner.filter_a(datum[0], datum[1], datum[2]),
+                datum[3])
+
     def test_good_tags_allowed(self):
         test_data = [(
             '<a href="http://www.google.com">Hello</a>',
