@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directives required in collection editor.
+ */
+
 require('pages/collection_editor/CollectionEditorDirective.ts');
 require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
 require('pages/collection_editor/CollectionEditorNavbarDirective.ts');

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directives required in collection player.
+ */
+
 require('pages/collection_player/CollectionFooterDirective.ts');
 require('pages/collection_player/CollectionLocalNavDirective.ts');
 require('pages/collection_player/CollectionPlayerPageDirective.ts');

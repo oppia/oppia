@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directives required in library.
+ */
+
 require('pages/library/LibraryPageDirective.ts');
 require('pages/library/LibraryFooter.ts');
 require('pages/library/SearchBarDirective.ts');

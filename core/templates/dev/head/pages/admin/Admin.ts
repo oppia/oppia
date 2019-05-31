@@ -12,4 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directives required in admin panel.
+ */
+
 require('pages/admin/AdminPageDirective.ts');
