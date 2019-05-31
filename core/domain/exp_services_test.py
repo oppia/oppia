@@ -1560,6 +1560,9 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
 content:
   content_id: content
   html: ''
+image_assets:
+  image_assets_mapping: {}
+  image_id_counter: 0
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1638,6 +1641,9 @@ written_translations:
 content:
   content_id: content
   html: ''
+image_assets:
+  image_assets_mapping: {}
+  image_id_counter: 0
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1699,8 +1705,8 @@ written_translations:
 
         dict_output = exp_services.export_states_to_yaml(self.EXP_ID, width=50)
 
-        # self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
-        self.assertEqual(dict_output, "keshav")
+        self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
+        # self.assertEqual(dict_output, "keshav")
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
@@ -3106,6 +3112,9 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
+    image_assets:
+      image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3128,6 +3137,9 @@ states:
     content:
       content_id: content
       html: ''
+    image_assets:
+      image_assets_mapping: {}
+      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
