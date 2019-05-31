@@ -407,7 +407,6 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         return user_data
 
 
-
 class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
 

@@ -139,12 +139,11 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         user_data = user_models.UserStatsModel.export_data(self.USER_ID_2)
         test_data = {
             'impact_score': None,
-            'total_plays': None,
+            'total_plays': 0,
             'average_ratings': None,
-            'num_ratings': None,
-            'weekly_creator_stats_list': None
+            'num_ratings': 0,
+            'weekly_creator_stats_list': []
         }
-        print(user_data) # what does empty user look like
         self.assertEqual(user_data, test_data)
 
 
