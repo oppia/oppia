@@ -23,8 +23,6 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-from google.appengine.ext import ndb
-
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
@@ -257,9 +255,6 @@ class VersionedModelTests(test_utils.GenericTestBase):
     def test_commit_with_model_instance_deleted_raises_error(self):
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        model_by_version = TestVersionedModel.get_version('model_id1', 1)
-
-        self.assertEqual(model_by_version.version, 1)
         model1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
 
         with self.assertRaisesRegexp(
@@ -269,7 +264,6 @@ class VersionedModelTests(test_utils.GenericTestBase):
     def test_raises_error_with_trusted_commit_method(self):
         model1 = TestVersionedModel(id='model_id1')
         model1.SNAPSHOT_METADATA_CLASS = None
-        model1.SNAPSHOT_CONTENT_CLASS = None
         with self.assertRaisesRegexp(
             Exception, 'No snapshot metadata class defined.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
@@ -285,13 +279,18 @@ class VersionedModelTests(test_utils.GenericTestBase):
             Exception, 'Expected commit_cmds to be a list of dicts, received'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', {})
 
-    def test_put_raises_not_implemented_error(self):
+        model1 = TestVersionedModel(id='model_id1')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected commit_cmds to be a list of dicts, received'):
+            model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [[]])
+
+    def test_put_raises_not_implemented_error_for_versioned_models(self):
         model1 = TestVersionedModel(id='model_id1')
 
         with self.assertRaises(NotImplementedError):
             model1.put()
 
-    def test_raises_error_with_commit(self):
+    def test_commit_with_invalid_change_list_raises_error(self):
         model1 = TestVersionedModel(id='model_id1')
 
         # Test for invalid commit command.
@@ -308,23 +307,20 @@ class VersionedModelTests(test_utils.GenericTestBase):
     def test_revert_with_not_allowed_revert_raises_error(self):
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp(
-            Exception, 'Reverting of objects of type .+ is not allowed.'):
+            Exception,
+            'Reverting objects of type TestVersionedModel is not allowed.'):
             model1.revert(model1, feconf.SYSTEM_COMMITTER_ID, '', 1)
 
     def test_get_snapshots_metadata_with_invalid_model_raises_error(self):
 
-        def _mock_get_multi(unused_metadata_keys):
-            """Mocks ndb.get_multi()."""
-            return [None]
-
         model1 = TestVersionedModel(id='model_id1')
         model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        get_multi_swap = self.swap(ndb, 'get_multi', _mock_get_multi)
 
         with self.assertRaisesRegexp(
-            Exception, 'Invalid version number .+ for model .+ with id .+'):
-            with get_multi_swap:
-                model1.get_snapshots_metadata('model_id1', [1])
+            Exception,
+            'Invalid version number 10 for model TestVersionedModel with id '
+            'model_id1'):
+            model1.get_snapshots_metadata('model_id1', [10])
 
     def test_get_multi_versions(self):
         model1 = TestVersionedModel(id='model_id1')

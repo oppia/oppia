@@ -41,18 +41,19 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
             response.body)
 
     def test_splash_page_with_invalid_c_value_redirects(self):
-        self.get_html_response(
+        response = self.get_html_response(
             '/splash?data=value', params={'c': 'invalid'},
             expected_status_int=302)
+        self.assertTrue(
+            response.headers['Location'].endswith('/splash?data=value'))
 
     def test_maintenance_page(self):
         fake_urls = []
         fake_urls.append(
             main.get_redirect_route(r'/maintenance', pages.MaintenancePage))
-        # fake_urls.append(main.URLS[-1])
         with self.swap(main, 'URLS', fake_urls):
             transaction_services = models.Registry.import_transaction_services()
-            app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+            app = transaction_services.toplevel_wrapper(
                 webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
             self.testapp = webtest.TestApp(app)
 

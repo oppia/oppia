@@ -611,6 +611,12 @@ class VersionedModel(BaseModel):
         """
         self._require_not_marked_deleted()
 
+        for item in commit_cmds:
+            if not isinstance(item, dict):
+                raise Exception(
+                    'Expected commit_cmds to be a list of dicts, received %s'
+                    % commit_cmds)
+
         for commit_cmd in commit_cmds:
             if 'cmd' not in commit_cmd:
                 raise Exception(
@@ -645,7 +651,7 @@ class VersionedModel(BaseModel):
 
         if not model.ALLOW_REVERT:
             raise Exception(
-                'Reverting of objects of type %s is not allowed.'
+                'Reverting objects of type %s is not allowed.'
                 % model.__class__.__name__)
 
         commit_cmds = [{
