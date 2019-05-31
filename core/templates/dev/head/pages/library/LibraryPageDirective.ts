@@ -50,7 +50,7 @@ oppia.constant('LIBRARY_PATHS_TO_MODES', {
   '/search/find': 'search'
 });
 
-oppia.directive('library', [
+oppia.directive('libraryPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',

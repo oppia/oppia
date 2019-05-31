@@ -47,7 +47,7 @@ oppia.animation('.oppia-collection-animate-slide', function() {
   };
 });
 
-oppia.directive('collectionPlayer', ['UrlInterpolationService',
+oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',

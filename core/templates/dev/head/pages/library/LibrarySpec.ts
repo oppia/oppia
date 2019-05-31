@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
-require('pages/library/LibraryDirective.ts');
+require('pages/library/LibraryPageDirective.ts');
 
 describe('Library controller', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -69,7 +69,7 @@ describe('Library controller', function() {
         preferred_language_codes: ['en']
       });
 
-      ctrl = $componentController('library', {
+      ctrl = $componentController('libraryPage', {
         AlertsService: null,
         DateTimeFormatService: null
       }, {});
