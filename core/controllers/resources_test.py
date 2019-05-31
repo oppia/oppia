@@ -243,8 +243,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS."""
 
     TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
-    TEST_AUDIO_FILE_FLAC = 'cafe.flac'
-    TEST_AUDIO_FILE_FLAC_1 = 'galway.flac'
+    TEST_AUDIO_FILE_FLAC = 'galway.flac'
     TEST_AUDIO_FILE_OVER_MAX_LENGTH = 'cafe-over-five-minutes.mp3'
     TEST_AUDIO_FILE_MPEG_CONTAINER = 'test-mpeg-container.mp3'
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
@@ -285,19 +284,19 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             'exploration/0'))
 
         with open(
-            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC_1),
+            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
             mode='rb') as f:
             raw_audio = f.read()
 
-        self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC_1))
+        self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
         self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
-            {'filename': self.TEST_AUDIO_FILE_FLAC_1},
+            {'filename': self.TEST_AUDIO_FILE_FLAC},
             csrf_token=csrf_token,
             upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
         )
-        self.assertTrue(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC_1))
+        self.assertTrue(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
         self.logout()
 
@@ -343,7 +342,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             raw_audio = f.read()
         response_dict = self.post_json(
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-            {'filename': self.TEST_AUDIO_FILE_FLAC_1},
+            {'filename': self.TEST_AUDIO_FILE_FLAC},
             csrf_token=csrf_token,
             expected_status_int=400,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)

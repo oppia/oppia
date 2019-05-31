@@ -73,14 +73,13 @@ class TranslatorTest(BaseTranslatorControllerTests):
         self.csrf_token = self.get_csrf_token_from_response(response)
 
     def test_put_with_no_payload_version_raises_error(self):
-        state_name = feconf.DEFAULT_INIT_STATE_NAME
         with self.assertRaisesRegexp(
             Exception, 'Invalid POST request: a version must be specified.'):
             self.put_json(
                 '/createhandler/translate/%s' % self.EXP_ID, {
                     'change_list': [{
                         'cmd': 'edit_state_property',
-                        'state_name': state_name,
+                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
                         'property_name': 'recorded_voiceovers',
                         'new_value': self.RECORDED_VOICEOVERS
                     }],
@@ -89,17 +88,15 @@ class TranslatorTest(BaseTranslatorControllerTests):
 
     def test_put_with_payload_version_different_from_exp_version_raises_error(
             self):
-        state_name = feconf.DEFAULT_INIT_STATE_NAME
-
         with self.assertRaisesRegexp(
-            Exception, 'Trying to update version .+ of exploration from version'
+            Exception, 'Trying to update version 1 of exploration from version'
             ' 3, which is too old. Please reload the page and try again.'):
 
             self.put_json(
                 '/createhandler/translate/%s' % self.EXP_ID, {
                     'change_list': [{
                         'cmd': 'edit_state_property',
-                        'state_name': state_name,
+                        'state_name': feconf.DEFAULT_INIT_STATE_NAME,
                         'property_name': 'recorded_voiceovers',
                         'new_value': self.RECORDED_VOICEOVERS
                     }],
@@ -108,12 +105,11 @@ class TranslatorTest(BaseTranslatorControllerTests):
                 }, csrf_token=self.csrf_token)
 
     def test_translator_can_save_valid_change_list(self):
-        state_name = feconf.DEFAULT_INIT_STATE_NAME
         response = self.put_json(
             '/createhandler/translate/%s' % self.EXP_ID, {
                 'change_list': [{
                     'cmd': 'edit_state_property',
-                    'state_name': state_name,
+                    'state_name': feconf.DEFAULT_INIT_STATE_NAME,
                     'property_name': 'recorded_voiceovers',
                     'new_value': self.RECORDED_VOICEOVERS
                 }],
@@ -122,7 +118,8 @@ class TranslatorTest(BaseTranslatorControllerTests):
             }, csrf_token=self.csrf_token)
         # Checking the response to have audio translations.
         self.assertEqual(
-            response['states'][state_name]['recorded_voiceovers'],
+            response['states'][feconf.DEFAULT_INIT_STATE_NAME]
+            ['recorded_voiceovers'],
             self.RECORDED_VOICEOVERS)
 
     def test_translator_cannot_save_invalid_change_list(self):
