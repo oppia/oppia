@@ -3,7 +3,8 @@
   <head>
     <title>Oppia Admin Panel</title>
 
-    {% include 'pages/header_css_libs.html' %}
+    <!-- Require head styles file using webpack -->
+    @require('header_css_libs.html')
 
     <script>
       var GLOBALS = {
@@ -27,7 +28,8 @@
       }
     </script>
 
-    {% include 'pages/header_js_libs.html' %}
+    <!-- Require head javascript file using webpack -->
+      @require('header_js_libs.html')
   </head>
 
   <body>
