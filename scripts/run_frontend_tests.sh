@@ -73,4 +73,7 @@ if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
   $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.ts --prodEnv
 fi
 
+# Temporary line, added for debugging.
+cat ../karma_coverage_reports/coverage-final.json
+
 echo Done!
