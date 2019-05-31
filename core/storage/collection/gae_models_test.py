@@ -83,7 +83,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionCommitLogEntryModel
             .get_all_non_private_commits(2, None, None))
         self.assertEqual(False, commits[2])
-        self.assertEqual('collection--b--0', commits[0][0].id)
+        self.assertEqual('collection-b-0', commits[0][0].id)
 
     def test_get_all_non_private_commits_with_invalid_max_age(self):
         with self.assertRaisesRegexp(
@@ -113,7 +113,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             .get_all_non_private_commits(2, None, max_age))
         self.assertFalse(more)
         self.assertEqual(len(results), 1)
-        self.assertEqual('collection--b--0', results[0].id)
+        self.assertEqual('collection-b-0', results[0].id)
 
 
 class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
