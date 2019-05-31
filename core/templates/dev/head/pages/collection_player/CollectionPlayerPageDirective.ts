@@ -54,7 +54,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/collection_player_directive.html'),
+        '/pages/collection_player/collection_player_page_directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$anchorScroll', '$http', '$location', '$scope',
