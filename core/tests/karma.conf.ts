@@ -162,6 +162,10 @@ module.exports = function(config) {
                 // this is needed for thread-loader to work correctly
                 happyPackMode: true
               }
+            },
+            {
+              test: /\.html$/,
+              loader: 'underscore-template-loader'
             }
           ]
         }]

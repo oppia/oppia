@@ -4,14 +4,7 @@
     <meta charset="UTF-8">
 
     <!-- This code is used for inserting meta tags via webpack -->
-    <% for (var meta in htmlWebpackPlugin.options.meta) { %>
-      <% if (typeof htmlWebpackPlugin.options.meta[meta] == 'object') { %>
-        <% var currentMeta = htmlWebpackPlugin.options.meta[meta] %>
-        <%='<meta ' + Object.keys(currentMeta)[0] + '="' + Object.values(currentMeta)[0] + '"' + Object.keys(currentMeta)[1] + '="' + Object.values(currentMeta)[1] + '"' +' >' %>
-      <% } else { %>
-        <meta name="<%= meta %>" content="<%= htmlWebpackPlugin.options.meta[meta] %>">
-      <% } %>
-    <% } %>
+    <%= htmlWebpackPlugin.options.meta.toHTML() %>
     <link rel="apple-touch-icon" href="/assets/images/logo/favicon.png">
 
     <title itemprop="name">Get Started - Oppia</title>
@@ -20,7 +13,6 @@
     @require('../header_css_libs.html')
     <script>
       var GLOBALS = {
-        isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
@@ -30,67 +22,63 @@
   </head>
   <body>
     <base-content>
-      <warning-loader-content>
-        <warning-loader>
-          <content>
-            <div class="oppia-static-header">
-              <h1 translate="I18N_GET_STARTED_PAGE_HEADING"></h1>
-            </div>
-            <background-banner></background-banner>
-            <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
-              <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
+      <content>
+        <div class="oppia-static-header">
+          <h1 translate="I18N_GET_STARTED_PAGE_HEADING"></h1>
+        </div>
+        <background-banner></background-banner>
+        <div class="oppia-page-card oppia-static-content oppia-static-content-below-banner">
+          <div class="oppia-static-card-content oppia-static-card-content-narrow oppia-get-started">
 
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_1">
-                </p>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_1">
+            </p>
 
-                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_2_HEADING"></h2>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_2">
-                </p>
+            <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_2_HEADING"></h2>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_2">
+            </p>
 
-                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_3_HEADING"></h2>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_3">
-                </p>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_4">
+            <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_3_HEADING"></h2>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_3">
+            </p>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_4">
 
-                </p>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_5">
+            </p>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_5">
 
-                </p>
-                <ul style="margin-left: 40px;">
-                  <li><a href="https://www.oppia.org/explore/0" target="new">Welcome to Oppia</a></li>
-                  <li><a href="https://www.oppia.org/collection/wqCTKpKA0LBe" target="new">Get Electrified!</a></li>
-                  <li><a href="https://www.oppia.org/collection/inDXV0w8-p1C" target="new">Programming with Carla</a></li>
-                </ul>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_6">
-                </p>
+            </p>
+            <ul style="margin-left: 40px;">
+              <li><a href="https://www.oppia.org/explore/0" target="new">Welcome to Oppia</a></li>
+              <li><a href="https://www.oppia.org/collection/wqCTKpKA0LBe" target="new">Get Electrified!</a></li>
+              <li><a href="https://www.oppia.org/collection/inDXV0w8-p1C" target="new">Programming with Carla</a></li>
+            </ul>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_6">
+            </p>
 
-                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_7_HEADING"></h2>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_7">
-                </p>
+            <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_7_HEADING"></h2>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_7">
+            </p>
 
-                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING"></h2>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_8">
-                </p>
+            <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_8_HEADING"></h2>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_8">
+            </p>
 
-                <!-- todo: make it easy to get the right link to share, update this doc with that info -->
+            <!-- todo: make it easy to get the right link to share, update this doc with that info -->
 
-                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING"></h2>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_9">
-                </p>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_10">
+            <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_9_HEADING"></h2>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_9">
+            </p>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_10">
 
-                </p>
+            </p>
 
-                <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING"></h2>
-                <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_11">
-                </p>
-              </div>
-            </div>
-            <div class="oppia-footer-padding-below-banner">
-            </div>
-          </content>
-        </warning-loader>
-      </warning-loader-content>
+            <h2 translate="I18N_GET_STARTED_PAGE_PARAGRAPH_11_HEADING"></h2>
+            <p translate="I18N_GET_STARTED_PAGE_PARAGRAPH_11">
+            </p>
+          </div>
+        </div>
+        <div class="oppia-footer-padding-below-banner">
+        </div>
+      </content>
 
       <navbar-breadcrumb>
         <ul class="nav navbar-nav oppia-navbar-breadcrumb">

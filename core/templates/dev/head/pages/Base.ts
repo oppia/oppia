@@ -12,17 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 /**
  * @fileoverview Oppia's base controller.
  */
 
 oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL',
-  'SITE_NAME',
+  'SidebarStatusService', 'UrlInterpolationService', 'UrlService', 'DEV_MODE',
+  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      SidebarStatusService, UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL,
-      SITE_NAME) {
+      SidebarStatusService, UrlInterpolationService, UrlService, DEV_MODE,
+      SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
@@ -30,11 +32,7 @@ oppia.controller('Base', [
     $scope.siteFeedbackFormUrl = SITE_FEEDBACK_FORM_URL;
     $scope.pageUrl = UrlService.getCurrentLocation().href;
     $scope.getAssetUrl = function(path) {
-      if (DEV_MODE) {
-        return UrlService.getOrigin() + path;
-      } else {
-        return UrlService.getOrigin() + '/build' + path;
-      }
+      return UrlInterpolationService.getFullStaticAssetUrl(path);
     };
 
     $rootScope.DEV_MODE = DEV_MODE;

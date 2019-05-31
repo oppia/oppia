@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ *
+ * @fileoverview Extra utilities used by webpack
+ */
 
 var PageMeta = function(name, description) {
   this.name = name;
@@ -55,8 +59,24 @@ var PageMeta = function(name, description) {
   };
 };
 
+PageMeta.prototype.toHTML = function() {
+  var html = '';
+  for (var meta in this) {
+    if (this.hasOwnProperty(meta)) {
+      if (typeof this[meta] === 'object') {
+        html += '<meta ' + Object.keys(this[meta])[0] + '="' +
+        Object.values(this[meta])[0] + '" ' + Object.keys(this[meta])[1] +
+        '="' + Object.values(this[meta])[1] + '">\n';
+      } else {
+        html += '<meta name="' + meta + '" content="' + this[meta] + '">\n';
+      }
+    }
+  }
+  return html;
+};
+
 var utilities = {
-  getMetas: function(page) {
+  getMetas: function() {
     var getStarted = new PageMeta(
       'Personalized Online Learning from Oppia',
       'Learn how to get started using Oppia.');

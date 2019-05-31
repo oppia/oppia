@@ -16,6 +16,5 @@
 /**
  * @fileoverview File to import necessary scripts for get_started page.
  */
-require('base_components/BaseContent.ts');
-require('base_components/WarningLoader.ts');
+require('base_components/BaseContentDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');

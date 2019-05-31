@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+require('services/contextual/UrlService.ts');
 require('services/AlertsService.ts');
 require('services/UtilsService.ts');
 
@@ -21,8 +22,8 @@ require('services/UtilsService.ts');
  */
 
 oppia.factory('UrlInterpolationService', [
-  'AlertsService', 'UtilsService', 'DEV_MODE',
-  function(AlertsService, UtilsService, DEV_MODE) {
+  'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',
+  function(AlertsService, UrlService, UtilsService, DEV_MODE) {
     var validateResourcePath = function(resourcePath) {
       if (!resourcePath) {
         AlertsService.fatalWarning('Empty path passed in method.');
@@ -184,6 +185,15 @@ oppia.factory('UrlInterpolationService', [
       getStaticAssetUrl: function(assetPath) {
         validateResourcePath(assetPath);
         return getCompleteUrl('/assets', assetPath);
+      },
+
+      getFullStaticAssetUrl: function(path) {
+        validateResourcePath(path);
+        if (DEV_MODE) {
+          return UrlService.getOrigin() + path;
+        } else {
+          return UrlService.getOrigin() + '/build' + path;
+        }
       },
 
       /**

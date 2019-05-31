@@ -1,6 +1,16 @@
 <main>
   <div ng-if="iframed">
-    <div ng-transclude="warning-loader"></div>
+    <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
+      <warning-loader></warning-loader>
+      <div ng-show="!loadingMessage">
+        <div ng-transclude="content">
+        </div>
+        <div ng-transclude="footer">
+          <!-- Loads default footer if no footer is provided -->
+          <page-footer></page-footer>
+        </div>
+      </div>
+    </div>
   </div>
   <div ng-if="!iframed">
     <div role="button" tabindex="0" ng-click="skipToMainContent()"
@@ -31,7 +41,17 @@
             <div class="oppia-top-of-page-padding">
             </div>
   
-            <div ng-transclude="warning-loader"></div>
+            <div tabindex="0" aria-label="Oppia Main Content" id="oppia-main-content" class="protractor-test-main-content" ng-cloak>
+              <warning-loader></warning-loader>
+              <div ng-show="!loadingMessage">
+                <div ng-transclude="content">
+                </div>
+                <div ng-transclude="footer">
+                  <!-- Loads default footer if no footer is provided -->
+                  <page-footer></page-footer>
+                </div>
+              </div>
+            </div>
           </div>
   
           <noscript>

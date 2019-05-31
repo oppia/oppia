@@ -188,7 +188,6 @@ module.exports = {
       chunks: ['app', 'get_started'],
       filename: 'get_started.html',
       meta: Utils.getMetas().getStarted,
-      loader: 'raw-loader',
       template: commonPrefix + '/pages/get_started/get_started.html',
       minify: htmlMinifyConfig,
       inject: false

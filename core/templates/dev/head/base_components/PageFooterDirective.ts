@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the attribution guide.
+ * @fileoverview Directive for the default footer.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -24,7 +24,7 @@ oppia.directive('pageFooter', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base_components/footer.html')
+        '/base_components/footer_directive.html')
     };
   }
 ]);

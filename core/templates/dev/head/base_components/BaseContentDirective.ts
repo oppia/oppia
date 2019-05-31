@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('base_components/PageFooterDirective.ts');
 
 oppia.directive('baseContent', [
   'UrlInterpolationService',
@@ -25,11 +26,12 @@ oppia.directive('baseContent', [
       restrict: 'E',
       transclude: {
         breadcrumb: 'navbarBreadcrumb',
+        content: 'content',
+        footer: '?pageFooter',
         'nav-options': '?localTopNavOptions',
-        'warning-loader': 'warningLoaderContent',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base_components/base_content.html')
+        '/base_components/base_content_directive.html')
     };
   }
 ]);

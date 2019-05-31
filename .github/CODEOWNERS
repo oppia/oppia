@@ -388,12 +388,12 @@
 
 # Speed Improvement team.
 /app.yaml @vojtechjelinek
-/core/templates/dev/head/base_components/base_content.html @jamesjay4199
-/core/templates/dev/head/base_components/BaseContent.ts @jamesjay4199
-/core/templates/dev/head/base_components/footer.html @jamesjay4199
-/core/templates/dev/head/base_components/PageFooter.ts @jamesjay4199
-/core/templates/dev/head/base_components/warning_loader.html @jamesjay4199
-/core/templates/dev/head/base_components/WarningLoader.ts @jamesjay4199
+/core/templates/dev/head/base_components/base_content_directive.html @jamesjay4199
+/core/templates/dev/head/base_components/BaseContentDirective.ts @jamesjay4199
+/core/templates/dev/head/base_components/footer_directive.html @jamesjay4199
+/core/templates/dev/head/base_components/PageFooterDirective.ts @jamesjay4199
+/core/templates/dev/head/base_components/warning_loader_directive.html @jamesjay4199
+/core/templates/dev/head/base_components/WarningLoaderDirective.ts @jamesjay4199
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
 /core/templates/dev/head/pages/base.html @vojtechjelinek
 /core/templates/dev/head/pages/footer.html @vojtechjelinek
@@ -405,7 +405,7 @@
 /webpack.config.ts @vojtechjelinek
 /webpack.dev.config.ts @vojtechjelinek
 /webpack.prod.config.ts @vojtechjelinek
-/webpack-utils.ts @jamesjay4199
+/webpack-utils.ts @vojtechjelinek
 # Typings.
 /typings @ankita240796
 
