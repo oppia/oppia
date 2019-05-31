@@ -2191,6 +2191,10 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
+        pass
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2225,7 +2229,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 33
+    CURRENT_EXP_SCHEMA_VERSION = 34
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2814,6 +2818,17 @@ class Exploration(object):
         exploration_dict['states'] = cls._convert_states_v27_dict_to_v28_dict(
             exploration_dict['states'])
         exploration_dict['states_schema_version'] = 28
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
+        """Converts a v33 exploration dict into a v34 exploration dict."""
+        exploration_dict['schema_version'] = 34
+
+        exploration_dict['states'] = cls._convert_states_v28_dict_to_v29_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 29
 
         return exploration_dict
 
