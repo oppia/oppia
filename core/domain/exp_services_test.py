@@ -1238,7 +1238,6 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1268,12 +1267,12 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
   New state:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1303,6 +1302,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1330,7 +1330,6 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1360,12 +1359,12 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
   Renamed state:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -1395,6 +1394,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1548,8 +1548,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     are state names and whose values are YAML strings representing the state's
     contents.
     """
-    _SAMPLE_INIT_STATE_CONTENT = ("""solicit_answer_details: false
-classifier_model_id: null
+    _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1578,6 +1577,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -1586,8 +1586,7 @@ written_translations:
 
     SAMPLE_EXPORTED_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'New state': ("""solicit_answer_details: false
-classifier_model_id: null
+        'New state': ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1616,6 +1615,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -1625,8 +1625,7 @@ written_translations:
 
     UPDATED_SAMPLE_DICT = {
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
-        'Renamed state': ("""solicit_answer_details: false
-classifier_model_id: null
+        'Renamed state': ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -1655,6 +1654,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -3121,7 +3121,6 @@ param_specs: {}
 schema_version: %d
 states:
   END:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3140,11 +3139,11 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
   %s:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3172,6 +3171,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}

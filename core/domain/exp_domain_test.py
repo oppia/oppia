@@ -3754,7 +3754,6 @@ param_specs: {}
 schema_version: 34
 states:
   (untitled state):
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3800,13 +3799,13 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
         feedback_1: {}
   END:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3825,11 +3824,11 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
   New state:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -3859,6 +3858,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -4298,7 +4298,6 @@ param_specs: {}
 schema_version: 34
 states:
   Introduction:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4324,12 +4323,12 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
   state1:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4365,13 +4364,13 @@ states:
         content: {}
         default_outcome: {}
         solution: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
         solution: {}
   state2:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4446,6 +4445,7 @@ states:
         feedback_2: {}
         hint_1: {}
         hint_2: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -4455,7 +4455,6 @@ states:
         hint_1: {}
         hint_2: {}
   state3:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4515,6 +4514,7 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -4648,7 +4648,6 @@ param_specs: {}
 schema_version: 34
 states:
   (untitled state):
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4696,13 +4695,13 @@ states:
         content: {}
         default_outcome: {}
         feedback_1: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
         feedback_1: {}
   END:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4721,11 +4720,11 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
   New state:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -4755,6 +4754,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -4804,7 +4804,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
         def _get_default_state_dict(content_str, dest_name):
             """Gets the default state dict of the exploration."""
             return {
-                'solicit_answer_details': False,
                 'classifier_model_id': None,
                 'content': {
                     'content_id': 'content',
@@ -4816,6 +4815,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'default_outcome': {}
                     }
                 },
+                'solicit_answer_details': False,
                 'written_translations': {
                     'translations_mapping': {
                         'content': {},

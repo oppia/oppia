@@ -315,8 +315,7 @@ class DownloadIntegrationTest(BaseEditorControllerTests):
     """Test handler for exploration and state download."""
 
     SAMPLE_JSON_CONTENT = {
-        'State A': ("""solicit_answer_details: false
-classifier_model_id: null
+        'State A': ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -345,13 +344,13 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
     default_outcome: {}
 """),
-        'State B': ("""solicit_answer_details: false
-classifier_model_id: null
+        'State B': ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -380,13 +379,13 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
     default_outcome: {}
 """),
-        feconf.DEFAULT_INIT_STATE_NAME: ("""solicit_answer_details: false
-classifier_model_id: null
+        feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -415,6 +414,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -422,8 +422,7 @@ written_translations:
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
-    SAMPLE_STATE_STRING = ("""solicit_answer_details: false
-classifier_model_id: null
+    SAMPLE_STATE_STRING = ("""classifier_model_id: null
 content:
   content_id: content
   html: ''
@@ -452,6 +451,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}

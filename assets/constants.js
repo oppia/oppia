@@ -532,7 +532,6 @@ var constants = {
   "NUM_QUESTIONS_PER_PAGE": 10,
 
   "NEW_STATE_TEMPLATE": {
-      "solicit_answer_details": false,
       "classifier_model_id": null,
       "content": {
           "html": "",
@@ -564,6 +563,7 @@ var constants = {
               "default_outcome": {}
           }
       },
+      "solicit_answer_details": false,
       "written_translations": {
           "translations_mapping": {
               "content": {},

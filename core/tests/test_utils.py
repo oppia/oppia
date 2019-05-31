@@ -341,7 +341,6 @@ param_specs: {}
 schema_version: %d
 states:
   %s:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -367,12 +366,12 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
   New state:
-    solicit_answer_details: false
     classifier_model_id: null
     content:
       content_id: content
@@ -398,6 +397,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}

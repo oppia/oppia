@@ -44,7 +44,6 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         state_dict = exploration.states['New state'].to_dict()
         expected_dict = {
-            'solicit_answer_details': False,
             'classifier_model_id': None,
             'content': {
                 'content_id': 'content',
@@ -76,6 +75,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'default_outcome': {}
                 }
             },
+            'solicit_answer_details': False,
             'written_translations': {
                 'translations_mapping': {
                     'content': {},
