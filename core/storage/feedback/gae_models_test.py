@@ -53,16 +53,17 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
         self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
 
     def test_raise_exception_by_mocking_collision(self):
+        feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
         # Test create method.
         with self.assertRaisesRegexp(
             Exception, 'Feedback thread ID conflict on create.'):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
-                feedback_models.GeneralFeedbackThreadModel, 'get_by_id',
+                feedback_thread_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
-                    feedback_models.GeneralFeedbackThreadModel)):
-                feedback_models.GeneralFeedbackThreadModel.create(
+                    feedback_thread_model_cls)):
+                feedback_thread_model_cls.create(
                     'exploration.exp_id.thread_id')
 
         # Test generate_new_thread_id method.
@@ -71,12 +72,12 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
             'New thread id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
-                feedback_models.GeneralFeedbackThreadModel, 'get_by_id',
+                feedback_thread_model_cls, 'get_by_id',
                 types.MethodType(
                     lambda x, y: True,
-                    feedback_models.GeneralFeedbackThreadModel)):
+                    feedback_thread_model_cls)):
                 (
-                    feedback_models.GeneralFeedbackThreadModel
+                    feedback_thread_model_cls
                     .generate_new_thread_id('exploration', 'entity_id')
                 )
 
@@ -104,11 +105,34 @@ class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
             thread_id, 0)
         self.assertEqual(model.entity_type, 'exploration')
 
-        all_msg = (
+        all_messages = (
             feedback_models.GeneralFeedbackMessageModel
             .get_all_messages(1, None))
-        self.assertEqual(all_msg[0][0].text, 'text 1')
-        self.assertEqual(all_msg[0][0].updated_subject, 'subject 1')
+
+        self.assertEqual(all_messages[0][0].thread_id, thread_id)
+        self.assertEqual(all_messages[0][0].entity_id, '0')
+        self.assertEqual(all_messages[0][0].entity_type, 'exploration')
+        self.assertEqual(all_messages[0][0].text, 'text 1')
+        self.assertEqual(all_messages[0][0].updated_subject, 'subject 1')
+
+    def test_get_most_recent_message(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', None, 'subject 1', 'text 1')
+
+        model1 = feedback_models.GeneralFeedbackMessageModel.get(
+            thread_id, 0)
+
+        self.assertEqual(model1.entity_type, 'exploration')
+
+        message = (
+            feedback_models.GeneralFeedbackMessageModel
+            .get_most_recent_message(thread_id))
+
+        self.assertEqual(message.thread_id, thread_id)
+        self.assertEqual(message.entity_id, '0')
+        self.assertEqual(message.entity_type, 'exploration')
+        self.assertEqual(message.text, 'text 1')
+        self.assertEqual(message.updated_subject, 'subject 1')
 
 
 class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
