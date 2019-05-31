@@ -136,12 +136,6 @@ class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
 
     def test_raise_exception_with_large_calculation_output(self):
 
-        def _mock_ndb_put():
-            """Mocks ndb.model.put() to raise an Exception. This swap is
-            required to test against large values of calculation_output.
-            """
-            raise Exception
-
         observed_log_messages = []
 
         def _mock_logging_function(msg, *_):
@@ -149,8 +143,12 @@ class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg)
 
         logging_swap = self.swap(logging, 'exception', _mock_logging_function)
+
+        # This swaps ndb.model.put() to raise an Exception. It is required to
+        # test against large values of calculation_output.
         put_swap = self.swap(
-            stat_models.StateAnswersCalcOutputModel, 'put', _mock_ndb_put)
+            stat_models.StateAnswersCalcOutputModel, 'put',
+            lambda: (_ for _ in ()).throw(Exception()))
 
         with put_swap, logging_swap:
             stat_models.StateAnswersCalcOutputModel.create_or_update(

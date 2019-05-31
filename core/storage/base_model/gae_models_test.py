@@ -154,6 +154,34 @@ class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
             base_models.BaseCommitLogEntryModel.get_commit('id', 1)
 
 
+class BaseSnapshotMetadataModelTests(test_utils.GenericTestBase):
+
+    def test_get_version_string(self):
+        model1 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.put()
+        self.assertEqual(model1.get_version_string(), '1')
+
+    def test_get_unversioned_instance_id(self):
+        model1 = base_models.BaseSnapshotMetadataModel(
+            id='model_id-1', committer_id='committer_id', commit_type='create')
+        model1.put()
+        self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
+
+
+class BaseSnapshotContentModelTests(test_utils.GenericTestBase):
+
+    def test_get_version_string(self):
+        model1 = base_models.BaseSnapshotContentModel(id='model_id-1')
+        model1.put()
+        self.assertEqual(model1.get_version_string(), '1')
+
+    def test_get_unversioned_instance_id(self):
+        model1 = base_models.BaseSnapshotContentModel(id='model_id-1')
+        model1.put()
+        self.assertEqual(model1.get_unversioned_instance_id(), 'model_id')
+
+
 class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Model that inherits the BaseCommitLogEntryModel for testing."""
     @classmethod

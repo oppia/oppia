@@ -14,7 +14,14 @@
 
 """Tests for various static pages (like the About page)."""
 
+from core.controllers import pages
+from core.platform import models
 from core.tests import test_utils
+import feconf
+import main
+
+import webapp2
+import webtest
 
 
 class NoninteractivePagesTests(test_utils.GenericTestBase):
@@ -35,4 +42,21 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
 
     def test_splash_page_with_invalid_c_value_redirects(self):
         self.get_html_response(
-            '/splash', params={'c': 'invalid'}, expected_status_int=302)
+            '/splash?data=value', params={'c': 'invalid'},
+            expected_status_int=302)
+
+    def test_maintenance_page(self):
+        fake_urls = []
+        fake_urls.append(
+            main.get_redirect_route(r'/maintenance', pages.MaintenancePage))
+        # fake_urls.append(main.URLS[-1])
+        with self.swap(main, 'URLS', fake_urls):
+            transaction_services = models.Registry.import_transaction_services()
+            app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name
+                webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
+            self.testapp = webtest.TestApp(app)
+
+            response = self.get_html_response('/maintenance')
+            self.assertIn(
+                'Oppia is currently being upgraded, and the site should be up',
+                response.body)
