@@ -421,7 +421,12 @@ class ExplorationFileDownloader(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        version = self.request.get('v', default_value=exploration.version)
+        version_str = self.request.get('v', default_value=exploration.version)
+        try:
+            version = int(version_str)
+        except ValueError:
+            version = exploration.version
+
         output_format = self.request.get('output_format', default_value='zip')
         width = int(self.request.get('width', default_value=80))
 

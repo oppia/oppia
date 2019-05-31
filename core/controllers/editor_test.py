@@ -557,6 +557,23 @@ written_translations:
         # Check downloaded dict.
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
 
+        # Check downloading a specific version.
+        download_url = (
+            '/createhandler/download/%s?output_format=%s&width=50&v=1' %
+            (exp_id, feconf.OUTPUT_FORMAT_JSON))
+        response = self.get_json(download_url)
+        self.assertEqual(['Introduction'], response.keys())
+
+        # Check downloading an invalid version results in downloading the
+        # latest version.
+        download_url = (
+            '/createhandler/download/%s?output_format=%s&width=50&v=xxx' %
+            (exp_id, feconf.OUTPUT_FORMAT_JSON))
+        response = self.get_json(download_url)
+        self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
+        self.assertEqual(
+            ['Introduction', 'State A', 'State B'], response.keys())
+
         self.logout()
 
     def test_state_yaml_handler(self):
