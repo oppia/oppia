@@ -1920,6 +1920,7 @@ def can_publish_skill(handler):
             return False
         if skill_rights.is_creator(user.user_id):
             return True
+        return False
 
     def test_can_publish_skill(self, skill_id, **kwargs):
         """Tests whether the user can publish a given skill by checking
