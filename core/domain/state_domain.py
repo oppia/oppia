@@ -1383,7 +1383,7 @@ class State(object):
             written_translations: WrittenTranslations. The written translations
                 for the state contents.
             solicit_answer_details: bool. Whether the creator wants to ask
-                for response from the learner about why they picked a particular
+                for answer details from the learner about why they picked a particular
                 answer while playing the exploration.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.

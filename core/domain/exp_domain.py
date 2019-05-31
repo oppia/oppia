@@ -2199,7 +2199,8 @@ class Exploration(object):
     def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
         """Converts from version 28 to 29. Version 29 adds
         solicit_answer_details boolean variable to the state, which
-        allows the creator to ask for response from the learner.
+        allows the creator to ask for answer details from the learner
+        about why they landed on a particular answer.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2846,7 +2847,7 @@ class Exploration(object):
         """Converts a v33 exploration dict into a v34 exploration dict.
 
         Adds solicit_answer_details in state to ask learners for the
-        response.
+        answer details.
         """
         exploration_dict['schema_version'] = 34
 
