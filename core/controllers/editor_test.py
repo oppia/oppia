@@ -1839,3 +1839,44 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
+
+
+class HasSeenTutorialTests(BaseEditorControllerTests):
+
+    def test_get_user_has_seen_editor_tutorial(self):
+        self.login(self.OWNER_EMAIL)
+
+        exp_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertTrue(response['show_state_editor_tutorial_on_load'])
+
+        user_services.record_user_started_state_editor_tutorial(
+            self.owner_id)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertFalse(response['show_state_editor_tutorial_on_load'])
+
+        self.logout()
+
+    def test_get_user_has_seen_translation_tutorial(self):
+        self.login(self.OWNER_EMAIL)
+
+        exp_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertTrue(response['show_state_translation_tutorial_on_load'])
+
+        user_services.record_user_started_state_translation_tutorial(
+            self.owner_id)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id))
+        self.assertFalse(response['show_state_translation_tutorial_on_load'])
+
+        self.logout()
