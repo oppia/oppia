@@ -333,6 +333,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+image_id_counter: 0
 init_state_name: %s
 language_code: en
 objective: ''
@@ -347,7 +348,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -380,7 +380,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []

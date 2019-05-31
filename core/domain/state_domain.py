@@ -175,22 +175,49 @@ class Hint(object):
 
 class ImageAssets(object):
     """Value object representing the images for the state."""
-    def __init__(self, image_assets_mapping, image_id_counter):
+    def __init__(self, image_assets_mapping):
         """Constructs a ImageAsset domain object.
 
         Args:
             image_assets_mapping: dict. The dict representation of
                 ImageAssets mapping.
-            image_id_counter: integer. The counter that is responsible
-                for creating image ids. Image Id is always <= image id
-                counter.
         """
         self.image_assets_mapping = image_assets_mapping
-        self.image_id_counter = image_id_counter
 
     def validate(self):
-        """TODO."""
-        pass
+        """Validates all properties of ImageAssets.
+
+        Raises:
+            ValidationError: One or more attributes of the ImageAssets are not
+            valid.
+        """
+        for (image_id, image_info) in self.image_assets_mapping.iteritems():
+            if not isinstance(image_id, int):
+                raise utils.ValidationError(
+                    'Expected image_id to be int, received %s' %
+                    image_id)
+
+            image_src = image_info['src']
+            image_author_id = image_info['author_id']
+            image_is_placeholder = image_info['is_placeholder']
+            instructions_if_placeholder = image_info['instructions']
+
+            if not isinstance(image_src, basestring):
+                raise utils.ValidationError(
+                    'Expected image_src to be str, received %s' %
+                    image_src)
+            if not isinstance(image_author_id, basestring):
+                raise utils.ValidationError(
+                    'Expected image_author_id to be str, received %s' %
+                    image_author_id)
+            if not isinstance(image_is_placeholder, bool):
+                raise utils.ValidationError(
+                    'Expected image_is_placeholder to be bool, received %s' %
+                    image_is_placeholder)
+            if not isinstance(instructions_if_placeholder, basestring):
+                raise utils.ValidationError(
+                    'Expected instructions_if_placeholder to be string,' +
+                    'received %s' %instructions_if_placeholder)
 
     def to_dict(self):
         """Returns a dict representing this ImageAssets domain object.
@@ -200,7 +227,6 @@ class ImageAssets(object):
         """
         image_assets = {}
         image_assets_mapping = {}
-        image_id_counter = 0
 
         for image_id in self.image_assets_mapping:
             image_assets_mapping[image_id] = {}
@@ -208,10 +234,7 @@ class ImageAssets(object):
             for info in image:
                 image_assets_mapping[image_id][info] = image[info]
 
-        image_id_counter = self.image_id_counter
-
         image_assets['image_assets_mapping'] = image_assets_mapping
-        image_assets['image_id_counter'] = image_id_counter
         return image_assets
 
     @classmethod
@@ -233,9 +256,8 @@ class ImageAssets(object):
             for info in image:
                 image_assets_mapping[image_id][info] = image[info]
 
-        image_id_counter = image_assets_dict['image_id_counter']
 
-        return cls(image_assets_mapping, image_id_counter)
+        return cls(image_assets_mapping)
 
     def add_image(self, image_info):
         """Adds default image object in state.

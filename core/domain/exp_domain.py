@@ -391,7 +391,7 @@ class Exploration(object):
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
             auto_tts_enabled, correctness_feedback_enabled,
-            created_on=None, last_updated=None):
+            image_id_counter, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -419,6 +419,8 @@ class Exploration(object):
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
+            image_id_counter: int. The counter that is responsible for creating
+                image ids. Image Id is always <= image_id_counter.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
@@ -434,6 +436,7 @@ class Exploration(object):
         self.author_notes = author_notes
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
+        self.image_id_counter = image_id_counter
 
         self.states = {}
         for (state_name, state_dict) in states_dict.iteritems():
@@ -459,7 +462,8 @@ class Exploration(object):
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            image_id_counter=feconf.DEFAULT_IMAGE_ID_COUNTER):
         """Returns a Exploration domain object with default values.
 
         'title', 'init_state_name', 'category', 'objective' if not provided are
@@ -492,7 +496,7 @@ class Exploration(object):
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, False, image_id_counter)
 
     @classmethod
     def from_dict(
@@ -520,7 +524,8 @@ class Exploration(object):
             title=exploration_dict['title'],
             category=exploration_dict['category'],
             objective=exploration_dict['objective'],
-            language_code=exploration_dict['language_code'])
+            language_code=exploration_dict['language_code'],
+            image_id_counter=exploration_dict['image_id_counter'])
         exploration.tags = exploration_dict['tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
@@ -642,6 +647,11 @@ class Exploration(object):
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
+
+        if not isinstance(self.image_id_counter, int):
+            raise utils.ValidationError(
+                'Expected image_id_counter to be a integer, received %s' %
+                self.image_id_counter)
 
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
@@ -2822,9 +2832,10 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
+    def _convert_v33_dict_to_v34_dict(cls, exploration_dict, image_id_counter):
         """Converts a v33 exploration dict into a v34 exploration dict."""
         exploration_dict['schema_version'] = 34
+        exploration_dict['image_id_counter'] = image_id_counter
 
         exploration_dict['states'] = cls._convert_states_v28_dict_to_v29_dict(
             exploration_dict['states'])
@@ -2834,7 +2845,8 @@ class Exploration(object):
 
     @classmethod
     def _migrate_to_latest_yaml_version(
-            cls, yaml_content, exp_id, title=None, category=None):
+            cls, yaml_content, exp_id, title=None, category=None,
+            image_id_counter=None):
         """Return the YAML content of the exploration in the latest schema
         format.
 
@@ -2843,6 +2855,7 @@ class Exploration(object):
             exp_id: str. ID of the exploration.
             title: str. The exploration title.
             category: str. The exploration category.
+            image_id_counter: int. The counter for an image id.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -3032,7 +3045,7 @@ class Exploration(object):
 
         if exploration_schema_version == 33:
             exploration_dict = cls._convert_v33_dict_to_v34_dict(
-                exploration_dict)
+                exploration_dict, image_id_counter)
             exploration_schema_version = 34
 
         return (exploration_dict, initial_schema_version)
@@ -3068,7 +3081,8 @@ class Exploration(object):
         return Exploration.from_dict(exploration_dict)
 
     @classmethod
-    def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
+    def from_untitled_yaml(cls, exploration_id, title, category,
+        image_id_counter, yaml_content):
         """Creates and returns exploration from a YAML text string. This is
         for importing explorations using YAML schema version 9 or earlier.
 
@@ -3076,6 +3090,7 @@ class Exploration(object):
             exploration_id: str. The id of the exploration.
             title: str. The exploration title.
             category: str. The exploration category.
+            image_id_counter: int. Counter for an image id.
             yaml_content: str. The YAML representation of the exploration.
 
         Returns:
@@ -3086,7 +3101,8 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id, title=title, category=category)
+            yaml_content, exploration_id, title=title, category=category,
+            image_id_counter=image_id_counter)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 
@@ -3128,6 +3144,7 @@ class Exploration(object):
             'author_notes': self.author_notes,
             'blurb': self.blurb,
             'states_schema_version': self.states_schema_version,
+            'image_id_counter': self.image_id_counter,
             'init_state_name': self.init_state_name,
             'language_code': self.language_code,
             'objective': self.objective,

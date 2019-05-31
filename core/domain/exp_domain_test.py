@@ -3746,6 +3746,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+image_id_counter: 0
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -3760,7 +3761,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups:
       - outcome:
@@ -3814,7 +3814,6 @@ states:
       html: <p>Congratulations, you have finished!</p>
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3839,7 +3838,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3879,55 +3877,55 @@ title: Title
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V1)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V1)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v2(self):
         """Test direct loading from a v2 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V2)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V2)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v3(self):
         """Test direct loading from a v3 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V3)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V3)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v4(self):
         """Test direct loading from a v4 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V4)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V4)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v5(self):
         """Test direct loading from a v5 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V5)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V5)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v6(self):
         """Test direct loading from a v6 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V6)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V6)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v7(self):
         """Test direct loading from a v7 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V7)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V7)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v8(self):
         """Test direct loading from a v8 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V8)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V8)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v9(self):
         """Test direct loading from a v9 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V9)
+            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V9)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v10(self):
@@ -4068,6 +4066,11 @@ title: Title
             'eid', self.YAML_CONTENT_V32)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v33(self):
+        """Test direct loading from a v33 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V33)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
     """Test HTML migration."""
@@ -4290,6 +4293,7 @@ auto_tts_enabled: true
 blurb: ''
 category: category
 correctness_feedback_enabled: false
+image_id_counter: 0
 init_state_name: Introduction
 language_code: en
 objective: ''
@@ -4304,7 +4308,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4337,7 +4340,6 @@ states:
       html: <blockquote><p>Hello, this is state1</p></blockquote>
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4381,7 +4383,6 @@ states:
       html: <p>Hello, </p><p>this <em>is </em>state2</p>
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups:
       - outcome:
@@ -4467,7 +4468,6 @@ states:
       html: <p>Hello, this is state3</p>
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups:
       - outcome:
@@ -4648,6 +4648,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
+image_id_counter: 0
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4664,7 +4665,6 @@ states:
         this is test case to check image tag inside p tag</p>
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups:
       - outcome:
@@ -4718,7 +4718,6 @@ states:
       html: <p>Congratulations, you have finished!</p>
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4743,7 +4742,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4788,7 +4786,7 @@ title: Title
             mock_get_filename_with_dimensions):
 
             exploration = exp_domain.Exploration.from_yaml(
-                'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
+                'eid', 0, self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_IMAGE_DIMENSIONS)
 
@@ -4799,7 +4797,7 @@ title: Title
             mock_get_filename_with_dimensions):
 
             exploration = exp_domain.Exploration.from_yaml(
-                'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
+                'eid', 0, self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_WITH_IMAGE_CAPTION)
 
@@ -4825,7 +4823,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 },
                 'image_assets': {
                     'image_assets_mapping': {},
-                    'image_id_counter': 0
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
