@@ -156,6 +156,7 @@ require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
 require('services/ExplorationFeaturesService.ts');
+require('services/PageTitleService.ts');
 require('services/PlaythroughIssuesService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
@@ -180,6 +181,9 @@ oppia.constant(
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+oppia.constant(
+  'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
+
 
 
 oppia.controller('ExplorationEditor', [
@@ -194,12 +198,13 @@ oppia.controller('ExplorationEditor', [
   'ExplorationParamSpecsService', 'ExplorationRightsService',
   'ExplorationStatesService', 'ExplorationTagsService',
   'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
-  'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+  'PageTitleService', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
   'StateClassifierMappingService', 'StateEditorService',
   'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
   'StateTutorialFirstTimeService', 'ThreadDataService',
   'UrlInterpolationService', 'UserEmailPreferencesService',
+  'EVENT_EXPLORATION_PROPERTY_CHANGED',
   function(
       $http, $log, $q, $rootScope, $scope, $templateCache, $timeout,
       $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
@@ -212,12 +217,13 @@ oppia.controller('ExplorationEditor', [
       ExplorationParamSpecsService, ExplorationRightsService,
       ExplorationStatesService, ExplorationTagsService,
       ExplorationTitleService, ExplorationWarningsService, GraphDataService,
-      ParamChangesObjectFactory, ParamSpecsObjectFactory,
+      PageTitleService, ParamChangesObjectFactory, ParamSpecsObjectFactory,
       PlaythroughIssuesService, RouterService, SiteAnalyticsService,
       StateClassifierMappingService, StateEditorService,
       StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
       StateTutorialFirstTimeService, ThreadDataService,
-      UrlInterpolationService, UserEmailPreferencesService) {
+      UrlInterpolationService, UserEmailPreferencesService,
+      EVENT_EXPLORATION_PROPERTY_CHANGED) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 
@@ -232,6 +238,17 @@ oppia.controller('ExplorationEditor', [
       '/createhandler/download/' + $scope.explorationId);
     $scope.revertExplorationUrl = (
       '/createhandler/revert/' + $scope.explorationId);
+
+    var setPageTitle = function() {
+      if (ExplorationTitleService.savedMemento) {
+        PageTitleService.setPageTitle(
+          ExplorationTitleService.savedMemento + ' - Oppia Editor');
+      } else {
+        PageTitleService.setPageTitle('Untitled Exploration - Oppia Editor');
+      }
+    };
+
+    $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
 
     $scope.getActiveTabName = RouterService.getActiveTabName;
 
