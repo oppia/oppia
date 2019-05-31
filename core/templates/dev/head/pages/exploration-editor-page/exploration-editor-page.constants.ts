@@ -21,6 +21,9 @@ oppia.constant(
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.constant(
+  'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
+  
+oppia.constant(
   'PARAM_ACTION_GET', 'get');
 
 oppia.constant(

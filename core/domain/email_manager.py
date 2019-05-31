@@ -366,7 +366,8 @@ def send_mail_to_admin(email_subject, email_body):
 
     app_id = app_identity_services.get_application_id()
     body = '(Sent from %s)\n\n%s' % (app_id, email_body)
-    system_name_email = '%s <%s>' % ('SYSTEM', feconf.SYSTEM_EMAIL_ADDRESS)
+    system_name_email = '%s <%s>' % (
+        feconf.SYSTEM_EMAIL_NAME, feconf.SYSTEM_EMAIL_ADDRESS)
     email_services.send_mail(
         system_name_email, feconf.ADMIN_EMAIL_ADDRESS, email_subject,
         body, body.replace('\n', '<br/>'), bcc_admin=False)
