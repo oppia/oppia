@@ -69,7 +69,7 @@
     "stylelint-config-standard": "^18.3.0",
     "thread-loader": "^2.1.2",
     "ts-loader": "^5.4.4",
-    "typescript": "^3.4.5",
+    "typescript": "^2.0.2",
     "uglify-js": "^3.5.8",
     "webdriver-manager": "^12.1.2",
     "webpack": "^4.29.6",
