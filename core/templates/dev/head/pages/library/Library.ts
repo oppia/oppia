@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('pages/library/LibraryDirective.ts');
+require('pages/library/LibraryPageDirective.ts');
 require('pages/library/LibraryFooter.ts');
 require('pages/library/SearchBarDirective.ts');

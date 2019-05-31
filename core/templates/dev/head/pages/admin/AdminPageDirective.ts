@@ -62,14 +62,14 @@ oppia.constant(
 oppia.constant(
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
 
-oppia.directive('admin', ['UrlInterpolationService',
+oppia.directive('adminPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/admin_directive.html'),
+        '/pages/admin/admin_page_directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',

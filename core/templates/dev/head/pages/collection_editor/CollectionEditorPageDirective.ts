@@ -45,14 +45,14 @@ oppia.constant(
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
-oppia.directive('collectionEditor', [
+oppia.directive('collectionEditorPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/collection_editor_directive.html'),
+        '/pages/collection_editor/collection_editor_page_directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'PageTitleService',

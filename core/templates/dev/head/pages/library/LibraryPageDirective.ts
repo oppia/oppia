@@ -57,7 +57,7 @@ oppia.directive('library', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/library_directive.html'),
+        '/pages/library/library_page_directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',

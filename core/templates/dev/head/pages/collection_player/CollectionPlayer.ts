@@ -14,4 +14,4 @@
 
 require('pages/collection_player/CollectionFooterDirective.ts');
 require('pages/collection_player/CollectionLocalNavDirective.ts');
-require('pages/collection_player/CollectionPlayerDirective.ts');
+require('pages/collection_player/CollectionPlayerPageDirective.ts');
