@@ -31,6 +31,7 @@ require('domain/collection/GuestCollectionProgressService.ts');
 require('domain/collection/ReadOnlyCollectionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
+require('services/PageTitleService.ts');
 
 oppia.constant(
   'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
@@ -59,13 +60,15 @@ oppia.directive('collectionPlayer', ['UrlInterpolationService',
         '$anchorScroll', '$http', '$location', '$scope',
         'AlertsService', 'CollectionObjectFactory',
         'CollectionPlaythroughObjectFactory', 'GuestCollectionProgressService',
-        'ReadOnlyCollectionBackendApiService', 'UrlInterpolationService',
+        'PageTitleService', 'ReadOnlyCollectionBackendApiService',
+        'UrlInterpolationService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
         function(
             $anchorScroll, $http, $location, $scope,
             AlertsService, CollectionObjectFactory,
             CollectionPlaythroughObjectFactory, GuestCollectionProgressService,
-            ReadOnlyCollectionBackendApiService, UrlInterpolationService,
+            PageTitleService, ReadOnlyCollectionBackendApiService,
+            UrlInterpolationService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
           var ctrl = this;
           ctrl.collection = null;
@@ -262,6 +265,9 @@ oppia.directive('collectionPlayer', ['UrlInterpolationService',
             function(collectionBackendObject) {
               ctrl.collection = CollectionObjectFactory.create(
                 collectionBackendObject);
+
+              PageTitleService.setPageTitle(
+                ctrl.collection.getTitle() + ' - Oppia');
 
               // Load the user's current progress in the collection. If the
               // user is a guest, then either the defaults from the server will

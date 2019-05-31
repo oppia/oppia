@@ -16,13 +16,15 @@
  * @fileoverview Primary directive for the collection editor page.
  */
 
-require('pages/collection_editor/CollectionEditorStateService.ts');
 require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.ts');
 require('pages/collection_editor/history_tab/CollectionHistoryTabDirective.ts');
 require(
   'pages/collection_editor/settings_tab/CollectionSettingsTabDirective.ts');
 require(
   'pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.ts');
+
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('services/PageTitleService.ts');
 
 // TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(
@@ -44,9 +46,7 @@ oppia.constant(
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.directive('collectionEditor', [
-  'CollectionEditorStateService', 'RouterService', 'UrlInterpolationService',
-  function(
-      CollectionEditorStateService, RouterService, UrlInterpolationService) {
+  'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -54,12 +54,32 @@ oppia.directive('collectionEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/collection_editor_directive.html'),
       controllerAs: '$ctrl',
-      controller: ['CollectionEditorStateService',
-        function(CollectionEditorStateService) {
+      controller: [
+        '$scope', 'CollectionEditorStateService', 'PageTitleService',
+        'RouterService', 'EVENT_COLLECTION_INITIALIZED',
+        'EVENT_COLLECTION_REINITIALIZED',
+        function(
+            $scope, CollectionEditorStateService, PageTitleService,
+            RouterService, EVENT_COLLECTION_INITIALIZED,
+            EVENT_COLLECTION_REINITIALIZED) {
           var ctrl = this;
           ctrl.getActiveTabName = RouterService.getActiveTabName;
           // Load the collection to be edited.
-          CollectionEditorStateService.loadCollection(GLOBALS.collectionId);
+          CollectionEditorStateService.loadCollection(
+            GLOBALS.collectionId);
+          var setTitle = function() {
+            var title = (
+              CollectionEditorStateService.getCollection().getTitle());
+            if (title) {
+              PageTitleService.setPageTitle(title + ' - Oppia Editor');
+            } else {
+              PageTitleService.setPageTitle(
+                'Untitled Collection - Oppia Editor');
+            }
+          };
+
+          $scope.$on(EVENT_COLLECTION_INITIALIZED, setTitle);
+          $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
         }]
     };
   }
