@@ -36,10 +36,19 @@ oppia.directive('promoBar', [
         function() {
           var ctrl = this;
           var isPromoDismissed = function() {
-            return !!angular.fromJson(sessionStorage.promoIsDismissed);
+            try {
+              return !!angular.fromJson(window.sessionStorage.promoIsDismissed);
+            } catch (e) {
+              return false;
+            }
           };
           var setPromoDismissed = function(promoIsDismissed) {
-            sessionStorage.promoIsDismissed = angular.toJson(promoIsDismissed);
+            try {
+              window.sessionStorage.promoIsDismissed = angular.toJson(
+                promoIsDismissed);
+            } catch (e) {
+              return;
+            }
           };
 
           PromoBarService.getPromoBarData().then(function(promoBarObject) {
