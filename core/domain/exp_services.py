@@ -174,6 +174,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.auto_tts_enabled,
         exploration_model.correctness_feedback_enabled,
+        exploration_model.image_id_counter,
         created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 
@@ -757,6 +758,11 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.WrittenTranslations.from_dict(
                             change.new_value))
                     state.update_written_translations(written_translations)
+            # elif change.cmd == exp_domain.CMD_ADD_IMAGE:
+            #     if change.property_name == 'add_new_image':
+            #         state = exploration.states[change.state_name]
+            #         state_domain.ImageAssets()
+
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -940,7 +946,8 @@ def _create_exploration(
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
-        correctness_feedback_enabled=exploration.correctness_feedback_enabled
+        correctness_feedback_enabled=exploration.correctness_feedback_enabled,
+        image_id_counter=exploration.image_id_counter
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)
@@ -1513,7 +1520,12 @@ def save_new_exploration_from_yaml_and_assets(
         # a title and a category; these need to be manually specified.
         exploration = exp_domain.Exploration.from_untitled_yaml(
             exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
-            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
+            feconf.DEFAULT_EXPLORATION_CATEGORY,
+            feconf.DEFAULT_IMAGE_ID_COUNTER,yaml_content)
+    elif(exp_schema_version <= 33 and exp_schema_version >= 10):
+        exploration = exp_domain.Exploration.from_yaml(
+            exploration_id, feconf.DEFAULT_IMAGE_ID_COUNTER,
+            yaml_content)
     else:
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)

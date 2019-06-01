@@ -63,6 +63,7 @@ GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
+CMD_ADD_IMAGE = 'add_image'
 # This takes an additional 'state_name' parameter.
 CMD_ADD_STATE = 'add_state'
 # This takes additional 'old_state_name' and 'new_state_name' parameters.
@@ -1147,6 +1148,16 @@ class Exploration(object):
                 is enabled or not.
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
+
+    @classmethod
+    def increment_image_id_counter(cls):
+        """Increment the image_id counter"""
+        self.image_id_counter += 1
+
+    @classmethod
+    def get_image_id_counter(cls):
+        """Returns the image_id counter"""
+        return self.image_id_counter
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -3053,7 +3064,7 @@ class Exploration(object):
     @classmethod
     def from_yaml(cls, exploration_id, yaml_content):
         """Creates and returns exploration from a YAML text string for YAML
-        schema versions 10 and later.
+        schema versions 34 and later.
 
         Args:
             exploration_id: str. The id of the exploration.
@@ -3064,10 +3075,41 @@ class Exploration(object):
 
         Raises:
             Exception: The initial schema version of exploration is less than
+                or equal to 33.
+        """
+        migration_result = cls._migrate_to_latest_yaml_version(
+            yaml_content, exploration_id, image_id_counter=image_id_counter)
+        exploration_dict = migration_result[0]
+        initial_schema_version = migration_result[1]
+
+        if (initial_schema_version <=
+                cls.LAST_UNTITLED_SCHEMA_VERSION):
+            raise Exception(
+                'Expected a YAML version >= 34, received: %d' % (
+                    initial_schema_version))
+
+        exploration_dict['id'] = exploration_id
+        return Exploration.from_dict(exploration_dict)
+
+    @classmethod
+    def from_withoud_image_id_counter_yaml(cls, exploration_id, image_id_counter, yaml_content):
+        """Creates and returns exploration from a YAML text string for YAML
+        schema versions 10 and later.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+            image_id_counter: str. Counter for an image id.
+            yaml_content: str. The YAML representation of the exploration.
+
+        Returns:
+            Exploration. The corresponding exploration domain object.
+
+        Raises:
+            Exception: The initial schema version of exploration is less than
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id)
+            yaml_content, exploration_id, image_id_counter=image_id_counter)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

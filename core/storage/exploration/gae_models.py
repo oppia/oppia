@@ -96,6 +96,7 @@ class ExplorationModel(base_models.VersionedModel):
     default_skin = ndb.StringProperty(default='conversation_v1')
     # DEPRECATED in v2.5.4. Do not use.
     skin_customizations = ndb.JsonProperty(indexed=False)
+    image_id_counter = ndb.JsonProperty(default=feconf.DEFAULT_IMAGE_ID_COUNTER, indexed=False)
 
     @classmethod
     def get_exploration_count(cls):

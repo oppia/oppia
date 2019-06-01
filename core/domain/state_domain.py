@@ -259,24 +259,20 @@ class ImageAssets(object):
 
         return cls(image_assets_mapping)
 
-    def add_image(self, image_info):
+    @classmethod
+    def add_image(cls, image_id, image_info):
         """Adds default image object in state.
 
         Args:
+            image_id: int, The image_id of an image.
             image_info: dict. The dicts representation of image info.
         """
-        self.image_id_counter += 1
-        image_id = self.image_id_counter
 
-        self.image_assets_mapping[image_id] = {}
-        self.image_assets_mapping[image_id]['author_id'] = (
-            image_info['author_id'])
-        self.image_assets_mapping[image_id]['is_placeholder'] = (
-            image_info['is_placeholder'])
-        self.image_assets_mapping[image_id]['instructions'] = (
-            image_info['instructions'])
-        self.image_assets_mapping[image_id]['src'] = (
-            image_info['src'])
+        image = {}
+        for info in image_info:
+            image[info] = image_info[info]
+
+        self.image_assets_mapping[image_id] = image
 
     def delete_image(self, image_id):
         """Deletes an image from the state.
