@@ -899,7 +899,8 @@ title: Title
             self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [test_asset])
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration', self.EXP_ID))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertEqual(
             fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
@@ -1204,7 +1205,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration', self.EXPLORATION_ID))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
         self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
         self.assertEqual(
             fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
@@ -1468,7 +1470,8 @@ title: A title
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration', self.EXP_ID))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
@@ -1506,7 +1509,8 @@ title: A title
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration', self.EXP_ID))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
@@ -1713,7 +1717,8 @@ written_translations:
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration', self.EXP_ID))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')

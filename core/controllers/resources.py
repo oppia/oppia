@@ -76,7 +76,8 @@ class AssetDevHandler(base.BaseHandler):
                 '%s/%s' % (asset_type, file_format))
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.EntityFileSystem('exploration', exploration_id))
+                fs_domain.EntityFileSystem(
+                    fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

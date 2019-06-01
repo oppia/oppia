@@ -23,6 +23,7 @@ from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
 (file_models,) = models.Registry.import_models(
@@ -37,11 +38,26 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration', 'eid'))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
+
+    def test_validate_entity_parameters(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid entity_id received: 1'):
+            fs_domain.EntityFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, 1)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Entity id cannot be empty'):
+            fs_domain.EntityFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, '')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid entity_name received: '
+            'invalid_name.'):
+            fs_domain.EntityFileSystem('invalid_name', 'exp_id')
 
     def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
@@ -111,7 +127,8 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.listdir('fake_dir'), [])
 
         new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration', 'eid2'))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_versioning(self):
@@ -139,7 +156,8 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
         fs2 = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('eid2', None))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             fs2.get('abc.png')
 
@@ -152,12 +170,26 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem('exploration', 'eid'))
+            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.fs.commit(self.user_id, 'abc.png', 'file_contents')
             self.assertEqual(self.fs.get('abc.png'), 'file_contents')
+
+    def test_validate_entity_parameters(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid entity_id received: 1'):
+            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, 1)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Entity id cannot be empty'):
+            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, '')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid entity_name received: '
+            'invalid_name.'):
+            fs_domain.GcsFileSystem('invalid_name', 'exp_id')
 
     def test_delete(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -214,7 +246,8 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.fs.listdir('fake_dir'), [])
 
             new_fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration', 'eid2'))
+                fs_domain.GcsFileSystem(
+                    fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
             self.assertEqual(new_fs.listdir('assets'), [])
 
 
@@ -228,7 +261,8 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem('exploration', 'eid'))
+            fs_domain.EntityFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']

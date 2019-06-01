@@ -30,6 +30,14 @@ app_identity_services = models.Registry.import_app_identity_services()
 ])
 
 CHANGE_LIST_SAVE = [{'cmd': 'save'}]
+ENTITY_TYPE_EXPLORATION = 'exploration'
+ENTITY_TYPE_TOPIC = 'topic'
+ENTITY_TYPE_SKILL = 'skill'
+ENTITY_TYPE_STORY = 'story'
+ENTITY_TYPE_QUESTION = 'question'
+ALLOWED_ENTITY_NAMES = [
+    ENTITY_TYPE_EXPLORATION, ENTITY_TYPE_TOPIC, ENTITY_TYPE_SKILL,
+    ENTITY_TYPE_STORY, ENTITY_TYPE_QUESTION]
 
 
 class FileMetadata(object):
@@ -111,13 +119,13 @@ class EntityFileSystem(object):
     """A datastore-backed read-write file system for a single entity.
 
     The conceptual intention is for each entity type to have its own parent
-    folder. In this, each individual object will have its own folder with the
+    folder. In this, each individual entity will have its own folder with the
     corresponding ID as the folder name. These folders will then have the assets
     folder inside which stores images, audio etc (example path:
-    story/story_id/assets/).An asset has no meaning outside its entity, so the
+    story/story_id/assets/). An asset has no meaning outside its entity, so the
     assets in these asset folders should therefore not be edited directly. They
-    should only be modified as side-effects of some other operation (such as
-    adding an image to an entity like topics, stories or explorations).
+    should only be modified as side-effects of some other operation on their
+    corresponding entity (such as adding an image to that entity).
 
     In general, assets should be retrieved only within the context of the
     entity that contains them, and should not be retrieved outside this
@@ -134,15 +142,12 @@ class EntityFileSystem(object):
         """Constructs a EntityFileSystem object.
 
         Args:
-        entity_name: str. The name of the entity (eg: exploration, topic etc).
-        entity_id: str or None. The ID of the corresponding entity. None is to
-            accommodate tests in some files and some older exp jobs where a
-            single exp_id is used to initialize class.
+            entity_name: str. The name of the entity
+                (eg: exploration, topic etc).
+            entity_id: str. The ID of the corresponding entity.
         """
-        if entity_id is None:
-            self._assets_path = entity_name
-        else:
-            self._assets_path = entity_name + '/' + entity_id
+        self._validate_entity_parameters(entity_name, entity_id)
+        self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
     @property
     def assets_path(self):
@@ -152,6 +157,26 @@ class EntityFileSystem(object):
             str. The path.
         """
         return self._assets_path
+
+    def _validate_entity_parameters(self, entity_name, entity_id):
+        """Checks whether the entity_id and entity_name passed in are valid.
+
+        Args:
+            entity_name: str. The name of the entity
+                (eg: exploration, topic etc).
+            entity_id: str. The ID of the corresponding entity.
+
+        Raises:
+            ValidationError. When parameters passed in are invalid.
+        """
+        if entity_name not in ALLOWED_ENTITY_NAMES:
+            raise utils.ValidationError(
+                'Invalid entity_name received: %s.' % entity_name)
+        if not isinstance(entity_id, basestring):
+            raise utils.ValidationError(
+                'Invalid entity_id received: %s' % entity_id)
+        if entity_id == '':
+            raise utils.ValidationError('Entity id cannot be empty')
 
     def _get_file_metadata(self, filepath, version):
         """Return the desired file metadata.
@@ -171,10 +196,10 @@ class EntityFileSystem(object):
         """
         if version is None:
             return file_models.FileMetadataModel.get_model(
-                self._assets_path, 'assets/%s' % filepath)
+                self._assets_path, filepath)
         else:
             return file_models.FileMetadataModel.get_version(
-                self._assets_path, 'assets/%s' % filepath, version)
+                self._assets_path, filepath, version)
 
     def _get_file_data(self, filepath, version):
         """Return the desired file content.
@@ -193,10 +218,10 @@ class EntityFileSystem(object):
         """
         if version is None:
             return file_models.FileModel.get_model(
-                self._assets_path, 'assets/%s' % filepath)
+                self._assets_path, filepath)
         else:
             return file_models.FileModel.get_version(
-                self._assets_path, 'assets/%s' % filepath, version)
+                self._assets_path, filepath, version)
 
     def _save_file(self, user_id, filepath, raw_bytes):
         """Create or update a file.
@@ -217,13 +242,13 @@ class EntityFileSystem(object):
         metadata = self._get_file_metadata(filepath, None)
         if not metadata:
             metadata = file_models.FileMetadataModel.create(
-                self._assets_path, 'assets/%s' % filepath)
+                self._assets_path, filepath)
         metadata.size = len(raw_bytes)
 
         data = self._get_file_data(filepath, None)
         if not data:
             data = file_models.FileModel.create(
-                self._assets_path, 'assets/%s' % filepath)
+                self._assets_path, filepath)
         data.content = raw_bytes
 
         data.commit(user_id, CHANGE_LIST_SAVE)
@@ -323,7 +348,7 @@ class EntityFileSystem(object):
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
         prefix = '%s' % utils.vfs_construct_path(
-            '/', self._assets_path, 'assets', dir_name)
+            '/', self._assets_path, dir_name)
         if not prefix.endswith('/'):
             prefix += '/'
 
@@ -353,14 +378,10 @@ class GcsFileSystem(object):
         Args:
             entity_name: str. The name of the entity
                 (eg: exploration, topic etc).
-            entity_id: str or None. The ID of the corresponding entity. None is
-                to accommodate tests in some files and some older exp jobs where
-                a single exp_id is used to initialize class.
+            entity_id: str. The ID of the corresponding entity.
         """
-        if entity_id is None:
-            self._assets_path = entity_name
-        else:
-            self._assets_path = entity_name + '/' + entity_id
+        self._validate_entity_parameters(entity_name, entity_id)
+        self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
     @property
     def assets_path(self):
@@ -370,6 +391,27 @@ class GcsFileSystem(object):
             str. The path.
         """
         return self._assets_path
+
+    def _validate_entity_parameters(self, entity_name, entity_id):
+        """Checks whether the entity_id and entity_name passed in are valid.
+
+        Args:
+            entity_name: str. The name of the entity
+                (eg: exploration, topic etc).
+            entity_id: str. The ID of the corresponding entity.
+
+        Raises:
+            ValidationError. When parameters passed in are invalid.
+        """
+        if entity_name not in ALLOWED_ENTITY_NAMES:
+            raise utils.ValidationError(
+                'Invalid entity_name received: %s.' % entity_name)
+
+        if not isinstance(entity_id, basestring):
+            raise utils.ValidationError(
+                'Invalid entity_id received: %s' % entity_id)
+        if entity_id == '':
+            raise utils.ValidationError('Entity id cannot be empty')
 
     def isfile(self, filepath):
         """Checks if the file with the given filepath exists in the GCS.
@@ -386,7 +428,7 @@ class GcsFileSystem(object):
         # Upload to GCS bucket with filepath
         # "<bucket>/<entity>/<entity-id>/assets/<filepath>".
         gcs_file_url = (
-            '/%s/%s/assets/%s' % (
+            '/%s/%s/%s' % (
                 bucket_name, self._assets_path, filepath))
         try:
             return cloudstorage.stat(gcs_file_url, retry_params=None)
@@ -415,7 +457,7 @@ class GcsFileSystem(object):
         if self.isfile(filepath):
             bucket_name = app_identity_services.get_gcs_resource_bucket_name()
             gcs_file_url = (
-                '/%s/%s/assets/%s' % (
+                '/%s/%s/%s' % (
                     bucket_name, self._assets_path, filepath))
             gcs_file = cloudstorage.open(gcs_file_url)
             data = gcs_file.read()
@@ -437,7 +479,7 @@ class GcsFileSystem(object):
         # Upload to GCS bucket with filepath
         # "<bucket>/<entity>/<entity-id>/assets/<filepath>".
         gcs_file_url = (
-            '/%s/%s/assets/%s' % (
+            '/%s/%s/%s' % (
                 bucket_name, self._assets_path, filepath))
         gcs_file = cloudstorage.open(
             gcs_file_url, mode='w', content_type=mimetype)
@@ -458,7 +500,7 @@ class GcsFileSystem(object):
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
         gcs_file_url = (
-            '/%s/%s/assets/%s' % (
+            '/%s/%s/%s' % (
                 bucket_name, self._assets_path, filepath))
         try:
             cloudstorage.delete(gcs_file_url)
@@ -485,7 +527,7 @@ class GcsFileSystem(object):
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
         prefix = '%s' % utils.vfs_construct_path(
-            '/', self._assets_path, 'assets', dir_name)
+            '/', self._assets_path, dir_name)
         if not prefix.endswith('/'):
             prefix += '/'
         # The prefix now ends and starts with '/'.

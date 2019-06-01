@@ -820,7 +820,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
     """
     file_system_class = fs_services.get_exploration_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
-        'exploration', exp_id))
+        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
     filepath = 'image/%s' % old_filename
     try:
         content = fs.get(filepath.encode('utf-8'))

@@ -709,7 +709,7 @@ class ImageUploadHandler(EditorHandler):
 
         file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            'exploration', exploration_id))
+            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
