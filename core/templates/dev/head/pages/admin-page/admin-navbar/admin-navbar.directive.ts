@@ -31,55 +31,58 @@ oppia.directive('adminNavbar', [
       LOGOUT_URL, PROFILE_URL_TEMPLATE) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getUserEmail: '&userEmail'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin-page/admin-navbar/' +
         'admin-navbar.directive.html'),
-      controller: ['$scope', 'UserService', function($scope, UserService) {
-        $scope.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
-        $scope.showTab = AdminRouterService.showTab;
-        $scope.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
-        $scope.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
-        $scope.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
-        $scope.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
-        $scope.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+      controllerAs: '$ctrl',
+      controller: ['UserService', function(UserService) {
+        var ctrl = this;
+        ctrl.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
+        ctrl.showTab = AdminRouterService.showTab;
+        ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
+        ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
+        ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
+        ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
+        ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
         UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
-          $scope.profilePictureDataUrl = dataUrl;
+          ctrl.profilePictureDataUrl = dataUrl;
         });
 
-        $scope.username = '';
-        $scope.isModerator = null;
-        $scope.isSuperAdmin = null;
-        $scope.profileUrl = '';
+        ctrl.username = '';
+        ctrl.isModerator = null;
+        ctrl.isSuperAdmin = null;
+        ctrl.profileUrl = '';
         UserService.getUserInfoAsync().then(function(userInfo) {
-          $scope.username = userInfo.getUsername();
-          $scope.isModerator = userInfo.isModerator();
-          $scope.isSuperAdmin = userInfo.isSuperAdmin();
+          ctrl.username = userInfo.getUsername();
+          ctrl.isModerator = userInfo.isModerator();
+          ctrl.isSuperAdmin = userInfo.isSuperAdmin();
 
-          $scope.profileUrl = (
+          ctrl.profileUrl = (
             UrlInterpolationService.interpolateUrl(PROFILE_URL_TEMPLATE, {
-              username: $scope.username
+              username: ctrl.username
             })
           );
         });
 
-        $scope.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
+        ctrl.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/logo/288x128_logo_white.png');
 
-        $scope.logoutUrl = LOGOUT_URL;
+        ctrl.logoutUrl = LOGOUT_URL;
 
-        $scope.profileDropdownIsActive = false;
-        $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
+        ctrl.profileDropdownIsActive = false;
+        ctrl.onMouseoverProfilePictureOrDropdown = function(evt) {
           angular.element(evt.currentTarget).parent().addClass('open');
-          $scope.profileDropdownIsActive = true;
+          ctrl.profileDropdownIsActive = true;
         };
 
-        $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
+        ctrl.onMouseoutProfilePictureOrDropdown = function(evt) {
           angular.element(evt.currentTarget).parent().removeClass('open');
-          $scope.profileDropdownIsActive = false;
+          ctrl.profileDropdownIsActive = false;
         };
       }]
     };

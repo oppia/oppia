@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the collection editor page.
+ * @fileoverview Directives required in collection editor.
  */
 
+<<<<<<< HEAD:core/templates/dev/head/pages/collection-editor-page/collection-editor-page.controller.ts
 // TODO(bhenning): These constants should be provided by the backend.
 
 require('pages/collection-editor-page/navbar/' +
@@ -72,3 +73,8 @@ oppia.controller('CollectionEditor', [
     $scope.$on(EVENT_COLLECTION_REINITIALIZED, setTitle);
   }
 ]);
+=======
+require('pages/collection_editor/CollectionEditorPageDirective.ts');
+require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
+require('pages/collection_editor/CollectionEditorNavbarDirective.ts');
+>>>>>>> develop:core/templates/dev/head/pages/collection_editor/CollectionEditor.ts

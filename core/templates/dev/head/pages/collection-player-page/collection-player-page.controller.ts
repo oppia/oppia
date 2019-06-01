@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the learner's view of a collection.
+ * @fileoverview Directives required in collection player.
  */
 
+<<<<<<< HEAD:core/templates/dev/head/pages/collection-player-page/collection-player-page.controller.ts
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require(
@@ -331,3 +332,8 @@ oppia.controller('CollectionPlayer', [
     };
   }
 );
+=======
+require('pages/collection_player/CollectionFooterDirective.ts');
+require('pages/collection_player/CollectionLocalNavDirective.ts');
+require('pages/collection_player/CollectionPlayerPageDirective.ts');
+>>>>>>> develop:core/templates/dev/head/pages/collection_player/CollectionPlayer.ts

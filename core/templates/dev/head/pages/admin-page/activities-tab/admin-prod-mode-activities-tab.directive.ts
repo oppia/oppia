@@ -19,15 +19,17 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive(
-  'adminProdModeActivitiesTab', [
-    'UrlInterpolationService', function(UrlInterpolationService) {
-      return {
-        restrict: 'E',
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/admin-page/activities-tab/' +
-          'admin-prod-mode-activities-tab.directive.html')
-      };
-    }
-  ]
-);
+oppia.directive('adminProdModeActivitiesTab', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/admin-page/activities-tab/' +
+        'admin-prod-mode-activities-tab.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [function() {}]
+    };
+  }
+]);

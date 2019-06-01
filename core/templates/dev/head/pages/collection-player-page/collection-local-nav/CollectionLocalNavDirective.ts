@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,21 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the history tab of the collection editor.
+ * @fileoverview Directive for the local navigation in the collection view.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-
-oppia.directive('collectionHistoryTab', [
+oppia.directive('collectionLocalNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection-editor-page/history-tab/' +
-        'collection-history-tab.directive.html'),
+        '/pages/collection_player/collection_local_nav_directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [function() {
+        var ctrl = this;
+        ctrl.canEdit = GLOBALS.canEdit;
+        ctrl.collectionId = GLOBALS.collectionId;
+      }]
     };
-  }]);
+  }
+]);

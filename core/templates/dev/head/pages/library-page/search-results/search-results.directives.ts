@@ -28,27 +28,31 @@ oppia.directive('searchResults', [
   '$q', 'UrlInterpolationService', function($q, UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/library-page/search-results/search-results.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$q', '$timeout', '$window',
         'SiteAnalyticsService', 'UserService',
         function($scope, $rootScope, $q, $timeout, $window,
             SiteAnalyticsService, UserService) {
-          $scope.someResultsExist = true;
+          var ctrl = this;
+          ctrl.someResultsExist = true;
 
-          $scope.userIsLoggedIn = null;
+          ctrl.userIsLoggedIn = null;
           $rootScope.loadingMessage = 'Loading';
           var userInfoPromise = UserService.getUserInfoAsync();
           userInfoPromise.then(function(userInfo) {
-            $scope.userIsLoggedIn = userInfo.isLoggedIn();
+            ctrl.userIsLoggedIn = userInfo.isLoggedIn();
           });
 
           // Called when the first batch of search results is retrieved from the
           // server.
           var searchResultsPromise = $scope.$on(
             'initialSearchResultsLoaded', function(evt, activityList) {
-              $scope.someResultsExist = activityList.length > 0;
+              ctrl.someResultsExist = activityList.length > 0;
             }
           );
 
@@ -56,7 +60,7 @@ oppia.directive('searchResults', [
             $rootScope.loadingMessage = '';
           });
 
-          $scope.onRedirectToLogin = function(destinationUrl) {
+          ctrl.onRedirectToLogin = function(destinationUrl) {
             SiteAnalyticsService.registerStartLoginEvent('noSearchResults');
             $timeout(function() {
               $window.location = destinationUrl;
@@ -64,7 +68,7 @@ oppia.directive('searchResults', [
             return false;
           };
 
-          $scope.noExplorationsImgUrl =
+          ctrl.noExplorationsImgUrl =
            UrlInterpolationService.getStaticImageUrl(
              '/general/no_explorations_found.png');
         }

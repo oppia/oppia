@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia contributors' library page.
+ * @fileoverview Directives required in library.
  */
 
+<<<<<<< HEAD:core/templates/dev/head/pages/library-page/library-page.controller.ts
 require(
   'components/common-layout-directives/common-elements/loading-dots.directive.ts');
 require(
@@ -343,3 +344,8 @@ oppia.controller('Library', [
     });
   }
 ]);
+=======
+require('pages/library/LibraryPageDirective.ts');
+require('pages/library/LibraryFooter.ts');
+require('pages/library/SearchBarDirective.ts');
+>>>>>>> develop:core/templates/dev/head/pages/library/Library.ts

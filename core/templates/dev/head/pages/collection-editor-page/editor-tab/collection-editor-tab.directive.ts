@@ -30,23 +30,26 @@ oppia.directive('collectionEditorTab', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection-editor-page/editor-tab/' +
         'collection-editor-tab.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
+        'CollectionEditorStateService', 'CollectionLinearizerService',
         function(
-            $scope, CollectionEditorStateService, CollectionLinearizerService) {
-          $scope.hasLoadedCollection = (
+            CollectionEditorStateService, CollectionLinearizerService) {
+          var ctrl = this;
+          ctrl.hasLoadedCollection = (
             CollectionEditorStateService.hasLoadedCollection);
-          $scope.collection = CollectionEditorStateService.getCollection();
+          ctrl.collection = CollectionEditorStateService.getCollection();
 
           // Returns a list of collection nodes which represents a valid linear
           // path through the collection.
-          $scope.getLinearlySortedNodes = function() {
+          ctrl.getLinearlySortedNodes = function() {
             return (
               CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-                $scope.collection));
+                ctrl.collection));
           };
         }
       ]

@@ -27,21 +27,28 @@ oppia.directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         twitterText: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+<<<<<<< HEAD:core/templates/dev/head/pages/collection-player-page/collection-footer/collection-footer.directive.ts
         '/pages/collection-player-page/collection-footer/' +
         'collection-footer.directive.html'),
+=======
+        '/pages/collection_player/' +
+        'collection_footer_directive.html'),
+      controllerAs: '$ctrl',
+>>>>>>> develop:core/templates/dev/head/pages/collection_player/CollectionFooterDirective.ts
       controller: [
-        '$scope',
-        function($scope) {
-          $scope.collectionId = GLOBALS.collectionId;
+        function() {
+          var ctrl = this;
+          ctrl.collectionId = GLOBALS.collectionId;
 
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-          $scope.getTwitterText = function() {
-            return $scope.twitterText;
+          ctrl.getTwitterText = function() {
+            return ctrl.twitterText;
           };
         }
       ]

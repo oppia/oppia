@@ -26,15 +26,24 @@ oppia.directive('collectionPermissionsCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+<<<<<<< HEAD:core/templates/dev/head/pages/collection-editor-page/settings-tab/collection-permissions-card.directive.ts
         '/pages/collection-editor-page/settings-tab/' +
         'collection-permissions-card.directive.html'),
+=======
+        '/pages/collection_editor/settings_tab/' +
+        'collection_permissions_card_directive.html'),
+      controllerAs: '$ctrl',
+>>>>>>> develop:core/templates/dev/head/pages/collection_editor/settings_tab/CollectionPermissionsCardDirective.ts
       controller: [
-        '$scope', 'CollectionEditorStateService',
-        function($scope, CollectionEditorStateService) {
-          $scope.collectionRights =
+        'CollectionEditorStateService',
+        function(CollectionEditorStateService) {
+          var ctrl = this;
+          ctrl.collectionRights =
             CollectionEditorStateService.getCollectionRights();
-          $scope.hasPageLoaded =
+          ctrl.hasPageLoaded =
             CollectionEditorStateService.hasLoadedCollection;
         }
       ]
