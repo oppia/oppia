@@ -275,3 +275,21 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 
         instances = stat_models.PlaythroughModel.get_multi(instance_ids)
         self.assertEqual(instances, [None, None])
+
+
+class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
+    """Test the LearnerAnswerDetailsModel class."""
+
+    def test_create_and_get_answer_details_model(self):
+        id_parameters = {'exp_id': 'abc', 'state_name': 'init_state'}
+        entity_id = stat_models.LearnerAnswerDetailsModel.get_entity_id(
+            id_parameters, feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(entity_id, 'abc.init_state')
+        stat_models.LearnerAnswerDetailsModel.create(
+            entity_id, feconf.ENTITY_TYPE_EXPLORATION,
+            'This my answer', 'This is my logic')
+        instances = stat_models.LearnerAnswerDetailsModel.get_answer_details(
+            feconf.ENTITY_TYPE_EXPLORATION, entity_id)
+        self.assertEqual(len(instances), 1)
+        self.assertEqual(
+            instances[0].learner_answer_details, 'This is my logic')

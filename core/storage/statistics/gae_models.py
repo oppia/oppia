@@ -1147,30 +1147,43 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     """
     # ID of the entity.
     entity_id = ndb.StringProperty(required=True, indexed=True)
-    # The type of entity, that whether it is state, question, or any other
-    # object if it is added in future.
+    # The type of entity, that whether it is exploration, question, or any
+    # other object if it is added in future.
     entity_type = ndb.StringProperty(required=True, indexed=True)
     # The answer submitted by the learner.
     learner_answer = ndb.StringProperty(required=True, indexed=False)
     # The response submitted by the learner.
-    learner_response = ndb.StringProperty(required=True, indexed=False)
+    learner_answer_details = ndb.StringProperty(required=True, indexed=False)
     # The time at which the response was created.
-    created_on = ndb.DateTimeProperty(required=True, indexed=False)
+    created_on = ndb.DateTimeProperty(required=True, indexed=True)
     # Whether the response received has been resolved.
     is_resolved = ndb.BooleanProperty(default=False, required=True)
 
     @classmethod
-    def get_entity_id(cls, exploration_id, state_name):
-        """Gets entity_id for a batch model based on given exploration state.
+    def get_entity_id(cls, id_parameters, entity_type):
+        """Gets entity_id for a batch model based on given entity_type.
 
         Args:
-            exploration_id: str. ID of the exploration currently being played.
-            state_name: str. The name of the state.
+            id_parameters: dict. The parameters which will be
+                responsible to generate the entity_id.
+            entity_type: str. The type of the entity.
 
         Returns:
             str. Returns entity_id for a new instance of this class.
+
+        Raises:
+           Exception: If entity type is not valid.
         """
-        return '%s.%s' % (exploration_id, state_name)
+        # NOTE: In future if this model is used for any other entity type,
+        # then make the id_parameters dict for it, for eg. id_parameters
+        # dict for entity type exploration is {'exp_id': '', 'state_name': ''}
+        #  and add a elif condition in this function with the method to
+        #  generate the entity_id.
+        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            return '%s.%s' % (
+                id_parameters['exp_id'], id_parameters['state_name'])
+        else:
+            raise Exception('Invalid entity type.')
 
     @classmethod
     def generate_new_answer_details_id(cls, entity_type, entity_id):
@@ -1196,34 +1209,38 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             if not cls.get_by_id(answer_details_id):
                 return answer_details_id
         raise Exception(
-            'New answer detail id generator is producing too many collisions.')
+            'New answer details id generator is producing too many collisions.')
 
     @classmethod
     def create(
-            cls, exp_id, state_name, entity_type, learner_answer,
+            cls, entity_id, entity_type, learner_answer,
             learner_answer_details):
         """Creates a new LearnerAnswerDetailsModel and
         then writes it to the datastore.
 
         Args:
-            exp_id: str. ID of the exploration currently being played.
-            state_name: str. The name of the state.
+            entity_id: str. ID of the entity.
             entity_type: str.  The type of entity, that whether it is state,
                 question, or any other object if it is added in future.
             learner_answer: str. The answer entered by the user.
             learner_answer_details: str. The details of the answer entered by
                 the learner.
+
+        Returns:
+            LearnerAnswerDetailsModel. The instance of the
+                LearnerAnswerDetailsModel.
         """
-        entity_id = cls.get_entity_id(exp_id, state_name)
         answer_details_id = cls.generate_new_answer_details_id(
             entity_type, entity_id)
-        cls(
+        answer_details_instance = cls(
             id=answer_details_id,
             entity_id=entity_id,
             entity_type=entity_type,
             learner_answer=learner_answer,
             learner_answer_details=learner_answer_details,
-            created_on=datetime.datetime.utcnow()).put()
+            created_on=datetime.datetime.utcnow())
+        answer_details_instance.put()
+        return answer_details_instance
 
     @classmethod
     def get_answer_details(
