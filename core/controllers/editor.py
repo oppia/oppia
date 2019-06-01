@@ -421,9 +421,13 @@ class ExplorationFileDownloader(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        version = self.request.get('v', default_value=exploration.version)
+        version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
-        width = int(self.request.get('width', default_value=80))
+
+        try:
+            version = int(version_str)
+        except ValueError:
+            version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s.zip' % (
@@ -436,7 +440,7 @@ class ExplorationFileDownloader(EditorHandler):
                 filename, 'text/plain')
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
-                exploration_id, version=version, width=width))
+                exploration_id, version=version))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
