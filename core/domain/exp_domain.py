@@ -1151,12 +1151,12 @@ class Exploration(object):
 
     @classmethod
     def increment_image_id_counter(cls):
-        """Increment the image_id counter"""
+        """Increment the image_id counter."""
         self.image_id_counter += 1
 
     @classmethod
     def get_image_id_counter(cls):
-        """Returns the image_id counter"""
+        """Returns the image_id counter."""
         return self.image_id_counter
 
     # Methods relating to states.
@@ -3078,7 +3078,7 @@ class Exploration(object):
                 or equal to 33.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id, image_id_counter=image_id_counter)
+            yaml_content, exploration_id)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

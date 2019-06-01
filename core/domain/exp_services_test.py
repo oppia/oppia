@@ -1230,6 +1230,7 @@ auto_tts_enabled: true
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
+image_id_counter: %s
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -1244,7 +1245,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1281,7 +1281,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1315,6 +1314,7 @@ states_schema_version: %d
 tags: []
 title: A title
 """ % (
+    feconf.DEFAULT_IMAGE_ID_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
@@ -1326,6 +1326,7 @@ auto_tts_enabled: true
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
+image_id_counter: %s
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -1340,7 +1341,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1377,7 +1377,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1411,6 +1410,7 @@ states_schema_version: %d
 tags: []
 title: A title
 """ % (
+    feconf.DEFAULT_IMAGE_ID_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
@@ -1602,7 +1602,6 @@ content:
   html: ''
 image_assets:
   image_assets_mapping: {}
-  image_id_counter: 0
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1643,7 +1642,6 @@ content:
   html: ''
 image_assets:
   image_assets_mapping: {}
-  image_id_counter: 0
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1706,7 +1704,6 @@ written_translations:
         dict_output = exp_services.export_states_to_yaml(self.EXP_ID, width=50)
 
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
-        # self.assertEqual(dict_output, "keshav")
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
@@ -3100,6 +3097,7 @@ auto_tts_enabled: true
 blurb: ''
 category: category
 correctness_feedback_enabled: false
+image_id_counter: %s
 init_state_name: %s
 language_code: en
 objective: Old objective
@@ -3114,7 +3112,6 @@ states:
       html: <p>Congratulations, you have finished!</p>
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3139,7 +3136,6 @@ states:
       html: ''
     image_assets:
       image_assets_mapping: {}
-      image_id_counter: 0
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3171,6 +3167,7 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
+    feconf.DEFAULT_IMAGE_ID_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
