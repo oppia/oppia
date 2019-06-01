@@ -464,35 +464,6 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                 if change_cmd['cmd'] in relevant_commit_cmds
             ]
 
-            try:
-                # Check if commit is to revert the exploration.
-                if change_list and change_list[0].cmd == (
-                        exp_models.ExplorationModel.CMD_REVERT_COMMIT):
-                    reverted_version = change_list[0].version_number
-                    # pylint: disable=line-too-long
-                    state_id_mapping = exp_services.generate_state_id_mapping_model_for_reverted_exploration(
-                        exploration.id, exploration.version - 1,
-                        reverted_version)
-                    # pylint: enable=line-too-long
-                else:
-                    state_id_mapping = (
-                        exp_services.generate_state_id_mapping_model(
-                            exploration, change_list))
-
-                state_id_mapping_model = exp_models.StateIdMappingModel.create(
-                    state_id_mapping.exploration_id,
-                    state_id_mapping.exploration_version,
-                    state_id_mapping.state_names_to_ids,
-                    state_id_mapping.largest_state_id_used, overwrite=True)
-                state_id_mapping_model.put()
-
-            except Exception as e:
-                yield (
-                    'ERROR with exp_id %s version %s' % (
-                        item.id, exploration.version),
-                    traceback.format_exc())
-                return
-
         yield (exploration.id, exploration.version)
 
     @staticmethod
