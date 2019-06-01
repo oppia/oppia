@@ -17,9 +17,11 @@
 """Tests for classifier domain objects."""
 
 import datetime
+import re
 
 from core.domain import classifier_domain
 from core.tests import test_utils
+import feconf
 import utils
 
 
@@ -108,8 +110,154 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job = self._get_training_job_from_dict(training_job_dict)
         training_job.validate()
 
-        # Verify validation error is raised when int is provided for instance id
+        # Verify validation error is raised when int is provided for exp_id
         # instead of string.
+        training_job_dict['exp_id'] = 1
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected exp_id to be a string')):
+            training_job.validate()
+
+        # Verify validation error is raised when int is provided for state name
+        # instead of string.
+        training_job_dict['exp_id'] = 'exp_id'
+        training_job_dict['state_name'] = 0
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected state to be a string')):
+            training_job.validate()
+
+        # Verify validation error is raised when status is not one of
+        # feconf.ALLOWED_TRAINING_JOB_STATUSES.
+        training_job_dict['state_name'] = 'some state'
+        training_job_dict['status'] = 'invalid_status'
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            re.escape('Expected status to be in %s'
+                      % (feconf.ALLOWED_TRAINING_JOB_STATUSES))):
+            training_job.validate()
+
+        # Verify validation error is raised when int is provided for interaction
+        # id instead of string.
+        training_job_dict['status'] = 'NEW'
+        training_job_dict['interaction_id'] = 0
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected interaction_id to be a string'):
+            training_job.validate()
+
+        # Verify validation error is raised when interaction id is not one of
+        # feconf.INTERACTION_CLASSIFIER_MAPPING.
+        training_job_dict['interaction_id'] = 'invalid_interaction_id'
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Invalid interaction id'):
+            training_job.validate()
+
+        # Verify validation error is raised when int is provided for algorithm
+        # id instead of string.
+        training_job_dict['interaction_id'] = 'TextInput'
+        training_job_dict['algorithm_id'] = 0
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected algorithm_id to be a string'):
+            training_job.validate()
+
+        # Verify validation error is raised when string is provided for data
+        # scheme version instead of int.
+        training_job_dict['algorithm_id'] = 'TextClassifier'
+        training_job_dict['data_schema_version'] = 'invalid_data_schema_version'
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected data_schema_version to be an int'):
+            training_job.validate()
+
+        # Verify validation error is raised when string is provided for
+        # classifier data instead of dict|None.
+        training_job_dict['data_schema_version'] = 1
+        training_job_dict['classifier_data'] = 'invalid_classifier_data'
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected classifier_data to be a dict|None'):
+            training_job.validate()
+
+        # Verify validation error is raised when answer_group_index is not
+        # present in training_data.
+        training_job_dict['classifier_data'] = None
+        training_job_dict['training_data'] = [
+            {
+                'answers': ['a1', 'a2']
+            }
+        ]
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected answer_group_index to be a key in training_data'
+            'list item'):
+            training_job.validate()
+
+        # Verify validation error is raised when answers is not
+        # present in training_data.
+        training_job_dict['classifier_data'] = None
+        training_job_dict['training_data'] = [
+            {
+                'answer_group_index': 1
+            }
+        ]
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected answers to be a key in training_data list item'):
+            training_job.validate()
+
+        # Verify validation error is raised when string is provided for answer
+        # group index instead of int.
+        training_job_dict['classifier_data'] = None
+        training_job_dict['training_data'] = [
+            {
+                'answer_group_index': 'invalid_answer_group_index',
+                'answers': ['a1', 'a2']
+            }
+        ]
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected answer_group_index to be an int'):
+            training_job.validate()
+
+        # Verify validation error is raised when string is provided for answers
+        # instead of list.
+        training_job_dict['classifier_data'] = None
+        training_job_dict['training_data'] = [
+            {
+                'answer_group_index': 1,
+                'answers': 'invalid_answers'
+            }
+        ]
+        training_job = self._get_training_job_from_dict(training_job_dict)
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected answers to be a list'):
+            training_job.validate()
+
+        # Verify validation error is raised when int is provided for job id
+        # instead of string.
+        training_job_dict['training_data'] = [
+            {
+                'answer_group_index': 1,
+                'answers': ['a1', 'a2']
+            },
+            {
+                'answer_group_index': 2,
+                'answers': ['a2', 'a3']
+            }
+        ]
         training_job_dict['job_id'] = 1
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
@@ -220,4 +368,22 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
         mapping = self._get_mapping_from_dict(mapping_dict)
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected exp_version to be an int')):
+            mapping.validate()
+
+        # Verify validation error is raised when int is provided for job id
+        # instead of string.
+        mapping_dict['exp_version'] = 2
+        mapping_dict['job_id'] = 0
+        mapping = self._get_mapping_from_dict(mapping_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected job_id to be a string')):
+            mapping.validate()
+
+        # Verify validation error is raised when int is provided for state name
+        # instead of string.
+        mapping_dict['job_id'] = 'job_id1'
+        mapping_dict['state_name'] = 0
+        mapping = self._get_mapping_from_dict(mapping_dict)
+        with self.assertRaisesRegexp(utils.ValidationError, (
+            'Expected state_name to be a string')):
             mapping.validate()
