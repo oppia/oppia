@@ -102,9 +102,8 @@ class ExplorationPage(EditorHandler):
                 iframe_restriction=None)
             return
 
-        (exploration, exploration_rights) = (
-            exp_services.get_exploration_and_exploration_rights_by_id(
-                exploration_id))
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
 
         visualizations_html = visualization_registry.Registry.get_full_html()
 
@@ -151,7 +150,6 @@ class ExplorationPage(EditorHandler):
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
-            'title': exploration.title,
             'visualizations_html': jinja2.utils.Markup(visualizations_html),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
@@ -175,14 +173,24 @@ class ExplorationHandler(EditorHandler):
         # are not used by that tab.
         version = self.request.get('v', default_value=None)
         apply_draft = self.request.get('apply_draft', default_value=False)
+
+        user_settings = user_services.get_user_settings(self.user_id)
+        has_seen_editor_tutorial = False
+        has_seen_translation_tutorial = False
+        if user_settings is not None:
+            if user_settings.last_started_state_editor_tutorial:
+                has_seen_editor_tutorial = True
+            if user_settings.last_started_state_translation_tutorial:
+                has_seen_translation_tutorial = True
+
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,
                 version=version)
             exploration_data['show_state_editor_tutorial_on_load'] = (
-                self.user_id and not self.has_seen_editor_tutorial)
+                self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
-                self.user_id and not self.has_seen_translation_tutorial)
+                self.user_id and not has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
 
@@ -209,10 +217,6 @@ class ExplorationHandler(EditorHandler):
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id)
-            exploration_data['show_state_editor_tutorial_on_load'] = (
-                self.user_id and not self.has_seen_editor_tutorial)
-            exploration_data['show_state_translation_tutorial_on_load'] = (
-                self.user_id and not self.has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
         self.values.update(exploration_data)
@@ -417,9 +421,13 @@ class ExplorationFileDownloader(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        version = self.request.get('v', default_value=exploration.version)
+        version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
-        width = int(self.request.get('width', default_value=80))
+
+        try:
+            version = int(version_str)
+        except ValueError:
+            version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s.zip' % (
@@ -432,7 +440,7 @@ class ExplorationFileDownloader(EditorHandler):
                 filename, 'text/plain')
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
-                exploration_id, version=version, width=width))
+                exploration_id, version=version))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
