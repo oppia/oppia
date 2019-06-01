@@ -458,12 +458,6 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                         exploration.id, exploration.version))
                 return
 
-            change_list = [
-                exp_domain.ExplorationChange(change_cmd)
-                for change_cmd in snapshot['commit_cmds']
-                if change_cmd['cmd'] in relevant_commit_cmds
-            ]
-
         yield (exploration.id, exploration.version)
 
     @staticmethod

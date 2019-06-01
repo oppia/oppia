@@ -3247,17 +3247,6 @@ title: Old Title
         # Store state id mapping model for new exploration.
         exploration = exp_services.get_exploration_from_model(exploration_model)
 
-        # Change list for version 3.
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'New state',
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        })]
-
         # Version 4 is an upgrade based on the migration job.
 
         # Start migration job on sample exploration.

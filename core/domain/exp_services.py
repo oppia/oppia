@@ -1014,7 +1014,6 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         committer_id, '', force_deletion=force_deletion)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration_version = exploration_model.version
     exploration_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)

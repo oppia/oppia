@@ -1153,10 +1153,6 @@ tags: []
         )
         exp_summary_model.put()
 
-        # Note: Also save state id mappping model for new exploration. If not
-        # saved, it may cause errors in test cases.
-        exploration = exp_services.get_exploration_from_model(exp_model)
-
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
         """Saves a new default exploration with a default version 21 states
         dictionary. Version 21 is where training data of exploration is stored
@@ -1217,10 +1213,6 @@ tags: []
             contributors_summary={},
         )
         exp_summary_model.put()
-
-        # Note: Also save state id mappping model for new exploration. If not
-        # saved, it may cause errors in test cases.
-        exploration = exp_services.get_exploration_from_model(exp_model)
 
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.
