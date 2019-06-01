@@ -116,7 +116,7 @@ oppia.directive('audioTranslationBar', [
           $scope.audioIsCurrentlyBeingSaved = false;
           $scope.elapsedTime = 0;
           $scope.timerInterval = null;
-          $scope.isPlayingUnsaved = false;
+          $scope.unsavedAudioIsPlaying = false;
           $scope.waveSurfer = null;
           document.body.onkeyup = function(e) {
             if (e.keyCode === 82 && !$scope.isAudioAvailable) {
@@ -240,12 +240,11 @@ oppia.directive('audioTranslationBar', [
             $scope.voiceoverRecorder.getMp3Data().then(function(audio) {
               var fileType = 'audio/mp3';
               $scope.audioBlob = new Blob(audio, {type: fileType});
-              // free the browser from workers
+              // Free the browser from web workers.
               $scope.voiceoverRecorder.closeRecorder();
-              // create audio play and pause for unsaved recording
-              // set visualizer
+              // Create audio play and pause for unsaved recording.
               var url = $window.URL.createObjectURL($scope.audioBlob);
-              // create visualizer for playing unsaved audio
+              // Create visualizer for playing unsaved audio.
               $scope.waveSurfer = $window.WaveSurfer.create({
                 container: '#visualized',
                 waveColor: '#009688',
@@ -258,11 +257,11 @@ oppia.directive('audioTranslationBar', [
 
           // Play and pause for unsaved recording.
           $scope.playAndPauseUnsavedAudio = function() {
-            $scope.isPlayingUnsaved = !$scope.isPlayingUnsaved;
-            if ($scope.isPlayingUnsaved) {
+            $scope.unsavedAudioIsPlaying = !$scope.unsavedAudioIsPlaying;
+            if ($scope.unsavedAudioIsPlaying) {
               $scope.waveSurfer.play();
               $scope.waveSurfer.on('finish', function() {
-                $scope.isPlayingUnsaved = false;
+                $scope.unsavedAudioIsPlaying = false;
                 $scope.$apply();
               });
             } else {
@@ -433,7 +432,7 @@ oppia.directive('audioTranslationBar', [
             AudioPlayerService.clear();
             $scope.showRecorderWarning = false;
             // re-initialize for unsaved recording
-            $scope.isPlayingUnsaved = false;
+            $scope.unsavedAudioIsPlaying = false;
             $scope.waveSurfer = null;
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();

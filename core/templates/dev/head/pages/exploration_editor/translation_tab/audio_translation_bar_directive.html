@@ -54,7 +54,7 @@
             ng-click="playAndPauseUnsavedAudio()"
             ng-disabled="voiceoverRecorder.status().isRecording"
             aria-label="Play recorded audio">
-      <i class="material-icons"><[isPlayingUnsaved ? 'pause' : 'play_arrow']></i>
+      <i class="material-icons"><[unsavedAudioIsPlaying ? 'pause' : 'play_arrow']></i>
     </button>
   </div>
   <div class="oppia-content-wrapper oppia-flex-1-wrapper">
