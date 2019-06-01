@@ -791,3 +791,50 @@ class InteractionCustomizationArgsValidationJob(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
+
+
+class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for migrating translator_ids to voice_artist_ids."""
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        translator_ids = item.translator_ids
+        commit_message = 'Migrate from translator to voice artist'
+        commit_cmds = [{
+            'cmd': 'change_role',
+            'assignee_id': translator_id,
+            # Using magic string because ROLE_TRANSLATOR is removed.
+            'old_role': 'translator',
+            'new_role': rights_manager.ROLE_VOICE_ARTIST
+        } for translator_id in translator_ids]
+
+        if len(translator_ids) > 0:
+            exp_summary_model = exp_models.ExpSummaryModel.get_by_id(item.id)
+
+            if exp_summary_model is None or exp_summary_model.deleted:
+                item.voice_artist_ids = translator_ids
+                item.translator_ids = []
+                item.commit('Admin', commit_message, commit_cmds)
+                yield ('Summary model does not exist or is deleted', item.id)
+            else:
+                exp_summary_model.voice_artist_ids = translator_ids
+                exp_summary_model.translator_ids = []
+                exp_summary_model.put()
+
+                item.voice_artist_ids = translator_ids
+                item.translator_ids = []
+                item.commit('Admin', commit_message, commit_cmds)
+                yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)

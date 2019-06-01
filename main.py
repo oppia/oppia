@@ -51,7 +51,7 @@ from core.controllers import suggestion
 from core.controllers import topic_editor
 from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
-from core.controllers import translator
+from core.controllers import voice_artist
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -441,8 +441,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.TRANSLATION_DATA_PREFIX,
-        translator.ExplorationTranslationHandler),
+        r'%s/<exploration_id>' % feconf.VOICEOVER_DATA_PREFIX,
+        voice_artist.ExplorationVoiceoverHandler),
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationFileDownloader),
@@ -451,7 +451,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
-        translator.AudioUploadHandler),
+        voice_artist.AudioUploadHandler),
     get_redirect_route(
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
@@ -490,13 +490,13 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.StartedTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/started_translation_tutorial_event/<exploration_id>',
-        translator.StartedTranslationTutorialEventHandler),
+        voice_artist.StartedTranslationTutorialEventHandler),
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
     get_redirect_route(
-        r'/createhandler/autosave_translation_draft/<exploration_id>',
-        translator.TranslatorAutosaveHandler),
+        r'/createhandler/autosave_voiceover_draft/<exploration_id>',
+        voice_artist.VoiceArtistAutosaveHandler),
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),

@@ -144,7 +144,7 @@ describe('Exploration translation', function() {
     explorationEditorTranslationTab.expectStartRecordingAccessibilityToMatch(
       'Start recording');
     explorationEditorTranslationTab.expectUploadRecordingAccessibilityToMatch(
-      'Upload translated file');
+      'Upload voiceovered file');
     explorationEditorTranslationTab.expectPlayRecordingAccessibilityToMatch(
       'Play recorded audio');
     users.logout();

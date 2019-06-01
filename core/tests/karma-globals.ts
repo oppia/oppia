@@ -21,7 +21,7 @@ var GLOBALS = {
   can_edit: true,
   can_publish: true,
   CAN_SEND_EMAILS: true,
-  can_translate: true,
+  can_voiceover: true,
   canDelete: true,
   canEdit: true,
   canModifyRoles: true,

@@ -396,18 +396,18 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
                 messages[0].body.decode(),
                 expected_email_text_body)
 
-    def test_correct_rights_are_written_in_translator_role_email_body(self):
+    def test_correct_rights_are_written_in_voice_artist_role_email_body(self):
         expected_email_html_body = (
             'Hi newuser,<br>'
             '<br>'
-            '<b>editor</b> has granted you translator rights to their '
+            '<b>editor</b> has granted you voice artist rights to their '
             'exploration, '
             '"<a href="https://www.oppia.org/create/A">Title</a>"'
             ', on Oppia.org.<br>'
             '<br>'
             'This allows you to:<br>'
             '<ul>'
-            '<li>Translate the exploration</li><br>'
+            '<li>Voiceover the exploration</li><br>'
             '<li>View and playtest the exploration</li><br>'
             '</ul>'
             'You can find the exploration '
@@ -424,11 +424,11 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
         expected_email_text_body = (
             'Hi newuser,\n'
             '\n'
-            'editor has granted you translator rights to their '
+            'editor has granted you voice artist rights to their '
             'exploration, "Title", on Oppia.org.\n'
             '\n'
             'This allows you to:\n'
-            '- Translate the exploration\n'
+            '- Voiceover the exploration\n'
             '- View and playtest the exploration\n'
             'You can find the exploration here.\n'
             '\n'
@@ -440,10 +440,10 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         with self.can_send_emails_ctx, self.can_send_editor_role_email_ctx:
-            # Check that correct email content is sent for Translator.
+            # Check that correct email content is sent for Voice Artist.
             email_manager.send_role_notification_email(
                 self.editor_id, self.new_user_id,
-                rights_manager.ROLE_TRANSLATOR, self.exploration.id,
+                rights_manager.ROLE_VOICE_ARTIST, self.exploration.id,
                 self.exploration.title)
 
             messages = self.mail_stub.get_sent_messages(to=self.NEW_USER_EMAIL)

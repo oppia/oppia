@@ -140,8 +140,8 @@ class CollectionRightsModel(base_models.VersionedModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this collection.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this collection.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to voiceover this collection.
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this collection.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
@@ -162,6 +162,8 @@ class CollectionRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
+    # DEPRECATED in v2.8.3. Do not use.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Updates the collection rights model by applying the given

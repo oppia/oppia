@@ -65,8 +65,8 @@ oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 oppia.constant(
-  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/translate/<exploration_id>');
+  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/voiceover/<exploration_id>');
 
 
 /* This should match the CSS class defined in the tutor card directive. */
