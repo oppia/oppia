@@ -370,7 +370,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       26: {
-        text: 'solicit_answer_details: false';
+        text: 'solicit_answer_details: false',
         highlighted: false
       },
       27: {
