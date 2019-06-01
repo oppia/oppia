@@ -60,7 +60,7 @@ var PageMeta = function(name, description) {
 };
 
 PageMeta.prototype.toHTML = function() {
-  var html = '';
+  var html = '<meta charset="UTF-8">\n';
   for (var meta in this) {
     if (this.hasOwnProperty(meta)) {
       if (typeof this[meta] === 'object') {

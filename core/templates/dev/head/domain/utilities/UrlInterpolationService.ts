@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('services/contextual/UrlService.ts');
 require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
 require('services/UtilsService.ts');
 
 /**

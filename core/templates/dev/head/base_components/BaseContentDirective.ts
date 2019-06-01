@@ -16,8 +16,8 @@
  * @fileoverview Directive for the Base Transclusion Component
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
 require('base_components/PageFooterDirective.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('baseContent', [
   'UrlInterpolationService',
