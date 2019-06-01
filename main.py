@@ -20,6 +20,7 @@ import logging
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import admin
+from core.controllers import analytics
 from core.controllers import base
 from core.controllers import classifier
 from core.controllers import collection_editor
@@ -664,6 +665,10 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/resolveissuehandler/<exploration_id>', editor.ResolveIssueHandler),
+
+    get_redirect_route(
+        r'%s' % feconf.ANALYTICS_DATA_URL,
+        analytics.AnalyticsHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
