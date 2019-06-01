@@ -746,7 +746,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         yaml_content = exploration.to_yaml()
         self.assertEqual(yaml_content, self.SAMPLE_YAML_CONTENT)
 
-        exploration2 = exp_domain.Exploration.from_withoud_image_id_counter_yaml('exp2', 0, yaml_content)
+        exploration2 = exp_domain.Exploration.from_yaml('exp2', yaml_content)
         self.assertEqual(len(exploration2.states), 2)
         yaml_content_2 = exploration2.to_yaml()
         self.assertEqual(yaml_content_2, yaml_content)
@@ -754,30 +754,30 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         # Verify SAMPLE_UNTITLED_YAML_CONTENT can be converted to an exploration
         # without error.
         exp_domain.Exploration.from_untitled_yaml(
-            'exp4', 'Title', 'Category', 0, self.SAMPLE_UNTITLED_YAML_CONTENT)
+            'exp4', 'Title', 'Category', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaises(Exception):
-            exp_domain.Exploration.from_withoud_image_id_counter_yaml('exp3', 'No_initial_state_name')
+            exp_domain.Exploration.from_yaml('exp3', 'No_initial_state_name')
 
         with self.assertRaises(Exception):
-            exp_domain.Exploration.from_withoud_image_id_counter_yaml(
+            exp_domain.Exploration.from_yaml(
                 'exp4', 'Invalid\ninit_state_name:\nMore stuff')
 
         with self.assertRaises(Exception):
-            exp_domain.Exploration.from_withoud_image_id_counter_yaml(
+            exp_domain.Exploration.from_yaml(
                 'exp4', 'State1:\n(\nInvalid yaml')
 
         with self.assertRaisesRegexp(
             Exception, 'Expected a YAML version >= 10, received: 9'
             ):
-            exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-                'exp4', 0, self.SAMPLE_UNTITLED_YAML_CONTENT)
+            exp_domain.Exploration.from_yaml(
+                'exp4', self.SAMPLE_UNTITLED_YAML_CONTENT)
 
         with self.assertRaisesRegexp(
             Exception, 'Expected a YAML version <= 9'
             ):
             exp_domain.Exploration.from_untitled_yaml(
-                'exp4', 'Title', 'Category', 0, self.SAMPLE_YAML_CONTENT)
+                'exp4', 'Title', 'Category', self.SAMPLE_YAML_CONTENT)
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
@@ -3877,193 +3877,193 @@ title: Title
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V1)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V1)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v2(self):
         """Test direct loading from a v2 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V2)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V2)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v3(self):
         """Test direct loading from a v3 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V3)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V3)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v4(self):
         """Test direct loading from a v4 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V4)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V4)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v5(self):
         """Test direct loading from a v5 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V5)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V5)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v6(self):
         """Test direct loading from a v6 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V6)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V6)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v7(self):
         """Test direct loading from a v7 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V7)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V7)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v8(self):
         """Test direct loading from a v8 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V8)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V8)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v9(self):
         """Test direct loading from a v9 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', 0, self.YAML_CONTENT_V9)
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V9)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v10(self):
         """Test direct loading from a v10 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V10)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V10)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v11(self):
         """Test direct loading from a v11 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V11)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V11)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v12(self):
         """Test direct loading from a v12 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V12)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V12)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v13(self):
         """Test direct loading from a v13 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V13)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V13)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v14(self):
         """Test direct loading from a v14 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V14)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V14)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v15(self):
         """Test direct loading from a v15 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V15)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V15)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v16(self):
         """Test direct loading from a v16 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V16)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V16)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v17(self):
         """Test direct loading from a v17 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V17)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V17)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v18(self):
         """Test direct loading from a v18 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V18)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V18)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v19(self):
         """Test direct loading from a v19 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V19)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V19)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v20(self):
         """Test direct loading from a v20 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V20)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V20)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v21(self):
         """Test direct loading from a v21 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V21)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V21)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v22(self):
         """Test direct loading from a v22 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V22)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V22)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v23(self):
         """Test direct loading from a v23 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V23)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V23)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v24(self):
         """Test direct loading from a v24 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V24)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V24)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v25(self):
         """Test direct loading from a v25 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V25)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V25)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v26(self):
         """Test direct loading from a v26 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V26)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V26)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v27(self):
         """Test direct loading from a v27 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V27)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V27)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v28(self):
         """Test direct loading from a v28 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V28)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V28)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v29(self):
         """Test direct loading from a v29 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V29)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V29)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v30(self):
         """Test direct loading from a v30 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V30)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V30)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v31(self):
         """Test direct loading from a v31 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V31)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V31)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v32(self):
         """Test direct loading from a v32 yaml file."""
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            'eid', 0, self.YAML_CONTENT_V32)
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V32)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     # def test_load_from_v33(self):
@@ -4785,8 +4785,8 @@ title: Title
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions):
 
-            exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-                'eid', 0, self.YAML_CONTENT_V26_TEXTANGULAR)
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_IMAGE_DIMENSIONS)
 
@@ -4796,8 +4796,8 @@ title: Title
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions):
 
-            exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-                'eid', 0, self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_WITH_IMAGE_CAPTION)
 
@@ -5256,7 +5256,7 @@ states:
         # exploration contains rules which have END as their destination state
         # but exploration itself does not have END state.
         exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', 0, self.EXPLORATION_CONTENT_1)
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
         expected_mapping = {
             '(untitled state)': 0,
             'New state': 1,
@@ -5275,7 +5275,7 @@ states:
         """
 
         old_exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', 0, self.EXPLORATION_CONTENT_1)
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
         state_id_map = (
             exp_domain.StateIdMapping.create_mapping_for_new_exploration(
                 old_exploration))
@@ -5285,7 +5285,7 @@ states:
         # version, if exploration does not contain any rule which has END
         # as its destination state.
         new_exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', 0, self.EXPLORATION_CONTENT_2)
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_2)
         expected_mapping = {
             '(untitled state)': 0,
             'New state': 1
@@ -5302,7 +5302,7 @@ states:
         """
 
         old_exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', 0, self.EXPLORATION_CONTENT_2)
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_2)
         state_id_map = (
             exp_domain.StateIdMapping.create_mapping_for_new_exploration(
                 old_exploration))
@@ -5312,7 +5312,7 @@ states:
         # version, if exploration does not contain any rule which has END
         # as its destination state.
         new_exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', 0, self.EXPLORATION_CONTENT_1)
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
         expected_mapping = {
             '(untitled state)': 0,
             'New state': 1,

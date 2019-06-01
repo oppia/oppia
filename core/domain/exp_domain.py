@@ -497,7 +497,8 @@ class Exploration(object):
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False, image_id_counter)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, False,
+            feconf.DEFAULT_IMAGE_ID_COUNTER)
 
     @classmethod
     def from_dict(
@@ -2843,10 +2844,13 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _convert_v33_dict_to_v34_dict(cls, exploration_dict, image_id_counter):
+    def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
         """Converts a v33 exploration dict into a v34 exploration dict."""
         exploration_dict['schema_version'] = 34
-        exploration_dict['image_id_counter'] = image_id_counter
+
+        # TODO
+        # exploration_dict['image_id_counter'] = get_number_of_images_in_exploration()
+        exploration_dict['image_id_counter'] = 0
 
         exploration_dict['states'] = cls._convert_states_v28_dict_to_v29_dict(
             exploration_dict['states'])
@@ -2856,8 +2860,7 @@ class Exploration(object):
 
     @classmethod
     def _migrate_to_latest_yaml_version(
-            cls, yaml_content, exp_id, title=None, category=None,
-            image_id_counter=None):
+            cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
         format.
 
@@ -2866,7 +2869,6 @@ class Exploration(object):
             exp_id: str. ID of the exploration.
             title: str. The exploration title.
             category: str. The exploration category.
-            image_id_counter: int. The counter for an image id.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -3056,43 +3058,13 @@ class Exploration(object):
 
         if exploration_schema_version == 33:
             exploration_dict = cls._convert_v33_dict_to_v34_dict(
-                exploration_dict, image_id_counter)
+                exploration_dict)
             exploration_schema_version = 34
 
         return (exploration_dict, initial_schema_version)
 
     @classmethod
     def from_yaml(cls, exploration_id, yaml_content):
-        """Creates and returns exploration from a YAML text string for YAML
-        schema versions 34 and later.
-
-        Args:
-            exploration_id: str. The id of the exploration.
-            yaml_content: str. The YAML representation of the exploration.
-
-        Returns:
-            Exploration. The corresponding exploration domain object.
-
-        Raises:
-            Exception: The initial schema version of exploration is less than
-                or equal to 33.
-        """
-        migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id)
-        exploration_dict = migration_result[0]
-        initial_schema_version = migration_result[1]
-
-        if (initial_schema_version <=
-                cls.LAST_UNTITLED_SCHEMA_VERSION):
-            raise Exception(
-                'Expected a YAML version >= 34, received: %d' % (
-                    initial_schema_version))
-
-        exploration_dict['id'] = exploration_id
-        return Exploration.from_dict(exploration_dict)
-
-    @classmethod
-    def from_withoud_image_id_counter_yaml(cls, exploration_id, image_id_counter, yaml_content):
         """Creates and returns exploration from a YAML text string for YAML
         schema versions 10 and later.
 
@@ -3109,7 +3081,7 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id, image_id_counter=image_id_counter)
+            yaml_content, exploration_id)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 
@@ -3123,8 +3095,7 @@ class Exploration(object):
         return Exploration.from_dict(exploration_dict)
 
     @classmethod
-    def from_untitled_yaml(cls, exploration_id, title, category,
-        image_id_counter, yaml_content):
+    def from_untitled_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string. This is
         for importing explorations using YAML schema version 9 or earlier.
 
@@ -3143,8 +3114,7 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, exploration_id, title=title, category=category,
-            image_id_counter=image_id_counter)
+            yaml_content, exploration_id, title=title, category=category)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

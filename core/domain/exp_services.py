@@ -1520,12 +1520,7 @@ def save_new_exploration_from_yaml_and_assets(
         # a title and a category; these need to be manually specified.
         exploration = exp_domain.Exploration.from_untitled_yaml(
             exploration_id, feconf.DEFAULT_EXPLORATION_TITLE,
-            feconf.DEFAULT_EXPLORATION_CATEGORY,
-            feconf.DEFAULT_IMAGE_ID_COUNTER,yaml_content)
-    elif(exp_schema_version <= 33 and exp_schema_version >= 10):
-        exploration = exp_domain.Exploration.from_withoud_image_id_counter_yaml(
-            exploration_id, feconf.DEFAULT_IMAGE_ID_COUNTER,
-            yaml_content)
+            feconf.DEFAULT_EXPLORATION_CATEGORY, yaml_content)
     else:
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)
