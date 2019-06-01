@@ -550,7 +550,7 @@ written_translations:
         # Download to JSON string using download handler.
         self.maxDiff = None
         download_url = (
-            '/createhandler/download/%s?output_format=%s&width=50' %
+            '/createhandler/download/%s?output_format=%s' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
 
@@ -559,7 +559,7 @@ written_translations:
 
         # Check downloading a specific version.
         download_url = (
-            '/createhandler/download/%s?output_format=%s&width=50&v=1' %
+            '/createhandler/download/%s?output_format=%s&v=1' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
         self.assertEqual(['Introduction'], response.keys())
@@ -567,7 +567,7 @@ written_translations:
         # Check downloading an invalid version results in downloading the
         # latest version.
         download_url = (
-            '/createhandler/download/%s?output_format=%s&width=50&v=xxx' %
+            '/createhandler/download/%s?output_format=%s&v=xxx' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)

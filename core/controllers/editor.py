@@ -440,7 +440,7 @@ class ExplorationFileDownloader(EditorHandler):
                 filename, 'text/plain')
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
-                exploration_id, version=version, width=80))
+                exploration_id, version=version))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
