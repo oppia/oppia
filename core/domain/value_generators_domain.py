@@ -113,11 +113,6 @@ class Registry(object):
             for _, clazz in inspect.getmembers(
                     module, predicate=inspect.isclass):
                 if issubclass(clazz, BaseValueGenerator):
-                    if clazz.__name__ in cls.value_generators_dict:
-                        raise Exception(
-                            'Duplicate value generator name %s'
-                            % clazz.__name__)
-
                     cls.value_generators_dict[clazz.__name__] = clazz
 
     @classmethod
