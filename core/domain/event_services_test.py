@@ -43,9 +43,10 @@ class BaseEventHandlerTests(test_utils.GenericTestBase):
     def test_handle_event_raises_not_implemented_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
-            re.escape('Subclasses of BaseEventHandler should implement the '
-            '_handle_event() method, using explicit arguments '
-            '(no *args or **kwargs).')):
+            re.escape(
+                'Subclasses of BaseEventHandler should implement the '
+                '_handle_event() method, using explicit arguments '
+                '(no *args or **kwargs).')):
             event_services.BaseEventHandler.record()
 
 
@@ -216,57 +217,60 @@ class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
             0)
 
 
-# class EventHandlerNameTests(test_utils.GenericTestBase):
+class EventHandlerNameTests(test_utils.GenericTestBase):
 
-#     def _get_all_python_files(self):
-#         """Recursively collects all Python files in the core/ and extensions/
-#         directory.
-#         Returns:
-#             a list of Python files.
-#         """
-#         current_dir = os.getcwd()
-#         files_in_directory = []
-#         for _dir, _, files in os.walk(current_dir):
-#             for file_name in files:
-#                 filepath = os.path.relpath(
-#                     os.path.join(_dir, file_name), current_dir)
-#                 if filepath.endswith('.py') and (
-#                         filepath.startswith('core/') or (
-#                             filepath.startswith('extensions/'))):
-#                     module = filepath[:-3].replace('/', '.')
-#                     files_in_directory.append(module)
-#         return files_in_directory
+    def _get_all_python_files(self):
+        """Recursively collects all Python files in the core/ and extensions/
+        directory.
+        Returns:
+            a list of Python files.
+        """
+        current_dir = os.getcwd()
+        files_in_directory = []
+        for _dir, _, files in os.walk(current_dir):
+            for file_name in files:
+                filepath = os.path.relpath(
+                    os.path.join(_dir, file_name), current_dir)
+                if filepath.endswith('.py') and (
+                        filepath.startswith('core/') or (
+                            filepath.startswith('extensions/'))):
+                    module = filepath[:-3].replace('/', '.')
+                    files_in_directory.append(module)
+        return files_in_directory
 
-#     def test_event_handler_names(self):
-#         """This function checks for duplicate event handlers."""
+    def test_event_handler_names(self):
+        """This function checks for duplicate event handlers."""
 
-#         all_python_files = self._get_all_python_files()
-#         all_event_handlers = []
+        all_python_files = self._get_all_python_files()
+        all_event_handlers = []
 
-#         for file_name in all_python_files:
-#             python_module = importlib.import_module(file_name)
-#             for name, clazz in inspect.getmembers(
-#                     python_module, predicate=inspect.isclass):
-#                 all_base_classes = [base_class.__name__ for base_class in
-#                                     (inspect.getmro(clazz))]
-#                 # Check that it is a subclass of 'BaseEventHandler'.
-#                 if 'BaseEventHandler' in all_base_classes:
-#                     # Event handler class should specify an event type.
-#                     self.assertIsNotNone(clazz.EVENT_TYPE)
+        for file_name in all_python_files:
+            if file_name.endswith('_test'):
+                continue
 
-#                     all_event_handlers.append(name)
+            python_module = importlib.import_module(file_name)
+            for name, clazz in inspect.getmembers(
+                    python_module, predicate=inspect.isclass):
+                all_base_classes = [base_class.__name__ for base_class in
+                                    (inspect.getmro(clazz))]
+                # Check that it is a subclass of 'BaseEventHandler'.
+                if 'BaseEventHandler' in all_base_classes and (
+                        name != 'BaseEventHandler'):
+                    # Event handler class should specify an event type.
+                    self.assertIsNotNone(clazz.EVENT_TYPE)
 
-#         expected_event_handlers = (
-#             ['BaseEventHandler', 'StatsEventsHandler',
-#             'AnswerSubmissionEventHandler',
-#             'ExplorationActualStartEventHandler', 'SolutionHitEventHandler',
-#             'StartExplorationEventHandler', 'MaybeLeaveExplorationEventHandler',
-#             'CompleteExplorationEventHandler', 'RateExplorationEventHandler',
-#             'StateHitEventHandler', 'StateCompleteEventHandler',
-#             'LeaveForRefresherExpEventHandler',
-#             'FeedbackThreadCreatedEventHandler',
-#             'FeedbackThreadStatusChangedEventHandler']
-#             )
+                    all_event_handlers.append(name)
 
-#         self.assertEqual(
-#             sorted(all_event_handlers), sorted(expected_event_handlers))
+        expected_event_handlers = [
+            'StatsEventsHandler', 'AnswerSubmissionEventHandler',
+            'ExplorationActualStartEventHandler', 'SolutionHitEventHandler',
+            'StartExplorationEventHandler', 'MaybeLeaveExplorationEventHandler',
+            'CompleteExplorationEventHandler', 'RateExplorationEventHandler',
+            'StateHitEventHandler', 'StateCompleteEventHandler',
+            'LeaveForRefresherExpEventHandler',
+            'FeedbackThreadCreatedEventHandler',
+            'FeedbackThreadStatusChangedEventHandler'
+        ]
+
+        self.assertEqual(
+            sorted(all_event_handlers), sorted(expected_event_handlers))
