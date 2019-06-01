@@ -3070,7 +3070,6 @@ class Exploration(object):
 
         Args:
             exploration_id: str. The id of the exploration.
-            image_id_counter: str. Counter for an image id.
             yaml_content: str. The YAML representation of the exploration.
 
         Returns:
@@ -3103,7 +3102,6 @@ class Exploration(object):
             exploration_id: str. The id of the exploration.
             title: str. The exploration title.
             category: str. The exploration category.
-            image_id_counter: int. Counter for an image id.
             yaml_content: str. The YAML representation of the exploration.
 
         Returns:
