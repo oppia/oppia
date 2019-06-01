@@ -48,7 +48,7 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 
 class StateCounterModelTests(test_utils.GenericTestBase):
 
-    def test_stat_model_gets_created(self):
+    def test_state_counter_model_gets_created(self):
         model_instance = stats_models.StateCounterModel.get_or_create(
             'exp_id1', 'state_name')
         model_instance.first_entry_count = 1
@@ -63,7 +63,7 @@ class StateCounterModelTests(test_utils.GenericTestBase):
         self.assertEqual(model_instance.resolved_answer_count, 3)
         self.assertEqual(model_instance.active_answer_count, 4)
 
-    def test_get_stat_model(self):
+    def test_get_state_counter_model(self):
         model = stats_models.StateCounterModel(id='exp_id1.state_name')
         model.first_entry_count = 1
         model.subsequent_entries_count = 2
@@ -115,7 +115,7 @@ class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
 
 class StateAnswersModelTests(test_utils.GenericTestBase):
 
-    def test_shard_count_with_newly_added_shards(self):
+    def test_shard_count_is_updated_when_data_overflows(self):
 
         submitted_answer_list = [{'answer': 'value'}]
 
