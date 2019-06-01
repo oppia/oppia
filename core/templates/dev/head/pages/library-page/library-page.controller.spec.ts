@@ -16,11 +16,7 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
-<<<<<<< HEAD:core/templates/dev/head/pages/library-page/library-page.controller.spec.ts
-require('pages/library-page/library-page.controller.ts');
-=======
-require('pages/library/LibraryPageDirective.ts');
->>>>>>> develop:core/templates/dev/head/pages/library/LibrarySpec.ts
+require('pages/library-page/library-page.directive.ts');
 
 describe('Library controller', function() {
   beforeEach(angular.mock.module('oppia'));

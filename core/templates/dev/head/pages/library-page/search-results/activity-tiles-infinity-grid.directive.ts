@@ -20,55 +20,57 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/SearchService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-oppia.directive(
-  'activityTilesInfinityGrid', [
-    'UrlInterpolationService', function(UrlInterpolationService) {
-      return {
-        restrict: 'E',
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/library-page/search-results/' +
-          'activity-tiles-infinity-grid.directive.html'),
-        controller: [
-          '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
-          function($scope, $rootScope, SearchService, WindowDimensionsService) {
-            $scope.endOfPageIsReached = false;
-            $scope.allActivitiesInOrder = [];
-            // Called when the first batch of search results is retrieved from
-            // the server.
-            $scope.$on(
-              'initialSearchResultsLoaded', function(evt, activityList) {
-                $scope.allActivitiesInOrder = activityList;
-                $scope.endOfPageIsReached = false;
-              }
-            );
+oppia.directive('activityTilesInfinityGrid', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/library-page/search-results/' +
+        'activity-tiles-infinity-grid.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
+        function($scope, $rootScope, SearchService, WindowDimensionsService) {
+          var ctrl = this;
+          ctrl.endOfPageIsReached = false;
+          ctrl.allActivitiesInOrder = [];
+          // Called when the first batch of search results is retrieved from the
+          // server.
+          $scope.$on(
+            'initialSearchResultsLoaded', function(evt, activityList) {
+              ctrl.allActivitiesInOrder = activityList;
+              ctrl.endOfPageIsReached = false;
+            }
+          );
 
-            $scope.showMoreActivities = function() {
-              if (!$rootScope.loadingMessage && !$scope.endOfPageIsReached) {
-                $scope.searchResultsAreLoading = true;
-                SearchService.loadMoreData(function(data, endOfPageIsReached) {
-                  $scope.allActivitiesInOrder =
-                  $scope.allActivitiesInOrder.concat(
-                    data.activity_list);
-                  $scope.endOfPageIsReached = endOfPageIsReached;
-                  $scope.searchResultsAreLoading = false;
-                }, function(endOfPageIsReached) {
-                  $scope.endOfPageIsReached = endOfPageIsReached;
-                  $scope.searchResultsAreLoading = false;
-                });
-              }
-            };
+          ctrl.showMoreActivities = function() {
+            if (!$rootScope.loadingMessage && !ctrl.endOfPageIsReached) {
+              ctrl.searchResultsAreLoading = true;
+              SearchService.loadMoreData(function(data, endOfPageIsReached) {
+                ctrl.allActivitiesInOrder =
+                ctrl.allActivitiesInOrder.concat(
+                  data.activity_list);
+                ctrl.endOfPageIsReached = endOfPageIsReached;
+                ctrl.searchResultsAreLoading = false;
+              }, function(endOfPageIsReached) {
+                ctrl.endOfPageIsReached = endOfPageIsReached;
+                ctrl.searchResultsAreLoading = false;
+              });
+            }
+          };
 
-            var libraryWindowCutoffPx = 530;
-            $scope.libraryWindowIsNarrow = (
+          var libraryWindowCutoffPx = 530;
+          ctrl.libraryWindowIsNarrow = (
+            WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+
+          WindowDimensionsService.registerOnResizeHook(function() {
+            ctrl.libraryWindowIsNarrow = (
               WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-
-            WindowDimensionsService.registerOnResizeHook(function() {
-              $scope.libraryWindowIsNarrow = (
-                WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
-              $scope.$apply();
-            });
-          }
-        ]
-      };
-    }
-  ]);
+            $scope.$apply();
+          });
+        }
+      ]
+    };
+  }]);

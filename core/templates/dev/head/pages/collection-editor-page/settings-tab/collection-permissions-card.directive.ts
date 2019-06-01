@@ -29,14 +29,9 @@ oppia.directive('collectionPermissionsCard', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-<<<<<<< HEAD:core/templates/dev/head/pages/collection-editor-page/settings-tab/collection-permissions-card.directive.ts
         '/pages/collection-editor-page/settings-tab/' +
         'collection-permissions-card.directive.html'),
-=======
-        '/pages/collection_editor/settings_tab/' +
-        'collection_permissions_card_directive.html'),
       controllerAs: '$ctrl',
->>>>>>> develop:core/templates/dev/head/pages/collection_editor/settings_tab/CollectionPermissionsCardDirective.ts
       controller: [
         'CollectionEditorStateService',
         function(CollectionEditorStateService) {

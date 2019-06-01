@@ -16,6 +16,10 @@
  * @fileoverview Constants for the Oppia contributors' library page.
  */
 
+// NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
+// be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
+// LIBRARY_PAGE_MODES.GROUP should have the same value as
+// LIBRARY_PAGE_MODE_GROUP in feconf.py.
 oppia.constant('LIBRARY_PAGE_MODES', {
   GROUP: 'group',
   INDEX: 'index',

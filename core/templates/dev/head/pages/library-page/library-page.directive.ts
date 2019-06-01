@@ -16,10 +16,17 @@
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
 
-require('components/loading/LoadingDotsDirective.ts');
-require('components/summary_tile/ExplorationSummaryTileDirective.ts');
-require('components/summary_tile/CollectionSummaryTileDirective.ts');
-require('pages/library/SearchResultsDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
+require(
+  'components/summary-tile-directives/' +
+  'exploration-summary-tile.directive.ts');
+require(
+  'components/summary-tile-directives/' +
+  'collection-summary-tile.directive.ts');
+require('pages/library-page/search-bar/search-bar.directive.ts');
+require('pages/library-page/search-results/search-results.directives.ts');
 
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts');
@@ -33,22 +40,7 @@ require('services/UserService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-// NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
-// be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
-// LIBRARY_PAGE_MODES.GROUP should have the same value as
-// LIBRARY_PAGE_MODE_GROUP in feconf.py.
-oppia.constant('LIBRARY_PAGE_MODES', {
-  GROUP: 'group',
-  INDEX: 'index',
-  SEARCH: 'search'
-});
-
-oppia.constant('LIBRARY_PATHS_TO_MODES', {
-  '/library': 'index',
-  '/library/top_rated': 'group',
-  '/library/recently_published': 'group',
-  '/search/find': 'search'
-});
+require('pages/library-page/library-page.constants.ts');
 
 oppia.directive('libraryPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -57,7 +49,7 @@ oppia.directive('libraryPage', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/library_page_directive.html'),
+        '/pages/library-page/library-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',

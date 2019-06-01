@@ -23,7 +23,8 @@ oppia.directive('collectionLocalNav', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/collection_local_nav_directive.html'),
+        '/pages/collection-player-page/collection-local-nav/' +
+        'collection-local-nav.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

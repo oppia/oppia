@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the Oppia admin page.
+ * @fileoverview Data and directive for the Oppia admin page.
  */
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
@@ -85,26 +85,46 @@ require(
   'pages/admin-page/admin-page-services/admin-router.service.ts');
 require('services/UtilsService.ts');
 
-oppia.controller('Admin', [
-    '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
-  function($http, $location, $scope, AdminRouterService, DEV_MODE) {
-    $scope.userEmail = GLOBALS.USER_EMAIL;
-    $scope.inDevMode = DEV_MODE;
+oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
+oppia.constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
+oppia.constant('PROFILE_URL_TEMPLATE', '/profile/<username>');
+oppia.constant(
+  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
+oppia.constant(
+  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
 
-    $scope.statusMessage = '';
-    $scope.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
-    $scope.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
-    $scope.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
-    $scope.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
-    $scope.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+oppia.directive('adminPage', ['UrlInterpolationService',
+  function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/admin-page/admin-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
+        function($http, $location, $scope, AdminRouterService, DEV_MODE) {
+          var ctrl = this;
+          ctrl.userEmail = GLOBALS.USER_EMAIL;
+          ctrl.inDevMode = DEV_MODE;
 
-    $scope.setStatusMessage = function(statusMessage) {
-      $scope.statusMessage = statusMessage;
+          ctrl.statusMessage = '';
+          ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
+          ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
+          ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
+          ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
+          ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+
+          ctrl.setStatusMessage = function(statusMessage) {
+            ctrl.statusMessage = statusMessage;
+          };
+
+          $scope.$on('$locationChangeSuccess', function() {
+            AdminRouterService.showTab($location.path().replace('/', '#'));
+          });
+        }
+      ]
     };
-
-    $scope.$on('$locationChangeSuccess', function() {
-      AdminRouterService.showTab($location.path().replace('/', '#'));
-    });
   }
 ]);
-

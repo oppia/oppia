@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the questions player directive.
+ * @fileoverview Controller for the questions player directive.
  */
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+
+require('domain/question/QuestionPlayerBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 require('domain/question/QuestionPlayerBackendApiService.ts');
@@ -107,45 +112,49 @@ oppia.directive('questionPlayer', [
       $http, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getQuestionPlayerConfig: '&playerConfig',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/question-directives/question-player/question-player.directive.html'),
+        '/components/question-directives/question-player/' +
+        'question-player.directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', 'QuestionPlayerBackendApiService',
+        '$rootScope', 'QuestionPlayerBackendApiService',
         function(
-            $scope, $rootScope, QuestionPlayerBackendApiService) {
-          $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
-          $scope.currentQuestion = 0;
-          $scope.totalQuestions = 0;
-          $scope.currentProgress = 0;
+            $rootScope, QuestionPlayerBackendApiService) {
+          var ctrl = this;
+          ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          ctrl.currentQuestion = 0;
+          ctrl.totalQuestions = 0;
+          ctrl.currentProgress = 0;
 
           var updateCurrentQuestion = function(currentQuestion) {
-            $scope.currentQuestion = currentQuestion;
+            ctrl.currentQuestion = currentQuestion;
             updateQuestionProgression();
           };
 
           var updateTotalQuestions = function(totalQuestions) {
-            $scope.totalQuestions = totalQuestions;
+            ctrl.totalQuestions = totalQuestions;
             updateQuestionProgression();
           };
 
           var updateQuestionProgression = function() {
             if (getTotalQuestions() > 0) {
-              $scope.currentProgress = (
+              ctrl.currentProgress = (
                 getCurrentQuestion() * 100 / getTotalQuestions());
             } else {
-              $scope.currentProgress = 0;
+              ctrl.currentProgress = 0;
             }
           };
 
           var getCurrentQuestion = function() {
-            return $scope.currentQuestion;
+            return ctrl.currentQuestion;
           };
 
           var getTotalQuestions = function() {
-            return $scope.totalQuestions;
+            return ctrl.totalQuestions;
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {

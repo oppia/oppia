@@ -29,14 +29,9 @@ oppia.directive('collectionNodeList', [
         getCollectionNodes: '&collectionNodes'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-<<<<<<< HEAD:core/templates/dev/head/pages/collection-player-page/collection-node-list/collection-node-list.directive.ts
         '/pages/collection-player-page/collection-node-list/' +
-        'collection-node-list.directive.html')
-=======
-        '/pages/collection_player/' +
-        'collection_node_list_directive.html'),
+        'collection-node-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {}]
->>>>>>> develop:core/templates/dev/head/pages/collection_player/CollectionNodeListDirective.ts
     };
   }]);

@@ -52,7 +52,7 @@ oppia.directive('collectionEditorPage', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/collection_editor_page_directive.html'),
+        '/pages/collection-editor-page/collection-editor-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'PageTitleService',

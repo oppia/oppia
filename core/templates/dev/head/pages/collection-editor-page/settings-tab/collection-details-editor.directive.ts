@@ -25,15 +25,10 @@ require(
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/collection/CollectionValidationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-<<<<<<< HEAD:core/templates/dev/head/pages/collection-editor-page/settings-tab/collection-details-editor.directive.ts
-require('pages/collection-editor-page/collection-editor-page.controller.ts');
+require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
   'pages/collection-editor-page/services/'+
   'collection-editor-state.service.ts');
-=======
-require('pages/collection_editor/CollectionEditorPageDirective.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
->>>>>>> develop:core/templates/dev/head/pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.ts
 require('services/AlertsService.ts');
 
 oppia.directive('collectionDetailsEditor', [
@@ -43,14 +38,9 @@ oppia.directive('collectionDetailsEditor', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-<<<<<<< HEAD:core/templates/dev/head/pages/collection-editor-page/settings-tab/collection-details-editor.directive.ts
         '/pages/collection-editor-page/settings-tab/' +
         'collection-details-editor.directive.html'),
-=======
-        '/pages/collection_editor/settings_tab/' +
-        'collection_details_editor_directive.html'),
       controllerAs: '$ctrl',
->>>>>>> develop:core/templates/dev/head/pages/collection_editor/settings_tab/CollectionDetailsEditorDirective.ts
       controller: [
         '$scope', 'CollectionEditorStateService', 'CollectionUpdateService',
         'CollectionValidationService', 'AlertsService', 'ALL_CATEGORIES',

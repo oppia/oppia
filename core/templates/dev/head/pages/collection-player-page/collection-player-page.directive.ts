@@ -18,12 +18,26 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('pages/collection_player/CollectionNodeListDirective.ts');
+require(
+  'pages/collection-player-page/collection-node-list/' +
+  'collection-node-list.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/attribution_guide/AttributionGuideDirective.ts');
-require('components/background/BackgroundBannerDirective.ts');
-require('components/summary_tile/ExplorationSummaryTileDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+require(
+  'components/summary-tile-directives/' +
+  'exploration-summary-tile.directive.ts');
+require(
+  'pages/collection-player-page/collection-footer/' +
+  'collection-footer.directive.ts');
+require(
+  'pages/collection-player-page/collection-local-nav/' +
+  'collection-local-nav.controller.ts');
 
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');
@@ -33,8 +47,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+require('pages/collection-player-page/collection-player-page.constants.ts');
 
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
@@ -54,7 +67,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/collection_player_page_directive.html'),
+        '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$anchorScroll', '$http', '$location', '$scope',
