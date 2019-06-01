@@ -377,12 +377,12 @@ p:last-child {
   font-size: 1em !important;
 }
 
-.oppia-rte ol, ul {
+.oppia-rte ol, .oppia-rte ul {
   line-height: 1.846;
   margin-bottom: 18px;
 }
 
-.oppia-rte-editor ol, ul {
+.oppia-rte-editor ol, .oppia-rte-editor ul {
   line-height: 1.846;
   margin-bottom: 18px;
 }
