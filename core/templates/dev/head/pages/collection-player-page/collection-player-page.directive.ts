@@ -37,7 +37,7 @@ require(
   'collection-footer.directive.ts');
 require(
   'pages/collection-player-page/collection-local-nav/' +
-  'collection-local-nav.controller.ts');
+  'collection-local-nav.directive.ts');
 
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');

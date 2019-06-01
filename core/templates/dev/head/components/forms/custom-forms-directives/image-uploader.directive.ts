@@ -31,7 +31,7 @@ oppia.directive('imageUploader', [
         width: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/image_uploader_directive.html'),
+        '/components/forms/custom-forms-directives/image-uploader.directive.html'),
       link: function(scope: ICustomScope, elt) {
         var onDragEnd = function(e) {
           e.preventDefault();

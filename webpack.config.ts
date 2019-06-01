@@ -36,10 +36,10 @@ module.exports = {
     app: commonPrefix + '/App.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
-      'collection-editor-page.controller.ts',
+      'collection-editor-page.scripts.ts',
     collection_player:
       commonPrefix + '/pages/collection-player-page/' +
-      'collection-player-page.controller.ts',
+      'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
@@ -66,7 +66,7 @@ module.exports = {
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.controller.ts',
-    library: commonPrefix + '/pages/library-page/library-page.controller.ts',
+    library: commonPrefix + '/pages/library-page/library-page.scripts.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
     moderator:
