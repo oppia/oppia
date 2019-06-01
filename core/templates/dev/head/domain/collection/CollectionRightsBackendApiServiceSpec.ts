@@ -17,7 +17,7 @@
  */
 
 require('domain/collection/CollectionRightsBackendApiService.ts');
-require('pages/collection-editor-page/collection-editor-page.controller.ts');
+require('pages/collection-editor-page/collection-editor-page.scripts.ts');
 
 describe('Collection rights backend API service', function() {
   var CollectionRightsBackendApiService = null;
