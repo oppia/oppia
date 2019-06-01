@@ -240,7 +240,7 @@ oppia.directive('audioTranslationBar', [
             $scope.voiceoverRecorder.getMp3Data().then(function(audio) {
               var fileType = 'audio/mp3';
               $scope.audioBlob = new Blob(audio, {type: fileType});
-              // Free the browser from web workers.
+              // Free the browser from web worker.
               $scope.voiceoverRecorder.closeRecorder();
               // Create audio play and pause for unsaved recording.
               var url = $window.URL.createObjectURL($scope.audioBlob);
