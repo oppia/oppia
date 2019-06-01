@@ -63,6 +63,10 @@ ISSUE_TYPE_KEYNAME_MAPPING = {
     'CyclicStateTransitions': 'state_names'
 }
 
+# Constants used for generating new ids.
+_MAX_RETRIES = 10
+_RAND_RANGE = 127 * 127
+
 
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
@@ -1134,23 +1138,92 @@ class PlaythroughModel(base_models.BaseModel):
         cls.delete_multi(instances)
 
 
-class LearnerAnswerDetailModel(base_models.BaseModel):
-    """Model for storing the approach/response learner enters when they
+class LearnerAnswerDetailsModel(base_models.BaseModel):
+    """Model for storing the answer details, learner enters when they
     are asked for it.
+
+    The id of instances of this class has the form
+        [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING]
     """
     # ID of the entity.
     entity_id = ndb.StringProperty(required=True, indexed=True)
     # The type of entity, that whether it is state, question, or any other
     # object if it is added in future.
     entity_type = ndb.StringProperty(required=True, indexed=True)
-    # ID of the response.
-    response_id = ndb.StringProperty(required=True, indexed=True)
-    # The answer entered by the learner.
+    # The answer submitted by the learner.
     learner_answer = ndb.StringProperty(required=True, indexed=False)
-    # The response entered by the learner.
+    # The response submitted by the learner.
     learner_response = ndb.StringProperty(required=True, indexed=False)
     # The time at which the response was created.
     created_on = ndb.DateTimeProperty(required=True, indexed=False)
+    # Whether the response received has been resolved.
+    is_resolved = ndb.BooleanProperty(default=False, required=True)
+
+    @classmethod
+    def get_entity_id(cls, exploration_id, state_name):
+        """Gets entity_id for a batch model based on given exploration state.
+
+        Args:
+            exploration_id: str. ID of the exploration currently being played.
+            state_name: str. The name of the state.
+
+        Returns:
+            str. Returns entity_id for a new instance of this class.
+        """
+        return '%s.%s' % (exploration_id, state_name)
+
+    @classmethod
+    def generate_new_answer_details_id(cls, entity_type, entity_id):
+        """Generates a new answer detail ID which is unique.
+
+        Args:
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
+
+        Returns:
+            str. An answer detail ID that is different from the IDs of all
+                the existing answer details within the given entity.
+
+        Raises:
+           Exception: There were too many collisions with existing answer
+               detail IDs when attempting to generate a new answer detail ID.
+        """
+        for _ in range(_MAX_RETRIES):
+            answer_details_id = (
+                entity_type + '.' + entity_id + '.' +
+                utils.base64_from_int(utils.get_current_time_in_millisecs()) +
+                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
+            if not cls.get_by_id(answer_details_id):
+                return answer_details_id
+        raise Exception(
+            'New answer detail id generator is producing too many collisions.')
+
+    @classmethod
+    def create(
+            cls, exp_id, state_name, entity_type, learner_answer,
+            learner_answer_details):
+        """Creates a new LearnerAnswerDetailsModel and
+        then writes it to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration currently being played.
+            state_name: str. The name of the state.
+            entity_type: str.  The type of entity, that whether it is state,
+                question, or any other object if it is added in future.
+            learner_answer: str. The answer entered by the user.
+            learner_answer_details: str. The details of the answer entered by
+                the learner.
+        """
+        entity_id = cls.get_entity_id(exp_id, state_name)
+        answer_details_id = cls.generate_new_answer_details_id(
+            entity_type, entity_id)
+        cls(
+            id=answer_details_id,
+            entity_id=entity_id,
+            entity_type=entity_type,
+            learner_answer=learner_answer,
+            learner_answer_details=learner_answer_details,
+            created_on=datetime.datetime.utcnow()).put()
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
