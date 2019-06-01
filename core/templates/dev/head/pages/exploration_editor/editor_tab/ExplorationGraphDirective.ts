@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
- /**
+/**
  * @fileoverview Directive for the exploration graph.
  */
 
@@ -46,29 +46,29 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
         ctrl.getGraphData = GraphDataService.getGraphData;
         ctrl.isEditable = EditabilityService.isEditable;
 
-         // We hide the graph at the outset in order not to confuse new
+        // We hide the graph at the outset in order not to confuse new
         // exploration creators.
         ctrl.isGraphShown = function() {
           return Boolean(ExplorationStatesService.isInitialized() &&
             ExplorationStatesService.getStateNames().length > 1);
         };
 
-         ctrl.deleteState = function(deleteStateName) {
+        ctrl.deleteState = function(deleteStateName) {
           ExplorationStatesService.deleteState(deleteStateName);
         };
 
-         ctrl.onClickStateInMinimap = function(stateName) {
+        ctrl.onClickStateInMinimap = function(stateName) {
           RouterService.navigateToMainTab(stateName);
         };
 
-         ctrl.getActiveStateName = function() {
+        ctrl.getActiveStateName = function() {
           return StateEditorService.getActiveStateName();
         };
 
-         ctrl.openStateGraphModal = function() {
+        ctrl.openStateGraphModal = function() {
           AlertsService.clearWarnings();
 
-           $uibModal.open({
+          $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration_editor/editor_tab/' +
               'exploration_graph_modal_directive.html'),
@@ -89,21 +89,21 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
                 $scope.graphData = GraphDataService.getGraphData();
                 $scope.isEditable = isEditable;
 
-                 $scope.deleteState = function(stateName) {
+                $scope.deleteState = function(stateName) {
                   $uibModalInstance.close({
                     action: 'delete',
                     stateName: stateName
                   });
                 };
 
-                 $scope.selectState = function(stateName) {
+                $scope.selectState = function(stateName) {
                   $uibModalInstance.close({
                     action: 'navigate',
                     stateName: stateName
                   });
                 };
 
-                 $scope.cancel = function() {
+                $scope.cancel = function() {
                   $uibModalInstance.dismiss('cancel');
                   AlertsService.clearWarnings();
                 };

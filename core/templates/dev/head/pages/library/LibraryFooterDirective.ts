@@ -34,4 +34,4 @@ oppia.directive('libraryFooter', ['UrlInterpolationService', function(
       }
     ]
   };
-  }]);
+}]);
