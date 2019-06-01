@@ -17,16 +17,18 @@
 from core.tests import test_utils
 import feconf
 
+
 class AnalyticsHandlerTests(test_utils.GenericTestBase):
-    
+
     def test_analytics_handler_returns_required_values(self):
-        
+
         values_dict = {
             'analytics_id': 'test123',
             'site_name_for_analytics': 'Oppia foundation'
         }
 
         with self.swap(feconf, 'ANALYTICS_ID', 'test123'):
-            with self.swap(feconf, 'SITE_NAME_FOR_ANALYTICS', 'Oppia foundation'):
+            with self.swap(
+                feconf, 'SITE_NAME_FOR_ANALYTICS', 'Oppia foundation'):
                 response = self.get_json(feconf.ANALYTICS_DATA_URL)
                 self.assertEqual(response, values_dict)

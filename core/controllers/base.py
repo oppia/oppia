@@ -37,7 +37,6 @@ import jinja_utils
 import utils
 
 from google.appengine.api import users
-import jinja2 # pylint: disable=unused-import
 import webapp2
 
 app_identity_services = models.Registry.import_app_identity_services()

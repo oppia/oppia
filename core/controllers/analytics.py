@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Controller for Google Analytics."""
+
 from core.controllers import acl_decorators
 from core.controllers import base
 import feconf
 
+
 class AnalyticsHandler(base.BaseHandler):
-    """Returns google analytics keys"""
-    
+    """Returns google analytics keys."""
+
     @acl_decorators.open_access
     def get(self):
         analytics_data = {
