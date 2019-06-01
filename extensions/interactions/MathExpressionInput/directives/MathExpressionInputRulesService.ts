@@ -19,6 +19,22 @@
 oppia.factory('MathExpressionInputRulesService', [function() {
   return {
     IsMathematicallyEquivalentTo: function(answer, inputs) {
+      try {
+        MathExpression.fromLatex(answer.latex);
+      } catch (e) {
+        throw Error(
+          'Bad answer: ' + e.message() + ' inputs: ' +
+          JSON.stringify(answer));
+      }
+
+      try {
+        MathExpression.fromLatex(inputs.x);
+      } catch (e) {
+        throw Error(
+          'Bad input: ' + e.message() + ' inputs: ' +
+          JSON.stringify(inputs));
+      }
+
       return (
         MathExpression.fromLatex(answer.latex).equals(
           MathExpression.fromLatex(inputs.x)));

@@ -18,6 +18,9 @@
 
 oppia.filter('removeDuplicatesInArray', [function() {
   return function(input) {
+    if (!input.filter) {
+      throw Error('Bad input: ' + JSON.stringify(input))
+    }
     return input.filter(function(val, pos) {
       return input.indexOf(val) === pos;
     });
