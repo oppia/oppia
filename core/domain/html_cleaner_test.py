@@ -27,19 +27,16 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         super(HtmlCleanerUnitTests, self).setUp()
         self.longMessage = True
 
-    def test_filter_a(self):
-        test_data = [(
-            'a', 'href', 'http://www.google.com', True
-        ), (
-            'a', 'href', '<code>http://www.google.com', False
-        ), (
-            'p', 'style', 'http://www.google.com', False
-        )]
+    def test_whitelisted_a_tags(self):
+    
+        self.assertTrue(
+                html_cleaner.filter_a('a', 'href', 'http://www.google.com'))
 
-        for datum in test_data:
-            self.assertEqual(
-                html_cleaner.filter_a(datum[0], datum[1], datum[2]),
-                datum[3])
+        self.assertFalse(
+                html_cleaner.filter_a('a', 'href', '<code>http://www.google.com'))
+
+        self.assertFalse(
+                html_cleaner.filter_a('p', 'style', 'http://www.google.com'))
 
     def test_good_tags_allowed(self):
         test_data = [(
