@@ -1135,8 +1135,8 @@ class PlaythroughModel(base_models.BaseModel):
 
 
 class LearnerAnswerDetailModel(base_models.BaseModel):
-    """Model for storing the approach/response user enters when he
-    is asked for it.
+    """Model for storing the approach/response learner enters when they
+    are asked for it.
     """
     # ID of the entity.
     entity_id = ndb.StringProperty(required=True, indexed=True)
@@ -1144,7 +1144,7 @@ class LearnerAnswerDetailModel(base_models.BaseModel):
     # object if it is added in future.
     entity_type = ndb.StringProperty(required=True, indexed=True)
     # ID of the response.
-    response_id = ndb.StringProperty(required=True, indexed=False)
+    response_id = ndb.StringProperty(required=True, indexed=True)
     # The answer entered by the learner.
     learner_answer = ndb.StringProperty(required=True, indexed=False)
     # The response entered by the learner.
