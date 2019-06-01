@@ -29,8 +29,8 @@ oppia.directive('continueButton', [
         focusLabel: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration-player-page/layout-directives/' +
-        'learner-experience/continue-button.directive.html')
+        '/pages/exploration-player-page/learner-experience/' +
+        'continue-button.directive.html')
     };
   }
 ]);
