@@ -13,13 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia library footer.
+ * @fileoverview Directive for the Oppia library footer.
  */
 
-oppia.controller('LibraryFooter', [
-  '$scope', '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-  function($scope, $window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
-    var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
-    $scope.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
-  }
-]);
+oppia.directive('libraryFooter', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/library/library_footer_directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
+      function($window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
+        var ctrl = this;
+        var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
+        ctrl.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
+      }
+    ]
+  };
+  }]);

@@ -13,7 +13,7 @@
 // limitations under the License.
 
  /**
- * @fileoverview Controllers for the exploration graph.
+ * @fileoverview Directive for the exploration graph.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
