@@ -1225,6 +1225,27 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             learner_answer_details=learner_answer_details,
             created_on=datetime.datetime.utcnow()).put()
 
+    @classmethod
+    def get_answer_details(
+            cls, entity_type, entity_id, limit=feconf.DEFAULT_QUERY_LIMIT):
+        """Returns a list of answer details associated with the entity, ordered
+        by their "created_on" field. The number of entities fetched is
+        limited by the `limit` argument to this method, whose default
+        value is equal to the default query limit.
+
+        Args:
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
+            limit: int. The maximum possible number of items in the returned
+                list.
+
+        Returns:
+            list(LearnerAnswerDetailsModel). List of answer details associated
+                with the entity. Doesn't include deleted entries.
+        """
+        return cls.get_all().filter(cls.entity_type == entity_type).filter(
+            cls.entity_id == entity_id).order(-cls.created_on).fetch(limit)
+
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
