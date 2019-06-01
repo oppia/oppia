@@ -17,6 +17,8 @@
  */
 
 require('components/background/BackgroundBannerDirective.ts');
+require('pages/FooterDirective.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.controller('Thanks', [

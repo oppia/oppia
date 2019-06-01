@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,23 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview Controllers for the error page.
+ /**
+ * @fileoverview Directive for the footer.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/PageTitleService.ts');
-require('pages/FooterDirective.ts');
 
-oppia.controller('Error', [
-  '$scope', 'PageTitleService', 'UrlInterpolationService',
-  function(
-      $scope, PageTitleService, UrlInterpolationService) {
-    $scope.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/oops_mint.png');
-
-    $scope.statusCode = GLOBALS.status_code;
-
-    PageTitleService.setPageTitle('Error ' + $scope.statusCode + ' - Oppia');
-  }
-]);
+oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/footer_directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+        function() {}
+    ]}}]);

@@ -19,6 +19,7 @@
 require('components/background/BackgroundBannerDirective.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
 require('filters/TruncateFilter.ts');
+require('pages/FooterDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');

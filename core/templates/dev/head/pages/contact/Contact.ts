@@ -17,3 +17,4 @@
  */
 
 require('components/background/BackgroundBannerDirective.ts');
+require('pages/FooterDirective.ts');

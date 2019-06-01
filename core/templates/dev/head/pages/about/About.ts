@@ -13,6 +13,7 @@
 // limitations under the License.
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/FooterDirective.ts');
 
 /**
  * @fileoverview Controllers for the about page.

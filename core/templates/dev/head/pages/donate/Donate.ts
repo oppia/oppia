@@ -19,6 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/contextual/WindowDimensionsService.ts');
+require('pages/FooterDirective.ts');
 
 oppia.controller('Donate', [
   '$http', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
