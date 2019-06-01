@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the Oppia library footer.
+ * @fileoverview Directive for the library footer.
  */
 
 oppia.directive('libraryFooter', ['UrlInterpolationService', function(
