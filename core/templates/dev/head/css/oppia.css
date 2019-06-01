@@ -377,6 +377,16 @@ p:last-child {
   font-size: 1em !important;
 }
 
+.oppia-rte ol, ul {
+  line-height: 1.846;
+  margin-bottom: 18px;
+}
+
+.oppia-rte-editor ol, ul {
+  line-height: 1.846;
+  margin-bottom: 18px;
+}
+
 .oppia-long-text-image {
   display: block;
   margin-left: auto;
