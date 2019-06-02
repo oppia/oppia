@@ -481,6 +481,7 @@ class Exploration(object):
             category: str. The category of the exploration.
             objective: str. The objective of the exploration.
             language_code: str. The language code of the exploration.
+            image_id_counter: int. Counter for an image id.
 
         Returns:
             Exploration. The Exploration domain object with default
@@ -498,7 +499,7 @@ class Exploration(object):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False,
-            feconf.DEFAULT_IMAGE_ID_COUNTER)
+            image_id_counter)
 
     @classmethod
     def from_dict(
@@ -704,7 +705,8 @@ class Exploration(object):
             state = self.states[state_name]
             state.validate(
                 self.param_specs,
-                allow_null_interaction=not strict)
+                self.image_id_counter,
+                allow_null_interaction=not strict,)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in
@@ -1150,13 +1152,11 @@ class Exploration(object):
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
-    @classmethod
-    def increment_image_id_counter(cls):
+    def increment_image_id_counter(self):
         """Increment the image_id counter."""
         self.image_id_counter += 1
 
-    @classmethod
-    def get_image_id_counter(cls):
+    def get_image_id_counter(self):
         """Returns the image_id counter."""
         return self.image_id_counter
 
@@ -2214,6 +2214,18 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
+        """TODO.
+            Converts from version 28 to 29. Version 29 added image assets field
+            in state model.
+
+         Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
         return states_dict
 
     @classmethod

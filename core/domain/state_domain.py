@@ -265,11 +265,8 @@ class ImageAssets(object):
             ValidationError: One or more attributes of the ImageAssets are not
             valid.
         """
-        for (image_id, image) in self.image_mapping.iteritems():
-            if not isinstance(image_id, int):
-                raise utils.ValidationError(
-                    'Expected image_id to be int, received %s' %
-                    image_id)
+        for image_id in self.image_mapping:
+            image = self.image_mapping[image_id]
             image.validate()
 
     def to_dict(self):
@@ -315,13 +312,16 @@ class ImageAssets(object):
             image_info: dict. The dicts representation of image info.
         """
 
-        src = image_info['src']
-        placeholder = image_info['placeholder']
-        author_id = image_info['author_id']
-        instructions = image_info['instructions']
+        if image_id in self.image_mapping:
+            raise utils.ValidationError('Image Id already exist.')
+        else:
+            src = image_info['src']
+            placeholder = image_info['placeholder']
+            author_id = image_info['author_id']
+            instructions = image_info['instructions']
 
-        image = Image(src, placeholder, author_id, instructions)
-        self.image_mapping[image_id] = image
+            image = Image(src, placeholder, author_id, instructions)
+            self.image_mapping[image_id] = image
 
     def delete_image(self, image_id):
         """Deletes an image from the state.
@@ -331,14 +331,13 @@ class ImageAssets(object):
         """
         del self.image_mapping[image_id]
 
-    @classmethod
-    def get_all_image_ids_(cls):
+    def get_all_image_ids(self):
         """Returns all image ids of images in the state.
 
         Returns:
             set. Set of image ids of all the images present in the state.
         """
-        return cls.image_mapping.keys()
+        return self.image_mapping.keys()
 
 
 class Solution(object):
@@ -1573,7 +1572,9 @@ class State(object):
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
 
-    def validate(self, exp_param_specs_dict, allow_null_interaction):
+    def validate(
+            self, exp_param_specs_dict, image_id_counter,
+            allow_null_interaction):
         """Validates various properties of the State.
 
         Args:
@@ -1582,6 +1583,7 @@ class State(object):
                 are ParamSpec value objects with an object type
                 property(obj_type). It is None if the state belongs to a
                 question.
+            image_id_counter: str. Counter for an image ids.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
 
@@ -1632,6 +1634,27 @@ class State(object):
                 raise utils.ValidationError(
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
+
+        # Validation for image ids.
+        # Things validated are.
+        #   1) Format of image id.
+        #   2) ImageID should be less then image counter.
+        #   3) Is more then one image id exist or not.
+        image_ids = self.image_assets.get_all_image_ids_()
+        copied_image_ids = copy.deepcopy(image_ids)
+        for image_id in image_ids:
+            if not isinstance(image_id, int):
+                raise utils.ValidationError(
+                    'Expected image_id to be int, received %s' %
+                    image_id)
+            if image_id > image_id_counter:
+                utils.ValidationError(
+                    'Found image id to be greater then image counter %s' %
+                    image_id)
+            copied_image_ids.pop(image_id)
+            if image_id in copied_image_ids:
+                raise utils.ValidationError(
+                    'Found a duplicate image id %s' % image_id)
 
         self.image_assets.validate()
         self.written_translations.validate(content_id_list)
