@@ -313,7 +313,8 @@ class ImageAssets(object):
         """
 
         if image_id in self.image_mapping:
-            raise utils.ValidationError('Image Id already exist.')
+            raise utils.ValidationError('Image Id already exist. %s' %
+                image_id)
         else:
             src = image_info['src']
             placeholder = image_info['placeholder']

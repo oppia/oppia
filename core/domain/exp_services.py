@@ -568,6 +568,16 @@ def get_top_rated_exploration_summaries(limit):
         exp_models.ExpSummaryModel.get_top_rated(limit))
 
 
+def get_deleted_images_ids():
+    """Returns a list of image_ids of all deleted images."""
+    return []
+
+
+def get_newly_added_images_ids():
+    """Returns a list of image_ids of newly images."""
+    return []
+
+
 def get_recently_published_exp_summaries(limit):
     """Returns a dict with recently published ExplorationSummary model
     instances, keyed by their exploration id. At most 'limit' entries are
@@ -758,11 +768,33 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.WrittenTranslations.from_dict(
                             change.new_value))
                     state.update_written_translations(written_translations)
-            # elif change.cmd == exp_domain.CMD_ADD_IMAGE:
-            #     if change.property_name == 'add_new_image':
-            #         state = exploration.states[change.state_name]
-            #         state_domain.ImageAssets()
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_ADD_NEW_IMAGE):
+                    # First deletes the image_ids from the ImageAssets of the
+                    # deleted images.
+                    deleted_image_ids = get_deleted_images_ids()
+                    for image_id in deleted_image_ids:
+                        state.image_assets.delete_image(image_id)
 
+                    # Find image_ids of newly added images.
+                    new_image_ids = get_newly_added_images_ids()
+
+                    # Adds a new image.
+                    if not isinstance(change.image_id, int):
+                        raise Exception(
+                            'Expected image_id to be int, '
+                            'received %s' % change.image_id)
+                    if not isinstance(change.image_info, dict):
+                        raise Exception(
+                            'Expected image_id to be dict, '
+                            'received %s' % change.image_info)
+                    if change.image_id not in new_image_ids:
+                        raise Exception(
+                            'Image Id does not exist in exploration, '
+                            'received image_id is %s' % change.image_id)
+                    state.image_assets.add_image(
+                        change.image_id, change.image_info)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
