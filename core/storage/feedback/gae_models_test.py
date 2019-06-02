@@ -77,7 +77,7 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
                     lambda x, y: True,
                     feedback_thread_model_cls)):
                 feedback_thread_model_cls.generate_new_thread_id(
-                    'exploration', 'entity_id')
+                    'exploration', 'exp_id')
 
 
 class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):

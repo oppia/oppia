@@ -102,6 +102,10 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             'b', 0, 'committer_id', 'username', 'msg',
             'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
+        # We need to manually set collection_id as it is a property of
+        # CollectionCommitLogEntryModel only and create() does not accept
+        # collection_id as a parameter. This property is set in
+        # CollectionModel._trusted_commit().
         private_commit.collection_id = 'a'
         public_commit.collection_id = 'b'
         private_commit.put()
