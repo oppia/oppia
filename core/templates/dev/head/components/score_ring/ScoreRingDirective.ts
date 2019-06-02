@@ -40,6 +40,9 @@ oppia.directive('scoreRing', [
           circle.style.strokeDasharray = `${circumference} ${circumference}`;
           circle.style.strokeDashoffset = circumference;
 
+          // SetScore is bound to the onload event for window to ensure
+          // that the animation of the ring being filled is visible to
+          // the user after all the elements are loaded.
           angular.element($window).bind('load', function() {
             setScore($scope.getScore());
           });
