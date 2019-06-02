@@ -25,7 +25,7 @@ oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/footer_directive.html'),
+      '/pages/oppia_footer_directive.html'),
     controllerAs: '$ctrl',
     controller: [
       function() {}
