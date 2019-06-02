@@ -51,7 +51,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             id='id',
             owner_ids=['owner_ids'],
             editor_ids=['editor_ids'],
-            translator_ids=['translator_ids'],
+            voice_artist_ids=['voice_artist_ids'],
             viewer_ids=['viewer_ids'],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
