@@ -632,7 +632,9 @@ textarea {
 
 .oppia-footer-container h4 {
   font-weight: bold;
+  font-size: 1em;
   text-transform: uppercase;
+  margin: 1.33em 0;
 }
 
 .oppia-footer-container ul {
