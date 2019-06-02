@@ -30,13 +30,16 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
     def test_whitelisted_a_tags(self):
 
         self.assertTrue(
-            html_cleaner.filter_a('a', 'href', 'http://www.google.com'))
+            html_cleaner.filter_a('a', 'href', 'http://www.oppia.com'))
 
         self.assertFalse(
-            html_cleaner.filter_a('a', 'href', '<code>http://www.google.com'))
+            html_cleaner.filter_a('a', 'href', '<code>http://www.oppia.com'))
 
         self.assertFalse(
-            html_cleaner.filter_a('p', 'style', 'http://www.google.com'))
+            html_cleaner.filter_a('p', 'href', 'http://www.oppia.com'))
+
+        self.assertFalse(
+            html_cleaner.filter_a('p', 'style', 'http://www.oppia.com'))
 
     def test_good_tags_allowed(self):
         test_data = [(
