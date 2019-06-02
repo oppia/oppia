@@ -113,6 +113,7 @@ export OPPIA_DIR=`pwd`
 export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
 export THIRD_PARTY_DIR=$OPPIA_DIR/third_party
+export GAE_THIRD_PARTY_LIB_DIR=$OPPIA_DIR/gae_third_party_lib
 export NODE_MODULE_DIR=$OPPIA_DIR/node_modules
 export ME=$(whoami)
 
