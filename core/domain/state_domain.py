@@ -173,16 +173,90 @@ class Hint(object):
         self.hint_content.validate()
 
 
+class Image(object):
+    """Value object representing the image for the state."""
+    def __init__(self, src, placeholder, author_id, instructions):
+        """Constructs an Image domain object.
+
+        Args:
+            src: str. The source of an image.
+            placeholder: bool. Is image a placeholder.
+            author_id: str. Id of an author which uploads an image.
+            instructions: str. Instructions for the image which needs in place
+                of a placeholder.
+        """
+        self.src = src
+        self.placeholder = placeholder
+        self.author_id = author_id
+        self.instructions = instructions
+
+    def to_dict(self):
+        """Returns a dict representing this Image domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of Image instance.
+        """
+        image = {}
+        image['src'] = self.src
+        image['placeholder'] = self.placeholder
+        image['author_id'] = self.author_id
+        image['instructions'] = self.instructions
+        return image
+
+    @classmethod
+    def from_dict(cls, image_info):
+        """Return an Imagedomain object from a dict.
+
+        Args:
+            image_info: dict. The dict representation of
+                Image object.
+
+        Returns:
+            Image. The corresponding ImageAssets domain
+            object.
+        """
+        src = image_info['src']
+        placeholder = image_info['placeholder']
+        author_id = image_info['author_id']
+        instructions = image_info['instructions']
+
+        return cls(src, placeholder, author_id, instructions)
+
+    def validate(self):
+        """Validates all properties of an Image.
+
+        Raises:
+            ValidationError: One or more attributes of the ImageAssets are not
+            valid.
+        """
+        if not isinstance(self.src, basestring):
+            raise utils.ValidationError(
+                'Expected image_src to be str, received %s' %
+                self.src)
+        if not isinstance(self.author_id, basestring):
+            raise utils.ValidationError(
+                'Expected author_id to be str, received %s' %
+                self.author_id)
+        if not isinstance(self.placeholder, bool):
+            raise utils.ValidationError(
+                'Expected placeholder to be bool, received %s' %
+                self.placeholder)
+        if not isinstance(self.instructions, basestring):
+            raise utils.ValidationError(
+                'Expected instructions to be string,' +
+                'received %s' %self.instructions)
+
+
 class ImageAssets(object):
     """Value object representing the images for the state."""
-    def __init__(self, image_assets_mapping):
+    def __init__(self, image_mapping):
         """Constructs a ImageAsset domain object.
 
         Args:
-            image_assets_mapping: dict. The dict representation of
+            image_mapping: dict. The dict representation of
                 ImageAssets mapping.
         """
-        self.image_assets_mapping = image_assets_mapping
+        self.image_mapping = image_mapping
 
     def validate(self):
         """Validates all properties of ImageAssets.
@@ -191,33 +265,12 @@ class ImageAssets(object):
             ValidationError: One or more attributes of the ImageAssets are not
             valid.
         """
-        for (image_id, image_info) in self.image_assets_mapping.iteritems():
+        for (image_id, image) in self.image_assets_mapping.iteritems():
             if not isinstance(image_id, int):
                 raise utils.ValidationError(
                     'Expected image_id to be int, received %s' %
                     image_id)
-
-            image_src = image_info['src']
-            image_author_id = image_info['author_id']
-            image_is_placeholder = image_info['is_placeholder']
-            instructions_if_placeholder = image_info['instructions']
-
-            if not isinstance(image_src, basestring):
-                raise utils.ValidationError(
-                    'Expected image_src to be str, received %s' %
-                    image_src)
-            if not isinstance(image_author_id, basestring):
-                raise utils.ValidationError(
-                    'Expected image_author_id to be str, received %s' %
-                    image_author_id)
-            if not isinstance(image_is_placeholder, bool):
-                raise utils.ValidationError(
-                    'Expected image_is_placeholder to be bool, received %s' %
-                    image_is_placeholder)
-            if not isinstance(instructions_if_placeholder, basestring):
-                raise utils.ValidationError(
-                    'Expected instructions_if_placeholder to be string,' +
-                    'received %s' %instructions_if_placeholder)
+            image.validate()
 
     def to_dict(self):
         """Returns a dict representing this ImageAssets domain object.
@@ -226,15 +279,13 @@ class ImageAssets(object):
             dict. A dict, mapping all fields of ImageAssets instance.
         """
         image_assets = {}
-        image_assets_mapping = {}
+        image_mapping = {}
 
-        for image_id in self.image_assets_mapping:
-            image_assets_mapping[image_id] = {}
-            image = self.image_assets_mapping[image_id]
-            for info in image:
-                image_assets_mapping[image_id][info] = image[info]
+        for image_id in self.image_mapping:
+            image = self.image_mapping[image_id]
+            image_mapping[image_id] = image.to_dict()
 
-        image_assets['image_assets_mapping'] = image_assets_mapping
+        image_assets['image_mapping'] = image_mapping
         return image_assets
 
     @classmethod
@@ -249,30 +300,28 @@ class ImageAssets(object):
             ImageAssets. The corresponding ImageAssets domain
             object.
         """
-        image_assets_mapping = {}
-        for image_id in image_assets_dict['image_assets_mapping']:
-            image_assets_mapping[image_id] = {}
-            image = image_assets_dict[image_id]
-            for info in image:
-                image_assets_mapping[image_id][info] = image[info]
+        image_mapping = {}
+        for image_id in image_assets_dict['image_mapping']:
+            image_info = image_assets_dict[image_id]
+            image_mapping[image_id] = Image.from_dict(image_info)
 
+        return cls(image_mapping)
 
-        return cls(image_assets_mapping)
-
-    @classmethod
-    def add_image(cls, image_id, image_info):
+    def add_image(self, image_id, image_info):
         """Adds default image object in state.
 
         Args:
-            image_id: int, The image_id of an image.
+            image_id: int. The image_id of an image.
             image_info: dict. The dicts representation of image info.
         """
 
-        image = {}
-        for info in image_info:
-            image[info] = image_info[info]
+        src = image_info['src']
+        placeholder = image_info['placeholder']
+        author_id = image_info['author_id']
+        instructions = image_info['instructions']
 
-        self.image_assets_mapping[image_id] = image
+        image = Image(src, placeholder, author_id, instructions)
+        self.image_mapping[image_id] = image
 
     def delete_image(self, image_id):
         """Deletes an image from the state.
@@ -280,16 +329,16 @@ class ImageAssets(object):
         Args:
             image_id: str. ID of an image.
         """
-        del self.image_assets_mapping[image_id]
+        del self.image_mapping[image_id]
 
     @classmethod
-    def get_image_ids_of_state(cls):
+    def get_all_image_ids_(cls):
         """Returns all image ids of images in the state.
 
         Returns:
             set. Set of image ids of all the images present in the state.
         """
-        return cls.image_assets_mapping.keys()
+        return cls.image_mapping.keys()
 
 
 class Solution(object):
