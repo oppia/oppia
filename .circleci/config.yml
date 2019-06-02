@@ -23,8 +23,8 @@ jobs:
     steps:
       - checkout
       - run: date +%F > date
-      - restore_cache:
-          <<: *restore_cache
+      # - restore_cache:
+      #     <<: *restore_cache
       - run:
           <<: *install_dependencies
       - save_cache:
