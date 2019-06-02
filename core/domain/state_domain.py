@@ -265,7 +265,7 @@ class ImageAssets(object):
             ValidationError: One or more attributes of the ImageAssets are not
             valid.
         """
-        for (image_id, image) in self.image_assets_mapping.iteritems():
+        for (image_id, image) in self.image_mapping.iteritems():
             if not isinstance(image_id, int):
                 raise utils.ValidationError(
                     'Expected image_id to be int, received %s' %

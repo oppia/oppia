@@ -82,8 +82,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 }
             },
             'image_assets': {
-                'image_assets_mapping': {},
-                'image_id_counter': 0
+                'image_mapping': {},
             }
         }
         self.assertEqual(expected_dict, state_dict)

@@ -538,7 +538,7 @@ var constants = {
           "content_id": "content"
       },
       "image_assets": {
-        "image_assets_mapping": {}
+        "image_mapping": {}
       },
       "interaction": {
             "id": null,

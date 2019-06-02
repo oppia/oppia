@@ -1244,7 +1244,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1280,7 +1280,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1340,7 +1340,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1376,7 +1376,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1561,7 +1561,7 @@ content:
   content_id: content
   html: ''
 image_assets:
-  image_assets_mapping: {}
+  image_mapping: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1600,7 +1600,7 @@ content:
   content_id: content
   html: ''
 image_assets:
-  image_assets_mapping: {}
+  image_mapping: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1640,7 +1640,7 @@ content:
   content_id: content
   html: ''
 image_assets:
-  image_assets_mapping: {}
+  image_mapping: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -3110,7 +3110,7 @@ states:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3134,7 +3134,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []

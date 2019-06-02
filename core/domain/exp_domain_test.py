@@ -3760,7 +3760,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups:
       - outcome:
@@ -3813,7 +3813,7 @@ states:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3837,7 +3837,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4307,7 +4307,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4339,7 +4339,7 @@ states:
       content_id: content
       html: <blockquote><p>Hello, this is state1</p></blockquote>
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4382,7 +4382,7 @@ states:
       content_id: content
       html: <p>Hello, </p><p>this <em>is </em>state2</p>
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4467,7 +4467,7 @@ states:
       content_id: content
       html: <p>Hello, this is state3</p>
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4664,7 +4664,7 @@ states:
         filepath-with-value="&amp;quot;random_height_490_width_120.png&amp;quot;"></oppia-noninteractive-image><p>Hello
         this is test case to check image tag inside p tag</p>
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4717,7 +4717,7 @@ states:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4741,7 +4741,7 @@ states:
       content_id: content
       html: ''
     image_assets:
-      image_assets_mapping: {}
+      image_mapping: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4822,7 +4822,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'html': content_str,
                 },
                 'image_assets': {
-                    'image_assets_mapping': {},
+                    'image_mapping': {},
                 },
                 'recorded_voiceovers': {
                     'voiceovers_mapping': {
