@@ -221,7 +221,7 @@ def get_collection_summary_by_id(collection_id):
     """
     # TODO(msl): Maybe use memcache similarly to get_collection_by_id.
     collection_summary_model = collection_models.CollectionSummaryModel.get(
-        collection_id)
+        collection_id, strict=False)
     if collection_summary_model:
         collection_summary = get_collection_summary_from_model(
             collection_summary_model)
@@ -555,28 +555,14 @@ def get_collection_ids_matching_query(query_string, cursor=None):
         collection_ids, search_cursor = search_services.search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
-        invalid_collection_ids = []
-        for ind, model in enumerate(
+        for ind, _ in enumerate(
                 collection_models.CollectionSummaryModel.get_multi(
                     collection_ids)):
-            if model is not None:
-                returned_collection_ids.append(collection_ids[ind])
-            else:
-                invalid_collection_ids.append(collection_ids[ind])
+            returned_collection_ids.append(collection_ids[ind])
 
         if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
                 search_cursor is None):
             break
-        else:
-            logging.error(
-                'Search index contains stale collection ids: %s' %
-                ', '.join(invalid_collection_ids))
-
-    if (len(returned_collection_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-            and search_cursor is not None):
-        logging.error(
-            'Could not fulfill search request for query string %s; at least '
-            '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
     return (returned_collection_ids, search_cursor)
 
@@ -712,19 +698,16 @@ def _save_collection(committer_id, collection, commit_message, change_list):
 
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)
-    if collection_model is None:
-        collection_model = collection_models.CollectionModel(id=collection.id)
-    else:
-        if collection.version > collection_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of collection '
-                'from version %s. Please reload the page and try again.'
-                % (collection_model.version, collection.version))
-        elif collection.version < collection_model.version:
-            raise Exception(
-                'Trying to update version %s of collection from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (collection_model.version, collection.version))
+    if collection.version > collection_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of collection '
+            'from version %s. Please reload the page and try again.'
+            % (collection_model.version, collection.version))
+    elif collection.version < collection_model.version:
+        raise Exception(
+            'Trying to update version %s of collection from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (collection_model.version, collection.version))
 
     collection_model.category = collection.category
     collection_model.title = collection.title
@@ -1132,17 +1115,11 @@ def load_demo(collection_id):
     """
     delete_demo(collection_id)
 
-    if not collection_domain.Collection.is_demo_collection_id(collection_id):
-        raise Exception('Invalid demo collection id %s' % collection_id)
-
     demo_filepath = os.path.join(
         feconf.SAMPLE_COLLECTIONS_DIR,
         feconf.DEMO_COLLECTIONS[collection_id])
 
-    if demo_filepath.endswith('yaml'):
-        yaml_content = utils.get_file_contents(demo_filepath)
-    else:
-        raise Exception('Unrecognized file path: %s' % demo_filepath)
+    yaml_content = utils.get_file_contents(demo_filepath)
 
     collection = save_new_collection_from_yaml(
         feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
