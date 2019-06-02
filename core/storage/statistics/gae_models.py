@@ -1177,8 +1177,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         # NOTE: In future if this model is used for any other entity type,
         # then make the id_parameters dict for it, for eg. id_parameters
         # dict for entity type exploration is {'exp_id': '', 'state_name': ''}
-        #  and add a elif condition in this function with the method to
-        #  generate the entity_id.
+        #  and add an elif condition in this function with the method to
+        #  generate the entity_id for that entity.
         if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
             return '%s.%s' % (
                 id_parameters['exp_id'], id_parameters['state_name'])
