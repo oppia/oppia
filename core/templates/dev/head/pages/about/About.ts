@@ -13,7 +13,7 @@
 // limitations under the License.
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/FooterDirective.ts');
+require('pages/OppiaFooterDirective.ts');
 
 /**
  * @fileoverview Controllers for the about page.

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the library footer.
  */
 
-require('pages/FooterDirective.ts');
+require('pages/OppiaFooterDirective.ts');
 
 oppia.directive('libraryFooter', ['UrlInterpolationService', function(
     UrlInterpolationService) {

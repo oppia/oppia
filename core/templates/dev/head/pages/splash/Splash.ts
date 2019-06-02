@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
-require('pages/FooterDirective.ts');
+require('pages/OppiaFooterDirective.ts');
 
 oppia.controller('Splash', [
   '$rootScope', '$scope', '$timeout', '$window', 'SiteAnalyticsService',

@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the teach page.
  */
 
-require('pages/FooterDirective.ts');
+require('pages/OppiaFooterDirective.ts');
 
 require('components/background/BackgroundBannerDirective.ts');
 require('domain/utilities/UrlInterpolationService.ts');

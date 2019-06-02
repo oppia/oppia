@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PageTitleService.ts');
-require('pages/FooterDirective.ts');
+require('pages/OppiaFooterDirective.ts');
 
 oppia.controller('Error', [
   '$scope', 'PageTitleService', 'UrlInterpolationService',
