@@ -363,13 +363,13 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         response = self.get_html_response('/explore/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        suggestion_to_accept = self.get_json(
+        suggestion_to_reject = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
         suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion_to_accept['suggestion_id'])
+            suggestion_to_reject['suggestion_id'])
 
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
@@ -379,20 +379,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         response = self.put_json('%s/exploration/%s/%s' % (
             feconf.SUGGESTION_ACTION_URL_PREFIX,
-            suggestion_to_accept['target_id'],
-            suggestion_to_accept['suggestion_id']), {
+            suggestion_to_reject['target_id'],
+            suggestion_to_reject['suggestion_id']), {
                 'action': u'reject',
                 'review_message': u'Rejected!'
             }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion_to_accept['suggestion_id'])
+            suggestion_to_reject['suggestion_id'])
 
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_REJECTED)
 
         self.logout()
-
 
     def test_accept_suggestion(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -710,18 +709,18 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TopicSuggestionTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
-        self.set_admins([self.OWNER_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
 
         self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.owner_id, 'Description')
+        self.save_new_skill(self.skill_id, self.admin_id, 'Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.owner_id, 'Name', 'Description',
+            self.topic_id, self.admin_id, 'Name', 'Description',
             [], [], [self.skill_id], [], 1)
 
         self.question_dict = {
@@ -756,23 +755,11 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_access_suggestion_to_topic_handler(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
 
         thread_id = feedback_services.create_thread(
             suggestion_models.TARGET_TYPE_QUESTION, self.topic_id,
             self.author_id, 'description', '', has_suggestion=True)
-
-        suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_QUESTION, self.topic_id,
-            1, suggestion_models.STATUS_IN_REVIEW, self.author_id,
-            None, {
-                'cmd': (
-                    question_domain
-                    .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-                'question_dict': self.question_dict,
-                'skill_id': None
-            }, 'score_category', thread_id)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -787,7 +774,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_topic_handler_with_invalid_target_type(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
 
         thread_id = feedback_services.create_thread(
             suggestion_models.TARGET_TYPE_QUESTION, self.topic_id,
@@ -822,7 +809,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_topic_handler_with_invalid_target_id(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -833,7 +820,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
                 self.author_id))['suggestions'][0]
 
         self.save_new_topic(
-            'topic_id', self.owner_id, 'Name1', 'Description',
+            'topic_id', self.admin_id, 'Name1', 'Description',
             [], [], [], [], 1)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
@@ -843,7 +830,11 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
-                    'topic_id', suggestion_to_accept['suggestion_id']), {},
+                    'topic_id', suggestion_to_accept['suggestion_id']),
+                {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                },
                 csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
@@ -854,7 +845,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_suggestion_to_topic_handler_with_invalid_action(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -882,18 +873,18 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_reject_suggestion(self):
-        self.login(self.OWNER_EMAIL)
+        self.login(self.ADMIN_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        suggestion_to_accept = self.get_json(
+        suggestion_to_reject = self.get_json(
             '%s?author_id=%s' % (
                 feconf.SUGGESTION_LIST_URL_PREFIX,
                 self.author_id))['suggestions'][0]
 
         suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion_to_accept['suggestion_id'])
+            suggestion_to_reject['suggestion_id'])
 
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_IN_REVIEW)
@@ -904,14 +895,14 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.put_json('%s/topic/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'],
-                suggestion_to_accept['suggestion_id']), {
+                suggestion_to_reject['target_id'],
+                suggestion_to_reject['suggestion_id']), {
                     'action': u'reject',
                     'review_message': u'Rejected!'
                 }, csrf_token=csrf_token)
 
         suggestion = suggestion_services.get_suggestion_by_id(
-            suggestion_to_accept['suggestion_id'])
+            suggestion_to_reject['suggestion_id'])
 
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_REJECTED)
