@@ -51,7 +51,7 @@ class LibraryPageTests(test_utils.GenericTestBase):
     def test_library_page(self):
         """Test access to the library page."""
         response = self.get_html_response(feconf.LIBRARY_INDEX_URL)
-        response.mustcontain('ng-controller="Library"')
+        response.mustcontain('<library-page></library-page>')
 
     def test_library_handler_demo_exploration(self):
         """Test the library data handler on demo explorations."""

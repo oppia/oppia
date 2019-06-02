@@ -264,9 +264,9 @@ describe('Permissions for private explorations', function() {
     });
   });
 
-  it('should be correct for translators', function() {
+  it('should be correct for voice artists', function() {
     users.createUser('expOwner@oppia.tests', 'expOwner');
-    users.createUser('translator@oppia.tests', 'translator');
+    users.createUser('voiceArtist@oppia.tests', 'voiceArtist');
     users.createUser('guestUser@oppia.tests', 'guestUser');
 
     users.login('expOwner@oppia.tests');
@@ -274,16 +274,16 @@ describe('Permissions for private explorations', function() {
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorPage.saveChanges('Added content to first card.');
     explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('translators');
-    workflow.addExplorationTranslator('translator');
+    explorationEditorSettingsTab.setTitle('voice artists');
+    workflow.addExplorationVoiceArtist('voiceArtist');
     expect(workflow.getExplorationManagers()).toEqual(['expOwner']);
     expect(workflow.getExplorationCollaborators()).toEqual([]);
-    expect(workflow.getExplorationTranslators()).toEqual(['translator']);
+    expect(workflow.getExplorationVoiceArtists()).toEqual(['voiceArtist']);
     expect(workflow.getExplorationPlaytesters()).toEqual([]);
     general.getExplorationIdFromEditor().then(function(explorationId) {
       users.logout();
 
-      users.login('translator@oppia.tests');
+      users.login('voiceArtist@oppia.tests');
       general.openEditor(explorationId);
       explorationEditorMainTab.expectContentToMatch(
         forms.toRichText('this is card 1'));
