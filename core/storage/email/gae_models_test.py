@@ -127,6 +127,50 @@ class SentEmailModelUnitTests(test_utils.GenericTestBase):
                     'Email Hash',
                     sent_datetime_lower_bound='Not a datetime object')
 
+    def test_raise_exception_by_mocking_collision(self):
+        # Test Exception for SentEmailModel.
+        with self.assertRaisesRegexp(
+            Exception, 'The id generator for SentEmailModel is '
+            'producing too many collisions.'
+            ):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                email_models.SentEmailModel, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    email_models.SentEmailModel)):
+                email_models.SentEmailModel.create(
+                    'recipient_id', 'recipient@email.com', 'sender_id',
+                    'sender@email.com', feconf.EMAIL_INTENT_SIGNUP,
+                    'Email Subject', 'Email Body', datetime.datetime.utcnow())
+
+        # Test Exception for GeneralFeedbackEmailReplyToIdModel.
+        with self.assertRaisesRegexp(
+            Exception, 'Unique id generator is producing too many collisions.'
+            ):
+            # Swap dependent method get_by_reply_to_id to simulate collision
+            # every time.
+            with self.swap(
+                email_models.GeneralFeedbackEmailReplyToIdModel,
+                'get_by_reply_to_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    email_models.GeneralFeedbackEmailReplyToIdModel)):
+                email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                    'user', 'exploration.exp0.0')
+
+    def test_raise_exception_with_existing_reply_to_id(self):
+        # Test Exception for GeneralFeedbackEmailReplyToIdModel.
+        model = email_models.GeneralFeedbackEmailReplyToIdModel.create(
+            'user1', 'exploration.exp1.1')
+        model.put()
+
+        with self.assertRaisesRegexp(
+            Exception, 'Unique reply-to ID for given user and thread '
+            'already exists.'):
+            email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                'user1', 'exploration.exp1.1')
+
 
 class GenerateHashTests(test_utils.GenericTestBase):
     """Test that generating hash functionality works as expected."""
