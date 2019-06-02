@@ -471,7 +471,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/moderatorrights/<exploration_id>',
         editor.ExplorationModeratorRightsHandler),
     get_redirect_route(
-        r'/createhandler/notificationpreferences/<exploration_id>',
+        r'%s/<exploration_id>' % feconf.USER_EXPLORATION_EMAILS_PREFIX,
         editor.UserExplorationEmailsHandler),
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',

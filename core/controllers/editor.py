@@ -96,11 +96,6 @@ class ExplorationPage(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in constants.DISABLED_EXPLORATION_IDS:
-            self.render_template(
-                'pages/error/disabled_exploration.html',
-                iframe_restriction=None)
-            return
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
@@ -271,11 +266,7 @@ class ExplorationRightsHandler(EditorHandler):
 
         elif make_community_owned:
             exploration = exp_services.get_exploration_by_id(exploration_id)
-            try:
-                exploration.validate(strict=True)
-            except utils.ValidationError as e:
-                raise self.InvalidInputException(e)
-
+            exploration.validate(strict=True)
             rights_manager.release_ownership_of_exploration(
                 self.user, exploration_id)
 
@@ -416,10 +407,7 @@ class ExplorationFileDownloader(EditorHandler):
     @acl_decorators.can_download_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
-            raise self.PageNotFoundException
+        exploration = exp_services.get_exploration_by_id(exploration_id)
 
         version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
@@ -456,11 +444,8 @@ class StateYamlHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
         """Handles POST requests."""
-        try:
-            state_dict = self.payload.get('state_dict')
-            width = self.payload.get('width')
-        except Exception:
-            raise self.PageNotFoundException
+        state_dict = self.payload.get('state_dict')
+        width = self.payload.get('width')
 
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
@@ -477,7 +462,7 @@ class ExplorationResourcesHandler(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
+            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
         dir_list = fs.listdir('')
 
         self.render_json({'filepaths': dir_list})
