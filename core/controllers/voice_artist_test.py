@@ -106,7 +106,6 @@ class VoiceArtistTest(BaseVoiceArtistControllerTests):
                 }, csrf_token=self.csrf_token)
 
     def test_voice_artist_can_save_valid_change_list(self):
-        state_name = feconf.DEFAULT_INIT_STATE_NAME
         response = self.put_json(
             '/createhandler/voiceover/%s' % self.EXP_ID, {
                 'change_list': [{
