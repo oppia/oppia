@@ -92,11 +92,11 @@ oppia.directive('topNavigationBar', [
           });
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
-            'create', 'explore', 'collection', 'topics_and_skills_dashboard',
-            'topic_editor', 'skill_editor', 'story_editor'];
+            'create', 'explore', 'collection', 'collection_editor',
+            'topics_and_skills_dashboard', 'topic_editor', 'skill_editor',
+            'story_editor'];
           ctrl.currentUrl = window.location.pathname.split('/')[1];
           ctrl.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
-          ctrl.newStructuresEnabled = constants.ENABLE_NEW_STRUCTURE_EDITORS;
           ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           ctrl.logoutUrl = LOGOUT_URL;
           ctrl.userMenuIsShown = (ctrl.currentUrl !== NAV_MODE_SIGNUP);
