@@ -340,13 +340,13 @@ def main():
             if not modified_files and not files_to_lint:
                 continue
             if files_to_lint:
-                lint_status = 0
+                lint_status = _start_linter(files_to_lint)
                 if lint_status != 0:
                     print 'Push failed, please correct the linting issues above'
                     sys.exit(1)
             frontend_status = 0
-            # If does_diff_include_js_or_ts_files(files_to_lint):
-            #     Frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
+            if does_diff_include_js_or_ts_files(files_to_lint):
+                frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
                 sys.exit(1)
