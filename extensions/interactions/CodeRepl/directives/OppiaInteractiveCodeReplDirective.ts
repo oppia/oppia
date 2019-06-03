@@ -45,7 +45,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           var ctrl = this;
           ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
-          ctrl.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             ctrl.interactionIsActive = false;
           });
           ctrl.language = HtmlEscaperService.escapedJsonToObj(

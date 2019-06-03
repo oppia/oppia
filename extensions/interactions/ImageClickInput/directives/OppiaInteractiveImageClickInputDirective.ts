@@ -41,8 +41,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
         'image_click_input_interaction_directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$element', '$attrs', 'CurrentInteractionService',
-        function($element, $attrs, CurrentInteractionService) {
+        '$element', '$attrs', '$scope', 'CurrentInteractionService',
+        function($element, $attrs, $scope, CurrentInteractionService) {
           var ctrl = this;
           var imageAndRegions = HtmlEscaperService.escapedJsonToObj(
             $attrs.imageAndRegionsWithValue);
@@ -148,7 +148,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
             return 'inline';
           };
-          ctrl.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             ctrl.interactionIsActive = false;
             ctrl.lastAnswer = {
               clickPosition: [ctrl.mouseX, ctrl.mouseY]

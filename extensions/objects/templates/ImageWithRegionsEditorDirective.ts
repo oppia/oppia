@@ -182,7 +182,7 @@ oppia.directive('imageWithRegionsEditor', [
                     <HTMLCanvasElement><any> this).width;
                   ctrl.originalImageHeight = (
                     <HTMLCanvasElement><any> this).height;
-                  ctrl.$apply();
+                  $scope.$apply();
                 }
               );
             }
