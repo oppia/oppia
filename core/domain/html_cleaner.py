@@ -26,32 +26,31 @@ import bs4
 from core.domain import rte_component_registry
 
 
-def filter_a(tag, name, value):
-    """Returns whether the described attribute of an anchor ('a') tag should be
+def filter_tag(unused_tag, name, value):
+    """Returns whether the described attribute of a tag should be
     whitelisted.
 
     Args:
-        tag: str. The value of the tag passed.
+        unused_tag: str. The value of the tag passed.
         name: str. The name of the attribute.
         value: str. The value of the attribute.
 
     Returns:
         bool. Whether the given attribute should be whitelisted.
     """
-    if tag == 'a':
-        if name in ('title', 'target'):
+    if name in ('title', 'target'):
+        return True
+    if name == 'href':
+        url_components = urlparse.urlsplit(value)
+        if url_components[0] in ['http', 'https']:
             return True
-        if name == 'href':
-            url_components = urlparse.urlsplit(value)
-            if url_components[0] in ['http', 'https']:
-                return True
-            logging.error('Found invalid URL href: %s' % value)
+        logging.error('Found invalid URL href: %s' % value)
 
     return False
 
 
 ATTRS_WHITELIST = {
-    'a': filter_a,
+    'a': filter_tag,
     'b': [],
     'blockquote': [],
     'br': [],

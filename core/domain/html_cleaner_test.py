@@ -27,19 +27,19 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         super(HtmlCleanerUnitTests, self).setUp()
         self.longMessage = True
 
-    def test_whitelisted_a_tags(self):
+    def test_whitelisted_tags(self):
 
         self.assertTrue(
-            html_cleaner.filter_a('a', 'href', 'http://www.oppia.com'))
+            html_cleaner.filter_tag('a', 'href', 'http://www.oppia.com'))
 
         self.assertFalse(
-            html_cleaner.filter_a('a', 'href', '<code>http://www.oppia.com'))
+            html_cleaner.filter_tag('a', 'href', '<code>http://www.oppia.com'))
+
+        self.assertTrue(
+            html_cleaner.filter_tag('link', 'href', 'http://www.oppia.com'))
 
         self.assertFalse(
-            html_cleaner.filter_a('p', 'href', 'http://www.oppia.com'))
-
-        self.assertFalse(
-            html_cleaner.filter_a('p', 'style', 'http://www.oppia.com'))
+            html_cleaner.filter_tag('p', 'style', 'http://www.oppia.com'))
 
     def test_good_tags_allowed(self):
         test_data = [(
