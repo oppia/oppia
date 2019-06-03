@@ -245,6 +245,7 @@
 /core/domain/question*.py @aks681
 /core/storage/question/ @aks681
 /core/templates/dev/head/components/QuestionCreationService*.ts @aks681
+/core/templates/dev/head/components/score_ring/ @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681
 /core/templates/dev/head/pages/practice_session/ @vinitamurthi
 /core/templates/dev/head/pages/question_editor/ @aks681
