@@ -258,6 +258,15 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             self.system_user, '0')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
+        mock_accepted_audio_extensions = {
+            'mp3': ['audio/mp3'],
+            'flac': ['audio/flac']
+        }
+
+        self.accepted_audio_extensions_swap = self.swap(
+            feconf, 'ACCEPTED_AUDIO_EXTENSIONS',
+            mock_accepted_audio_extensions)
+
     def test_audio_upload(self):
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/create/0')
@@ -290,12 +299,14 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
         self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
-        self.post_json(
-            '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
-            {'filename': self.TEST_AUDIO_FILE_FLAC},
-            csrf_token=csrf_token,
-            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
-        )
+        with self.accepted_audio_extensions_swap:
+            self.post_json(
+                '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
+                {'filename': self.TEST_AUDIO_FILE_FLAC},
+                csrf_token=csrf_token,
+                upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+            )
+
         self.assertTrue(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
         self.logout()
@@ -313,15 +324,16 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                   mode='rb') as f:
             raw_audio = f.read()
 
-        response_dict = self.post_json(
-            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-            {'filename': mismatched_filename},
-            csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
-        )
+        with self.accepted_audio_extensions_swap:
+            response_dict = self.post_json(
+                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+                {'filename': mismatched_filename},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+                upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+            )
+
         self.logout()
-        self.assertEqual(response_dict['status_code'], 400)
         self.assertIn(
             'Although the filename extension indicates the file is a flac '
             'file, it was not recognized as one. Found mime types:',
@@ -340,15 +352,16 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
                                'img.png'),
                   mode='rb') as f:
             raw_audio = f.read()
-        response_dict = self.post_json(
-            '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
-            {'filename': self.TEST_AUDIO_FILE_FLAC},
-            csrf_token=csrf_token,
-            expected_status_int=400,
-            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
-        )
+
+        with self.accepted_audio_extensions_swap:
+            response_dict = self.post_json(
+                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+                {'filename': self.TEST_AUDIO_FILE_FLAC},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+                upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+            )
         self.logout()
-        self.assertEqual(response_dict['status_code'], 400)
         self.assertEqual(response_dict['error'], 'Audio not recognized as '
                          'a flac file')
 
