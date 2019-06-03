@@ -432,7 +432,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationRightsService.init(
           explorationData.rights.owner_names,
           explorationData.rights.editor_names,
-          explorationData.rights.translator_names,
+          explorationData.rights.voice_artist_names,
           explorationData.rights.viewer_names, explorationData.rights.status,
           explorationData.rights.cloned_from,
           explorationData.rights.community_owned,
@@ -445,7 +445,7 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markEditable();
         }
 
-        if (GLOBALS.can_translate || GLOBALS.can_edit) {
+        if (GLOBALS.can_voiceover || GLOBALS.can_edit) {
           EditabilityService.markTranslatable();
         }
 
