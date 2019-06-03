@@ -147,8 +147,8 @@ oppia.controller('SettingsTab', [
       name: 'Collaborator (can make changes)',
       value: 'editor'
     }, {
-      name: 'Translator (can do audio translations)',
-      value: 'translator'
+      name: 'Voice Artist (can do voiceover)',
+      value: 'voice artist'
     }, {
       name: 'Playtester (can give feedback)',
       value: 'viewer'
@@ -407,6 +407,10 @@ oppia.controller('SettingsTab', [
 
     $scope.closeRolesForm = function() {
       $scope.isRolesFormOpen = false;
+    };
+
+    $scope.isTitlePresent = function() {
+      return ExplorationTitleService.savedMemento.length > 0;
     };
   }
 ]);
