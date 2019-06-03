@@ -106,7 +106,7 @@ require(
   'pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.ts');
 require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
 require('pages/exploration_editor/ParamChangesEditorDirective.ts');
-require('pages/exploration_editor/editor_tab/ExplorationEditorTab.ts');
+require('pages/exploration_editor/editor_tab/ExplorationEditorTabDirective.ts');
 require('pages/exploration_editor/editor_tab/ExplorationGraph.ts');
 require(
   'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');

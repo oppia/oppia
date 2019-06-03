@@ -18,7 +18,7 @@
 
 require('App.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/editor_tab/ExplorationEditorTab.ts');
+require('pages/exploration_editor/editor_tab/ExplorationEditorTabDirective.ts');
 require('pages/state_editor/state_properties/StateContentService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
 
