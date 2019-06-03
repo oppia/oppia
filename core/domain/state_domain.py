@@ -314,7 +314,7 @@ class ImageAssets(object):
 
         if image_id in self.image_mapping:
             raise utils.ValidationError('Image Id already exist. %s' %
-                image_id)
+                                        image_id)
         else:
             src = image_info['src']
             placeholder = image_info['placeholder']
@@ -1641,7 +1641,7 @@ class State(object):
         #   1) Format of image id.
         #   2) ImageID should be less then image counter.
         #   3) Is more then one image id exist or not.
-        image_ids = self.image_assets.get_all_image_ids_()
+        image_ids = self.image_assets.get_all_image_ids()
         copied_image_ids = copy.deepcopy(image_ids)
         for image_id in image_ids:
             if not isinstance(image_id, int):

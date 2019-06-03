@@ -29,6 +29,7 @@ import logging
 import math
 import os
 import pprint
+import re
 import traceback
 import zipfile
 
@@ -568,14 +569,48 @@ def get_top_rated_exploration_summaries(limit):
         exp_models.ExpSummaryModel.get_top_rated(limit))
 
 
-def get_deleted_images_ids():
-    """Returns a list of image_ids of all deleted images."""
-    return []
+def get_images_ids_of_exploration(exploration_id):
+    """Returns a list of image_ids of newly images.
+
+    Args:
+        exploration_id: str. Id of an exploration.
+
+    Returns:
+        list. List of ids, of all images present in an exploration.
+    """
+    image_ids = []
+    exploration = get_exploration_by_id(exploration_id)
+    exploration_content = (exploration.get_all_html_content_strings())[0]
+    image_ids_with_value = (
+        re.findall('image_id=["][0-9]*["]', exploration_content))
+
+    # image_ids_with_value is a list whose value be like
+    # ['image_id="4"', 'image_id="2"', 'image_id="5555"'].
+    # So to get all individual image id with type int, a loop is run to
+    # get the desired result i.e [4,2,555].
+
+    for each_image_id in image_ids_with_value:
+        image_id = each_image_id.replace('image_id="', '')
+        image_id = image_id.replace('"', '')
+        image_ids.append(int(image_id))
+    return image_ids
 
 
-def get_newly_added_images_ids():
-    """Returns a list of image_ids of newly images."""
-    return []
+def get_deleted_images_ids(exploration_id, image_ids_before_change):
+    """Returns a list of image_ids of all deleted images.
+
+    Args:
+        exploration_id: str. Id of an exploration.
+        image_ids_before_change: list. List of all ids of all images present
+            in an exploration before change.
+
+    Returns:
+        list. List of ids, of all deleted images of an exploration.
+    """
+    image_ids_after_change = get_images_ids_of_exploration(exploration_id)
+    deleted_image_ids = (
+        list(set(image_ids_before_change) - set(image_ids_after_change)))
+    return deleted_image_ids
 
 
 def get_recently_published_exp_summaries(limit):
@@ -694,6 +729,7 @@ def apply_change_list(exploration_id, change_list):
         Exception: Any entries in the changelist are invalid.
     """
     exploration = get_exploration_by_id(exploration_id)
+    image_ids_before_change = get_images_ids_of_exploration(exploration_id)
     try:
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
@@ -771,14 +807,16 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_ADD_NEW_IMAGE):
-                    # First deletes the image_ids from the ImageAssets of the
-                    # deleted images.
-                    deleted_image_ids = get_deleted_images_ids()
-                    for image_id in deleted_image_ids:
-                        state.image_assets.delete_image(image_id)
+                    # First deletes the image_ids of deleted images from the
+                    # ImageAssets.
+                    deleted_image_ids = get_deleted_images_ids(
+                        exploration_id, image_ids_before_change)
+                    if deleted_image_ids != []:
+                        for image_id in deleted_image_ids:
+                            state.image_assets.delete_image(image_id)
 
                     # Find image_ids of newly added images.
-                    new_image_ids = get_newly_added_images_ids()
+                    image_ids = get_images_ids_of_exploration(exploration_id)
 
                     # Adds a new image.
                     if not isinstance(change.image_id, int):
@@ -789,10 +827,15 @@ def apply_change_list(exploration_id, change_list):
                         raise Exception(
                             'Expected image_id to be dict, '
                             'received %s' % change.image_info)
-                    if change.image_id not in new_image_ids:
+                    if change.image_id not in image_ids:
                         raise Exception(
                             'Image Id does not exist in exploration, '
                             'received image_id is %s' % change.image_id)
+                    if change.image_id > exploration.image_id_counter:
+                        raise Exception(
+                            'Image Id is greater then image_id counter'
+                            'not possible, received image_id is %s' %
+                            change.image_id)
                     state.image_assets.add_image(
                         change.image_id, change.image_info)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
