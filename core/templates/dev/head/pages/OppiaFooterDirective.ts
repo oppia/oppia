@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,19 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the 'thanks' page.
+ * @fileoverview Directive for the footer.
  */
-
-require('components/background/BackgroundBannerDirective.ts');
-require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.controller('Thanks', [
-  '$scope', 'UrlInterpolationService',
-  function(
-      $scope, UrlInterpolationService) {
-    $scope.thanksImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/donate.png');
+oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/oppia_footer_directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      function() {}
+    ]
   }
-]);
+}]);
