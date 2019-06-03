@@ -189,7 +189,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
 
         response = self.get_json(
             '/emaildashboarddatahandler',
-            params={'num_queries_to_fetch': 'invalid_num_queries_to_fetch'},
+            params={'num_queries_to_fetch': '-5'},
             expected_status_int=400)
         self.assertEqual(
             response['error'], '400 Invalid input for query results.')
