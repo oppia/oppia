@@ -30,5 +30,5 @@ oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
     controller: [
       function() {}
     ]
-  }
+  };
 }]);
