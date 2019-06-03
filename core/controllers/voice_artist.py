@@ -60,7 +60,7 @@ class AudioUploadHandler(base.BaseHandler):
     # to the end of 'assets/').
     _FILENAME_PREFIX = 'audio'
 
-    @acl_decorators.can_translate_exploration
+    @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
         raw_audio_file = self.request.get('raw_audio_file')
@@ -138,10 +138,10 @@ class AudioUploadHandler(base.BaseHandler):
         self.render_json({'filename': filename})
 
 
-class TranslatorAutosaveHandler(base.BaseHandler):
-    """Handles requests from the translator for draft autosave."""
+class VoiceArtistAutosaveHandler(base.BaseHandler):
+    """Handles requests from the voice artist for draft autosave."""
 
-    @acl_decorators.can_translate_exploration
+    @acl_decorators.can_voiceover_exploration
     def put(self, exploration_id):
         """Handles PUT requests for draft updation."""
         # Raise an Exception if the draft change list fails non-strict
@@ -154,7 +154,7 @@ class TranslatorAutosaveHandler(base.BaseHandler):
             version = self.payload.get('version')
             exp_services.create_or_update_draft(
                 exploration_id, self.user_id, change_list, version,
-                datetime.datetime.utcnow(), is_by_translator=True)
+                datetime.datetime.utcnow(), is_by_voice_artist=True)
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
@@ -169,21 +169,21 @@ class TranslatorAutosaveHandler(base.BaseHandler):
             'is_version_of_draft_valid': exp_services.is_version_of_draft_valid(
                 exploration_id, version)})
 
-    @acl_decorators.can_translate_exploration
+    @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id):
         """Handles POST request for discarding draft changes."""
         exp_services.discard_draft(exploration_id, self.user_id)
         self.render_json({})
 
 
-class ExplorationTranslationHandler(base.BaseHandler):
-    """Handles updates to exploration translations. It returns json format
+class ExplorationVoiceoverHandler(base.BaseHandler):
+    """Handles updates to exploration voiceovers. It returns json format
     response when an exception is raised.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_translate_exploration
+    @acl_decorators.can_voiceover_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration.
 
@@ -206,7 +206,7 @@ class ExplorationTranslationHandler(base.BaseHandler):
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message,
-                is_by_translator=True)
+                is_by_voice_artist=True)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
