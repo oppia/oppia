@@ -259,7 +259,12 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
             last_updated_ms_before_deletion = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
-            exp_services.delete_exploration(USER_ID, EXP_ID)
+            # Set remove_from_subscribers to False because we depend on
+            # RecentUpdatesMRJobManager to loop over UserSubscriptionsModel for
+            # explorations the user has subscribed to and check changes.
+            exp_services.delete_exploration(
+                USER_ID, EXP_ID,
+                remove_from_subscribers=False)
 
             MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(

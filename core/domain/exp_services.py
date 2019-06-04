@@ -993,7 +993,9 @@ def save_new_exploration(committer_id, exploration):
     user_services.record_user_created_an_exploration(committer_id)
 
 
-def delete_exploration(committer_id, exploration_id, force_deletion=False):
+def delete_exploration(
+        committer_id, exploration_id, force_deletion=False,
+        remove_from_subscribers=True):
     """Deletes the exploration with the given exploration_id.
 
     IMPORTANT: Callers of this function should ensure that committer_id has
@@ -1010,6 +1012,9 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         force_deletion: bool. If True, completely deletes the storage models
             corresponding to the exploration. Otherwise, marks them as deleted
             but keeps the corresponding models in the datastore.
+        remove_from_subscribers: bool. If True, create a task in the taskqueue
+            to remove deleted exploration id from all subscribers' activity_ids
+            field.
     """
     # TODO(sll): Delete the files too?
 
@@ -1046,10 +1051,11 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         exploration_id, exploration_version)
 
     # Remove from subscribers.
-    taskqueue_services.defer(
-        delete_exploration_from_subscribed_users,
-        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
-        exploration_id)
+    if remove_from_subscribers:
+        taskqueue_services.defer(
+            delete_exploration_from_subscribed_users,
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+            exploration_id)
 
 
 def delete_exploration_from_subscribed_users(exploration_id):
