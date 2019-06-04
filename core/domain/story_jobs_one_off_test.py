@@ -137,3 +137,34 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         expected = [[u'story_migrated',
                      [u'1 stories successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_migration_job_skips_updated_story_failing_validation(self):
+
+        def _mock_get_story_by_id(unused_story_id):
+            """Mocks get_story_by_id()."""
+            return 'invalid_story'
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A title')
+        story_services.save_new_story(self.albert_id, story)
+
+        get_story_by_id_swap = self.swap(
+            story_services, 'get_story_by_id', _mock_get_story_by_id)
+
+        with get_story_by_id_swap:
+            job_id = (
+                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(
+            job_id)
+
+        # If the story had been successfully migrated, this would include a
+        # 'successfully migrated' message. Its absence means that the story
+        # could not be processed.
+        expected = [[u'validation_error',
+                     [u'Story %s failed validation: \'str\' object has '
+                      'no attribute \'validate\'' % (self.STORY_ID)]]]
+        self.assertEqual(
+            expected, [ast.literal_eval(x) for x in output])
