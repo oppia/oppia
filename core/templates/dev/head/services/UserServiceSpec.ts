@@ -93,6 +93,7 @@ describe('User Service', function() {
     });
     $httpBackend.flush();
 
+    sampleUserInfoBackendObject['user_is_logged_in'] = false;
     $httpBackend.when('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
     $httpBackend.expect('GET', requestUrl).respond(404);
