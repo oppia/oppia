@@ -120,7 +120,7 @@ require('pages/exploration_editor/settings_tab/SettingsTab.ts');
 require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');
 require(
   'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
-require('pages/exploration_editor/statistics_tab/StatisticsTab.ts');
+require('pages/exploration_editor/statistics_tab/StatisticsTabDirective.ts');
 require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');

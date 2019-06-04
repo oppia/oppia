@@ -77,7 +77,7 @@
       </div>
 
       <div ng-show="getActiveTabName() === 'stats'">
-        {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
+        <statistics-tab></statistics-tab>
       </div>
 
       <improvements-tab ng-if="getActiveTabName() === 'improvements'">
