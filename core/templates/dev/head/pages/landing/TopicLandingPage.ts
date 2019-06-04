@@ -16,6 +16,8 @@
  * @fileoverview Controller for landing page.
  */
 
+require('components/background/BackgroundBannerDirective.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/CapitalizeFilter.ts');
 require('pages/landing/TopicLandingPage.ts');
@@ -29,17 +31,61 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
     fractions: {
       collection_id: '4UgTQUc1tala',
       page_data: {
-        image_1: 'matthew_paper.png',
-        image_2: 'matthew_fractions.png',
+        image_1: {
+          file_name: 'matthew_paper.png',
+          alt: 'Matthew showing parts of fractions written on a card.'
+        },
+        image_2: {
+          file_name: 'matthew_fractions.png',
+          alt: 'Matthew solving problems on Oppia.'
+        },
         video: 'fractions_video.mp4',
+        lessons: [
+          'What is a Fraction?',
+          'Comparing Fractions',
+          'The Meaning of "Equal Parts"',
+          'Adding and Subtracting Fractions'
+        ]
+      }
+    },
+    'negative-numbers': {
+      collection_id: 'GdYIgsfRZwG7',
+      page_data: {
+        image_1: {
+          file_name: 'negative_1.png',
+          alt: 'A boy showing 3 + -24 written on a slate.'
+        },
+        image_2: {
+          file_name: 'negative_2.png',
+          alt: 'A boy smiling and solving negative-number problems on Oppia.'
+        },
+        video: 'negative-numbers_video.mp4',
+        lessons: [
+          'The number line',
+          'What is a negative number?',
+          'Adding and subtracting negative numbers'
+        ]
       }
     },
     ratios: {
       collection_id: '53gXGLIR044l',
       page_data: {
-        image_1: 'ratios_James.png',
-        image_2: 'ratios_question.png',
+        image_1: {
+          file_name: 'ratios_James.png',
+          alt: 'A boy showing 2 is to 3 ratio on a card.'
+        },
+        image_2: {
+          file_name: 'ratios_question.png',
+          alt: 'A smoothie shop and a card having question "What does a ratio' +
+            'tell us?" with options.'
+        },
         video: 'ratios_video.mp4',
+        lessons: [
+          'What is Ratio?',
+          'Equivalent Ratios',
+          'Ratios & Proportional Reasoning',
+          'Writing Ratios in Simplest Form'
+        ]
       }
     }
   }
@@ -64,20 +110,29 @@ oppia.controller('TopicLandingPage', [
     var pageTitle = 'Learn ' + capitalizedTopic + ' - Oppia';
     PageTitleService.setPageTitle(pageTitle);
 
-    $scope.getRowImageUrl = function(index) {
+    $scope.lessons = landingPageData.lessons;
+    $scope.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
+      '/splash/books.svg');
+
+
+    var getImageData = function(index) {
       var imageKey = 'image_' + index;
       if (landingPageData[imageKey]) {
         var imagePath = UrlInterpolationService.interpolateUrl(
           angular.copy(assetsPathFormat), {
             subject: $scope.subject,
             topic: $scope.topic,
-            file_name: landingPageData[imageKey]
+            file_name: landingPageData[imageKey].file_name
           });
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      } else {
-        throw Error('page_data does not have ' + imageKey + ' key.');
+        return {
+          src: UrlInterpolationService.getStaticImageUrl(imagePath),
+          alt: landingPageData[imageKey].alt
+        };
       }
     };
+
+    $scope.image1 = getImageData(1);
+    $scope.image2 = getImageData(2);
 
     $scope.getVideoUrl = function() {
       if (landingPageData.video) {
@@ -91,11 +146,6 @@ oppia.controller('TopicLandingPage', [
       } else {
         throw Error('There is no video data available for this landing page.');
       }
-    };
-
-    $scope.getStaticSubjectImageUrl = function(subjectName) {
-      return UrlInterpolationService.getStaticImageUrl(
-        '/subjects/' + subjectName + '.svg');
     };
 
     $scope.onClickGetStartedButton = function() {
