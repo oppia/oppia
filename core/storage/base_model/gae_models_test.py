@@ -45,7 +45,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(
             base_models.BaseModel.get('Invalid id', strict=False))
 
-    def test_export_data_raises_not_implemented_error(self):
+    def test_base_model_export_data_raises_not_implemented_error(self):
         with self.assertRaises(NotImplementedError):
             base_models.BaseModel.export_data('user_id')
 
@@ -261,7 +261,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             Exception, 'This model instance has been deleted.'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
 
-    def test_raises_error_with_trusted_commit_method(self):
+    def test_trusted_commit_with_no_snapshot_metadata_raises_error(self):
         model1 = TestVersionedModel(id='model_id1')
         model1.SNAPSHOT_METADATA_CLASS = None
         with self.assertRaisesRegexp(
@@ -304,7 +304,7 @@ class VersionedModelTests(test_utils.GenericTestBase):
             Exception, 'Invalid change list command:'):
             model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [{'cmd': 'AUTO'}])
 
-    def test_revert_with_not_allowed_revert_raises_error(self):
+    def test_revert_raises_error_when_not_allowed(self):
         model1 = TestVersionedModel(id='model_id1')
         with self.assertRaisesRegexp(
             Exception,
@@ -359,13 +359,15 @@ class TestBaseModel(base_models.BaseModel):
 
 class BaseModelTests(test_utils.GenericTestBase):
 
-    def test_raise_exception_by_mocking_collision(self):
-        with self.assertRaisesRegexp(
-            Exception, 'New id generator is producing too many collisions.'):
-            # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
-                TestBaseModel, 'get_by_id',
-                types.MethodType(
-                    lambda _, __: True,
-                    TestBaseModel)):
-                TestBaseModel.get_new_id('exploration')
+    def test_create_raises_error_when_many_id_collisions_occur(self):
+
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+                TestBaseModel, 'get_by_id', types.MethodType(
+                    lambda _, __: True, TestBaseModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'New id generator is producing too many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            TestBaseModel.get_new_id('exploration')

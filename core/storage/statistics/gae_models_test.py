@@ -99,7 +99,7 @@ class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
 
         self.assertEqual(sorted(versions), ['1', '2'])
 
-        # Test get_version for invalid exploration id.
+    def test_get_version_for_invalid_exploration_id(self):
         versions = stats_models.ExplorationAnnotationsModel.get_versions(
             'invalid_exp_id')
 
@@ -162,7 +162,7 @@ class StateAnswersModelTests(test_utils.GenericTestBase):
 
 class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
 
-    def test_create_and_get_models(self):
+    def test_get_model_returns_created_properties(self):
 
         stats_models.StateAnswersCalcOutputModel.create_or_update(
             'exp_id', '1', 'state_name', '', 'calculation_id', '', {})
@@ -442,15 +442,16 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         instances = stats_models.PlaythroughModel.get_multi(instance_ids)
         self.assertEqual(instances, [None, None])
 
-    def test_raise_exception_by_mocking_collision(self):
-        with self.assertRaisesRegexp(
+    def test_create_raises_error_when_many_id_collisions_occur(self):
+        # Swap dependent method get_by_id to simulate collision every time.
+        get_by_id_swap = self.swap(
+                stats_models.PlaythroughModel, 'get_by_id', types.MethodType(
+                    lambda _, __: True, stats_models.PlaythroughModel))
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'The id generator for PlaythroughModel is producing too '
-            'many collisions.'):
-            # Swap dependent method get_by_id to simulate collision every time.
-            with self.swap(
-                stats_models.PlaythroughModel, 'get_by_id',
-                types.MethodType(
-                    lambda x, y: True,
-                    stats_models.PlaythroughModel)):
-                stats_models.PlaythroughModel.create(
-                    'exp_id1', 1, 'EarlyQuit', {}, [])
+            'many collisions.')
+
+        with assert_raises_regexp_context_manager, get_by_id_swap:
+            stats_models.PlaythroughModel.create(
+                'exp_id1', 1, 'EarlyQuit', {}, [])
