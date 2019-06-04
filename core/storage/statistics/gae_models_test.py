@@ -185,9 +185,9 @@ class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
 
         observed_log_messages = []
 
-        def _mock_logging_function(msg, *_):
+        def _mock_logging_function(msg, *args):
             """Mocks logging.exception."""
-            observed_log_messages.append(msg)
+            observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'exception', _mock_logging_function)
 
