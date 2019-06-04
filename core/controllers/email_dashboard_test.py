@@ -213,10 +213,13 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             '/emaildashboarddatahandler',
             params={'num_queries_to_fetch': 1})
 
-        self.assertEqual(response['recent_queries'][0]['id'], query_id)
+        self.assertEqual(len(response['recent_queries']), 1)
+
+        recent_query = response['recent_queries'][0]
+
+        self.assertEqual(recent_query['id'], query_id)
         self.assertEqual(
-            response['recent_queries'][0]['status'],
-            feconf.USER_QUERY_STATUS_PROCESSING)
+            recent_query['status'], feconf.USER_QUERY_STATUS_PROCESSING)
 
         self.logout()
 
