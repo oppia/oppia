@@ -16,23 +16,23 @@
  * @fileoverview Unit tests for the exploration history tab.
  */
 
-require('pages/exploration_editor/history_tab/HistoryTabDirective.ts');
+require('pages/exploration_editor/history_tab/HistoryTab.ts');
 
 describe('HistoryTab controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('HistoryTab', function() {
-    var $componentController, historyTabCtrl;
+    var $scope, historyTabCtrl;
 
-    beforeEach(angular.mock.inject(function(_$componentController_) {
-      $componentController = _$componentController_;
-      historyTabCtrl = $componentController('historyTab', null, {});
+    beforeEach(angular.mock.inject(function($controller, $rootScope) {
+      $scope = $rootScope.$new();
+      historyTabCtrl = $controller('HistoryTab', {$scope: $scope});
     }));
 
     it('should get version numbers of revisions to be displayed',
       function() {
-        historyTabCtrl.displayedCurrentPageNumber = 1;
-        historyTabCtrl.versionCheckboxArray = [
+        $scope.displayedCurrentPageNumber = 1;
+        $scope.versionCheckboxArray = [
           {vnum: 32, selected: false},
           {vnum: 31, selected: true},
           {vnum: 30, selected: false},
@@ -66,13 +66,13 @@ describe('HistoryTab controller', function() {
           {vnum: 2, selected: false},
           {vnum: 1, selected: false}
         ];
-        historyTabCtrl.computeVersionsToDisplay();
-        expect(historyTabCtrl.versionNumbersToDisplay).toEqual([
+        $scope.computeVersionsToDisplay();
+        expect($scope.versionNumbersToDisplay).toEqual([
           32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16,
           15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3]);
-        historyTabCtrl.displayedCurrentPageNumber = 2;
-        historyTabCtrl.computeVersionsToDisplay();
-        expect(historyTabCtrl.versionNumbersToDisplay).toEqual([2, 1]);
+        $scope.displayedCurrentPageNumber = 2;
+        $scope.computeVersionsToDisplay();
+        expect($scope.versionNumbersToDisplay).toEqual([2, 1]);
       }
     );
   });
