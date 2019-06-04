@@ -243,7 +243,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
             'collection_id', self.owner_id)
 
         apply_change_list_swap = self.swap(
-            collection_services, 'apply_change_list', lambda x, y: collection)
+            collection_services, 'apply_change_list', lambda _, __: collection)
 
         with apply_change_list_swap, self.assertRaisesRegexp(
             Exception,

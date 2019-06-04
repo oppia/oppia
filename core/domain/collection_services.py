@@ -555,11 +555,16 @@ def get_collection_ids_matching_query(query_string, cursor=None):
         collection_ids, search_cursor = search_services.search_collections(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
+        # Collection model cannot be None as we are fetching the collection ids
+        # through query and there cannot be a collection id for which there is
+        # no collection.
         for ind, _ in enumerate(
                 collection_models.CollectionSummaryModel.get_multi(
                     collection_ids)):
             returned_collection_ids.append(collection_ids[ind])
 
+        # The number of collections in a page is always lesser or equal to
+        # feconf.SEARCH_RESULTS_PAGE_SIZE.
         if len(returned_collection_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE or (
                 search_cursor is None):
             break
@@ -696,6 +701,9 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     if rights_manager.is_collection_public(collection.id):
         validate_exps_in_collection_are_public(collection)
 
+    # Collection model cannot be none as we are passing the collection as a
+    # parameter and also this function is called by update_collection which only
+    # works if the collection is put into the datastore.
     collection_model = collection_models.CollectionModel.get(
         collection.id, strict=False)
     if collection.version > collection_model.version:
