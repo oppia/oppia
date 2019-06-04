@@ -58,7 +58,7 @@ oppia.directive('audioTranslationBar', [
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
           scope.dropAreaIsAccessible = GLOBALS.can_voiceover;
-          scope.userIsGuest = userIsLoggedIn;
+          scope.userIsGuest = !userIsLoggedIn;
           scope.$digest();
           return false;
         });

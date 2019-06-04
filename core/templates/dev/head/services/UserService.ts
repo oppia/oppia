@@ -13,6 +13,7 @@
 // limitations under the License.
 
 require('services/contextual/UrlService.ts');
+require('domain/user/UserInfoObjectFactory.ts');
 
 /**
  * @fileoverview Service for user data.
