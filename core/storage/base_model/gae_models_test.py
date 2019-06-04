@@ -363,8 +363,8 @@ class BaseModelTests(test_utils.GenericTestBase):
 
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
-                TestBaseModel, 'get_by_id', types.MethodType(
-                    lambda _, __: True, TestBaseModel))
+            TestBaseModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, TestBaseModel))
 
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'New id generator is producing too many collisions.')

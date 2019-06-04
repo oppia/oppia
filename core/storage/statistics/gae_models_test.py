@@ -445,8 +445,8 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
     def test_create_raises_error_when_many_id_collisions_occur(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
-                stats_models.PlaythroughModel, 'get_by_id', types.MethodType(
-                    lambda _, __: True, stats_models.PlaythroughModel))
+            stats_models.PlaythroughModel, 'get_by_id', types.MethodType(
+                lambda _, __: True, stats_models.PlaythroughModel))
 
         assert_raises_regexp_context_manager = self.assertRaisesRegexp(
             Exception, 'The id generator for PlaythroughModel is producing too '
