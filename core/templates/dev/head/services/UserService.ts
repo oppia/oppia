@@ -40,6 +40,7 @@ oppia.factory('UserService', [
       ).then(function(response) {
         if (response.data.user_is_logged_in) {
           userInfo = UserInfoObjectFactory.createFromBackendDict(response.data);
+          return $q.resolve(userInfo);
         } else {
           return $q.resolve(UserInfoObjectFactory.createDefault());
         }
