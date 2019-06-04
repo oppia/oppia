@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia library footer.
+ * @fileoverview Directive for the footer.
  */
 
-oppia.controller('LibraryFooter', [
-  '$scope', '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-  function($scope, $window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
-    var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
-    $scope.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
-  }
-]);
+require('domain/utilities/UrlInterpolationService.ts');
+
+oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/oppia_footer_directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      function() {}
+    ]
+  };
+}]);

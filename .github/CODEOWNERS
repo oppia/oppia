@@ -391,7 +391,8 @@
 /app.yaml @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
 /core/templates/dev/head/pages/base.html @vojtechjelinek
-/core/templates/dev/head/pages/footer.html @vojtechjelinek
+/core/templates/dev/head/pages/oppia_footer_directive.html @vojtechjelinek
+/core/templates/dev/head/pages/OppiaFooterDirective.ts @vojtechjelinek
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek

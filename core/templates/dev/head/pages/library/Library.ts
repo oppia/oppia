@@ -17,5 +17,5 @@
  */
 
 require('pages/library/LibraryPageDirective.ts');
-require('pages/library/LibraryFooter.ts');
+require('pages/library/LibraryFooterDirective.ts');
 require('pages/library/SearchBarDirective.ts');

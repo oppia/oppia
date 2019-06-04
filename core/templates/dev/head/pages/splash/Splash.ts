@@ -16,6 +16,8 @@
  * @fileoverview Data and controllers for the Oppia splash page.
  */
 
+require('pages/OppiaFooterDirective.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
