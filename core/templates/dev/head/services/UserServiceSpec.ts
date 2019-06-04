@@ -96,7 +96,7 @@ describe('User Service', function() {
     sampleUserInfoBackendObject['user_is_logged_in'] = false;
     $httpBackend.when('GET', '/userinfohandler').respond(
       200, sampleUserInfoBackendObject);
-    $httpBackend.expect('GET', requestUrl).respond(404);
+    $httpBackend.when('GET', requestUrl).respond(404);
 
     UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
