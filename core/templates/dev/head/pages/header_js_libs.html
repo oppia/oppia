@@ -21,7 +21,7 @@ rendering.-->
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
   (function() {
-    fetch('/analytics').then(function(response) {
+    fetch('/google_analytics').then(function(response) {
       return response.text()
     }).then(function (response) {
       response = JSON.parse(response.substring(4));
