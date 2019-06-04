@@ -145,7 +145,7 @@ class TestVersionedModel(base_models.VersionedModel):
 
 class BaseCommitLogEntryModelTests(test_utils.GenericTestBase):
 
-    def test_get_instance_id_raises_not_implemented_error(self):
+    def test_base_class_get_instance_id_raises_not_implemented_error(self):
         # Raise NotImplementedError as _get_instance_id is to be overwritten
         # in child classes of BaseCommitLogEntryModel.
         with self.assertRaises(NotImplementedError):
@@ -349,15 +349,23 @@ class VersionedModelTests(test_utils.GenericTestBase):
             'At least one version number is invalid'):
             TestVersionedModel.get_multi_versions('model_id1', [1, 1.5, 2])
 
-    # Note: This test for the generic base model is written at last since some
-    # unrelated tests fail if this test is written at the beginning.
+
+class TestBaseModel(base_models.BaseModel):
+    """Model that inherits BaseModel for testing. This is required as BaseModel
+    gets subclassed a lot in other tests and that can create unexpected errors.
+    """
+    pass
+
+
+class BaseModelTests(test_utils.GenericTestBase):
+
     def test_raise_exception_by_mocking_collision(self):
         with self.assertRaisesRegexp(
             Exception, 'New id generator is producing too many collisions.'):
             # Swap dependent method get_by_id to simulate collision every time.
             with self.swap(
-                base_models.BaseModel, 'get_by_id',
+                TestBaseModel, 'get_by_id',
                 types.MethodType(
-                    lambda x, y: True,
-                    base_models.BaseModel)):
-                base_models.BaseModel.get_new_id('exploration')
+                    lambda _, __: True,
+                    TestBaseModel)):
+                TestBaseModel.get_new_id('exploration')

@@ -49,36 +49,29 @@ class AnswerSubmittedEventLogEntryModelUnitTests(test_utils.GenericTestBase):
 class StateCounterModelTests(test_utils.GenericTestBase):
 
     def test_state_counter_model_gets_created(self):
+        # This tests whether get_or_create() can create the model.
         model_instance = stats_models.StateCounterModel.get_or_create(
             'exp_id1', 'state_name')
-        model_instance.first_entry_count = 1
-        model_instance.subsequent_entries_count = 2
-        model_instance.resolved_answer_count = 3
-        model_instance.active_answer_count = 4
-        model_instance.put()
 
         self.assertEqual(model_instance.id, 'exp_id1.state_name')
-        self.assertEqual(model_instance.first_entry_count, 1)
-        self.assertEqual(model_instance.subsequent_entries_count, 2)
-        self.assertEqual(model_instance.resolved_answer_count, 3)
-        self.assertEqual(model_instance.active_answer_count, 4)
+        self.assertEqual(model_instance.first_entry_count, 0)
+        self.assertEqual(model_instance.subsequent_entries_count, 0)
+        self.assertEqual(model_instance.resolved_answer_count, 0)
+        self.assertEqual(model_instance.active_answer_count, 0)
 
     def test_get_state_counter_model(self):
-        model = stats_models.StateCounterModel(id='exp_id1.state_name')
-        model.first_entry_count = 1
-        model.subsequent_entries_count = 2
-        model.resolved_answer_count = 3
-        model.active_answer_count = 4
-        model.put()
+        # This tests whether get_or_create() can get/fetch the model when the
+        # model is created by creating an instance.
+        stats_models.StateCounterModel(id='exp_id1.state_name')
 
         model_instance = stats_models.StateCounterModel.get_or_create(
             'exp_id1', 'state_name')
 
         self.assertEqual(model_instance.id, 'exp_id1.state_name')
-        self.assertEqual(model_instance.first_entry_count, 1)
-        self.assertEqual(model_instance.subsequent_entries_count, 2)
-        self.assertEqual(model_instance.resolved_answer_count, 3)
-        self.assertEqual(model_instance.active_answer_count, 4)
+        self.assertEqual(model_instance.first_entry_count, 0)
+        self.assertEqual(model_instance.subsequent_entries_count, 0)
+        self.assertEqual(model_instance.resolved_answer_count, 0)
+        self.assertEqual(model_instance.active_answer_count, 0)
 
 
 class ExplorationAnnotationsModelTests(test_utils.GenericTestBase):
@@ -198,15 +191,12 @@ class StateAnswersCalcOutputModelTests(test_utils.GenericTestBase):
 
         logging_swap = self.swap(logging, 'exception', _mock_logging_function)
 
-        # This swaps ndb.model.put() to raise an Exception. It is required to
-        # test against large values of calculation_output.
-        put_swap = self.swap(
-            stats_models.StateAnswersCalcOutputModel, 'put',
-            lambda: (_ for _ in ()).throw(Exception()))
+        large_calculation_output = {'key': 'a' * 1200000}
 
-        with put_swap, logging_swap:
+        with logging_swap:
             stats_models.StateAnswersCalcOutputModel.create_or_update(
-                'exp_id', '1', 'state_name', '', 'calculation_id', '', '')
+                'exp_id', '1', 'state_name', '', 'calculation_id', '',
+                large_calculation_output)
 
             self.assertEqual(len(observed_log_messages), 1)
             self.assertEqual(
