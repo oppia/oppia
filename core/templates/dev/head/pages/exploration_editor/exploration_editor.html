@@ -73,7 +73,7 @@
       </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getActiveTabName() === 'preview'">
-        {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
+        <preview-tab></preview-tab>
       </div>
 
       <div ng-show="getActiveTabName() === 'stats'">
