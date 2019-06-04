@@ -63,7 +63,8 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                config_domain.IS_IMPROVEMENTS_TAB_ENABLED: new_config_value,
+                config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name: (
+                    new_config_value),
             }
         }
         self.post_json('/adminhandler', payload, csrf_token=csrf_token)
