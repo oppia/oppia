@@ -72,8 +72,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': self.UNICODE_TEST_STRING,
-        }, response_config_properties[new_config_value])
+            'value': new_config_value,
+        }, response_config_properties[
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name])
 
         self.logout()
 

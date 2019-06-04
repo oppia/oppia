@@ -581,6 +581,7 @@ class GoogleAnalyticsHandler(BaseHandler):
     """Returns Google Analytics variables."""
 
     def get(self):
+        """Respond to a get request for the variables."""
         google_analytics_data = {
             'analytics_id': feconf.ANALYTICS_ID,
             'site_name_for_analytics': feconf.SITE_NAME_FOR_ANALYTICS
