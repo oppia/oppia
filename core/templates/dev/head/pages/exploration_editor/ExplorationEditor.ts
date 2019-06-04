@@ -116,7 +116,7 @@ require('pages/exploration_editor/history_tab/HistoryTab.ts');
 require(
   'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
 require('pages/exploration_editor/preview_tab/PreviewTabDirective.ts');
-require('pages/exploration_editor/settings_tab/SettingsTab.ts');
+require('pages/exploration_editor/settings_tab/SettingsTabDirective.ts');
 require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');
 require(
   'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
