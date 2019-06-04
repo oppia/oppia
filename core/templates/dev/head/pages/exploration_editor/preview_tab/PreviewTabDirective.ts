@@ -63,9 +63,10 @@ oppia.directive('previewTab', ['UrlInterpolationService', function(
           ExplorationFeaturesService, ExplorationInitStateNameService,
           ExplorationParamChangesService, ExplorationParamSpecsService,
           ExplorationStatesService, ExplorationTitleService,
-          LearnerParamsService, NumberAttemptsService, ParamChangeObjectFactory,
-          ParameterMetadataService, PlayerCorrectnessFeedbackEnabledService,
-          StateEditorService, UrlInterpolationService) {
+          LearnerParamsService, NumberAttemptsService,
+          ParamChangeObjectFactory, ParameterMetadataService,
+          PlayerCorrectnessFeedbackEnabledService, StateEditorService,
+          UrlInterpolationService) {
         var ctrl = this;
         ctrl.isExplorationPopulated = false;
         ExplorationDataService.getData().then(function() {
@@ -188,4 +189,6 @@ oppia.directive('previewTab', ['UrlInterpolationService', function(
           ctrl.allParams = LearnerParamsService.getAllParams();
         });
       }
-    ]}}]);
+    ]
+  };
+}]);

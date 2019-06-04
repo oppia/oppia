@@ -419,7 +419,6 @@
             Please save your changes first.
           </span>
         </p>
-
         <p ng-if="$ctrl.canDelete" class="oppia-exploration-ctrl">
           <button type="button" ng-if="$ctrl.ExplorationRightsService.isPrivate()"
                   class="btn btn-danger" ng-click="$ctrl.deleteExploration()"
@@ -429,23 +428,23 @@
         </p>
       </div>
 
-      <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
+      <div class="col-lg-6 col-md-6 col-sm-6" ng-if="$ctrl.currentUserIsAdmin || $ctrl.currentUserIsModerator">
         <h3>Admin Controls</h3>
 
         <p ng-if="$ctrl.canUnpublish" class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-show="$ctrl.ExplorationRightsService.isPublic()">
           <button type="button" class="btn btn-default" ng-click="$ctrl.unpublishExplorationAsModerator()" ng-disabled="$ctrl.isExplorationLockedForEditing()">
             Unpublish
-            <span ng-if="currentUserIsAdmin">(as admin)</span>
-            <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+            <span ng-if="$ctrl.currentUserIsAdmin">(as admin)</span>
+            <span ng-if="!$ctrl.currentUserIsAdmin && $ctrl.currentUserIsModerator">(as moderator)</span>
           </button>
         </p>
 
-        <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="$ctrl.ExplorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
+        <p class="oppia-exploration-ctrl oppia-exploration-ctrl-admin" ng-if="$ctrl.ExplorationRightsService.isPublic() && ($ctrl.currentUserIsAdmin || $ctrl.currentUserIsModerator)">
           <button type="button" class="btn btn-danger protractor-test-delete-exploration-button"
                   ng-click="$ctrl.deleteExploration()">
             Delete Exploration
-            <span ng-if="currentUserIsAdmin">(as admin)</span>
-            <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+            <span ng-if="$ctrl.currentUserIsAdmin">(as admin)</span>
+            <span ng-if="!$ctrl.currentUserIsAdmin && $ctrl.currentUserIsModerator">(as moderator)</span>
           </button>
         </p>
       </div>

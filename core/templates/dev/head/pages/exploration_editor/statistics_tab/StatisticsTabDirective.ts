@@ -59,8 +59,8 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
           ExplorationFeaturesService,
           ExplorationStatesService, ReadOnlyExplorationBackendApiService,
           RouterService, StateImprovementSuggestionService,
-          StateRulesStatsService, StatesObjectFactory, UrlInterpolationService,
-          IMPROVE_TYPE_INCOMPLETE) {
+          StateRulesStatsService, StatesObjectFactory,
+          UrlInterpolationService, IMPROVE_TYPE_INCOMPLETE) {
         var ctrl = this;
         ctrl.COMPLETION_RATE_CHART_OPTIONS = {
           chartAreaWidth: 300,
@@ -188,10 +188,10 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
                 'visualizationsInfo', 'HtmlEscaperService',
                 'AngularNameService', 'AnswerClassificationService',
                 function(
-                    $scope, $uibModalInstance, $filter, $injector, stateName,
-                    stateStats, improvementType, visualizationsInfo,
-                    HtmlEscaperService, AngularNameService,
-                    AnswerClassificationService) {
+                    $scope, $uibModalInstance, $filter, $injector,
+                    stateName, stateStats, improvementType,
+                    visualizationsInfo, HtmlEscaperService,
+                    AngularNameService, AnswerClassificationService) {
                   var COMPLETION_RATE_PIE_CHART_OPTIONS = {
                     left: 20,
                     pieHole: 0.6,
@@ -285,4 +285,5 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
         };
       }
     ]
-  }}]);
+  };
+}]);

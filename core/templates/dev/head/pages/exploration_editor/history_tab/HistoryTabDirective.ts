@@ -38,7 +38,7 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
     controller: [
       '$http', '$log', '$rootScope', '$scope',
       '$uibModal', 'CompareVersionsService',
-      'DateTimeFormatService', 'EditabilityService','ExplorationDataService',
+      'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
       'UrlInterpolationService', 'VersionTreeService',
       function(
           $http, $log, $rootScope, $scope,
@@ -50,8 +50,8 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
         ctrl.explorationId = ExplorationDataService.explorationId;
         ctrl.explorationAllSnapshotsUrl =
             '/createhandler/snapshots/' + ctrl.explorationId;
-        ctrl.revertExplorationUrl = (
-          '/createhandler/revert/' + ctrl.explorationId);
+        ctrl.revertExplorationUrl =
+          '/createhandler/revert/' + ctrl.explorationId;
 
         /* Variable definitions:
         *
@@ -64,12 +64,13 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
         * 'commitMessage', and 'versionNumber'. It contains a maximum of 30
         * versions.
         *
-        * versionCheckboxArray is an array of the version numbers of the revisions
-        * to be displayed on the page, in the order they are displayed in.
-        *
+        * versionCheckboxArray is an array of the version numbers of the
+        * revisions to be displayed on the page, in the order they are displayed
+        * in.
+        * 
         * nodesData is an object whose keys are nodeIds (assigned in version
-        * comparison), and whose values are an object containing 'newestStateName',
-        * 'originalStateName' and 'stateProperty'.
+        * comparison), and whose values are an object containing
+        * 'newestStateName', 'originalStateName' and 'stateProperty'.
         */
         ctrl.explorationVersionMetadata = null;
         ctrl.versionCheckboxArray = [];
@@ -91,7 +92,8 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
           }
         });
 
-        // Compares the two selected versions and displays the comparison results.
+        // Compares the two selected versions and displays the comparison
+        // results.
         ctrl.compareSelectedVersions = function() {
           if (ctrl.selectedVersionsArray.length === 2) {
             ctrl.changeCompareVersion();
@@ -99,7 +101,8 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
             ctrl.compareVersionsButtonIsHidden = true;
           }
         };
-        // Changes the checkbox selection and provides an appropriate user prompt.
+        // Changes the checkbox selection and provides an appropriate user
+        // prompt.
         ctrl.changeSelectedVersions = function(evt, versionNumber) {
           var checkbox = evt.target;
           var selectedVersionsArrayPos = ctrl.selectedVersionsArray.indexOf(
@@ -241,8 +244,8 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
 
         // Downloads the zip file for an exploration.
         ctrl.downloadExplorationWithVersion = function(versionNumber) {
-          // Note that this opens (and then immediately closes) a new tab. If we do
-          // this in the same tab, the beforeunload handler is triggered.
+          // Note that this opens (and then immediately closes) a new tab. If we
+          // do this in the same tab, the beforeunload handler is triggered.
           window.open(
             ctrl.explorationDownloadUrl + '?v=' + versionNumber,
             '&output_format=zip');
@@ -260,8 +263,11 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
               }
             },
             controller: [
-              '$scope', '$uibModalInstance', 'version', 'ExplorationDataService',
-              function($scope, $uibModalInstance, version, ExplorationDataService) {
+              '$scope', '$uibModalInstance', 'version',
+              'ExplorationDataService',
+              function(
+                  $scope, $uibModalInstance, version,
+                  ExplorationDataService) {
                 $scope.version = version;
 
                 $scope.getExplorationUrl = function(version) {

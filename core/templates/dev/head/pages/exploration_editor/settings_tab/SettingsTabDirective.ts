@@ -49,7 +49,10 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
   return {
     restrict: 'E',
     scope: {},
-    bindToController: {},
+    bindToController: {
+      currentUserIsAdmin: '=',
+      currentUserIsModerator: '='
+    },
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/exploration_editor/settings_tab/settings_tab_directive.html'),
     controllerAs: '$ctrl',
@@ -98,6 +101,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
         ctrl.canModifyRoles = GLOBALS.canModifyRoles;
         ctrl.canReleaseOwnership = GLOBALS.canReleaseOwnership;
         ctrl.canUnpublish = GLOBALS.canUnpublish;
+        ctrl.explorationId = ExplorationDataService.explorationId;
 
         var CREATOR_DASHBOARD_PAGE_URL = '/creator_dashboard';
         var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -115,7 +119,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           ctrl.explorationLanguageCodeService = ExplorationLanguageCodeService;
           ctrl.explorationTagsService = ExplorationTagsService;
           ctrl.ExplorationRightsService = ExplorationRightsService;
-          ctrl.explorationInitStateNameService = ExplorationInitStateNameService;
+          ctrl.explorationInitStateNameService = (
+            ExplorationInitStateNameService);
           ctrl.explorationParamSpecsService = ExplorationParamSpecsService;
           ctrl.explorationParamChangesService = ExplorationParamChangesService;
           ctrl.UserEmailPreferencesService = UserEmailPreferencesService;
@@ -134,7 +139,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           if (ExplorationStatesService.isInitialized()) {
             var categoryIsInSelect2 = ctrl.CATEGORY_LIST_FOR_SELECT2.some(
               function(categoryItem) {
-                return categoryItem.id === ExplorationCategoryService.savedMemento;
+                return (
+                  categoryItem.id === ExplorationCategoryService.savedMemento);
               }
             );
 
@@ -221,7 +227,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
         ctrl.enableParameters = ExplorationFeaturesService.enableParameters;
 
         ctrl.isAutomaticTextToSpeechEnabled = (
-          ExplorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled);
+          ExplorationAutomaticTextToSpeechService
+            .isAutomaticTextToSpeechEnabled);
         ctrl.toggleAutomaticTextToSpeech = (
           ExplorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech);
 
@@ -259,14 +266,16 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           UserEmailPreferencesService.setFeedbackNotificationPreferences(true);
         };
         ctrl.muteSuggestionNotifications = function() {
-          UserEmailPreferencesService.setSuggestionNotificationPreferences(true);
+          UserEmailPreferencesService.setSuggestionNotificationPreferences(
+            true);
         };
 
         ctrl.unmuteFeedbackNotifications = function() {
           UserEmailPreferencesService.setFeedbackNotificationPreferences(false);
         };
         ctrl.unmuteSuggestionNotifications = function() {
-          UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
+          UserEmailPreferencesService.setSuggestionNotificationPreferences(
+            false);
         };
 
         // Methods relating to control buttons.
@@ -278,7 +287,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
               'preview_summary_tile_modal_directive.html'),
             backdrop: true,
             controller: [
-              '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+              '$scope', '$uibModalInstance', function(
+                  $scope, $uibModalInstance) {
                 $scope.getExplorationTitle = function() {
                   return ExplorationTitleService.displayed;
                 };
@@ -298,7 +308,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
                 $scope.getThumbnailBgColor = function() {
                   var category = ExplorationCategoryService.displayed;
                   var color = null;
-                  if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
+                  if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(
+                      category)) {
                     color = constants.DEFAULT_COLOR;
                   } else {
                     color = constants.CATEGORIES_TO_COLORS[category];
@@ -323,7 +334,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
               'transfer_exploration_ownership_modal_directive.html'),
             backdrop: true,
             controller: [
-              '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+              '$scope', '$uibModalInstance', function(
+                  $scope, $uibModalInstance) {
                 $scope.transfer = $uibModalInstance.close;
 
                 $scope.cancel = function() {
@@ -346,7 +358,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
               'delete_exploration_modal_directive.html'),
             backdrop: true,
             controller: [
-              '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+              '$scope', '$uibModalInstance', function(
+                  $scope, $uibModalInstance) {
                 $scope.reallyDelete = $uibModalInstance.close;
 
                 $scope.cancel = function() {

@@ -181,7 +181,8 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
 
         ctrl.addNewMessage = function(threadId, tmpText, tmpStatus) {
           if (threadId === null) {
-            AlertsService.addWarning('Cannot add message to thread with ID: null.');
+            AlertsService.addWarning(
+              'Cannot add message to thread with ID: null.');
             return;
           }
           if (!tmpStatus) {
@@ -190,7 +191,8 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
           }
           ctrl.threadIsUpdated = true;
           ctrl.messageSendingInProgress = true;
-          ThreadDataService.addNewMessage(threadId, tmpText, tmpStatus, function() {
+          ThreadDataService.addNewMessage(
+              threadId, tmpText, tmpStatus, function() {
             _resetTmpMessageFields();
             ctrl.messageSendingInProgress = false;
           }, function() {
@@ -212,4 +214,6 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
           ctrl.tmpMessage.status = ctrl.activeThread.status;
         };
       }
-    ]}}]);
+    ]};
+  }
+]);
