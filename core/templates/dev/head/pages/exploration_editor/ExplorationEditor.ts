@@ -110,7 +110,7 @@ require('pages/exploration_editor/editor_tab/ExplorationEditorTabDirective.ts');
 require('pages/exploration_editor/editor_tab/ExplorationGraph.ts');
 require(
   'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
-require('pages/exploration_editor/feedback_tab/FeedbackTab.ts');
+require('pages/exploration_editor/feedback_tab/FeedbackTabDirective.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
 require('pages/exploration_editor/history_tab/HistoryTabDirective.ts');
 require(
