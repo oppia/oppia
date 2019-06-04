@@ -112,7 +112,7 @@ require(
   'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
 require('pages/exploration_editor/feedback_tab/FeedbackTabDirective.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
-require('pages/exploration_editor/history_tab/HistoryTabDirective.ts');
+require('pages/exploration_editor/history_tab/HistoryTab.ts');
 require(
   'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
 require('pages/exploration_editor/preview_tab/PreviewTabDirective.ts');

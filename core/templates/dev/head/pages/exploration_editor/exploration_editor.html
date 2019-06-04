@@ -88,7 +88,7 @@
       </div>
 
       <div ng-show="getActiveTabName() === 'history'">
-        <history-tab></history-tab>
+        {% include 'pages/exploration_editor/history_tab/history_tab.html' %}
       </div>
 
       <div ng-show="getActiveTabName() === 'feedback'">

@@ -1,0 +1,50 @@
+<div ng-controller="HistoryTab" class="container-fluid" style="word-wrap: break-word;">
+  <md-card class="oppia-editor-card">
+    <h3>List of Changes</h3>
+    <div ng-repeat="versionNumber in versionNumbersToDisplay" class="row">
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <input type="checkbox" name="compareVer" ng-model="versionCheckboxArray[versionNumber].selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionNumber)" ng-disabled="isCheckboxDisabled(versionNumber)" ng-hide="comparisonsAreDisabled" class="protractor-test-history-checkbox-selector">
+        [<[versionNumber]>]
+        <strong><profile-link-text username="explorationVersionMetadata[versionNumber].committerId"></profile-link-text></strong>
+      </div>
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <[explorationVersionMetadata[versionNumber].commitMessage]>
+      </div>
+      <div class="col-sm-4 col-md-4 col-lg-4">
+        <span>
+          <em><[explorationVersionMetadata[versionNumber].createdOnStr]></em>
+          <span ng-if="versionNumber !== currentVersion && EditabilityService.isEditable()">
+            | <a href="#" class="protractor-test-revert-version" ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
+          </span>
+          <span>
+            | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
+          </span>
+        </span>
+      </div>
+    </div>
+
+    <br>
+
+    <div ng-hide="!explorationVersionMetadata || compareVersionsButtonIsHidden">
+      <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="compareSelectedVersions()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+      <div class="version-count-prompt">
+        <[versionCountPrompt]>
+      </div>
+    </div>
+
+    <div ng-show="versionCheckboxArray.length > VERSIONS_PER_PAGE" style="margin-top: 30px" uib-pagination boundary-links="true" class="pagination-sm" max-size="5" items-per-page="VERSIONS_PER_PAGE" total-items="versionCheckboxArray.length" ng-model="displayedCurrentPageNumber" ng-change="computeVersionsToDisplay()"></div>
+  </md-card>
+
+  <md-card class="oppia-editor-card" style="position: relative;"
+           ng-if="diffData && !hideHistoryGraph && explorationVersionMetadata">
+    <h3>
+      Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]>
+      to version <[compareVersionMetadata.laterVersion.versionNumber]>
+    </h3>
+
+    <version-diff-visualization diff-data="diffData"
+                                earlier-version-header="earlierVersionHeader"
+                                later-version-header="laterVersionHeader">
+    </version-diff-visualization>
+  </md-card>
+</div>
