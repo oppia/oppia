@@ -580,6 +580,8 @@ class CsrfTokenManager(object):
 class GoogleAnalyticsHandler(BaseHandler):
     """Returns Google Analytics variables."""
 
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
     def get(self):
         """Respond to a get request for the variables."""
         google_analytics_data = {
