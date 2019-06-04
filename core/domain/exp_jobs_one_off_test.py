@@ -225,7 +225,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,
                     exp_rights_model.editor_ids,
-                    exp_rights_model.translator_ids,
+                    exp_rights_model.voice_artist_ids,
                     exp_rights_model.viewer_ids,
                     [self.admin_id],
                     {self.admin_id: 1},
@@ -247,9 +247,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 if exp_rights_model.editor_ids:
                     expected_job_output[exp_id].editor_ids = (
                         exp_rights_model.editor_ids)
-                if exp_rights_model.translator_ids:
-                    expected_job_output[exp_id].translator_ids = (
-                        exp_rights_model.translator_ids)
+                if exp_rights_model.voice_artist_ids:
+                    expected_job_output[exp_id].voice_artist_ids = (
+                        exp_rights_model.voice_artist_ids)
                 if exp_rights_model.viewer_ids:
                     expected_job_output[exp_id].viewer_ids = (
                         exp_rights_model.viewer_ids)
@@ -274,7 +274,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             simple_props = ['id', 'title', 'category', 'objective',
                             'language_code', 'tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
-                            'editor_ids', 'translator_ids', 'viewer_ids',
+                            'editor_ids', 'voice_artist_ids', 'viewer_ids',
                             'contributor_ids', 'contributors_summary',
                             'version', 'exploration_model_created_on']
             for exp_id in actual_job_output:
@@ -2342,3 +2342,143 @@ class InteractionCustomizationArgsValidationJobTests(
         run_job_for_deleted_exp(
             self,
             exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
+
+
+class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob]
+
+    EXP_ID = 'exp_id'
+
+    USERNAME_A = 'usernamea'
+    USERNAME_B = 'usernameb'
+    EMAIL_A = 'emaila@example.com'
+    EMAIL_B = 'emailb@example.com'
+
+    def setUp(self):
+        super(TranslatorToVoiceArtistOneOffJobTests, self).setUp()
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
+    def test_action_is_performed_when_translator_ids_exists(self):
+        """Test translator_ids are migrated to voice_artist_ids successfully."""
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
+
+        rights_manager.create_new_exploration_rights(
+            exploration.id, self.user_a_id)
+        exp_rights_model = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        exp_rights_model.translator_ids = [self.user_a_id, self.user_b_id]
+        commit_message = 'Assign a translator for test'
+        commit_cmds = [{
+            'cmd': 'change_role',
+            'assignee_id': self.user_a_id,
+            'new_role': 'translator'
+            }, {
+                'cmd': 'change_role',
+                'assignee_id': self.user_b_id,
+                'new_role': 'translator'
+            }]
+        exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
+
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exploration.id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            community_owned=exp_rights_model.community_owned,
+            translator_ids=[self.user_a_id, self.user_b_id]
+        )
+        exp_summary_model.put()
+
+        job_id = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())
+        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(
+                job_id)
+            )
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
+        exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        self.assertEqual([], exp_rights_model_2.translator_ids)
+        self.assertEqual(
+            [self.user_a_id, self.user_b_id],
+            exp_rights_model_2.voice_artist_ids
+        )
+
+        exp_summary_model_2 = exp_models.ExpSummaryModel.get(exploration.id)
+        self.assertEqual([], exp_summary_model_2.translator_ids)
+        self.assertEqual(
+            [self.user_a_id, self.user_b_id],
+            exp_summary_model_2.voice_artist_ids
+        )
+
+    def test_partial_job_is_performed_for_deleted_exploration_summary(self):
+        """Tests that when ExplorationRightsModel exists but ExpSummaryModel
+        does not exist or is deleted, action is only performed for rights model,
+        and returns the id of corresponding exploration.
+        """
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
+
+        rights_manager.create_new_exploration_rights(
+            exploration.id, self.user_a_id)
+        exp_rights_model = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        exp_rights_model.translator_ids = [self.user_b_id]
+        commit_message = 'Assign a translator for test'
+        commit_cmds = [{
+            'cmd': 'change_role',
+            'assignee_ids': self.user_b_id,
+            'new_role': 'translator'
+        }]
+        exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
+
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exploration.id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            community_owned=exp_rights_model.community_owned,
+            translator_ids=[self.user_b_id]
+        )
+        exp_summary_model.put()
+        exp_services.delete_exploration_summary(exploration.id)
+
+        job_id = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())
+        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(
+                job_id)
+            )
+        expected_output = ['[u\'Summary model does not exist or is '
+                           'deleted\', [u\'exp_id\']]']
+        self.assertEqual(actual_output, expected_output)
+
+        exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        self.assertEqual([], exp_rights_model_2.translator_ids)
+        self.assertEqual([self.user_b_id], exp_rights_model_2.voice_artist_ids)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Tests that no action is performed when an exploration is deleted."""
+        exp_id = '100'
+        self.save_new_valid_exploration(exp_id, self.user_a_id)
+        exp_services.delete_exploration(self.user_a_id, exp_id)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob)
