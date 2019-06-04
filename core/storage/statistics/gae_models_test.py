@@ -280,6 +280,12 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
     """Test the LearnerAnswerDetailsModel class."""
 
+    def test_get_entity_id(self):
+        id_parameters = {'exp_id': 'abc', 'state_name': 'init_state'}
+        entity_type = feconf.ENTITY_TYPE_TOPIC
+        with self.assertRaisesRegexp(Exception, 'Invalid entity type'):
+            entity_id = stat_models.LearnerAnswerDetailsModel.get_entity_id(
+                id_parameters, entity_type)
     def test_create_and_get_answer_details_model(self):
         id_parameters = {'exp_id': 'abc', 'state_name': 'init_state'}
         entity_id = stat_models.LearnerAnswerDetailsModel.get_entity_id(
