@@ -704,6 +704,82 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                     'new_value': 'New title'
                 })], 'Did migration.')
 
+    def test_get_multiple_explorations_from_model_by_id(self):
+        rights_manager.create_new_exploration_rights(
+            'exp_id_1', self.owner_id)
+
+        exploration_model = exp_models.ExplorationModel(
+            id='exp_id_1',
+            category='category 1',
+            title='title 1',
+            objective='objective 1',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
+        )
+
+        exploration_model.commit(
+            self.owner_id, 'exploration model created',
+            [{
+                'cmd': 'create',
+                'title': 'title 1',
+                'category': 'category 1',
+            }])
+
+        rights_manager.create_new_exploration_rights(
+            'exp_id_2', self.owner_id)
+
+        exploration_model = exp_models.ExplorationModel(
+            id='exp_id_2',
+            category='category 2',
+            title='title 2',
+            objective='objective 2',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
+        )
+
+        exploration_model.commit(
+            self.owner_id, 'exploration model created',
+            [{
+                'cmd': 'create',
+                'title': 'title 2',
+                'category': 'category 2',
+            }])
+
+        explorations = exp_services.get_multiple_explorations_by_id(
+            ['exp_id_1', 'exp_id_2'])
+
+        self.assertEqual(len(explorations), 2)
+        self.assertEqual(explorations['exp_id_1'].title, 'title 1')
+        self.assertEqual(explorations['exp_id_1'].category, 'category 1')
+        self.assertEqual(
+            explorations['exp_id_1'].objective, 'objective 1')
+
+        self.assertEqual(explorations['exp_id_2'].title, 'title 2')
+        self.assertEqual(explorations['exp_id_2'].category, 'category 2')
+        self.assertEqual(
+            explorations['exp_id_2'].objective, 'objective 2')
+
+    def test_get_state_classifier_mapping(self):
+        yaml_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        with open(yaml_path, 'r') as yaml_file:
+            yaml_content = yaml_file.read()
+
+        exploration = exp_services.get_exploration_by_id('exp_id', strict=False)
+        self.assertIsNone(exploration)
+
+        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, 'exp_id', [])
+
+        state_classifier_mapping = exp_services.get_user_exploration_data(
+            'user_id', 'exp_id')['state_classifier_mapping']
+
+        self.assertEqual(len(state_classifier_mapping), 1)
+
+        self.assertEqual(
+            state_classifier_mapping['Home']['data_schema_version'], 1)
+        self.assertEqual(
+            state_classifier_mapping['Home']['algorithm_id'], 'TextClassifier')
+
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
@@ -725,9 +801,7 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
                 mock_get_filename_with_dimensions):
                 exp_services.load_demo(exp_id)
                 exploration = exp_services.get_exploration_by_id(exp_id)
-            warnings = exploration.validate(strict=True)
-            if warnings:
-                raise Exception(warnings)
+            exploration.validate(strict=True)
 
             duration = datetime.datetime.utcnow() - start_time
             processing_time = duration.seconds + duration.microseconds / 1E6
@@ -743,6 +817,11 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
             exp_services.delete_demo(exp_id)
         self.assertEqual(
             exp_models.ExplorationModel.get_exploration_count(), 0)
+
+    def test_load_demo_with_invalid_demo_exploration_id_raises_error(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid demo exploration id'):
+            exp_services.load_demo('invalid_exploration_id')
 
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
@@ -961,6 +1040,117 @@ title: Title
         self.assertEqual(default_outcome_voiceovers, {})
         self.assertEqual(hint_voiceovers, {})
         self.assertEqual(solution_voiceovers, {})
+
+    def test_cannot_load_yaml_with_no_schema_version(self):
+        yaml_with_no_schema_version = ("""
+        author_notes: ''
+        auto_tts_enabled: true
+        blurb: ''
+        category: Category
+        correctness_feedback_enabled: false
+        init_state_name: Introduction
+        language_code: en
+        objective: ''
+        param_changes: []
+        param_specs: {}
+        states:
+          Introduction:
+            classifier_model_id: null
+            content:
+              audio_translations:
+                en:
+                    filename: %s
+                    file_size_bytes: 99999
+                    needs_update: false
+              html: ''
+            interaction:
+              answer_groups:
+              - outcome:
+                  dest: New state
+                  feedback:
+                    audio_translations:
+                        en:
+                            filename: %s
+                            file_size_bytes: 99999
+                            needs_update: false
+                    html: Correct!
+                  labelled_as_correct: false
+                  missing_prerequisite_skill_id: null
+                  param_changes: []
+                  refresher_exploration_id: null
+                rule_specs:
+                - inputs:
+                    x: InputString
+                  rule_type: Equals
+              confirmed_unclassified_answers: []
+              customization_args: {}
+              default_outcome:
+                dest: Introduction
+                feedback:
+                  audio_translations:
+                    en:
+                        filename: %s
+                        file_size_bytes: 99999
+                        needs_update: false
+                  html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              hints:
+                - hint_content:
+                    html: hint one,
+                    audio_translations:
+                        en:
+                            filename: %s
+                            file_size_bytes: 99999
+                            needs_update: false
+              id: TextInput
+              solution:
+                answer_is_exclusive: false
+                correct_answer: helloworld!
+                explanation:
+                    html: hello_world is a string
+                    audio_translations:
+                        en:
+                            filename: %s
+                            file_size_bytes: 99999
+                            needs_update: false
+            param_changes: []
+          New state:
+            classifier_model_id: null
+            content:
+              audio_translations: {}
+              html: ''
+            interaction:
+              answer_groups: []
+              confirmed_unclassified_answers: []
+              customization_args: {}
+              default_outcome:
+                dest: New state
+                feedback:
+                  audio_translations: {}
+                  html: ''
+                labelled_as_correct: false
+                missing_prerequisite_skill_id: null
+                param_changes: []
+                refresher_exploration_id: null
+              hints: []
+              id: null
+              solution: null
+            param_changes: []
+        states_schema_version: 18
+        tags: []
+        title: Title
+        """) % (
+            self.INTRO_AUDIO_FILE, self.ANSWER_GROUP_AUDIO_FILE,
+            self.DEFAULT_OUTCOME_AUDIO_FILE,
+            self.HINT_AUDIO_FILE, self.SOLUTION_AUDIO_FILE)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid YAML file: missing schema version'):
+            exp_services.save_new_exploration_from_yaml_and_assets(
+                self.owner_id, yaml_with_no_schema_version, self.EXP_ID, None)
 
 
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
@@ -2663,6 +2853,14 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
         populate_datastore()
 
+    def test_get_next_page_of_all_non_private_commits_with_invalid_max_age(
+            self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'max_age must be a datetime.timedelta instance. or None.'):
+            exp_services.get_next_page_of_all_non_private_commits(
+                max_age='invalid_max_age')
+
     def test_get_next_page_of_all_non_private_commits(self):
         all_commits = (
             exp_services.get_next_page_of_all_non_private_commits()[0])
@@ -2786,6 +2984,14 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
         self.assertAlmostEqual(
             exp_services.get_scaled_average_rating(exp.ratings),
             2.056191454757, places=4)
+
+    def test_valid_demo_file_path(self):
+        for filename in os.listdir(feconf.SAMPLE_EXPLORATIONS_DIR):
+            full_filepath = os.path.join(
+                feconf.SAMPLE_EXPLORATIONS_DIR, filename)
+            valid_exploration_path = os.path.isdir(full_filepath) or (
+                filename.endswith('yaml'))
+            self.assertTrue(valid_exploration_path)
 
 
 class ExplorationSummaryTests(ExplorationServicesUnitTests):
@@ -2913,6 +3119,12 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
         self._check_contributors_summary(
             self.EXP_ID_1, {albert_id: 1, bob_id: 2})
+
+    def test_get_exploration_summary_by_id_with_invalid_exploration_id(self):
+        exploration_summary = exp_services.get_exploration_summary_by_id(
+            'invalid_exploration_id')
+
+        self.assertIsNone(exploration_summary)
 
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
@@ -3379,6 +3591,112 @@ title: Old Title
         # converted.
         self.assertEqual(exploration.to_yaml(), self.UPGRADED_EXP_YAML)
 
+    def test_get_exploration_from_model_with_invalid_schema_version_raise_error(
+            self):
+        exp_model = exp_models.ExplorationModel(
+            id='exp_id',
+            category='category',
+            title='title',
+            objective='Old objective',
+            states_schema_version=-1,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
+        )
+
+        rights_manager.create_new_exploration_rights('exp_id', self.albert_id)
+
+        exp_model.commit(
+            self.albert_id, 'New exploration created', [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d and unversioned exploration '
+            'state schemas at present.' % feconf.CURRENT_STATE_SCHEMA_VERSION):
+            exp_services.get_exploration_from_model(exp_model)
+
+    def test_update_exploration_with_empty_change_list_does_not_update(self):
+        exploration = self.save_new_default_exploration('exp_id', 'user_id')
+
+        self.assertEqual(exploration.title, 'A title')
+        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(
+            exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
+        self.assertEqual(exploration.language_code, 'en')
+
+        exp_services.update_exploration(
+            'user_id', 'exp_id', None, 'empty commit')
+
+        exploration = exp_services.get_exploration_by_id('exp_id')
+
+        self.assertEqual(exploration.title, 'A title')
+        self.assertEqual(exploration.category, 'A category')
+        self.assertEqual(
+            exploration.objective, feconf.DEFAULT_EXPLORATION_OBJECTIVE)
+        self.assertEqual(exploration.language_code, 'en')
+
+    def test_save_exploration_with_mismatch_of_versions_raises_error(self):
+        self.save_new_valid_exploration('exp_id', 'user_id')
+
+        exploration_model = exp_models.ExplorationModel.get('exp_id')
+        exploration_model.version = 0
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unexpected error: trying to update version 0 of exploration '
+            'from version 1. Please reload the page and try again.'):
+            exp_services.update_exploration(
+                'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })], 'changed title')
+
+    def test_update_exploration_as_suggestion_with_invalid_commit_message(self):
+        self.save_new_valid_exploration('exp_id', 'user_id')
+
+        exploration_model = exp_models.ExplorationModel.get('exp_id')
+        exploration_model.version = 0
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid commit message for suggestion.'):
+            exp_services.update_exploration(
+                'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })], '', is_suggestion=True)
+
+    def test_update_exploration_with_invalid_commit_message(self):
+        self.save_new_valid_exploration('exp_id', 'user_id')
+
+        exploration_model = exp_models.ExplorationModel.get('exp_id')
+        exploration_model.version = 0
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Commit messages for non-suggestions may not start with'):
+            exp_services.update_exploration(
+                'user_id', 'exp_id', [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                    'property_name': 'title',
+                    'new_value': 'new title'
+                })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
+
+    def test_revert_exploration_with_mismatch_of_versions_raises_error(self):
+        self.save_new_valid_exploration('exp_id', 'user_id')
+
+        exploration_model = exp_models.ExplorationModel.get('exp_id')
+        exploration_model.version = 0
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unexpected error: trying to update version 0 of exploration '
+            'from version 1. Please reload the page and try again.'):
+            exp_services.revert_exploration('user_id', 'exp_id', 1, 0)
+
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     """Test editor auto saving functions in exp_services."""
@@ -3541,6 +3859,27 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertIsNone(exp_user_data.draft_change_list)
         self.assertIsNone(exp_user_data.draft_change_list_last_updated)
         self.assertIsNone(exp_user_data.draft_change_list_exp_version)
+
+    def test_create_or_update_draft_with_exploration_model_not_created(self):
+        self.save_new_valid_exploration(
+            'exp_id', self.USER_ID, title='title')
+
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.USER_ID, 'exp_id')
+        self.assertIsNone(exp_user_data)
+
+        exp_services.create_or_update_draft(
+            'exp_id', self.USER_ID, self.NEW_CHANGELIST, 1,
+            self.NEWER_DATETIME)
+        exp_user_data = user_models.ExplorationUserDataModel.get(
+            self.USER_ID, 'exp_id')
+        self.assertEqual(exp_user_data.exploration_id, 'exp_id')
+        self.assertEqual(
+            exp_user_data.draft_change_list, self.NEW_CHANGELIST_DICT)
+        self.assertEqual(
+            exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
+        self.assertEqual(exp_user_data.draft_change_list_exp_version, 1)
+        self.assertEqual(exp_user_data.draft_change_list_id, 1)
 
 
 class GetExplorationAndExplorationRightsTests(ExplorationServicesUnitTests):

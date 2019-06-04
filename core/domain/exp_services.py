@@ -89,8 +89,6 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     """
     states_schema_version = versioned_exploration_states[
         'states_schema_version']
-    if states_schema_version is None or states_schema_version < 1:
-        states_schema_version = 0
 
     if not (0 <= states_schema_version
             <= feconf.CURRENT_STATE_SCHEMA_VERSION):
@@ -251,7 +249,7 @@ def get_exploration_summary_by_id(exploration_id):
     """
     # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
-        exploration_id)
+        exploration_id, strict=False)
     if exp_summary_model:
         exp_summary = get_exploration_summary_from_model(exp_summary_model)
         return exp_summary
@@ -277,17 +275,9 @@ def get_multiple_explorations_by_version(exp_id, version_numbers):
     explorations = []
     exploration_models = exp_models.ExplorationModel.get_multi_versions(
         exp_id, version_numbers)
-    error_versions = []
-    for index, exploration_model in enumerate(exploration_models):
-        try:
-            explorations.append(get_exploration_from_model(exploration_model))
-        except utils.ExplorationConversionError:
-            error_versions.append(version_numbers[index])
+    for _, exploration_model in enumerate(exploration_models):
+        explorations.append(get_exploration_from_model(exploration_model))
 
-    if error_versions:
-        raise Exception(
-            'Exploration %s, versions [%s] could not be converted to latest'
-            'schema version.' % (exp_id, ', '.join(map(str, error_versions))))
     return explorations
 
 
@@ -513,27 +503,13 @@ def get_exploration_ids_matching_query(query_string, cursor=None):
         exp_ids, search_cursor = search_services.search_explorations(
             query_string, remaining_to_fetch, cursor=search_cursor)
 
-        invalid_exp_ids = []
-        for ind, model in enumerate(
+        for ind, _ in enumerate(
                 exp_models.ExpSummaryModel.get_multi(exp_ids)):
-            if model is not None:
-                returned_exploration_ids.append(exp_ids[ind])
-            else:
-                invalid_exp_ids.append(exp_ids[ind])
+            returned_exploration_ids.append(exp_ids[ind])
 
         if (len(returned_exploration_ids) == feconf.SEARCH_RESULTS_PAGE_SIZE
                 or search_cursor is None):
             break
-        else:
-            logging.error(
-                'Search index contains stale exploration ids: %s' %
-                ', '.join(invalid_exp_ids))
-
-    if (len(returned_exploration_ids) < feconf.SEARCH_RESULTS_PAGE_SIZE
-            and search_cursor is not None):
-        logging.error(
-            'Could not fulfill search request for query string %s; at least '
-            '%s retries were needed.' % (query_string, MAX_ITERATIONS))
 
     return (returned_exploration_ids, search_cursor)
 
@@ -821,8 +797,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         Exception: The versions of the given exploration and the currently
             stored exploration model do not match.
     """
-    if change_list is None:
-        change_list = []
     exploration_rights = rights_manager.get_exploration_rights(exploration.id)
     if exploration_rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE:
         exploration.validate(strict=True)
@@ -831,19 +805,17 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     exploration_model = exp_models.ExplorationModel.get(
         exploration.id, strict=False)
-    if exploration_model is None:
-        exploration_model = exp_models.ExplorationModel(id=exploration.id)
-    else:
-        if exploration.version > exploration_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of exploration '
-                'from version %s. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
-        elif exploration.version < exploration_model.version:
-            raise Exception(
-                'Trying to update version %s of exploration from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (exploration_model.version, exploration.version))
+
+    if exploration.version > exploration_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of exploration '
+            'from version %s. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
+    elif exploration.version < exploration_model.version:
+        raise Exception(
+            'Trying to update version %s of exploration from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (exploration_model.version, exploration.version))
 
     old_states = get_exploration_from_model(exploration_model).states
     exploration_model.category = exploration.category
@@ -1148,6 +1120,9 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
+    if change_list is None:
+        change_list = []
+
     if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
             'Voice artist does not have permission to make some '
@@ -1463,10 +1438,8 @@ def get_demo_exploration_components(demo_path):
     if demo_filepath.endswith('yaml'):
         file_contents = utils.get_file_contents(demo_filepath)
         return file_contents, []
-    elif os.path.isdir(demo_filepath):
-        return utils.get_exploration_components_from_dir(demo_filepath)
     else:
-        raise Exception('Unrecognized file path: %s' % demo_path)
+        return utils.get_exploration_components_from_dir(demo_filepath)
 
 
 def save_new_exploration_from_yaml_and_assets(
@@ -1570,9 +1543,6 @@ def load_demo(exploration_id):
         Exception: The exploration id provided is invalid.
     """
     delete_demo(exploration_id)
-
-    if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
-        raise Exception('Invalid demo exploration id %s' % exploration_id)
 
     exp_filename = feconf.DEMO_EXPLORATIONS[exploration_id]
 
@@ -1782,19 +1752,6 @@ def get_scaled_average_rating(ratings):
     return 1 + 4 * wilson_score_lower_bound
 
 
-def get_exploration_search_rank(exp_id):
-    """Returns the search rank.
-
-    Args:
-        exp_id: str. The id of the exploration.
-
-    Returns:
-        int. The rank of the exploration.
-    """
-    exp_summary = get_exploration_summary_by_id(exp_id)
-    return search_services.get_search_rank_from_exp_summary(exp_summary)
-
-
 def index_explorations_given_ids(exp_ids):
     """Indexes the explorations corresponding to the given exploration ids.
 
@@ -1946,12 +1903,12 @@ def create_or_update_draft(
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
 
-    updated_exploration = apply_change_list(exp_id, change_list)
-    updated_exploration.validate(strict=False)
-
     if exp_user_data is None:
         exp_user_data = user_models.ExplorationUserDataModel.create(
             user_id, exp_id)
+
+    updated_exploration = apply_change_list(exp_id, change_list)
+    updated_exploration.validate(strict=False)
 
     draft_change_list_id = exp_user_data.draft_change_list_id
     draft_change_list_id += 1
