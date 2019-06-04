@@ -133,7 +133,6 @@ var GLOBALS = {
   UNFINISHED_JOB_DATA: [],
   UPDATABLE_ROLES: [],
   USER_EMAIL: 'user@example.com',
-  userIsLoggedIn: true,
   VIEWABLE_ROLES: [],
 
 };

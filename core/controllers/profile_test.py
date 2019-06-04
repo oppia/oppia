@@ -864,7 +864,8 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
             'user_is_logged_in': True}, json_response)
         self.logout()
 
-        self.get_json('/userinfohandler', expected_status_int=401)
+        json_response = self.get_json('/userinfohandler')
+        self.assertEqual(json_response['user_is_logged_in'], False)
 
 
 class UrlHandlerTests(test_utils.GenericTestBase):
