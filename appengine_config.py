@@ -23,8 +23,6 @@ import time
 
 import feconf
 
-from google.appengine.ext import vendor
-
 
 # Whether to calculate costs for RPCs, in addition to time taken.
 appstats_CALC_RPC_COSTS = True
@@ -89,7 +87,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'beautifulsoup4-4.7.1'),
     os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),
     os.path.join(ROOT_PATH, 'third_party', 'soupsieve-1.8'),
-    os.path.join(ROOT_PATH, 'gae_third_party_lib', 'Pillow-6.0.0'),
+    os.path.join(ROOT_PATH, 'third_party', 'Pillow-6.0.0'),
 ]
 
 for lib_path in THIRD_PARTY_LIBS:
@@ -99,7 +97,3 @@ for lib_path in THIRD_PARTY_LIBS:
 
 # Required, otherwise MapReduce third-party library will throw errors.
 os.environ['PYTHONPATH'] = ','.join(sys.path)
-
-# This line is required to use Pillow as a third party library with the
-# Google App Engine.
-vendor.add(os.path.join(ROOT_PATH, 'gae_third_party_lib'))

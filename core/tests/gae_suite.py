@@ -30,7 +30,6 @@ import unittest
 CURR_DIR = os.path.abspath(os.getcwd())
 OPPIA_TOOLS_DIR = os.path.join(CURR_DIR, '..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
-GAE_THIRD_PARTY_LIB_DIR = os.path.join(CURR_DIR, 'gae_third_party_lib')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
@@ -42,7 +41,7 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(OPPIA_TOOLS_DIR, 'browsermob-proxy-0.7.1'),
     os.path.join(OPPIA_TOOLS_DIR, 'selenium-2.53.2'),
     CURR_DIR,
-    os.path.join(GAE_THIRD_PARTY_LIB_DIR, 'Pillow-6.0.0'),
+    os.path.join(THIRD_PARTY_DIR, 'Pillow-6.0.0'),
     os.path.join(THIRD_PARTY_DIR, 'backports.functools_lru_cache-1.5'),
     os.path.join(THIRD_PARTY_DIR, 'bleach-1.2.2'),
     os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.15.0'),
