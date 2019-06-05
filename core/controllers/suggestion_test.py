@@ -208,8 +208,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         response = self.put_json(
             '%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['target_id'], 'invalid_suggestion_id'),
-            {}, csrf_token=csrf_token, expected_status_int=400)
+                suggestion_to_accept['target_id'], 'invalid_suggestion_id'), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -224,7 +226,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             '%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['target_id'],
-                'exploration.target_id.id'), {}, csrf_token=csrf_token,
+                'exploration.target_id.id'), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token,
             expected_status_int=404)
 
         self.logout()
@@ -261,8 +266,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         response = self.put_json(
             '%s/exploration/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID, thread_id),
-            {}, csrf_token=csrf_token, expected_status_int=400)
+                feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID, thread_id), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -289,8 +296,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         response = self.put_json(
             '%s/exploration/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, 'exp_id',
-                suggestion_to_accept['suggestion_id']),
-            {}, csrf_token=csrf_token, expected_status_int=400)
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
@@ -322,8 +331,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         response = self.put_json(
             '%s/exploration/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID, thread_id),
-            {}, csrf_token=csrf_token, expected_status_int=401)
+                feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID, thread_id), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token, expected_status_int=401)
 
         self.assertEqual(
             response['error'], 'You cannot accept/reject your own suggestion.')
@@ -540,8 +551,10 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         response = self.put_json(
             '%s/resubmit/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX, 'invalid_suggestion_id'),
-            {}, csrf_token=csrf_token, expected_status_int=400)
+                feconf.SUGGESTION_ACTION_URL_PREFIX, 'invalid_suggestion_id'), {
+                    'action': u'reject',
+                    'review_message': u'Rejected!'
+                }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'], 'No suggestion found with given suggestion id')
@@ -768,8 +781,10 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
             self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX, self.topic_id,
-                    thread_id),
-                {}, csrf_token=csrf_token, expected_status_int=404)
+                    thread_id), {
+                        'action': u'reject',
+                        'review_message': u'Rejected!'
+                    }, csrf_token=csrf_token, expected_status_int=404)
 
         self.logout()
 
@@ -799,8 +814,10 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
-                    self.topic_id, thread_id),
-                {}, csrf_token=csrf_token, expected_status_int=400)
+                    self.topic_id, thread_id), {
+                        'action': u'reject',
+                        'review_message': u'Rejected!'
+                    }, csrf_token=csrf_token, expected_status_int=400)
 
         self.assertEqual(
             response['error'],
