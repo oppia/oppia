@@ -242,6 +242,7 @@
 # Question project.
 /core/controllers/practice_sessions*.py @vinitamurthi
 /core/controllers/question*.py @aks681
+/core/controllers/review_tests*.py @sophiewu6
 /core/domain/question*.py @aks681
 /core/storage/question/ @aks681
 /core/templates/dev/head/components/QuestionCreationService*.ts @aks681
@@ -251,6 +252,7 @@
 /core/templates/dev/head/pages/question_editor/ @aks681
 /core/templates/dev/head/pages/questions_list/ @aks681
 /core/templates/dev/head/pages/question_player/ @vinitamurthi
+/core/templates/dev/head/pages/review_test/ @sophiewu6
 
 # Skill project.
 /core/controllers/concept_card_viewer*.py @aks681
