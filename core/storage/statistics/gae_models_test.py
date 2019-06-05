@@ -441,7 +441,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
 
         instances = stats_models.PlaythroughModel.get_multi(instance_ids)
         self.assertEqual(instances, [None, None])
-        
+
     def test_create_raises_error_when_many_id_collisions_occur(self):
         # Swap dependent method get_by_id to simulate collision every time.
         get_by_id_swap = self.swap(
@@ -464,18 +464,18 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         id_parameters = {'exp_id': 'abc', 'state_name': 'init_state'}
         entity_type = feconf.ENTITY_TYPE_TOPIC
         with self.assertRaisesRegexp(Exception, 'Invalid entity type'):
-            stat_models.LearnerAnswerDetailsModel.get_entity_id(
+            stats_models.LearnerAnswerDetailsModel.get_entity_id(
                 id_parameters, entity_type)
 
     def test_create_and_get_answer_details_model(self):
         id_parameters = {'exp_id': 'abc', 'state_name': 'init_state'}
-        entity_id = stat_models.LearnerAnswerDetailsModel.get_entity_id(
+        entity_id = stats_models.LearnerAnswerDetailsModel.get_entity_id(
             id_parameters, feconf.ENTITY_TYPE_EXPLORATION)
         self.assertEqual(entity_id, 'abc.init_state')
-        stat_models.LearnerAnswerDetailsModel.create(
+        stats_models.LearnerAnswerDetailsModel.create(
             entity_id, feconf.ENTITY_TYPE_EXPLORATION,
             'This my answer', 'This is my logic')
-        instances = stat_models.LearnerAnswerDetailsModel.get_answer_details(
+        instances = stats_models.LearnerAnswerDetailsModel.get_answer_details(
             feconf.ENTITY_TYPE_EXPLORATION, entity_id)
         self.assertEqual(len(instances), 1)
         self.assertEqual(
