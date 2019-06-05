@@ -66,7 +66,7 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        model = list(all_models)[0]
+        model = all_models.get()
 
         self.assertEqual(model.exp_id, 'exp_id')
         self.assertEqual(model.state_name, 'state_name')
@@ -90,7 +90,7 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        model = list(all_models)[0]
+        model = all_models.get()
 
         self.assertEqual(model.exp_id, 'exp_id')
         self.assertEqual(model.state_name, 'state_name')
@@ -116,7 +116,7 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        model = list(all_models)[0]
+        model = all_models.get()
 
         self.assertEqual(model.exploration_id, 'exp_id')
         self.assertEqual(model.state_name, 'state_name')
@@ -142,7 +142,7 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        model = list(all_models)[0]
+        model = all_models.get()
 
         self.assertEqual(model.exp_id, 'exp_id')
         self.assertEqual(model.state_name, 'state_name')
@@ -169,7 +169,7 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        model = list(all_models)[0]
+        model = all_models.get()
 
         self.assertEqual(model.exp_id, 'exp_id')
         self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
