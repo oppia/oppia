@@ -43,10 +43,8 @@ class Registry(object):
 
             ancestor_names = [
                 base_class.__name__ for base_class in inspect.getmro(clazz)]
-            if 'BaseVisualization' not in ancestor_names:
-                continue
-
-            cls.visualizations_dict[clazz.__name__] = clazz
+            if 'BaseVisualization' in ancestor_names:
+                cls.visualizations_dict[clazz.__name__] = clazz
 
     @classmethod
     def get_full_html(cls):

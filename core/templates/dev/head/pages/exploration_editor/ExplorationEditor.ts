@@ -107,7 +107,7 @@ require(
 require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
 require('pages/exploration_editor/ParamChangesEditorDirective.ts');
 require('pages/exploration_editor/editor_tab/ExplorationEditorTab.ts');
-require('pages/exploration_editor/editor_tab/ExplorationGraph.ts');
+require('pages/exploration_editor/editor_tab/ExplorationGraphDirective.ts');
 require(
   'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
 require('pages/exploration_editor/feedback_tab/FeedbackTab.ts');
@@ -176,8 +176,8 @@ oppia.constant(
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>');
 oppia.constant(
-  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/translate/<exploration_id>');
+  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/voiceover/<exploration_id>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
@@ -327,7 +327,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationRightsService.init(
           explorationData.rights.owner_names,
           explorationData.rights.editor_names,
-          explorationData.rights.translator_names,
+          explorationData.rights.voice_artist_names,
           explorationData.rights.viewer_names, explorationData.rights.status,
           explorationData.rights.cloned_from,
           explorationData.rights.community_owned,
@@ -340,7 +340,7 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markEditable();
         }
 
-        if (GLOBALS.can_translate || GLOBALS.can_edit) {
+        if (GLOBALS.can_voiceover || GLOBALS.can_edit) {
           EditabilityService.markTranslatable();
         }
 
