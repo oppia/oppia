@@ -14,6 +14,8 @@
 
 """Models for storing the question data models."""
 
+import math
+
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
@@ -243,6 +245,21 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
         return question_skill_link_models, skill_descriptions, next_cursor_str
+
+    @classmethod
+    def get_question_skill_links_with_constant_number_per_skill(
+            cls, question_count, skill_ids):
+
+        question_count_per_skill = int(
+            math.ceil(float(question_count) / float(len(skill_ids))))
+        question_skill_link_models = []
+        for skill_id in skill_ids:
+            question_skill_link_models.extend(
+                cls.query(cls.skill_id == skill_id).fetch(
+                    question_count_per_skill
+                )
+            )
+        return question_skill_link_models      
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):

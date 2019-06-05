@@ -15,10 +15,14 @@
 /**
  * @fileoverview Controllers for the review tests.
  */
-oppia.constant('REVIEW_TEST_DATA_URL', 'review_test/data/<story_id>');
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+oppia.constant('REVIEW_TEST_DATA_URL', '/review_test/data/<story_id>');
 
+require('components/background/BackgroundBannerDirective.ts');
 require('pages/question_player/QuestionPlayerDirective.ts');
 require('pages/review_test/ReviewTestEngineService.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.controller('ReviewTest', [
   '$http', '$rootScope', '$scope', 'AlertsService',
@@ -29,7 +33,7 @@ oppia.controller('ReviewTest', [
       $http, $rootScope, $scope, AlertsService,
       ReviewTestEngineService,
       UrlInterpolationService, UrlService,
-      FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL,
+      FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL
   ) {
     $scope.storyId = UrlService.getStoryIdFromUrl();
     var _fetchSkillDetails = function() {

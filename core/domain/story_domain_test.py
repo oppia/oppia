@@ -41,6 +41,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
         )
         self.story.add_node(self.NODE_ID_1, 'Node title')
+        self.story.add_node(self.NODE_ID_2, 'Node title')
         self.signup('user@example.com', 'user')
         self.signup('user1@example.com', 'user1')
 
@@ -91,6 +92,17 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'version': 0
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
+
+    def test_get_acquired_skill_ids_for_exp_ids(self):
+        self.story.story_contents.nodes[0].acquired_skill_ids = ['skill_1']
+        self.story.story_contents.nodes[1].acquired_skill_ids = ['skill_2']
+        self.story.story_contents.nodes[0].exploration_id = 'exp_id'
+        self.story.story_contents.nodes[1].exploration_id = 'exp_id_2'
+        self.assertEqual(
+            self.story.get_acquired_skill_ids_for_exp_ids(
+                ['exp_id', 'exp_id_2']),
+            ['skill_1', 'skill_2']
+        )
 
     def test_get_prerequisite_skill_ids(self):
         self.story.story_contents.nodes[0].prerequisite_skill_ids = ['skill_1']
@@ -144,9 +156,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_add_node_validation(self):
         with self.assertRaisesRegexp(
-            Exception, 'The node id node_3 does not match the expected '
+            Exception, 'The node id node_4 does not match the expected '
             'next node id for the story'):
-            self.story.add_node('node_3', 'Title 3')
+            self.story.add_node('node_4', 'Title 4')
 
     def test_get_number_from_node_id(self):
         self.assertEqual(

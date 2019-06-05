@@ -64,6 +64,7 @@ module.exports = {
       commonPrefix + '/pages/practice_session/PracticeSession.ts',
     preferences: commonPrefix + '/pages/preferences/Preferences.ts',
     profile: commonPrefix + '/pages/profile/Profile.ts',
+    review_test: commonPrefix + '/pages/review_test/ReviewTest.ts',
     signup: commonPrefix + '/pages/signup/Signup.ts',
     skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
     splash: commonPrefix + '/pages/splash/Splash.ts',
@@ -260,6 +261,13 @@ module.exports = {
       chunks: ['profile'],
       filename: 'profile.html',
       template: commonPrefix + '/pages/profile/profile.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['review_test'],
+      filename: 'review_test.html',
+      template: commonPrefix + '/pages/review_test/review_test.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -142,6 +142,15 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     return questions, skill_descriptions, next_cursor
 
 
+def get_questions_by_skill_ids(question_count, skill_ids):
+    question_skill_link_models = (
+        question_models.QuestionSkillLinkModel.get_question_skill_links_with_constant_number_per_skill( #pylint: disable=line-too-long
+            question_count, skill_ids))
+    question_ids = [model.question_id for model in question_skill_link_models]
+    questions = get_questions_by_ids(question_ids)
+    return questions
+
+
 def get_new_question_id():
     """Returns a new question id.
 

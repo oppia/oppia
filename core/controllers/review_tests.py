@@ -1,0 +1,97 @@
+# Copyright 2019 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Controllers for the reivew tests page."""
+
+from constants import constants
+from core.controllers import acl_decorators
+from core.controllers import base
+from core.domain import dependency_registry
+from core.domain import interaction_registry
+from core.domain import obj_services
+from core.domain import story_services
+import feconf
+import jinja2
+
+
+class ReviewTestsPage(base.BaseHandler):
+    """Renders the review tests page."""
+
+    @acl_decorators.can_access_story_viewer_page
+    def get(self, story_id):
+        """Handles GET requests."""
+
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        story = story_services.get_story_by_id(story_id)
+
+        if story is None:
+            raise self.PageNotFoundException(
+                Exception('The story with the given id doesn\'t exist.'))
+        
+        interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
+
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                interaction_dependency_ids))
+
+        interaction_templates = (
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
+
+        self.values.update({
+            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
+            'additional_angular_modules': additional_angular_modules,
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html),
+            'story_name': story.title
+        })
+        self.render_template('dist/review_test.html')
+
+
+class ReviewTestsPageDataHandler(base.BaseHandler):
+    """Fetches relevant data for the review tests page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_story_viewer_page
+    def get(self, story_id):
+        """Handles GET request."""
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        story = story_services.get_story_by_id(story_id)
+        latest_completed_exploration_ids = (
+            story_services.get_latest_completed_node_ids(self.user_id, story_id))
+
+        if story is None:
+            raise self.PageNotFoundException(
+                Exception('The story with the given id doesn\'t exist.'))
+        if len(latest_completed_exploration_ids) == 0:
+            raise self.PageNotFoundException
+
+        acquired_skill_ids = story.get_acquired_skill_ids_for_exp_ids(
+            latest_completed_exploration_ids
+        )
+
+        self.values.update({
+            'skill_list': acquired_skill_ids
+        })
+        self.render_json(self.values)

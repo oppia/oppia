@@ -1032,16 +1032,14 @@ class QuestionPlayerHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Question count has to be greater than 0')
 
-        questions, _, next_start_cursor = (
-            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+        questions = (
+            question_services.get_questions_by_skill_ids(
                 int(question_count),
-                skill_ids,
-                start_cursor)
+                skill_ids)
         )
 
         question_dicts = [question.to_dict() for question in questions]
         self.values.update({
-            'question_dicts': question_dicts,
-            'next_start_cursor': next_start_cursor
+            'question_dicts': question_dicts
         })
         self.render_json(self.values)

@@ -59,6 +59,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'))
 
+        self.question_id_1 = question_services.get_new_question_id()
+        self.question_1 = self.save_new_question(
+            self.question_id_1, self.editor_id,
+            self._create_valid_question_data('ABC'))
+
         self.save_new_skill(
             'skill_1', self.admin_id, 'Skill Description 1')
         self.save_new_skill(
@@ -77,7 +82,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'not found'):
             question_services.get_question_by_id('question_id')
 
-    def test_get_questions_by_skill_ids(self):
+    def test_get_questions_and_skill_descriptions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
             self.question_id, 'skill_1', 0.3)
         questions, _, _ = (
@@ -86,6 +91,22 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
+
+    def test_get_questions_by_skill_ids(self):
+        question_services.create_new_question_skill_link(
+            self.question_id, 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.question_id, 'skill_2', 0.8)
+        question_services.create_new_question_skill_link(
+            self.question_id_1, 'skill_2', 0.5)
+
+        questions = question_services.get_questions_by_skill_ids(
+            2, ['skill_1', 'skill_2'], '')
+        self.assertEqual(len(questions), 2)
+        self.assertEqual(
+            questions[0].to_dict(), self.question.to_dict())
+        self.assertEqual(
+            questions[1].to_dict(), self.question_1.to_dict())
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()

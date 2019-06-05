@@ -18,13 +18,15 @@
 
 oppia.factory('ReviewTestEngineService', [
   function() {
-    var getReviewTestTotalQuestions = function(numOfSkills) {
-      if (numOfSkills < 6) {
-        return numOfSkills * 3;
-      } else if (numOfSkills < 10) {
-        return numOfSkills * 2;
-      } else {
-        return numOfSkills;
+    return {
+      getReviewTestTotalQuestions: function(numOfSkills) {
+        if (numOfSkills < 6) {
+          return numOfSkills * 3;
+        } else if (numOfSkills < 10) {
+          return numOfSkills * 2;
+        } else {
+          return numOfSkills;
+        }
       }
     }
   }

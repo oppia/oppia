@@ -48,46 +48,68 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
 class ReviewTestsPageTests(BaseReviewTestsControllerTests):
 
+    def test_get_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_html_response(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_URL_PREFIX,
+                    self.story_id_1),
+                expected_status_int=404)
+
     def test_any_user_can_access_review_tests_page(self):
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.REVIEW_TEST_URL_PREFIX,
-                self.story_id_1))
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_URL_PREFIX,
+                    self.story_id_1))
 
     def test_no_user_can_access_unpublished_story_review_sessions_page(self):
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.REVIEW_TEST_URL_PREFIX, self.story_id_2),
-            expected_status_int=404)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_URL_PREFIX, self.story_id_2),
+                expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.REVIEW_TEST_URL_PREFIX,
-                'story_id_3'),
-            expected_status_int=404)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_URL_PREFIX,
+                    'story_id_3'),
+                expected_status_int=404)
 
 
 class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
 
+    def test_get_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_json(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                    self.story_id_1),
+                expected_status_int=404)
+
     def test_any_user_can_access_review_tests_data(self):
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                self.story_id_1))
-        self.assertEqual(len(json_response['skill_list']), 2)
-        self.assertEqual(json_response['skill_list'][0], 'skill_id_1')
-        self.assertEqual(json_response['skill_list'][1], 'skill_id_2')
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                    self.story_id_1))
+            self.assertEqual(len(json_response['skill_list']), 2)
+            self.assertEqual(json_response['skill_list'][0], 'skill_id_1')
+            self.assertEqual(json_response['skill_list'][1], 'skill_id_2')
 
     def test_no_user_can_access_unpublished_story_review_sessions_data(self):
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_2),
-            expected_status_int=404)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_2),
+                expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):
-        self.get_html_response(
-            '%s/%s' % (
-                feconf.REVIEW_TEST_DATA_URL_PREFIX,
-                'story_id_3'),
-            expected_status_int=404)
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                    'story_id_3'),
+                expected_status_int=404)
