@@ -54,6 +54,7 @@ require(
   'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require('components/score_ring/ScoreRingDirective.ts');
 require('filters/NormalizeWhitespaceFilter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
@@ -120,6 +121,7 @@ oppia.directive('questionPlayer', [
           var calculateScorePerSkill = function(questionSkillData,
               questionScores) {
             $scope.scorePerSkill = [];
+            $scope.totalScore = 0.0;
             var totalScore = 0.0;
             for (skill in questionSkillData) {
               var totalScorePerSkill = 0.0;
@@ -129,7 +131,9 @@ oppia.directive('questionPlayer', [
                 totalScorePerSkill += questionScores[questionIds[i]];
               }
               $scope.scorePerSkill.push([description, totalScorePerSkill]);
+              totalScore += totalScorePerSkill;
             }
+            $scope.totalScore = totalScore / questionSkillData.length;
           };
 
 
