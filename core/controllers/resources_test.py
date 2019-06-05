@@ -243,7 +243,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
     """Test the upload of audio files to GCS."""
 
     TEST_AUDIO_FILE_MP3 = 'cafe.mp3'
-    TEST_AUDIO_FILE_FLAC = 'galway.flac'
+    TEST_AUDIO_FILE_FLAC = 'cafe.flac'
     TEST_AUDIO_FILE_OVER_MAX_LENGTH = 'cafe-over-five-minutes.mp3'
     TEST_AUDIO_FILE_MPEG_CONTAINER = 'test-mpeg-container.mp3'
     AUDIO_UPLOAD_URL_PREFIX = '/createhandler/audioupload'
