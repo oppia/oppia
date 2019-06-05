@@ -20,7 +20,6 @@ import datetime
 import imghdr
 import logging
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -209,11 +208,9 @@ class ExplorationHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        try:
-            exploration_data = exp_services.get_user_exploration_data(
-                self.user_id, exploration_id)
-        except:
-            raise self.PageNotFoundException
+        exploration_data = exp_services.get_user_exploration_data(
+            self.user_id, exploration_id)
+
         self.values.update(exploration_data)
         self.render_json(self.values)
 
@@ -447,25 +444,13 @@ class StateYamlHandler(EditorHandler):
         state_dict = self.payload.get('state_dict')
         width = self.payload.get('width')
 
+        if not width or not state_dict:
+            raise self.PageNotFoundException
+
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
                 state_dict, width),
         })
-
-
-class ExplorationResourcesHandler(EditorHandler):
-    """Manages assets associated with an exploration."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
-        dir_list = fs.listdir('')
-
-        self.render_json({'filepaths': dir_list})
 
 
 class ExplorationSnapshotsHandler(EditorHandler):
@@ -477,11 +462,8 @@ class ExplorationSnapshotsHandler(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
 
-        try:
-            snapshots = exp_services.get_exploration_snapshots_metadata(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        snapshots = exp_services.get_exploration_snapshots_metadata(
+            exploration_id)
 
         # Patch `snapshots` to use the editor's display name.
         snapshots_committer_ids = [
@@ -535,11 +517,8 @@ class ExplorationStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            current_exploration = exp_services.get_exploration_by_id(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(
+            exploration_id)
 
         self.render_json(stats_services.get_exploration_stats(
             exploration_id, current_exploration.version).to_frontend_dict())
@@ -553,11 +532,8 @@ class StateRulesStatsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
-        try:
-            current_exploration = exp_services.get_exploration_by_id(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(
+            exploration_id)
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
@@ -587,7 +563,7 @@ class FetchIssuesHandler(EditorHandler):
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
         if exp_issues is None:
             raise self.PageNotFoundException(
-                'Invalid exploration ID %s' % (exp_id))
+                'Invalid exploration version %s' % (exp_version))
         unresolved_issues = []
         for issue in exp_issues.unresolved_issues:
             if issue.is_valid:
@@ -779,11 +755,7 @@ class StateAnswerStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            current_exploration = (
-                exp_services.get_exploration_by_id(exploration_id))
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(exploration_id)
 
         self.render_json({
             'answers': stats_services.get_top_state_answer_stats_multi(
@@ -799,9 +771,8 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
         """Handles GET requests for unresolved answers."""
-        try:
-            state_name = self.request.get('state_name')
-        except Exception:
+        state_name = self.request.get('state_name')
+        if not state_name:
             raise self.PageNotFoundException
 
         unresolved_answers_with_frequency = (

@@ -168,6 +168,13 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
                 '/mock/%s' % self.private_col_id, expected_status_int=404)
         self.logout()
 
+    def test_cannot_access_collection_with_invalid_collection_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/invalid_collection_id', expected_status_int=404)
+        self.logout()
+
 
 class EditCollectionDecoratorTests(test_utils.GenericTestBase):
     """Tests for can_edit_collection decorator."""

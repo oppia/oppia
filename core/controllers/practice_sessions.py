@@ -35,11 +35,9 @@ class PracticeSessionsPage(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
+        # Topic cannot be None as an exception will be thrown from its decorator
+        # if so.
         topic = topic_services.get_topic_by_name(topic_name)
-
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given name doesn\'t exist.'))
 
         interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
@@ -77,12 +75,11 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
+        # Topic cannot be None as an exception will be thrown from its decorator
+        # if so.
         topic = topic_services.get_topic_by_name(topic_name)
         skills_of_topic = topic.get_all_skill_ids()
 
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given name doesn\'t exist.'))
         topic_name = topic.name
 
         self.values.update({

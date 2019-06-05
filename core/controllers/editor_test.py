@@ -26,7 +26,6 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import stats_jobs_continuous
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
@@ -98,31 +97,7 @@ class BaseEditorControllerTests(test_utils.GenericTestBase):
         self.assertNotIn(self.CAN_VOICEOVER_STR, response_body)
 
 
-# class MockInteractionAnswerSummariesAggregator(
-#         stats_jobs_continuous.InteractionAnswerSummariesAggregator):
-#     """A modified InteractionAnswerSummariesAggregator that does not start
-#     a new batch job when the previous one has finished.
-#     """
-#     @classmethod
-#     def _get_batch_job_manager_class(cls):
-#         return MockInteractionAnswerSummariesMRJobManager
-
-#     @classmethod
-#     def _kickoff_batch_job_after_previous_one_ends(cls):
-#         pass
-
-
-# class MockInteractionAnswerSummariesMRJobManager(
-#         stats_jobs_continuous.InteractionAnswerSummariesMRJobManager):
-
-#     @classmethod
-#     def _get_continuous_computation_class(cls):
-#         return MockInteractionAnswerSummariesAggregator
-
-
 class EditorTests(BaseEditorControllerTests):
-
-    # ALL_CC_MANAGERS_FOR_TESTS = [MockInteractionAnswerSummariesAggregator]
 
     def setUp(self):
         super(EditorTests, self).setUp()
@@ -131,151 +106,158 @@ class EditorTests(BaseEditorControllerTests):
         rights_manager.release_ownership_of_exploration(
             self.system_user, '0')
 
-    # def test_editor_page(self):
-    #     """Test access to editor pages for the sample exploration."""
+    def test_editor_page(self):
+        """Test access to editor pages for the sample exploration."""
 
-    #     # Check that non-editors can access, but not edit, the editor page.
-    #     response = self.get_html_response('/create/0')
-    #     self.assertIn('Help others learn new things.', response.body)
-    #     self.assert_cannot_edit(response.body)
+        # Check that non-editors can access, but not edit, the editor page.
+        response = self.get_html_response('/create/0')
+        self.assertIn('Help others learn new things.', response.body)
+        self.assert_cannot_edit(response.body)
 
-    #     # Log in as an editor.
-    #     self.login(self.EDITOR_EMAIL)
+        # Log in as an editor.
+        self.login(self.EDITOR_EMAIL)
 
-    #     # Check that it is now possible to access and edit the editor page.
-    #     response = self.get_html_response('/create/0')
-    #     self.assertIn('Help others learn new things.', response.body)
-    #     self.assert_can_edit(response.body)
-    #     self.assertIn('Stats', response.body)
-    #     self.assertIn('History', response.body)
+        # Check that it is now possible to access and edit the editor page.
+        response = self.get_html_response('/create/0')
+        self.assertIn('Help others learn new things.', response.body)
+        self.assert_can_edit(response.body)
+        self.assertIn('Stats', response.body)
+        self.assertIn('History', response.body)
 
-    #     self.logout()
+        self.logout()
 
-    # def test_new_state_template(self):
-    #     """Test the validity of the NEW_STATE_TEMPLATE."""
+    def test_new_state_template(self):
+        """Test the validity of the NEW_STATE_TEMPLATE."""
 
-    #     exploration = exp_services.get_exploration_by_id('0')
-    #     exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
-    #     new_state_dict = exploration.states[
-    #         feconf.DEFAULT_INIT_STATE_NAME].to_dict()
-    #     self.assertEqual(new_state_dict, constants.NEW_STATE_TEMPLATE)
-    #     # Validates if the current NEW_STATE_TEMPLATE is the latest version
-    #     # by validating it.
-    #     exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
+        exploration = exp_services.get_exploration_by_id('0')
+        exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
+        new_state_dict = exploration.states[
+            feconf.DEFAULT_INIT_STATE_NAME].to_dict()
+        self.assertEqual(new_state_dict, constants.NEW_STATE_TEMPLATE)
+        # Validates if the current NEW_STATE_TEMPLATE is the latest version
+        # by validating it.
+        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
 
 
-    # def test_that_default_exploration_cannot_be_published(self):
-    #     """Test that publishing a default exploration raises an error
-    #     due to failing strict validation.
-    #     """
-    #     self.login(self.EDITOR_EMAIL)
+    def test_that_default_exploration_cannot_be_published(self):
+        """Test that publishing a default exploration raises an error
+        due to failing strict validation.
+        """
+        self.login(self.EDITOR_EMAIL)
 
-    #     response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-    #     csrf_token = self.get_csrf_token_from_response(response)
-    #     exp_id = self.post_json(
-    #         feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
-    #     )[creator_dashboard.EXPLORATION_ID_KEY]
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        exp_id = self.post_json(
+            feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
+        )[creator_dashboard.EXPLORATION_ID_KEY]
 
-    #     response = self.get_html_response('/create/%s' % exp_id)
-    #     csrf_token = self.get_csrf_token_from_response(response)
-    #     publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
-    #     self.put_json(
-    #         publish_url, {
-    #             'make_public': True,
-    #         }, csrf_token=csrf_token, expected_status_int=400)
+        response = self.get_html_response('/create/%s' % exp_id)
+        csrf_token = self.get_csrf_token_from_response(response)
+        publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
+        self.put_json(
+            publish_url, {
+                'make_public': True,
+            }, csrf_token=csrf_token, expected_status_int=400)
 
-    #     self.logout()
+        self.logout()
 
-    # def test_add_new_state_error_cases(self):
-    #     """Test the error cases for adding a new state to an exploration."""
-    #     current_version = 1
+    def test_add_new_state_error_cases(self):
+        """Test the error cases for adding a new state to an exploration."""
+        current_version = 1
 
-    #     self.login(self.EDITOR_EMAIL)
-    #     response = self.get_html_response('/create/0')
-    #     csrf_token = self.get_csrf_token_from_response(response)
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
 
-    #     def _get_payload(new_state_name, version=None):
-    #         """Gets the payload in the dict format."""
-    #         result = {
-    #             'change_list': [{
-    #                 'cmd': 'add_state',
-    #                 'state_name': new_state_name
-    #             }],
-    #             'commit_message': 'Add new state',
-    #         }
-    #         if version is not None:
-    #             result['version'] = version
-    #         return result
+        def _get_payload(new_state_name, version=None):
+            """Gets the payload in the dict format."""
+            result = {
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': new_state_name
+                }],
+                'commit_message': 'Add new state',
+            }
+            if version is not None:
+                result['version'] = version
+            return result
 
-    #     def _put_and_expect_400_error(payload):
-    #         """Puts a request with no version number and hence, expects 400
-    #         error.
-    #         """
-    #         return self.put_json(
-    #             '/createhandler/data/0', payload,
-    #             csrf_token=csrf_token, expected_status_int=400)
+        def _put_and_expect_400_error(payload):
+            """Puts a request with no version number and hence, expects 400
+            error.
+            """
+            return self.put_json(
+                '/createhandler/data/0', payload,
+                csrf_token=csrf_token, expected_status_int=400)
 
-    #     # A request with no version number is invalid.
-    #     response_dict = _put_and_expect_400_error(_get_payload('New state'))
-    #     self.assertIn('a version must be specified', response_dict['error'])
+        # A request with no version number is invalid.
+        response_dict = _put_and_expect_400_error(_get_payload('New state'))
+        self.assertIn('a version must be specified', response_dict['error'])
 
-    #     # A request with the wrong version number is invalid.
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('New state', version=123))
-    #     self.assertIn('which is too old', response_dict['error'])
+        # A request with the wrong version number is invalid.
+        response_dict = _put_and_expect_400_error(
+            _get_payload('New state', version=123))
+        self.assertIn('which is too old', response_dict['error'])
 
-    #     # A request with an empty state name is invalid.
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('', version=current_version))
-    #     self.assertIn('should be between 1 and 50', response_dict['error'])
+        # A request with an empty state name is invalid.
+        response_dict = _put_and_expect_400_error(
+            _get_payload('', version=current_version))
+        self.assertIn('should be between 1 and 50', response_dict['error'])
 
-    #     # A request with a really long state name is invalid.
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('a' * 100, version=current_version))
-    #     self.assertIn('should be between 1 and 50', response_dict['error'])
+        # A request with a really long state name is invalid.
+        response_dict = _put_and_expect_400_error(
+            _get_payload('a' * 100, version=current_version))
+        self.assertIn('should be between 1 and 50', response_dict['error'])
 
-    #     # A request with a state name containing invalid characters is
-    #     # invalid.
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('[Bad State Name]', version=current_version))
-    #     self.assertIn('Invalid character [', response_dict['error'])
+        # A request with a state name containing invalid characters is
+        # invalid.
+        response_dict = _put_and_expect_400_error(
+            _get_payload('[Bad State Name]', version=current_version))
+        self.assertIn('Invalid character [', response_dict['error'])
 
-    #     # A name cannot have spaces at the front or back.
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('  aa', version=current_version))
-    #     self.assertIn('start or end with whitespace', response_dict['error'])
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('aa\t', version=current_version))
-    #     self.assertIn('end with whitespace', response_dict['error'])
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('\n', version=current_version))
-    #     self.assertIn('end with whitespace', response_dict['error'])
+        # A name cannot have spaces at the front or back.
+        response_dict = _put_and_expect_400_error(
+            _get_payload('  aa', version=current_version))
+        self.assertIn('start or end with whitespace', response_dict['error'])
+        response_dict = _put_and_expect_400_error(
+            _get_payload('aa\t', version=current_version))
+        self.assertIn('end with whitespace', response_dict['error'])
+        response_dict = _put_and_expect_400_error(
+            _get_payload('\n', version=current_version))
+        self.assertIn('end with whitespace', response_dict['error'])
 
-    #     # A name cannot have consecutive whitespace.
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('The   B', version=current_version))
-    #     self.assertIn('Adjacent whitespace', response_dict['error'])
-    #     response_dict = _put_and_expect_400_error(
-    #         _get_payload('The\t\tB', version=current_version))
-    #     self.assertIn('Adjacent whitespace', response_dict['error'])
+        # A name cannot have consecutive whitespace.
+        response_dict = _put_and_expect_400_error(
+            _get_payload('The   B', version=current_version))
+        self.assertIn('Adjacent whitespace', response_dict['error'])
+        response_dict = _put_and_expect_400_error(
+            _get_payload('The\t\tB', version=current_version))
+        self.assertIn('Adjacent whitespace', response_dict['error'])
 
-    #     self.logout()
+        self.logout()
 
-    def test_can(self):
+    def test_publish_exploration(self):
         self.login(self.ADMIN_EMAIL)
+
         exp_id = exp_services.get_new_exploration_id()
         self.save_new_valid_exploration(
             exp_id, self.admin_id, end_state_name='end state')
         response = self.get_html_response('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
         publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
+
         exploration_rights = self.put_json(
             publish_url, payload={},
             csrf_token=csrf_token)['rights']
+
         self.assertEqual(exploration_rights['status'], 'private')
+
         exploration_rights = self.put_json(
             publish_url, payload={'make_public': True},
             csrf_token=csrf_token)['rights']
+
+        self.assertEqual(exploration_rights['status'], 'public')
+
         self.logout()
 
 
@@ -472,199 +454,465 @@ written_translations:
     default_outcome: {}
 """)
 
-    # def test_exploration_download_handler_for_default_exploration(self):
-    #     self.login(self.EDITOR_EMAIL)
-    #     owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-
-    #     # Create a simple exploration.
-    #     exp_id = 'eid'
-    #     self.save_new_valid_exploration(
-    #         exp_id, owner_id,
-    #         title='The title for ZIP download handler test!',
-    #         category='This is just a test category',
-    #         objective='')
-
-    #     exploration = exp_services.get_exploration_by_id(exp_id)
-    #     init_state = exploration.states[exploration.init_state_name]
-    #     init_interaction = init_state.interaction
-    #     init_interaction.default_outcome.dest = exploration.init_state_name
-    #     exp_services.update_exploration(
-    #         owner_id, exp_id, [
-    #             exp_domain.ExplorationChange({
-    #                 'cmd': exp_domain.CMD_ADD_STATE,
-    #                 'state_name': 'State A',
-    #             }),
-    #             exp_domain.ExplorationChange({
-    #                 'cmd': exp_domain.CMD_ADD_STATE,
-    #                 'state_name': 'State 2',
-    #             }),
-    #             exp_domain.ExplorationChange({
-    #                 'cmd': exp_domain.CMD_ADD_STATE,
-    #                 'state_name': 'State 3',
-    #             }),
-    #             exp_domain.ExplorationChange({
-    #                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-    #                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-    #                 'state_name': 'State A',
-    #                 'new_value': 'TextInput'
-    #             }),
-    #             exp_domain.ExplorationChange({
-    #                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-    #                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-    #                 'state_name': 'State 2',
-    #                 'new_value': 'TextInput'
-    #             }),
-    #             exp_domain.ExplorationChange({
-    #                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-    #                 'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-    #                 'state_name': 'State 3',
-    #                 'new_value': 'TextInput'
-    #             }),
-    #             exp_domain.ExplorationChange({
-    #                 'cmd': exp_domain.CMD_RENAME_STATE,
-    #                 'old_state_name': 'State 2',
-    #                 'new_state_name': 'State B'
-    #             }),
-    #             exp_domain.ExplorationChange({
-    #                 'cmd': exp_domain.CMD_DELETE_STATE,
-    #                 'state_name': 'State 3',
-    #             })], 'changes')
-    #     exploration = exp_services.get_exploration_by_id(exp_id)
-    #     response = self.get_html_response('/create/%s' % exp_id)
-
-    #     # Check download to zip file.
-    #     # Download to zip file using download handler.
-    #     download_url = '/createhandler/download/%s' % exp_id
-    #     response = self.get_custom_response(download_url, 'text/plain')
-
-    #     # Check downloaded zip file.
-    #     filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
-    #     self.assertEqual(response.headers['Content-Disposition'],
-    #                      'attachment; filename=%s' % str(filename))
-    #     zf_saved = zipfile.ZipFile(StringIO.StringIO(response.body))
-    #     self.assertEqual(
-    #         zf_saved.namelist(),
-    #         ['The title for ZIP download handler test!.yaml'])
-
-    #     # Load golden zip file.
-    #     with open(os.path.join(
-    #         feconf.TESTS_DATA_DIR,
-    #         'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'),
-    #               'rb') as f:
-    #         golden_zipfile = f.read()
-    #     zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
-    #     # Compare saved with golden file.
-    #     self.assertEqual(
-    #         zf_saved.open(
-    #             'The title for ZIP download handler test!.yaml').read(),
-    #         zf_gold.open(
-    #             'The title for ZIP download handler test!.yaml').read())
-
-    #     # Check download to JSON.
-    #     exploration.update_objective('Test JSON download')
-    #     exp_services._save_exploration(  # pylint: disable=protected-access
-    #         owner_id, exploration, '', [])
-
-    #     # Download to JSON string using download handler.
-    #     self.maxDiff = None
-    #     download_url = (
-    #         '/createhandler/download/%s?output_format=%s&width=50' %
-    #         (exp_id, feconf.OUTPUT_FORMAT_JSON))
-    #     response = self.get_json(download_url)
-
-    #     # Check downloaded dict.
-    #     self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
-
-    #     self.logout()
-
-    # def test_state_yaml_handler(self):
-    #     self.login(self.EDITOR_EMAIL)
-    #     owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-
-    #     # Create a simple exploration.
-    #     exp_id = 'eid'
-    #     self.save_new_valid_exploration(
-    #         exp_id, owner_id,
-    #         title='The title for states download handler test!',
-    #         category='This is just a test category')
-
-    #     exploration = exp_services.get_exploration_by_id(exp_id)
-    #     exploration.add_states(['State A', 'State 2', 'State 3'])
-    #     exploration.states['State A'].update_interaction_id('TextInput')
-
-    #     response = self.get_html_response(
-    #         '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
-    #     csrf_token = self.get_csrf_token_from_response(response)
-    #     response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
-    #         'state_dict': exploration.states['State A'].to_dict(),
-    #         'width': 50,
-    #     }, csrf_token=csrf_token)
-    #     self.assertEqual({
-    #         'yaml': self.SAMPLE_STATE_STRING
-    #     }, response)
-
-    #     self.logout()
-
-    def test_can_1(self):
+    def test_exploration_download_handler_for_default_exploration(self):
         self.login(self.EDITOR_EMAIL)
-        exp_id = 'eid'
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.save_new_valid_exploration(exp_id, owner_id)
+
+        # Create a simple exploration.
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, owner_id,
+            title='The title for ZIP download handler test!',
+            category='This is just a test category',
+            objective='')
+
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        init_state = exploration.states[exploration.init_state_name]
+        init_interaction = init_state.interaction
+        init_interaction.default_outcome.dest = exploration.init_state_name
+        exp_services.update_exploration(
+            owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State A',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State 2',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State 3',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'State A',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'State 2',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'state_name': 'State 3',
+                    'new_value': 'TextInput'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_RENAME_STATE,
+                    'old_state_name': 'State 2',
+                    'new_state_name': 'State B'
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_DELETE_STATE,
+                    'state_name': 'State 3',
+                })], 'changes')
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        response = self.get_html_response('/create/%s' % exp_id)
+
+        # Check download to zip file.
+        # Download to zip file using download handler.
+        download_url = '/createhandler/download/%s' % exp_id
+        response = self.get_custom_response(download_url, 'text/plain')
+
+        # Check downloaded zip file.
+        filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
+        self.assertEqual(response.headers['Content-Disposition'],
+                         'attachment; filename=%s' % str(filename))
+        zf_saved = zipfile.ZipFile(StringIO.StringIO(response.body))
+        self.assertEqual(
+            zf_saved.namelist(),
+            ['The title for ZIP download handler test!.yaml'])
+
+        # Load golden zip file.
+        with open(os.path.join(
+            feconf.TESTS_DATA_DIR,
+            'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'),
+                  'rb') as f:
+            golden_zipfile = f.read()
+        zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
+        # Compare saved with golden file.
+        self.assertEqual(
+            zf_saved.open(
+                'The title for ZIP download handler test!.yaml').read(),
+            zf_gold.open(
+                'The title for ZIP download handler test!.yaml').read())
+
+        # Check download to JSON.
+        exploration.update_objective('Test JSON download')
+        exp_services._save_exploration(  # pylint: disable=protected-access
+            owner_id, exploration, '', [])
+
+        # Download to JSON string using download handler.
+        self.maxDiff = None
         download_url = (
-            '/createhandler/download/%s?output_format=%s' %
+            '/createhandler/download/%s?output_format=%s&width=50' %
             (exp_id, feconf.OUTPUT_FORMAT_JSON))
         response = self.get_json(download_url)
 
         # Check downloaded dict.
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
 
-        # Check downloading a specific version.
-        download_url = (
-            '/createhandler/download/%s?output_format=%s&v=1' %
-            (exp_id, feconf.OUTPUT_FORMAT_JSON))
-        response = self.get_json(download_url)
-        self.assertEqual(['Introduction'], response.keys())
-
-        # Check downloading an invalid version results in downloading the
-        # latest version.
-        download_url = (
-            '/createhandler/download/%s?output_format=%s&v=xxx' %
-            (exp_id, feconf.OUTPUT_FORMAT_JSON))
-        response = self.get_json(download_url)
-        self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
-        self.assertEqual(
-            ['Introduction', 'State A', 'State B'], response.keys())
         self.logout()
 
-    def test_can(self):
+    def test_state_yaml_handler(self):
         self.login(self.EDITOR_EMAIL)
-        exp_id = 'eid'
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.save_new_valid_exploration(exp_id, owner_id)
+
+        # Create a simple exploration.
+        exp_id = 'eid'
+        self.save_new_valid_exploration(
+            exp_id, owner_id,
+            title='The title for states download handler test!',
+            category='This is just a test category')
+
         exploration = exp_services.get_exploration_by_id(exp_id)
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
+
         response = self.get_html_response(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/createhandler/state_yaml/%s' % exp_id, {
-            },
-            csrf_token=csrf_token, expected_status_int=500)
+        response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
+            'state_dict': exploration.states['State A'].to_dict(),
+            'width': 50,
+        }, csrf_token=csrf_token)
+        self.assertEqual({
+            'yaml': self.SAMPLE_STATE_STRING
+        }, response)
 
+        self.logout()
 
-class ExplorationResourcesHandlerTests(test_utils.GenericTestBase):
-    def test_can(self):
-        from core.domain import fs_domain
-        self.login(self.EDITOR_EMAIL)
+    def test_state_yaml_handler_with_no_state_dict_raises_error(self):
+        self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
-        owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(exp_id, owner_id)
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/eid'))
-        dir_list = fs.listdir('')
-        # response = self.get_json(
-        #     '/createhandler/resource_list/%s' % (exp_id))
-        self.assertEqual(dir_list, 'as')
+
+        response = self.get_html_response(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        self.post_json(
+            '/createhandler/state_yaml/%s' % exp_id, {},
+            csrf_token=csrf_token, expected_status_int=404)
+
+        self.logout()
+
+    def test_exploration_download_handler_with_invalid_exploration_id(self):
+        self.login(self.OWNER_EMAIL)
+
+        self.get_json(
+            '/createhandler/download/invalid_exploration_id',
+            expected_status_int=404)
+
+        self.logout()
+
+    def test_exploration_download_handler_with_invalid_output_format(self):
+        self.login(self.OWNER_EMAIL)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        exp_id = 'exp_id1'
+
+        self.save_new_valid_exploration(exp_id, owner_id)
+
+        response = self.get_json(
+            '/createhandler/download/%s?output_format=invalid_output_format'
+            % (exp_id), expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Unrecognized output format invalid_output_format')
+
+        self.logout()
+
+
+class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationSnapshotsHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+    def test_get_with_invalid_exploration_id_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+
+        self.get_json(
+            '/createhandler/snapshots/invalid_exploration_id',
+            expected_status_int=404)
+
+        self.logout()
+
+    def test_get_exploration_snapshot_history(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.save_new_valid_exploration(exp_id, owner_id)
+
+        snapshots = exp_services.get_exploration_snapshots_metadata(exp_id)
+
+        # Patch `snapshots` to use the editor's display name.
+        for snapshot in snapshots:
+            snapshot.update({
+                'committer_id': 'owner'
+                })
+
+        response = self.get_json('/createhandler/snapshots/%s' % (exp_id))
+
+        self.assertEqual(response['snapshots'], snapshots)
+
+        exp_services.update_exploration(
+            owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State A',
+                })], 'Addes state')
+
+        snapshots = exp_services.get_exploration_snapshots_metadata(exp_id)
+
+        # Patch `snapshots` to use the editor's display name.
+        for snapshot in snapshots:
+            snapshot.update({
+                'committer_id': 'owner'
+                })
+
+        response = self.get_json('/createhandler/snapshots/%s' % (exp_id))
+
+        self.assertEqual(response['snapshots'], snapshots)
+
+        self.logout()
+
+
+class ExplorationStatisticsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationStatisticsHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+    def test_get_with_invalid_exploration_id_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+
+        self.get_json(
+            '/createhandler/statistics/invalid_exploration_id',
+            expected_status_int=404)
+
+        self.logout()
+
+    def test_get_exploration_statistics(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exploration = self.save_new_valid_exploration(exp_id, owner_id)
+        exp_stats = stats_services.get_exploration_stats(
+            exp_id, exploration.version)
+
+        response = self.get_json('/createhandler/statistics/%s' % (exp_id))
+
+        self.assertEqual(response, exp_stats.to_frontend_dict())
+
+        exp_services.update_exploration(
+            owner_id, exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State A',
+                })], 'Addes state')
+
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        exp_stats = stats_services.get_exploration_stats(
+            exp_id, exploration.version)
+
+        response = self.get_json('/createhandler/statistics/%s' % (exp_id))
+
+        self.assertEqual(response, exp_stats.to_frontend_dict())
+
+        self.logout()
+
+
+class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StartedTutorialEventHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+    def test_record_user_saw_tutorial(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.save_new_valid_exploration(exp_id, owner_id)
+
+        response = self.get_html_response(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        user_settings = user_services.get_user_settings(owner_id)
+
+        self.assertFalse(user_settings.last_started_state_editor_tutorial)
+
+        self.post_json(
+            '/createhandler/started_tutorial_event/%s' % (exp_id), {},
+            csrf_token=csrf_token)
+
+        user_settings = user_services.get_user_settings(owner_id)
+
+        self.assertTrue(user_settings.last_started_state_editor_tutorial)
+
+        self.logout()
+
+
+class StateAnswerStatisticsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StateAnswerStatisticsHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+    def test_get_with_invalid_exploration_id_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+
+        self.get_json(
+            '/createhandler/state_answer_stats/invalid_exp_id',
+            expected_status_int=404)
+
+        self.logout()
+
+    def test_get_basic_learner_answer_statistics_for_a_state(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exploration = self.save_new_valid_exploration(exp_id, owner_id)
+
+        answers = stats_services.get_top_state_answer_stats_multi(
+            exp_id, exploration.states)
+
+        response = self.get_json(
+            '/createhandler/state_answer_stats/%s' % exp_id)
+
+        self.assertEqual(response['answers'], answers)
+
+        self.logout()
+
+
+class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopUnresolvedAnswersHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.exp_id = 'exp_id'
+        self.exploration = self.save_new_valid_exploration(
+            self.exp_id, self.owner_id)
+
+    def test_cannot_get_unresolved_answers_with_no_state_name(self):
+        self.login(self.OWNER_EMAIL)
+
+
+        self.get_json(
+            '/createhandler/get_top_unresolved_answers/%s' % self.exp_id,
+            expected_status_int=404)
+
+        self.logout()
+
+    def test_get_top_unresolved_answers(self):
+        self.login(self.OWNER_EMAIL)
+
+        answers = stats_services.get_top_state_unresolved_answers(
+            self.exp_id, self.exploration.init_state_name)
+
+        response = self.get_json(
+            '/createhandler/get_top_unresolved_answers/%s?state_name=%s'
+            % (self.exp_id, self.exploration.init_state_name))
+
+        self.assertEqual(response['unresolved_answers'], answers)
+
+        self.logout()
+
+
+class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StateRulesStatsHandlerTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+    def test_get_with_invalid_exploration_id_raises_error(self):
+        self.login(self.OWNER_EMAIL)
+
+        self.get_json(
+            '/createhandler/state_rules_stats/invalid_exp_id/state_name',
+            expected_status_int=404)
+
+        self.logout()
+
+    def test_cannot_get_learner_answer_statistics_with_invalid_state_name(
+            self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.save_new_valid_exploration(exp_id, owner_id)
+
+        with logging_swap:
+            self.get_json(
+                '/createhandler/state_rules_stats/%s/invalid_state_name'
+                % (exp_id), expected_status_int=404)
+
+        self.assertEqual(len(observed_log_messages), 2)
+        self.assertEqual(
+            observed_log_messages[0],
+            'Could not find state: invalid_state_name')
+
+        self.logout()
+
+    def test_get_learner_answer_statistics_for_state(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'eid'
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        exploration = self.save_new_valid_exploration(exp_id, owner_id)
+
+        response = self.get_json(
+            '/createhandler/state_rules_stats/%s/%s'
+            % (exp_id, exploration.init_state_name))
+
+        visualizations_info = stats_services.get_visualizations_info(
+            exploration.id, 'Introduction',
+            exploration.states[exploration.init_state_name].interaction.id)
+
+        self.assertEqual(
+            response['visualizations_info'], visualizations_info)
+
+        exploration.add_states(['new_state_name'])
+
+        exploration.update_init_state_name('new_state_name')
+
+        exploration = exp_services.get_exploration_by_id(exp_id)
+
+        response = self.get_json(
+            '/createhandler/state_rules_stats/%s/%s'
+            % (exp_id, exploration.init_state_name))
+
+        visualizations_info = stats_services.get_visualizations_info(
+            exploration.id, 'new_state_name',
+            exploration.states[exploration.init_state_name].interaction.id)
+
+        self.assertEqual(
+            response['visualizations_info'], visualizations_info)
+
+        self.logout()
+
 
 class ExplorationDeletionRightsTests(BaseEditorControllerTests):
 
@@ -867,11 +1115,11 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 },
             })], 'Change objective and init state content')
 
-    def test_can(self):
-        response = self.get_html_response(
+    def test_get_with_disabled_exploration_id_raises_error(self):
+        self.get_html_response(
             '%s/%s' % (
                 feconf.EDITOR_URL_PREFIX, feconf.DISABLED_EXPLORATION_IDS[0]),
-                expected_status_int=404)
+            expected_status_int=404)
 
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
@@ -960,6 +1208,21 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
         self.get_json(
             '%s/%s?v=3' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID),
             expected_status_int=404)
+
+    def test_revert_with_invalid_current_version_raises_error(self):
+        response = self.get_html_response(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.EXP_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response = self.post_json(
+            '/createhandler/revert/%s' % self.EXP_ID, {
+                'current_version': 'invalid_version',
+                'revert_to_version': 1
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Expected an integer current version; received invalid_version.')
 
 
 class ExplorationEditRightsTest(BaseEditorControllerTests):
@@ -1219,7 +1482,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_can(self):
+    def test_get_with_invalid_version_raises_error(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1228,7 +1491,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             params={'v': 'invalid_version'}, expected_status_int=404)
         self.logout()
 
-    def test_can_1(self):
+    def test_put_with_invalid_new_member_raises_error(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1240,11 +1503,11 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
                 payload={
-                'version': exploration.version,
-                'new_member_username': 'invalid_new_member_username'},
+                    'version': exploration.version,
+                    'new_member_username': 'invalid_new_member_username'},
                 csrf_token=csrf_token)
 
-    def test_can_2(self):
+    def test_make_private_exploration_viewable(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1256,13 +1519,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
             payload={
-            'version': exploration.version,
-            'viewable_if_private': True}, csrf_token=csrf_token)
+                'version': exploration.version,
+                'viewable_if_private': True}, csrf_token=csrf_token)
         exploration = exp_services.get_exploration_by_id(exp_id)
         exploration_rights = rights_manager.get_exploration_rights(exp_id)
         self.assertTrue(exploration_rights.viewable_if_private)
 
-    def test_can_2(self):
+    def test_put_with_no_specified_changes_raise_error(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1274,6 +1537,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
             self.put_json(
                 '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
                 payload={'version': exploration.version}, csrf_token=csrf_token)
+
 
 class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
     """Test the handler for user email notification preferences."""
@@ -1336,7 +1600,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_can(self):
+    def test_put_with_invalid_message_type_raises_error(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         self.save_new_valid_exploration(exp_id, self.owner_id)
@@ -1349,6 +1613,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
                 payload={'message_type': 'invalid_message_type'},
                 csrf_token=csrf_token)
         self.logout()
+
 
 class ModeratorEmailsTests(test_utils.GenericTestBase):
     """Integration test for post-moderator action emails."""
@@ -1609,6 +1874,16 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
             }]
         )
 
+    def test_cannot_fetch_issues_with_invalid_version(self):
+        self.get_json(
+            '/issuesdatahandler/%s' % (self.EXP_ID),
+            params={'exp_version': 2}, expected_status_int=404)
+
+    def test_cannot_fetch_playthrough_with_invalid_playthrough_id(self):
+        self.get_json(
+            '/playthroughdatahandler/%s/%s' % (
+                self.EXP_ID, 'invalid_playthrough_id'), expected_status_int=404)
+
     def test_fetch_issues_handler(self):
         """Test that all issues get fetched correctly."""
         response = self.get_json(
@@ -1800,6 +2075,14 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
                 'exp_version': 1
             }, csrf_token=self.csrf_token,
             expected_status_int=404)
+
+    def test_error_on_passing_invalid_exploration_version(self):
+        self.post_json(
+            '/resolveissuehandler/%s' % (self.EXP_ID),
+            {
+                'exp_issue_dict': self.exp_issue_dict,
+                'exp_version': 2
+            }, csrf_token=self.csrf_token, expected_status_int=404)
 
 
 class EditorAutosaveTest(BaseEditorControllerTests):

@@ -95,6 +95,9 @@ def can_play_exploration(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
@@ -170,6 +173,9 @@ def can_play_collection(handler):
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
 
+        if collection_rights is None:
+            return self.PageNotFoundException
+
         if rights_manager.check_can_access_activity(
                 self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
@@ -211,6 +217,10 @@ def can_download_exploration(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
@@ -251,6 +261,10 @@ def can_view_exploration_stats(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
