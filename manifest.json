@@ -128,12 +128,12 @@
           "js": ["app/angular.audio.js"]
         }
       },
-      "angularRecorder": {
-        "version": "1.4.1",
+      "lamejs": {
+        "version": "1.2.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/logbon72/angular-recorder/archive/1.4.1.zip",
-        "rootDirPrefix": "angular-recorder-",
-        "targetDirPrefix": "angular-recorder-"
+        "url": "https://github.com/zhuker/lamejs/archive/1.2.0.zip",
+        "rootDirPrefix": "lamejs-",
+        "targetDirPrefix": "lamejs-"
       },
       "angularTest": {
         "version": "1.5.8",
@@ -341,9 +341,9 @@
         }
       },
       "jquery": {
-        "version": "3.2.1",
+        "version": "3.4.1",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1",
+        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.4.1",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],
@@ -485,9 +485,9 @@
         "targetDirPrefix": "ui-codemirror-"
       },
       "uiSortable": {
-        "version": "0.17.1",
+        "version": "0.19.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-sortable/archive/src0.17.1.zip",
+        "url": "https://github.com/angular-ui/ui-sortable/archive/src0.19.0.zip",
         "rootDirPrefix": "ui-sortable-src",
         "targetDirPrefix": "ui-sortable-",
         "bundle": {
