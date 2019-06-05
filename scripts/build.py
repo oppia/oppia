@@ -103,9 +103,7 @@ FILEPATHS_NOT_TO_RENAME = (
     'third_party/generated/js/third_party.min.js.map',
     'third_party/generated/webfonts/*',
     '*.bundle.js',
-    '*.bundle.js.map'
-    '*.woff',
-    '*.woff2')
+    '*.bundle.js.map')
 
 # Hashes for files with these paths should be provided to the frontend in
 # JS hashes object.
