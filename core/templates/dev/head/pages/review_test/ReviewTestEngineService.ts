@@ -28,6 +28,6 @@ oppia.factory('ReviewTestEngineService', [
           return numOfSkills;
         }
       }
-    }
+    };
   }
 ]);
