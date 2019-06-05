@@ -551,7 +551,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ):
 
             # User A deletes the exploration.
-            exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+            exp_services.delete_exploration(
+                self.user_a_id, self.EXP_ID_1, remove_from_subscribers=False)
 
         self._run_one_off_job()
 
@@ -650,7 +651,8 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 self.user_a_id, self.COLLECTION_ID_1)
 
             # User A deletes the exploration from earlier.
-            exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+            exp_services.delete_exploration(
+                self.user_a_id, self.EXP_ID_1, remove_from_subscribers=False)
 
         self._run_one_off_job()
 
