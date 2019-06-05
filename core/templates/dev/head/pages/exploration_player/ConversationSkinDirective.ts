@@ -377,7 +377,6 @@ oppia.directive('conversationSkin', [
           var tutorCardIsDisplayedIfNarrow = true;
           $scope.explorationId = ExplorationEngineService.getExplorationId();
           var questionPlayerConfig = $scope.getQuestionPlayerConfig();
-
           $scope.isInPreviewMode = ExplorationEngineService.isInPreviewMode();
           $scope.isIframed = UrlService.isIframed();
           $rootScope.loadingMessage = 'Loading';
