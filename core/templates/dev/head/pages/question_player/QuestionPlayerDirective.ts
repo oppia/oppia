@@ -72,11 +72,13 @@ oppia.directive('questionPlayer', [
       $http, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getQuestionPlayerConfig: '&playerConfig',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_player/question_player_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$location', 'QuestionPlayerBackendApiService',
         function(
@@ -92,30 +94,30 @@ oppia.directive('questionPlayer', [
           var WRONG_ANSWER_PENALTY = 0.1;
 
           var updateCurrentQuestion = function(currentQuestion) {
-            $scope.currentQuestion = currentQuestion;
+            ctrl.currentQuestion = currentQuestion;
             updateQuestionProgression();
           };
 
           var updateTotalQuestions = function(totalQuestions) {
-            $scope.totalQuestions = totalQuestions;
+            ctrl.totalQuestions = totalQuestions;
             updateQuestionProgression();
           };
 
           var updateQuestionProgression = function() {
             if (getTotalQuestions() > 0) {
-              $scope.currentProgress = (
+              ctrl.currentProgress = (
                 getCurrentQuestion() * 100 / getTotalQuestions());
             } else {
-              $scope.currentProgress = 0;
+              ctrl.currentProgress = 0;
             }
           };
 
           var getCurrentQuestion = function() {
-            return $scope.currentQuestion;
+            return ctrl.currentQuestion;
           };
 
           var getTotalQuestions = function() {
-            return $scope.totalQuestions;
+            return ctrl.totalQuestions;
           };
 
           var calculateScorePerSkill = function(questionSkillData,

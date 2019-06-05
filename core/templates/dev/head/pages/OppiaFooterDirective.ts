@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,9 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the local navigation in the collection view.
+ * @fileoverview Directive for the footer.
  */
 
-oppia.controller('CollectionLocalNav', ['$scope', function($scope) {
-  $scope.canEdit = GLOBALS.canEdit;
+require('domain/utilities/UrlInterpolationService.ts');
+
+oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/oppia_footer_directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      function() {}
+    ]
+  };
 }]);
