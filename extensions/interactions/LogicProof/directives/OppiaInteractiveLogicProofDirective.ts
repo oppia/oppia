@@ -176,7 +176,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             }
             // NOTE: this line is necessary to force angular to refresh the
             // displayed errorMessage.
-            ctrl.$apply();
+            $scope.$apply();
           };
 
           ctrl.clearMessage = function() {
