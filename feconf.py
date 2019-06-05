@@ -612,6 +612,7 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
+GOOGLE_ANALYTICS_DATA_URL = '/google_analytics'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
@@ -952,3 +953,7 @@ RTE_CONTENT_SPEC = {
 AVAILABLE_LANDING_PAGES = {
     'maths': ['fractions', 'ratios']
 }
+
+# Data required for Google Analytics.
+ANALYTICS_ID = ''
+SITE_NAME_FOR_ANALYTICS = ''

@@ -671,7 +671,8 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             # Following handler are present in base.py where acl_decorators
             # cannot be imported.
             if (handler.__name__ == 'LogoutPage' or
-                    handler.__name__ == 'Error404Handler'):
+                    handler.__name__ == 'Error404Handler' or
+                    handler.__name__ == 'GoogleAnalyticsHandler'):
                 continue
 
             if handler.get != base.BaseHandler.get:
@@ -888,3 +889,19 @@ class SignUpTests(test_utils.GenericTestBase):
         )
 
         self.get_html_response('/about')
+
+
+class GoogleAnalyticsHandlerTests(test_utils.GenericTestBase):
+
+    def test_analytics_handler_returns_required_values(self):
+
+        with self.swap(feconf, 'ANALYTICS_ID', 'test123'):
+            with self.swap(
+                feconf, 'SITE_NAME_FOR_ANALYTICS', 'Oppia foundation'):
+                response = self.get_json(feconf.GOOGLE_ANALYTICS_DATA_URL)
+                self.assertEqual(
+                    response, {
+                        'analytics_id': 'test123',
+                        'site_name_for_analytics': 'Oppia foundation'
+                    }
+                )
