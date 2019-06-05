@@ -37,12 +37,14 @@ from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
-from google.appengine.ext import ndb
+from google.appengine.api import datastore_types
+from google.appengine.ext import db
 
 gae_search_services = models.Registry.import_search_services()
 
 USER_EMAIL = 'useremail@example.com'
 USER_NAME = 'username'
+CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
     activity_models, audit_models, base_models, email_models, exp_models,
@@ -53,87 +55,59 @@ USER_NAME = 'username'
             models.NAMES.user]))
 
 
+OriginalDatetimeType = datetime.datetime
+
+
+class PatchedDatetimeType(type):
+    """Validates the datetime instances."""
+    def __instancecheck__(cls, other):
+        """Validates whether the given instance is a datatime
+        instance.
+        """
+        return isinstance(other, OriginalDatetimeType)
+
+
+class MockDatetime13Hours(datetime.datetime):
+    __metaclass__ = PatchedDatetimeType
+
+    @classmethod
+    def utcnow(cls):
+        """Returns the current date and time 13 hours behind of UTC."""
+        return CURRENT_DATETIME - datetime.timedelta(hours=13)
+
+
 def run_job_and_check_output(
         self, expected_output, sort=False):
     """Helper function to run job and compare output."""
-    job_class = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
-    job_id = job_class.create_new()
+    job_id = self.job_class.create_new()
     self.assertEqual(
         self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-    job_class.enqueue(job_id)
+    self.job_class.enqueue(job_id)
     self.assertEqual(
         self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     self.process_and_flush_pending_tasks()
-    actual_output = job_class.get_output(job_id)
+    actual_output = self.job_class.get_output(job_id)
     if sort:
         self.assertEqual(sorted(actual_output), sorted(expected_output))
     else:
         self.assertEqual(actual_output, expected_output)
 
 
-class MockModelValidator(prod_validation_jobs_one_off.BaseModelValidator):
-    """Class for validating mock models. The mock models are used to validate
-    last_updated properties since this property cannot be altered in other
-    models.
+def update_datastore_types_for_mock_datetime():
+    """Updates datastore types for MockDatetime13Hours to ensure that validation
+    of ndb datetime properties does not fail.
     """
 
-    MOCK_MODEL_ID_REGEX_STRING = '.'
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return cls.MOCK_MODEL_ID_REGEX_STRING
-
-    @classmethod
-    def _get_json_properties_schema(cls):
-        return {}
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {}
-
-    @classmethod
-    def _get_validation_functions(cls):
-        return []
-
-
-class MockModel(base_models.BaseModel):
-    """Mock model to validate cases where last_updated >= current time."""
-
-    last_updated = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-
-
-class MockModelValidatorTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(MockModelValidatorTests, self).setUp()
-
-        self.model_instance = MockModel(id='mock')
-        self.model_instance.put()
-        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
-            MockModel: MockModelValidator,
-        }
-
-    def test_standard_model(self):
-        expected_output = [u'[u\'fully-validated MockModel\', 1]']
-        run_job_and_check_output(self, expected_output)
-
-    def test_model_with_last_updated_greater_than_current_time(self):
-        self.model_instance.last_updated = (
-            datetime.datetime.utcnow() + datetime.timedelta(days=1))
-        self.model_instance.put()
-        expected_output = [(
-            u'[u\'failed validation check for current time check of '
-            'MockModel\', '
-            '[u\'Model id %s: The last_updated field has a '
-            'value %s which is greater than the time when the job was run\']]'
-        ) % (self.model_instance.id, self.model_instance.last_updated)]
-        run_job_and_check_output(self, expected_output)
+    # pylint: disable=protected-access
+    datastore_types._VALIDATE_PROPERTY_VALUES[MockDatetime13Hours] = (
+        datastore_types.ValidatePropertyNothing)
+    datastore_types._PACK_PROPERTY_VALUES[MockDatetime13Hours] = (
+        datastore_types.PackDatetime)
+    datastore_types._PROPERTY_MEANINGS[MockDatetime13Hours] = (
+        datastore_types.entity_pb.Property.GD_WHEN)
+    # pylint: enable=protected-access
 
 
 class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
@@ -169,10 +143,8 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
         }]
         self.model_instance.put()
 
-        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
-            activity_models.ActivityReferencesModel:
-                prod_validation_jobs_one_off.ActivityReferencesModelValidator,
-        }
+        self.job_class = (
+            prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [u'[u\'fully-validated ActivityReferencesModel\', 1]']
@@ -191,6 +163,19 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.created_on, self.model_instance.last_updated
             )]
         run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ActivityReferencesModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
 
     def test_model_with_invalid_activity_references_schema(self):
         self.model_instance.activity_references = [{
@@ -274,10 +259,8 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d')
         self.model_instance.put()
 
-        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
-            audit_models.RoleQueryAuditModel:
-                prod_validation_jobs_one_off.RoleQueryAuditModelValidator,
-        }
+        self.job_class = (
+            prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [u'[u\'fully-validated RoleQueryAuditModel\', 1]']
@@ -297,6 +280,19 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.last_updated
             )]
         run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'RoleQueryAuditModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
 
     def test_model_with_non_existent_admin_id(self):
         user_models.UserSettingsModel.get(self.admin_id).delete()
@@ -379,10 +375,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance = email_models.SentEmailModel.get_by_hash(
             'Email Hash')[0]
 
-        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
-            email_models.SentEmailModel:
-                prod_validation_jobs_one_off.SentEmailModelValidator,
-        }
+        self.job_class = (
+            prod_validation_jobs_one_off.SentEmailModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [u'[u\'fully-validated SentEmailModel\', 1]']
@@ -402,6 +396,22 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.last_updated
             )]
         run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance.sent_datetime = (
+            datetime.datetime.utcnow() - datetime.timedelta(hours=20))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'SentEmailModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
 
     def test_model_with_non_existent_sender_id(self):
         self.sender_model.delete()
@@ -508,10 +518,8 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance = email_models.BulkEmailModel.get_by_id(
             self.model_id)
 
-        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
-            email_models.BulkEmailModel:
-                prod_validation_jobs_one_off.BulkEmailModelValidator,
-        }
+        self.job_class = (
+            prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [u'[u\'fully-validated BulkEmailModel\', 1]']
@@ -531,6 +539,22 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance.last_updated
             )]
         run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance.sent_datetime = (
+            datetime.datetime.utcnow() - datetime.timedelta(hours=20))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'BulkEmailModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
 
     def test_model_with_non_existent_sender_id(self):
         self.sender_model.delete()
@@ -617,11 +641,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                 self.user_id, self.thread_id))
         self.model_instance.put()
 
-        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
-            email_models.GeneralFeedbackEmailReplyToIdModel:
-                prod_validation_jobs_one_off.
-                GeneralFeedbackEmailReplyToIdModelValidator,
-        }
+        self.job_class = prod_validation_jobs_one_off.GeneralFeedbackEmailReplyToIdModelAuditOneOffJob # pylint: disable=line-too-long
 
     def test_standard_model(self):
         expected_output = [(
@@ -642,6 +662,19 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                 self.model_instance.last_updated
             )]
         run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'GeneralFeedbackEmailReplyToIdModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
 
     def test_model_with_non_existent_user_id(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
@@ -733,10 +766,8 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
                 self.user_id, collection.id)
         self.process_and_flush_pending_tasks()
 
-        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
-            user_models.UserSubscriptionsModel:
-                prod_validation_jobs_one_off.UserSubscriptionsModelValidator,
-        }
+        self.job_class = (
+            prod_validation_jobs_one_off.UserSubscriptionsModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -779,10 +810,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
-        prod_validation_jobs_one_off.MODEL_TO_VALIDATOR_MAPPING = {
-            exp_models.ExplorationModel:
-                prod_validation_jobs_one_off.ExplorationModelValidator,
-        }
+        self.job_class = (
+            prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob)
 
     def test_standard_operation(self):
         exp_services.update_exploration(

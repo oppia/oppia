@@ -652,26 +652,25 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return MODEL_TO_VALIDATOR_MAPPING.keys()
+        raise NotImplementedError
 
     @staticmethod
     def map(model_instance):
         if not model_instance.deleted:
-            if type(model_instance) in MODEL_TO_VALIDATOR_MAPPING:  # pylint: disable=unidiomatic-typecheck
-                model_name = model_instance.__class__.__name__
-                validator_cls = MODEL_TO_VALIDATOR_MAPPING[type(model_instance)]
-                validator = validator_cls()
-                validator.validate(model_instance)
-                if len(validator.errors) > 0:
-                    for error_key, error_val in (
-                            validator.errors.iteritems()):
-                        yield (
-                            'failed validation check for %s of %s' % (
-                                error_key, model_name),
-                            error_val)
-                else:
+            model_name = model_instance.__class__.__name__
+            validator_cls = MODEL_TO_VALIDATOR_MAPPING[type(model_instance)]
+            validator = validator_cls()
+            validator.validate(model_instance)
+            if len(validator.errors) > 0:
+                for error_key, error_val in (
+                        validator.errors.iteritems()):
                     yield (
-                        'fully-validated %s' % model_name, 1)
+                        'failed validation check for %s of %s' % (
+                            error_key, model_name),
+                        error_val)
+            else:
+                yield (
+                    'fully-validated %s' % model_name, 1)
 
     @staticmethod
     def reduce(key, values):
@@ -679,3 +678,60 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class ActivityReferencesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ActivityReferencesModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [activity_models.ActivityReferencesModel]
+
+
+class RoleQueryAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates RoleQueryAuditModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [audit_models.RoleQueryAuditModel]
+
+
+class SentEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SentEmailModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [email_models.SentEmailModel]
+
+
+class BulkEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates BulkEmailModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [email_models.BulkEmailModel]
+
+
+class GeneralFeedbackEmailReplyToIdModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralFeedbackEmailReplyToIdModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [email_models.GeneralFeedbackEmailReplyToIdModel]
+
+
+class ExplorationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+
+class UserSubscriptionsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserSubscriptionsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSubscriptionsModel]
