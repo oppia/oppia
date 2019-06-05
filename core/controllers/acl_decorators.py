@@ -174,7 +174,7 @@ def can_play_collection(handler):
             collection_id, strict=False)
 
         if collection_rights is None:
-            return self.PageNotFoundException
+            raise self.PageNotFoundException
 
         if rights_manager.check_can_access_activity(
                 self.user, collection_rights):
