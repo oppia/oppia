@@ -192,12 +192,12 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
           ctrl.threadIsUpdated = true;
           ctrl.messageSendingInProgress = true;
           ThreadDataService.addNewMessage(
-              threadId, tmpText, tmpStatus, function() {
-            _resetTmpMessageFields();
-            ctrl.messageSendingInProgress = false;
-          }, function() {
-            ctrl.messageSendingInProgress = false;
-          });
+            threadId, tmpText, tmpStatus, function() {
+              _resetTmpMessageFields();
+              ctrl.messageSendingInProgress = false;
+            }, function() {
+              ctrl.messageSendingInProgress = false;
+            });
         };
 
         ctrl.setActiveThread = function(threadId) {
@@ -215,5 +215,4 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
         };
       }
     ]};
-  }
-]);
+}]);

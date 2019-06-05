@@ -196,7 +196,7 @@ oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
                   stateName, recordedVoiceovers);
               }
               if (writtenTranslations.hasUnflaggedWrittenTranslations(
-                    contentId)) {
+                contentId)) {
                 writtenTranslations.markAllTranslationsAsNeedingUpdate(
                   contentId);
                 ExplorationStatesService.saveWrittenTranslations(

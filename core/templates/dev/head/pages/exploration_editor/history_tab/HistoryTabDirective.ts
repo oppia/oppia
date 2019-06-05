@@ -67,7 +67,7 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
         * versionCheckboxArray is an array of the version numbers of the
         * revisions to be displayed on the page, in the order they are displayed
         * in.
-        * 
+        *
         * nodesData is an object whose keys are nodeIds (assigned in version
         * comparison), and whose values are an object containing
         * 'newestStateName', 'originalStateName' and 'stateProperty'.
@@ -307,4 +307,5 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
           }
         };
       }
-    ]}}]);
+    ]};
+}]);

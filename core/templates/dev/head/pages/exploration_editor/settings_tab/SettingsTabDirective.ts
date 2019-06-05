@@ -309,7 +309,7 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
                   var category = ExplorationCategoryService.displayed;
                   var color = null;
                   if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(
-                      category)) {
+                    category)) {
                     color = constants.DEFAULT_COLOR;
                   } else {
                     color = constants.CATEGORIES_TO_COLORS[category];
@@ -442,4 +442,5 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           return ExplorationTitleService.savedMemento.length > 0;
         };
       }
-    ]}}]);
+    ]};
+}]);
