@@ -110,11 +110,11 @@ if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
 fi
 
-echo Checking if Pillow is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/Pillow-6.0.0" ]; then
+echo Checking if Pillow is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/Pillow-6.0.0" ]; then
   echo Installing Pillow
 
-  pip_install Pillow==6.0.0 --target="$THIRD_PARTY_DIR/Pillow-6.0.0"
+  pip_install Pillow==6.0.0 --target="$TOOLS_DIR/Pillow-6.0.0"
 
   if [[ $? != 0 && ${OS} == "Darwin" ]]; then
     echo "  Pillow install failed. See troubleshooting instructions at:"
