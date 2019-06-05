@@ -71,7 +71,7 @@ describe('User Service', function() {
 
   it('should return image data', function() {
     var requestUrl = '/preferenceshandler/profile_picture';
-    // creating a test user for checking profile picture of user.
+    // Create a test user for checking profile picture of user.
     var sampleUserInfoBackendObject = {
       is_moderator: false,
       is_admin: false,
