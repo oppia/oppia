@@ -1126,6 +1126,7 @@ tags: []
             blurb='',
             author_notes='',
             states_schema_version=0,
+            image_id_counter=feconf.DEFAULT_IMAGE_ID_COUNTER,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=self.VERSION_0_STATES_DICT,
             param_specs={},

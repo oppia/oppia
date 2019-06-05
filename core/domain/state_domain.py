@@ -298,9 +298,9 @@ class ImageAssets(object):
             object.
         """
         image_mapping = {}
-        for image_id in image_assets_dict['image_mapping']:
-            image_info = image_assets_dict[image_id]
-            image_mapping[image_id] = Image.from_dict(image_info)
+        for image_id in image_assets_dict['image_mapping'].iterkeys():
+            image_info = image_assets_dict['image_mapping'][image_id]
+            image_assets_dict['image_mapping'][image_id] = Image.from_dict(image_info)
 
         return cls(image_mapping)
 
@@ -1652,7 +1652,7 @@ class State(object):
                 utils.ValidationError(
                     'Found image id to be greater then image counter %s' %
                     image_id)
-            copied_image_ids.pop(image_id)
+            copied_image_ids.remove(image_id)
             if image_id in copied_image_ids:
                 raise utils.ValidationError(
                     'Found a duplicate image id %s' % image_id)

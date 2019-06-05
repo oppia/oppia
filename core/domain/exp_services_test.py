@@ -98,6 +98,257 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
 
+class ImageWorkflowTests(ExplorationServicesUnitTests):
+    """Tests for the image workflow like add,deletes image."""
+
+    def test_invalid_image_id(self):
+        """Test various methods of invalid image_id"""
+        self.login(self.OWNER_EMAIL)
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+
+        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
+                    'image_id-with-value="1"></oppia-noninteractive-image>')
+        change_dict_1 = {
+            'new_value': {
+                'html': new_html,
+                'content_id': 'content'
+            },
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'old_value': {
+                'html': '',
+                'content_id': 'content'
+                },
+            'property_name': 'content',
+            }
+        change_dict_2 = {
+            'new_value': 5,
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'old_value': 0,
+            'property_name': 'image_id_counter'
+        }
+
+        # Invalid image_id (image_id > image_id_counter)
+        change_dict_3 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'property_name': 'add_new_image',
+            'image_id': 10,
+            'image_info': {
+                'src': '',
+                'placeholder': True,
+                'author_id': 'random',
+                'instructions': 'no instructions'
+                }
+            }
+        change_object_1 = exp_domain.ExplorationChange(change_dict_1)
+        change_object_2 = exp_domain.ExplorationChange(change_dict_2)
+        change_object_3 = exp_domain.ExplorationChange(change_dict_3)
+
+        change_list = [change_object_1, change_object_2, change_object_3]
+        with self.assertRaises(Exception):
+            exp_services.update_exploration(
+                self.editor_id, self.EXP_ID, change_list, 'one commit')
+
+        # Invalid image_id (image_id doesn't exist)
+        change_dict_3 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'property_name': 'add_new_image',
+            'image_id': 22,
+            'image_info': {
+                'src': '',
+                'placeholder': True,
+                'author_id': 'random',
+                'instructions': 'no instructions'
+                }
+            }
+
+        change_object_3 = exp_domain.ExplorationChange(change_dict_3)
+        change_list = [change_object_1, change_object_2, change_object_3]
+        with self.assertRaises(Exception):
+            exp_services.update_exploration(
+                self.editor_id, self.EXP_ID, change_list, 'one commit')
+
+        # Invalid image_id (image_id is not int)
+        change_dict_3 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'property_name': 'add_new_image',
+            'image_id': 'invalid',
+            'image_info': {
+                'src': '',
+                'placeholder': True,
+                'author_id': 'random',
+                'instructions': 'no instructions'
+                }
+            }
+
+        change_object_3 = exp_domain.ExplorationChange(change_dict_3)
+        change_list = [change_object_1, change_object_2, change_object_3]
+        with self.assertRaises(Exception):
+            exp_services.update_exploration(
+                self.editor_id, self.EXP_ID, change_list, 'one commit')
+
+    def test_add_image(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+
+        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
+                    'image_id-with-value="1"></oppia-noninteractive-image>')
+        change_dict_1 = {
+#             'new_value': {
+                'html': new_html,
+                'content_id': 'content'
+            },
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'old_value': {
+                'html': '',
+                'content_id': 'content'
+                },
+            'property_name': 'content',
+            }
+        change_dict_2 = {
+            'new_value': 5,
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'old_value': 0,
+            'property_name': 'image_id_counter'
+        }
+        change_dict_3 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'property_name': 'add_new_image',
+            'image_id': 1,
+            'image_info': {
+                'src': '',
+                'placeholder': True,
+                'author_id': 'random',
+                'instructions': 'no instructions'
+                }
+            }
+        change_object_1 = exp_domain.ExplorationChange(change_dict_1)
+        change_object_2 = exp_domain.ExplorationChange(change_dict_2)
+        change_object_3 = exp_domain.ExplorationChange(change_dict_3)
+
+        change_list = [change_object_1, change_object_2, change_object_3]
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, change_list, 'one commit')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        image_ids = exp_services.get_images_ids_of_exploration(exploration)
+        expected_image_ids_list = [1]
+        self.assertEqual(expected_image_ids_list, image_ids)
+
+
+    def test_delete_image(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+
+        new_html_before_deleting_image = ('''<p>ssssssssssssssss</p>
+            <oppia-noninteractive-image image_id-with-value="1">
+            </oppia-noninteractive-image> hjkhjkhkjh
+            <oppia-noninteractive-image image_id-with-value="2">
+            </oppia-noninteractive-image> dgfsdgfd ggggggggggg
+            oppia-noninteractive-image image_id-with-value="3">\
+            </oppia-noninteractive-image>ffffff ''')
+
+        new_html_after_deleting_image = ('''
+            <p>ssssssssssssssss</p><oppia-noninteractive-image image_id-with-value="1">
+            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image image_id-with-value="2">
+            </oppia-noninteractive-image>dgfsdgfd
+            ''')
+
+        change_dict_1 = {'new_value': {
+                'html': new_html_before_deleting_image,
+                'content_id': 'content'
+                },
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'old_value': {
+                'html': '',
+                'content_id': 'content'
+                },
+            'property_name': 'content',
+            }
+
+        change_dict_2 = {
+            'new_value': 5,
+            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'old_value': 0,
+            'property_name': 'image_id_counter'
+        }
+
+        change_dict_3 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'property_name': 'add_new_image',
+            'image_id': 1,
+            'image_info': {
+                'src': '',
+                'placeholder': True,
+                'author_id': 'random',
+                'instructions': 'no instructions'
+            }
+        }
+
+        change_dict_4 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'property_name': 'add_new_image',
+            'image_id': 2,
+            'image_info': {
+                'src': '',
+                'placeholder': False,
+                'author_id': 'random 2',
+                'instructions': 'no instructions'
+            }
+        }
+
+        change_dict_5 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'property_name': 'add_new_image',
+            'image_id': 3,
+            'image_info': {
+                'src': '',
+                'placeholder': True,
+                'author_id': 'random',
+                'instructions': 'no instructions'
+            }
+        }
+
+        change_dict_6 = {
+            'new_value': {
+                'html': new_html_after_deleting_image,
+                'content_id': 'content'
+            },
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'old_value': {
+                'html': '',
+                'content_id': 'content'
+                },
+            'property_name': 'content',
+        }
+
+        change_object_1 = exp_domain.ExplorationChange(change_dict_1)
+        change_object_2 = exp_domain.ExplorationChange(change_dict_2)
+        change_object_3 = exp_domain.ExplorationChange(change_dict_3)
+        change_object_4 = exp_domain.ExplorationChange(change_dict_4)
+        change_object_5 = exp_domain.ExplorationChange(change_dict_5)
+        change_object_6 = exp_domain.ExplorationChange(change_dict_6)
+
+        change_list = ([change_object_1, change_object_2, change_object_3,
+            change_object_4, change_object_5, change_object_6])
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, change_list, 'one commit')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        image_ids = exp_services.get_images_ids_of_exploration(exploration)
+        expected_image_ids_list = [1,2]
+        self.assertEqual(expected_image_ids_list, image_ids)
+
+
 class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
     """Test that classifier models are correctly mapped when an exploration
     is reverted.
@@ -961,233 +1212,233 @@ title: Title
         self.assertEqual(solution_voiceovers, {})
 
 
-class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
+# class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
 
-    def test_get_image_filenames_from_exploration(self):
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'eid', title='title', category='category')
-        exploration.add_states(['state1', 'state2', 'state3'])
-        state1 = exploration.states['state1']
-        state2 = exploration.states['state2']
-        state3 = exploration.states['state3']
-        content1_dict = {
-            'content_id': 'content',
-            'html': (
-                '<blockquote>Hello, this is state1</blockquote><p>'
-                '<oppia-noninteractive-image filepath-with-value='
-                '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
-                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
-                '</oppia-noninteractive-image></p>')
-        }
-        content2_dict = {
-            'content_id': 'content',
-            'html': '<pre>Hello, this is state2</pre>'
-        }
-        content3_dict = {
-            'content_id': 'content',
-            'html': '<p>Hello, this is state3</p>'
-        }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
+#     def test_get_image_filenames_from_exploration(self):
+#         exploration = exp_domain.Exploration.create_default_exploration(
+#             'eid', title='title', category='category')
+#         exploration.add_states(['state1', 'state2', 'state3'])
+#         state1 = exploration.states['state1']
+#         state2 = exploration.states['state2']
+#         state3 = exploration.states['state3']
+#         content1_dict = {
+#             'content_id': 'content',
+#             'html': (
+#                 '<blockquote>Hello, this is state1</blockquote><p>'
+#                 '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+#                 '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
+#                 '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
+#                 '</oppia-noninteractive-image></p>')
+#         }
+#         content2_dict = {
+#             'content_id': 'content',
+#             'html': '<pre>Hello, this is state2</pre>'
+#         }
+#         content3_dict = {
+#             'content_id': 'content',
+#             'html': '<p>Hello, this is state3</p>'
+#         }
+#         state1.update_content(content1_dict)
+#         state2.update_content(content2_dict)
+#         state3.update_content(content3_dict)
 
-        state1.update_interaction_id('ImageClickInput')
-        state2.update_interaction_id('MultipleChoiceInput')
-        state3.update_interaction_id('ItemSelectionInput')
+#         state1.update_interaction_id('ImageClickInput')
+#         state2.update_interaction_id('MultipleChoiceInput')
+#         state3.update_interaction_id('ItemSelectionInput')
 
-        customization_args_dict1 = {
-            'highlightRegionsOnHover': {'value': True},
-            'imageAndRegions': {
-                'value': {
-                    'imagePath': 's1ImagePath.png',
-                    'labeledRegions': [{
-                        'label': 'classdef',
-                        'region': {
-                            'area': [
-                                [0.004291845493562232, 0.004692192192192192],
-                                [0.40987124463519314, 0.05874624624624625]
-                            ],
-                            'regionType': 'Rectangle'
-                        }
-                    }]
-                }
-            }
-        }
-        customization_args_dict2 = {
-            'choices': {'value': [
-                (
-                    '<p>This is value1 for MultipleChoice'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
-                ),
-                (
-                    '<p>This is value2 for MultipleChoice'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p></p>')
-            ]}
-        }
-        customization_args_dict3 = {
-            'choices': {'value': [
-                (
-                    '<p>This is value1 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
-                    '<p>This is value2 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
-                (
-                    '<p>This is value3 for ItemSelection'
-                    '<oppia-noninteractive-image filepath-with-value='
-                    '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
-            ]}
-        }
-        state1.update_interaction_customization_args(customization_args_dict1)
-        state2.update_interaction_customization_args(customization_args_dict2)
-        state3.update_interaction_customization_args(customization_args_dict3)
+#         customization_args_dict1 = {
+#             'highlightRegionsOnHover': {'value': True},
+#             'imageAndRegions': {
+#                 'value': {
+#                     'imagePath': 's1ImagePath.png',
+#                     'labeledRegions': [{
+#                         'label': 'classdef',
+#                         'region': {
+#                             'area': [
+#                                 [0.004291845493562232, 0.004692192192192192],
+#                                 [0.40987124463519314, 0.05874624624624625]
+#                             ],
+#                             'regionType': 'Rectangle'
+#                         }
+#                     }]
+#                 }
+#             }
+#         }
+#         customization_args_dict2 = {
+#             'choices': {'value': [
+#                 (
+#                     '<p>This is value1 for MultipleChoice'
+#                     '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+#                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
+#                     '"&amp;quot;&amp;quot;" alt-with-value='
+#                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
+#                 ),
+#                 (
+#                     '<p>This is value2 for MultipleChoice'
+#                     '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+#                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
+#                     '"&amp;quot;&amp;quot;" alt-with-value='
+#                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+#                     '</p></p>')
+#             ]}
+#         }
+#         customization_args_dict3 = {
+#             'choices': {'value': [
+#                 (
+#                     '<p>This is value1 for ItemSelection'
+#                     '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+#                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
+#                     '"&amp;quot;&amp;quot;" alt-with-value='
+#                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+#                     '</p>'),
+#                 (
+#                     '<p>This is value2 for ItemSelection'
+#                     '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+#                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
+#                     '"&amp;quot;&amp;quot;" alt-with-value='
+#                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+#                     '</p>'),
+#                 (
+#                     '<p>This is value3 for ItemSelection'
+#                     '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+#                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
+#                     '"&amp;quot;&amp;quot;" alt-with-value='
+#                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+#                     '</p>')
+#             ]}
+#         }
+#         state1.update_interaction_customization_args(customization_args_dict1)
+#         state2.update_interaction_customization_args(customization_args_dict2)
+#         state3.update_interaction_customization_args(customization_args_dict3)
 
-        default_outcome_dict1 = {
-            'dest': 'state2',
-            'feedback': {
-                'content_id': 'default_outcome',
-                'html': '<p>Default outcome for state1</p>'
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
-        }
-        state1.update_interaction_default_outcome(default_outcome_dict1)
+#         default_outcome_dict1 = {
+#             'dest': 'state2',
+#             'feedback': {
+#                 'content_id': 'default_outcome',
+#                 'html': '<p>Default outcome for state1</p>'
+#             },
+#             'param_changes': [],
+#             'labelled_as_correct': False,
+#             'refresher_exploration_id': None,
+#             'missing_prerequisite_skill_id': None
+#         }
+#         state1.update_interaction_default_outcome(default_outcome_dict1)
 
-        hint_list2 = [{
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': (
-                    '<p>Hello, this is html1 for state2'
-                    '<oppia-noninteractive-image filepath-with-value="'
-                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
-            }
-        }, {
-            'hint_content': {
-                'content_id': 'hint_2',
-                'html': '<p>Hello, this is html2 for state2</p>'
-            }
-        }]
-        state2.update_interaction_hints(hint_list2)
+#         hint_list2 = [{
+#             'hint_content': {
+#                 'content_id': 'hint_1',
+#                 'html': (
+#                     '<p>Hello, this is html1 for state2'
+#                     '<oppia-noninteractive-image image_id-with-value='' filepath-with-value="'
+#                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+#                     '"&amp;quot;&amp;quot;" alt-with-value='
+#                     '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+#                     '</p>')
+#             }
+#         }, {
+#             'hint_content': {
+#                 'content_id': 'hint_2',
+#                 'html': '<p>Hello, this is html2 for state2</p>'
+#             }
+#         }]
+#         state2.update_interaction_hints(hint_list2)
 
-        answer_group_list2 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': 1}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': (
-                        '<p>Outcome1 for state2<oppia-noninteractive-image'
-                        ' filepath-with-value='
-                        '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;"'
-                        ' alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_misconception_id': None
-        }, {
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 0}
-            }],
-            'outcome': {
-                'dest': 'state3',
-                'feedback': {
-                    'content_id': 'feedback_2',
-                    'html': '<p>Outcome2 for state2</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_misconception_id': None
-        }]
-        answer_group_list3 = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value1 for ItemSelection'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice1.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
-                ]}
-            }, {
-                'rule_type': 'Equals',
-                'inputs': {'x': [
-                    (
-                        '<p>This is value3 for ItemSelection'
-                        '<oppia-noninteractive-image filepath-with-value='
-                        '"&amp;quot;s3Choice3.png&amp;quot;"'
-                        ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;">'
-                        '</oppia-noninteractive-image></p>')
-                ]}
-            }],
-            'outcome': {
-                'dest': 'state1',
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': '<p>Outcome for state3</p>'
-                },
-                'param_changes': [],
-                'labelled_as_correct': False,
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': [],
-            'tagged_misconception_id': None
-        }]
-        state2.update_interaction_answer_groups(answer_group_list2)
-        state3.update_interaction_answer_groups(answer_group_list3)
+#         answer_group_list2 = [{
+#             'rule_specs': [{
+#                 'rule_type': 'Equals',
+#                 'inputs': {'x': 0}
+#             }, {
+#                 'rule_type': 'Equals',
+#                 'inputs': {'x': 1}
+#             }],
+#             'outcome': {
+#                 'dest': 'state1',
+#                 'feedback': {
+#                     'content_id': 'feedback_1',
+#                     'html': (
+#                         '<p>Outcome1 for state2<oppia-noninteractive-image'
+#                         ' filepath-with-value='
+#                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
+#                         ' caption-with-value="&amp;quot;&amp;quot;"'
+#                         ' alt-with-value="&amp;quot;&amp;quot;">'
+#                         '</oppia-noninteractive-image></p>')
+#                 },
+#                 'param_changes': [],
+#                 'labelled_as_correct': False,
+#                 'refresher_exploration_id': None,
+#                 'missing_prerequisite_skill_id': None
+#             },
+#             'training_data': [],
+#             'tagged_misconception_id': None
+#         }, {
+#             'rule_specs': [{
+#                 'rule_type': 'Equals',
+#                 'inputs': {'x': 0}
+#             }],
+#             'outcome': {
+#                 'dest': 'state3',
+#                 'feedback': {
+#                     'content_id': 'feedback_2',
+#                     'html': '<p>Outcome2 for state2</p>'
+#                 },
+#                 'param_changes': [],
+#                 'labelled_as_correct': False,
+#                 'refresher_exploration_id': None,
+#                 'missing_prerequisite_skill_id': None
+#             },
+#             'training_data': [],
+#             'tagged_misconception_id': None
+#         }]
+#         answer_group_list3 = [{
+#             'rule_specs': [{
+#                 'rule_type': 'Equals',
+#                 'inputs': {'x': [
+#                     (
+#                         '<p>This is value1 for ItemSelection'
+#                         '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+#                         '"&amp;quot;s3Choice1.png&amp;quot;"'
+#                         ' caption-with-value="&amp;quot;&amp;quot;" '
+#                         'alt-with-value="&amp;quot;&amp;quot;">'
+#                         '</oppia-noninteractive-image></p>')
+#                 ]}
+#             }, {
+#                 'rule_type': 'Equals',
+#                 'inputs': {'x': [
+#                     (
+#                         '<p>This is value3 for ItemSelection'
+#                         '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+#                         '"&amp;quot;s3Choice3.png&amp;quot;"'
+#                         ' caption-with-value="&amp;quot;&amp;quot;" '
+#                         'alt-with-value="&amp;quot;&amp;quot;">'
+#                         '</oppia-noninteractive-image></p>')
+#                 ]}
+#             }],
+#             'outcome': {
+#                 'dest': 'state1',
+#                 'feedback': {
+#                     'content_id': 'feedback_1',
+#                     'html': '<p>Outcome for state3</p>'
+#                 },
+#                 'param_changes': [],
+#                 'labelled_as_correct': False,
+#                 'refresher_exploration_id': None,
+#                 'missing_prerequisite_skill_id': None
+#             },
+#             'training_data': [],
+#             'tagged_misconception_id': None
+#         }]
+#         state2.update_interaction_answer_groups(answer_group_list2)
+#         state3.update_interaction_answer_groups(answer_group_list3)
 
-        filenames = (
-            exp_services.get_image_filenames_from_exploration(exploration))
-        expected_output = ['s1ImagePath.png', 's1Content.png', 's2Choice1.png',
-                           's2Choice2.png', 's3Choice1.png', 's3Choice2.png',
-                           's3Choice3.png', 's2Hint1.png',
-                           's2AnswerGroup.png']
-        self.assertEqual(len(filenames), len(expected_output))
-        for filename in expected_output:
-            self.assertIn(filename, filenames)
+#         filenames = (
+#             exp_services.get_image_filenames_from_exploration(exploration))
+#         expected_output = ['s1ImagePath.png', 's1Content.png', 's2Choice1.png',
+#                            's2Choice2.png', 's3Choice1.png', 's3Choice2.png',
+#                            's3Choice3.png', 's2Hint1.png',
+#                            's2AnswerGroup.png']
+#         self.assertEqual(len(filenames), len(expected_output))
+#         for filename in expected_output:
+#             self.assertIn(filename, filenames)
 
 
 class SaveOriginalAndCompressedVersionsOfImageTests(

@@ -124,12 +124,14 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+        STATE_PROPERTY_ADD_NEW_IMAGE)
 
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
+        'image_id_counter')
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'state_name', 'old_state_name', 'new_state_name',
@@ -174,10 +176,16 @@ class ExplorationChange(object):
         elif self.cmd == CMD_EDIT_STATE_PROPERTY:
             if change_dict['property_name'] not in self.STATE_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
-            self.state_name = change_dict['state_name']
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
+            if change_dict['property_name'] == 'add_new_image':
+                self.state_name = change_dict['state_name']
+                self.property_name = change_dict['property_name']
+                self.image_id = change_dict['image_id']
+                self.image_info = change_dict['image_info']
+            else:
+                self.state_name = change_dict['state_name']
+                self.property_name = change_dict['property_name']
+                self.new_value = change_dict['new_value']
+                self.old_value = change_dict.get('old_value')
         elif self.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
             if (change_dict['property_name'] not in
                     self.EXPLORATION_PROPERTIES):
@@ -1153,9 +1161,11 @@ class Exploration(object):
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
 
-    def increment_image_id_counter(self):
+    def update_image_id_counter(self, new_value):
         """Increment the image_id counter."""
-        self.image_id_counter += 1
+        # self.image_id_counter += 1
+        self.image_id_counter = new_value
+
 
     def get_image_id_counter(self):
         """Returns the image_id counter."""
@@ -2227,6 +2237,11 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
+        image_assets = {}
+        image_mapping = {}
+        for state_dict in states_dict.itervalues():
+            state_dict['image_assets'] = image_assets
+            state_dict['image_assets']['image_mapping'] = image_mapping
         return states_dict
 
     @classmethod
