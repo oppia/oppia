@@ -497,3 +497,66 @@ class ExpSummaryModel(base_models.BaseModel):
         ).order(
             -ExpSummaryModel.first_published_msec
         ).fetch(limit)
+
+
+class StateIdMappingModel(base_models.BaseModel):
+    """DEPRECATED: DO NOT USE.
+    State ID model for Oppia explorations.
+    This model maps each exploration version's state to a unique id.
+    Note: use the state id only for derived data, but not for data that’s
+    regarded as the source of truth, as the rules for assigning state id may
+    change in future.
+    The key of each instance is a combination of exploration id and version.
+    """
+
+    # The exploration id whose states are mapped.
+    exploration_id = ndb.StringProperty(indexed=True, required=True)
+
+    # The version of the exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True, required=True)
+
+    # A dict which maps each state name to a unique id.
+    state_names_to_ids = ndb.JsonProperty(required=True)
+
+    # Latest state id that has been assigned to any of the states in any of
+    # of the versions of given exploration. New state IDs should be assigned
+    # from this value + 1.
+    largest_state_id_used = ndb.IntegerProperty(indexed=True, required=True)
+
+    @classmethod
+    def _generate_instance_id(cls, exp_id, exp_version):
+        """Generates ID of the state id mapping model instance.
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of the exploration.
+        Returns:
+            str. A string containing exploration ID and
+                exploration version.
+        """
+        return '%s.%d' % (exp_id, exp_version)
+
+    @classmethod
+    def get_state_id_mapping_model(cls, exp_id, exp_version):
+        """Retrieve state id mapping model from the datastore.
+        Args:
+            exp_id: str. The exploration id.
+            exp_version: int. The exploration version.
+        Returns:
+            StateIdMappingModel. The model retrieved from the datastore.
+        """
+        instance_id = cls._generate_instance_id(exp_id, exp_version)
+        instance = cls.get(instance_id)
+        return instance
+
+    @classmethod
+    def delete_state_id_mapping_models(cls, exp_id, exp_versions):
+        """Removes state id mapping models present in state_id_mapping_models.
+        Args:
+            exp_id: str. The id of the exploration.
+            exp_versions: list(int). A list of exploration versions for which
+                the state id mapping model is to be deleted.
+        """
+        keys = [
+            ndb.Key(cls, cls._generate_instance_id(exp_id, exp_version))
+            for exp_version in exp_versions]
+        ndb.delete_multi(keys)
