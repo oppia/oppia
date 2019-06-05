@@ -371,8 +371,8 @@ describe('Exploration history', function() {
       },
       26: {
         text: 'solicit_answer_details: false',
-        highlighted: false,
-      }
+        highlighted: false
+      },
       27: {
         text: 'written_translations:',
         highlighted: false
