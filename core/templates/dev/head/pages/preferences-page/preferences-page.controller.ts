@@ -26,6 +26,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
+require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');

@@ -179,9 +179,7 @@ require(
 require(
   'pages/exploration-editor-page/editor-tab/' + 
   'exploration-editor-tab.controller.ts');
-require(
-  'pages/exploration-editor-page/editor-tab/graph-directives/' +
-  'exploration-graph.controller.ts');
+require('pages/exploration_editor/editor_tab/ExplorationGraphDirective.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'unresolved-answers-overview/unresolved-answers-overview.directive.ts');

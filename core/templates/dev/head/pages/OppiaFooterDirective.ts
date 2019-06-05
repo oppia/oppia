@@ -13,10 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview File to import necessary scripts for contact page.
+ * @fileoverview Directive for the footer.
  */
 
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
-require('pages/OppiaFooterDirective.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
+oppia.directive('oppiaFooter', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/oppia_footer_directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      function() {}
+    ]
+  };
+}]);

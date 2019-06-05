@@ -23,6 +23,7 @@ require(
   'components/summary-tile-directives/' +
   'exploration-summary-tile.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
+require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');
