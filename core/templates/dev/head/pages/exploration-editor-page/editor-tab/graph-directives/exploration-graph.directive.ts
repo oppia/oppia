@@ -17,10 +17,18 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/GraphDataService.ts');
-require('pages/exploration_editor/RouterService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'graph-data.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'router.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/' +
+  'editor-tab-services/responses.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
@@ -31,8 +39,8 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/editor_tab/' +
-      'exploration_graph_directive.html'),
+      '/pages/exploration-editor-page/editor-tab/graph-directives/' +
+      'exploration-graph.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$uibModal', 'AlertsService', 'EditabilityService',
@@ -70,8 +78,9 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
 
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/editor_tab/' +
-              'exploration_graph_modal_directive.html'),
+              '/pages/exploration-editor-page/editor-tab/' +
+              'editor-tab-templates/modal-templates/' +
+              'exploration-graph-modal.template.html'),
             backdrop: true,
             resolve: {
               isEditable: function() {
