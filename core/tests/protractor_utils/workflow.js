@@ -171,7 +171,8 @@ var _getExplorationRoles = function(roleName) {
   var itemName = roleName + 'Name';
   var listName = roleName + 'Names';
   return element.all(by.repeater(
-    itemName + ' in $ctrl.ExplorationRightsService.' + listName + ' track by $index'
+    itemName + ' in $ctrl.ExplorationRightsService.' + listName +
+    ' track by $index'
   )).map(function(elem) {
     return elem.getText();
   });
