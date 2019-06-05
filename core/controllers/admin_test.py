@@ -60,6 +60,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
         new_config_value = True
 
+        response_dict = self.get_json('/adminhandler')
+        response_config_properties = response_dict['config_properties']
+        self.assertDictContainsSubset({
+            'value': False,
+        }, response_config_properties[
+            config_domain.IS_IMPROVEMENTS_TAB_ENABLED.name])
+
         payload = {
             'action': 'save_config_properties',
             'new_config_property_values': {

@@ -23,7 +23,7 @@ rendering.-->
   (function() {
     fetch('/google_analytics').then(function(response) {
       return response.text()
-    }).then(function (response) {
+    }).then(function(response) {
       response = JSON.parse(response.substring(4));
       ga('create', response.analytics_id, 'auto', {allowLinker: true});
       ga('set', 'anonymizeIp', true);
