@@ -220,9 +220,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-                get_question_skill_links_with_constant_number_per_skill(
-                    2, ['skill_id1', 'skill_id3']
-                )
+            get_question_skill_links_with_constant_number_per_skill(
+                2, ['skill_id1', 'skill_id3']
+            )
         )
         self.assertEqual(len(question_skill_links), 2)
         self.assertEqual(question_skill_links[0].skill_id, 'skill_id1')

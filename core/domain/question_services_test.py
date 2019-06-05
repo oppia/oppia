@@ -101,7 +101,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id_1, 'skill_2', 0.5)
 
         questions = question_services.get_questions_by_skill_ids(
-            2, ['skill_1', 'skill_2'], '')
+            2, ['skill_1', 'skill_2'])
         self.assertEqual(len(questions), 2)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())

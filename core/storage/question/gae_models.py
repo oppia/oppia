@@ -249,7 +249,18 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     @classmethod
     def get_question_skill_links_with_constant_number_per_skill(
             cls, question_count, skill_ids):
+        """Fetches the list of constant number of QuestionSkillLinkModels
+        linked to the skills.
 
+        Args:
+            question_count: int. The number of questions to be returned.
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+
+        Returns:
+            list(QuestionSkillLinkModel). Constant number of
+                QuestionSkillLinkModels corresponding to given skill_ids.
+        """
         question_count_per_skill = int(
             math.ceil(float(question_count) / float(len(skill_ids))))
         question_skill_link_models = []
@@ -259,7 +270,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     question_count_per_skill
                 )
             )
-        return question_skill_link_models      
+        return question_skill_link_models 
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):

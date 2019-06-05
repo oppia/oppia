@@ -143,6 +143,17 @@ def get_questions_and_skill_descriptions_by_skill_ids(
 
 
 def get_questions_by_skill_ids(question_count, skill_ids):
+    """Returns constant number of questions linked to the given skill ids.
+
+    Args:
+        question_count: int. The number of questions to return.
+        skill_ids: list(str). The ID of the skills to which the questions are
+            linked.
+
+    Returns:
+        list(Question). The list of constant number of questions linked to each
+            given skill id.
+    """ 
     question_skill_link_models = (
         question_models.QuestionSkillLinkModel.get_question_skill_links_with_constant_number_per_skill( #pylint: disable=line-too-long
             question_count, skill_ids))

@@ -513,7 +513,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             story_services.get_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
-    
+
     def test_get_latest_completed_node_ids(self):
         self.assertIsNone(
             self._get_progress_model(self.owner_id, self.STORY_1_ID))

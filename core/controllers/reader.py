@@ -1021,7 +1021,6 @@ class QuestionPlayerHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET request."""
-        start_cursor = self.request.get('start_cursor')
         # Skill ids are given as a comma separated list because this is
         # a GET request.
 
