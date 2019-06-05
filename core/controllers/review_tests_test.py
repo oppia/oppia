@@ -21,6 +21,7 @@ from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
+
 class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
     def setUp(self):
