@@ -270,7 +270,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                     question_count_per_skill
                 )
             )
-        return question_skill_link_models 
+        return question_skill_link_models
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):
