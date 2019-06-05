@@ -66,11 +66,12 @@ class ExplorationActualStartEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        for model in all_models:
-            self.assertEqual(model.exp_id, 'exp_id')
-            self.assertEqual(model.state_name, 'state_name')
-            self.assertEqual(model.session_id, 'session_id')
-            self.assertEqual(model.exp_version, 1)
+        model = list(all_models)[0]
+
+        self.assertEqual(model.exp_id, 'exp_id')
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exp_version, 1)
 
 
 class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
@@ -89,12 +90,13 @@ class SolutionHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        for model in all_models:
-            self.assertEqual(model.exp_id, 'exp_id')
-            self.assertEqual(model.state_name, 'state_name')
-            self.assertEqual(model.session_id, 'session_id')
-            self.assertEqual(model.exp_version, 1)
-            self.assertEqual(model.time_spent_in_state_secs, 2.0)
+        model = list(all_models)[0]
+
+        self.assertEqual(model.exp_id, 'exp_id')
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exp_version, 1)
+        self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
 
 class StateHitEventHandlerTests(test_utils.GenericTestBase):
@@ -114,13 +116,14 @@ class StateHitEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        for model in all_models:
-            self.assertEqual(model.exploration_id, 'exp_id')
-            self.assertEqual(model.state_name, 'state_name')
-            self.assertEqual(model.session_id, 'session_id')
-            self.assertEqual(model.exploration_version, 1)
-            self.assertEqual(model.params, {})
-            self.assertEqual(model.play_type, feconf.PLAY_TYPE_PLAYTEST)
+        model = list(all_models)[0]
+
+        self.assertEqual(model.exploration_id, 'exp_id')
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exploration_version, 1)
+        self.assertEqual(model.params, {})
+        self.assertEqual(model.play_type, feconf.PLAY_TYPE_PLAYTEST)
 
 
 class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
@@ -139,12 +142,13 @@ class StateCompleteEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        for model in all_models:
-            self.assertEqual(model.exp_id, 'exp_id')
-            self.assertEqual(model.state_name, 'state_name')
-            self.assertEqual(model.session_id, 'session_id')
-            self.assertEqual(model.exp_version, 1)
-            self.assertEqual(model.time_spent_in_state_secs, 2.0)
+        model = list(all_models)[0]
+
+        self.assertEqual(model.exp_id, 'exp_id')
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exp_version, 1)
+        self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
 
 class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
@@ -165,13 +169,14 @@ class LeaveForRefresherExpEventHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(all_models.count(), 1)
 
-        for model in all_models:
-            self.assertEqual(model.exp_id, 'exp_id')
-            self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
-            self.assertEqual(model.state_name, 'state_name')
-            self.assertEqual(model.session_id, 'session_id')
-            self.assertEqual(model.exp_version, 1)
-            self.assertEqual(model.time_spent_in_state_secs, 2.0)
+        model = list(all_models)[0]
+
+        self.assertEqual(model.exp_id, 'exp_id')
+        self.assertEqual(model.refresher_exp_id, 'refresher_exp_id')
+        self.assertEqual(model.state_name, 'state_name')
+        self.assertEqual(model.session_id, 'session_id')
+        self.assertEqual(model.exp_version, 1)
+        self.assertEqual(model.time_spent_in_state_secs, 2.0)
 
 
 class TestEventHandler(event_services.BaseEventHandler):
