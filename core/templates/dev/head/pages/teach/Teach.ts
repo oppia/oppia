@@ -17,6 +17,8 @@
  */
 
 require('components/background/BackgroundBannerDirective.ts');
+require('pages/OppiaFooterDirective.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 
