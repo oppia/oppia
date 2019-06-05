@@ -665,6 +665,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/resolveissuehandler/<exploration_id>', editor.ResolveIssueHandler),
 
+    get_redirect_route(
+        r'%s' % feconf.GOOGLE_ANALYTICS_DATA_URL,
+        base.GoogleAnalyticsHandler),
+
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]
