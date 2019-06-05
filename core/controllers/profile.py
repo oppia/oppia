@@ -370,8 +370,8 @@ class SiteLanguageHandler(base.BaseHandler):
 
 
 class UserInfoHandler(base.BaseHandler):
-    """Provides info about user.
-    If user is not logged in, return dict containing false as logged in status.
+    """Provides info about user. If user is not logged in,
+    return dict containing false as logged in status.
     """
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
