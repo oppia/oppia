@@ -13,13 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia library footer.
+ * @fileoverview Directive for the local navigation in the collection view.
  */
 
-oppia.controller('LibraryFooter', [
-  '$scope', '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',
-  function($scope, $window, LIBRARY_PAGE_MODES, LIBRARY_PATHS_TO_MODES) {
-    var pageMode = LIBRARY_PATHS_TO_MODES[$window.location.pathname];
-    $scope.footerIsDisplayed = (pageMode !== LIBRARY_PAGE_MODES.SEARCH);
+oppia.directive('collectionLocalNav', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/collection_player/collection_local_nav_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.canEdit = GLOBALS.canEdit;
+        ctrl.collectionId = GLOBALS.collectionId;
+      }]
+    };
   }
 ]);

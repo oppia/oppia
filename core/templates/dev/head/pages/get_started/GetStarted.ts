@@ -18,3 +18,4 @@
  */
 require('base_components/BaseContentDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');
+require('pages/OppiaFooterDirective.ts');

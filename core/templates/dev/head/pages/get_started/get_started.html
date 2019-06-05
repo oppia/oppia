@@ -1,21 +1,15 @@
 <!DOCTYPE html>
 <html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
-    <!-- This code is used for inserting meta tags via webpack -->
-    <%= htmlWebpackPlugin.options.meta.toHTML() %>
-    <link rel="apple-touch-icon" href="/assets/images/logo/favicon.png">
-
-    <title itemprop="name">Get Started - Oppia</title>
-
-    <!-- Require head styles file using webpack -->
-    @require('../header_css_libs.html')
+    <!-- Insert head content using webpack -->
+    @require('../../base_components/header.html', {"title": "Get Started - Oppia"})
+    
     <script>
       var GLOBALS = {
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
-    <!-- Require head javascript file using webpack -->
-    @require('../header_js_libs.html')
+    
     {{BEFORE_END_HEAD_TAG_HOOK}}
   </head>
   <body>

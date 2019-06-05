@@ -18,7 +18,7 @@ module.exports = function(config) {
       'local_compiled_js/assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
-      'third_party/static/jquery-3.2.1/jquery.min.js',
+      'third_party/static/jquery-3.4.1/jquery.min.js',
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
       'third_party/static/angularjs-1.5.8/angular.js',
       'third_party/static/angularjs-1.5.8/angular-mocks.js',
@@ -26,8 +26,6 @@ module.exports = function(config) {
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.9.2/ckeditor.js',
-      'third_party/static/angular-recorder-1.4.1/dist' +
-      '/angular-audio-recorder.min.js',
       generatedJs,
       'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of

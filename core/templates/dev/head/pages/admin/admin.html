@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html ng-app="oppia" ng-controller="Admin">
+<html ng-app="oppia">
   <head>
     <title>Oppia Admin Panel</title>
 
@@ -33,45 +33,10 @@
   </head>
 
   <body>
-    <admin-navbar user-email="userEmail" logout-url="logoutUrl"></admin-navbar>
 
-    <div align="center"
-         ng-if="statusMessage"
-         style="background-color: #ffffff; position: fixed; max-width: 30%; z-index: 3000; border: 1px solid #00376d; right: 30px; bottom: 30px">
-      <[statusMessage]>
-    </div>
-    <br>
-
-    <div style="padding-top: 16px;">
-      <admin-dev-mode-activities-tab ng-if="isActivitiesTabOpen() && inDevMode"
-                                     set-status-message="setStatusMessage">
-      </admin-dev-mode-activities-tab>
-      <admin-prod-mode-activities-tab ng-if="isActivitiesTabOpen() && !inDevMode">
-      </admin-prod-mode-activities-tab>
-
-      <admin-jobs-tab ng-if="isJobsTabOpen()"
-                      set-status-message="setStatusMessage">
-      </admin-jobs-tab>
-
-      <admin-config-tab ng-if="isConfigTabOpen()"
-                        set-status-message="setStatusMessage">
-      </admin-config-tab>
-
-      <admin-roles-tab ng-if="isRolesTabOpen()"
-                       set-status-message="setStatusMessage">
-      </admin-roles-tab>
-
-      <admin-misc-tab ng-if="isMiscTabOpen()"
-                      set-status-message="setStatusMessage">
-      </admin-misc-tab>
-    </div>
-
-    <div ng-if="inDevMode" class="oppia-dev-mode">
-      Dev Mode
-    </div>
+    <admin-page></admin-page>
 
     {% include 'pages/footer_js_libs.html' %}
-
     <script src="/templates/dev/head/AppInit.js"></script>
     <!-- This code is used for inserting webpack bundles
        https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
