@@ -3,13 +3,13 @@
   <head>
     <!-- Insert head content using webpack -->
     @require('../../base_components/header.html', {"title": "Get Started - Oppia"})
-    
+
     <script>
       var GLOBALS = {
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
-    
+
     {{BEFORE_END_HEAD_TAG_HOOK}}
   </head>
   <body>

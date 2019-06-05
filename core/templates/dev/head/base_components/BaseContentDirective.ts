@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/OppiaFooterDirective.ts')
+require('pages/OppiaFooterDirective.ts');
 
 oppia.directive('baseContent', [
   'UrlInterpolationService',
