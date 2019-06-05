@@ -91,6 +91,11 @@ describe('Url Service', function() {
     expect(UrlService.getHash()).toBe(sampleHash);
   });
 
+  it('should correctly return the origin of window.location', function() {
+    var origin = 'http://sample.com';
+    expect(UrlService.getOrigin()).toBe(origin);
+  });
+
   it('should correctly retrieve topic id from url', function() {
     mockLocation.pathname = '/topic_editor/abcdefgijklm';
     expect(
