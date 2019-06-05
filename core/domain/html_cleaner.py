@@ -26,7 +26,7 @@ import bs4
 from core.domain import rte_component_registry
 
 
-def filter_tag(unused_tag, name, value):
+def filter_a(unused_tag, name, value):
     """Returns whether the described attribute of a tag should be
     whitelisted.
 
@@ -50,7 +50,7 @@ def filter_tag(unused_tag, name, value):
 
 
 ATTRS_WHITELIST = {
-    'a': filter_tag,
+    'a': filter_a,
     'b': [],
     'blockquote': [],
     'br': [],
