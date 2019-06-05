@@ -21,13 +21,15 @@ require('services/contextual/UrlService.ts');
 describe('Url Service', function() {
   var UrlService = null;
   var sampleHash = 'sampleHash';
-  var pathname = 'sample.com/embed';
+  var pathname = '/embed';
   var mockLocation = null;
+  var origin = 'http://sample.com';
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
     mockLocation = {
-      href: 'http://' + pathname,
+      href: origin + pathname,
+      origin: origin,
       pathname: pathname,
       hash: sampleHash,
       search: ''

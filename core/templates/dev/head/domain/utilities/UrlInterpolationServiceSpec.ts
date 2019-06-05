@@ -30,7 +30,7 @@ describe('URL Interpolation Service', function() {
     uis = $injector.get('UrlInterpolationService');
 
     mockLocation = {
-      href: 'http://sample.com'
+      origin: 'http://sample.com'
     };
     UrlService = $injector.get('UrlService');
     spyOn(UrlService, 'getCurrentLocation').and.returnValue(mockLocation);
