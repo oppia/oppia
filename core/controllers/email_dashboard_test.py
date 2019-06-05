@@ -232,9 +232,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
+            job_id, additional_job_params={'query_id': query_id})
 
         # Complete execution of query.
         self.assertEqual(
@@ -268,14 +267,12 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
+            job_id, additional_job_params={'query_id': query_id})
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id_1}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_1, additional_job_params=params)
+            job_id_1, additional_job_params={'query_id': query_id_1})
 
         # Complete execution of query.
         self.assertEqual(
@@ -308,9 +305,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
+            job_id, additional_job_params={'query_id': query_id})
 
         # Complete execution of query.
         self.assertEqual(
@@ -343,14 +339,12 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
+            job_id, additional_job_params={'query_id': query_id})
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id_1}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_1, additional_job_params=params)
+            job_id_1, additional_job_params={'query_id': query_id_1})
 
         # Complete execution of query.
         self.assertEqual(
@@ -383,9 +377,8 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
+            job_id, additional_job_params={'query_id': query_id})
 
         # Complete execution of query.
         self.assertEqual(
@@ -418,14 +411,12 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
             has_not_logged_in_for_n_days=30)
 
         job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
+            job_id, additional_job_params={'query_id': query_id})
 
         job_id_1 = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-        params = {'query_id': query_id_1}
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id_1, additional_job_params=params)
+            job_id_1, additional_job_params={'query_id': query_id_1})
 
         # Complete execution of query.
         self.assertEqual(
