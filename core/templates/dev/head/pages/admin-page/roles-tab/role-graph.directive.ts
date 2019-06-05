@@ -42,10 +42,10 @@ oppia.directive('roleGraph', [
         '/pages/admin-page/roles-tab/role-graph.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$element', '$timeout', '$filter', 'StateGraphLayoutService',
+        '$element', '$timeout', '$filter', 'GraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
-            $element, $timeout, $filter, StateGraphLayoutService,
+            $element, $timeout, $filter, GraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
           var ctrl = this;
           var getElementDimensions = function() {
@@ -67,15 +67,15 @@ oppia.directive('roleGraph', [
             var nodeData = GraphLayoutService.computeLayout(
               nodes, links, initStateId, angular.copy(finalStateIds));
 
-            ctrl.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
+            ctrl.GRAPH_WIDTH = GraphLayoutService.getGraphWidth(
               MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
-            ctrl.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
+            ctrl.GRAPH_HEIGHT = GraphLayoutService.getGraphHeight(
               nodeData);
 
-            nodeData = StateGraphLayoutService.modifyPositionValues(
+            nodeData = GraphLayoutService.modifyPositionValues(
               nodeData, ctrl.GRAPH_WIDTH, ctrl.GRAPH_HEIGHT);
 
-            ctrl.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
+            ctrl.augmentedLinks = GraphLayoutService.getAugmentedLinks(
               nodeData, links);
 
             ctrl.getNodeTitle = function(node) {
