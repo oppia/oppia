@@ -668,11 +668,13 @@ class Story(object):
             list(str)|None. The list of acquired skill ids for the
                 node ids or None, if no node is linked to them.
         """
-        acquired_skill_ids = set()
+        acquired_skill_ids = []
         for node in self.story_contents.nodes:
             if node.id in node_ids:
-                acquired_skill_ids.update(node.acquired_skill_ids)
-        return list(acquired_skill_ids)
+                for skill_id in node.acquired_skill_ids:
+                    if skill_id not in acquired_skill_ids:
+                        acquired_skill_ids.append(skill_id)
+        return acquired_skill_ids
 
     def get_prerequisite_skill_ids_for_exp_id(self, exp_id):
         """Returns the prerequisite skill ids of the node having the given
