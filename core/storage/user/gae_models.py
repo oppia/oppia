@@ -390,18 +390,31 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
 
         Args:
             user_id: str. The user_id denotes which user's data to extract.
+                If the user_id is not valid, this method returns None.
 
         Returns:
             dict. The user-relevant properties of UserStatsModel in a python
                 dict format.
         """
-        user_model = UserStatsModel.get_or_create(user_id)
+        user_model = UserStatsModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        validated_weekly_creator_stats_list = []
+        for weekly_stat in user_model.weekly_creator_stats_list:
+            if isinstance(weekly_stat, dict) and len(weekly_stat) == 1:
+                key_obj = list(weekly_stat.keys())[0]
+                if isinstance(weekly_stat[key_obj], dict):
+                    key_entries = sorted(list(weekly_stat[key_obj].keys()))
+                    if key_entries == ['average_ratings', 'total_plays']:
+                        validated_weekly_creator_stats_list.append(weekly_stat)
+
         user_data = {
             'impact_score': user_model.impact_score,
             'total_plays': user_model.total_plays,
             'average_ratings': user_model.average_ratings,
             'num_ratings': user_model.num_ratings,
-            'weekly_creator_stats_list': user_model.weekly_creator_stats_list
+            'weekly_creator_stats_list': validated_weekly_creator_stats_list
         }
 
         return user_data

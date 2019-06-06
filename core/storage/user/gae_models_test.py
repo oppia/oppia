@@ -89,6 +89,7 @@ class UserStatsModelTest(test_utils.GenericTestBase):
 
     USER_ID_1 = 1
     USER_ID_2 = 2
+    USER_ID_3 = 3
 
     USER_1_IMPACT_SCORE = 0.87
     USER_1_TOTAL_PLAYS = 33
@@ -109,6 +110,25 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         }
     ]
 
+    USER_2_IMPACT_SCORE = 0.33
+    USER_2_TOTAL_PLAYS = 15
+    USER_2_AVERAGE_RATINGS = 2.50
+    USER_2_NUM_RATINGS = 10
+    USER_2_WEEKLY_CREATOR_STATS_LIST = [
+        {
+            ('2019-05-21'): {
+                'average_ratings': 2.50,
+                'total_plays': 4
+            }
+        },
+        {
+            ('2019-05-28'): {
+                'average_ratings': 2.50,
+                'total_plays': 6
+            }
+        }
+    ]
+
     def setUp(self):
         """Set up user models in datastore for use in testing."""
         super(UserStatsModelTest, self).setUp()
@@ -122,6 +142,15 @@ class UserStatsModelTest(test_utils.GenericTestBase):
             self.USER_1_WEEKLY_CREATOR_STATS_LIST)
         user_models.UserStatsModel.put(user_model_1)
 
+        user_model_2 = user_models.UserStatsModel(id=self.USER_ID_2)
+        user_model_2.impact_score = self.USER_2_IMPACT_SCORE
+        user_model_2.total_plays = self.USER_2_TOTAL_PLAYS
+        user_model_2.average_ratings = self.USER_2_AVERAGE_RATINGS
+        user_model_2.num_ratings = self.USER_2_NUM_RATINGS
+        user_model_2.weekly_creator_stats_list = (
+            self.USER_2_WEEKLY_CREATOR_STATS_LIST)
+        user_models.UserStatsModel.put(user_model_2)
+
     def test_export_data_on_existing_user(self):
         """Test if export_data works when user is in data store."""
         user_data = user_models.UserStatsModel.export_data(self.USER_ID_1)
@@ -134,16 +163,33 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         }
         self.assertEqual(user_data, test_data)
 
-    def test_export_data_on_nonexistent_user(self):
-        """Test if export_data works when user is not in data store."""
-        user_data = user_models.UserStatsModel.export_data(self.USER_ID_2)
-        test_data = {
-            'impact_score': None,
-            'total_plays': 0,
-            'average_ratings': None,
-            'num_ratings': 0,
-            'weekly_creator_stats_list': []
+    def test_export_data_on_multiple_users(self):
+        """Test if export_data works on multiple users in data store."""
+        user_1_data = user_models.UserStatsModel.export_data(self.USER_ID_1)
+        test_1_data = {
+            'impact_score': self.USER_1_IMPACT_SCORE,
+            'total_plays': self.USER_1_TOTAL_PLAYS,
+            'average_ratings': self.USER_1_AVERAGE_RATINGS,
+            'num_ratings': self.USER_1_NUM_RATINGS,
+            'weekly_creator_stats_list': self.USER_1_WEEKLY_CREATOR_STATS_LIST
         }
+
+        user_2_data = user_models.UserStatsModel.export_data(self.USER_ID_2)
+        test_2_data = {
+            'impact_score': self.USER_2_IMPACT_SCORE,
+            'total_plays': self.USER_2_TOTAL_PLAYS,
+            'average_ratings': self.USER_2_AVERAGE_RATINGS,
+            'num_ratings': self.USER_2_NUM_RATINGS,
+            'weekly_creator_stats_list': self.USER_2_WEEKLY_CREATOR_STATS_LIST
+        }
+
+        self.assertEqual(user_1_data, test_1_data)
+        self.assertEqual(user_2_data, test_2_data)
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if export_data returns None when user is not in data store."""
+        user_data = user_models.UserStatsModel.export_data(self.USER_ID_3)
+        test_data = None
         self.assertEqual(user_data, test_data)
 
 
