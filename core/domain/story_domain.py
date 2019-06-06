@@ -671,7 +671,7 @@ class Story(object):
         acquired_skill_ids = set()
         for node in self.story_contents.nodes:
             if node.id in node_ids:
-                acquired_skill_ids.add(node.acquired_skill_ids)
+                acquired_skill_ids.update(node.acquired_skill_ids)
         return list(acquired_skill_ids)
 
     def get_prerequisite_skill_ids_for_exp_id(self, exp_id):

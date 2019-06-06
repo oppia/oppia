@@ -131,9 +131,13 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     self.story_id_1))
+            skill_ids = ['skill_id_1', 'skill_id_2']
+
             self.assertEqual(len(json_response['skill_list']), 2)
-            self.assertEqual(json_response['skill_list'][0], 'skill_id_1')
-            self.assertEqual(json_response['skill_list'][1], 'skill_id_2')
+            for skill_id in json_response['skill_list']:
+                self.assertTrue(skill_id in skill_ids)
+            self.assertNotEqual(
+                json_response['skill_list'][0], json_response['skill_list'][1])
 
     def test_no_user_can_access_unpublished_story_review_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
