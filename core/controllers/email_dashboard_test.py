@@ -247,7 +247,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         response = self.post_json(
-            ('/emaildashboardresult/%s' % 'invalid_query_id'), {},
+            '/emaildashboardresult/%s' % 'invalid_query_id', {},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(response['error'], '400 Invalid query id.')
         self.logout()
@@ -288,7 +288,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
-            ('/emaildashboardresult/%s' % query_id_1), {},
+            '/emaildashboardresult/%s' % query_id_1, {},
             csrf_token=csrf_token, expected_status_int=401)
         self.assertEqual(
             response['error'],
@@ -320,7 +320,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         response = self.post_json(
-            ('/emaildashboardcancelresult/%s' % 'invalid_query_id'), {},
+            '/emaildashboardcancelresult/%s' % 'invalid_query_id', {},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(response['error'], '400 Invalid query id.')
         self.logout()
@@ -360,7 +360,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
-            ('/emaildashboardcancelresult/%s' % query_id_1), {},
+            '/emaildashboardcancelresult/%s' % query_id_1, {},
             csrf_token=csrf_token, expected_status_int=401)
         self.assertEqual(
             response['error'],
@@ -392,7 +392,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         response = self.post_json(
-            ('/emaildashboardtestbulkemailhandler/%s' % 'invalid_query_id'), {},
+            '/emaildashboardtestbulkemailhandler/%s' % 'invalid_query_id', {},
             csrf_token=csrf_token, expected_status_int=400)
         self.assertEqual(response['error'], '400 Invalid query id.')
         self.logout()
@@ -432,7 +432,7 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         # Raises authorization error when passing a query id whose associated
         # query model is not created by the logged in user.
         response = self.post_json(
-            ('/emaildashboardtestbulkemailhandler/%s' % query_id_1), {},
+            '/emaildashboardtestbulkemailhandler/%s' % query_id_1, {},
             csrf_token=csrf_token, expected_status_int=401)
         self.assertEqual(
             response['error'],
