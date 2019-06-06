@@ -62,6 +62,7 @@ module.exports = {
       commonPrefix + '/pages/notifications_dashboard/NotificationsDashboard.ts',
     practice_session:
       commonPrefix + '/pages/practice_session/PracticeSession.ts',
+    privacy: commonPrefix + '/pages/privacy/Privacy.ts',
     preferences: commonPrefix + '/pages/preferences/Preferences.ts',
     profile: commonPrefix + '/pages/profile/Profile.ts',
     signup: commonPrefix + '/pages/signup/Signup.ts',
@@ -231,7 +232,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['app', 'privacy'],
       filename: 'privacy.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. Join ' +
+          'the community to create or try an exploration today!'
+      },
       template: commonPrefix + '/pages/privacy/privacy.html',
       minify: htmlMinifyConfig,
       inject: false
