@@ -1268,15 +1268,15 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
 
             self.assertEqual(
                 gae_image_services.get_image_dimensions(
-                original_image_content),
+                    original_image_content),
                 (width, height))
             self.assertEqual(
                 gae_image_services.get_image_dimensions(
-                compressed_image_content),
+                    compressed_image_content),
                 (new_width, new_height))
             self.assertEqual(
                 gae_image_services.get_image_dimensions(
-                micro_image_content),
+                    micro_image_content),
                 (new_width, new_height))
 
 
