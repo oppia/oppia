@@ -22,6 +22,8 @@ import re
 from constants import constants
 from core import jobs
 from core.domain import activity_domain
+from core.domain import commit_commands_domain
+from core.domain import exp_services
 from core.platform import models
 import feconf
 import schema_utils
@@ -44,6 +46,8 @@ class BaseModelValidator(object):
     # of the model class and a list of (external_key, external_model_instance)
     # tuples.
     external_models = {}
+    is_commit_log_entry_model = False
+    is_snapshot_metadata_model = False
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -68,8 +72,11 @@ class BaseModelValidator(object):
                 'Model id %s: Model id does not match regex pattern') % item.id
 
     @classmethod
-    def _get_json_properties_schema(cls):
+    def _get_json_properties_schema(cls, item):
         """Defines a schema for model properties.
+
+        Args:
+            item: ndb.Model. Entity to validate.
 
         Returns:
             dict(str, dict). A dictionary whose keys are names of model
@@ -85,7 +92,7 @@ class BaseModelValidator(object):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        properties_schema_dict = cls._get_json_properties_schema()
+        properties_schema_dict = cls._get_json_properties_schema(item)
 
         for property_name, property_schema in (
                 properties_schema_dict.iteritems()):
@@ -196,6 +203,65 @@ class BaseModelValidator(object):
                 ) % (item.id, item.last_updated)
 
     @classmethod
+    def _validate_commit_type(cls, item):
+        """Validates that commit type is valid."""
+        if item.commit_type not in ['create', 'edit', 'revert', 'delete']:
+            cls.errors['commit type check'] = (
+                'Model id %s: Commit type %s is not allowed') % (
+                    item.id, item.commit_type)
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        """Defines a Commit command domain class.
+
+        Returns:
+            A domain object instance.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _validate_commit_cmds_schema(cls, item):
+        """Validates schema of commit commands in commit_cmds dict."""
+        for commit_cmd_dict in item.commit_cmds:
+            if len(commit_cmd_dict.keys()):
+                name = commit_cmd_dict['cmd']
+                parameters = commit_cmd_dict
+                parameters.pop('cmd', None)
+                commit_cmd_domain_object = cls._get_commit_cmd_domain_class()(
+                    name=name, parameters=parameters)
+                try:
+                    commit_cmd_domain_object.validate()
+                except Exception as e:
+                    cls.errors['commit cmd %s check' % name] = (
+                        'Model id %s: Commit command domain validation failed '
+                        'with error: %s') % (item.id, e)
+
+    @classmethod
+    def _validate_post_commit_status(cls, item):
+        """Validates that post_commit_status is either public or private."""
+        if item.post_commit_status not in ['public', 'private']:
+            cls.errors['post commit status check'] = (
+                'Model id %s: Post commit status %s is invalid') % (
+                    item.id, item.post_commit_status)
+
+    @classmethod
+    def _validate_post_commit_is_private(cls, item):
+        """Validates that post_commit_is_private is true iff
+        post_commit_status is private.
+        """
+        if item.post_commit_status == 'private' and not (
+                item.post_commit_is_private):
+            cls.errors['post commit is private check'] = (
+                'Model id %s: Post commit status is private but '
+                'post_commit_is_private is False') % item.id
+
+        if item.post_commit_status == 'public' and (
+                item.post_commit_is_private):
+            cls.errors['post commit is private check'] = (
+                'Model id %s: Post commit status is public but '
+                'post_commit_is_private is True') % item.id
+
+    @classmethod
     def _get_validation_functions(cls):
         """Returns the list of validation function to run.
 
@@ -220,6 +286,17 @@ class BaseModelValidator(object):
         cls._validate_model_json_properties(item)
         cls._validate_model_domain_object_instances(item)
         cls._validate_external_id_relationships(item)
+
+        if cls.is_commit_log_entry_model:
+            cls._validate_commit_type(item)
+            cls._validate_commit_cmds_schema(item)
+            cls._validate_post_commit_status(item)
+            cls._validate_post_commit_is_private(item)
+
+        if cls.is_snapshot_metadata_model:
+            cls._validate_commit_type(item)
+            cls._validate_commit_cmds_schema(item)
+
         for func in cls._get_validation_functions():
             func(item)
 
@@ -235,7 +312,7 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_json_properties_schema(cls):
+    def _get_json_properties_schema(cls, item):
         activity_references_dict_schema = {
             'type': 'dict',
             'properties': [{
@@ -276,6 +353,10 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         return model_domain_object_instances
 
     @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         exploration_ids = []
         collection_ids = []
@@ -312,12 +393,16 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_json_properties_schema(cls):
+    def _get_json_properties_schema(cls, item):
         return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -352,12 +437,16 @@ class SentEmailModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_json_properties_schema(cls):
+    def _get_json_properties_schema(cls, item):
         return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -430,12 +519,16 @@ class BulkEmailModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls):
+    def _get_json_properties_schema(cls, item):
         return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -503,12 +596,16 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls):
+    def _get_json_properties_schema(cls, item):
         return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -541,40 +638,6 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
         return [cls._validate_reply_to_id_length]
 
 
-class UserSubscriptionsModelValidator(BaseModelValidator):
-    """Class for validating UserSubscriptionsModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls):
-        return {}
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
-    def _get_external_id_relationships(cls, item):
-        return {
-            'activity_ids': (exp_models.ExplorationModel, item.activity_ids),
-            'collection_ids': (
-                collection_models.CollectionModel,
-                item.collection_ids),
-            'general_feedback_thread_ids': (
-                feedback_models.GeneralFeedbackThreadModel,
-                item.general_feedback_thread_ids),
-            'creator_ids': (user_models.UserSettingsModel, item.creator_ids),
-            'id': (user_models.UserSettingsModel, [item.id]),
-        }
-
-    @classmethod
-    def _get_validation_functions(cls):
-        return []
-
-
 class ExplorationModelValidator(BaseModelValidator):
     """Class for validating ExplorationModel."""
 
@@ -583,22 +646,51 @@ class ExplorationModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls):
+    def _get_json_properties_schema(cls, item):
         return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
-        return []
+        model_domain_object_instances = [
+            exp_services.get_exploration_from_model(item)]
+
+        return model_domain_object_instances
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         state_id_mapping_model_ids = [
             '%s.%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
+        exploration_commit_log_entry_model_ids = [
+            'exploration-%s-%s' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        exp_summary_model_ids = [item.id]
+        exploration_rights_model_ids = [item.id]
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
         return {
             'state_id_mapping_model': (
                 exp_models.StateIdMappingModel,
-                state_id_mapping_model_ids)
+                state_id_mapping_model_ids),
+            'exploration_commit_log_entry_model': (
+                exp_models.ExplorationCommitLogEntryModel,
+                exploration_commit_log_entry_model_ids),
+            'exp_summary_model': (
+                exp_models.ExpSummaryModel, exp_summary_model_ids),
+            'exploration_rights_model': (
+                exp_models.ExplorationRightsModel,
+                exploration_rights_model_ids),
+            'snapshot_metadata_model': (
+                exp_models.ExplorationSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                exp_models.ExplorationSnapshotContentModel,
+                snapshot_model_ids),
         }
 
     @classmethod
@@ -635,6 +727,617 @@ class ExplorationModelValidator(BaseModelValidator):
         return [cls._validate_state_name]
 
 
+class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating ExplorationSnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.ExplorationCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_model': (
+                exp_models.ExplorationModel, [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_exploration_model_version_from_item_id(cls, item):
+        """Validate that exploration model corresponding to snapshot
+        metadata model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: ExplorationSnapshotMetadataModel to validate.
+        """
+        _, exploration_model_tuples = cls.external_models['exploration_model']
+
+        exploration_model = exploration_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(exploration_model.version) < int(version):
+            cls.errors['exploration model version check'] = (
+                'Model id %s: Exploration model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot metadata model id' % (
+                    item.id, exploration_model.id, exploration_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_exploration_model_version_from_item_id]
+
+
+class ExplorationSnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating ExplorationSnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_model': (
+                exp_models.ExplorationModel, [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_exploration_model_version_from_item_id(cls, item):
+        """Validate that exploration model corresponding to snapshot
+        content model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: ExplorationSnapshotContentModel to validate.
+        """
+        _, exploration_model_tuples = cls.external_models['exploration_model']
+
+        exploration_model = exploration_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(exploration_model.version) < int(version):
+            cls.errors['exploration model version check'] = (
+                'Model id %s: Exploration model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot content model id' % (
+                    item.id, exploration_model.id, exploration_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_exploration_model_version_from_item_id]
+
+
+class ExplorationRightsModelValidator(BaseModelValidator):
+    """Class for validating ExplorationRightsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        cloned_from_exploration_id = []
+        if item.cloned_from:
+            cloned_from_exploration_id.append(item.cloned_from)
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'exploration_model': (
+                exp_models.ExplorationModel, [item.id]),
+            'cloned_from_exploration_model': (
+                exp_models.ExplorationModel,
+                cloned_from_exploration_id),
+            'owner_user_model': (
+                user_models.UserSettingsModel, item.owner_ids),
+            'editor_user_model': (
+                user_models.UserSettingsModel, item.editor_ids),
+            'translator_user_model': (
+                user_models.UserSettingsModel, item.translator_ids),
+            'viewer_user_model': (
+                user_models.UserSettingsModel, item.viewer_ids),
+            'snapshot_metadata_model': (
+                exp_models.ExplorationRightsSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                exp_models.ExplorationRightsSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+    @classmethod
+    def _validate_first_published_msec(cls, item):
+        """Validate that first published time of model is less than current
+        time.
+
+        Args:
+            item: ExplorationRightsModel to validate.
+        """
+        if not item.first_published_msec:
+            return
+
+        epoch = datetime.datetime.utcfromtimestamp(0)
+        current_msec = (
+            datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
+        if item.first_published_msec > current_msec:
+            cls.errors['first published msec check'] = (
+                'Model id %s: The first_published_msec field has a value %s '
+                'which is greater than the time when the job was run'
+                ) % (item.id, item.first_published_msec)
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_first_published_msec]
+
+
+class ExplorationRightsSnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating ExplorationRightsSnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.ExplorationRightsCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_rights_model': (
+                exp_models.ExplorationRightsModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_exploration_model_version_from_item_id(cls, item):
+        """Validate that exploration rights model corresponding to snapshot
+        metadata model has a version greater than or equal to the version in
+        item.id.
+
+        Args:
+            item: ExplorationRightsSnapshotMetadataModel to validate.
+        """
+        _, exploration_rights_model_tuples = cls.external_models[
+            'exploration_rights_model']
+
+        exploration_rights_model = exploration_rights_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(exploration_rights_model.version) < int(version):
+            cls.errors['exploration rights model version check'] = (
+                'Model id %s: Exploration Rights model corresponding to '
+                'id %s has a version %s which is less '
+                'than the version %s in snapshot metadata model id' % (
+                    item.id, exploration_rights_model.id,
+                    exploration_rights_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_exploration_model_version_from_item_id]
+
+
+class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating ExplorationRightsSnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_rights_model': (
+                exp_models.ExplorationRightsModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_exploration_model_version_from_item_id(cls, item):
+        """Validate that exploration rights model corresponding to snapshot
+        content model has a version greater than or equal to the version in
+        item.id.
+
+        Args:
+            item: ExplorationRightsSnapshotContentModel to validate.
+        """
+        _, exploration_rights_model_tuples = cls.external_models[
+            'exploration_rights_model']
+
+        exploration_rights_model = exploration_rights_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(exploration_rights_model.version) < int(version):
+            cls.errors['exploration rights model version check'] = (
+                'Model id %s: Exploration Rights model corresponding to '
+                'id %s has a version %s which is less '
+                'than the version %s in snapshot content model id' % (
+                    item.id, exploration_rights_model.id,
+                    exploration_rights_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_exploration_model_version_from_item_id]
+
+
+class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
+    """Class for validating ExplorationCommitLogEntryModel."""
+
+    is_commit_log_entry_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        regex_string = '(exploration|rights)-%s-\\d*$' % (
+            item.exploration_id)
+
+        return regex_string
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.ExplorationCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_model': (
+                exp_models.ExplorationModel, [item.exploration_id]),
+        }
+
+    @classmethod
+    def _validate_exploration_model_version_from_item_id(cls, item):
+        """Validate that exploration model corresponding to item.exploration_id
+        has a version greater than or equal to the exp version in item.id.
+
+        Args:
+            item: ExplorationCommitLogEntryModel to validate.
+        """
+        _, exploration_model_tuples = cls.external_models['exploration_model']
+
+        exploration_model = exploration_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(exploration_model.version) < int(version):
+            cls.errors['exploration model version check'] = (
+                'Model id %s: Exploration model corresponding to exploration '
+                'id %s has a version %s which is less than the version %s in '
+                'commit log model id' % (
+                    item.id, item.exploration_id, exploration_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_exploration_model_version_from_item_id]
+
+
+class ExpSummaryModelValidator(BaseModelValidator):
+    """Class for validating ExpSummaryModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        non_negative_int_schema = {
+            'type': 'int',
+            'validators': [{
+                'id': 'is_at_least',
+                'min_value': 0
+            }]
+        }
+        ratings_schema = {
+            'type': 'dict',
+            'properties': [{
+                'name': '%s' % rating_value,
+                'schema': non_negative_int_schema,
+            } for rating_value in ['1', '2', '3', '4', '5']]
+        }
+
+        if len(item.ratings.keys()):
+            return {'ratings': ratings_schema}
+        else:
+            return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_model': (
+                exp_models.ExplorationModel, [item.id]),
+            'exploration_rights_model': (
+                exp_models.ExplorationRightsModel, [item.id]),
+            'owner_user_model': (
+                user_models.UserSettingsModel, item.owner_ids),
+            'editor_user_model': (
+                user_models.UserSettingsModel, item.editor_ids),
+            'translator_user_model': (
+                user_models.UserSettingsModel, item.translator_ids),
+            'viewer_user_model': (
+                user_models.UserSettingsModel, item.viewer_ids),
+            'contributor_user_model': (
+                user_models.UserSettingsModel, item.contributor_ids)
+        }
+
+    @classmethod
+    def _validate_contributors_summary(cls, item):
+        """Validate that contributor ids match the contributor ids obtained
+        from contributors summary.
+
+        Args:
+            item: ExpSummaryModel to validate.
+        """
+        contributor_ids_from_contributors_summary = (
+            item.contributors_summary.keys())
+        if sorted(item.contributor_ids) != sorted(
+                contributor_ids_from_contributors_summary):
+            cls.errors['contributors summary check'] = (
+                'Model id %s: Contributor ids: %s do not match the contributor '
+                'ids obtained using contributors summary: %s') % (
+                    item.id, (',').join(sorted(item.contributor_ids)),
+                    (',').join(
+                        sorted(contributor_ids_from_contributors_summary)))
+
+    @classmethod
+    def _validate_language_code(cls, item):
+        """Validate that language code is present in allowed language codes.
+
+        Args:
+            item: ExpSummaryModel to validate.
+        """
+        allowed_language_codes = [
+            language_item['code'] for language_item in (
+                constants.ALL_LANGUAGE_CODES)]
+
+        if item.language_code not in allowed_language_codes:
+            cls.errors['language code check'] = (
+                'Model id %s: Language code %s for model is unsupported' % (
+                    item.id, item.language_code))
+
+    @classmethod
+    def _validate_first_published_msec(cls, item):
+        """Validate that first published time of model is less than current
+        time.
+
+        Args:
+            item: ExpSummaryModel to validate.
+        """
+        if not item.first_published_msec:
+            return
+
+        epoch = datetime.datetime.utcfromtimestamp(0)
+        current_msec = (
+            datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
+        if item.first_published_msec > current_msec:
+            cls.errors['first published msec check'] = (
+                'Model id %s: The first_published_msec field has a value %s '
+                'which is greater than the time when the job was run'
+                ) % (item.id, item.first_published_msec)
+
+    @classmethod
+    def _validate_related_model_properties(cls, item):
+        """Validate that model properties match the corresponding exploration
+        model and exploration rights model properties.
+
+        Args:
+            item: ExpSummaryModel to validate.
+        """
+        _, exploration_model_tuples = cls.external_models[
+            'exploration_model']
+        _, exploration_rights_model_tuples = cls.external_models[
+            'exploration_rights_model']
+        exploration_model = exploration_model_tuples[0][1]
+        exploration_rights_model = exploration_rights_model_tuples[0][1]
+
+        if item.title != exploration_model.title:
+            cls.errors['title field check'] = (
+                'Model id %s: title field in model: %s does not match '
+                'corresponding exploration title field: %s') % (
+                    item.id, item.title, exploration_model.title)
+
+        if item.category != exploration_model.category:
+            cls.errors['category field check'] = (
+                'Model id %s: category field in model: %s does not match '
+                'corresponding exploration category field: %s') % (
+                    item.id, item.category, exploration_model.category)
+
+        if item.objective != exploration_model.objective:
+            cls.errors['objective field check'] = (
+                'Model id %s: objective field in model: %s does not match '
+                'corresponding exploration objective field: %s') % (
+                    item.id, item.objective, exploration_model.objective)
+
+        if item.language_code != exploration_model.language_code:
+            cls.errors['language_code field check'] = (
+                'Model id %s: language_code field in model: %s does not match '
+                'corresponding exploration language_code field: %s') % (
+                    item.id, item.language_code,
+                    exploration_model.language_code)
+
+        if item.tags != exploration_model.tags:
+            cls.errors['tags field check'] = (
+                'Model id %s: tags field in model: %s does not match '
+                'corresponding exploration tags field: %s') % (
+                    item.id, (',').join(item.tags),
+                    (',').join(exploration_model.tags))
+
+        if item.exploration_model_created_on != exploration_model.created_on:
+            cls.errors['exploration_model_created_on field check'] = (
+                'Model id %s: exploration_model_created_on field in model: %s '
+                'does not match corresponding exploration created_on '
+                'field: %s') % (
+                    item.id, item.exploration_model_created_on,
+                    exploration_model.created_on)
+
+        if item.first_published_msec != (
+                exploration_rights_model.first_published_msec):
+            cls.errors['first_published_msec field check'] = (
+                'Model id %s: first_published_msec field in model: %s does '
+                'not match corresponding exploration rights '
+                'first_published_msec field: %s') % (
+                    item.id, item.first_published_msec,
+                    exploration_rights_model.first_published_msec)
+
+        if item.status != exploration_rights_model.status:
+            cls.errors['status field check'] = (
+                'Model id %s: status field in model: %s does not match '
+                'corresponding exploration rights status field: %s') % (
+                    item.id, item.status, exploration_rights_model.status)
+
+        if item.community_owned != exploration_rights_model.community_owned:
+            cls.errors['community_owned field check'] = (
+                'Model id %s: community_owned field in model: %s does not '
+                'match corresponding exploration rights community_owned '
+                'field: %s') % (
+                    item.id, item.community_owned,
+                    exploration_rights_model.community_owned)
+
+        if item.owner_ids != exploration_rights_model.owner_ids:
+            cls.errors['owner_ids field check'] = (
+                'Model id %s: owner_ids field in model: %s does not match '
+                'corresponding exploration rights owner_ids field: %s') % (
+                    item.id, (',').join(item.owner_ids),
+                    (',').join(exploration_rights_model.owner_ids))
+
+        if item.editor_ids != exploration_rights_model.editor_ids:
+            cls.errors['editor_ids field check'] = (
+                'Model id %s: editor_ids field in model: %s does not match '
+                'corresponding exploration rights editor_ids field: %s') % (
+                    item.id, (',').join(item.editor_ids),
+                    (',').join(exploration_rights_model.editor_ids))
+
+        if item.translator_ids != exploration_rights_model.translator_ids:
+            cls.errors['translator_ids field check'] = (
+                'Model id %s: translator_ids field in model: %s does not match '
+                'corresponding exploration rights translator_ids field: %s') % (
+                    item.id, (',').join(item.translator_ids),
+                    (',').join(exploration_rights_model.translator_ids))
+
+        if item.viewer_ids != exploration_rights_model.viewer_ids:
+            cls.errors['viewer_ids field check'] = (
+                'Model id %s: viewer_ids field in model: %s does not match '
+                'corresponding exploration rights viewer_ids field: %s') % (
+                    item.id, (',').join(item.viewer_ids),
+                    (',').join(exploration_rights_model.viewer_ids))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [
+            cls._validate_language_code, cls._validate_first_published_msec,
+            cls._validate_contributors_summary,
+            cls._validate_related_model_properties]
+
+
+class UserSubscriptionsModelValidator(BaseModelValidator):
+    """Class for validating UserSubscriptionsModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'activity_ids': (exp_models.ExplorationModel, item.activity_ids),
+            'collection_ids': (
+                collection_models.CollectionModel,
+                item.collection_ids),
+            'general_feedback_thread_ids': (
+                feedback_models.GeneralFeedbackThreadModel,
+                item.general_feedback_thread_ids),
+            'creator_ids': (user_models.UserSettingsModel, item.creator_ids),
+            'id': (user_models.UserSettingsModel, [item.id]),
+        }
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return []
+
+
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
@@ -643,6 +1346,18 @@ MODEL_TO_VALIDATOR_MAPPING = {
     email_models.GeneralFeedbackEmailReplyToIdModel: (
         GeneralFeedbackEmailReplyToIdModelValidator),
     exp_models.ExplorationModel: ExplorationModelValidator,
+    exp_models.ExplorationSnapshotMetadataModel: (
+        ExplorationSnapshotMetadataModelValidator),
+    exp_models.ExplorationSnapshotContentModel: (
+        ExplorationSnapshotContentModelValidator),
+    exp_models.ExplorationRightsModel: ExplorationRightsModelValidator,
+    exp_models.ExplorationRightsSnapshotMetadataModel: (
+        ExplorationRightsSnapshotMetadataModelValidator),
+    exp_models.ExplorationRightsSnapshotContentModel: (
+        ExplorationRightsSnapshotContentModelValidator),
+    exp_models.ExplorationCommitLogEntryModel: (
+        ExplorationCommitLogEntryModelValidator),
+    exp_models.ExpSummaryModel: ExpSummaryModelValidator,
     user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
 }
 
@@ -727,6 +1442,67 @@ class ExplorationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]
+
+
+class ExplorationSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotMetadataModel]
+
+
+class ExplorationSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationSnapshotContentModel]
+
+
+class ExplorationRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsModel]
+
+
+class ExplorationRightsSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationRightsSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsSnapshotMetadataModel]
+
+
+class ExplorationRightsSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationRightsSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsSnapshotContentModel]
+
+
+class ExplorationCommitLogEntryModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationCommitLogEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationCommitLogEntryModel]
+
+
+class ExpSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExpSummaryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExpSummaryModel]
 
 
 class UserSubscriptionsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
