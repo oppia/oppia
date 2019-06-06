@@ -17,6 +17,7 @@
 """Domain object for commit commands."""
 
 from core.domain import collection_domain
+from core.domain import config_domain
 from core.domain import exp_domain
 import utils
 
@@ -222,3 +223,33 @@ class CollectionRightsCommitCmd(object):
             Exception: The command is invalid.
         """
         return
+
+
+class ConfigPropertyCommitCmd(object):
+    """Domain object for commit commands of a config property.
+
+    Attributes:
+        name: str. The command name.
+        parameters: dict. The command parameters.
+    """
+
+    def __init__(self, name, parameters):
+        """Constructs a ConfigPropertyCommitCmd domain object.
+
+        Args:
+            name: str. The command name.
+            parameters: dict. The command parameters.
+        """
+        self.name = name
+        self.parameters = parameters
+
+    def validate(self):
+        """Checks that all parameters of a command are valid for the
+        given command name.
+
+        Raises:
+            Exception: The command is invalid.
+        """
+        if self.name == config_domain.CMD_CHANGE_PROPERTY_VALUE:
+            required_keys = ['new_value']
+            validate_dict_keys(self.parameters.keys(), required_keys)

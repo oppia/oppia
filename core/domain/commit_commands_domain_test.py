@@ -18,6 +18,7 @@
 
 from core.domain import collection_domain
 from core.domain import commit_commands_domain
+from core.domain import config_domain
 from core.domain import exp_domain
 from core.tests import test_utils
 import utils
@@ -171,6 +172,25 @@ class CollectionCommitCmdUnitTests(test_utils.GenericTestBase):
         }]
 
         commit_cmd_class = commit_commands_domain.CollectionCommitCmd
+        for cmd in command_list:
+            validate_with_valid_command(
+                commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_missing_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_extra_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+
+
+class ConfigPropertyCommitCmdUnitTests(test_utils.GenericTestBase):
+    """Test the config property commit cmd domain object."""
+
+    def test_commands(self):
+        command_list = [{
+            'name': config_domain.CMD_CHANGE_PROPERTY_VALUE,
+            'parameters': {'new_value': 'new value'}
+        }]
+
+        commit_cmd_class = commit_commands_domain.ConfigPropertyCommitCmd
         for cmd in command_list:
             validate_with_valid_command(
                 commit_cmd_class, cmd['name'], cmd['parameters'])
