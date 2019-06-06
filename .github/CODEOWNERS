@@ -330,8 +330,14 @@
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
+<<<<<<< HEAD
 /core/domain/change_domain.py @seanlip
 /core/templates/dev/head/tests/ @seanlip
+=======
+/core/domain/commit_commands_domain.py @ankita240796
+/core/domain/commit_commands_domain_test.py @ankita240796
+/core/templates/dev/head/pages/tests/ @seanlip
+>>>>>>> ccfbec5... Exploration models
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
 /schema_utils*.py @seanlip
 /utils*.py @aks681
