@@ -68,32 +68,26 @@
         {% include 'pages/exploration-editor-page/editor-tab/editor-tab-templates/editor-tab.template.html' %}
       </div>
 
-      <div ng-if="getActiveTabName() === 'translation'">
-        <translation-tab></translation-tab>
-      </div>
+      <translation-tab ng-if="getActiveTabName() === 'translation'">
+      </translation-tab>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-      <div ng-if="getActiveTabName() === 'preview'">
-        {% include 'pages/exploration-editor-page/preview-tab/preview-tab-templates/preview-tab.template.html' %}
-      </div>
+      <preview-tab ng-if="getActiveTabName() === 'preview'">
+      </preview-tab>
 
-      <div ng-show="getActiveTabName() === 'stats'">
-        {% include 'pages/exploration-editor-page/statistics-tab/statistics-tab-templates/statistics-tab.template.html' %}
-      </div>
+      <statistics-tab ng-show="getActiveTabName() === 'stats'">
+      </statistics-tab>
 
       <improvements-tab ng-if="getActiveTabName() === 'improvements'">
       </improvements-tab>
 
-      <div ng-show="getActiveTabName() === 'settings'">
-        {% include 'pages/exploration-editor-page/settings-tab/settings-tab-templates/settings-tab.template.html' %}
-      </div>
+      <settings-tab ng-show="getActiveTabName() === 'settings'" current-user-is-admin="currentUserIsAdmin" current-user-is-moderator="currentUserIsModerator">
+      </settings-tab>
 
-      <div ng-show="getActiveTabName() === 'history'">
-        {% include 'pages/exploration-editor-page/history-tab/history-tab-templates/history-tab.template.html' %}
-      </div>
+      <history-tab ng-show="getActiveTabName() === 'history'">
+      </history-tab>
 
-      <div ng-show="getActiveTabName() === 'feedback'">
-        {% include 'pages/exploration-editor-page/feedback-tab/feedback-tab-templates/feedback-tab.template.html' %}
-      </div>
+      <feedback-tab ng-show="getActiveTabName() === 'feedback'">
+      </feedback-tab>
     </div>
   </div>
 

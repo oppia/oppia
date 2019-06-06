@@ -21,7 +21,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab-services/' +
   'state-improvement-suggestion.service.ts'
 );
-require('pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
+require('pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
 
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));

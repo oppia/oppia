@@ -178,25 +178,24 @@ require(
   'param-changes-editor.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' + 
-  'exploration-editor-tab.controller.ts');
+  'exploration-editor-tab.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/graph-directives/' +
   'exploration-graph.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'unresolved-answers-overview/unresolved-answers-overview.directive.ts');
-require(
-  'pages/exploration-editor-page/feedback-tab/feedback-tab.controller.ts');
+require('pages/exploration-editor-page/feedback-tab/feedback-tab.directive.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.directive.ts');
 require(
-  'pages/exploration-editor-page/history-tab/history-tab.controller.ts');
+  'pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/' +
   'improvements-tab.directive.ts');
-require('pages/exploration-editor-page/preview-tab/preview-tab.controller.ts');
-require('pages/exploration-editor-page/settings-tab/settings-tab.controller.ts');
+require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
+require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/charts/' +
   'pie-chart.directive.ts');
@@ -204,7 +203,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'playthrough-issues.directive.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/statistics-tab.controller.ts');
+  'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
 require('pages/exploration-player-page/learner-experience/conversation-skin.directive.ts');
