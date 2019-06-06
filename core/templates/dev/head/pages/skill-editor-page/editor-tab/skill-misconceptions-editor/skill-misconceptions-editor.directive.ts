@@ -75,8 +75,8 @@ oppia.directive(
             $scope.openDeleteMisconceptionModal = function(index, evt) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill-editor-page/skill-editor-templates' +
-                  '/delete-misconception-modal.directive.html'),
+                  '/pages/skill-editor-page/skill-editor-modal-templates/' +
+                  'delete-misconception-modal.directive.html'),
                 backdrop: 'static',
                 controller: [
                   '$scope', '$uibModalInstance',

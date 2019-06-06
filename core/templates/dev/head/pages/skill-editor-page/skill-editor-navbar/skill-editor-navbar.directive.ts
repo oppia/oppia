@@ -159,8 +159,8 @@ oppia.directive('skillEditorNavbar', [
           $scope.publishSkill = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill-editor-page/skill-editor-templates' +
-                '/skill-editor-pre-publish-modal.directive.html'),
+                '/pages/skill-editor-page/skill-editor-modal-templates/' +
+                'skill-editor-pre-publish-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
