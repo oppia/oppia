@@ -282,15 +282,27 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['splash'],
+      chunks: ['app', 'splash'],
       filename: 'splash.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash/splash.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['splash'],
+      chunks: ['app', 'splash'],
       filename: 'splash_at0.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash/splash_at0.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -298,6 +310,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash_at1.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash/splash_at1.html',
       minify: htmlMinifyConfig,
       inject: false

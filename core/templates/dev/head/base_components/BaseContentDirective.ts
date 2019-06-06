@@ -25,7 +25,7 @@ oppia.directive('baseContent', [
     return {
       restrict: 'E',
       transclude: {
-        breadcrumb: 'navbarBreadcrumb',
+        breadcrumb: '?navbarBreadcrumb',
         content: 'content',
         footer: '?pageFooter',
         navOptions: '?localTopNavOptions',
