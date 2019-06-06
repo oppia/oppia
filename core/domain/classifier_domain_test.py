@@ -114,8 +114,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         # instead of string.
         training_job_dict['exp_id'] = 1
         training_job = self._get_training_job_from_dict(training_job_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_id to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected exp_id to be a string'):
             training_job.validate()
 
         # Verify validation error is raised when int is provided for state name
@@ -123,8 +123,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict['exp_id'] = 'exp_id'
         training_job_dict['state_name'] = 0
         training_job = self._get_training_job_from_dict(training_job_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected state to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected state to be a string'):
             training_job.validate()
 
         # Verify validation error is raised when status is not one of
@@ -144,8 +144,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict['interaction_id'] = 0
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected interaction_id to be a string'):
+            utils.ValidationError, 'Expected interaction_id to be a string'):
             training_job.validate()
 
         # Verify validation error is raised when interaction id is not one of
@@ -153,8 +152,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict['interaction_id'] = 'invalid_interaction_id'
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Invalid interaction id'):
+            utils.ValidationError, 'Invalid interaction id'):
             training_job.validate()
 
         # Verify validation error is raised when int is provided for algorithm
@@ -163,8 +161,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict['algorithm_id'] = 0
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected algorithm_id to be a string'):
+            utils.ValidationError, 'Expected algorithm_id to be a string'):
             training_job.validate()
 
         # Verify validation error is raised when string is provided for data
@@ -173,8 +170,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict['data_schema_version'] = 'invalid_data_schema_version'
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected data_schema_version to be an int'):
+            utils.ValidationError, 'Expected data_schema_version to be an int'):
             training_job.validate()
 
         # Verify validation error is raised when string is provided for
@@ -227,8 +223,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         ]
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected answer_group_index to be an int'):
+            utils.ValidationError, 'Expected answer_group_index to be an int'):
             training_job.validate()
 
         # Verify validation error is raised when string is provided for answers
@@ -242,8 +237,7 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         ]
         training_job = self._get_training_job_from_dict(training_job_dict)
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected answers to be a list'):
+            utils.ValidationError, 'Expected answers to be a list'):
             training_job.validate()
 
         # Verify validation error is raised when int is provided for job id
@@ -260,8 +254,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         ]
         training_job_dict['job_id'] = 1
         training_job = self._get_training_job_from_dict(training_job_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected id to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected id to be a string'):
             training_job.validate()
 
         # Verify validation error is raised when string is provided for
@@ -269,8 +263,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict['job_id'] = 'exp_id1.SOME_RANDOM_STRING'
         training_job_dict['exp_version'] = 'abc'
         training_job = self._get_training_job_from_dict(training_job_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_version to be an int')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected exp_version to be an int'):
             training_job.validate()
 
         # Verify validation error is raised when string is provided for
@@ -278,8 +272,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict['exp_version'] = 1
         training_job_dict['next_scheduled_check_time'] = 'abc'
         training_job = self._get_training_job_from_dict(training_job_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected next_scheduled_check_time to be datetime')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected next_scheduled_check_time to be datetime'):
             training_job.validate()
 
         # Verify validation error is raised when invalid state_name is provided.
@@ -288,8 +283,8 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
                 '2017-08-11 12:42:31', '%Y-%m-%d %H:%M:%S'))
         training_job_dict['state_name'] = 'A string #'
         training_job = self._get_training_job_from_dict(training_job_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid character # in the state name')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid character # in the state name'):
             training_job.validate()
 
         # Verify validation error is raised when invalid algorithm_id is
@@ -297,16 +292,16 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         training_job_dict['state_name'] = 'a state name'
         training_job_dict['algorithm_id'] = 'abc'
         training_job = self._get_training_job_from_dict(training_job_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Invalid algorithm id')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid algorithm id'):
             training_job.validate()
 
         # Verify validation error is raised when dict is provided for list.
         training_job_dict['algorithm_id'] = 'TextClassifier'
         training_job_dict['training_data'] = {}
         training_job = self._get_training_job_from_dict(training_job_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected training_data to be a list')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected training_data to be a list'):
             training_job.validate()
 
 
@@ -357,8 +352,8 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
         # instead of string.
         mapping_dict['exp_id'] = 1
         mapping = self._get_mapping_from_dict(mapping_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_id to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected exp_id to be a string'):
             mapping.validate()
 
         # Verify validation error is raised when string is provided for
@@ -366,8 +361,8 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
         mapping_dict['exp_id'] = 'exp_id1'
         mapping_dict['exp_version'] = '1'
         mapping = self._get_mapping_from_dict(mapping_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected exp_version to be an int')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected exp_version to be an int'):
             mapping.validate()
 
         # Verify validation error is raised when int is provided for job id
@@ -375,8 +370,8 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
         mapping_dict['exp_version'] = 2
         mapping_dict['job_id'] = 0
         mapping = self._get_mapping_from_dict(mapping_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected job_id to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected job_id to be a string'):
             mapping.validate()
 
         # Verify validation error is raised when int is provided for state name
@@ -384,6 +379,6 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
         mapping_dict['job_id'] = 'job_id1'
         mapping_dict['state_name'] = 0
         mapping = self._get_mapping_from_dict(mapping_dict)
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected state_name to be a string')):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected state_name to be a string'):
             mapping.validate()

@@ -232,15 +232,16 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
         """
         current_dir = os.getcwd()
         files_in_directory = []
-        for _dir, _, files in os.walk(current_dir):
+        for directory, _, files in os.walk(current_dir):
             for file_name in files:
                 filepath = os.path.relpath(
-                    os.path.join(_dir, file_name), current_dir)
-                if filepath.endswith('.py') and (
+                    os.path.join(directory, file_name), current_dir)
+                if not (filepath.endswith('.py') and (
                         filepath.startswith('core/') or (
-                            filepath.startswith('extensions/'))):
-                    module = filepath[:-3].replace('/', '.')
-                    files_in_directory.append(module)
+                            filepath.startswith('extensions/')))):
+                    continue
+                module = filepath[:-3].replace('/', '.')
+                files_in_directory.append(module)
         return files_in_directory
 
     def test_event_handler_names(self):
