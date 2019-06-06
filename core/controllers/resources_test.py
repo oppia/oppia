@@ -292,16 +292,16 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         fs = fs_domain.AbstractFileSystem(file_system_class(
             'exploration/0'))
 
-        with open(
-            os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_FLAC),
-            mode='rb') as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR,
+                               self.TEST_AUDIO_FILE_FLAC),
+                  mode='rb') as f:
             raw_audio = f.read()
 
         self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
 
         with self.accepted_audio_extensions_swap:
             self.post_json(
-                '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
+                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
                 {'filename': self.TEST_AUDIO_FILE_FLAC},
                 csrf_token=csrf_token,
                 upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
