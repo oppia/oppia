@@ -30,12 +30,12 @@ import feconf
 import schema_utils
 
 (
-    activity_models, audit_models, collection_models, email_models, exp_models,
-    feedback_models, user_models,) = (
+    activity_models, audit_models, collection_models, config_models,
+    email_models, exp_models, feedback_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.collection,
-            models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
-            models.NAMES.user]))
+            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+            models.NAMES.feedback, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -1037,6 +1037,154 @@ class CollectionSummaryModelValidator(BaseModelValidator):
             cls._validate_related_model_properties]
 
 
+class ConfigPropertyModelValidator(BaseModelValidator):
+    """Class for validating ConfigPropertyModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'snapshot_metadata_model': (
+                config_models.ConfigPropertySnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                config_models.ConfigPropertySnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return []
+
+
+class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating ConfigPropertySnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.ConfigPropertyCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'config_property_model': (
+                config_models.ConfigPropertyModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_config_property_model_version_from_item_id(cls, item):
+        """Validate that config property model corresponding to snapshot
+        metadata model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: ConfigPropertySnapshotMetadataModel to validate.
+        """
+        _, config_property_model_tuples = cls.external_models[
+            'config_property_model']
+
+        config_property_model = config_property_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(config_property_model.version) < int(version):
+            cls.errors['config property model version check'] = (
+                'Model id %s: ConfigProperty model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot metadata model id' % (
+                    item.id, config_property_model.id,
+                    config_property_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_config_property_model_version_from_item_id]
+
+
+class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating ConfigPropertySnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'config_property_model': (
+                config_models.ConfigPropertyModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_config_property_model_version_from_item_id(cls, item):
+        """Validate that config property model corresponding to snapshot
+        content model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: ConfigPropertySnapshotContentModel to validate.
+        """
+        _, config_property_model_tuples = cls.external_models[
+            'config_property_model']
+
+        config_property_model = config_property_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(config_property_model.version) < int(version):
+            cls.errors['config property model version check'] = (
+                'Model id %s: ConfigProperty model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot content model id' % (
+                    item.id, config_property_model.id,
+                    config_property_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_config_property_model_version_from_item_id]
+
+
 class SentEmailModelValidator(BaseModelValidator):
     """Class for validating SentEmailModels."""
 
@@ -1963,6 +2111,11 @@ MODEL_TO_VALIDATOR_MAPPING = {
     collection_models.CollectionCommitLogEntryModel: (
         CollectionCommitLogEntryModelValidator),
     collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
+    config_models.ConfigPropertyModel: ConfigPropertyModelValidator,
+    config_models.ConfigPropertySnapshotMetadataModel: (
+        ConfigPropertySnapshotMetadataModelValidator),
+    config_models.ConfigPropertySnapshotContentModel: (
+        ConfigPropertySnapshotContentModelValidator),
     email_models.SentEmailModel: SentEmailModelValidator,
     email_models.BulkEmailModel: BulkEmailModelValidator,
     email_models.GeneralFeedbackEmailReplyToIdModel: (
@@ -2033,31 +2186,6 @@ class RoleQueryAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
         return [audit_models.RoleQueryAuditModel]
 
 
-class SentEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates SentEmailModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [email_models.SentEmailModel]
-
-
-class BulkEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
-    """Job that audits and validates BulkEmailModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [email_models.BulkEmailModel]
-
-
-class GeneralFeedbackEmailReplyToIdModelAuditOneOffJob(
-        ProdValidationAuditOneOffJob):
-    """Job that audits and validates GeneralFeedbackEmailReplyToIdModel."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [email_models.GeneralFeedbackEmailReplyToIdModel]
-
-
 class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates CollectionModel."""
 
@@ -2125,6 +2253,57 @@ class CollectionSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [collection_models.CollectionSummaryModel]
+
+
+class ConfigPropertyModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ConfigPropertyModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.ConfigPropertyModel]
+
+
+class ConfigPropertySnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ConfigPropertySnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.ConfigPropertySnapshotMetadataModel]
+
+
+class ConfigPropertySnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ConfigPropertySnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [config_models.ConfigPropertySnapshotContentModel]
+
+
+class SentEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SentEmailModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [email_models.SentEmailModel]
+
+
+class BulkEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates BulkEmailModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [email_models.BulkEmailModel]
+
+
+class GeneralFeedbackEmailReplyToIdModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralFeedbackEmailReplyToIdModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [email_models.GeneralFeedbackEmailReplyToIdModel]
 
 
 class ExplorationModelAuditOneOffJob(ProdValidationAuditOneOffJob):

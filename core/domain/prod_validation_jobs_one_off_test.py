@@ -50,10 +50,10 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
     activity_models, audit_models, base_models, collection_models,
-    email_models, exp_models, feedback_models, user_models,) = (
+    config_models, email_models, exp_models, feedback_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
-            models.NAMES.collection, models.NAMES.email,
+            models.NAMES.collection, models.NAMES.config, models.NAMES.email,
             models.NAMES.exploration, models.NAMES.feedback,
             models.NAMES.user]))
 
@@ -112,7 +112,7 @@ def run_job_and_check_output(
             sorted(expected_output_dict.keys()))
         for key in actual_output_dict:
             self.assertEqual(actual_output_dict[key], expected_output_dict[key])
-    elif sort:
+    if sort:
         self.assertEqual(sorted(actual_output), sorted(expected_output))
     else:
         self.assertEqual(actual_output, expected_output)
@@ -1875,6 +1875,321 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
             setattr(self.model_instance_0, property_name, actual_value)
             self.model_instance_0.put()
+
+
+class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ConfigPropertyModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.model_instance = config_models.ConfigPropertyModel(
+            id='config_model', value='c')
+        self.model_instance.commit(feconf.SYSTEM_COMMITTER_ID, [])
+
+        self.csrf_model_instance = config_models.ConfigPropertyModel.get_by_id(
+            'oppia_csrf_secret')
+
+        self.job_class = (
+            prod_validation_jobs_one_off.ConfigPropertyModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ConfigPropertyModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.commit(self.admin_id, [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of ConfigPropertyModel\', '
+                '[u\'Model id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id,
+                    self.model_instance.created_on,
+                    self.model_instance.last_updated
+                ),
+            u'[u\'fully-validated ConfigPropertyModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.csrf_model_instance.delete(self.admin_id, '', [{}])
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ConfigPropertyModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+            'config_model-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_model '
+                'field check of ConfigPropertyModel\', '
+                '[u"Model id config_model: based on field '
+                'snapshot_metadata_model having '
+                'value config_model-1, expect model '
+                'ConfigPropertySnapshotMetadataModel '
+                'with id config_model-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ConfigPropertyModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        config_models.ConfigPropertySnapshotContentModel.get_by_id(
+            'config_model-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_model '
+                'field check of ConfigPropertyModel\', '
+                '[u"Model id config_model: based on field '
+                'snapshot_content_model having '
+                'value config_model-1, expect model '
+                'ConfigPropertySnapshotContentModel '
+                'with id config_model-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated ConfigPropertyModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class ConfigPropertySnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ConfigPropertySnapshotMetadataModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.config_model = config_models.ConfigPropertyModel(
+            id='config_model', value='c')
+        self.config_model.commit(self.admin_id, [])
+
+        user_models.UserSettingsModel(
+            id=feconf.SYSTEM_COMMITTER_ID, email='system@committer.com').put()
+        self.model_instance = (
+            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+                'config_model-1'))
+        self.csrf_model_instance = (
+            config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
+                'oppia_csrf_secret-1'))
+
+        self.job_class = prod_validation_jobs_one_off.ConfigPropertySnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        self.config_model.commit(self.admin_id, [])
+        expected_output = [
+            u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of ConfigPropertySnapshotMetadataModel\', '
+                '[u\'Model id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id,
+                    self.model_instance.created_on,
+                    self.model_instance.last_updated),
+            u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.csrf_model_instance.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ConfigPropertySnapshotMetadataModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_config_property_model_failure(self):
+        self.config_model.delete(self.admin_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for config_property_model '
+                'field check of ConfigPropertySnapshotMetadataModel\', '
+                '[u"Model id config_model-1: based on field '
+                'config_property_model having value config_model, '
+                'expect model ConfigPropertyModel with '
+                'id config_model but it doesn\'t exist", '
+                'u"Model id config_model-2: based on field '
+                'config_property_model having value config_model, expect model '
+                'ConfigPropertyModel with id config_model but it doesn\'t '
+                'exist"]]'
+            ),
+            u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_model field '
+                'check of ConfigPropertySnapshotMetadataModel\', '
+                '[u"Model id config_model-1: based on field committer_model '
+                'having value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.admin_id, self.admin_id),
+            u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_config_property_model_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            config_models.ConfigPropertySnapshotMetadataModel(
+                id='config_model-3', committer_id=self.admin_id,
+                commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for config property model '
+                'version check of ConfigPropertySnapshotMetadataModel\', '
+                '[u\'Model id config_model-3: ConfigProperty model '
+                'corresponding to id config_model has a version 1 '
+                'which is less than the version 3 in '
+                'snapshot metadata model id\']]'
+            ),
+            u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance.commit_cmds = [{
+            'cmd': 'change_property_value',
+            'random_key': 'random'
+        }]
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd '
+                'change_property_value '
+                'check of ConfigPropertySnapshotMetadataModel\', '
+                '[u\'Model id config_model-1: Commit command domain '
+                'validation failed with error: Following required keys '
+                'are missing: new_value, Following extra keys are '
+                'present: random_key\']]'
+            ),
+            u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class ConfigPropertySnapshotContentModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ConfigPropertySnapshotContentModelValidatorTests, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+
+        self.config_model = config_models.ConfigPropertyModel(
+            id='config_model', value='c')
+        self.config_model.commit(self.admin_id, [])
+
+        user_models.UserSettingsModel(
+            id=feconf.SYSTEM_COMMITTER_ID, email='system@committer.com').put()
+        self.model_instance = (
+            config_models.ConfigPropertySnapshotContentModel.get_by_id(
+                'config_model-1'))
+        self.csrf_model_instance = (
+            config_models.ConfigPropertySnapshotContentModel.get_by_id(
+                'oppia_csrf_secret-1'))
+
+        self.job_class = prod_validation_jobs_one_off.ConfigPropertySnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        self.config_model.commit(self.admin_id, [])
+        expected_output = [
+            u'[u\'fully-validated ConfigPropertySnapshotContentModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of ConfigPropertySnapshotContentModel\', '
+                '[u\'Model id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id,
+                    self.model_instance.created_on,
+                    self.model_instance.last_updated
+                ),
+            u'[u\'fully-validated ConfigPropertySnapshotContentModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.csrf_model_instance.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ConfigPropertySnapshotContentModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_config_property_model_failure(self):
+        self.config_model.delete(self.admin_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for config_property_model '
+                'field check of ConfigPropertySnapshotContentModel\', '
+                '[u"Model id config_model-1: based on field '
+                'config_property_model having value config_model, '
+                'expect model ConfigPropertyModel with '
+                'id config_model but it doesn\'t exist", '
+                'u"Model id config_model-2: based on field '
+                'config_property_model having value config_model, expect model '
+                'ConfigPropertyModel with id config_model but it '
+                'doesn\'t exist"]]'
+            ),
+            u'[u\'fully-validated ConfigPropertySnapshotContentModel\', 1]']
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
+    def test_invalid_config_property_model_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            config_models.ConfigPropertySnapshotContentModel(
+                id='config_model-3'))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for config property model '
+                'version check of ConfigPropertySnapshotContentModel\', '
+                '[u\'Model id config_model-3: ConfigProperty model '
+                'corresponding to id config_model has a version 1 '
+                'which is less than the version 3 in snapshot '
+                'content model id\']]'
+            ),
+            u'[u\'fully-validated ConfigPropertySnapshotContentModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class SentEmailModelValidatorTests(test_utils.GenericTestBase):
