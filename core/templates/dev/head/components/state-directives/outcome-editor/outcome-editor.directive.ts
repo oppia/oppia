@@ -41,7 +41,7 @@ oppia.directive('outcomeEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/outcome-editor/outcome-editor.directive.html'),
+        '/components/state-directives/outcome-editor/outcome-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'StateEditorService', 'StateInteractionIdService',

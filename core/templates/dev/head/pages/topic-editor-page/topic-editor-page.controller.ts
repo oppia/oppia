@@ -91,21 +91,21 @@ require(
   'components/forms/custom-forms-directives/' +
   'image-uploader.directive.ts');
 require(
-  'components/state/answer-group-editor/answer-group-editor.directive.ts');
-require('components/state/hint-editor/hint-editor.directive.ts');
-require('components/state/outcome-editor/outcome-editor.directive.ts');
+  'components/state-directives/answer-group-editor/answer-group-editor.directive.ts');
+require('components/state-directives/hint-editor/hint-editor.directive.ts');
+require('components/state-directives/outcome-editor/outcome-editor.directive.ts');
 require(
-  'components/state/outcome-editor/' +
+  'components/state-directives/outcome-editor/' +
   'outcome-destination-editor.directive.ts');
 require(
-  'components/state/outcome-editor/' +
+  'components/state-directives/outcome-editor/' +
   'outcome-feedback-editor.directive.ts');
-require('components/state/response-header/response-header.directive.ts');
-require('components/state/rule-editor/rule-editor.directive.ts');
-require('components/state/rule-editor/rule-type-selector.directive.ts');
-require('components/state/solution-editor/solution-editor.directive.ts');
+require('components/state-directives/response-header/response-header.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.directive.ts');
+require('components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require('components/state-directives/solution-editor/solution-editor.directive.ts');
 require(
-  'components/state/solution-editor/' +
+  'components/state-directives/solution-editor/' +
   'solution-explanation-editor.directive.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');

@@ -16,7 +16,7 @@
  * @fileoverview Directive for the concept card editor.
  */
 
-require('components/state/answer-group-editor/summary-list-header.directive.ts');
+require('components/state-directives/answer-group-editor/summary-list-header.directive.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-editor.directive.ts');

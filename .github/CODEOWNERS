@@ -105,7 +105,7 @@
 /core/templates/dev/head/components/ExplorationCreationService*.ts @DubeySandeep
 /core/templates/dev/head/components/HintAndSolutionButtonsDirective*.ts @aks681
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive.html @aks681
-/core/templates/dev/head/components/state/ @aks681
+/core/templates/dev/head/components/state-directives/ @aks681
 /core/templates/dev/head/components/GraphLayoutService*.ts @DubeySandeep
 /core/templates/dev/head/components/version_diff_visualization_directive.html @DubeySandeep
 /core/templates/dev/head/components/VersionDiffVisualizationDirective*.ts @DubeySandeep
@@ -117,7 +117,7 @@
 /core/templates/dev/head/pages/exploration-editor-page/ @DubeySandeep
 /core/templates/dev/head/pages/exploration-player-page/ @aks681
 /core/templates/dev/head/components/state-editor/ @aks681
-/core/templates/dev/head/components/state/ @aks681
+/core/templates/dev/head/components/state-directives/ @aks681
 /core/templates/dev/head/pages/exploration-player-page/ @aks681
 /core/templates/dev/head/services/ComputeGraphService.ts @DubeySandeep
 /core/templates/dev/head/services/ContextService*.ts @aks681

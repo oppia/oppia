@@ -30,7 +30,7 @@ oppia.directive(
           outcome: '='
         },
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/components/state/outcome-editor/' +
+          '/components/state-directives/outcome-editor/' +
           'outcome-feedback-editor.directive.html'),
         controllerAs: '$ctrl',
         controller: [function() {

@@ -15,7 +15,7 @@
 /**
  * @fileoverview Directive containing the exploration material to be translated.
  */
-require('components/state/response-header/response-header.directive.ts');
+require('components/state-directives/response-header/response-header.directive.ts');
 require(
   'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
   'audio-translation-bar.directive.ts');

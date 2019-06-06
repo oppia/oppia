@@ -39,7 +39,7 @@ oppia.directive('outcomeDestinationEditor', [
         addState: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/outcome-editor/' +
+        '/components/state-directives/outcome-editor/' +
         'outcome-destination-editor.directive.html'),
     controllerAs: '$ctrl',
       controller: [

@@ -17,8 +17,8 @@
  */
 
 require(
-  'components/state/answer-group-editor/answer-group-editor.directive.ts');
-require('components/state/response-header/response-header.directive.ts');
+  'components/state-directives/answer-group-editor/answer-group-editor.directive.ts');
+require('components/state-directives/response-header/response-header.directive.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');

@@ -17,8 +17,8 @@
  * editor.
  */
 
-require('components/state/hint-editor/hint-editor.directive.ts');
-require('components/state/response-header/response-header.directive.ts');
+require('components/state-directives/hint-editor/hint-editor.directive.ts');
+require('components/state-directives/response-header/response-header.directive.ts');
 
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
