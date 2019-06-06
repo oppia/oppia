@@ -389,7 +389,7 @@
 
 # Speed Improvement team.
 /app.yaml @vojtechjelinek
-/core/templates/dev/head/base_components/* @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/base_components/ @jamesjay4199 @vojtechjelinek
 /core/templates/dev/head/pages/Base.ts @vojtechjelinek
 /core/templates/dev/head/pages/base.html @vojtechjelinek
 /core/templates/dev/head/pages/oppia_footer_directive.html @vojtechjelinek
@@ -402,7 +402,8 @@
 /webpack.config.ts @vojtechjelinek
 /webpack.dev.config.ts @vojtechjelinek
 /webpack.prod.config.ts @vojtechjelinek
-/webpack-utils.ts @vojtechjelinek @jamesjay4199
+
+
 # Typings.
 /typings @ankita240796
 

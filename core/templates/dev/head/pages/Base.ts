@@ -12,7 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+require('services/stateful/BackgroundMaskService.ts');
 
 /**
  * @fileoverview Oppia's base controller.

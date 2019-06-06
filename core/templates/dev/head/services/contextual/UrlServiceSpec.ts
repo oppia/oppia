@@ -94,8 +94,7 @@ describe('Url Service', function() {
   });
 
   it('should correctly return the origin of window.location', function() {
-    var origin = 'http://sample.com';
-    expect(UrlService.getOrigin()).toBe(origin);
+    expect(UrlService.getOrigin()).toBe('http://sample.com');
   });
 
   it('should correctly retrieve topic id from url', function() {

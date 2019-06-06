@@ -19,7 +19,6 @@
 var CleanWebpackPlugin = require('clean-webpack-plugin');
 var ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
-var Utils = require('./webpack-utils.ts');
 
 var htmlMinifyConfig = {
   ignoreCustomFragments: [
@@ -187,7 +186,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['app', 'get_started'],
       filename: 'get_started.html',
-      meta: Utils.getMetas().getStarted,
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Learn how to get started using Oppia.'
+      },
       template: commonPrefix + '/pages/get_started/get_started.html',
       minify: htmlMinifyConfig,
       inject: false
