@@ -127,6 +127,7 @@ describe('Answer classification service with string classifier disabled',
           hints: []
         },
         param_changes: [],
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -241,6 +242,7 @@ describe('Answer classification service with string classifier disabled',
           hints: []
         },
         param_changes: [],
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -373,6 +375,7 @@ describe('Answer classification service with string classifier enabled',
           hints: []
         },
         param_changes: [],
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -540,6 +543,7 @@ describe('Answer classification service with training data classification',
           hints: []
         },
         param_changes: [],
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},

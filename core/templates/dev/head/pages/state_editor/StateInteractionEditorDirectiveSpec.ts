@@ -119,6 +119,7 @@ describe('State Interaction controller', function() {
             hints: []
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -167,6 +168,7 @@ describe('State Interaction controller', function() {
             hints: []
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},

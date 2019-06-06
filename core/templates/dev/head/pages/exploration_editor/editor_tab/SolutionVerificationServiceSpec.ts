@@ -128,6 +128,7 @@ describe('Solution Verification Service', function() {
           }]
         },
         param_changes: [],
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
@@ -176,6 +177,7 @@ describe('Solution Verification Service', function() {
           hints: []
         },
         param_changes: [],
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},

@@ -43,7 +43,6 @@ describe('Question object factory', function() {
 
     _sampleQuestionBackendDict = {
       id: 'question_id',
-      solicit_answer_details: false,
       question_state_data: {
         content: {
           html: 'Question 1',
@@ -115,7 +114,8 @@ describe('Question object factory', function() {
             content_4: {},
             content_5: {}
           }
-        }
+        },
+        solicit_answer_details: false
       },
       language_code: 'en',
       version: 1
