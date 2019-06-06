@@ -23,7 +23,6 @@ import time
 
 import feconf
 
-
 # Whether to calculate costs for RPCs, in addition to time taken.
 appstats_CALC_RPC_COSTS = True
 # The number of lines to record for an RPC stacktrace.

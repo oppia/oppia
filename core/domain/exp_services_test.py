@@ -1225,13 +1225,13 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
 
     def test_save_original_and_compressed_versions_of_image_with_dev_mode_off(
             self):
-        dev_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
         max_resize_dimension_px_swap = self.swap(
             gae_image_services, 'MAX_RESIZE_DIMENSION_PX', 20)
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             original_image_content = f.read()
 
-        with dev_mode_swap, max_resize_dimension_px_swap:
+        with prod_mode_swap, max_resize_dimension_px_swap:
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(
                     'exploration/%s' % self.EXPLORATION_ID))
@@ -1249,7 +1249,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
             # greater than MAX_RESIZE_DIMENSION_PX.
             width = 32
             height = 32
-            new_scaling_factor = gae_image_services.MAX_RESIZE_DIMENSION_PX / (
+            new_scaling_factor = (
+                gae_image_services.MAX_RESIZE_DIMENSION_PX /
                 float(max(width, height)))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
