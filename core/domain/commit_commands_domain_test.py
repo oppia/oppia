@@ -16,158 +16,165 @@
 
 """Tests for commit commands domain objects."""
 
-
-import utils
-
+from core.domain import collection_domain
 from core.domain import commit_commands_domain
 from core.domain import exp_domain
 from core.tests import test_utils
+import utils
 
 
 def assert_validation_error(self, domain_object, expected_error_substring):
+    """Checks that validation of commit command domain object raises
+    the given error.
+
+    Args:
+        domain_object: CommitCmdDomainObject. The domain object to validate.
+        expected_error_substring: str. The error message.
+
+    Raises:
+        Exception: If the error message is not produced on validation.
+    """
     with self.assertRaisesRegexp(
         utils.ValidationError, expected_error_substring):
         domain_object.validate()
 
 
+def validate_with_valid_command(commit_cmd_class, name, parameters):
+    """Validates a valid commit command.
+
+    Args:
+        commit_cmd_class: CommitCmdDomainClass. The domain class of the command
+            to validate.
+        name: str. The command name.
+        parameters: dict. Dict containing command parameters.
+    """
+    commit_cmd_domain_object = commit_cmd_class(
+        name=name, parameters=parameters)
+    commit_cmd_domain_object.validate()
+
+
+def validate_with_missing_keys_in_command(
+        self, commit_cmd_class, name, parameters):
+    """Validates a commit command with missing keys in parameters.
+
+    Args:
+        commit_cmd_class: CommitCmdDomainClass. The domain class of the command
+            to validate.
+        name: str. The command name.
+        parameters: dict. Dict containing command parameters.
+    """
+    parameter_key = sorted(parameters.keys())[0]
+    parameters.pop(parameter_key, None)
+    commit_cmd_domain_object = commit_cmd_class(
+        name=name, parameters=parameters)
+    assert_validation_error(
+        self, commit_cmd_domain_object,
+        'Following required keys are missing: %s' % parameter_key)
+
+
+def validate_with_extra_keys_in_command(
+        self, commit_cmd_class, name, parameters):
+    """Validates a commit command with extra keys in parameters.
+
+    Args:
+        commit_cmd_class: CommitCmdDomainClass. The domain class of the command
+            to validate.
+        name: str. The command name.
+        parameters: dict. Dict containing command parameters.
+    """
+    parameters['random'] = 'random'
+    commit_cmd_domain_object = commit_cmd_class(
+        name=name, parameters=parameters)
+    assert_validation_error(
+        self, commit_cmd_domain_object,
+        'Following extra keys are present: random')
+
+
 class ExplorationCommitCmdUnitTests(test_utils.GenericTestBase):
     """Test the exploration commit cmd domain object."""
 
-    def test_validation_with_valid_add_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_ADD_STATE, parameters={'state_name': 'new_state'})
-        commit_cmd_domain_object.validate()
-
-    def test_validation_with_missing_keys_in_add_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_ADD_STATE, parameters={})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following required keys are missing: state_name')
-
-    def test_validation_with_extra_keys_in_add_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_ADD_STATE, parameters={
-                'state_name': 'new_state', 'random': 'random'})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following extra keys are present: random')
-
-    def test_validation_with_valid_delete_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_DELETE_STATE, parameters={'state_name': 'state'})
-        commit_cmd_domain_object.validate()
-
-    def test_validation_with_missing_keys_in_delete_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_DELETE_STATE, parameters={})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following required keys are missing: state_name')
-
-    def test_validation_with_extra_keys_in_delete_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_DELETE_STATE, parameters={
-                'state_name': 'state', 'random': 'random'})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following extra keys are present: random')
-
-    def test_validation_with_valid_rename_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_RENAME_STATE, parameters={
-                'old_state_name': 'old_state', 'new_state_name': 'new_state'})
-        commit_cmd_domain_object.validate()
-
-    def test_validation_with_missing_keys_in_rename_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_RENAME_STATE, parameters={
-            'old_state_name': 'old_state'})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following required keys are missing: new_state_name')
-
-    def test_validation_with_extra_keys_in_rename_state_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_RENAME_STATE, parameters={
-                'old_state_name': 'old_state','new_state_name': 'new_state',
-                'random': 'random'})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following extra keys are present: random')
-
-    def test_validation_with_valid_edit_state_property_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_EDIT_STATE_PROPERTY, parameters={
-                'property_name': 'property',
-                'state_name': 'state_name', 'new_value': 'new_value'})
-        commit_cmd_domain_object.validate()
-
-    def test_validation_with_missing_keys_in_edit_state_property_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_EDIT_STATE_PROPERTY, parameters={
-            'property_name': 'property', 'old_value': 'old_value',
-            'state_name': 'state_name'})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following required keys are missing: new_value')
-
-    def test_validation_with_extra_keys_in_edit_state_property_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_EDIT_STATE_PROPERTY, parameters={
-                'property_name': 'property', 'state_name': 'state_name',
-                'new_value': 'new_value', 'old_value': 'old_value',
-                'random': 'random'})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following extra keys are present: random')
-
-    def test_validation_with_valid_edit_exploration_property_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_EDIT_EXPLORATION_PROPERTY, parameters={
-                'property_name': 'property', 'new_value': 'new_value'})
-        commit_cmd_domain_object.validate()
-
-    def test_validation_with_missing_keys_in_edit_exploration_property_command(
-            self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_EDIT_EXPLORATION_PROPERTY, parameters={
-            'property_name': 'property', 'old_value': 'old_value',})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following required keys are missing: new_value')
-
-    def test_validation_with_extra_keys_in_edit_exploration_property_command(
-            self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_EDIT_EXPLORATION_PROPERTY, parameters={
+    def test_commands(self):
+        command_list = [{
+            'name': exp_domain.CMD_ADD_STATE,
+            'parameters': {'state_name': 'state'}
+        }, {
+            'name': exp_domain.CMD_DELETE_STATE,
+            'parameters': {'state_name': 'state'}
+        }, {
+            'name': exp_domain.CMD_RENAME_STATE,
+            'parameters': {
+                'old_state_name': 'old_state', 'new_state_name': 'new_state'
+            }
+        }, {
+            'name': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'parameters': {
+                'property_name': 'property', 'state_name': 'state',
+                'new_value': 'value'
+            }
+        }, {
+            'name': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+            'parameters': {
                 'property_name': 'property', 'new_value': 'new_value',
-                'old_value': 'old_value', 'random': 'random'})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following extra keys are present: random')
+                'old_value': 'old_value'
+            }
+        }, {
+            'name': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+            'parameters': {'from_version': 1, 'to_version': 3}
+        }]
 
-    def test_validation_with_valid_migrate_schema_version_command(self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            parameters={'from_version': 0, 'to_version': 20})
-        commit_cmd_domain_object.validate()
+        commit_cmd_class = commit_commands_domain.ExplorationCommitCmd
+        for cmd in command_list:
+            validate_with_valid_command(
+                commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_missing_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_extra_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
 
-    def test_validation_with_missing_keys_in_migrate_schema_version_command(
-            self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            parameters={'from_version': 1})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following required keys are missing: to_version')
 
-    def test_validation_with_extra_keys_in_migrate_schema_version_command(
-            self):
-        commit_cmd_domain_object = commit_commands_domain.ExplorationCommitCmd(
-            name=exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-            parameters={
-                'from_version': 0, 'to_version': 20, 'random': 'random'})
-        assert_validation_error(
-            self, commit_cmd_domain_object,
-            'Following extra keys are present: random')
+class CollectionCommitCmdUnitTests(test_utils.GenericTestBase):
+    """Test the collection commit cmd domain object."""
+
+    def test_commands(self):
+        command_list = [{
+            'name': collection_domain.CMD_ADD_COLLECTION_NODE,
+            'parameters': {'exploration_id': '0'}
+        }, {
+            'name': collection_domain.CMD_DELETE_COLLECTION_NODE,
+            'parameters': {'exploration_id': '0'}
+        }, {
+            'name': collection_domain.CMD_SWAP_COLLECTION_NODES,
+            'parameters': {
+                'first_index': 0, 'second_index': 1
+            }
+        }, {
+            'name': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+            'parameters': {
+                'property_name': 'property', 'new_value': 'new_value',
+                'old_value': 'old_value'
+            }
+        }, {
+            'name': collection_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+            'parameters': {'from_version': 1, 'to_version': 3}
+        }, {
+            'name': collection_domain.CMD_ADD_COLLECTION_SKILL,
+            'parameters': {'name': 'name'}
+        }, {
+            'name': collection_domain.CMD_DELETE_COLLECTION_SKILL,
+            'parameters': {'skill_id': '0'}
+        }, {
+            'name': collection_domain.CMD_ADD_QUESTION_ID_TO_SKILL,
+            'parameters': {'question_id': '0', 'skill_id': '0'}
+        }, {
+            'name': collection_domain.CMD_REMOVE_QUESTION_ID_FROM_SKILL,
+            'parameters': {'question_id': '0', 'skill_id': '0'}
+        }]
+
+        commit_cmd_class = commit_commands_domain.CollectionCommitCmd
+        for cmd in command_list:
+            validate_with_valid_command(
+                commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_missing_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_extra_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
