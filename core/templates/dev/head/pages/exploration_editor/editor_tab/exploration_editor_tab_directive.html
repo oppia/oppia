@@ -1,0 +1,25 @@
+<div class="oppia-editor-cards-container">
+  <div class="oppia-editor-header">
+    <state-name-editor></state-name-editor>
+  </div>
+
+  <div ng-if="$ctrl.areParametersEnabled()">
+    <state-param-changes-editor></state-param-changes-editor>
+  </div>
+
+  <state-editor on-save-state-content="$ctrl.saveStateContent"
+                on-save-interaction-customization-args="$ctrl.saveInteractionCustomizationArgs"
+                on-save-interaction-id="$ctrl.saveInteractionId"
+                on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
+                on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
+                on-save-solution="$ctrl.saveSolution"
+                on-save-hints="$ctrl.saveHints"
+                recompute-graph="$ctrl.recomputeGraph"
+                show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
+                state-content-placeholder="$ctrl.getStateContentPlaceholder()"
+                navigate-to-state="$ctrl.navigateToState"
+                add-state="$ctrl.addState"
+                refresh-warnings="$ctrl.refreshWarnings"
+                interaction-is-shown="$ctrl.interactionIsShown">
+  </state-editor>
+</div>
