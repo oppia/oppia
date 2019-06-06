@@ -232,8 +232,8 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
         """
         files_in_directory = []
         for directory, _, files in os.walk('.'):
-            if not (directory.startswith('./core/') or (
-                    directory.startswith('./extensions/'))):
+            if not (directory.startswith('./core/') or
+                    directory.startswith('./extensions/')):
                 continue
             for file_name in files:
                 filepath = os.path.join(directory, file_name)
