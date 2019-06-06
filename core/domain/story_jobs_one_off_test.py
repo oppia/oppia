@@ -20,6 +20,7 @@ import ast
 from core.domain import story_domain
 from core.domain import story_jobs_one_off
 from core.domain import story_services
+from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -39,6 +40,12 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         # Setup user who will own the test stories.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            self.TOPIC_ID, self.albert_id, 'Name', 'Description',
+            [self.story_id_1, self.story_id_2], [self.story_id_3],
+            [self.skill_id_1, self.skill_id_2], [], 1
+        )
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.process_and_flush_pending_tasks()
 
@@ -49,8 +56,10 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Create a new story that should not be affected by the
         # job.
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A title')
+            self.STORY_ID, 'A title', self.TOPIC_ID)
         story_services.save_new_story(self.albert_id, story)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
         self.assertEqual(
             story.story_contents_schema_version,
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
@@ -78,7 +87,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A title')
+            self.STORY_ID, 'A title', self.TOPIC_ID)
         story_services.save_new_story(self.albert_id, story)
 
         # Delete the story before migration occurs.
@@ -115,7 +124,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Generate story with old(v1) story contents data.
         self.save_new_story_with_story_contents_schema_v1(
             self.STORY_ID, self.albert_id, 'A title',
-            'A description', 'A note')
+            'A description', 'A note', self.TOPIC_ID)
         story = (
             story_services.get_story_by_id(self.STORY_ID))
         self.assertEqual(story.story_contents_schema_version, 1)
@@ -145,7 +154,7 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             return 'invalid_story'
 
         story = story_domain.Story.create_default_story(
-            self.STORY_ID, title='A title')
+            self.STORY_ID, 'A title', self.TOPIC_ID)
         story_services.save_new_story(self.albert_id, story)
 
         get_story_by_id_swap = self.swap(

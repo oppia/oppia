@@ -27,6 +27,7 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import story_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -117,7 +118,7 @@ def get_story_from_model(story_model):
         story_domain.StoryContents.from_dict(
             versioned_story_contents['story_contents']),
         versioned_story_contents['schema_version'],
-        story_model.language_code,
+        story_model.language_code, story_model.belongs_to_topic,
         story_model.version, story_model.created_on,
         story_model.last_updated)
 
@@ -244,7 +245,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         language_code=story.language_code,
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
-        story_contents=story.story_contents.to_dict()
+        story_contents=story.story_contents.to_dict(),
+        belongs_to_topic=story.belongs_to_topic
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -415,6 +417,18 @@ def _save_story(committer_id, story, commit_message, change_list):
                 'which is too old. Please reload the page and try again.'
                 % (story_model.version, story.version))
 
+    topic = topic_services.get_topic_by_id(story.belongs_to_topic, strict=False)
+    if topic is None:
+        raise utils.ValidationError(
+            'Expected story to only belong to a valid topic, but found an '
+            'topic with ID: %s' % story.belongs_to_topic)
+
+    if story.id not in topic.canonical_story_ids + topic.additional_story_ids:
+        raise Exception(
+            'Expected story to belongs to the topic %s, but it is '
+            'neither a part of canonical story or the addition story of '
+            'the topic.' % story.belongs_to_topic)
+
     story_model.description = story.description
     story_model.title = story.title
     story_model.notes = story.notes
@@ -422,6 +436,7 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.story_contents_schema_version = (
         story.story_contents_schema_version)
     story_model.story_contents = story.story_contents.to_dict()
+    story_model.belongs_to_topic = story.belongs_to_topic
     story_model.version = story.version
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
