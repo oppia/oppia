@@ -661,12 +661,12 @@ class Story(object):
         node ids.
 
         Args:
-            exp_ids: list(str). The list of IDs of the explorations linked to
+            node_ids: list(str). The list of IDs of the nodes inside
             the story.
 
         Returns:
             list(str)|None. The list of acquired skill ids for the
-                explorations or None, if no node is linked to them.
+                node ids or None, if no node is linked to them.
         """
         acquired_skill_ids = set()
         for node in self.story_contents.nodes:

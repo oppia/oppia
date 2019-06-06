@@ -113,7 +113,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         ]
         self.assertEqual(len(questions), 3)
         for question in questions:
-            self.assertTrue(question.to_dict(), question_dicts)
+            self.assertTrue(question.to_dict() in question_dicts)
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
