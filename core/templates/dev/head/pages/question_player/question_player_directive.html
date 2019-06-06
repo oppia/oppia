@@ -13,6 +13,7 @@
     <exploration-footer></exploration-footer>
   </div>
 </div>
+
 <div class="oppia-question-player-results-container" ng-show="showResultsView">
   <div class="results-loading-screen" ng-hide="resultsLoaded">
         Calculating Results...
@@ -20,30 +21,129 @@
   <div class="oppia-question-player-results" ng-show="resultsLoaded">
     <div class="results-header">
       <h3> Test Complete. Well Done! </h3>
-      <score-ring score=35></score-ring>
+      <div>
+        <score-ring score="totalScore"></score-ring>
+        <h4 class="learn-more"> Learn more about your score </h4>
+    </div>
+    
+    <div class="results-footer">
+      <span data-ng-repeat="actionButton in questionPlayerConfig.resultActionButtons"
+            ng-click="$ctrl.performAction(actionButton)">
+        <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
+          <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
+            <div ng-bind-html="$ctrl.getActionButtonIconHtml(actionButton.type)">
+            </div>
+            <div class="action-button-text"><[actionButton.text]></div>
+          </div>
+        </div>
+      </span>
+    <span class="last-child"></span>
     </div>
   </div>
-
 </div>
 
 <style>
+ 
+.last-child {
+    width: 100%;
+    display: inline-block;
+}
+  .action-button-icon {
+    margin-top: 12px;
+    font-size: 36px;
+    height: 36px;
+    width: 36px;
+  }
+
+  .action-button-inner {
+    height: 85px;
+    width: 85px;
+    text-align: center;
+    vertical-align: center;
+  }
+
+  .action-button {
+    height: 100px;
+    width: 100px;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 14px;
+    vertical-align: top;
+    display: inline-block;
+  }
+
+  .action-button-text {
+    font-size: 12px;
+    margin: 0 auto;
+    width: 50px;
+  }
+
+  .boost-score-outer {
+    background-color: #D95C0C;
+  }
+
+  .boost-score-inner {
+    background-color: #F3EAE6;
+  }
+
+  .new-session-outer {
+    background-color: #0D48A1;
+  }
+
+  .new-session-inner {
+    background-color: #E3ECF2;
+  }
+
+  .my-dashboard-outer {
+    background-color: #009688;
+  }
+
+  .my-dashboard-inner {
+    background-color: #E9F2F2;
+  }
+
   .oppia-question-player-header,
   .results-loading-screen,
-  .results-header {
+  .results-header,
+  .results-footer {
     margin: 0 20px;
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 4px;
-    background: #FFF;background: #FFFFFF;
+    background: #FFFFFF;
     height: 100px;
   }
 
-  .results-header {
+  .oppia-question-player-container
+  .conversation-skin-correctness-footer-container {
+    max-width: 800px;
+  }
+
+  .learn-more {
+    color: #0D48A1;
+    margin-top: -15px;
+  }
+
+  .results-header,
+  .results-footer {
     padding-top: 2px;
+    text-align: center;
+  }
+
+  .results-header {
+    height: 360px;
+  }
+
+  .results-footer {
+    height: 130px;
+    padding: 0px 10px;
+    text-align: justify;
   }
 
   .oppia-question-player-container,
   .oppia-question-player-results-container,
-  .oppia-question-player-results .results-header {
+  .oppia-question-player-results .results-header,
+  .oppia-question-player-results .results-footer {
     margin: 0 auto;
     max-width: 800px;
   }
@@ -87,4 +187,11 @@
     background: #0D48A1;
     height: 16px;
   }
+
+  .stretch {
+    width: 100%;
+    display: inline-block;
+    font-size: 0;
+    line-height: 0
+}
 </style>

@@ -16,6 +16,7 @@
  * @fileoverview Controller for the questions player directive.
  */
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+oppia.constant('HASH_PARAM', 'question-player-result=');
 
 require('domain/question/QuestionPlayerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
@@ -59,6 +60,7 @@ require('filters/NormalizeWhitespaceFilter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('services/HtmlEscaperService.ts');
 require('components/attribution_guide/AttributionGuideDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
@@ -80,18 +82,82 @@ oppia.directive('questionPlayer', [
         '/pages/question_player/question_player_directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', '$location', 'QuestionPlayerBackendApiService',
+        'HASH_PARAM', '$scope', '$sce', '$rootScope', '$location',
+        '$sanitize', '$window', 'HtmlEscaperService',
+        'QuestionPlayerBackendApiService',
         function(
-            $scope, $rootScope, $location, QuestionPlayerBackendApiService) {
-          $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
-          $scope.currentQuestion = 0;
-          $scope.totalQuestions = 0;
-          $scope.currentProgress = 0;
+            HASH_PARAM, $scope, $sce, $rootScope, $location,
+            $sanitize, $window, HtmlEscaperService,
+            QuestionPlayerBackendApiService) {
+          var ctrl = this;
+          $scope.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.showResultsView = false;
           $scope.resultsLoaded = false;
 
           var VIEW_HINT_PENALTY = 0.1;
           var WRONG_ANSWER_PENALTY = 0.1;
+
+          var getStaticImageUrl = function(url) {
+            return UrlInterpolationService.getStaticImageUrl(url);
+          };
+
+          ctrl.getActionButtonOuterClass = function(actionButtonType) {
+            var className = getClassNameForType(actionButtonType);
+            if (className) {
+              return className + 'outer';
+            }
+            return "";
+          };
+
+          ctrl.getActionButtonInnerClass = function(actionButtonType) {
+            var className = getClassNameForType(actionButtonType);
+            if (className) {
+              return className + 'inner';
+            }
+            return "";
+          };
+
+          ctrl.getActionButtonIconHtml = function(actionButtonType) {
+            var iconHtml = "";
+            if (actionButtonType === 'BOOST_SCORE') {
+              iconHtml = '<img class="action-button-icon" src="' +
+              getStaticImageUrl('/icons/rocket@2x.png') + '"/>';
+            } else if (actionButtonType === 'RETRY_SESSION') {
+              iconHtml = '<i class="material-icons md-36 action-button-icon">&#xE5D5</i>';
+
+            } else if (actionButtonType === 'DASHBOARD') {
+              iconHtml = '<i class="material-icons md-36 action-button-icon">&#xE88A</i>';
+            }
+            return $sce.trustAsHtml($sanitize(iconHtml));
+          };
+
+          ctrl.performAction = function(actionButton) {
+            if (actionButton.type === 'BOOST_SCORE') {
+              boostScoreModal();
+            } else if (actionButton.url) {
+              $window.location.href = actionButton.url;
+            }
+          }
+
+
+          var boostScoreModal = function() {
+            console.log("Boost score for skill: " +
+              ctrl.worstSkill.skill_id + "," +
+              ctrl.worstSkill.skill_description);
+          }
+
+          var getClassNameForType = function(actionButtonType) {
+            if (actionButtonType === 'BOOST_SCORE') {
+              return 'boost-score-';
+            }
+            if (actionButtonType === 'RETRY_SESSION') {
+              return 'new-session-';
+            }
+            if (actionButtonType === 'DASHBOARD') {
+              return 'my-dashboard-';
+            }
+            return null;
+          };
 
           var updateCurrentQuestion = function(currentQuestion) {
             ctrl.currentQuestion = currentQuestion;
@@ -124,18 +190,26 @@ oppia.directive('questionPlayer', [
               questionScores) {
             $scope.scorePerSkill = [];
             $scope.totalScore = 0.0;
+            var minScore = Number.MAX_VALUE;
             var totalScore = 0.0;
-            for (skill in questionSkillData) {
+            for (var skill in questionSkillData) {
               var totalScorePerSkill = 0.0;
               var questionIds = questionSkillData[skill].question_ids;
               var description = questionSkillData[skill].skill_description;
-              for (i = 0; i < questionIds.length; i += 1) {
+              for (var i = 0; i < questionIds.length; i += 1) {
                 totalScorePerSkill += questionScores[questionIds[i]];
+              }
+              if (totalScorePerSkill < minScore) {
+                minScore = totalScorePerSkill;
+                ctrl.worstSkill = {
+                  skill_id: skill,
+                  skill_description: description
+                }
               }
               $scope.scorePerSkill.push([description, totalScorePerSkill]);
               totalScore += totalScorePerSkill;
             }
-            $scope.totalScore = totalScore / questionSkillData.length;
+            $scope.totalScore = totalScore * 100/ Object.keys(questionScores).length;
           };
 
 
@@ -181,11 +255,17 @@ oppia.directive('questionPlayer', [
           });
 
           $rootScope.$on('questionSessionCompleted', function(event, result) {
-            $location.hash(encodeURIComponent(JSON.stringify(result)));
+            $location.hash(HASH_PARAM 
+              + encodeURIComponent(JSON.stringify(result)));
           });
 
           $scope.$on('$locationChangeSuccess', function(event) {
-            var resultHashString = decodeURIComponent($location.hash());
+            var hashContent = $location.hash();
+            if (!hashContent || hashContent.indexOf(HASH_PARAM) == -1) {
+              return;
+            }
+            var resultHashString = decodeURIComponent(
+              hashContent.substring(hashContent.indexOf(HASH_PARAM) + HASH_PARAM.length));
             if (resultHashString) {
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);

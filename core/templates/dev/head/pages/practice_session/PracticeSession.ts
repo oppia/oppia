@@ -18,8 +18,15 @@
 oppia.constant('TOTAL_QUESTIONS', 20);
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant(
+  'PRACTICE_SESSIONS_URL',
+  '/practice_session/<topic_name>'
+  );
+oppia.constant(
   'PRACTICE_SESSIONS_DATA_URL',
   '/practice_session/data/<topic_name>');
+oppia.constant(
+  'TOPIC_VIEWER_PAGE',
+  '/topic/<topic_name>');
 
 require('components/background/BackgroundBannerDirective.ts');
 require('pages/question_player/QuestionPlayerDirective.ts');
@@ -30,11 +37,15 @@ require('services/contextual/UrlService.ts');
 oppia.controller('PracticeSession', [
   '$http', '$rootScope', '$scope', 'AlertsService',
   'UrlInterpolationService', 'UrlService',
-  'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL', 'TOTAL_QUESTIONS',
+  'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_URL',
+  'PRACTICE_SESSIONS_DATA_URL', 'TOPIC_VIEWER_PAGE',
+  'TOTAL_QUESTIONS',
   function(
       $http, $rootScope, $scope, AlertsService,
       UrlInterpolationService, UrlService,
-      FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL, TOTAL_QUESTIONS
+      FATAL_ERROR_CODES, PRACTICE_SESSIONS_URL,
+      PRACTICE_SESSIONS_DATA_URL, TOPIC_VIEWER_PAGE,
+      TOTAL_QUESTIONS
   ) {
     $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
     var _fetchSkillDetails = function() {
@@ -42,8 +53,32 @@ oppia.controller('PracticeSession', [
         PRACTICE_SESSIONS_DATA_URL, {
           topic_name: $scope.topicName
         });
+      var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
+        PRACTICE_SESSIONS_URL, {
+          topic_name: $scope.topicName
+        });
+      var topicViewerUrl = UrlInterpolationService.interpolateUrl(
+        TOPIC_VIEWER_PAGE, {
+          topic_name: $scope.topicName
+        });
       $http.get(practiceSessionsDataUrl).then(function(result) {
         var questionPlayerConfig = {
+          resultActionButtons: [
+            {
+              type: 'BOOST_SCORE',
+              text: 'Boost My Score'
+            }, 
+            {
+              type: 'RETRY_SESSION',
+              text: 'New Session',
+              url: practiceSessionsUrl
+            },
+            {
+              type: 'DASHBOARD',
+              text: 'My Dashboard',
+              url: topicViewerUrl
+            }
+          ],
           skillList: result.data.skill_list,
           questionCount: TOTAL_QUESTIONS
         };
