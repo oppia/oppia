@@ -16,6 +16,7 @@
 
 """Unit tests for core.domain.prod_validation_jobs_one_off."""
 
+import ast
 import datetime
 import math
 import random
@@ -48,13 +49,13 @@ USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    activity_models, audit_models, base_models, email_models, exp_models,
-    feedback_models, user_models,) = (
+    activity_models, audit_models, base_models, collection_models,
+    email_models, exp_models, feedback_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
-            models.NAMES.email, models.NAMES.exploration, models.NAMES.feedback,
+            models.NAMES.collection, models.NAMES.email,
+            models.NAMES.exploration, models.NAMES.feedback,
             models.NAMES.user]))
-
 
 OriginalDatetimeType = datetime.datetime
 
@@ -78,7 +79,7 @@ class MockDatetime13Hours(datetime.datetime):
 
 
 def run_job_and_check_output(
-        self, expected_output, sort=False):
+        self, expected_output, sort=False, literal_eval=False):
     """Helper function to run job and compare output."""
     job_id = self.job_class.create_new()
     self.assertEqual(
@@ -90,7 +91,28 @@ def run_job_and_check_output(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
     self.process_and_flush_pending_tasks()
     actual_output = self.job_class.get_output(job_id)
-    if sort:
+    if literal_eval:
+        actual_output_dict = {}
+        expected_output_dict = {}
+
+        for item in [ast.literal_eval(value) for value in actual_output]:
+            value = item[1]
+            if isinstance(value, list):
+                value = sorted(value)
+            actual_output_dict[item[0]] = value
+
+        for item in [ast.literal_eval(value) for value in expected_output]:
+            value = item[1]
+            if isinstance(value, list):
+                value = sorted(value)
+            expected_output_dict[item[0]] = value
+
+        self.assertEqual(
+            sorted(actual_output_dict.keys()),
+            sorted(expected_output_dict.keys()))
+        for key in actual_output_dict:
+            self.assertEqual(actual_output_dict[key], expected_output_dict[key])
+    elif sort:
         self.assertEqual(sorted(actual_output), sorted(expected_output))
     else:
         self.assertEqual(actual_output, expected_output)
@@ -341,6 +363,1518 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             '[u\'Model id %s: Model id does not match regex pattern\']]'
         ) % model_invalid_id]
         run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        language_codes = ['ar', 'en', 'en']
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+            language_code=language_codes[i]
+        ) for i in xrange(3)]
+
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            collection_services.save_new_collection(self.owner_id, collection)
+
+        self.model_instance_0 = collection_models.CollectionModel.get_by_id('0')
+        self.model_instance_1 = collection_models.CollectionModel.get_by_id('1')
+        self.model_instance_2 = collection_models.CollectionModel.get_by_id('2')
+
+        self.job_class = (
+            prod_validation_jobs_one_off.CollectionModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changes.')
+
+        expected_output = [
+            u'[u\'fully-validated CollectionModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of CollectionModel\', '
+                '[u\'Model id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id,
+                    self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated
+                ),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_collection_schema(self):
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'CollectionModel\', '
+                '[u\'Model id %s: Model fails domain validation with the error '
+                'Invalid language code: %s\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        with self.swap(
+            constants, 'ALL_LANGUAGE_CODES', [{
+                'code': 'en', 'description': 'English'}]):
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('1').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'exploration_model field check of CollectionModel\', '
+                '[u"Model id 0: based on field exploration_model having value '
+                '1, expect model ExplorationModel '
+                'with id 1 but it doesn\'t exist"]]'
+            ),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_commit_log_entry_model_failure(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changes.')
+        collection_models.CollectionCommitLogEntryModel.get_by_id(
+            'collection-0-1').delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'collection_commit_log_entry_model field check of '
+                'CollectionModel\', '
+                '[u"Model id 0: based on field '
+                'collection_commit_log_entry_model having value '
+                'collection-0-1, expect model CollectionCommitLogEntryModel '
+                'with id collection-0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_summary_model_failure(self):
+        collection_models.CollectionSummaryModel.get_by_id('0').delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_summary_model '
+                'field check of CollectionModel\', '
+                '[u"Model id 0: based on field collection_summary_model having '
+                'value 0, expect model CollectionSummaryModel with id 0 '
+                'but it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_rights_model_failure(self):
+        collection_models.CollectionRightsModel.get_by_id(
+            '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_rights_model '
+                'field check of CollectionModel\', '
+                '[u"Model id 0: based on field collection_rights_model having '
+                'value 0, expect model CollectionRightsModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        collection_models.CollectionSnapshotMetadataModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_model '
+                'field check of CollectionModel\', '
+                '[u"Model id 0: based on field snapshot_metadata_model having '
+                'value 0-1, expect model CollectionSnapshotMetadataModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        collection_models.CollectionSnapshotContentModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_model '
+                'field check of CollectionModel\', '
+                '[u"Model id 0: based on field snapshot_content_model having '
+                'value 0-1, expect model CollectionSnapshotContentModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionSnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionSnapshotMetadataModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+        ) for i in xrange(3)]
+
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            if collection.id != '0':
+                collection_services.save_new_collection(
+                    self.owner_id, collection)
+            else:
+                collection_services.save_new_collection(
+                    self.user_id, collection)
+
+        self.model_instance_0 = (
+            collection_models.CollectionSnapshotMetadataModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            collection_models.CollectionSnapshotMetadataModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            collection_models.CollectionSnapshotMetadataModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated CollectionSnapshotMetadataModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionSnapshotMetadataModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'CollectionSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionSnapshotMetadataModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_model_failure(self):
+        collection_models.CollectionModel.get_by_id('0').delete(
+            self.user_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_model '
+                'field check of CollectionSnapshotMetadataModel\', '
+                '[u"Model id 0-1: based on field collection_model '
+                'having value 0, expect model CollectionModel with '
+                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
+                'collection_model having value 0, expect model '
+                'CollectionModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'CollectionSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_model field '
+                'check of CollectionSnapshotMetadataModel\', '
+                '[u"Model id 0-1: based on field committer_model having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.user_id, self.user_id), (
+                u'[u\'fully-validated '
+                'CollectionSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_collection_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            collection_models.CollectionSnapshotMetadataModel(
+                id='0-3', committer_id=self.owner_id, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection model '
+                'version check of CollectionSnapshotMetadataModel\', '
+                '[u\'Model id 0-3: Collection model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot metadata model id\']]'
+            ), (
+                u'[u\'fully-validated CollectionSnapshotMetadataModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'add_collection_node',
+        }, {
+            'cmd': 'delete_collection_node',
+            'random_key': 'random'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd '
+                'delete_collection_node '
+                'check of CollectionSnapshotMetadataModel\', '
+                '[u\'Model id 0-1: Commit command domain validation failed '
+                'with error: Following required keys are missing: '
+                'exploration_id, '
+                'Following extra keys are present: random_key\']]'
+            ), (
+                u'[u\'failed validation check for commit cmd '
+                'add_collection_node '
+                'check of CollectionSnapshotMetadataModel\', '
+                '[u\'Model id 0-1: Commit command domain validation failed '
+                'with error: Following required keys are missing: '
+                'exploration_id\']]'
+            ),
+            u'[u\'fully-validated CollectionSnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionSnapshotContentModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+        ) for i in xrange(3)]
+
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            collection_services.save_new_collection(self.owner_id, collection)
+
+        self.model_instance_0 = (
+            collection_models.CollectionSnapshotContentModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            collection_models.CollectionSnapshotContentModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            collection_models.CollectionSnapshotContentModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated CollectionSnapshotContentModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionSnapshotContentModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'CollectionSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionSnapshotContentModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_model_failure(self):
+        collection_models.CollectionModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_model '
+                'field check of CollectionSnapshotContentModel\', '
+                '[u"Model id 0-1: based on field collection_model '
+                'having value 0, expect model CollectionModel with '
+                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
+                'collection_model having value 0, expect model '
+                'CollectionModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'CollectionSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_collection_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            collection_models.CollectionSnapshotContentModel(
+                id='0-3'))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection model '
+                'version check of CollectionSnapshotContentModel\', '
+                '[u\'Model id 0-3: Collection model corresponding to '
+                'id 0 has a version 1 which is less than '
+                'the version 3 in snapshot content model id\']]'
+            ), (
+                u'[u\'fully-validated CollectionSnapshotContentModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionRightsModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        editor_email = 'user@editor.com'
+        translator_email = 'user@translator.com'
+        viewer_email = 'user@viewer.com'
+
+        self.signup(editor_email, 'editor')
+        self.signup(translator_email, 'translator')
+        self.signup(viewer_email, 'viewer')
+
+        self.editor_id = self.get_user_id_from_email(editor_email)
+        self.translator_id = self.get_user_id_from_email(translator_email)
+        self.viewer_id = self.get_user_id_from_email(viewer_email)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+        ) for i in xrange(3)]
+
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            collection_services.save_new_collection(self.owner_id, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+
+        rights_manager.assign_role_for_collection(
+            self.owner, '1', self.translator_id, rights_manager.ROLE_TRANSLATOR)
+
+        rights_manager.assign_role_for_collection(
+            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+
+        self.model_instance_0 = (
+            collection_models.CollectionRightsModel.get_by_id('0'))
+        self.model_instance_1 = (
+            collection_models.CollectionRightsModel.get_by_id('1'))
+        self.model_instance_2 = (
+            collection_models.CollectionRightsModel.get_by_id('2'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.CollectionRightsModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        rights_manager.publish_collection(self.owner, '0')
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionRightsModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionRightsModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_first_published_datetime_than_current_time(self):
+        rights_manager.publish_collection(self.owner, '0')
+        rights_manager.publish_collection(self.owner, '1')
+        self.model_instance_0.first_published_msec = (
+            self.model_instance_0.first_published_msec * 1000000.0)
+        self.model_instance_0.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for first published msec check '
+                'of CollectionRightsModel\', '
+                '[u\'Model id 0: The first_published_msec field has a value %s '
+                'which is greater than the time when the job was run\']]'
+            ) % (self.model_instance_0.first_published_msec),
+            u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_model_failure(self):
+        collection_models.CollectionModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_model '
+                'field check of CollectionRightsModel\', '
+                '[u"Model id 0: based on field collection_model having '
+                'value 0, expect model CollectionModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_owner_user_model_failure(self):
+        rights_manager.assign_role_for_collection(
+            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for owner_user_model '
+                'field check of CollectionRightsModel\', '
+                '[u"Model id 0: based on field owner_user_model having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
+            u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_editor_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for editor_user_model '
+                'field check of CollectionRightsModel\', '
+                '[u"Model id 0: based on field editor_user_model having '
+                'value %s, expect model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.editor_id, self.editor_id),
+            u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_translator_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.translator_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for translator_user_model '
+                'field check of CollectionRightsModel\', '
+                '[u"Model id 1: based on field translator_user_model having '
+                'value %s, expect model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.translator_id, self.translator_id),
+            u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_viewer_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for viewer_user_model '
+                'field check of CollectionRightsModel\', '
+                '[u"Model id 2: based on field viewer_user_model having '
+                'value %s, expect model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.viewer_id, self.viewer_id),
+            u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_model '
+                'field check of CollectionRightsModel\', '
+                '[u"Model id 0: based on field snapshot_metadata_model having '
+                'value 0-1, expect model '
+                'CollectionRightsSnapshotMetadataModel '
+                'with id 0-1 but it doesn\'t exist"]]'
+            ),
+            u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_model '
+                'field check of CollectionRightsModel\', '
+                '[u"Model id 0: based on field snapshot_content_model having '
+                'value 0-1, expect model CollectionRightsSnapshotContentModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionRightsSnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionRightsSnapshotMetadataModelValidatorTests, self).setUp(
+            )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+        ) for i in xrange(3)]
+
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            if collection.id != '0':
+                collection_services.save_new_collection(
+                    self.owner_id, collection)
+            else:
+                collection_services.save_new_collection(
+                    self.user_id, collection)
+
+        self.model_instance_0 = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.CollectionRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionRightsSnapshotMetadataModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'CollectionRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionRightsSnapshotMetadataModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_rights_model_failure(self):
+        collection_models.CollectionRightsModel.get_by_id('0').delete(
+            self.user_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_rights_model '
+                'field check of CollectionRightsSnapshotMetadataModel\', '
+                '[u"Model id 0-1: based on field collection_rights_model '
+                'having value 0, expect model CollectionRightsModel with '
+                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
+                'collection_rights_model having value 0, expect model '
+                'CollectionRightsModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'CollectionRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_model field '
+                'check of CollectionRightsSnapshotMetadataModel\', '
+                '[u"Model id 0-1: based on field committer_model having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.user_id, self.user_id), (
+                u'[u\'fully-validated '
+                'CollectionRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_collection_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            collection_models.CollectionRightsSnapshotMetadataModel(
+                id='0-3', committer_id=self.owner_id, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection rights model '
+                'version check of CollectionRightsSnapshotMetadataModel\', '
+                '[u\'Model id 0-3: Collection Rights model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot metadata model id\']]'
+            ), (
+                u'[u\'fully-validated '
+                'CollectionRightsSnapshotMetadataModel\', 3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionRightsSnapshotContentModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionRightsSnapshotContentModelValidatorTests, self).setUp(
+            )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+        ) for i in xrange(3)]
+
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            collection_services.save_new_collection(self.owner_id, collection)
+
+        self.model_instance_0 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            collection_models.CollectionRightsSnapshotContentModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.CollectionRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated CollectionRightsSnapshotContentModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionRightsSnapshotContentModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'CollectionRightsSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionRightsSnapshotContentModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_model_failure(self):
+        collection_models.CollectionRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_rights_model '
+                'field check of CollectionRightsSnapshotContentModel\', '
+                '[u"Model id 0-1: based on field collection_rights_model '
+                'having value 0, expect model CollectionRightsModel with '
+                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
+                'collection_rights_model having value 0, expect model '
+                'CollectionRightsModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'CollectionRightsSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_collection_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            collection_models.CollectionRightsSnapshotContentModel(
+                id='0-3'))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection rights model '
+                'version check of CollectionRightsSnapshotContentModel\', '
+                '[u\'Model id 0-3: Collection Rights model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot content model id\']]'
+            ), (
+                u'[u\'fully-validated CollectionRightsSnapshotContentModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionCommitLogEntryModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+        ) for i in xrange(3)]
+
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            collection_services.save_new_collection(self.owner_id, collection)
+
+        self.model_instance_0 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'collection-0-1'))
+        self.model_instance_1 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'collection-1-1'))
+        self.model_instance_2 = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'collection-2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        collection_services.update_collection(
+            self.owner_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionCommitLogEntryModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionCommitLogEntryModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_model_failure(self):
+        collection_models.CollectionModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_model '
+                'field check of CollectionCommitLogEntryModel\', '
+                '[u"Model id collection-0-1: based on field collection_model '
+                'having value 0, expect model CollectionModel with id 0 '
+                'but it doesn\'t exist", u"Model id collection-0-2: based '
+                'on field collection_model having value 0, expect model '
+                'CollectionModel with id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(
+            self, expected_output, literal_eval=True)
+
+    def test_invalid_collection_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            collection_models.CollectionCommitLogEntryModel.create(
+                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
+                'msg', [{}],
+                constants.ACTIVITY_STATUS_PUBLIC, False))
+        model_with_invalid_version_in_id.collection_id = '0'
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection model '
+                'version check of CollectionCommitLogEntryModel\', '
+                '[u\'Model id %s: Collection model corresponding '
+                'to collection id 0 has a version 1 which is less than '
+                'the version 3 in commit log model id\']]'
+            ) % (model_with_invalid_version_in_id.id),
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_id(self):
+        model_with_invalid_id = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='random-0-1', user_id=self.owner_id,
+                username=self.OWNER_USERNAME, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}],
+                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+                post_commit_is_private=False))
+        model_with_invalid_id.collection_id = '0'
+        model_with_invalid_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for model id check of '
+                'CollectionCommitLogEntryModel\', '
+                '[u\'Model id %s: Model id does not match regex pattern\']]'
+            ) % (model_with_invalid_id.id),
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_type(self):
+        self.model_instance_0.commit_type = 'random'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit type check of '
+                'CollectionCommitLogEntryModel\', '
+                '[u\'Model id collection-0-1: Commit type random is '
+                'not allowed\']]'
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_post_commit_status(self):
+        self.model_instance_0.post_commit_status = 'random'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit status check '
+                'of CollectionCommitLogEntryModel\', '
+                '[u\'Model id collection-0-1: Post commit status random '
+                'is invalid\']]'
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_true_post_commit_is_private(self):
+        self.model_instance_0.post_commit_status = 'public'
+        self.model_instance_0.post_commit_is_private = True
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit is private '
+                'check of CollectionCommitLogEntryModel\', '
+                '[u\'Model id %s: Post commit status is '
+                'public but post_commit_is_private is True\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_false_post_commit_is_private(self):
+        self.model_instance_0.post_commit_status = 'private'
+        self.model_instance_0.post_commit_is_private = False
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit is private '
+                'check of CollectionCommitLogEntryModel\', '
+                '[u\'Model id %s: Post commit status is '
+                'private but post_commit_is_private is False\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'add_collection_node'
+        }, {
+            'cmd': 'delete_collection_node',
+            'random_key': 'random'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd '
+                'delete_collection_node '
+                'check of CollectionCommitLogEntryModel\', '
+                '[u\'Model id collection-0-1: Commit command domain '
+                'validation failed with error: Following required keys '
+                'are missing: exploration_id, Following extra keys are '
+                'present: random_key\']]'
+            ), (
+                u'[u\'failed validation check for commit cmd '
+                'add_collection_node '
+                'check of CollectionCommitLogEntryModel\', '
+                '[u\'Model id collection-0-1: Commit command domain '
+                'validation failed with error: Following required '
+                'keys are missing: exploration_id\']]'
+            ),
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CollectionSummaryModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        editor_email = 'user@editor.com'
+        viewer_email = 'user@viewer.com'
+        contributor_email = 'user@contributor.com'
+
+        self.signup(editor_email, 'editor')
+        self.signup(viewer_email, 'viewer')
+        self.signup(contributor_email, 'contributor')
+
+        self.editor_id = self.get_user_id_from_email(editor_email)
+        self.viewer_id = self.get_user_id_from_email(viewer_email)
+        self.contributor_id = self.get_user_id_from_email(contributor_email)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        language_codes = ['ar', 'en', 'en']
+        collections = [collection_domain.Collection.create_default_collection(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+            objective='objective%d' % i,
+            language_code=language_codes[i]
+        ) for i in xrange(3)]
+
+        for index, collection in enumerate(collections):
+            collection.add_node('%s' % (index * 2))
+            collection.add_node('%s' % (index * 2 + 1))
+            collection.tags = ['math', 'art']
+            collection_services.save_new_collection(self.owner_id, collection)
+
+        rights_manager.assign_role_for_collection(
+            self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
+        collection_services.update_collection(
+            self.contributor_id, '0', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changes.')
+
+        rights_manager.assign_role_for_collection(
+            self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
+
+        self.model_instance_0 = (
+            collection_models.CollectionSummaryModel.get_by_id('0'))
+        self.model_instance_0.ratings = {'1': 2, '2': 0, '3': 4, '4': 0, '5': 0}
+        self.model_instance_0.put()
+
+        self.model_instance_1 = (
+            collection_models.CollectionSummaryModel.get_by_id('1'))
+        self.model_instance_2 = (
+            collection_models.CollectionSummaryModel.get_by_id('2'))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.CollectionSummaryModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        rights_manager.publish_collection(self.owner, '0')
+        collection_services.update_collection(
+            self.owner_id, '1', [{
+                'cmd': 'edit_collection_property',
+                'property_name': 'title',
+                'new_value': 'New title'
+            }], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated CollectionSummaryModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of CollectionSummaryModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        collection_services.delete_collection(self.owner_id, '1')
+        collection_services.delete_collection(self.owner_id, '2')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'CollectionSummaryModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_collection_model_failure(self):
+        collection_models.CollectionModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_model '
+                'field check of CollectionSummaryModel\', '
+                '[u"Model id 0: based on field collection_model having '
+                'value 0, expect model CollectionModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_owner_user_model_failure(self):
+        rights_manager.assign_role_for_collection(
+            self.owner, '0', self.user_id, rights_manager.ROLE_OWNER)
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for owner_user_model '
+                'field check of CollectionSummaryModel\', '
+                '[u"Model id 0: based on field owner_user_model having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_editor_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for editor_user_model '
+                'field check of CollectionSummaryModel\', '
+                '[u"Model id 0: based on field editor_user_model having '
+                'value %s, expect model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.editor_id, self.editor_id),
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_viewer_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for viewer_user_model '
+                'field check of CollectionSummaryModel\', '
+                '[u"Model id 2: based on field viewer_user_model having '
+                'value %s, expect model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.viewer_id, self.viewer_id),
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_contributor_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.contributor_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for contributor_user_model '
+                'field check of CollectionSummaryModel\', '
+                '[u"Model id 0: based on field contributor_user_model having '
+                'value %s, expect model UserSettingsModel with id %s but '
+                'it doesn\'t exist"]]') % (
+                    self.contributor_id, self.contributor_id),
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_ratings(self):
+        self.model_instance_0.ratings = {'10': 4, '5': 15}
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for ratings schema check of '
+                'CollectionSummaryModel\', '
+                '[u"Model id 0: Property does not match the schema with '
+                'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
+                'Extra keys: [u\'10\']"]]'
+            ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_language_code(self):
+        expected_output = [
+            (
+                u'[u\'failed validation check for language code check of '
+                'CollectionSummaryModel\', '
+                '[u\'Model id %s: Language code %s for model is unsupported'
+                '\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        with self.swap(
+            constants, 'ALL_LANGUAGE_CODES', [{
+                'code': 'en', 'description': 'English'}]):
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_contributors_summary(self):
+        self.model_instance_0.contributors_summary = {'random': 1}
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for contributors summary check '
+                'of CollectionSummaryModel\', '
+                '[u\'Model id %s: Contributor ids: %s do not match the '
+                'contributor ids obtained using contributors summary: %s'
+                '\']]'
+            ) % (
+                self.model_instance_0.id,
+                (',').join(sorted(self.model_instance_0.contributor_ids)),
+                (',').join(
+                    sorted(self.model_instance_0.contributors_summary.keys()))),
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_node_count(self):
+        self.model_instance_0.node_count = 10
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for node count check '
+                'of CollectionSummaryModel\', '
+                '[u\'Model id 0: Node count: 10 does not match the '
+                'number of nodes in collection_contents dict: 2'
+                '\']]'
+            ),
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_collection_model_related_properties(self):
+        mock_created_on_time = datetime.datetime.utcnow()
+        properties_dict = {
+            'title': 'random',
+            'category': 'random',
+            'objective': 'random',
+            'language_code': 'en',
+            'tags': ['random1', 'random2'],
+            'collection_model_created_on': mock_created_on_time
+        }
+
+        output_dict = {
+            'title': 'random',
+            'category': 'random',
+            'objective': 'random',
+            'language_code': 'en',
+            'tags': 'random1,random2',
+            'collection_model_created_on': mock_created_on_time
+        }
+
+        for property_name in properties_dict:
+            actual_value = getattr(self.model_instance_0, property_name)
+            setattr(
+                self.model_instance_0, property_name,
+                properties_dict[property_name])
+            self.model_instance_0.put()
+            corresponding_property_name = property_name
+            if property_name == 'collection_model_created_on':
+                corresponding_property_name = 'created_on'
+            output_actual_value = actual_value
+            if isinstance(actual_value, list):
+                output_actual_value = (',').join(actual_value)
+            expected_output = [
+                (
+                    u'[u\'failed validation check for %s field check of '
+                    'CollectionSummaryModel\', '
+                    '[u\'Model id %s: %s field in model: %s does not match '
+                    'corresponding collection %s field: %s\']]'
+                ) % (
+                    property_name, self.model_instance_0.id, property_name,
+                    output_dict[property_name], corresponding_property_name,
+                    output_actual_value),
+                u'[u\'fully-validated CollectionSummaryModel\', 2]']
+            run_job_and_check_output(self, expected_output, sort=True)
+            setattr(self.model_instance_0, property_name, actual_value)
+            self.model_instance_0.put()
+
+    def test_model_with_invalid_collection_rights_model_related_properties(
+            self):
+        user_models.UserSettingsModel(
+            id='random1', email='random1@email.com').put()
+        user_models.UserSettingsModel(
+            id='random2', email='random2@email.com').put()
+        properties_dict = {
+            'status': 'public',
+            'community_owned': True,
+            'owner_ids': ['random1', 'random2'],
+            'editor_ids': ['random1', 'random2'],
+            'viewer_ids': ['random1', 'random2']
+        }
+
+        output_dict = {
+            'status': 'public',
+            'community_owned': True,
+            'owner_ids': 'random1,random2',
+            'editor_ids': 'random1,random2',
+            'viewer_ids': 'random1,random2'
+        }
+
+        for property_name in properties_dict:
+            actual_value = getattr(self.model_instance_0, property_name)
+            setattr(
+                self.model_instance_0, property_name,
+                properties_dict[property_name])
+            self.model_instance_0.put()
+            corresponding_property_name = property_name
+            output_actual_value = actual_value
+            if isinstance(actual_value, list):
+                output_actual_value = (',').join(actual_value)
+            expected_output = [
+                (
+                    u'[u\'failed validation check for %s field check of '
+                    'CollectionSummaryModel\', '
+                    '[u\'Model id %s: %s field in model: %s does not match '
+                    'corresponding collection rights %s field: %s\']]'
+                ) % (
+                    property_name, self.model_instance_0.id, property_name,
+                    output_dict[property_name], corresponding_property_name,
+                    output_actual_value
+                ),
+                u'[u\'fully-validated CollectionSummaryModel\', 2]']
+            run_job_and_check_output(self, expected_output, sort=True)
+            setattr(self.model_instance_0, property_name, actual_value)
+            self.model_instance_0.put()
 
 
 class SentEmailModelValidatorTests(test_utils.GenericTestBase):
@@ -1000,7 +2534,8 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationSnapshotMetadataModel\', 2]')]
-        run_job_and_check_output(self, expected_output, sort=True)
+        run_job_and_check_output(
+            self, expected_output, literal_eval=True)
 
     def test_missing_committer_model_failure(self):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()

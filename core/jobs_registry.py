@@ -55,6 +55,14 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob,
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionRightsSnapshotMetadataModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.CollectionRightsSnapshotContentModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.SentEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
     prod_validation_jobs_one_off.GeneralFeedbackEmailReplyToIdModelAuditOneOffJob, # pylint: disable=line-too-long

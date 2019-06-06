@@ -22,6 +22,7 @@ import re
 from constants import constants
 from core import jobs
 from core.domain import activity_domain
+from core.domain import collection_services
 from core.domain import commit_commands_domain
 from core.domain import exp_services
 from core.platform import models
@@ -426,6 +427,614 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_validation_functions(cls):
         return [cls._validate_user_id_belongs_to_admin]
+
+
+class CollectionModelValidator(BaseModelValidator):
+    """Class for validating CollectionModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        model_domain_object_instances = [
+            collection_services.get_collection_from_model(item)]
+
+        return model_domain_object_instances
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        nodes = item.collection_contents['nodes']
+        exploration_model_ids = [node['exploration_id'] for node in nodes]
+        collection_commit_log_entry_model_ids = [
+            'collection-%s-%s' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        collection_summary_model_ids = [item.id]
+        collection_rights_model_ids = [item.id]
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'exploration_model': (
+                exp_models.ExplorationModel, exploration_model_ids),
+            'collection_commit_log_entry_model': (
+                collection_models.CollectionCommitLogEntryModel,
+                collection_commit_log_entry_model_ids),
+            'collection_summary_model': (
+                collection_models.CollectionSummaryModel,
+                collection_summary_model_ids),
+            'collection_rights_model': (
+                collection_models.CollectionRightsModel,
+                collection_rights_model_ids),
+            'snapshot_metadata_model': (
+                collection_models.CollectionSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                collection_models.CollectionSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return []
+
+
+class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating CollectionSnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.CollectionCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_model': (
+                collection_models.CollectionModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_collection_model_version_from_item_id(cls, item):
+        """Validate that collection model corresponding to snapshot
+        metadata model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: CollectionSnapshotMetadataModel to validate.
+        """
+        _, collection_model_tuples = cls.external_models['collection_model']
+
+        collection_model = collection_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(collection_model.version) < int(version):
+            cls.errors['collection model version check'] = (
+                'Model id %s: Collection model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot metadata model id' % (
+                    item.id, collection_model.id, collection_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_collection_model_version_from_item_id]
+
+
+class CollectionSnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating CollectionSnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_model': (
+                collection_models.CollectionModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_collection_model_version_from_item_id(cls, item):
+        """Validate that collection model corresponding to snapshot
+        content model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: CollectionSnapshotContentModel to validate.
+        """
+        _, collection_model_tuples = cls.external_models['collection_model']
+
+        collection_model = collection_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(collection_model.version) < int(version):
+            cls.errors['collection model version check'] = (
+                'Model id %s: Collection model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot content model id' % (
+                    item.id, collection_model.id, collection_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_collection_model_version_from_item_id]
+
+
+class CollectionRightsModelValidator(BaseModelValidator):
+    """Class for validating CollectionRightsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'collection_model': (
+                collection_models.CollectionModel, [item.id]),
+            'owner_user_model': (
+                user_models.UserSettingsModel, item.owner_ids),
+            'editor_user_model': (
+                user_models.UserSettingsModel, item.editor_ids),
+            'translator_user_model': (
+                user_models.UserSettingsModel, item.translator_ids),
+            'viewer_user_model': (
+                user_models.UserSettingsModel, item.viewer_ids),
+            'snapshot_metadata_model': (
+                collection_models.CollectionRightsSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                collection_models.CollectionRightsSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+    @classmethod
+    def _validate_first_published_msec(cls, item):
+        """Validate that first published time of model is less than current
+        time.
+
+        Args:
+            item: CollectionRightsModel to validate.
+        """
+        if not item.first_published_msec:
+            return
+
+        epoch = datetime.datetime.utcfromtimestamp(0)
+        current_msec = (
+            datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
+        if item.first_published_msec > current_msec:
+            cls.errors['first published msec check'] = (
+                'Model id %s: The first_published_msec field has a value %s '
+                'which is greater than the time when the job was run'
+                ) % (item.id, item.first_published_msec)
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_first_published_msec]
+
+
+class CollectionRightsSnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating CollectionRightsSnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.CollectionRightsCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_rights_model': (
+                collection_models.CollectionRightsModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_collection_model_version_from_item_id(cls, item):
+        """Validate that collection rights model corresponding to snapshot
+        metadata model has a version greater than or equal to the version in
+        item.id.
+
+        Args:
+            item: CollectionRightsSnapshotMetadataModel to validate.
+        """
+        _, collection_rights_model_tuples = cls.external_models[
+            'collection_rights_model']
+
+        collection_rights_model = collection_rights_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(collection_rights_model.version) < int(version):
+            cls.errors['collection rights model version check'] = (
+                'Model id %s: Collection Rights model corresponding to '
+                'id %s has a version %s which is less '
+                'than the version %s in snapshot metadata model id' % (
+                    item.id, collection_rights_model.id,
+                    collection_rights_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_collection_model_version_from_item_id]
+
+
+class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating CollectionRightsSnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_rights_model': (
+                collection_models.CollectionRightsModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_collection_model_version_from_item_id(cls, item):
+        """Validate that collection rights model corresponding to snapshot
+        content model has a version greater than or equal to the version in
+        item.id.
+
+        Args:
+            item: CollectionRightsSnapshotContentModel to validate.
+        """
+        _, collection_rights_model_tuples = cls.external_models[
+            'collection_rights_model']
+
+        collection_rights_model = collection_rights_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(collection_rights_model.version) < int(version):
+            cls.errors['collection rights model version check'] = (
+                'Model id %s: Collection Rights model corresponding to '
+                'id %s has a version %s which is less '
+                'than the version %s in snapshot content model id' % (
+                    item.id, collection_rights_model.id,
+                    collection_rights_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_collection_model_version_from_item_id]
+
+
+class CollectionCommitLogEntryModelValidator(BaseModelValidator):
+    """Class for validating CollectionCommitLogEntryModel."""
+
+    is_commit_log_entry_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        regex_string = '(collection|rights)-%s-\\d*$' % (
+            item.collection_id)
+
+        return regex_string
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.CollectionCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_model': (
+                collection_models.CollectionModel, [item.collection_id]),
+        }
+
+    @classmethod
+    def _validate_collection_model_version_from_item_id(cls, item):
+        """Validate that collection model corresponding to item.collection_id
+        has a version greater than or equal to the exp version in item.id.
+
+        Args:
+            item: CollectionCommitLogEntryModel to validate.
+        """
+        _, collection_model_tuples = cls.external_models['collection_model']
+
+        collection_model = collection_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(collection_model.version) < int(version):
+            cls.errors['collection model version check'] = (
+                'Model id %s: Collection model corresponding to collection '
+                'id %s has a version %s which is less than the version %s in '
+                'commit log model id' % (
+                    item.id, item.collection_id, collection_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_collection_model_version_from_item_id]
+
+
+class CollectionSummaryModelValidator(BaseModelValidator):
+    """Class for validating CollectionSummaryModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        non_negative_int_schema = {
+            'type': 'int',
+            'validators': [{
+                'id': 'is_at_least',
+                'min_value': 0
+            }]
+        }
+        ratings_schema = {
+            'type': 'dict',
+            'properties': [{
+                'name': '%s' % rating_value,
+                'schema': non_negative_int_schema,
+            } for rating_value in ['1', '2', '3', '4', '5']]
+        }
+
+        if item.ratings and len(item.ratings.keys()):
+            return {'ratings': ratings_schema}
+        else:
+            return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'collection_model': (
+                collection_models.CollectionModel, [item.id]),
+            'collection_rights_model': (
+                collection_models.CollectionRightsModel, [item.id]),
+            'owner_user_model': (
+                user_models.UserSettingsModel, item.owner_ids),
+            'editor_user_model': (
+                user_models.UserSettingsModel, item.editor_ids),
+            'viewer_user_model': (
+                user_models.UserSettingsModel, item.viewer_ids),
+            'contributor_user_model': (
+                user_models.UserSettingsModel, item.contributor_ids)
+        }
+
+    @classmethod
+    def _validate_contributors_summary(cls, item):
+        """Validate that contributor ids match the contributor ids obtained
+        from contributors summary.
+
+        Args:
+            item: CollectionSummaryModel to validate.
+        """
+        contributor_ids_from_contributors_summary = (
+            item.contributors_summary.keys())
+        if sorted(item.contributor_ids) != sorted(
+                contributor_ids_from_contributors_summary):
+            cls.errors['contributors summary check'] = (
+                'Model id %s: Contributor ids: %s do not match the contributor '
+                'ids obtained using contributors summary: %s') % (
+                    item.id, (',').join(sorted(item.contributor_ids)),
+                    (',').join(
+                        sorted(contributor_ids_from_contributors_summary)))
+
+    @classmethod
+    def _validate_language_code(cls, item):
+        """Validate that language code is present in allowed language codes.
+
+        Args:
+            item: CollectionSummaryModel to validate.
+        """
+        allowed_language_codes = [
+            language_item['code'] for language_item in (
+                constants.ALL_LANGUAGE_CODES)]
+
+        if item.language_code not in allowed_language_codes:
+            cls.errors['language code check'] = (
+                'Model id %s: Language code %s for model is unsupported' % (
+                    item.id, item.language_code))
+
+    @classmethod
+    def _validate_node_count(cls, item):
+        """Validate that node_count of model is equal to number of nodes
+        collection_contents in collection model.
+
+        Args:
+            item: CollectionSummaryModel to validate.
+        """
+        _, collection_model_tuples = cls.external_models[
+            'collection_model']
+        collection_model = collection_model_tuples[0][1]
+        nodes = collection_model.collection_contents['nodes']
+        if item.node_count != len(nodes):
+            cls.errors['node count check'] = (
+                'Model id %s: Node count: %s does not match the number of '
+                'nodes in collection_contents dict: %s') % (
+                    item.id, item.node_count, len(nodes))
+
+    @classmethod
+    def _validate_related_model_properties(cls, item):
+        """Validate that model properties match the corresponding collection
+        model and collection rights model properties.
+
+        Args:
+            item: CollectionSummaryModel to validate.
+        """
+        _, collection_model_tuples = cls.external_models[
+            'collection_model']
+        _, collection_rights_model_tuples = cls.external_models[
+            'collection_rights_model']
+        collection_model = collection_model_tuples[0][1]
+        collection_rights_model = collection_rights_model_tuples[0][1]
+
+        if item.title != collection_model.title:
+            cls.errors['title field check'] = (
+                'Model id %s: title field in model: %s does not match '
+                'corresponding collection title field: %s') % (
+                    item.id, item.title, collection_model.title)
+
+        if item.category != collection_model.category:
+            cls.errors['category field check'] = (
+                'Model id %s: category field in model: %s does not match '
+                'corresponding collection category field: %s') % (
+                    item.id, item.category, collection_model.category)
+
+        if item.objective != collection_model.objective:
+            cls.errors['objective field check'] = (
+                'Model id %s: objective field in model: %s does not match '
+                'corresponding collection objective field: %s') % (
+                    item.id, item.objective, collection_model.objective)
+
+        if item.language_code != collection_model.language_code:
+            cls.errors['language_code field check'] = (
+                'Model id %s: language_code field in model: %s does not match '
+                'corresponding collection language_code field: %s') % (
+                    item.id, item.language_code,
+                    collection_model.language_code)
+
+        if item.tags != collection_model.tags:
+            cls.errors['tags field check'] = (
+                'Model id %s: tags field in model: %s does not match '
+                'corresponding collection tags field: %s') % (
+                    item.id, (',').join(item.tags),
+                    (',').join(collection_model.tags))
+
+        if item.collection_model_created_on != collection_model.created_on:
+            cls.errors['collection_model_created_on field check'] = (
+                'Model id %s: collection_model_created_on field in model: %s '
+                'does not match corresponding collection created_on '
+                'field: %s') % (
+                    item.id, item.collection_model_created_on,
+                    collection_model.created_on)
+
+        if item.status != collection_rights_model.status:
+            cls.errors['status field check'] = (
+                'Model id %s: status field in model: %s does not match '
+                'corresponding collection rights status field: %s') % (
+                    item.id, item.status, collection_rights_model.status)
+
+        if item.community_owned != collection_rights_model.community_owned:
+            cls.errors['community_owned field check'] = (
+                'Model id %s: community_owned field in model: %s does not '
+                'match corresponding collection rights community_owned '
+                'field: %s') % (
+                    item.id, item.community_owned,
+                    collection_rights_model.community_owned)
+
+        if item.owner_ids != collection_rights_model.owner_ids:
+            cls.errors['owner_ids field check'] = (
+                'Model id %s: owner_ids field in model: %s does not match '
+                'corresponding collection rights owner_ids field: %s') % (
+                    item.id, (',').join(item.owner_ids),
+                    (',').join(collection_rights_model.owner_ids))
+
+        if item.editor_ids != collection_rights_model.editor_ids:
+            cls.errors['editor_ids field check'] = (
+                'Model id %s: editor_ids field in model: %s does not match '
+                'corresponding collection rights editor_ids field: %s') % (
+                    item.id, (',').join(item.editor_ids),
+                    (',').join(collection_rights_model.editor_ids))
+
+        if item.viewer_ids != collection_rights_model.viewer_ids:
+            cls.errors['viewer_ids field check'] = (
+                'Model id %s: viewer_ids field in model: %s does not match '
+                'corresponding collection rights viewer_ids field: %s') % (
+                    item.id, (',').join(item.viewer_ids),
+                    (',').join(collection_rights_model.viewer_ids))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [
+            cls._validate_language_code, cls._validate_node_count,
+            cls._validate_contributors_summary,
+            cls._validate_related_model_properties]
 
 
 class SentEmailModelValidator(BaseModelValidator):
@@ -1099,7 +1708,7 @@ class ExpSummaryModelValidator(BaseModelValidator):
             } for rating_value in ['1', '2', '3', '4', '5']]
         }
 
-        if len(item.ratings.keys()):
+        if item.ratings and len(item.ratings.keys()):
             return {'ratings': ratings_schema}
         else:
             return {}
@@ -1341,6 +1950,19 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
+    collection_models.CollectionModel: CollectionModelValidator,
+    collection_models.CollectionSnapshotMetadataModel: (
+        CollectionSnapshotMetadataModelValidator),
+    collection_models.CollectionSnapshotContentModel: (
+        CollectionSnapshotContentModelValidator),
+    collection_models.CollectionRightsModel: CollectionRightsModelValidator,
+    collection_models.CollectionRightsSnapshotMetadataModel: (
+        CollectionRightsSnapshotMetadataModelValidator),
+    collection_models.CollectionRightsSnapshotContentModel: (
+        CollectionRightsSnapshotContentModelValidator),
+    collection_models.CollectionCommitLogEntryModel: (
+        CollectionCommitLogEntryModelValidator),
+    collection_models.CollectionSummaryModel: CollectionSummaryModelValidator,
     email_models.SentEmailModel: SentEmailModelValidator,
     email_models.BulkEmailModel: BulkEmailModelValidator,
     email_models.GeneralFeedbackEmailReplyToIdModel: (
@@ -1434,6 +2056,75 @@ class GeneralFeedbackEmailReplyToIdModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [email_models.GeneralFeedbackEmailReplyToIdModel]
+
+
+class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionModel]
+
+
+class CollectionSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionSnapshotMetadataModel]
+
+
+class CollectionSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionSnapshotContentModel]
+
+
+class CollectionRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionRightsModel]
+
+
+class CollectionRightsSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionRightsSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionRightsSnapshotMetadataModel]
+
+
+class CollectionRightsSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionRightsSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionRightsSnapshotContentModel]
+
+
+class CollectionCommitLogEntryModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionCommitLogEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionCommitLogEntryModel]
+
+
+class CollectionSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionSummaryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [collection_models.CollectionSummaryModel]
 
 
 class ExplorationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
