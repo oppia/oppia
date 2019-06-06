@@ -60,7 +60,7 @@ require('components/attribution_guide/AttributionGuideDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/LearnerLocalNav.ts');
+require('pages/exploration_player/LearnerLocalNavDirective.ts');
 require('pages/exploration_player/LearnerViewInfo.ts');
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
