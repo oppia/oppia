@@ -20,21 +20,26 @@
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/CamelCaseToHyphensFilter.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/RouterService.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require(
-  'pages/exploration_editor/statistics_tab/' +
-  'StateImprovementSuggestionService.ts'
-);
+  'pages/exploration-editor-page/services/' +
+  'exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'router.service.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/statistics-tab-services/' +
+  'state-improvement-suggestion.service.ts');
 require('services/AlertsService.ts');
 require('services/ComputeGraphService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/StateRulesStatsService.ts');
 
-oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 oppia.directive('statisticsTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
@@ -43,7 +48,8 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/statistics_tab/statistics_tab_directive.html'),
+      '/pages/exploration-editor-page/statistics-tab/' +
+      'statistics-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
@@ -165,8 +171,8 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
           ).then(function(stateRulesStats) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/statistics_tab/' +
-                'state_stats_modal_directive.html'),
+                '/pages/exploration-editor-page/statistics-tab/' +
+                'statistics-tab-templates/state-stats-modal.template.html'),
               backdrop: true,
               resolve: {
                 stateName: function() {

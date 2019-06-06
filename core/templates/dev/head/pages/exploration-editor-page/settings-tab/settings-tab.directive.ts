@@ -16,33 +16,75 @@
  * @fileoverview Controllers for the exploration settings tab.
  */
 
-require('components/forms/Select2DropdownDirective.ts');
-require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
-require('pages/exploration_editor/ExplorationObjectiveEditorDirective.ts');
-require('pages/exploration_editor/ParamChangesEditorDirective.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require(
+  'pages/exploration-editor-page/exploration-title-editor/' +
+  'exploration-title-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/exploration-objective-editor/' +
+  'exploration-objective-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/param-changes-editor/' +
+  'param-changes-editor.directive.ts');
 
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ChangeListService.ts');
-require('pages/exploration_editor/ExplorationAutomaticTextToSpeechService.ts');
-require('pages/exploration_editor/ExplorationCategoryService.ts');
-require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
-require('pages/exploration_editor/ExplorationEditor.ts');
-require('pages/exploration_editor/ExplorationInitStateNameService.ts');
-require('pages/exploration_editor/ExplorationLanguageCodeService.ts');
-require('pages/exploration_editor/ExplorationObjectiveService.ts');
-require('pages/exploration_editor/ExplorationParamChangesService.ts');
-require('pages/exploration_editor/ExplorationParamSpecsService.ts');
-require('pages/exploration_editor/ExplorationRightsService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/ExplorationTagsService.ts');
-require('pages/exploration_editor/ExplorationTitleService.ts');
-require('pages/exploration_editor/ExplorationWarningsService.ts');
-require('pages/exploration_editor/UserEmailPreferencesService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'change-list.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-automatic-text-to-speech.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-category.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-data.service.ts');
+require('pages/exploration-editor-page/exploration-editor-page.controller.ts');
+
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-language-code.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-objective.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-param-changes.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-param-specs.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-tags.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-title.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-warnings.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'user-email-preferences.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesService.ts');
+
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 oppia.directive('settingsTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
@@ -54,7 +96,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
       currentUserIsModerator: '='
     },
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/settings_tab/settings_tab_directive.html'),
+      '/pages/exploration-editor-page/settings-tab/' +
+      'settings-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$http', '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
@@ -283,9 +326,9 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           AlertsService.clearWarnings();
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/settings_tab/' +
-              'preview_summary_tile_modal_directive.html'),
-            backdrop: true,
+              '/pages/exploration-editor-page/settings-tab/' +
+              'settings-tab-templates/preview-summary-tile-modal.template.html'),
+                backdrop: true,
             controller: [
               '$scope', '$uibModalInstance', function(
                   $scope, $uibModalInstance) {
@@ -330,9 +373,10 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           AlertsService.clearWarnings();
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/settings_tab/' +
-              'transfer_exploration_ownership_modal_directive.html'),
-            backdrop: true,
+              '/pages/exploration-editor-page/settings-tab/' +
+              'settings-tab-templates/' +
+              'transfer-exploration-ownership-modal.template.html'),
+                backdrop: true,
             controller: [
               '$scope', '$uibModalInstance', function(
                   $scope, $uibModalInstance) {
@@ -354,9 +398,9 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
 
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/settings_tab/' +
-              'delete_exploration_modal_directive.html'),
-            backdrop: true,
+              '/pages/exploration-editor-page/settings-tab/' +
+              'settings-tab-templates/delete-exploration-modal.template.html'),
+                backdrop: true,
             controller: [
               '$scope', '$uibModalInstance', function(
                   $scope, $uibModalInstance) {
@@ -388,8 +432,9 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/settings_tab/' +
-                'moderator_unpublish_exploration_modal_directive.html'),
+                '/pages/exploration-editor-page/settings-tab/' +
+                'settings-tab-templates/' +
+                'moderator-unpublish-exploration-modal.template.html'),
               backdrop: true,
               resolve: {
                 draftEmailBody: function() {

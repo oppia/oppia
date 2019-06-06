@@ -16,19 +16,36 @@
  * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
-require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
 require(
-  'pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.ts');
-require('pages/state_editor/StateEditorDirective.ts');
+  'pages/exploration-editor-page/editor-tab/state-name-editor/' +
+  'state-name-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/' +
+  'state-param-changes-editor/state-param-changes-editor.directive.ts');
+require('components/state-editor/state-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
-require('pages/exploration_editor/ExplorationInitStateNameService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/ExplorationWarningsService.ts');
-require('pages/exploration_editor/GraphDataService.ts');
-require('pages/exploration_editor/RouterService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-warnings.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'graph-data.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'router.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
@@ -40,8 +57,8 @@ oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/editor_tab/' +
-      'exploration_editor_tab_directive.html'),
+      '/pages/exploration-editor-page/editor-tab/' +
+      'exploration-editor-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',
@@ -185,9 +202,9 @@ oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
               writtenTranslations.hasUnflaggedWrittenTranslations(contentId)) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/forms/mark_all_audio_and_translations_as_' +
-                'needing_update_modal_directive.html'),
-              backdrop: true,
+                '/components/forms/forms-templates/mark-all-audio-and-' +
+                'translations-as-needing-update-modal.directive.html'),
+                backdrop: true,
               controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
             }).result.then(function() {
               if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {

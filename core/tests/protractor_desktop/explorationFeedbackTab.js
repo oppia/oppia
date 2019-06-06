@@ -31,7 +31,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('ExplorationFeedback', function() {
+fdescribe('ExplorationFeedback', function() {
   var EXPLORATION_TITLE = 'Exploration with Feedback';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
