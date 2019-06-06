@@ -236,9 +236,9 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
                     directory.startswith('./extensions/')):
                 continue
             for file_name in files:
-                filepath = os.path.join(directory, file_name)
-                if not filepath.endswith('.py'):
+                if not file_name.endswith('.py'):
                     continue
+                filepath = os.path.join(directory, file_name)
                 # 'filepath' is in the form of './YYY/XXX.py', so we need to
                 # extract YYY.XXX from the filepath so that it can be imported
                 # as a module.
