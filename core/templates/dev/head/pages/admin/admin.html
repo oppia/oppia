@@ -36,19 +36,7 @@
 
     <admin-page></admin-page>
 
-    {% include 'pages/footer_js_libs.html' %}
-    <script src="/templates/dev/head/AppInit.js"></script>
-    <!-- This code is used for inserting webpack bundles
-       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-      <% if (webpackConfig.mode == 'production') { %>
-        <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } else { %>
-        <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } %>
-    <% } %>
-    {% include 'components/rich_text_components.html' %}
-
+    @require('../footer_js_libs.html')
     <script>
       {{ value_generators_js }}
     </script>
