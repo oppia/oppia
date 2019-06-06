@@ -1236,11 +1236,10 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
                 fs_domain.GcsFileSystem(
                     'exploration/%s' % self.EXPLORATION_ID))
 
-            self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
-            self.assertEqual(
-                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
-            self.assertEqual(
-                fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), False)
+            self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
+            self.assertFalse(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+            self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
             exp_services.save_original_and_compressed_versions_of_image(
                 self.USER, self.FILENAME, self.EXPLORATION_ID,
@@ -1248,25 +1247,37 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
 
             # The scaling factor changes if the dimensions of the image is
             # greater than MAX_RESIZE_DIMENSION_PX.
-            width, height = gae_image_services.get_image_dimensions(
-                original_image_content)
+            width = 32
+            height = 32
             new_scaling_factor = gae_image_services.MAX_RESIZE_DIMENSION_PX / (
                 float(max(width, height)))
             new_width = int(width * new_scaling_factor)
             new_height = int(height * new_scaling_factor)
 
-            self.assertEqual(fs.isfile('image/%s' % self.FILENAME), True)
-            self.assertEqual(
-                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
-            self.assertEqual(
-                fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
+            self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
+            self.assertTrue(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+            self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
 
+            original_image_content = fs.get(
+                'image/%s' % self.FILENAME)
             compressed_image_content = fs.get(
                 'image/%s' % self.COMPRESSED_IMAGE_FILENAME)
+            micro_image_content = fs.get(
+                'image/%s' % self.MICRO_IMAGE_FILENAME)
 
-            new_dimensions = gae_image_services.get_image_dimensions(
-                compressed_image_content)
-            self.assertEqual(new_dimensions, (new_width, new_height))
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                original_image_content),
+                (width, height))
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                compressed_image_content),
+                (new_width, new_height))
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                micro_image_content),
+                (new_width, new_height))
 
 
 # pylint: disable=protected-access
