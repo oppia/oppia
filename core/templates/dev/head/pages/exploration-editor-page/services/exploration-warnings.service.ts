@@ -31,7 +31,7 @@ require(
   'parameter-metadata.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/solution-validity.service.ts');
+  'services/solution-validity.service.ts');
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 

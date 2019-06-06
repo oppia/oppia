@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/' +
+  'services/' +
   'solution-validity.service.ts');
 
 describe('Solution Validity Service', function() {

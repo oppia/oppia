@@ -30,7 +30,7 @@ require(
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'training-panel/training-data.service.ts');
@@ -63,7 +63,7 @@ oppia.factory(
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/editor-tab/' +
-              'editor-tab-templates/' +
+              'templates/' +
               'training-data-editor.template.html'),
             backdrop: true,
             controller: [

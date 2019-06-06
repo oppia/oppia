@@ -26,7 +26,7 @@ require(
   'editor-tab/state-name-editor/state-name-editor.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
 describe('Sidebar state name controller', function() {

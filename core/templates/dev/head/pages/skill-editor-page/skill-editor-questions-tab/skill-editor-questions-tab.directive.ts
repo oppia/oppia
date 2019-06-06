@@ -31,7 +31,7 @@ require(
   'skill-editor-state.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 

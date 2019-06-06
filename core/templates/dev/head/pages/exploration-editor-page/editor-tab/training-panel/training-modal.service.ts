@@ -37,14 +37,14 @@ require(
   'graph-data.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'training-panel/training-data.service.ts');
 require('pages/exploration-player-page/services/answer-classification.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
@@ -67,7 +67,7 @@ oppia.factory('TrainingModalService', [
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-editor-page/editor-tab/' +
-            'editor-tab-templates/modal-templates/' +
+            'templates/modal-templates/' +
             'training-unresolved-answer-modal.template.html'),
           backdrop: true,
           controller: [

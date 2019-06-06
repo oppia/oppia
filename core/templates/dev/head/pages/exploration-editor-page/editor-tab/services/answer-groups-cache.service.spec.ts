@@ -17,7 +17,7 @@
  */
 
 require(
-  'pages/exploration-editor-page/editor-tab/editor-tab-services/answer-groups-cache.service.ts');
+  'pages/exploration-editor-page/editor-tab/services/answer-groups-cache.service.ts');
 
 describe('Answer Groups Cache Service', function() {
   describe('AnswerGroupsCache', function() {

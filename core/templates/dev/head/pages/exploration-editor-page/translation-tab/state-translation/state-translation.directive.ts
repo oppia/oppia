@@ -49,7 +49,7 @@ require(
   'translation-tab-active-content-id.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 

@@ -36,7 +36,7 @@ oppia.directive(
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
           '/pages/topics-and-skills-dashboard-page/' +
           'navbar/' +
-          'topics-and-skills-dashboard-page-navbar.directive.html'),
+          'topics-and-skills-dashboard-navbar.directive.html'),
         controller: [
           '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
           'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',

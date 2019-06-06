@@ -28,7 +28,7 @@ require(
   'router.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
@@ -79,7 +79,7 @@ oppia.directive('explorationGraph', ['UrlInterpolationService', function(
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/editor-tab/' +
-              'editor-tab-templates/modal-templates/' +
+              'templates/modal-templates/' +
               'exploration-graph-modal.template.html'),
             backdrop: true,
             resolve: {

@@ -22,7 +22,7 @@ require(
 require('pages/exploration-player-page/services/answer-classification.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 
 oppia.factory(
   'SolutionVerificationService', [

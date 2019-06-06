@@ -21,10 +21,10 @@ require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
-require('pages/exploration-editor-page/editor-tab/editor-tab-services/solution-verification.service.ts');
+require('pages/exploration-editor-page/editor-tab/services/solution-verification.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');

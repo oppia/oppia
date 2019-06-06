@@ -27,10 +27,10 @@ require(
   'graph-data.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 
 oppia.factory('TrainingDataService', [
   '$http', '$rootScope', 'ExplorationStatesService', 'GraphDataService',

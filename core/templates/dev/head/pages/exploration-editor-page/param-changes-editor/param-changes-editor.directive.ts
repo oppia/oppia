@@ -34,7 +34,7 @@ require(
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 

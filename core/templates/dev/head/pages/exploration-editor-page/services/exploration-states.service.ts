@@ -32,14 +32,14 @@ require(
   'exploration-init-state-name.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/' +
+  'services/' +
   'solution-validity.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'answer-classification.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts')
@@ -424,7 +424,7 @@ oppia.factory(
           return $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
               '/pages/exploration-editor-page/editor-tab/' +
-              'editor-tab-templates/modal-templates/' +
+              'templates/modal-templates/' +
               'confirm-delete-state-modal.template.html'),
             backdrop: true,
             resolve: {

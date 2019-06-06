@@ -23,18 +23,18 @@ require(
   'exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/' +
+  'services/' +
   'interaction-details-cache.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/' +
+  'services/' +
   'solution-verification.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-customization-args.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-interaction-id.service.ts');

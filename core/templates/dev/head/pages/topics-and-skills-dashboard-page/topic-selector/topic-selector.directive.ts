@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive('selectTopics', [
+oppia.directive('topicSelector', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -28,7 +28,7 @@ oppia.directive('selectTopics', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics-and-skills-dashboard-page/topic-selector/' +
-        'select-topics.directive.html'),
+        'topic-selector.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope',
         function(

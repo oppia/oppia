@@ -32,7 +32,7 @@ require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'pages/topic-editor-page/services/' +
   'topic-editor-state.service.ts');

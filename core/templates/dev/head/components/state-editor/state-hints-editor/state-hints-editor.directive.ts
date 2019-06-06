@@ -24,7 +24,7 @@ require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/state-hints.service.ts');
 require(
@@ -139,7 +139,7 @@ oppia.directive('stateHintsEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/editor-tab/' +
-                'editor-tab-templates/modal-templates/' +
+                'templates/modal-templates/' +
                 'add-hint-modal.template.html'),
               backdrop: 'static',
               controller: [
@@ -208,7 +208,7 @@ oppia.directive('stateHintsEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/editor-tab/' +
-                'editor-tab-templates/modal-templates/' +
+                'templates/modal-templates/' +
                 'delete-last-hint-modal.template.html'),
               backdrop: true,
               controller: [
@@ -248,7 +248,7 @@ oppia.directive('stateHintsEditor', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/exploration-editor-page/editor-tab/' +
-                'editor-tab-templates/modal-templates/' +
+                'templates/modal-templates/' +
                 'delete-hint-modal.template.html'),
               backdrop: true,
               controller: [

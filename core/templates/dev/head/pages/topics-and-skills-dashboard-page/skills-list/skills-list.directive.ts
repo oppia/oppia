@@ -18,7 +18,7 @@
 
 require(
   'pages/topics-and-skills-dashboard-page/topic-selector/' +
-  'select-topics.directive.ts');
+  'topic-selector.directive.ts');
 
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');

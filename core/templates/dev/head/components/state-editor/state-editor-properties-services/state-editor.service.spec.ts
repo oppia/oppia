@@ -18,7 +18,7 @@
 
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 
 describe('Editor state service', function() {
   beforeEach(angular.mock.module('oppia'));

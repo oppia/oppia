@@ -19,7 +19,7 @@
 
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/' +
+  'services/' +
   'solution-validity.service.ts');
 
 oppia.factory('StateEditorService', [

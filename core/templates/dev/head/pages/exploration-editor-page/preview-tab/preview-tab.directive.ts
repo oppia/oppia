@@ -52,7 +52,7 @@ require(
   'player-correctness-feedback-enabled.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
-  'editor-tab-services/responses.service.ts');
+  'services/responses.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 
