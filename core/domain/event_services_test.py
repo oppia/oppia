@@ -230,17 +230,19 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
         Returns:
             a list of Python files.
         """
-        current_dir = os.getcwd()
         files_in_directory = []
-        for directory, _, files in os.walk(current_dir):
+        for directory, _, files in os.walk('.'):
+            if not (directory.startswith('./core/') or (
+                    directory.startswith('./extensions/'))):
+                continue
             for file_name in files:
-                filepath = os.path.relpath(
-                    os.path.join(directory, file_name), current_dir)
-                if not (filepath.endswith('.py') and (
-                        filepath.startswith('core/') or (
-                            filepath.startswith('extensions/')))):
+                filepath = os.path.join(directory, file_name)
+                if not filepath.endswith('.py'):
                     continue
-                module = filepath[:-3].replace('/', '.')
+                # 'filepath' is in the form of './YYY/XXX.py', so we need to
+                # extract YYY.XXX from the filepath so that it can be imported
+                # as a module.
+                module = filepath[2:-3].replace('/', '.')
                 files_in_directory.append(module)
         return files_in_directory
 
