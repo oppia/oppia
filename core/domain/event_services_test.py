@@ -262,7 +262,7 @@ class EventHandlerNameTests(test_utils.GenericTestBase):
                 all_base_classes = [base_class.__name__ for base_class in
                                     (inspect.getmro(clazz))]
                 # Check that it is a subclass of 'BaseEventHandler'.
-                if 'BaseEventHandler' in all_base_classes and (
+                if ('BaseEventHandler' in all_base_classes and
                         name != 'BaseEventHandler'):
                     # Event handler class should specify an event type.
                     self.assertIsNotNone(clazz.EVENT_TYPE)
