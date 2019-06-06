@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service to handle the updating of a skill.
-*/
+ * @fileoverview Service to handle the updating of a skill.
+ */
 
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');

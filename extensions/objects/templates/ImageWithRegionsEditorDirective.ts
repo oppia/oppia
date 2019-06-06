@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Directive for image with regions editor.
+ */
+
 // Every editor directive should implement an alwaysEditable option. There
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
@@ -178,7 +182,7 @@ oppia.directive('imageWithRegionsEditor', [
                     <HTMLCanvasElement><any> this).width;
                   ctrl.originalImageHeight = (
                     <HTMLCanvasElement><any> this).height;
-                  ctrl.$apply();
+                  $scope.$apply();
                 }
               );
             }

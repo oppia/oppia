@@ -12,4 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview File to import necessary scripts for contact page.
+ */
+
 require('components/background/BackgroundBannerDirective.ts');
+require('pages/OppiaFooterDirective.ts');

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the CodeRepl interaction.
+ * @fileoverview Directive for the CodeRepl interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -45,7 +45,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           var ctrl = this;
           ctrl.interactionIsActive = (ctrl.getLastAnswer() === null);
 
-          ctrl.$on(EVENT_NEW_CARD_AVAILABLE, function() {
+          $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             ctrl.interactionIsActive = false;
           });
           ctrl.language = HtmlEscaperService.escapedJsonToObj(

@@ -1,0 +1,315 @@
+<div class="oppia-library-container">
+  <div style="position: relative; z-index: 3;">
+    <div>
+      <div class="oppia-exp-summary-tiles-container" ng-if="$ctrl.pageMode === $ctrl.LIBRARY_PAGE_MODES.SEARCH">
+        <search-results></search-results>
+      </div>
+
+      <div class="oppia-exp-summary-tiles-container"
+           ng-if="$ctrl.pageMode === $ctrl.LIBRARY_PAGE_MODES.GROUP"
+           style="margin-bottom: 20px;">
+        <div ng-if="$ctrl.activityList.length === 0"
+             style="font-size: 1.2em; padding-bottom: 40px; padding-top: 40px;">
+          <p style="text-align: center;">
+            <span translate="I18N_LIBRARY_NO_EXPLORATIONS"></span>
+          </p>
+        </div>
+
+        <div ng-if="$ctrl.activityList.length > 0"
+             style="margin-right: auto; margin-left: auto; max-width: 856px;">
+          <h2 class="oppia-group-page-header" style="font-size: 2em;">
+            <span translate="<[$ctrl.groupHeaderI18nId]>"></span>
+          </h2>
+
+          <div ng-repeat="tile in $ctrl.activityList" style="display: inline-block;">
+            <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
+                                      exploration-id="tile.id"
+                                      exploration-title="tile.title"
+                                      last-updated-msec="tile.last_updated_msec"
+                                      objective="tile.objective"
+                                      category="tile.category"
+                                      ratings="tile.ratings"
+                                      num-views="tile.num_views"
+                                      thumbnail-icon-url="tile.thumbnail_icon_url"
+                                      thumbnail-bg-color="tile.thumbnail_bg_color"
+                                      class="protractor-test-exp-summary-tile">
+            </exploration-summary-tile>
+          </div>
+        </div>
+      </div>
+
+      <div class="oppia-exp-summary-tiles-container" ng-if="$ctrl.pageMode === $ctrl.LIBRARY_PAGE_MODES.INDEX">
+        <img ng-src="<[$ctrl.bannerImageFileUrl]>" align="center"
+             width="100%" alt="">
+        <div style="text-align: center; width: 100%;">
+          <h1 class="oppia-library-h1 protractor-test-library-main-header" translate="I18N_LIBRARY_MAIN_HEADER"></h1>
+          <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
+        </div>
+
+        <div class="visible-xs" style="margin: 0 auto; width: fit-content; padding-right: 15px">
+          <search-bar></search-bar>
+        </div>
+
+        <div ng-if="$ctrl.libraryGroups.length === 0"
+             style="margin: 150px auto; text-align: center; width: 100%;"
+             translate="I18N_LIBRARY_NO_EXPLORATION_GROUPS">
+        </div>
+
+        <div class="oppia-library-group" ng-repeat="group in $ctrl.libraryGroups track by $index" ng-mouseenter="$ctrl.setActiveGroup($index)" ng-mouseleave="$ctrl.clearActiveGroup()">
+          <div class="oppia-library-group-header-container">
+            <h2 ng-class="{'active': $ctrl.activeGroupIndex === $index}" class="oppia-library-group-header">
+              <a ng-if="group.has_full_results_page" class="protractor-test-library-<[group.protractor_id]>" ng-click="$ctrl.showFullResultsPage(group.categories, group.full_results_url)" tabindex="0">
+                <span translate="<[group.header_i18n_id]>"></span>
+                <span ng-show="$ctrl.activeGroupIndex === $index"><i class="material-icons md-32">&#xE315;</i></span>
+              </a>
+              <span ng-if="!group.has_full_results_page" translate="<[group.header_i18n_id]>">
+              </span>
+            </h2>
+          </div>
+
+          <!-- TODO(sll): Add card at end of the row that, when clicked, does showFullResultsPage(group.categories)" -->
+          <div ng-if="!$ctrl.libraryWindowIsNarrow">
+            <md-button class="md-no-ink oppia-library-carousel-scroller"
+                       ng-click="$ctrl.scroll($index, true)"
+                       ng-hide="$ctrl.leftmostCardIndices[$index] == 0">
+              <i class="material-icons">&#xE314;</i>
+            </md-button>
+            <div class="oppia-library-carousel-scroller" ng-if="$ctrl.leftmostCardIndices[$index] == 0" aria-hidden="true">
+            </div>
+
+            <div class="oppia-library-carousel"
+                 ng-swipe-right="$ctrl.scroll($index, true)"
+                 ng-swipe-left="$ctrl.scroll($index, false)">
+              <div class="oppia-library-carousel-tiles">
+                <div ng-repeat="tile in group.activity_summary_dicts" style="display: inline-block;">
+                  <collection-summary-tile ng-if="tile.activity_type == 'collection'"
+                                           collection-id="tile.id"
+                                           collection-title="tile.title"
+                                           last-updated-msec="tile.last_updated_msec"
+                                           objective="tile.objective"
+                                           node-count="tile.node_count"
+                                           category="tile.category"
+                                           thumbnail-icon-url="tile.thumbnail_icon_url"
+                                           thumbnail-bg-color="tile.thumbnail_bg_color"
+                                           activity-is-owned-by-current-user="$ctrl.activitiesOwned.collections[tile.id]"
+                                           show-learner-dashboard-icons-if-possible="true">
+                  </collection-summary-tile>
+                  <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
+                                            exploration-id="tile.id"
+                                            exploration-title="tile.title"
+                                            last-updated-msec="tile.last_updated_msec"
+                                            objective="tile.objective"
+                                            category="tile.category"
+                                            ratings="tile.ratings"
+                                            num-views="tile.num_views"
+                                            thumbnail-icon-url="tile.thumbnail_icon_url"
+                                            thumbnail-bg-color="tile.thumbnail_bg_color"
+                                            class="protractor-test-exp-summary-tile"
+                                            activity-is-owned-by-current-user="$ctrl.activitiesOwned.explorations[tile.id]"
+                                            show-learner-dashboard-icons-if-possible="true">
+                  </exploration-summary-tile>
+                </div>
+              </div>
+            </div>
+
+            <md-button class="md-no-ink oppia-library-carousel-scroller"
+                       ng-click="$ctrl.scroll($index, false)"
+                       ng-hide="(group.activity_summary_dicts.length - $ctrl.tileDisplayCount) <= $ctrl.leftmostCardIndices[$index]"
+                       aria-hidden="true">
+              <i class="material-icons">&#xE315;</i>
+            </md-button>
+            <div class="oppia-library-carousel-scroller"
+                 ng-if="(group.activity_summary_dicts.length - $ctrl.tileDisplayCount) <= $ctrl.leftmostCardIndices[$index]">
+            </div>
+          </div>
+
+          <div ng-if="$ctrl.libraryWindowIsNarrow && $ctrl.leftmostCardIndices">
+            <md-button class="md-no-ink oppia-library-carousel-scroller"
+                       ng-click="$ctrl.decrementLeftmostCardIndex($index)"
+                       ng-hide="$ctrl.leftmostCardIndices[$index] == 0"
+                       aria-hidden="true">
+              <i class="material-icons">&#xE314;</i>
+            </md-button>
+            <div class="oppia-library-carousel-scroller" ng-if="$ctrl.leftmostCardIndices[$index] == 0"></div>
+
+            <div class="oppia-library-carousel"
+                 ng-swipe-right="$ctrl.decrementLeftmostCardIndex($index)"
+                 ng-swipe-left="$ctrl.incrementLeftmostCardIndex($index)">
+              <div class="oppia-library-carousel-tiles">
+                <collection-summary-tile ng-if="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].activity_type == 'collection'"
+                                         collection-id="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].id"
+                                         collection-title="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].title"
+                                         last-updated-msec="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].last_updated_msec"
+                                         objective="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].objective"
+                                         node-count="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].node_count"
+                                         category="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].category"
+                                         thumbnail-icon-url="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_icon_url"
+                                         thumbnail-bg-color="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_bg_color"
+                                         show-learner-dashboard-icons-if-possible="true"
+                                         container-is-narrow="true">
+                </collection-summary-tile>
+                <exploration-summary-tile ng-if="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].activity_type == 'exploration'"
+                                          exploration-id="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].id"
+                                          exploration-title="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].title"
+                                          last-updated-msec="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].last_updated_msec"
+                                          objective="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].objective"
+                                          category="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].category"
+                                          ratings="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].ratings"
+                                          num-views="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].num_views"
+                                          thumbnail-icon-url="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_icon_url"
+                                          thumbnail-bg-color="group.activity_summary_dicts[$ctrl.leftmostCardIndices[$index]].thumbnail_bg_color"
+                                          class="protractor-test-exp-summary-tile"
+                                          show-learner-dashboard-icons-if-possible="true"
+                                          container-is-narrow="true">
+                </exploration-summary-tile>
+              </div>
+            </div>
+
+            <md-button class="md-no-ink oppia-library-carousel-scroller"
+                       ng-click="$ctrl.incrementLeftmostCardIndex($index)"
+                       ng-hide="(group.activity_summary_dicts.length - $ctrl.tileDisplayCount) <= $ctrl.leftmostCardIndices[$index]">
+              <i class="material-icons">&#xE315;</i>
+            </md-button>
+            <div class="oppia-library-carousel-scroller"
+                 ng-if="(group.activity_summary_dicts.length - $ctrl.tileDisplayCount) <= $ctrl.leftmostCardIndices[$index]">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .oppia-group-page-header {
+    color: #2c4841;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+  }
+  .oppia-library-h1 {
+    color: #033e39;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+  }
+  .oppia-library-h2 {
+    color: #04857c;
+    font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+    padding-bottom: 1em;
+  }
+  .oppia-library-group {
+    display: block;
+    height: 350px;
+    margin-bottom: 72px;
+    margin-top: 36px;
+    max-width: 928px;
+    width: 100vw;
+  }
+  .oppia-library-group-header-container {
+    max-width: 928px;
+    margin: 0 -15px 0 0;
+    min-width: 315px;
+    width: calc(100% - 120px);
+    width: -moz-calc(100% - 120px);
+    width: -o-calc(100% - 120px);
+    width: -webkit-calc(100% - 120px);
+  }
+  @media(max-width: 720px) {
+    .oppia-library-group-header-container {
+      width: 80%;
+    }
+  }
+  @media(max-width: 480px) {
+    .oppia-library-group-header-container {
+      width: 100%;
+    }
+  }
+  .oppia-library-group-header {
+    display: inline-block;
+    font-size: 2em;
+    margin-bottom: 24px;
+    margin-left: 44px;
+    min-width: 126px;
+  }
+  .oppia-library-group-header.active {
+    color: #04857c;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+  }
+  @media(max-width: 720px) {
+    .oppia-library-group-header {
+      width: -webkit-calc(80% - 120px);
+      width: -moz-calc(80% - 120px);
+      width: -o-calc(80% - 120px);
+      width: calc(80% - 120px);
+    }
+  }
+  @media(max-width: 390px) {
+    .oppia-library-group-header {
+      margin-left: 11.25%;
+    }
+  }
+  .oppia-library-group-header a, .oppia-library-group-header span {
+    color: inherit;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+  }
+  .oppia-library-group-header a:hover,
+  .oppia-library-group-header a:focus {
+    color: #04857c;
+    text-decoration: none;
+  }
+  @media (max-width: 720px) {
+    .oppia-library-group-header {
+      font-size: 6vw;
+    }
+  }
+  .oppia-library-carousel-scroller {
+    color: #2c4841;
+    cursor: default;
+    float: left;
+    height: 60px;
+    margin-top: 100px;
+    max-width: 40px;
+    padding: 0;
+    position: relative;
+    width: 10vw;
+  }
+  .md-button.oppia-library-carousel-scroller {
+    cursor: pointer;
+  }
+  .oppia-library-carousel-scroller i {
+    font-size: 36px;
+    margin: 0;
+    padding: 0;
+    top: 50%;
+  }
+  .oppia-library-carousel-tiles {
+    /*The height is adjusted to hide the scrollbars*/
+    height: 290px;
+    left: 0;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+    position: relative;
+    top: 0;
+    white-space: nowrap;
+  }
+  .oppia-library-carousel {
+    height: 282px;
+    float: left;
+    max-width: 848px;
+    overflow: hidden;
+    position: relative;
+  }
+  @media (min-width: 630px) {
+    .oppia-library-h1 {
+      font-size: 2.5em;
+    }
+    .oppia-library-h2 {
+      font-size: 1.75em;
+    }
+  }
+  @media (max-width: 629px) {
+    .oppia-library-h1 {
+      font-size: 1.2em;
+    }
+    .oppia-library-h2 {
+      font-size: .85em;
+    }
+  }
+</style>
