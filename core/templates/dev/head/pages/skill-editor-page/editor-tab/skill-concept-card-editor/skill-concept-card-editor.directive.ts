@@ -171,8 +171,8 @@ oppia.directive(
             $scope.openAddWorkedExampleModal = function() {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill-editor-page/skill-editor-templates' +
-                  '/add-worked-example-modal.directive.html'),
+                  '/pages/skill-editor-page/skill-editor-modal-templates/' +
+                  'add-worked-example-modal.directive.html'),
                 backdrop: 'static',
                 controller: [
                   '$scope', '$uibModalInstance',

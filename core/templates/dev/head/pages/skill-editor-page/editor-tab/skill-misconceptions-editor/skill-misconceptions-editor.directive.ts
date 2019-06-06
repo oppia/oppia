@@ -102,8 +102,8 @@ oppia.directive(
             $scope.openAddMisconceptionModal = function() {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill-editor-page/skill-editor-templates' +
-                  '/add-misconception-modal.directive.html'),
+                  '/pages/skill-editor-page/skill-editor-modal-templates/' +
+                  'add-misconception-modal.directive.html'),
                 backdrop: 'static',
                 controller: [
                   '$scope', '$uibModalInstance',
