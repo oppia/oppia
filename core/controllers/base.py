@@ -37,6 +37,7 @@ import jinja_utils
 import utils
 
 from google.appengine.api import users
+import jinja2
 import webapp2
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -49,6 +50,14 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
+BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
+    'before_end_head_tag_hook', {
+        'type': 'unicode',
+        'ui_config': {
+            'rows': 7,
+        },
+    },
+    'Code to insert just before the closing </head> tag in all pages.', '')
 
 
 def _clear_login_cookies(response_headers):
@@ -299,6 +308,8 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
+            'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
+                BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': constants.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
@@ -575,18 +586,3 @@ class CsrfTokenManager(object):
             return False
         except Exception:
             return False
-
-
-class GoogleAnalyticsHandler(BaseHandler):
-    """Returns Google Analytics variables."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    def get(self):
-        """Respond to a get request for the variables."""
-        google_analytics_data = {
-            'analytics_id': feconf.ANALYTICS_ID,
-            'site_name_for_analytics': feconf.SITE_NAME_FOR_ANALYTICS
-        }
-
-        self.render_json(google_analytics_data)
