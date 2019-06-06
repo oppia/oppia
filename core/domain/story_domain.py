@@ -656,9 +656,9 @@ class Story(object):
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
 
-    def get_acquired_skill_ids_for_exp_ids(self, exp_ids):
+    def get_acquired_skill_ids_for_exp_ids(self, node_ids):
         """Returns the acquired skill ids of the nodes having the given
-        exploration ids.
+        node ids.
 
         Args:
             exp_ids: list(str). The list of IDs of the explorations linked to
@@ -668,12 +668,11 @@ class Story(object):
             list(str)|None. The list of acquired skill ids for the
                 explorations or None, if no node is linked to them.
         """
-        acquired_skill_ids = []
+        acquired_skill_ids = set()
         for node in self.story_contents.nodes:
-            for exp_id in exp_ids:
-                if node.exploration_id == exp_id:
-                    acquired_skill_ids += node.acquired_skill_ids
-        return acquired_skill_ids
+            if node.id in node_ids:
+                acquired_skill_ids.add(node.acquired_skill_ids)
+        return list(acquired_skill_ids)
 
     def get_prerequisite_skill_ids_for_exp_id(self, exp_id):
         """Returns the prerequisite skill ids of the node having the given

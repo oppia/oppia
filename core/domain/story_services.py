@@ -573,13 +573,12 @@ def get_latest_completed_node_ids(user_id, story_id):
     """
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)
-    if progress_model:
-        num_of_nodes = min(len(progress_model.completed_node_ids), 3)
 
-    return (
-        progress_model.completed_node_ids[-num_of_nodes:]
-        if progress_model else []
-    )
+    if not progress_model:
+        return []
+
+    num_of_nodes = min(len(progress_model.completed_node_ids), 3)
+    return progress_model.completed_node_ids[-num_of_nodes:]
 
 
 def get_node_ids_completed_in_stories(user_id, story_ids):

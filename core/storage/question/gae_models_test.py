@@ -211,7 +211,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             )
         questionskilllink_model3 = (
             question_models.QuestionSkillLinkModel.create(
-                'question_id2', 'skill_id3', 0.8)
+                'question_id3', 'skill_id2', 0.8)
             )
 
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
@@ -221,9 +221,20 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
             get_question_skill_links_with_constant_number_per_skill(
-                2, ['skill_id1', 'skill_id3']
+                2, ['skill_id1', 'skill_id2']
             )
         )
         self.assertEqual(len(question_skill_links), 2)
         self.assertEqual(question_skill_links[0].skill_id, 'skill_id1')
-        self.assertEqual(question_skill_links[1].skill_id, 'skill_id3')
+        self.assertEqual(question_skill_links[1].skill_id, 'skill_id2')
+
+        question_skill_links_2 = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_with_constant_number_per_skill(
+                4, ['skill_id1', 'skill_id2']
+            )
+        )
+        self.assertEqual(len(question_skill_links_2), 3)
+        self.assertEqual(question_skill_links_2[0].skill_id, 'skill_id1')
+        self.assertEqual(question_skill_links_2[1].skill_id, 'skill_id1')
+        self.assertEqual(question_skill_links_2[2].skill_id, 'skill_id2')

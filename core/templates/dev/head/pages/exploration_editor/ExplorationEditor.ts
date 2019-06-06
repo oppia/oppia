@@ -185,7 +185,6 @@ oppia.constant(
   'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
 
 
-
 oppia.controller('ExplorationEditor', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',
   '$uibModal', '$window', 'AutosaveInfoModalsService', 'ChangeListService',

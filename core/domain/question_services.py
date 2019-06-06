@@ -598,9 +598,10 @@ def get_question_summaries_by_creator_id(creator_id):
     question_summary_models = (
         question_models.QuestionSummaryModel.get_by_creator_id(creator_id))
 
-    for question_summary_model in question_summary_models:
-        question_summaries = [
-            get_question_summary_from_model(question_summary_model)]
+    question_summaries = [
+        get_question_summary_from_model(question_summary_model)
+        for question_summary_model in question_summary_models
+    ]
 
     return question_summaries
 

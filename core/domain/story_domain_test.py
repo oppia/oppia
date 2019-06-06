@@ -96,11 +96,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_get_acquired_skill_ids_for_exp_ids(self):
         self.story.story_contents.nodes[0].acquired_skill_ids = ['skill_1']
         self.story.story_contents.nodes[1].acquired_skill_ids = ['skill_2']
-        self.story.story_contents.nodes[0].exploration_id = 'exp_id'
-        self.story.story_contents.nodes[1].exploration_id = 'exp_id_2'
         self.assertEqual(
             self.story.get_acquired_skill_ids_for_exp_ids(
-                ['exp_id', 'exp_id_2']),
+                [self.NODE_ID_1, self.NODE_ID_2]),
             ['skill_1', 'skill_2']
         )
 

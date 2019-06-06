@@ -24,27 +24,60 @@ import feconf
 
 class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
 
+    OWNER_EMAIL = 'owner@example.com'
+    VIEWER_EMAIL = 'viewer@example.com'
+    VIEWER_USERNAME = 'viewer'
+
     def setUp(self):
         """Completes the sign-up process for the various users."""
         super(BaseReviewTestsControllerTests, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
 
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
+        self.node_id = 'node_1'
+        self.node_id_2 = 'node_2'
+        self.exp_id = 'exp_id'
+
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+        self.publish_exploration(self.owner_id, self.exp_id)
+
+        self.node_1 = {
+            'id': self.node_id,
+            'title': 'Title 1',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_id_1', 'skill_id_2'],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.exp_id
+        }
 
         self.story = story_domain.Story.create_default_story(
             self.story_id_1, 'Public Story Title')
-        self.story.acquired_skill_ids = ['skill_id_1', 'skill_id_2']
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(self.node_1)
+        ]
+        self.story.story_contents.initial_node_id = self.node_id
+        self.story.story_contents.next_node_id = self.node_id_2
         story_services.save_new_story(self.admin_id, self.story)
 
-        self.story = story_domain.Story.create_default_story(
+        self.story_2 = story_domain.Story.create_default_story(
             self.story_id_2, 'Private Story Title')
-        story_services.save_new_story(self.admin_id, self.story)
+        story_services.save_new_story(self.admin_id, self.story_2)
 
         story_services.publish_story(self.story_id_1, self.admin_id)
+
+        self.login(self.VIEWER_EMAIL)
 
 
 class ReviewTestsPageTests(BaseReviewTestsControllerTests):
@@ -92,6 +125,8 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
 
     def test_any_user_can_access_review_tests_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            story_services.record_completed_node_in_story_context(
+                self.viewer_id, self.story_id_1, self.node_id)
             json_response = self.get_json(
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
