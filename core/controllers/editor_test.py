@@ -146,8 +146,6 @@ class EditorTests(BaseEditorControllerTests):
         response = self.get_html_response('/create/0')
         self.assertIn('Help others learn new things.', response.body)
         self.assert_can_edit(response.body)
-        self.assertIn('Stats', response.body)
-        self.assertIn('History', response.body)
 
         self.logout()
 
