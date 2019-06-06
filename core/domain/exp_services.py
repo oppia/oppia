@@ -606,6 +606,14 @@ def get_deleted_images_ids(image_ids_after_change, image_ids_before_change):
     Returns:
         list. List of ids, of all deleted images of an exploration.
     """
+    if not isinstance(image_ids_after_change, list):
+        raise Exception(
+            'Expected image_ids_after_change to be a list, '
+            'received %s' % image_ids_after_change)
+    if not isinstance(image_ids_before_change, list):
+        raise Exception(
+            'Expected image_ids_before_change to be a list, '
+            'received %s' % image_ids_before_change)
     deleted_image_ids = (
         list(set(image_ids_before_change) - set(image_ids_after_change)))
     return deleted_image_ids
@@ -816,7 +824,7 @@ def apply_change_list(exploration_id, change_list):
                                 'received %s' % change.image_id)
                         if not isinstance(change.image_info, dict):
                             raise Exception(
-                                'Expected image info to be dict, '
+                                'Expected image_info to be dict, '
                                 'received %s' % change.image_info)
                         if change.image_id not in image_ids:
                             raise Exception(

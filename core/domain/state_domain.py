@@ -300,7 +300,7 @@ class ImageAssets(object):
         image_mapping = {}
         for image_id in image_assets_dict['image_mapping'].iterkeys():
             image_info = image_assets_dict['image_mapping'][image_id]
-            image_assets_dict['image_mapping'][image_id] = Image.from_dict(image_info)
+            image_mapping[image_id] = Image.from_dict(image_info)
 
         return cls(image_mapping)
 
