@@ -16,9 +16,9 @@
 
 """Tests for the feedback controllers."""
 
-from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import feedback_jobs_continuous
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import state_domain
@@ -26,6 +26,7 @@ from core.domain import suggestion_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -39,6 +40,28 @@ EXPECTED_THREAD_KEYS = [
 EXPECTED_MESSAGE_KEYS = [
     'author_username', 'created_on', 'entity_type', 'message_id', 'entity_id',
     'text', 'updated_status', 'updated_subject', 'received_via_email']
+
+
+class MockFeedbackAnalyticsAggregator(
+        feedback_jobs_continuous.FeedbackAnalyticsAggregator):
+    """A modified FeedbackAnalyticsAggregator that does not start a new batch
+    job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockFeedbackAnalyticsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockFeedbackAnalyticsMRJobManager(
+        feedback_jobs_continuous.FeedbackAnalyticsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockFeedbackAnalyticsAggregator
 
 
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
@@ -557,7 +580,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         self.assertDictContainsSubset(
             expected_suggestion_dict, response['suggestion'])
 
-    def test_get_feedback_threads_with_no_text_and_no_updated_status_raises_400(
+    def test_post_feedback_threads_with_no_text_and_no_updated_status_raise_400(
             self):
         self.login(self.OWNER_EMAIL_1)
         response = self.get_html_response('/create/%s' % self.EXP_ID)
@@ -587,16 +610,19 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             None, change, 'score category', thread_id)
 
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
-        self.post_json(
+        response = self.post_json(
             thread_url, {
                 'text': None,
                 'updated_subject': None,
                 'updated_status': None
             }, csrf_token=csrf_token, expected_status_int=400)
 
+        self.assertEqual(
+            response['error'], 'Text for the message must be specified.')
+
         self.logout()
 
-    def test_get_feedback_threads_with_updated_suggestion_status_raises_400(
+    def test_post_feedback_threads_with_updated_suggestion_status_raises_400(
             self):
         self.login(self.OWNER_EMAIL_1)
         response = self.get_html_response('/create/%s' % self.EXP_ID)
@@ -626,12 +652,16 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             None, change, 'score category', thread_id)
 
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
-        self.post_json(
+        response = self.post_json(
             thread_url, {
                 'text': 'Message 1',
                 'updated_subject': None,
                 'updated_status': 'open'
             }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Suggestion thread status cannot be changed manually.')
 
         self.logout()
 
@@ -649,50 +679,35 @@ class ThreadListHandlerForTopicsHandlerTests(test_utils.GenericTestBase):
             self.topic_id, self.owner_id, 'Name', 'Description',
             [], [], [], [], 1)
 
-    def test_get_feedback_threads_with_new_structure_editors_disabled_raise_404(
-            self):
+    def test_get_feedback_threads_linked_to_topics(self):
         self.login(self.OWNER_EMAIL)
+
+        response_dict = self.get_json(
+            '%s/%s' % (
+                feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
+                self.topic_id))
+        suggestion_thread_dicts = response_dict[
+            'suggestion_thread_dicts']
+
+        self.assertEqual(suggestion_thread_dicts, [])
 
         feedback_services.create_thread(
             feconf.ENTITY_TYPE_TOPIC, self.topic_id, self.owner_id,
             'a subject', 'some text', has_suggestion=True)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', False):
-            self.get_json(
-                '%s/%s' % (
-                    feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
-                    self.topic_id), expected_status_int=404)
-        self.logout()
+        response_dict = self.get_json(
+            '%s/%s' % (
+                feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
+                self.topic_id))
+        suggestion_thread_dicts = response_dict[
+            'suggestion_thread_dicts'][0]
+        topic_thread = feedback_services.get_all_threads(
+            feconf.ENTITY_TYPE_TOPIC, self.topic_id, True)[0]
 
-    def test_get_feedback_threads_linked_to_topics(self):
-        self.login(self.OWNER_EMAIL)
+        self.assertEqual(suggestion_thread_dicts['subject'], 'a subject')
+        self.assertEqual(
+            suggestion_thread_dicts['thread_id'], topic_thread.id)
 
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            response_dict = self.get_json(
-                '%s/%s' % (
-                    feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
-                    self.topic_id))
-            suggestion_thread_dicts = response_dict[
-                'suggestion_thread_dicts']
-
-            self.assertEqual(suggestion_thread_dicts, [])
-
-            feedback_services.create_thread(
-                feconf.ENTITY_TYPE_TOPIC, self.topic_id, self.owner_id,
-                'a subject', 'some text', has_suggestion=True)
-
-            response_dict = self.get_json(
-                '%s/%s' % (
-                    feconf.FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS,
-                    self.topic_id))
-            suggestion_thread_dicts = response_dict[
-                'suggestion_thread_dicts'][0]
-            topic_thread = feedback_services.get_all_threads(
-                feconf.ENTITY_TYPE_TOPIC, self.topic_id, True)[0]
-
-            self.assertEqual(suggestion_thread_dicts['subject'], 'a subject')
-            self.assertEqual(
-                suggestion_thread_dicts['thread_id'], topic_thread.id)
         self.logout()
 
 
@@ -721,15 +736,26 @@ class RecentFeedbackMessagesHandlerTests(test_utils.GenericTestBase):
             feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
             'a subject', 'some text')
 
+        feedback_services.create_thread(
+            feconf.ENTITY_TYPE_EXPLORATION, self.exp_id, self.owner_id,
+            'new subject', 'new text')
+
         response = self.get_json(
             feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL)
         results = response['results']
 
+        self.assertEqual(len(results), 2)
+
         self.assertFalse(response['more'])
-        self.assertEqual(results[0]['text'], 'some text')
-        self.assertEqual(results[0]['updated_subject'], 'a subject')
+        self.assertEqual(results[0]['text'], 'new text')
+        self.assertEqual(results[0]['updated_subject'], 'new subject')
         self.assertEqual(results[0]['entity_type'], 'exploration')
         self.assertEqual(results[0]['entity_id'], self.exp_id)
+
+        self.assertEqual(results[1]['text'], 'some text')
+        self.assertEqual(results[1]['updated_subject'], 'a subject')
+        self.assertEqual(results[1]['entity_type'], 'exploration')
+        self.assertEqual(results[1]['entity_id'], self.exp_id)
 
         self.logout()
 
@@ -760,12 +786,19 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(response['num_total_threads'], 0)
         self.assertEqual(response['num_open_threads'], 0)
 
-        feedback_models.FeedbackAnalyticsModel.create(self.exp_id, 2, 3)
+        feedback_services.create_thread(
+            'exploration', self.exp_id, self.owner_id, 'subject', 'text')
+
+        MockFeedbackAnalyticsAggregator.start_computation()
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+        self.process_and_flush_pending_tasks()
 
         response = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
 
-        self.assertEqual(response['num_total_threads'], 3)
-        self.assertEqual(response['num_open_threads'], 2)
+        self.assertEqual(response['num_total_threads'], 1)
+        self.assertEqual(response['num_open_threads'], 1)
 
         self.logout()
