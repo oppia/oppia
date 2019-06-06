@@ -81,6 +81,11 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
 
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
+
     def test_query_status_check_handler_with_invalid_query_id_raises_400(
             self):
         self.login(self.SUBMITTER_EMAIL)
@@ -194,6 +199,13 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         self.assertEqual(
             response['error'], '400 Invalid input for query results.')
 
+        response = self.get_json(
+            '/emaildashboarddatahandler',
+            params={'num_queries_to_fetch': 'invalid_data'},
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'], '400 Invalid input for query results.')
+
         self.logout()
 
     def test_email_dashboard_data_handler(self):
@@ -235,13 +247,18 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params={'query_id': query_id})
 
-        # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
+        # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
 
         response = self.get_html_response('/emaildashboardresult/%s' % query_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -274,13 +291,18 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id_1, additional_job_params={'query_id': query_id_1})
 
-        # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             2)
+        # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
 
         response = self.get_html_response('/emaildashboardresult/%s' % query_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -308,13 +330,18 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params={'query_id': query_id})
 
-        # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
+        # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
 
         response = self.get_html_response('/emaildashboardresult/%s' % query_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -346,13 +373,18 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id_1, additional_job_params={'query_id': query_id_1})
 
-        # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             2)
+        # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
 
         response = self.get_html_response('/emaildashboardresult/%s' % query_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -380,13 +412,18 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id, additional_job_params={'query_id': query_id})
 
-        # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             1)
+        # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
 
         response = self.get_html_response('/emaildashboardresult/%s' % query_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -418,13 +455,18 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
         user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
             job_id_1, additional_job_params={'query_id': query_id_1})
 
-        # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
             2)
+        # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS),
+            0)
 
         response = self.get_html_response('/emaildashboardresult/%s' % query_id)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -567,10 +609,10 @@ class EmailDashboardResultTests(test_utils.GenericTestBase):
                 '/emaildashboardresult/%s' % query_models[0].id)
         self.logout()
 
-        # Complete execution of query.
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        # Complete execution of query.
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.process_and_flush_pending_tasks()
             query_models = user_models.UserQueryModel.query().fetch()
