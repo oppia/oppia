@@ -100,7 +100,7 @@ describe('ExplorationStatesService', function() {
 
       beforeEach(angular.mock.inject(function($injector) {
         var spec = this;
-        spyOn(this.cls, 'deleteState');
+        spyOn(this.cls, 'deleteState').and.returnValue(this.$q.resolve);
 
         var modalArgs = {
           resolve: {
