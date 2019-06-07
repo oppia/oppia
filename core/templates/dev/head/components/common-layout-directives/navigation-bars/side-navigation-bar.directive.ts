@@ -25,8 +25,8 @@ oppia.directive('sideNavigationBar', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/side_navigation_bar/' +
-        'side_navigation_bar_directive.html'),
+        '/components/common-layout-directives/navigation-bars/' +
+        'side-navigation-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$timeout', function($timeout) {
         var ctrl = this;
