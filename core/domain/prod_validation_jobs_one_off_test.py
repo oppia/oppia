@@ -31,6 +31,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import prod_validation_jobs_one_off
 from core.domain import rating_services
+from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import subscription_services
 from core.domain import user_services
@@ -50,12 +51,13 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
     activity_models, audit_models, base_models, collection_models,
-    config_models, email_models, exp_models, feedback_models, user_models,) = (
+    config_models, email_models, exp_models, feedback_models,
+    recommendations_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.collection, models.NAMES.config, models.NAMES.email,
             models.NAMES.exploration, models.NAMES.feedback,
-            models.NAMES.user]))
+            models.NAMES.recommendations, models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
 
@@ -113,7 +115,10 @@ def run_job_and_check_output(
         for key in actual_output_dict:
             self.assertEqual(actual_output_dict[key], expected_output_dict[key])
     if sort:
-        self.assertEqual(sorted(actual_output), sorted(expected_output))
+        try:
+            self.assertEqual(sorted(actual_output), sorted(expected_output))
+        except Exception:
+            raise Exception(actual_output)
     else:
         self.assertEqual(actual_output, expected_output)
 
@@ -4021,6 +4026,272 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
             setattr(self.model_instance_0, property_name, actual_value)
             self.model_instance_0.put()
+
+
+class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationRecommendationsModelValidatorTests, self).setUp()
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.user_id, exp)
+
+        recommendations_services.set_recommendations('0', ['3', '4'])
+        recommendations_services.set_recommendations('1', ['5'])
+
+        self.model_instance_0 = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '0'))
+        self.model_instance_1 = (
+            recommendations_models.ExplorationRecommendationsModel.get_by_id(
+                '1'))
+
+        self.job_class = prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_model(self):
+        expected_output = [(
+            u'[u\'fully-validated ExplorationRecommendationsModel\', 2]')]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of ExplorationRecommendationsModel\', '
+                '[u\'Model id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id, self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated),
+            u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ExplorationRecommendationsModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_model_with_missing_recommended_exploration(self):
+        exp_models.ExplorationModel.get_by_id('3').delete(
+            self.user_id, '', [{}])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_model field '
+                'check of ExplorationRecommendationsModel\', '
+                '[u"Model id 0: based on field exploration_model having value '
+                '3, expect model ExplorationModel with '
+                'id 3 but it doesn\'t exist"]]'
+            ),
+            u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
+
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_id_in_recommended_ids(self):
+        self.model_instance_0.recommended_exploration_ids = ['0', '4']
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for item exploration id check '
+                'of ExplorationRecommendationsModel\', '
+                '[u\'Model id 0: The exploration id: 0 for which the '
+                'model is created is also present in the recommended '
+                'exploration ids for model\']]'
+            ),
+            u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TopicSimilaritiesModelValidatorTests, self).setUp()
+
+        self.model_instance = recommendations_models.TopicSimilaritiesModel(
+            id=recommendations_models.TOPIC_SIMILARITIES_ID)
+
+        self.content = {
+            'Art': {'Art': '1.0', 'Biology': '0.8', 'Chemistry': '0.1'},
+            'Biology': {'Art': '0.8', 'Biology': '1.0', 'Chemistry': '0.5'},
+            'Chemistry': {'Art': '0.1', 'Biology': '0.5', 'Chemistry': '1.0'},
+        }
+
+        self.model_instance.content = self.content
+        self.model_instance.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob)
+
+    def test_standard_model(self):
+        expected_output = [(
+            u'[u\'fully-validated TopicSimilaritiesModel\', 1]')]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of TopicSimilaritiesModel\', '
+                '[u\'Model id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance.id, self.model_instance.created_on,
+                    self.model_instance.last_updated)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'TopicSimilaritiesModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_id(self):
+        model_with_invalid_id = recommendations_models.TopicSimilaritiesModel(
+            id='random', content=self.content)
+        model_with_invalid_id.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for model id check of '
+                'TopicSimilaritiesModel\', '
+                '[u\'Model id random: Model id does not match regex pattern\']]'
+            ),
+            u'[u\'fully-validated TopicSimilaritiesModel\', 1]']
+
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_topic_similarities_columns(self):
+        content = {
+            'Art': {'Art': '1.0', 'Biology': '0.5'},
+            'Biology': {}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic similarities column '
+            'check of TopicSimilaritiesModel\', '
+            '[u\'Model id %s: Length of topic similarities columns '
+            'does not match length of topic list\']]') % (
+                self.model_instance.id)]
+
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_topic(self):
+        content = {
+            'Art': {'Art': '1.0', 'Random': '0.5'},
+            'Random': {'Art': '0.5', 'Random': '1.0'}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic check of '
+            'TopicSimilaritiesModel\', '
+            '[u\'Model id %s: Topic Random not in list of known topics\']]'
+        ) % self.model_instance.id]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_topic_similarities_rows(self):
+        content = {
+            'Art': {'Art': '1.0', 'Biology': '0.5'}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for topic similarities row 0 '
+            'check of TopicSimilaritiesModel\', '
+            '[u\'Model id %s: Length of topic similarities rows '
+            'does not match length of topic list\']]') % (
+                self.model_instance.id)]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_similarity_type(self):
+        content = {
+            'Art': {'Art': 'one', 'Biology': 0.5},
+            'Biology': {'Art': 0.5, 'Biology': 1.0}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for similarity type check of '
+                'TopicSimilaritiesModel\', '
+                '[u\'Model id %s: Expected similarity to be a float, '
+                'received one\']]'
+            ) % self.model_instance.id, (
+                u'[u\'failed validation check for similarity value check of '
+                'TopicSimilaritiesModel\', '
+                '[u\'Model id %s: Expected similarity to be between 0.0 '
+                'and 1.0, received one\']]') % self.model_instance.id]
+
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_similarity_value(self):
+        content = {
+            'Art': {'Art': 10.0, 'Biology': 0.5},
+            'Biology': {'Art': 0.5, 'Biology': 1.0}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for similarity value check '
+            'of TopicSimilaritiesModel\', '
+            '[u\'Model id %s: Expected similarity to be between '
+            '0.0 and 1.0, received 10.0\']]') % self.model_instance.id]
+
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_assymetric_content(self):
+        content = {
+            'Art': {'Art': 1.0, 'Biology': 0.5},
+            'Biology': {'Art': 0.6, 'Biology': 1.0}
+        }
+        self.model_instance.content = content
+        self.model_instance.put()
+
+        expected_output = [(
+            u'[u\'failed validation check for symmetry check of '
+            'TopicSimilaritiesModel\', '
+            '[u\'Model id %s: Expected topic similarities '
+            'to be symmetric\']]') % self.model_instance.id]
+
+        run_job_and_check_output(self, expected_output)
 
 
 class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):

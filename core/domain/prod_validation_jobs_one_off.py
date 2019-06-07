@@ -16,6 +16,7 @@
 
 """One-off jobs for validating prod models."""
 
+import csv
 import datetime
 import re
 
@@ -25,17 +26,20 @@ from core.domain import activity_domain
 from core.domain import collection_services
 from core.domain import commit_commands_domain
 from core.domain import exp_services
+from core.domain import recommendations_services
 from core.platform import models
 import feconf
 import schema_utils
 
 (
     activity_models, audit_models, collection_models, config_models,
-    email_models, exp_models, feedback_models, user_models,) = (
+    email_models, exp_models, feedback_models,
+    recommendations_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.user]))
+            models.NAMES.feedback, models.NAMES.recommendations,
+            models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -2057,6 +2061,155 @@ class ExpSummaryModelValidator(BaseModelValidator):
             cls._validate_related_model_properties]
 
 
+class ExplorationRecommendationsModelValidator(BaseModelValidator):
+    """Class for validating ExplorationRecommendationsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        exploration_ids = [item.id]
+        exploration_ids = exploration_ids + item.recommended_exploration_ids
+        return {
+            'exploration_model': (
+                exp_models.ExplorationModel, exploration_ids),
+        }
+
+    @classmethod
+    def _validate_item_id_not_in_recommended_exploration_ids(cls, item):
+        """Validate that model id is not present in recommended exploration ids.
+
+        Args:
+            item: ExplorationRecommendationsModel to validate.
+        """
+        if item.id in item.recommended_exploration_ids:
+            cls.errors['item exploration id check'] = (
+                'Model id %s: The exploration id: %s for which the model is '
+                'created is also present in the recommended exploration ids '
+                'for model') % (item.id, item.id)
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_item_id_not_in_recommended_exploration_ids]
+
+
+class TopicSimilaritiesModelValidator(BaseModelValidator):
+    """Class for validating TopicSimilaritiesModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {}
+
+    @classmethod
+    def _validate_topic_similarities(cls, item):
+        """Validate the topic similarities to be symmetric and have real
+        values between 0.0 and 1.0.
+
+        Args:
+            item: TopicSimilaritiesModel to validate.
+        """
+
+        topics = item.content.keys()
+        data = '%s\n' % (',').join(topics)
+
+        for topic1 in topics:
+            similarity_list = []
+            for topic2 in item.content[topic1]:
+                similarity_list.append(str(item.content[topic1][topic2]))
+            if len(similarity_list):
+                data = data + '%s\n' % (',').join(similarity_list)
+
+        data = data.splitlines()
+        data = list(csv.reader(data))
+        topics_list = data[0]
+        topics_length = len(topics_list)
+        topic_similarities_values = data[1:]
+
+        invalid_model = False
+
+        if len(topic_similarities_values) != topics_length:
+            invalid_model = True
+            cls.errors['topic similarities column check'] = (
+                'Model id %s: Length of topic similarities columns does '
+                'not match length of topic list') % item.id
+
+        for topic in topics_list:
+            if topic not in recommendations_services.RECOMMENDATION_CATEGORIES:
+                cls.errors['topic check'] = (
+                    'Model id %s: Topic %s not in list of known topics') % (
+                        item.id, topic)
+
+        if invalid_model:
+            return
+
+        for index, topic in enumerate(topics_list):
+            if len(topic_similarities_values[index]) != topics_length:
+                invalid_model = topic_similarities_values
+                cls.errors['topic similarities row %s check' % index] = (
+                    'Model id %s: Length of topic similarities rows does '
+                    'not match length of topic list') % item.id
+
+        if invalid_model:
+            return
+
+        for row_ind in range(topics_length):
+            for col_ind in range(topics_length):
+                similarity = topic_similarities_values[row_ind][col_ind]
+                try:
+                    similarity = float(similarity)
+                except Exception:
+                    cls.errors['similarity type check'] = (
+                        'Model id %s: Expected similarity to be a float, '
+                        'received %s') % (item.id, similarity)
+
+                if similarity < 0.0 or similarity > 1.0:
+                    cls.errors['similarity value check'] = (
+                        'Model id %s: Expected similarity to be between 0.0 '
+                        'and 1.0, received %s') % (item.id, similarity)
+
+        for row_ind in range(topics_length):
+            for col_ind in range(topics_length):
+                if (topic_similarities_values[row_ind][col_ind] !=
+                        topic_similarities_values[col_ind][row_ind]):
+                    cls.errors['symmetry check'] = (
+                        'Model id %s: Expected topic similarities to be '
+                        'symmetric') % item.id
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_topic_similarities]
+
+
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
 
@@ -2133,6 +2286,10 @@ MODEL_TO_VALIDATOR_MAPPING = {
     exp_models.ExplorationCommitLogEntryModel: (
         ExplorationCommitLogEntryModelValidator),
     exp_models.ExpSummaryModel: ExpSummaryModelValidator,
+    recommendations_models.ExplorationRecommendationsModel: (
+        ExplorationRecommendationsModelValidator),
+    recommendations_models.TopicSimilaritiesModel: (
+        TopicSimilaritiesModelValidator),
     user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
 }
 
@@ -2373,6 +2530,23 @@ class ExpSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExpSummaryModel]
+
+
+class ExplorationRecommendationsModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationRecommendationsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [recommendations_models.ExplorationRecommendationsModel]
+
+
+class TopicSimilaritiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates TopicSimilaritiesModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [recommendations_models.TopicSimilaritiesModel]
 
 
 class UserSubscriptionsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
