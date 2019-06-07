@@ -580,7 +580,7 @@ def get_images_ids_of_exploration(exploration):
     """
     image_ids = []
     exploration_content = (exploration.get_all_html_content_strings())[0]
-  
+
     image_ids_with_value = (
         re.findall('image_id-with-value=["][0-9]*["]', exploration_content))
     # image_ids_with_value is a list whose value be like
@@ -599,7 +599,8 @@ def get_deleted_images_ids(image_ids_after_change, image_ids_before_change):
     """Returns a list of image_ids of all deleted images.
 
     Args:
-        exploration_id: str. Id of an exploration.
+        image_ids_after_change: list. List of all ids of all images present
+            in an exploration after change.
         image_ids_before_change: list. List of all ids of all images present
             in an exploration before change.
 
@@ -841,7 +842,8 @@ def apply_change_list(exploration_id, change_list):
 
                 # Deletes the image_ids of deleted images from the
                 # ImageAssets.
-                image_ids_after_change = get_images_ids_of_exploration(exploration)
+                image_ids_after_change = (
+                    get_images_ids_of_exploration(exploration))
                 deleted_image_ids = get_deleted_images_ids(
                     image_ids_after_change, image_ids_before_change)
 

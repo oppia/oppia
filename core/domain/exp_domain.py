@@ -1163,7 +1163,7 @@ class Exploration(object):
 
     def update_image_id_counter(self, new_value):
         """Increment the image_id counter."""
-        # self.image_id_counter += 1
+        # self.image_id_counter += 1.
         self.image_id_counter = new_value
 
 
@@ -2253,14 +2253,18 @@ class Exploration(object):
             if state_dict['interaction']['default_outcome']:
                 interaction_feedback_html = state_dict[
                     'interaction']['default_outcome']['feedback']['html']
-                (new_interaction_feedback_html, image_id_counter, image_mapping) = (
-                    html_validation_service.get_html_with_image_id_in_image_tag(
-                        interaction_feedback_html, image_id_counter, image_mapping))
+                (
+                    new_interaction_feedback_html, image_id_counter,
+                    image_mapping) = (
+                        html_validation_service.
+                        get_html_with_image_id_in_image_tag(
+                            interaction_feedback_html, image_id_counter,
+                            image_mapping))
                 state_dict['interaction']['default_outcome']['feedback'][
                     'html'] = new_interaction_feedback_html
 
             for answer_group_index, answer_group in enumerate(
-                state_dict['interaction']['answer_groups']):
+                    state_dict['interaction']['answer_groups']):
                 answer_group_html = answer_group['outcome']['feedback']['html']
                 (new_answer_group_html, image_id_counter, image_mapping) = (
                     html_validation_service.get_html_with_image_id_in_image_tag(
@@ -2272,9 +2276,11 @@ class Exploration(object):
                     for rule_spec_index, rule_spec in enumerate(
                             answer_group['rule_specs']):
                         for x_index, x in enumerate(rule_spec['inputs']['x']):
-                            (new_x, image_id_counter, image_mapping) = (
-                                html_validation_service.get_html_with_image_id_in_image_tag(
-                                    x, image_id_counter, image_mapping))
+                            (
+                                new_x, image_id_counter, image_mapping) = (
+                                    html_validation_service.
+                                    get_html_with_image_id_in_image_tag(
+                                        x, image_id_counter, image_mapping))
                             state_dict['interaction']['answer_groups'][
                                 answer_group_index]['rule_specs'][
                                     rule_spec_index]['inputs']['x'][x_index] = (
@@ -2291,20 +2297,22 @@ class Exploration(object):
 
             if state_dict['interaction']['solution']:
                 solution_html = state_dict[
-                'interaction']['solution']['explanation']['html']
+                    'interaction']['solution']['explanation']['html']
                 (new_solution_html, image_id_counter, image_mapping) = (
-                html_validation_service.get_html_with_image_id_in_image_tag(
-                    solution_html, image_id_counter, image_mapping))
+                    html_validation_service.
+                    get_html_with_image_id_in_image_tag(
+                        solution_html, image_id_counter, image_mapping))
                 state_dict['interaction']['solution']['explanation']['html'] = (
                     new_solution_html)
 
             if state_dict['interaction']['id'] in (
-                'ItemSelectionInput', 'MultipleChoiceInput'):
+                    'ItemSelectionInput', 'MultipleChoiceInput'):
                 for value_index, value in enumerate(
                         state_dict['interaction']['customization_args'][
                             'choices']['value']):
                     (new_value, image_id_counter, image_mapping) = (
-                        html_validation_service.get_html_with_image_id_in_image_tag(
+                        html_validation_service.
+                        get_html_with_image_id_in_image_tag(
                             value, image_id_counter, image_mapping))
                     state_dict['interaction']['customization_args'][
                         'choices']['value'][value_index] = new_value
