@@ -71,45 +71,48 @@ oppia.directive('questionPlayer', [
       $http, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getQuestionPlayerConfig: '&playerConfig',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_player/question_player_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$rootScope', 'QuestionPlayerBackendApiService',
+        '$rootScope', '$scope', 'QuestionPlayerBackendApiService',
         function(
-            $scope, $rootScope, QuestionPlayerBackendApiService) {
-          $scope.questionPlayerConfig = $scope.getQuestionPlayerConfig();
-          $scope.currentQuestion = 0;
-          $scope.totalQuestions = 0;
-          $scope.currentProgress = 0;
+            $rootScope, $scope, QuestionPlayerBackendApiService) {
+          var ctrl = this;
+          $scope.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          ctrl.currentQuestion = 0;
+          ctrl.totalQuestions = 0;
+          ctrl.currentProgress = 0;
 
           var updateCurrentQuestion = function(currentQuestion) {
-            $scope.currentQuestion = currentQuestion;
+            ctrl.currentQuestion = currentQuestion;
             updateQuestionProgression();
           };
 
           var updateTotalQuestions = function(totalQuestions) {
-            $scope.totalQuestions = totalQuestions;
+            ctrl.totalQuestions = totalQuestions;
             updateQuestionProgression();
           };
 
           var updateQuestionProgression = function() {
             if (getTotalQuestions() > 0) {
-              $scope.currentProgress = (
+              ctrl.currentProgress = (
                 getCurrentQuestion() * 100 / getTotalQuestions());
             } else {
-              $scope.currentProgress = 0;
+              ctrl.currentProgress = 0;
             }
           };
 
           var getCurrentQuestion = function() {
-            return $scope.currentQuestion;
+            return ctrl.currentQuestion;
           };
 
           var getTotalQuestions = function() {
-            return $scope.totalQuestions;
+            return ctrl.totalQuestions;
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {

@@ -678,11 +678,11 @@ TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
-TRANSLATION_DATA_PREFIX = '/createhandler/translate'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+VOICEOVER_DATA_PREFIX = '/createhandler/voiceover'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
