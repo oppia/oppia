@@ -64,7 +64,6 @@ GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
-CMD_ADD_IMAGE = 'add_image'
 # This takes an additional 'state_name' parameter.
 CMD_ADD_STATE = 'add_state'
 # This takes additional 'old_state_name' and 'new_state_name' parameters.

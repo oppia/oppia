@@ -250,7 +250,7 @@ class Image(object):
 class ImageAssets(object):
     """Value object representing the images for the state."""
     def __init__(self, image_mapping):
-        """Constructs a ImageAsset domain object.
+        """Constructs a ImageAssets domain object.
 
         Args:
             image_mapping: dict. The dict representation of
@@ -1547,7 +1547,7 @@ class State(object):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
-            image_assets: ImageAssetsInstance. The images for the state
+            image_assets: ImageAssets. The images for the state
                 contents.
             recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the state contents and translations.
@@ -2054,8 +2054,7 @@ class State(object):
             [],
             InteractionInstance.create_default_interaction(
                 default_dest_state_name),
-            ImageAssets.from_dict(copy.deepcopy(
-                feconf.DEFAULT_IMAGE_ASSETS)),
+            ImageAssets.from_dict(copy.deepcopy(feconf.DEFAULT_IMAGE_ASSETS)),
             RecordedVoiceovers.from_dict(copy.deepcopy(
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
