@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** @fileoverview Tests for ExplorationStatesService. */
+/**
+ * @fileoverview Tests for ExplorationStatesService.
+ */
 
 require('pages/exploration_editor/ExplorationStatesService.ts');
 
