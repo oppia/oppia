@@ -415,13 +415,10 @@ def convert_to_ckeditor(html_data):
                         else:
                             break
 
-    # This block wraps p tag in li tag if the parent of p is ol/ul tag. Also,
-    # if the parent of p tag is pre tag, it unwraps the p tag.
+    # This block unwraps the p tag, if the parent of p tag is pre tag.
     for p in soup.findAll(name='p'):
         if p.parent.name == 'pre':
             p.unwrap()
-        elif p.parent.name in list_tags:
-            p.wrap(soup.new_tag('li'))
 
     # This block ensures that ol/ul tag is not a direct child of another ul/ol
     # tag. The conversion works as follows:
