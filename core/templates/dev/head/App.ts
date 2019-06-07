@@ -49,14 +49,14 @@ require('components/button-directives/create-activity-button.directive.ts');
 
 require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
-  '/components/common-layout-directives/common-elements/' +
+  'components/common-layout-directives/common-elements/' +
   'promo-bar.directive.ts');
 require(
-  '/components/common-layout-directives/navigation-bars/' +
+  'components/common-layout-directives/navigation-bars/' +
   'side-navigation-bar.directive.ts');
 require('components/button-directives/social-buttons.directive.ts');
 require(
-  '/components/common-layout-directives/navigation-bars/' +
+  'components/common-layout-directives/navigation-bars/' +
   'top-navigation-bar.directive.ts');
 
 require('domain/sidebar/SidebarStatusService.ts');

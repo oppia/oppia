@@ -51,7 +51,7 @@ require('components/forms/schema-viewers/schema-based-list-viewer.directive.ts')
 require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
-require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 require('components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require('components/state/AnswerGroupEditorDirective.ts');

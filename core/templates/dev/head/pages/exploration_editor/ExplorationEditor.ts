@@ -48,7 +48,7 @@ require('components/forms/schema-viewers/schema-based-list-viewer.directive.ts')
 require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
-require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');
 require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
@@ -86,7 +86,7 @@ require('filters/TruncateInputBasedOnInteractionAnswerTypeFilter.ts');
 require('filters/UnderscoresToCamelCaseFilter.ts');
 require('filters/WrapTextWithEllipsisFilter.ts');
 require(
-  '/components/forms/forms-templates/' +
+  'components/forms/forms-templates/' +
   'mark-all-audio-and-translations-as-needing-update.controller.ts');
 require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
 require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
