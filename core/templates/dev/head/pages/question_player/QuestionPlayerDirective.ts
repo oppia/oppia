@@ -62,8 +62,8 @@ require('components/attribution_guide/AttributionGuideDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/LearnerLocalNav.ts');
-require('pages/exploration_player/LearnerViewInfo.ts');
+require('pages/exploration_player/LearnerLocalNavDirective.ts');
+require('pages/exploration_player/LearnerViewInfoDirective.ts');
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',
@@ -79,11 +79,11 @@ oppia.directive('questionPlayer', [
         '/pages/question_player/question_player_directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', 'QuestionPlayerBackendApiService',
+        '$rootScope', '$scope', 'QuestionPlayerBackendApiService',
         function(
-            $rootScope, QuestionPlayerBackendApiService) {
+            $rootScope, $scope, QuestionPlayerBackendApiService) {
           var ctrl = this;
-          ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          $scope.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           ctrl.currentQuestion = 0;
           ctrl.totalQuestions = 0;
           ctrl.currentProgress = 0;
