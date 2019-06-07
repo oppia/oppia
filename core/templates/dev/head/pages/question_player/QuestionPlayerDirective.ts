@@ -20,8 +20,8 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 require('domain/question/QuestionPlayerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('components/CkEditorRteDirective.ts');
-require('components/CkEditorWidgetsInitializer.ts');
+require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
