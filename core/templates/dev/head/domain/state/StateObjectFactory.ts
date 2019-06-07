@@ -40,7 +40,7 @@ oppia.factory('StateObjectFactory', [
       this.interaction = interaction;
       this.paramChanges = paramChanges;
       this.recordedVoiceovers = recordedVoiceovers;
-      this.solicitAnswerDetails = this.solicitAnswerDetails;
+      this.solicitAnswerDetails = solicitAnswerDetails;
       this.writtenTranslations = writtenTranslations;
     };
 
