@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the exploration history tab.
+ * @fileoverview Directive for the exploration history tab.
  */
 
 require('components/profile_link/ProfileLinkTextDirective.ts');

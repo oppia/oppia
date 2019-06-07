@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the exploration editor feedback tab.
+ * @fileoverview Directive for the exploration editor feedback tab.
  */
 
 require('domain/state/StateObjectFactory.ts');

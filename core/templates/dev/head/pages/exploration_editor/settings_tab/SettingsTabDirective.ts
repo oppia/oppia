@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the exploration settings tab.
+ * @fileoverview Directive for the exploration settings tab.
  */
 
 require('components/forms/Select2DropdownDirective.ts');
