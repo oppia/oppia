@@ -16,6 +16,14 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/IdGenerationService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/UserService.ts');
+require('services/contextual/UrlService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.controller('Signup', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
   'FocusManagerService',

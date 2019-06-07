@@ -16,6 +16,9 @@
  * @fileoverview Directive for the miscellaneous tab in the admin panel.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/admin/AdminTaskManagerService.ts');
+
 oppia.directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
@@ -24,17 +27,20 @@ oppia.directive('adminMiscTab', [
       ADMIN_HANDLER_URL, ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/misc_tab/' +
         'admin_misc_tab_directive.html'),
-      controller: ['$scope', function($scope) {
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
         var DATA_EXTRACTION_QUERY_HANDLER_URL = (
           '/explorationdataextractionhandler');
 
-        $scope.clearSearchIndex = function() {
+        ctrl.clearSearchIndex = function() {
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
@@ -42,22 +48,22 @@ oppia.directive('adminMiscTab', [
             return;
           }
 
-          $scope.setStatusMessage('Clearing search index...');
+          ctrl.setStatusMessage('Clearing search index...');
 
           AdminTaskManagerService.startTask();
           $http.post(ADMIN_HANDLER_URL, {
             action: 'clear_search_index'
           }).then(function() {
-            $scope.setStatusMessage('Index successfully cleared.');
+            ctrl.setStatusMessage('Index successfully cleared.');
             AdminTaskManagerService.finishTask();
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
             AdminTaskManagerService.finishTask();
           });
         };
 
-        $scope.uploadTopicSimilaritiesFile = function() {
+        ctrl.uploadTopicSimilaritiesFile = function() {
           var file = (
             <HTMLInputElement>document.getElementById(
               'topicSimilaritiesFile')).files[0];
@@ -68,26 +74,26 @@ oppia.directive('adminMiscTab', [
               action: 'upload_topic_similarities',
               data: data
             }).then(function() {
-              $scope.setStatusMessage(
+              ctrl.setStatusMessage(
                 'Topic similarities uploaded successfully.');
             }, function(errorResponse) {
-              $scope.setStatusMessage(
+              ctrl.setStatusMessage(
                 'Server error: ' + errorResponse.data.error);
             });
           };
           reader.readAsText(file);
         };
 
-        $scope.downloadTopicSimilaritiesFile = function() {
+        ctrl.downloadTopicSimilaritiesFile = function() {
           $window.location.href = ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL;
         };
 
         var setDataExtractionQueryStatusMessage = function(message) {
-          $scope.showDataExtractionQueryStatus = true;
-          $scope.dataExtractionQueryStatusMessage = message;
+          ctrl.showDataExtractionQueryStatus = true;
+          ctrl.dataExtractionQueryStatusMessage = message;
         };
 
-        $scope.submitQuery = function() {
+        ctrl.submitQuery = function() {
           var STATUS_PENDING = (
             'Data extraction query has been submitted. Please wait.');
           var STATUS_FINISHED = 'Loading the extracted data ...';
@@ -97,23 +103,23 @@ oppia.directive('adminMiscTab', [
 
           var downloadUrl = DATA_EXTRACTION_QUERY_HANDLER_URL + '?';
 
-          downloadUrl += 'exp_id=' + encodeURIComponent($scope.expId);
+          downloadUrl += 'exp_id=' + encodeURIComponent(ctrl.expId);
           downloadUrl += '&exp_version=' + encodeURIComponent(
-            $scope.expVersion);
+            ctrl.expVersion);
           downloadUrl += '&state_name=' + encodeURIComponent(
-            $scope.stateName);
+            ctrl.stateName);
           downloadUrl += '&num_answers=' + encodeURIComponent(
-            $scope.numAnswers);
+            ctrl.numAnswers);
 
           $window.open(downloadUrl);
         };
 
-        $scope.resetForm = function() {
-          $scope.expId = '';
-          $scope.expVersion = 0;
-          $scope.stateName = '';
-          $scope.numAnswers = 0;
-          $scope.showDataExtractionQueryStatus = false;
+        ctrl.resetForm = function() {
+          ctrl.expId = '';
+          ctrl.expVersion = 0;
+          ctrl.stateName = '';
+          ctrl.numAnswers = 0;
+          ctrl.showDataExtractionQueryStatus = false;
         };
       }]
     };

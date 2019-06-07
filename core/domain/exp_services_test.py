@@ -78,17 +78,19 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(self.translator_id, self.TRANSLATOR_EMAIL)
+        user_services.create_new_user(
+            self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
         user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
@@ -903,7 +905,7 @@ title: Title
         self.assertEqual(
             fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
-    def test_can_load_yaml_with_audio_translations(self):
+    def test_can_load_yaml_with_voiceovers(self):
         exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [])
         exp = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -911,60 +913,54 @@ title: Title
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
         content_id = state.content.content_id
-        content_translations = (
-            state.content_ids_to_audio_translations[content_id])
+        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
+        content_voiceovers = voiceovers_mapping[content_id]
         feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
-        answer_group_translations = (
-            state.content_ids_to_audio_translations[feedback_id])
+        answer_group_voiceovers = voiceovers_mapping[feedback_id]
         default_outcome_id = interaction.default_outcome.feedback.content_id
-        default_outcome_translations = (
-            state.content_ids_to_audio_translations[default_outcome_id])
+        default_outcome_voiceovers = voiceovers_mapping[default_outcome_id]
         hint_id = interaction.hints[0].hint_content.content_id
-        hint_translations = state.content_ids_to_audio_translations[hint_id]
+        hint_voiceovers = voiceovers_mapping[hint_id]
         solution_id = interaction.solution.explanation.content_id
-        solution_translations = (
-            state.content_ids_to_audio_translations[solution_id])
+        solution_voiceovers = voiceovers_mapping[solution_id]
 
         self.assertEqual(
-            content_translations['en'].filename, self.INTRO_AUDIO_FILE)
+            content_voiceovers['en'].filename, self.INTRO_AUDIO_FILE)
         self.assertEqual(
-            answer_group_translations['en'].filename,
+            answer_group_voiceovers['en'].filename,
             self.ANSWER_GROUP_AUDIO_FILE)
         self.assertEqual(
-            default_outcome_translations['en'].filename,
+            default_outcome_voiceovers['en'].filename,
             self.DEFAULT_OUTCOME_AUDIO_FILE)
+        self.assertEqual(hint_voiceovers['en'].filename, self.HINT_AUDIO_FILE)
         self.assertEqual(
-            hint_translations['en'].filename, self.HINT_AUDIO_FILE)
-        self.assertEqual(
-            solution_translations['en'].filename, self.SOLUTION_AUDIO_FILE)
+            solution_voiceovers['en'].filename, self.SOLUTION_AUDIO_FILE)
 
-    def test_can_load_yaml_with_stripped_audio_translations(self):
+    def test_can_load_yaml_with_stripped_voiceovers(self):
         exp_services.save_new_exploration_from_yaml_and_assets(
             self.owner_id, self.YAML_WITH_AUDIO_TRANSLATIONS, self.EXP_ID, [],
-            strip_audio_translations=True)
+            strip_voiceovers=True)
         exp = exp_services.get_exploration_by_id(self.EXP_ID)
 
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
         content_id = state.content.content_id
-        content_translations = (
-            state.content_ids_to_audio_translations[content_id])
+        voiceovers_mapping = state.recorded_voiceovers.voiceovers_mapping
+        content_voiceovers = voiceovers_mapping[content_id]
         feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
-        answer_group_translations = (
-            state.content_ids_to_audio_translations[feedback_id])
+        answer_group_voiceovers = voiceovers_mapping[feedback_id]
         default_outcome_id = interaction.default_outcome.feedback.content_id
-        default_outcome_translations = (
-            state.content_ids_to_audio_translations[default_outcome_id])
+        default_outcome_voiceovers = voiceovers_mapping[default_outcome_id]
         hint_id = interaction.hints[0].hint_content.content_id
-        hint_translations = state.content_ids_to_audio_translations[hint_id]
+        hint_voiceovers = voiceovers_mapping[hint_id]
         solution_id = interaction.solution.explanation.content_id
-        solution_translations = (
-            state.content_ids_to_audio_translations[solution_id])
-        self.assertEqual(content_translations, {})
-        self.assertEqual(answer_group_translations, {})
-        self.assertEqual(default_outcome_translations, {})
-        self.assertEqual(hint_translations, {})
-        self.assertEqual(solution_translations, {})
+        solution_voiceovers = voiceovers_mapping[solution_id]
+
+        self.assertEqual(content_voiceovers, {})
+        self.assertEqual(answer_group_voiceovers, {})
+        self.assertEqual(default_outcome_voiceovers, {})
+        self.assertEqual(hint_voiceovers, {})
+        self.assertEqual(solution_voiceovers, {})
 
 
 class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
@@ -1248,9 +1244,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1272,6 +1265,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1281,9 +1278,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1305,6 +1299,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1336,9 +1334,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1360,6 +1355,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1369,9 +1368,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -1393,6 +1389,10 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1550,9 +1550,6 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
 content:
   content_id: content
   html: ''
-content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1574,6 +1571,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
@@ -1586,9 +1587,6 @@ written_translations:
 content:
   content_id: content
   html: ''
-content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1610,6 +1608,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
@@ -1623,9 +1625,6 @@ written_translations:
 content:
   content_id: content
   html: ''
-content_ids_to_audio_translations:
-  content: {}
-  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1647,6 +1646,10 @@ interaction:
   id: TextInput
   solution: null
 param_changes: []
+recorded_voiceovers:
+  voiceovers_mapping:
+    content: {}
+    default_outcome: {}
 written_translations:
   translations_mapping:
     content: {}
@@ -3014,7 +3017,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'translator_ids', 'viewer_ids',
+                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
@@ -3057,7 +3060,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'translator_ids', 'viewer_ids',
+                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
@@ -3089,8 +3092,6 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3102,6 +3103,9 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -3110,9 +3114,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -3132,6 +3133,10 @@ states:
       id: Continue
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}

@@ -16,6 +16,98 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require('directives/AngularHtmlBindDirective.ts');
+require('directives/MathjaxBindDirective.ts');
+require('filters/CamelCaseToHyphensFilter.ts');
+require('filters/CapitalizeFilter.ts');
+require('filters/ConvertToPlainTextFilter.ts');
+require('filters/FormatRtePreviewFilter.ts');
+require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/NormalizeWhitespacePunctuationAndCaseFilter.ts');
+require('filters/ParameterizeRuleDescriptionFilter.ts');
+require('filters/RemoveDuplicatesInArrayFilter.ts');
+require('filters/ReplaceInputsWithEllipsesFilter.ts');
+require('filters/TruncateFilter.ts');
+require('filters/TruncateAndCapitalizeFilter.ts');
+require('filters/TruncateAtFirstEllipsisFilter.ts');
+require('filters/TruncateAtFirstLineFilter.ts');
+require('filters/TruncateInputBasedOnInteractionAnswerTypeFilter.ts');
+require('filters/UnderscoresToCamelCaseFilter.ts');
+require('filters/WrapTextWithEllipsisFilter.ts');
+require('components/RatingComputationService.ts');
+require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
+require('components/forms/ConvertHtmlToUnicodeFilter.ts');
+require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/forms/ApplyValidationDirective.ts');
+require('components/forms/RequireIsFloatDirective.ts');
+require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require(
+  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
+require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+require(
+  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
+require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+require('components/forms/Select2DropdownDirective.ts');
+require('components/forms/ImageUploaderDirective.ts');
+require('components/forms/AudioFileUploaderDirective.ts');
+require('pages/question_editor/QuestionEditorDirective.ts');
+require('components/state/AnswerGroupEditorDirective.ts');
+require('components/state/HintEditorDirective.ts');
+require('components/state/OutcomeEditorDirective.ts');
+require('components/state/OutcomeDestinationEditorDirective.ts');
+require('components/state/OutcomeFeedbackEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
+require('components/state/RuleEditorDirective.ts');
+require('components/state/RuleTypeSelectorDirective.ts');
+require('components/state/SolutionEditorDirective.ts');
+require('components/state/SolutionExplanationEditorDirective.ts');
+require('components/forms/HtmlSelectDirective.ts');
+require('services/AutoplayedVideosService.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require('components/share/SharingLinksDirective.ts');
+require('components/background/BackgroundBannerDirective.ts');
+require('components/summary_tile/CollectionSummaryTileDirective.ts');
+require('pages/exploration_player/PlayerConstants.ts');
+require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
+
+require('components/ExplorationCreationService.ts');
+require('components/RatingComputationService.ts');
+require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/suggestion/SuggestionObjectFactory.ts');
+require('domain/suggestion/SuggestionThreadObjectFactory.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardBackendApiService.ts'
+);
+require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require('pages/suggestion_editor/ShowSuggestionModalForCreatorViewService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/UserService.ts');
+
 oppia.constant('EXPLORATION_DROPDOWN_STATS', {
   OPEN_FEEDBACK: 'open_feedback'
 });

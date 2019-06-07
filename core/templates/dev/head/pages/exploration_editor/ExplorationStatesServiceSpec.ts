@@ -16,6 +16,8 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
+require('pages/exploration_editor/ExplorationStatesService.ts');
+
 describe('ExplorationStatesService', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -34,10 +36,12 @@ describe('ExplorationStatesService', function() {
             content_id: 'content',
             html: ''
           },
-          content_ids_to_audio_translations: {
-            content: {},
-            default_outcome: {},
-            feedback_1: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {},
+              default_outcome: {},
+              feedback_1: {}
+            }
           },
           param_changes: [],
           interaction: {

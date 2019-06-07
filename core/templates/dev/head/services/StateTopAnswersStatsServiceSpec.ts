@@ -17,6 +17,10 @@
  * statistics for a particular state.
  */
 
+require('App.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('services/StateTopAnswersStatsService.ts');
+
 var joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', function() {
@@ -57,10 +61,12 @@ describe('StateTopAnswersStatsService', function() {
           id: 'TextInput',
         },
         classifier_model_id: 0,
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         written_translations: {
           translations_mapping: {

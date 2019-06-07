@@ -17,7 +17,6 @@
 """Tests for Story-related one-off jobs."""
 import ast
 
-from constants import constants
 from core.domain import story_domain
 from core.domain import story_jobs_one_off
 from core.domain import story_services
@@ -57,11 +56,10 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
-            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the story is exactly the same after migration.
         updated_story = (
@@ -92,14 +90,13 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
             story_services.get_story_by_id(self.STORY_ID)
 
         # Start migration job on sample story.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
-            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        job_id = (
+            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
 
-            # This running without errors indicates the deleted story is
-            # being ignored.
-            self.process_and_flush_pending_tasks()
+        # This running without errors indicates the deleted story is
+        # being ignored.
+        self.process_and_flush_pending_tasks()
 
         # Ensure the story is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -124,11 +121,10 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(story.story_contents_schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
-            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+        story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the story migrates correctly.
         updated_story = (
@@ -141,3 +137,34 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         expected = [[u'story_migrated',
                      [u'1 stories successfully migrated.']]]
         self.assertEqual(expected, [ast.literal_eval(x) for x in output])
+
+    def test_migration_job_skips_updated_story_failing_validation(self):
+
+        def _mock_get_story_by_id(unused_story_id):
+            """Mocks get_story_by_id()."""
+            return 'invalid_story'
+
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, title='A title')
+        story_services.save_new_story(self.albert_id, story)
+
+        get_story_by_id_swap = self.swap(
+            story_services, 'get_story_by_id', _mock_get_story_by_id)
+
+        with get_story_by_id_swap:
+            job_id = (
+                story_jobs_one_off.StoryMigrationOneOffJob.create_new())
+            story_jobs_one_off.StoryMigrationOneOffJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
+
+        output = story_jobs_one_off.StoryMigrationOneOffJob.get_output(
+            job_id)
+
+        # If the story had been successfully migrated, this would include a
+        # 'successfully migrated' message. Its absence means that the story
+        # could not be processed.
+        expected = [[u'validation_error',
+                     [u'Story %s failed validation: \'str\' object has '
+                      'no attribute \'validate\'' % (self.STORY_ID)]]]
+        self.assertEqual(
+            expected, [ast.literal_eval(x) for x in output])

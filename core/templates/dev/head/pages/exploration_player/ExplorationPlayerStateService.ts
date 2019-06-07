@@ -17,27 +17,58 @@
  *  like engine service.
  */
 
+
+oppia.constant('EXPLORATION_MODE', {
+  EXPLORATION: 'exploration',
+  PRETEST: 'pretest',
+  QUESTION_PLAYER: 'question_player',
+  OTHER: 'other'
+});
+
+require('domain/exploration/EditableExplorationBackendApiService.ts');
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/question/PretestQuestionBackendApiService.ts');
+require('domain/question/QuestionPlayerBackendApiService.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/NumberAttemptsService.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/exploration_player/PretestEngineService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration_player/StatsReportingService.ts');
+require('services/ContextService.ts');
+require('services/ExplorationFeaturesBackendApiService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/PlaythroughIssuesService.ts');
+require('services/PlaythroughService.ts');
+require('services/contextual/UrlService.ts');
+
 oppia.factory('ExplorationPlayerStateService', [
-  '$log', '$q', 'ContextService', 'EditableExplorationBackendApiService',
+  '$log', '$q', '$rootScope', 'ContextService',
+  'EditableExplorationBackendApiService',
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
   'PretestEngineService', 'PretestQuestionBackendApiService',
+  'QuestionPlayerBackendApiService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlService',
+  'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
-      $log, $q, ContextService, EditableExplorationBackendApiService,
+      $log, $q, $rootScope, ContextService,
+      EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
       PretestEngineService, PretestQuestionBackendApiService,
+      QuestionPlayerBackendApiService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlService) {
+      StatsReportingService, UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
-    var inPretestMode = false;
+    var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var questionPlayerMode = ContextService.isInQuestionPlayerMode();
     var explorationId = ContextService.getExplorationId();
     var version = GLOBALS.explorationVersion;
     var storyId = UrlService.getStoryIdInPlayer();
@@ -64,13 +95,23 @@ oppia.factory('ExplorationPlayerStateService', [
       PretestEngineService.init(pretestQuestionDicts, callback);
     };
 
+    var initializeQuestionPlayerServices = function(questionDicts, callback) {
+      PlayerCorrectnessFeedbackEnabledService.init(true);
+      PretestEngineService.init(questionDicts, callback);
+    };
+
     var setExplorationMode = function() {
-      inPretestMode = false;
+      explorationMode = EXPLORATION_MODE.EXPLORATION;
       currentEngineService = ExplorationEngineService;
     };
 
     var setPretestMode = function() {
-      inPretestMode = true;
+      explorationMode = EXPLORATION_MODE.PRETEST;
+      currentEngineService = PretestEngineService;
+    };
+
+    var setQuestionPlayerMode = function() {
+      explorationMode = EXPLORATION_MODE.QUESTION_PLAYER;
       currentEngineService = PretestEngineService;
     };
 
@@ -90,6 +131,16 @@ oppia.factory('ExplorationPlayerStateService', [
         PlayerCorrectnessFeedbackEnabledService.init(
           explorationData.correctness_feedback_enabled);
         NumberAttemptsService.reset();
+      });
+    };
+
+    var initQuestionPlayer = function(questionPlayerConfig, callback) {
+      setQuestionPlayerMode();
+      QuestionPlayerBackendApiService.fetchQuestions(
+        questionPlayerConfig.skillList,
+        questionPlayerConfig.questionCount, true).then(function(questionData) {
+        $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
+        initializeQuestionPlayerServices(questionData, callback);
       });
     };
 
@@ -130,11 +181,22 @@ oppia.factory('ExplorationPlayerStateService', [
           initExplorationPlayer(callback);
         }
       },
+      initializeQuestionPlayer: function(config, callback) {
+        PlayerTranscriptService.init();
+        initQuestionPlayer(config, callback);
+      },
       getCurrentEngineService: function() {
         return currentEngineService;
       },
       isInPretestMode: function() {
-        return inPretestMode;
+        return explorationMode === EXPLORATION_MODE.PRETEST;
+      },
+      isInQuestionMode: function() {
+        return explorationMode === EXPLORATION_MODE.PRETEST ||
+        explorationMode === EXPLORATION_MODE.QUESTION_PLAYER;
+      },
+      isInQuestionPlayerMode: function() {
+        return explorationMode === EXPLORATION_MODE.QUESTION_PLAYER;
       },
       getPretestQuestionCount: function() {
         return PretestEngineService.getPretestQuestionCount();

@@ -16,6 +16,10 @@
  * @fileoverview unit tests for number with units object type factory service.
  */
 
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/objects/UnitsObjectFactory.ts');
+
 describe('NumberWithUnitsObjectFactory', function() {
   beforeEach(angular.mock.module('oppia'));
 

@@ -17,13 +17,19 @@
  * is in production mode.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('adminProdModeActivitiesTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/activities_tab/' +
-        'admin_prod_mode_activities_tab_directive.html')
+        'admin_prod_mode_activities_tab_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }
 ]);

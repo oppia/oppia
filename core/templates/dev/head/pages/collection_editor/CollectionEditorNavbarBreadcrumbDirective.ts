@@ -16,6 +16,11 @@
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 // TODO(bhenning): After the navbar is moved to a directive, this directive
 // should be updated to say 'Loading...' if the collection editor's controller
 // is not yet finished loading the collection. Also, this directive should
@@ -27,15 +32,18 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/' +
         'collection_editor_navbar_breadcrumb_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'RouterService', 'CollectionEditorStateService',
+        'RouterService', 'CollectionEditorStateService',
         'FocusManagerService', 'COLLECTION_TITLE_INPUT_FOCUS_LABEL',
         function(
-            $scope, RouterService, CollectionEditorStateService,
+            RouterService, CollectionEditorStateService,
             FocusManagerService, COLLECTION_TITLE_INPUT_FOCUS_LABEL) {
+          var ctrl = this;
           var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
             main: 'Edit',
             preview: 'Preview',
@@ -45,14 +53,14 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
             history: 'History',
           };
 
-          $scope.collection = CollectionEditorStateService.getCollection();
+          ctrl.collection = CollectionEditorStateService.getCollection();
 
-          $scope.getCurrentTabName = function() {
+          ctrl.getCurrentTabName = function() {
             return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
               RouterService.getActiveTabName()];
           };
 
-          $scope.editCollectionTitle = function() {
+          ctrl.editCollectionTitle = function() {
             RouterService.navigateToSettingsTab();
             FocusManagerService.setFocus(COLLECTION_TITLE_INPUT_FOCUS_LABEL);
           };

@@ -19,20 +19,6 @@ from core.controllers import base
 import feconf
 
 
-# TODO(bhenning): Convert this over to using action-based ACLs.
-def require_maintenance_mode(handler):
-    """Decorator that checks whether maintenance mode is enabled in feconf."""
-
-    def test_maintenance_mode(self, **kwargs):
-        """Checks whether the site is in maintenance mode."""
-        if not feconf.ENABLE_MAINTENANCE_MODE:
-            raise self.UnauthorizedUserException(
-                'You cannot access this page unless the site is in '
-                'maintenance mode')
-        return handler(self, **kwargs)
-    return test_maintenance_mode
-
-
 class SplashPage(base.BaseHandler):
     """Landing page for Oppia."""
 
@@ -45,10 +31,10 @@ class SplashPage(base.BaseHandler):
         })
 
         if not c_value:
-            self.render_template('pages/splash/splash.html')
+            self.render_template('dist/splash.html')
         else:
             try:
-                self.render_template('pages/splash/splash_%s.html' % c_value)
+                self.render_template('dist/splash_%s.html' % c_value)
             except Exception:
                 # Old c values may have been deprecated, in which case we
                 # revert to the default splash page URL. When redirecting,
@@ -74,7 +60,7 @@ class AboutPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/about/about.html')
+        self.render_template('dist/about.html')
 
 
 class GetStartedPage(base.BaseHandler):
@@ -86,7 +72,7 @@ class GetStartedPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.GET_STARTED_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/get_started/get_started.html')
+        self.render_template('dist/get_started.html')
 
 
 class TeachPage(base.BaseHandler):
@@ -98,7 +84,7 @@ class TeachPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/teach/teach.html')
+        self.render_template('dist/teach.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -110,7 +96,7 @@ class ContactPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/contact/contact.html')
+        self.render_template('dist/contact.html')
 
 
 class DonatePage(base.BaseHandler):
@@ -122,7 +108,7 @@ class DonatePage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/donate/donate.html')
+        self.render_template('dist/donate.html')
 
 
 class ThanksPage(base.BaseHandler):
@@ -134,7 +120,7 @@ class ThanksPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
         })
-        self.render_template('pages/thanks/thanks.html')
+        self.render_template('dist/thanks.html')
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -155,7 +141,7 @@ class TermsPage(base.BaseHandler):
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
 
-        self.render_template('pages/terms/terms.html')
+        self.render_template('dist/terms.html')
 
 
 class PrivacyPage(base.BaseHandler):
@@ -164,7 +150,7 @@ class PrivacyPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/privacy/privacy.html')
+        self.render_template('dist/privacy.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -200,7 +186,7 @@ class ConsoleErrorPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/tests/console_errors.html')
+        self.render_template('dist/console_errors.html')
 
 
 class MaintenancePage(base.BaseHandler):
@@ -209,4 +195,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('pages/maintenance/maintenance.html')
+        self.render_template('dist/maintenance.html')

@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for FeedbackThreadObjectFactory.
-*/
+ * @fileoverview Unit tests for FeedbackThreadObjectFactory.
+ */
+
+require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 
 describe('Feedback thread object factory', function() {
   beforeEach(angular.mock.module('oppia'));

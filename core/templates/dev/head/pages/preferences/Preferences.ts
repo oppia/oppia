@@ -16,6 +16,18 @@
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  */
 
+require('components/forms/Select2DropdownDirective.ts');
+require('components/forms/ImageUploaderDirective.ts');
+require('components/background/BackgroundBannerDirective.ts');
+require('filters/TruncateFilter.ts');
+require('pages/OppiaFooterDirective.ts');
+
+require('domain/utilities/LanguageUtilService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/UserService.ts');
+require('services/UtilsService.ts');
+
 oppia.controller('Preferences', [
   '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate', '$uibModal',
   'AlertsService', 'LanguageUtilService', 'UrlInterpolationService',

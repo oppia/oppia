@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service to handle the updating of a question.
-*/
+ * @fileoverview Service to handle the updating of a question.
+ */
+
+require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/QuestionObjectFactory.ts');
 
 oppia.constant('QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
 oppia.constant('QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
@@ -89,13 +94,11 @@ oppia.factory('QuestionUpdateService', [
       var contentIdsToAdd = _getElementsInFirstSetButNotInSecond(
         newContentIds, oldContentIds);
       contentIdsToDelete.forEach(function(contentId) {
-        newState.contentIdsToAudioTranslations.deleteContentId(
-          contentId);
-        newState.writtenTranslations.deleteContentId(
-          contentId);
+        newState.recordedVoiceovers.deleteContentId(contentId);
+        newState.writtenTranslations.deleteContentId(contentId);
       });
       contentIdsToAdd.forEach(function(contentId) {
-        newState.contentIdsToAudioTranslations.addContentId(contentId);
+        newState.recordedVoiceovers.addContentId(contentId);
         newState.writtenTranslations.addContentId(contentId);
       });
     };

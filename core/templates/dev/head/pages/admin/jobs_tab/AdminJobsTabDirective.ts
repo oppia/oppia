@@ -16,6 +16,8 @@
  * @fileoverview Directive for the jobs tab in the admin panel.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('adminJobsTab', [
   '$http', '$timeout', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
@@ -24,94 +26,97 @@ oppia.directive('adminJobsTab', [
       ADMIN_JOB_OUTPUT_URL_TEMPLATE) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/jobs_tab/' +
         'admin_jobs_tab_directive.html'),
-      controller: ['$scope', function($scope) {
-        $scope.HUMAN_READABLE_CURRENT_TIME = (
+      controllerAs: '$ctrl',
+      controller: [function() {
+        var ctrl = this;
+        ctrl.HUMAN_READABLE_CURRENT_TIME = (
           GLOBALS.HUMAN_READABLE_CURRENT_TIME);
-        $scope.CONTINUOUS_COMPUTATIONS_DATA = (
+        ctrl.CONTINUOUS_COMPUTATIONS_DATA = (
           GLOBALS.CONTINUOUS_COMPUTATIONS_DATA);
-        $scope.ONE_OFF_JOB_SPECS = GLOBALS.ONE_OFF_JOB_SPECS;
-        $scope.UNFINISHED_JOB_DATA = GLOBALS.UNFINISHED_JOB_DATA;
-        $scope.RECENT_JOB_DATA = GLOBALS.RECENT_JOB_DATA;
+        ctrl.ONE_OFF_JOB_SPECS = GLOBALS.ONE_OFF_JOB_SPECS;
+        ctrl.UNFINISHED_JOB_DATA = GLOBALS.UNFINISHED_JOB_DATA;
+        ctrl.RECENT_JOB_DATA = GLOBALS.RECENT_JOB_DATA;
 
-        $scope.showingJobOutput = false;
-        $scope.showJobOutput = function(jobId) {
+        ctrl.showingJobOutput = false;
+        ctrl.showJobOutput = function(jobId) {
           var adminJobOutputUrl = UrlInterpolationService.interpolateUrl(
             ADMIN_JOB_OUTPUT_URL_TEMPLATE, {
               jobId: jobId
             });
           $http.get(adminJobOutputUrl).then(function(response) {
-            $scope.showingJobOutput = true;
-            $scope.jobOutput = response.data.output || [];
-            $scope.jobOutput.sort();
+            ctrl.showingJobOutput = true;
+            ctrl.jobOutput = response.data.output || [];
+            ctrl.jobOutput.sort();
             $timeout(function() {
               document.querySelector('#job-output').scrollIntoView();
             });
           });
         };
 
-        $scope.startNewJob = function(jobType) {
-          $scope.setStatusMessage('Starting new job...');
+        ctrl.startNewJob = function(jobType) {
+          ctrl.setStatusMessage('Starting new job...');
 
           $http.post(ADMIN_HANDLER_URL, {
             action: 'start_new_job',
             job_type: jobType
           }).then(function() {
-            $scope.setStatusMessage('Job started successfully.');
+            ctrl.setStatusMessage('Job started successfully.');
             window.location.reload();
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
         };
 
-        $scope.cancelJob = function(jobId, jobType) {
-          $scope.setStatusMessage('Cancelling job...');
+        ctrl.cancelJob = function(jobId, jobType) {
+          ctrl.setStatusMessage('Cancelling job...');
 
           $http.post(ADMIN_HANDLER_URL, {
             action: 'cancel_job',
             job_id: jobId,
             job_type: jobType
           }).then(function() {
-            $scope.setStatusMessage('Abort signal sent to job.');
+            ctrl.setStatusMessage('Abort signal sent to job.');
             window.location.reload();
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
         };
 
-        $scope.startComputation = function(computationType) {
-          $scope.setStatusMessage('Starting computation...');
+        ctrl.startComputation = function(computationType) {
+          ctrl.setStatusMessage('Starting computation...');
 
           $http.post(ADMIN_HANDLER_URL, {
             action: 'start_computation',
             computation_type: computationType
           }).then(function() {
-            $scope.setStatusMessage('Computation started successfully.');
+            ctrl.setStatusMessage('Computation started successfully.');
             window.location.reload();
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
         };
 
-        $scope.stopComputation = function(computationType) {
-          $scope.setStatusMessage('Stopping computation...');
+        ctrl.stopComputation = function(computationType) {
+          ctrl.setStatusMessage('Stopping computation...');
 
           $http.post(ADMIN_HANDLER_URL, {
             action: 'stop_computation',
             computation_type: computationType
           }).then(function() {
-            $scope.setStatusMessage('Abort signal sent to computation.');
+            ctrl.setStatusMessage('Abort signal sent to computation.');
             window.location.reload();
           }, function(errorResponse) {
-            $scope.setStatusMessage(
+            ctrl.setStatusMessage(
               'Server error: ' + errorResponse.data.error);
           });
         };

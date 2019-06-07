@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,30 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the collection editor page.
+ * @fileoverview Directives required in collection editor.
  */
 
-// TODO(bhenning): These constants should be provided by the backend.
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
-oppia.constant(
-  'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
-  '/collection_editor_handler/data/<collection_id>');
-oppia.constant(
-  'COLLECTION_RIGHTS_URL_TEMPLATE',
-  '/collection_editor_handler/rights/<collection_id>');
-
-oppia.constant(
-  'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
-
-oppia.constant(
-  'SEARCH_EXPLORATION_URL_TEMPLATE',
-  '/exploration/metadata_search?q=<query>');
-
-oppia.controller('CollectionEditor', [
-  'CollectionEditorStateService',
-  function(CollectionEditorStateService) {
-    // Load the collection to be edited.
-    CollectionEditorStateService.loadCollection(GLOBALS.collectionId);
-  }
-]);
+require('pages/collection_editor/CollectionEditorPageDirective.ts');
+require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
+require('pages/collection_editor/CollectionEditorNavbarDirective.ts');

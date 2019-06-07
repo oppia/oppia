@@ -197,7 +197,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
         exp_summary_model.status, exp_summary_model.community_owned,
         exp_summary_model.owner_ids, exp_summary_model.editor_ids,
-        exp_summary_model.translator_ids, exp_summary_model.viewer_ids,
+        exp_summary_model.voice_artist_ids, exp_summary_model.viewer_ids,
         exp_summary_model.contributor_ids,
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
@@ -737,9 +737,15 @@ def apply_change_list(exploration_id, change_list):
 
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS): # pylint: disable=line-too-long
-                    state.update_content_ids_to_audio_translations(
-                        change.new_value)
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected recorded_voiceovers to be a dict, '
+                            'received %s' % change.new_value)
+                    recorded_voiceovers = (
+                        state_domain.RecordedVoiceovers.from_dict(
+                            change.new_value))
+                    state.update_recorded_voiceovers(recorded_voiceovers)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
@@ -1115,7 +1121,7 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
 
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
-        is_suggestion=False, is_by_translator=False):
+        is_suggestion=False, is_by_voice_artist=False):
     """Update an exploration. Commits changes.
 
     Args:
@@ -1131,8 +1137,8 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
         is_suggestion: bool. Whether the update is due to a suggestion being
             accepted.
-        is_by_translator: bool. Whether the changes are made by a
-            translator.
+        is_by_voice_artist: bool. Whether the changes are made by a
+            voice artist.
 
     Raises:
         ValueError: No commit message is supplied and the exploration is public.
@@ -1142,9 +1148,9 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
-    if is_by_translator and not is_translation_change_list(change_list):
+    if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
-            'Translator does not have permission to make some '
+            'Voice artist does not have permission to make some '
             'changes in the change list.')
 
     is_public = rights_manager.is_exploration_public(exploration_id)
@@ -1275,10 +1281,10 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, scaled_average_rating, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.translator_ids, exp_rights.viewer_ids,
-        contributor_ids, contributors_summary, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated,
-        first_published_msec)
+        exp_rights.editor_ids, exp_rights.voice_artist_ids,
+        exp_rights.viewer_ids, contributor_ids, contributors_summary,
+        exploration.version, exploration_model_created_on,
+        exploration_model_last_updated, first_published_msec)
 
     return exp_summary
 
@@ -1337,7 +1343,7 @@ def save_exploration_summary(exp_summary):
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
-        translator_ids=exp_summary.translator_ids,
+        voice_artist_ids=exp_summary.voice_artist_ids,
         viewer_ids=exp_summary.viewer_ids,
         contributor_ids=exp_summary.contributor_ids,
         contributors_summary=exp_summary.contributors_summary,
@@ -1465,7 +1471,7 @@ def get_demo_exploration_components(demo_path):
 
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, exploration_id, assets_list,
-        strip_audio_translations=False):
+        strip_voiceovers=False):
     """Note that the default title and category will be used if the YAML
     schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
@@ -1478,8 +1484,8 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(list(str)). A list of lists of assets, which contains
             asset's filename and content.
-        strip_audio_translations: bool. Whether to strip away all audio
-            translations from the imported exploration.
+        strip_voiceovers: bool. Whether to strip away all audio voiceovers
+            from the imported exploration.
 
     Raises:
         Exception: The yaml file is invalid due to a missing schema version.
@@ -1513,10 +1519,9 @@ def save_new_exploration_from_yaml_and_assets(
             exploration_id, yaml_content)
 
     # Check whether audio translations should be stripped.
-    if strip_audio_translations:
+    if strip_voiceovers:
         for state in exploration.states.values():
-            for content_id in state.content_ids_to_audio_translations:
-                state.content_ids_to_audio_translations[content_id] = {}
+            state.recorded_voiceovers.strip_all_existing_voiceovers()
 
     create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
@@ -1802,9 +1807,9 @@ def index_explorations_given_ids(exp_ids):
         if exploration_summary is not None])
 
 
-def is_translation_change_list(change_list):
+def is_voiceover_change_list(change_list):
     """Checks whether the change list contains only the changes which are
-    allowed for translator to do.
+    allowed for voice artist to do.
 
     Args:
         change_list: list(ExplorationChange). A list that contains the changes
@@ -1812,11 +1817,11 @@ def is_translation_change_list(change_list):
 
     Returns:
         bool. Whether the change_list contains only the changes which are
-        allowed for translator to do.
+        allowed for voice artist to do.
     """
     for change in change_list:
         if (change.property_name !=
-                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS):
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
             return False
     return True
 
@@ -1913,7 +1918,7 @@ def get_user_exploration_data(
 
 def create_or_update_draft(
         exp_id, user_id, change_list, exp_version, current_datetime,
-        is_by_translator=False):
+        is_by_voice_artist=False):
     """Create a draft with the given change list, or update the change list
     of the draft if it already exists. A draft is updated only if the change
     list timestamp of the new change list is greater than the change list
@@ -1928,12 +1933,12 @@ def create_or_update_draft(
             to be made to the ExplorationUserDataModel object.
         exp_version: int. The current version of the exploration.
         current_datetime: datetime.datetime. The current date and time.
-        is_by_translator: bool. Whether the changes are made by a
-            translator.
+        is_by_voice_artist: bool. Whether the changes are made by a
+            voice artist.
     """
-    if is_by_translator and not is_translation_change_list(change_list):
+    if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
-            'Translator does not have permission to make some '
+            'Voice artist does not have permission to make some '
             'changes in the change list.')
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
