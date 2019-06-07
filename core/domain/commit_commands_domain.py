@@ -343,3 +343,59 @@ class StoryRightsCommitCmd(object):
                 self.name == story_domain.CMD_UNPUBLISH_STORY):
             required_keys = []
             validate_dict_keys(self.parameters.keys(), required_keys)
+
+
+class FileMetadataCommitCmd(object):
+    """Domain object for commit commands of a file metadata.
+
+    Attributes:
+        name: str. The command name.
+        parameters: dict. The command parameters.
+    """
+
+    def __init__(self, name, parameters):
+        """Constructs a FileMetadataCommitCmd domain object.
+
+        Args:
+            name: str. The command name.
+            parameters: dict. The command parameters.
+        """
+        self.name = name
+        self.parameters = parameters
+
+    def validate(self):
+        """Checks that all parameters of a command are valid for the
+        given command name.
+
+        Raises:
+            Exception: The command is invalid.
+        """
+        return
+
+
+class FileCommitCmd(object):
+    """Domain object for commit commands of a file.
+
+    Attributes:
+        name: str. The command name.
+        parameters: dict. The command parameters.
+    """
+
+    def __init__(self, name, parameters):
+        """Constructs a FileCommitCmd domain object.
+
+        Args:
+            name: str. The command name.
+            parameters: dict. The command parameters.
+        """
+        self.name = name
+        self.parameters = parameters
+
+    def validate(self):
+        """Checks that all parameters of a command are valid for the
+        given command name.
+
+        Raises:
+            Exception: The command is invalid.
+        """
+        return
