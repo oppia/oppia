@@ -30,34 +30,64 @@ require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
 require('components/forms/validators/IsIntegerFilter.ts');
 require('components/forms/validators/IsNonemptyFilter.ts');
-require('components/forms/custom-forms-directives/apply-validation.directive.ts');
-require('components/forms/custom-forms-directives/require-is-float.directive.ts');
-require('components/forms/schema-based-editors/schema-based-bool-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-choices-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-custom-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-dict-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-expression-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-float-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-html-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-list-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-unicode-editor.directive.ts');
-require('components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
 require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 require('filters/NormalizeWhitespaceFilter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/common-layout-directives/common-elements/attribution-guide.directive.ts');
-require('components/common-layout-directives/common-elements/background-banner.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');
 require('pages/exploration_player/LearnerLocalNavDirective.ts');

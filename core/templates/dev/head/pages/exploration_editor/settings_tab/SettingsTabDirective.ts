@@ -16,7 +16,8 @@
  * @fileoverview Directive for the exploration settings tab.
  */
 
-require('components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
 require('pages/exploration_editor/ExplorationObjectiveEditorDirective.ts');
 require('pages/exploration_editor/ParamChangesEditorDirective.ts');

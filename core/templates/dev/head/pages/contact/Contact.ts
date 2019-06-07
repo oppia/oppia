@@ -16,5 +16,7 @@
  * @fileoverview File to import necessary scripts for contact page.
  */
 
-require('components/common-layout-directives/common-elements/background-banner.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 require('pages/OppiaFooterDirective.ts');

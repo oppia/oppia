@@ -33,7 +33,8 @@ oppia.directive('hintAndSolutionButtons', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/button-directives/hint-and-solution-buttons.directive.html'),
+        '/components/button-directives/' +
+        'hint-and-solution-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', 'HintsAndSolutionManagerService',

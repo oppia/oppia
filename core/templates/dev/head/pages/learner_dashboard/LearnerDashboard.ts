@@ -16,8 +16,12 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
-require('components/common-layout-directives/common-elements/background-banner.directive.ts');
-require('components/common-layout-directives/common-elements/loading-dots.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 require('components/summary_tile/CollectionSummaryTileDirective.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
 require('filters/TruncateFilter.ts');

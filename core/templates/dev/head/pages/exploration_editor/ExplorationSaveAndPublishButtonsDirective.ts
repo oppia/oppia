@@ -16,7 +16,9 @@
  * @fileoverview Directive for the exploration save & publish buttons.
  */
 
-require('components/common-layout-directives/common-elements/loading-dots.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ChangeListService.ts');

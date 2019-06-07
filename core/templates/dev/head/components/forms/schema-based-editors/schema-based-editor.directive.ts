@@ -16,15 +16,32 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
-require('components/forms/schema-based-editors/schema-based-bool-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-choices-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-custom-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-dict-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-float-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-html-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-list-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-unicode-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 

@@ -17,7 +17,9 @@
  *   versions of an exploration.
  */
 
-require('components/common-layout-directives/common-elements/loading-dots.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 

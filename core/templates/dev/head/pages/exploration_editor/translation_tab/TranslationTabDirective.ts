@@ -16,7 +16,9 @@
  * @fileoverview Directive for the translation tab.
  */
 
-require('components/common-layout-directives/common-elements/attribution-guide.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
 require(
   'pages/exploration_editor/translation_tab/StateTranslationDirective.ts');
 require(

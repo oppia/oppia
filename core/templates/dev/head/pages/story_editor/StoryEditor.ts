@@ -28,27 +28,49 @@ require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
 require('components/forms/validators/IsIntegerFilter.ts');
 require('components/forms/validators/IsNonemptyFilter.ts');
-require('components/forms/custom-forms-directives/apply-validation.directive.ts');
-require('components/forms/custom-forms-directives/require-is-float.directive.ts');
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
-require('components/forms/schema-based-editors/schema-based-custom-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-dict-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require(
-  'components/forms/schema-based-editors/schema-based-expression-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-float-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-html-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-list-editor.directive.ts');
-require('components/forms/schema-based-editors/schema-based-unicode-editor.directive.ts');
-require('components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
 require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
-require('components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 require('services/HtmlEscaperService.ts');
 require('services/IdGenerationService.ts');
@@ -57,7 +79,9 @@ require('services/SchemaDefaultValueService.ts');
 require('services/SchemaUndefinedLastElementService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 require('services/GenerateContentIdService.ts');
-require('components/common-layout-directives/common-elements/loading-dots.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');

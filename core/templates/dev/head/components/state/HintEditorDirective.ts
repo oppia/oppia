@@ -16,7 +16,8 @@
  * @fileoverview Directive for the hint editor.
  */
 
-require('components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

@@ -21,8 +21,12 @@
 require('pages/collection_player/CollectionNodeListDirective.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/common-layout-directives/common-elements/attribution-guide.directive.ts');
-require('components/common-layout-directives/common-elements/background-banner.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
 
 require('domain/collection/CollectionObjectFactory.ts');

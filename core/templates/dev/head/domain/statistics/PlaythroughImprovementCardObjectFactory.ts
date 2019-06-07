@@ -40,7 +40,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       var discardThis = function() {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/common-layout-directives/common-elements/confirmation-modal.template.html'),
+            '/components/common-layout-directives/common-elements/' +
+            'confirmation-modal.template.html'),
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance',

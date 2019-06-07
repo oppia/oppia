@@ -21,7 +21,9 @@ oppia.constant(
   'PRACTICE_SESSIONS_DATA_URL',
   '/practice_session/data/<topic_name>');
 
-require('components/common-layout-directives/common-elements/background-banner.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 require('pages/question_player/QuestionPlayerDirective.ts');
 
 require('services/AlertsService.ts');

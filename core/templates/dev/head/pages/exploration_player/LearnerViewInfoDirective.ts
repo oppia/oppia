@@ -18,7 +18,9 @@
  */
 
 require('components/profile_link/ProfileLinkImageDirective.ts');
-require('components/common-layout-directives/common-elements/sharing-links.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'sharing-links.directive.ts');
 require('filters/SummarizeNonnegativeNumberFilter.ts');
 require('filters/TruncateAndCapitalizeFilter.ts');
 
