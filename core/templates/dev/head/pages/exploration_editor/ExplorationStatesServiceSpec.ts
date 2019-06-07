@@ -22,58 +22,63 @@ describe('ExplorationStatesService', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector) {
-    this.ContextService = $injector.get('ContextService');
-    this.ExplorationStatesService = $injector.get('ExplorationStatesService');
-    this.$q = $injector.get('$q');
+    this.ess = $injector.get('ExplorationStatesService');
 
-    spyOn(this.ContextService, 'getExplorationId').and.returnValue('7');
+    spyOn($injector.get('ContextService'), 'getExplorationId')
+      .and.returnValue('7');
   }));
 
   describe('Callback Registration', function() {
     beforeEach(function() {
-      this.ExplorationStatesService.init({
+      this.ess.init({
         Hola: {
-          content: {content_id: 'content', html: ''},
+          content: {
+            content_id: 'content',
+            html: ''
+          },
           recorded_voiceovers: {
             voiceovers_mapping: {
               content: {},
               default_outcome: {},
-              feedback_1: {},
-            },
+              feedback_1: {}
+            }
           },
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_specs: [
-                {rule_type: 'Contains', inputs: {x: 'hola'}},
-              ],
+              rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
               outcome: {
                 dest: 'Me Llamo',
-                feedback: {content_id: 'feedback_1', html: 'buen trabajo!'},
-                labelled_as_correct: true,
-              },
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: 'buen trabajo!'
+                },
+                labelled_as_correct: true
+              }
             }],
             default_outcome: {
               dest: 'Hola',
-              feedback: {content_id: 'default_outcome', html: 'try again!'},
-              labelled_as_correct: false,
+              feedback: {
+                content_id: 'default_outcome',
+                html: 'try again!'
+              },
+              labelled_as_correct: false
             },
             hints: [],
             id: 'TextInput',
-            solution: null,
+            solution: null
           },
           written_translations: {
             translations_mapping: {
               content: {},
               default_outcome: {},
-              feedback_1: {},
-            },
+              feedback_1: {}
+            }
           },
           classifier_model_id: 0,
-        },
+        }
       });
     });
-
     beforeEach(angular.mock.inject(function($injector) {
       // ChangeListService will need its calls mocked out since it isn't
       // configured correctly in, or interesting to, the tests of this block.
@@ -88,8 +93,8 @@ describe('ExplorationStatesService', function() {
       it('callsback when a new state is added', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
-        this.ExplorationStatesService.registerOnStateAddedCallback(callbackSpy);
-        this.ExplorationStatesService.addState('Me Llamo');
+        this.ess.registerOnStateAddedCallback(callbackSpy);
+        this.ess.addState('Me Llamo');
 
         expect(callbackSpy).toHaveBeenCalledWith('Me Llamo');
       });
@@ -99,22 +104,23 @@ describe('ExplorationStatesService', function() {
       var STATE_NAME = 'Hola';
 
       beforeEach(angular.mock.inject(function($injector) {
-        var spec = this;
-        spyOn(this.cls, 'deleteState').and.returnValue(this.$q.resolve);
+        spyOn(this.cls, 'deleteState');
 
         var modalArgs = {
           resolve: {
             deleteStateName: function() {
               return STATE_NAME;
-            },
-          },
+            }
+          }
         };
 
         // When ExplorationStatesService tries to show the confirm-delete
         // modal, have it immediately confirm.
         spyOn($injector.get('$uibModal'), 'open').and.callFake(
           function(modalArgs) {
-            return {result: spec.$q.resolve(STATE_NAME)};
+            return {
+              result: Promise.resolve(STATE_NAME)
+            };
           }
         );
       }));
@@ -122,10 +128,9 @@ describe('ExplorationStatesService', function() {
       it('callsback when a state is deleted', function(done) {
         var callbackSpy = jasmine.createSpy('callback');
 
-        this.ExplorationStatesService.registerOnStateDeletedCallback(
-          callbackSpy);
+        this.ess.registerOnStateDeletedCallback(callbackSpy);
 
-        this.ExplorationStatesService.deleteState(STATE_NAME).then(function() {
+        this.ess.deleteState(STATE_NAME).then(function() {
           expect(callbackSpy).toHaveBeenCalledWith(STATE_NAME);
           done();
         });
@@ -140,9 +145,8 @@ describe('ExplorationStatesService', function() {
       it('callsback when a state is renamed', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
-        this.ExplorationStatesService.registerOnStateRenamedCallback(
-          callbackSpy);
-        this.ExplorationStatesService.renameState('Hola', 'Bonjour');
+        this.ess.registerOnStateRenamedCallback(callbackSpy);
+        this.ess.renameState('Hola', 'Bonjour');
 
         expect(callbackSpy).toHaveBeenCalledWith('Hola', 'Bonjour');
       });
@@ -156,9 +160,8 @@ describe('ExplorationStatesService', function() {
       it('callsback when answer groups of a state are saved', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
-        this.ExplorationStatesService.registerOnStateInteractionSavedCallback(
-          callbackSpy);
-        this.ExplorationStatesService.saveInteractionAnswerGroups('Hola', []);
+        this.ess.registerOnStateInteractionSavedCallback(callbackSpy);
+        this.ess.saveInteractionAnswerGroups('Hola', []);
 
         expect(callbackSpy).toHaveBeenCalledWith('Hola');
       });
