@@ -57,7 +57,7 @@ require('services/SchemaDefaultValueService.ts');
 require('services/SchemaUndefinedLastElementService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 require('services/GenerateContentIdService.ts');
-require('components/loading/LoadingDotsDirective.ts');
+require('components/common-layout-directives/common-elements/loading-dots.directive.ts');
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');

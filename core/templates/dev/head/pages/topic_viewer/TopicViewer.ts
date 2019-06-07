@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the topic viewer.
  */
 
-require('components/background/BackgroundBannerDirective.ts');
+require('components/common-layout-directives/common-elements/background-banner.directive.ts');
 require('pages/topic_viewer/StoriesListDirective.ts');
 require('pages/topic_viewer/TopicViewerNavbarBreadcrumbDirective.ts');
 

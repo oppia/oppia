@@ -42,11 +42,13 @@ require('services/stateful/BackgroundMaskService.ts');
 require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
 
-require('components/alerts/AlertMessageDirective.ts');
+require('components/common-layout-directives/common-elements/alert-message.directive.ts');
 require('components/button-directives/create-activity-button.directive.ts');
 
 require('components/forms/ObjectEditorDirective.ts');
-require('components/promo/PromoBarDirective.ts');
+require(
+  '/components/common-layout-directives/common-elements/' +
+  'promo-bar.directive.ts');
 require('components/side_navigation_bar/SideNavigationBarDirective.ts');
 require('components/button-directives/social-buttons.directive.ts');
 require('components/top_navigation_bar/TopNavigationBarDirective.ts');

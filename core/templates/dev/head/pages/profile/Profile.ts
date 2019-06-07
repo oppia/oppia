@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
-require('components/background/BackgroundBannerDirective.ts');
+require('components/common-layout-directives/common-elements/background-banner.directive.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
 require('filters/TruncateFilter.ts');
 require('pages/OppiaFooterDirective.ts');

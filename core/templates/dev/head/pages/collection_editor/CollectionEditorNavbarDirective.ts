@@ -17,7 +17,7 @@
  */
 
 require('components/forms/Select2DropdownDirective.ts');
-require('components/loading/LoadingDotsDirective.ts');
+require('components/common-layout-directives/common-elements/loading-dots.directive.ts');
 
 require('domain/collection/CollectionRightsBackendApiService.ts');
 require('domain/collection/CollectionUpdateService.ts');

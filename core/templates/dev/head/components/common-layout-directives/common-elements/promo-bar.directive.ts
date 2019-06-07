@@ -29,8 +29,8 @@ oppia.directive('promoBar', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/promo/' +
-        'promo_bar_directive.html'),
+        '/components/common-layout-directives/common-elements/' +
+        'promo-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {

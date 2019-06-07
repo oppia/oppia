@@ -58,8 +58,8 @@ require('filters/NormalizeWhitespaceFilter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/attribution_guide/AttributionGuideDirective.ts');
-require('components/background/BackgroundBannerDirective.ts');
+require('components/common-layout-directives/common-elements/attribution-guide.directive.ts');
+require('components/common-layout-directives/common-elements/background-banner.directive.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');
 require('pages/exploration_player/LearnerLocalNavDirective.ts');

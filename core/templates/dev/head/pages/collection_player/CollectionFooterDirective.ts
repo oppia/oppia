@@ -17,7 +17,7 @@
  * in collection player.
  */
 
-require('components/share/SharingLinksDirective.ts');
+require('components/common-layout-directives/common-elements/sharing-links.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 

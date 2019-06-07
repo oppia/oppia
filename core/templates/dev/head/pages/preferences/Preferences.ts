@@ -18,7 +18,7 @@
 
 require('components/forms/Select2DropdownDirective.ts');
 require('components/forms/ImageUploaderDirective.ts');
-require('components/background/BackgroundBannerDirective.ts');
+require('components/common-layout-directives/common-elements/background-banner.directive.ts');
 require('filters/TruncateFilter.ts');
 require('pages/OppiaFooterDirective.ts');
 

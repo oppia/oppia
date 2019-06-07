@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2015 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,20 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying animated loading dots.
+ * @fileoverview Directive for the background banner.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive('loadingDots', [
+oppia.directive('backgroundBanner', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/loading/loading_dots_directive.html'),
+        '/components/common-layout-directives/common-elements/' +
+        'background-banner.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [
+        function() {
+          var ctrl = this;
+          var possibleBannerFilenames = [
+            'bannerA.svg', 'bannerB.svg', 'bannerC.svg', 'bannerD.svg'];
+          var bannerImageFilename = possibleBannerFilenames[
+            Math.floor(Math.random() * possibleBannerFilenames.length)];
+          ctrl.bannerImageFileUrl = UrlInterpolationService.getStaticImageUrl(
+            '/background/' + bannerImageFilename);
+        }
+      ]
     };
   }]);

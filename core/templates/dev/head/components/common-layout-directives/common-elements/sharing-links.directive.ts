@@ -35,8 +35,8 @@ oppia.directive('sharingLinks', [
         getCollectionId: '&collectionId'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/share/' +
-        'sharing_links_directive.html'),
+        '/components/common-layout-directives/common-elements/' +
+        'sharing-links.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$window', 'HtmlEscaperService',

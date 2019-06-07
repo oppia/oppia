@@ -96,7 +96,7 @@ require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('components/VersionDiffVisualizationDirective.ts');
-require('components/attribution_guide/AttributionGuideDirective.ts');
+require('components/common-layout-directives/common-elements/attribution-guide.directive.ts');
 require('components/forms/Select2DropdownDirective.ts');
 require('components/profile_link/ProfileLinkTextDirective.ts');
 require('pages/exploration_editor/EditorNavbarBreadcrumbDirective.ts');
