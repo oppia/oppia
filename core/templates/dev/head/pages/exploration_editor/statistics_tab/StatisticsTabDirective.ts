@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the exploration statistics tab in the
+ * @fileoverview Directive for the exploration statistics tab in the
  * exploration editor.
  */
 
