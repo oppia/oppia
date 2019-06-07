@@ -89,13 +89,15 @@ def run_job_for_deleted_exp(
     output or error condition.
     """
     job_id = job_class.create_new()
-    self.assertEqual(
-        self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-    job_class.enqueue(job_id)
+    # Check there is one job in the taskqueue corresponding to
+    # delete_exploration_from_subscribed_users.
     self.assertEqual(
         self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+    job_class.enqueue(job_id)
+    self.assertEqual(
+        self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
     self.process_and_flush_pending_tasks()
 
     if check_error:
