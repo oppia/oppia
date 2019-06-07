@@ -107,9 +107,6 @@ require(
 require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
 require('pages/exploration_editor/ParamChangesEditorDirective.ts');
 require('pages/exploration_editor/editor_tab/ExplorationEditorTabDirective.ts');
-require('pages/exploration_editor/editor_tab/ExplorationGraphDirective.ts');
-require(
-  'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
 require('pages/exploration_editor/feedback_tab/FeedbackTabDirective.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
 require('pages/exploration_editor/history_tab/HistoryTabDirective.ts');
