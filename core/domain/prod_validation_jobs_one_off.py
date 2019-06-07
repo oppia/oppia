@@ -34,13 +34,14 @@ import schema_utils
 
 (
     activity_models, audit_models, collection_models, config_models,
-    email_models, exp_models, feedback_models,
+    email_models, exp_models, feedback_models, file_models,
     recommendations_models, story_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.recommendations,
-            models.NAMES.story, models.NAMES.user]))
+            models.NAMES.feedback, models.NAMES.file,
+            models.NAMES.recommendations, models.NAMES.story,
+            models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -2049,6 +2050,328 @@ class ExpSummaryModelValidator(BaseModelValidator):
             cls._validate_related_model_properties]
 
 
+class FileMetadataModelValidator(BaseModelValidator):
+    """Class for validating FileMetadataModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        exploration_model_ids = []
+        if item.id.startswith('/'):
+            next_index = item.id[1:].find('/')
+            if next_index == -1:
+                next_index = len(item.id)
+            else:
+                next_index = next_index + 1
+            exploration_model_ids = [item.id[1: next_index]]
+        else:
+            exploration_model_ids = [item.id[:item.id.find('/')]]
+        return {
+            'snapshot_metadata_model': (
+                file_models.FileMetadataSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                file_models.FileMetadataSnapshotContentModel,
+                snapshot_model_ids),
+            'exploration_model': (
+                exp_models.ExplorationModel,
+                exploration_model_ids)
+        }
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return []
+
+
+class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating FileMetadataSnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.FileMetadataCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'file_metadata_model': (
+                file_models.FileMetadataModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_file_metadata_model_version_from_item_id(cls, item):
+        """Validate that file_metadata model corresponding to snapshot
+        metadata model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: FileMetadataSnapshotMetadataModel to validate.
+        """
+        _, file_metadata_model_tuples = cls.external_models[
+            'file_metadata_model']
+
+        file_metadata_model = file_metadata_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(file_metadata_model.version) < int(version):
+            cls.errors['file_metadata model version check'] = (
+                'Model id %s: FileMetadata model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot metadata model id' % (
+                    item.id, file_metadata_model.id,
+                    file_metadata_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_file_metadata_model_version_from_item_id]
+
+
+class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating FileMetadataSnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'file_metadata_model': (
+                file_models.FileMetadataModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_file_metadata_model_version_from_item_id(cls, item):
+        """Validate that file_metadata model corresponding to snapshot
+        content model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: FileMetadataSnapshotContentModel to validate.
+        """
+        _, file_metadata_model_tuples = cls.external_models[
+            'file_metadata_model']
+
+        file_metadata_model = file_metadata_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(file_metadata_model.version) < int(version):
+            cls.errors['file_metadata model version check'] = (
+                'Model id %s: FileMetadata model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot content model id' % (
+                    item.id, file_metadata_model.id,
+                    file_metadata_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_file_metadata_model_version_from_item_id]
+
+
+class FileModelValidator(BaseModelValidator):
+    """Class for validating FileModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        exploration_model_ids = []
+        if item.id.startswith('/'):
+            next_index = item.id[1:].find('/')
+            if next_index == -1:
+                next_index = len(item.id)
+            else:
+                next_index = next_index + 1
+            exploration_model_ids = [item.id[1: next_index]]
+        else:
+            exploration_model_ids = [item.id[:item.id.find('/')]]
+        return {
+            'snapshot_metadata_model': (
+                file_models.FileSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                file_models.FileSnapshotContentModel,
+                snapshot_model_ids),
+            'exploration_model': (
+                exp_models.ExplorationModel,
+                exploration_model_ids)
+        }
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return []
+
+
+class FileSnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating FileSnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.FileCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'file_model': (
+                file_models.FileModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_file_model_version_from_item_id(cls, item):
+        """Validate that file model corresponding to snapshot
+        metadata model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: FileSnapshotMetadataModel to validate.
+        """
+        _, file_model_tuples = cls.external_models[
+            'file_model']
+
+        file_model = file_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(file_model.version) < int(version):
+            cls.errors['file model version check'] = (
+                'Model id %s: File model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot metadata model id' % (
+                    item.id, file_model.id,
+                    file_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_file_model_version_from_item_id]
+
+
+class FileSnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating FileSnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'file_model': (
+                file_models.FileModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_file_model_version_from_item_id(cls, item):
+        """Validate that file model corresponding to snapshot
+        content model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: FileSnapshotContentModel to validate.
+        """
+        _, file_model_tuples = cls.external_models[
+            'file_model']
+
+        file_model = file_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(file_model.version) < int(version):
+            cls.errors['file model version check'] = (
+                'Model id %s: File model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot content model id' % (
+                    item.id, file_model.id,
+                    file_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_file_model_version_from_item_id]
+
+
 class ExplorationRecommendationsModelValidator(BaseModelValidator):
     """Class for validating ExplorationRecommendationsModel."""
 
@@ -2757,6 +3080,14 @@ MODEL_TO_VALIDATOR_MAPPING = {
     exp_models.ExplorationCommitLogEntryModel: (
         ExplorationCommitLogEntryModelValidator),
     exp_models.ExpSummaryModel: ExpSummaryModelValidator,
+    file_models.FileMetadataModel: FileMetadataModelValidator,
+    file_models.FileMetadataSnapshotMetadataModel: (
+        FileMetadataSnapshotMetadataModelValidator),
+    file_models.FileMetadataSnapshotContentModel: (
+        FileMetadataSnapshotContentModelValidator),
+    file_models.FileModel: FileModelValidator,
+    file_models.FileSnapshotMetadataModel: FileSnapshotMetadataModelValidator,
+    file_models.FileSnapshotContentModel: FileSnapshotContentModelValidator,
     recommendations_models.ExplorationRecommendationsModel: (
         ExplorationRecommendationsModelValidator),
     recommendations_models.TopicSimilaritiesModel: (
@@ -3014,6 +3345,58 @@ class ExpSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExpSummaryModel]
+
+
+class FileMetadataModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates FileMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileMetadataModel]
+
+
+class FileModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates FileModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileModel]
+
+
+class FileSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates FileSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileSnapshotMetadataModel]
+
+
+class FileSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates FileSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileSnapshotContentModel]
+
+
+class FileMetadataSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates FileMetadataSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileMetadataSnapshotMetadataModel]
+
+
+class FileMetadataSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates FileMetadataSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileMetadataSnapshotContentModel]
 
 
 class ExplorationRecommendationsModelAuditOneOffJob(

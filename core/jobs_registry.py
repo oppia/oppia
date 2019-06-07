@@ -79,6 +79,12 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileMetadataSnapshotMetadataModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.FileMetadataSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.StoryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob,
