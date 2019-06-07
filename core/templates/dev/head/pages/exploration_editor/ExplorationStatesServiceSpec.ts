@@ -109,7 +109,8 @@ describe('ExplorationStatesService', function() {
 
         // When ExplorationStatesService tries to show the confirm-delete
         // modal, have it immediately confirm.
-        spyOn($injector.get('$uibModal'), 'open').and.callFake(this.$q.resolve);
+        spyOn($injector.get('$uibModal'), 'open').and.returnValue(
+          this.$q.resolve());
       }));
 
       it('callsback when a state is deleted', function(done) {
