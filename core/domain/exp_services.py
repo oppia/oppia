@@ -814,6 +814,9 @@ def apply_change_list(exploration_id, change_list):
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_ADD_NEW_IMAGE):
+
+                    # Increment image_id_counter
+                    exploration.image_id_counter += 1
                     if (exploration.get_all_html_content_strings())[0] != '':
                         # Find image_ids of newly added images.
                         image_ids = get_images_ids_of_exploration(exploration)

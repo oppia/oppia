@@ -4066,11 +4066,11 @@ title: Title
             'eid', self.YAML_CONTENT_V32)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
-    # def test_load_from_v33(self):
-    #     """Test direct loading from a v33 yaml file."""
-    #     exploration = exp_domain.Exploration.from_yaml(
-    #         'eid', self.YAML_CONTENT_V33)
-    #     self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+    def test_load_from_v33(self):
+        """Test direct loading from a v33 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V33)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
     """Test HTML migration."""
@@ -4648,7 +4648,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
-image_id_counter: 0
+image_id_counter: 1
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4661,10 +4661,15 @@ states:
     content:
       content_id: content
       html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-        filepath-with-value="&amp;quot;random_height_490_width_120.png&amp;quot;"></oppia-noninteractive-image><p>Hello
-        this is test case to check image tag inside p tag</p>
+        image_id-with-value="1"></oppia-noninteractive-image><p>Hello this is test
+         case to check image tag inside p tag</p>
     image_assets:
-      image_mapping: {}
+      image_mapping:
+        1:
+          src: "&amp;quot;random_height_490_width_120.png&amp;quot;"
+          placeholder: False
+          author_id: ''
+          instructions: ''
     interaction:
       answer_groups:
       - outcome:

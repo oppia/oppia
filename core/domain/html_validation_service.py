@@ -860,6 +860,8 @@ def get_html_with_image_id_in_image_tag(
         }
         image_mapping[image_id_counter] = image_info
 
-    new_content_html = soup
+        # Removes filepath from image tag.
+        del image['filepath-with-value']
+    new_content_html = str(soup)
 
     return (new_content_html, image_id_counter, image_mapping)

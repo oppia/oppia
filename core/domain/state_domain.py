@@ -1575,8 +1575,7 @@ class State(object):
         self.written_translations = written_translations
 
     def validate(
-            self, exp_param_specs_dict, image_id_counter,
-            allow_null_interaction):
+            self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
 
         Args:

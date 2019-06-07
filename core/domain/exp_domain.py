@@ -714,8 +714,7 @@ class Exploration(object):
             state = self.states[state_name]
             state.validate(
                 self.param_specs,
-                self.image_id_counter,
-                allow_null_interaction=not strict,)
+                allow_null_interaction=not strict)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
             # questions. This logic is here because the validation checks in
@@ -1160,16 +1159,6 @@ class Exploration(object):
                 is enabled or not.
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
-
-    def update_image_id_counter(self, new_value):
-        """Increment the image_id counter."""
-        # self.image_id_counter += 1.
-        self.image_id_counter = new_value
-
-
-    def get_image_id_counter(self):
-        """Returns the image_id counter."""
-        return self.image_id_counter
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -2226,9 +2215,8 @@ class Exploration(object):
     @classmethod
     def _convert_states_v28_dict_to_v29_dict(
             cls, states_dict, image_id_counter):
-        """TODO.
-            Converts from version 28 to 29. Version 29 added image assets field
-            in state model.
+        """Converts from version 28 to 29. Version 29 added image assets field
+        in state model.
 
          Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -2316,9 +2304,10 @@ class Exploration(object):
                             value, image_id_counter, image_mapping))
                     state_dict['interaction']['customization_args'][
                         'choices']['value'][value_index] = new_value
-
+            print(image_mapping)
+            image_assets['image_mapping'] = image_mapping
             state_dict['image_assets'] = image_assets
-            state_dict['image_assets']['image_mapping'] = image_mapping
+            print(state_dict)
 
         return (states_dict, image_id_counter)
 
@@ -2960,7 +2949,6 @@ class Exploration(object):
                 exploration_dict['states'],
                 exploration_dict['image_id_counter']))
         exploration_dict['states_schema_version'] = 29
-
         return exploration_dict
 
     @classmethod
