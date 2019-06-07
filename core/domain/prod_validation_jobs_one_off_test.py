@@ -33,6 +33,8 @@ from core.domain import prod_validation_jobs_one_off
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
@@ -52,12 +54,13 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 (
     activity_models, audit_models, base_models, collection_models,
     config_models, email_models, exp_models, feedback_models,
-    recommendations_models, user_models,) = (
+    recommendations_models, story_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.collection, models.NAMES.config, models.NAMES.email,
             models.NAMES.exploration, models.NAMES.feedback,
-            models.NAMES.recommendations, models.NAMES.user]))
+            models.NAMES.recommendations, models.NAMES.story,
+            models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
 
@@ -4230,6 +4233,1216 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             'to be symmetric\']]') % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output)
+
+
+class StoryModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StoryModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(6)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        language_codes = ['ar', 'en', 'en']
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d'
+        ) for i in xrange(3)]
+
+        for index, story in enumerate(stories):
+            story.language_code = language_codes[index]
+            story.add_node('node_1', 'Node1')
+            story.add_node('node_2', 'Node2')
+            story.update_node_destination_node_ids('node_1', ['node_2'])
+            story.update_node_exploration_id(
+                'node_1', explorations[index * 2].id)
+            story.update_node_exploration_id(
+                'node_2', explorations[index * 2 + 1].id)
+            story_services.save_new_story(self.owner_id, story)
+
+        self.model_instance_0 = story_models.StoryModel.get_by_id('0')
+        self.model_instance_1 = story_models.StoryModel.get_by_id('1')
+        self.model_instance_2 = story_models.StoryModel.get_by_id('2')
+
+        self.job_class = (
+            prod_validation_jobs_one_off.StoryModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        story_services.update_story(
+            self.owner_id, '0', [story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'title',
+                'new_value': 'New title',
+                'old_value': 'title 0'
+            })], 'Changes.')
+
+        expected_output = [
+            u'[u\'fully-validated StoryModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of StoryModel\', '
+                '[u\'Model id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id,
+                    self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated
+                ),
+            u'[u\'fully-validated StoryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'StoryModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_story_schema(self):
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'StoryModel\', '
+                '[u\'Model id %s: Model fails domain validation with the error '
+                'Invalid language code: %s\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
+            u'[u\'fully-validated StoryModel\', 2]']
+        with self.swap(
+            constants, 'ALL_LANGUAGE_CODES', [{
+                'code': 'en', 'description': 'English'}]):
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('1').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_model field '
+                'check of StoryModel\', '
+                '[u"Model id 0: based on field exploration_model having value '
+                '1, expect model ExplorationModel with id 1 but it '
+                'doesn\'t exist"]]'),
+            u'[u\'fully-validated StoryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_commit_log_entry_model_failure(self):
+        story_services.update_story(
+            self.owner_id, '0', [story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'title',
+                'new_value': 'New title',
+                'old_value': 'title 0'
+            })], 'Changes.')
+        story_models.StoryCommitLogEntryModel.get_by_id(
+            'story-0-1').delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'story_commit_log_entry_model field check of '
+                'StoryModel\', '
+                '[u"Model id 0: based on field '
+                'story_commit_log_entry_model having value '
+                'story-0-1, expect model StoryCommitLogEntryModel '
+                'with id story-0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated StoryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_summary_model_failure(self):
+        story_models.StorySummaryModel.get_by_id('0').delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_summary_model '
+                'field check of StoryModel\', '
+                '[u"Model id 0: based on field story_summary_model having '
+                'value 0, expect model StorySummaryModel with id 0 '
+                'but it doesn\'t exist"]]'),
+            u'[u\'fully-validated StoryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_rights_model_failure(self):
+        story_models.StoryRightsModel.get_by_id(
+            '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_rights_model '
+                'field check of StoryModel\', '
+                '[u"Model id 0: based on field story_rights_model having '
+                'value 0, expect model StoryRightsModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated StoryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        story_models.StorySnapshotMetadataModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_model '
+                'field check of StoryModel\', '
+                '[u"Model id 0: based on field snapshot_metadata_model having '
+                'value 0-1, expect model StorySnapshotMetadataModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated StoryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        story_models.StorySnapshotContentModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_model '
+                'field check of StoryModel\', '
+                '[u"Model id 0: based on field snapshot_content_model having '
+                'value 0-1, expect model StorySnapshotContentModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated StoryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class StorySnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StorySnapshotMetadataModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+        ) for i in xrange(3)]
+
+        for story in stories:
+            if story.id != '0':
+                story_services.save_new_story(self.owner_id, story)
+            else:
+                story_services.save_new_story(self.user_id, story)
+
+        self.model_instance_0 = (
+            story_models.StorySnapshotMetadataModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            story_models.StorySnapshotMetadataModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            story_models.StorySnapshotMetadataModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        story_services.update_story(
+            self.owner_id, '0', [story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'title',
+                'new_value': 'New title',
+                'old_value': 'title 0'
+            })], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated StorySnapshotMetadataModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of StorySnapshotMetadataModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'StorySnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'StorySnapshotMetadataModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id('0').delete(
+            self.user_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_model '
+                'field check of StorySnapshotMetadataModel\', '
+                '[u"Model id 0-1: based on field story_model '
+                'having value 0, expect model StoryModel with '
+                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
+                'story_model having value 0, expect model '
+                'StoryModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'StorySnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(
+            self, expected_output, literal_eval=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_model field '
+                'check of StorySnapshotMetadataModel\', '
+                '[u"Model id 0-1: based on field committer_model having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.user_id, self.user_id), (
+                u'[u\'fully-validated '
+                'StorySnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_story_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            story_models.StorySnapshotMetadataModel(
+                id='0-3', committer_id=self.owner_id, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for story model '
+                'version check of StorySnapshotMetadataModel\', '
+                '[u\'Model id 0-3: Story model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot metadata model id\']]'
+            ), (
+                u'[u\'fully-validated StorySnapshotMetadataModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'add_story_node'
+        }, {
+            'cmd': 'delete_story_node',
+            'random_key': 'random'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd delete_story_node '
+                'check of StorySnapshotMetadataModel\', '
+                '[u\'Model id 0-1: Commit command domain validation failed '
+                'with error: Following required keys are missing: node_id, '
+                'Following extra keys are present: random_key\']]'
+            ), (
+                u'[u\'failed validation check for commit cmd add_story_node '
+                'check of StorySnapshotMetadataModel\', '
+                '[u\'Model id 0-1: Commit command domain validation failed '
+                'with error: Following required keys are missing: '
+                'node_id\']]'
+            ),
+            u'[u\'fully-validated StorySnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StorySnapshotContentModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+        ) for i in xrange(3)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
+
+        self.model_instance_0 = (
+            story_models.StorySnapshotContentModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            story_models.StorySnapshotContentModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            story_models.StorySnapshotContentModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.StorySnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        story_services.update_story(
+            self.owner_id, '0', [story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'title',
+                'new_value': 'New title',
+                'old_value': 'title 0'
+            })], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated StorySnapshotContentModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of StorySnapshotContentModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'StorySnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'StorySnapshotContentModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id('0').delete(self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_model '
+                'field check of StorySnapshotContentModel\', '
+                '[u"Model id 0-1: based on field story_model '
+                'having value 0, expect model StoryModel with '
+                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
+                'story_model having value 0, expect model '
+                'StoryModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'StorySnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_story_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            story_models.StorySnapshotContentModel(
+                id='0-3'))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for story model '
+                'version check of StorySnapshotContentModel\', '
+                '[u\'Model id 0-3: Story model corresponding to '
+                'id 0 has a version 1 which is less than '
+                'the version 3 in snapshot content model id\']]'
+            ), (
+                u'[u\'fully-validated StorySnapshotContentModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StoryRightsModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+
+        manager1_email = 'user@manager1.com'
+        manager2_email = 'user@manager2.com'
+
+        self.signup(manager1_email, 'manager1')
+        self.signup(manager2_email, 'manager2')
+
+        self.set_topic_managers(['manager1', 'manager2'])
+
+        self.manager1_id = self.get_user_id_from_email(manager1_email)
+        self.manager2_id = self.get_user_id_from_email(manager2_email)
+
+        self.manager1 = user_services.UserActionsInfo(self.manager1_id)
+        self.manager2 = user_services.UserActionsInfo(self.manager2_id)
+
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+        ) for i in xrange(3)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
+
+        story_services.assign_role(
+            self.admin, self.manager1, story_domain.ROLE_MANAGER, stories[0].id)
+        story_services.assign_role(
+            self.admin, self.manager2, story_domain.ROLE_MANAGER, stories[0].id)
+        story_services.assign_role(
+            self.admin, self.manager2, story_domain.ROLE_MANAGER, stories[1].id)
+
+        self.model_instance_0 = story_models.StoryRightsModel.get_by_id('0')
+        self.model_instance_1 = story_models.StoryRightsModel.get_by_id('1')
+        self.model_instance_2 = story_models.StoryRightsModel.get_by_id('2')
+
+        self.job_class = (
+            prod_validation_jobs_one_off.StoryRightsModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated StoryRightsModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of StoryRightsModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated StoryRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'StoryRightsModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_model '
+                'field check of StoryRightsModel\', '
+                '[u"Model id 0: based on field story_model having '
+                'value 0, expect model StoryModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated StoryRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_manager_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.manager1_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for manager_user_model '
+                'field check of StoryRightsModel\', '
+                '[u"Model id 0: based on field manager_user_model having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]') % (
+                    self.manager1_id, self.manager1_id),
+            u'[u\'fully-validated StoryRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        story_models.StoryRightsSnapshotMetadataModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_model '
+                'field check of StoryRightsModel\', '
+                '[u"Model id 0: based on field snapshot_metadata_model having '
+                'value 0-1, expect model '
+                'StoryRightsSnapshotMetadataModel '
+                'with id 0-1 but it doesn\'t exist"]]'
+            ),
+            u'[u\'fully-validated StoryRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        story_models.StoryRightsSnapshotContentModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_model '
+                'field check of StoryRightsModel\', '
+                '[u"Model id 0: based on field snapshot_content_model having '
+                'value 0-1, expect model StoryRightsSnapshotContentModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated StoryRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class StoryRightsSnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StoryRightsSnapshotMetadataModelValidatorTests, self).setUp(
+            )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+        ) for i in xrange(3)]
+
+        for story in stories:
+            if story.id != '0':
+                story_services.save_new_story(self.owner_id, story)
+            else:
+                story_services.save_new_story(self.user_id, story)
+
+        self.model_instance_0 = (
+            story_models.StoryRightsSnapshotMetadataModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            story_models.StoryRightsSnapshotMetadataModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            story_models.StoryRightsSnapshotMetadataModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.StoryRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated StoryRightsSnapshotMetadataModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of StoryRightsSnapshotMetadataModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'StoryRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'StoryRightsSnapshotMetadataModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_rights_model_failure(self):
+        story_models.StoryRightsModel.get_by_id('0').delete(
+            self.user_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_rights_model '
+                'field check of StoryRightsSnapshotMetadataModel\', '
+                '[u"Model id 0-1: based on field story_rights_model '
+                'having value 0, expect model StoryRightsModel with '
+                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
+                'story_rights_model having value 0, expect model '
+                'StoryRightsModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'StoryRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_model field '
+                'check of StoryRightsSnapshotMetadataModel\', '
+                '[u"Model id 0-1: based on field committer_model having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.user_id, self.user_id), (
+                u'[u\'fully-validated '
+                'StoryRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_story_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            story_models.StoryRightsSnapshotMetadataModel(
+                id='0-3', committer_id=self.owner_id, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for story rights model '
+                'version check of StoryRightsSnapshotMetadataModel\', '
+                '[u\'Model id 0-3: Story Rights model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot metadata model id\']]'
+            ), (
+                u'[u\'fully-validated '
+                'StoryRightsSnapshotMetadataModel\', 3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'change_role',
+            'assignee_id': 'id',
+            'new_role': 'manager'
+        }, {
+            'cmd': 'publish_story',
+            'random_key': 'random'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd publish_story '
+                'check of StoryRightsSnapshotMetadataModel\', '
+                '[u\'Model id 0-1: Commit command domain validation failed '
+                'with error: Following extra keys are present: random_key\']]'
+            ), (
+                u'[u\'failed validation check for commit cmd change_role '
+                'check of StoryRightsSnapshotMetadataModel\', '
+                '[u\'Model id 0-1: Commit command domain validation failed '
+                'with error: Following required keys are missing: '
+                'old_role\']]'
+            ),
+            u'[u\'fully-validated StoryRightsSnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class StoryRightsSnapshotContentModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StoryRightsSnapshotContentModelValidatorTests, self).setUp(
+            )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+        ) for i in xrange(3)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
+
+        self.model_instance_0 = (
+            story_models.StoryRightsSnapshotContentModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            story_models.StoryRightsSnapshotContentModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            story_models.StoryRightsSnapshotContentModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.StoryRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated StoryRightsSnapshotContentModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of StoryRightsSnapshotContentModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'StoryRightsSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'StoryRightsSnapshotContentModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_model_failure(self):
+        story_models.StoryRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_rights_model '
+                'field check of StoryRightsSnapshotContentModel\', '
+                '[u"Model id 0-1: based on field story_rights_model '
+                'having value 0, expect model StoryRightsModel with '
+                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
+                'story_rights_model having value 0, expect model '
+                'StoryRightsModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'StoryRightsSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_story_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            story_models.StoryRightsSnapshotContentModel(
+                id='0-3'))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for story rights model '
+                'version check of StoryRightsSnapshotContentModel\', '
+                '[u\'Model id 0-3: Story Rights model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot content model id\']]'
+            ), (
+                u'[u\'fully-validated StoryRightsSnapshotContentModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StoryCommitLogEntryModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+        ) for i in xrange(3)]
+
+        for story in stories:
+            story_services.save_new_story(self.owner_id, story)
+
+        self.model_instance_0 = (
+            story_models.StoryCommitLogEntryModel.get_by_id(
+                'story-0-1'))
+        self.model_instance_1 = (
+            story_models.StoryCommitLogEntryModel.get_by_id(
+                'story-1-1'))
+        self.model_instance_2 = (
+            story_models.StoryCommitLogEntryModel.get_by_id(
+                'story-2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        story_services.update_story(
+            self.owner_id, '0', [story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'title',
+                'new_value': 'New title',
+                'old_value': 'title 0'
+            })], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated StoryCommitLogEntryModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of StoryCommitLogEntryModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'StoryCommitLogEntryModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_model '
+                'field check of StoryCommitLogEntryModel\', '
+                '[u"Model id story-0-1: based on field story_model '
+                'having value 0, expect model StoryModel with id 0 '
+                'but it doesn\'t exist", u"Model id story-0-2: based '
+                'on field story_model having value 0, expect model '
+                'StoryModel with id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
+    def test_invalid_story_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            story_models.StoryCommitLogEntryModel.create(
+                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
+                'msg', [{}],
+                constants.ACTIVITY_STATUS_PUBLIC, False))
+        model_with_invalid_version_in_id.story_id = '0'
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for story model '
+                'version check of StoryCommitLogEntryModel\', '
+                '[u\'Model id %s: Story model corresponding '
+                'to story id 0 has a version 1 which is less than '
+                'the version 3 in commit log model id\']]'
+            ) % (model_with_invalid_version_in_id.id),
+            u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_id(self):
+        model_with_invalid_id = (
+            story_models.StoryCommitLogEntryModel(
+                id='random-0-1', user_id=self.owner_id,
+                username=self.OWNER_USERNAME, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}],
+                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+                post_commit_is_private=False))
+        model_with_invalid_id.story_id = '0'
+        model_with_invalid_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for model id check of '
+                'StoryCommitLogEntryModel\', '
+                '[u\'Model id %s: Model id does not match regex pattern\']]'
+            ) % (model_with_invalid_id.id),
+            u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_type(self):
+        self.model_instance_0.commit_type = 'random'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit type check of '
+                'StoryCommitLogEntryModel\', '
+                '[u\'Model id story-0-1: Commit type random is '
+                'not allowed\']]'
+            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_post_commit_status(self):
+        self.model_instance_0.post_commit_status = 'random'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit status check '
+                'of StoryCommitLogEntryModel\', '
+                '[u\'Model id story-0-1: Post commit status random '
+                'is invalid\']]'
+            ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_true_post_commit_is_private(self):
+        self.model_instance_0.post_commit_status = 'public'
+        self.model_instance_0.post_commit_is_private = True
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit is private '
+                'check of StoryCommitLogEntryModel\', '
+                '[u\'Model id %s: Post commit status is '
+                'public but post_commit_is_private is True\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_false_post_commit_is_private(self):
+        self.model_instance_0.post_commit_status = 'private'
+        self.model_instance_0.post_commit_is_private = False
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit is private '
+                'check of StoryCommitLogEntryModel\', '
+                '[u\'Model id %s: Post commit status is '
+                'private but post_commit_is_private is False\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'add_story_node'
+        }, {
+            'cmd': 'delete_story_node',
+            'random_key': 'random'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd delete_story_node '
+                'check of StoryCommitLogEntryModel\', '
+                '[u\'Model id story-0-1: Commit command domain validation '
+                'failed with error: Following required keys are missing: '
+                'node_id, Following extra keys are present: random_key\']]'
+            ), (
+                u'[u\'failed validation check for commit cmd add_story_node '
+                'check of StoryCommitLogEntryModel\', '
+                '[u\'Model id story-0-1: Commit command domain validation '
+                'failed with error: Following required keys are missing: '
+                'node_id\']]'
+            ),
+            u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StorySummaryModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        language_codes = ['ar', 'en', 'en']
+        stories = [story_domain.Story.create_default_story(
+            '%s' % i,
+            title='title %d' % i,
+        ) for i in xrange(3)]
+
+        for index, story in enumerate(stories):
+            story.description = 'story-test'
+            story.language_code = language_codes[index]
+            story_services.save_new_story(self.owner_id, story)
+
+        self.model_instance_0 = story_models.StorySummaryModel.get_by_id('0')
+        self.model_instance_1 = story_models.StorySummaryModel.get_by_id('1')
+        self.model_instance_2 = story_models.StorySummaryModel.get_by_id('2')
+
+        self.job_class = (
+            prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        story_services.update_story(
+            self.owner_id, '1', [story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'title',
+                'new_value': 'New title',
+                'old_value': 'title 0'
+            })], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated StorySummaryModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of StorySummaryModel\', '
+            '[u\'Model id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated StorySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        story_services.delete_story(self.owner_id, '1')
+        story_services.delete_story(self.owner_id, '2')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'StorySummaryModel\', '
+            '[u\'Model id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_story_model_failure(self):
+        story_models.StoryModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for story_model '
+                'field check of StorySummaryModel\', '
+                '[u"Model id 0: based on field story_model having '
+                'value 0, expect model StoryModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated StorySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_language_code(self):
+        expected_output = [
+            (
+                u'[u\'failed validation check for language code check of '
+                'StorySummaryModel\', '
+                '[u\'Model id %s: Language code %s for model is unsupported'
+                '\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
+            u'[u\'fully-validated StorySummaryModel\', 2]']
+        with self.swap(
+            constants, 'ALL_LANGUAGE_CODES', [{
+                'code': 'en', 'description': 'English'}]):
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_node_count(self):
+        self.model_instance_0.node_count = 10
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for node count check '
+                'of StorySummaryModel\', '
+                '[u\'Model id 0: Node count: 10 does not match the '
+                'number of nodes in story_contents dict: 0'
+                '\']]'
+            ),
+            u'[u\'fully-validated StorySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_story_model_related_properties(self):
+        mock_created_on_time = datetime.datetime.utcnow()
+        properties_dict = {
+            'title': 'random',
+            'description': 'random',
+            'language_code': 'en',
+            'story_model_created_on': mock_created_on_time
+        }
+
+        output_dict = {
+            'title': 'random',
+            'description': 'random',
+            'language_code': 'en',
+            'story_model_created_on': mock_created_on_time
+        }
+
+        for property_name in properties_dict:
+            actual_value = getattr(self.model_instance_0, property_name)
+            setattr(
+                self.model_instance_0, property_name,
+                properties_dict[property_name])
+            self.model_instance_0.put()
+            corresponding_property_name = property_name
+            if property_name == 'story_model_created_on':
+                corresponding_property_name = 'created_on'
+            output_actual_value = actual_value
+            if isinstance(actual_value, list):
+                output_actual_value = (',').join(actual_value)
+            expected_output = [
+                (
+                    u'[u\'failed validation check for %s field check of '
+                    'StorySummaryModel\', '
+                    '[u\'Model id %s: %s field in model: %s does not match '
+                    'corresponding story %s field: %s\']]'
+                ) % (
+                    property_name, self.model_instance_0.id, property_name,
+                    output_dict[property_name], corresponding_property_name,
+                    output_actual_value),
+                u'[u\'fully-validated StorySummaryModel\', 2]']
+            run_job_and_check_output(self, expected_output, sort=True)
+            setattr(self.model_instance_0, property_name, actual_value)
+            self.model_instance_0.put()
 
 
 class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):

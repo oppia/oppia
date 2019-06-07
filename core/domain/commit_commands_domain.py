@@ -19,6 +19,7 @@
 from core.domain import collection_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import story_domain
 import utils
 
 
@@ -252,4 +253,93 @@ class ConfigPropertyCommitCmd(object):
         """
         if self.name == config_domain.CMD_CHANGE_PROPERTY_VALUE:
             required_keys = ['new_value']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+
+
+class StoryCommitCmd(object):
+    """Domain object for commit commands of a story.
+
+    Attributes:
+        name: str. The command name.
+        parameters: dict. The command parameters.
+    """
+
+    def __init__(self, name, parameters):
+        """Constructs a StoryCommitCmd domain object.
+
+        Args:
+            name: str. The command name.
+            parameters: dict. The command parameters.
+        """
+        self.name = name
+        self.parameters = parameters
+
+    def validate(self):
+        """Checks that all parameters of a command are valid for the
+        given command name.
+
+        Raises:
+            Exception: The command is invalid.
+        """
+        if self.name == story_domain.CMD_UPDATE_STORY_PROPERTY:
+            required_keys = ['property_name', 'new_value', 'old_value']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
+            required_keys = [
+                'node_id', 'property_name', 'new_value', 'old_value']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
+            required_keys = ['property_name', 'new_value', 'old_value']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_ADD_STORY_NODE:
+            required_keys = ['node_id']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_DELETE_STORY_NODE:
+            required_keys = ['node_id']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS:
+            required_keys = ['node_id']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_CREATE_NEW:
+            required_keys = ['title']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
+            required_keys = ['from_version', 'to_version']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+
+
+class StoryRightsCommitCmd(object):
+    """Domain object for commit commands of a story rights.
+
+    Attributes:
+        name: str. The command name.
+        parameters: dict. The command parameters.
+    """
+
+    def __init__(self, name, parameters):
+        """Constructs a StoryRightsCommitCmd domain object.
+
+        Args:
+            name: str. The command name.
+            parameters: dict. The command parameters.
+        """
+        self.name = name
+        self.parameters = parameters
+
+    def validate(self):
+        """Checks that all parameters of a command are valid for the
+        given command name.
+
+        Raises:
+            Exception: The command is invalid.
+        """
+        if self.name == story_domain.CMD_CREATE_NEW:
+            required_keys = []
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_CHANGE_ROLE:
+            required_keys = ['assignee_id', 'new_role', 'old_role']
+            validate_dict_keys(self.parameters.keys(), required_keys)
+        elif self.name == story_domain.CMD_PUBLISH_STORY or (
+                self.name == story_domain.CMD_UNPUBLISH_STORY):
+            required_keys = []
             validate_dict_keys(self.parameters.keys(), required_keys)

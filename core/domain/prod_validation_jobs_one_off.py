@@ -27,6 +27,7 @@ from core.domain import collection_services
 from core.domain import commit_commands_domain
 from core.domain import exp_services
 from core.domain import recommendations_services
+from core.domain import story_services
 from core.platform import models
 import feconf
 import schema_utils
@@ -34,12 +35,12 @@ import schema_utils
 (
     activity_models, audit_models, collection_models, config_models,
     email_models, exp_models, feedback_models,
-    recommendations_models, user_models,) = (
+    recommendations_models, story_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.recommendations,
-            models.NAMES.user]))
+            models.NAMES.story, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 
@@ -2197,6 +2198,489 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
         return [cls._validate_topic_similarities]
 
 
+class StoryModelValidator(BaseModelValidator):
+    """Class for validating StoryModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        model_domain_object_instances = [
+            story_services.get_story_from_model(item)]
+
+        return model_domain_object_instances
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        story_commit_log_entry_model_ids = [
+            'story-%s-%s' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        story_summary_model_ids = [item.id]
+        story_rights_model_ids = [item.id]
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        exploration_model_ids = [
+            node['exploration_id'] for node in item.story_contents['nodes']]
+        return {
+            'story_commit_log_entry_model': (
+                story_models.StoryCommitLogEntryModel,
+                story_commit_log_entry_model_ids),
+            'story_summary_model': (
+                story_models.StorySummaryModel, story_summary_model_ids),
+            'story_rights_model': (
+                story_models.StoryRightsModel,
+                story_rights_model_ids),
+            'snapshot_metadata_model': (
+                story_models.StorySnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                story_models.StorySnapshotContentModel,
+                snapshot_model_ids),
+            'exploration_model': (
+                exp_models.ExplorationModel,
+                exploration_model_ids)
+        }
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return []
+
+
+class StorySnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating StorySnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.StoryCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_model': (
+                story_models.StoryModel, [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_story_model_version_from_item_id(cls, item):
+        """Validate that story model corresponding to snapshot
+        metadata model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: StorySnapshotMetadataModel to validate.
+        """
+        _, story_model_tuples = cls.external_models['story_model']
+
+        story_model = story_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(story_model.version) < int(version):
+            cls.errors['story model version check'] = (
+                'Model id %s: Story model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot metadata model id' % (
+                    item.id, story_model.id, story_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_story_model_version_from_item_id]
+
+
+class StorySnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating StorySnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_model': (
+                story_models.StoryModel, [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_story_model_version_from_item_id(cls, item):
+        """Validate that story model corresponding to snapshot
+        content model has a version greater than or equal to the in item.id.
+
+        Args:
+            item: StorySnapshotContentModel to validate.
+        """
+        _, story_model_tuples = cls.external_models['story_model']
+
+        story_model = story_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(story_model.version) < int(version):
+            cls.errors['story model version check'] = (
+                'Model id %s: Story model corresponding to '
+                'id %s has a version %s which is less than the version %s in '
+                'snapshot content model id' % (
+                    item.id, story_model.id, story_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_story_model_version_from_item_id]
+
+
+class StoryRightsModelValidator(BaseModelValidator):
+    """Class for validating StoryRightsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'story_model': (
+                story_models.StoryModel, [item.id]),
+            'manager_user_model': (
+                user_models.UserSettingsModel, item.manager_ids),
+            'snapshot_metadata_model': (
+                story_models.StoryRightsSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_model': (
+                story_models.StoryRightsSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return []
+
+
+class StoryRightsSnapshotMetadataModelValidator(BaseModelValidator):
+    """Class for validating StoryRightsSnapshotMetadataModel."""
+
+    is_snapshot_metadata_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.StoryRightsCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_rights_model': (
+                story_models.StoryRightsModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_model': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+    @classmethod
+    def _validate_story_model_version_from_item_id(cls, item):
+        """Validate that story rights model corresponding to snapshot
+        metadata model has a version greater than or equal to the version in
+        item.id.
+
+        Args:
+            item: StoryRightsSnapshotMetadataModel to validate.
+        """
+        _, story_rights_model_tuples = cls.external_models[
+            'story_rights_model']
+
+        story_rights_model = story_rights_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(story_rights_model.version) < int(version):
+            cls.errors['story rights model version check'] = (
+                'Model id %s: Story Rights model corresponding to '
+                'id %s has a version %s which is less '
+                'than the version %s in snapshot metadata model id' % (
+                    item.id, story_rights_model.id,
+                    story_rights_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_story_model_version_from_item_id]
+
+
+class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
+    """Class for validating StoryRightsSnapshotContentModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_rights_model': (
+                story_models.StoryRightsModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+    @classmethod
+    def _validate_story_model_version_from_item_id(cls, item):
+        """Validate that story rights model corresponding to snapshot
+        content model has a version greater than or equal to the version in
+        item.id.
+
+        Args:
+            item: StoryRightsSnapshotContentModel to validate.
+        """
+        _, story_rights_model_tuples = cls.external_models[
+            'story_rights_model']
+
+        story_rights_model = story_rights_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(story_rights_model.version) < int(version):
+            cls.errors['story rights model version check'] = (
+                'Model id %s: Story Rights model corresponding to '
+                'id %s has a version %s which is less '
+                'than the version %s in snapshot content model id' % (
+                    item.id, story_rights_model.id,
+                    story_rights_model.version, version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_story_model_version_from_item_id]
+
+
+class StoryCommitLogEntryModelValidator(BaseModelValidator):
+    """Class for validating StoryCommitLogEntryModel."""
+
+    is_commit_log_entry_model = True
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        regex_string = '(story|rights)-%s-\\d*$' % (
+            item.story_id)
+
+        return regex_string
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return commit_commands_domain.StoryCommitCmd
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_model': (
+                story_models.StoryModel, [item.story_id]),
+        }
+
+    @classmethod
+    def _validate_story_model_version_from_item_id(cls, item):
+        """Validate that story model corresponding to item.story_id
+        has a version greater than or equal to the exp version in item.id.
+
+        Args:
+            item: StoryCommitLogEntryModel to validate.
+        """
+        _, story_model_tuples = cls.external_models['story_model']
+
+        story_model = story_model_tuples[0][1]
+        version = item.id[item.id.rfind('-') + 1:]
+        if int(story_model.version) < int(version):
+            cls.errors['story model version check'] = (
+                'Model id %s: Story model corresponding to story '
+                'id %s has a version %s which is less than the version %s in '
+                'commit log model id' % (
+                    item.id, item.story_id, story_model.version,
+                    version))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [cls._validate_story_model_version_from_item_id]
+
+
+class StorySummaryModelValidator(BaseModelValidator):
+    """Class for validating StorySummaryModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '.'
+
+    @classmethod
+    def _get_json_properties_schema(cls, item):
+        return {}
+
+    @classmethod
+    def _get_model_domain_object_instances(cls, item):
+        return []
+
+    @classmethod
+    def _get_commit_cmd_domain_class(cls):
+        return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'story_model': (
+                story_models.StoryModel, [item.id]),
+            'story_rights_model': (
+                story_models.StoryRightsModel, [item.id]),
+        }
+
+    @classmethod
+    def _validate_language_code(cls, item):
+        """Validate that language code is present in allowed language codes.
+
+        Args:
+            item: StorySummaryModel to validate.
+        """
+        allowed_language_codes = [
+            language_item['code'] for language_item in (
+                constants.ALL_LANGUAGE_CODES)]
+
+        if item.language_code not in allowed_language_codes:
+            cls.errors['language code check'] = (
+                'Model id %s: Language code %s for model is unsupported' % (
+                    item.id, item.language_code))
+
+    @classmethod
+    def _validate_node_count(cls, item):
+        """Validate that node_count of model is equal to number of nodes
+        story_contents in story model.
+
+        Args:
+            item: StorySummaryModel to validate.
+        """
+        _, story_model_tuples = cls.external_models[
+            'story_model']
+        story_model = story_model_tuples[0][1]
+        nodes = story_model.story_contents['nodes']
+        if item.node_count != len(nodes):
+            cls.errors['node count check'] = (
+                'Model id %s: Node count: %s does not match the number of '
+                'nodes in story_contents dict: %s') % (
+                    item.id, item.node_count, len(nodes))
+
+    @classmethod
+    def _validate_related_model_properties(cls, item):
+        """Validate that model properties match the corresponding story
+        model and story rights model properties.
+
+        Args:
+            item: StorySummaryModel to validate.
+        """
+        _, story_model_tuples = cls.external_models[
+            'story_model']
+        story_model = story_model_tuples[0][1]
+
+        if item.title != story_model.title:
+            cls.errors['title field check'] = (
+                'Model id %s: title field in model: %s does not match '
+                'corresponding story title field: %s') % (
+                    item.id, item.title, story_model.title)
+
+        if item.language_code != story_model.language_code:
+            cls.errors['language_code field check'] = (
+                'Model id %s: language_code field in model: %s does not match '
+                'corresponding story language_code field: %s') % (
+                    item.id, item.language_code,
+                    story_model.language_code)
+
+        if item.description != story_model.description:
+            cls.errors['description field check'] = (
+                'Model id %s: description field in model: %s does not match '
+                'corresponding story description field: %s') % (
+                    item.id, item.description, story_model.description)
+
+        if item.story_model_created_on != story_model.created_on:
+            cls.errors['story_model_created_on field check'] = (
+                'Model id %s: story_model_created_on field in model: %s '
+                'does not match corresponding story created_on '
+                'field: %s') % (
+                    item.id, item.story_model_created_on,
+                    story_model.created_on)
+
+    @classmethod
+    def _get_validation_functions(cls):
+        return [
+            cls._validate_language_code, cls._validate_node_count,
+            cls._validate_related_model_properties]
+
+
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
 
@@ -2277,6 +2761,19 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ExplorationRecommendationsModelValidator),
     recommendations_models.TopicSimilaritiesModel: (
         TopicSimilaritiesModelValidator),
+    story_models.StoryModel: StoryModelValidator,
+    story_models.StorySnapshotMetadataModel: (
+        StorySnapshotMetadataModelValidator),
+    story_models.StorySnapshotContentModel: (
+        StorySnapshotContentModelValidator),
+    story_models.StoryRightsModel: StoryRightsModelValidator,
+    story_models.StoryRightsSnapshotMetadataModel: (
+        StoryRightsSnapshotMetadataModelValidator),
+    story_models.StoryRightsSnapshotContentModel: (
+        StoryRightsSnapshotContentModelValidator),
+    story_models.StoryCommitLogEntryModel: (
+        StoryCommitLogEntryModelValidator),
+    story_models.StorySummaryModel: StorySummaryModelValidator,
     user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
 }
 
@@ -2534,6 +3031,75 @@ class TopicSimilaritiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [recommendations_models.TopicSimilaritiesModel]
+
+
+class StoryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates StoryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryModel]
+
+
+class StorySnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates StorySnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StorySnapshotMetadataModel]
+
+
+class StorySnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates StorySnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StorySnapshotContentModel]
+
+
+class StoryRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates StoryRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryRightsModel]
+
+
+class StoryRightsSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates StoryRightsSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryRightsSnapshotMetadataModel]
+
+
+class StoryRightsSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates StoryRightsSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryRightsSnapshotContentModel]
+
+
+class StoryCommitLogEntryModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates StoryCommitLogEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StoryCommitLogEntryModel]
+
+
+class StorySummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates StorySummaryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [story_models.StorySummaryModel]
 
 
 class UserSubscriptionsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
