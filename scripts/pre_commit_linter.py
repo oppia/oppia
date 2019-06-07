@@ -1443,7 +1443,7 @@ class LintChecksManager(object):
                     # component name should exactly match the filename
                     # containing it. If the component's name is xxx then the
                     # filename should be xxx.js.
-                    else:
+                    elif component == 'controller' or component == 'factory':
                         if component_name != exact_filename:
                             print (
                                 '%s -> Please ensure that the %s name '

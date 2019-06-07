@@ -34,6 +34,8 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*Spec.ts',
       'core/templates/dev/head/*Spec.ts',
+      'core/templates/dev/head/**/*.spec.ts',
+      'core/templates/dev/head/*.spec.ts',
       'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
       {
@@ -81,6 +83,8 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.ts': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/!(*.spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*.spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
