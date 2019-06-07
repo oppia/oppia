@@ -173,7 +173,7 @@ oppia.factory('StateCardObjectFactory', [
       // This check is added here to ensure that this._inputReponsePairs is
       // accessed only if there is atleast one input response pair present.
       // In the editor preview tab if a user clicks on restart from beginning
-      // option just after submitting an answer for a card while the response 
+      // option just after submitting an answer for a card while the response
       // is still loading, this function is called after
       // this._inputResponsePairs is set to null as we are starting from the
       // first card again. Adding a check here makes sure that element at index
