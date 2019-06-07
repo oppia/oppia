@@ -58,7 +58,7 @@ oppia.factory('ShowSuggestionModalForLearnerLocalViewService', [
             $timeout(function() {
               $scope.showEditor = true;
             }, 500);
-        
+
             $scope.cancelSuggestion = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };

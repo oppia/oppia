@@ -78,7 +78,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
             $scope.canAccept = $scope.isNotHandled;
             if (!$scope.isNotHandled) {
               if (suggestionStatus === (
-                  SuggestionModalService.SUGGESTION_ACCEPTED)) {
+                SuggestionModalService.SUGGESTION_ACCEPTED)) {
                 $scope.errorMessage = SuggestionModalService
                   .SUGGESTION_ACCEPTED_MSG;
                 $scope.isSuggestionRejected = false;
@@ -90,7 +90,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
             } else {
               $scope.errorMessage = '';
             }
-        
+
             $scope.oldContent = oldContent;
             $scope.newContent = newContent;
             $scope.stateName = stateName;
@@ -113,7 +113,7 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
                   reviewMessage: $scope.reviewMessage,
                 });
             };
-        
+
             $scope.rejectSuggestion = function() {
               SuggestionModalService.rejectSuggestion(
                 $uibModalInstance,

@@ -88,7 +88,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
             $scope.canReject = $scope.canEdit && $scope.isNotHandled;
             $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
               suggestionIsValid && !unsavedChangesExist;
-        
+
             if (!$scope.canEdit) {
               $scope.errorMessage = '';
             } else if (!$scope.isNotHandled) {
@@ -104,10 +104,10 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
             } else {
               $scope.errorMessage = '';
             }
-        
+
             $scope.currentContent = currentContent;
             $scope.newContent = newContent;
-        
+
             $scope.acceptSuggestion = function() {
               SuggestionModalService.acceptSuggestion(
                 $uibModalInstance,
@@ -124,7 +124,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
                   audioUpdateRequired: false
                 });
             };
-        
+
             $scope.rejectSuggestion = function() {
               SuggestionModalService.rejectSuggestion(
                 $uibModalInstance,
@@ -133,7 +133,7 @@ oppia.factory('ShowSuggestionModalForEditorViewService', [
                   reviewMessage: $scope.reviewMessage
                 });
             };
-        
+
             $scope.cancelReview = function() {
               SuggestionModalService.cancelSuggestion($uibModalInstance);
             };
