@@ -17,9 +17,11 @@
  */
 
 require('pages/exploration_player/PlayerTranscriptService.ts');
+require('services/ContextService.ts');
 
 oppia.factory('PlayerPositionService', [
-  'PlayerTranscriptService', function(PlayerTranscriptService) {
+  'ContextService', 'PlayerTranscriptService', function(
+      ContextService, PlayerTranscriptService) {
     var displayedCardIndex = null;
     var onChangeCallback = null;
     var learnerJustSubmittedAnAnswer = false;
@@ -30,8 +32,19 @@ oppia.factory('PlayerPositionService', [
         onChangeCallback = callback;
       },
       getCurrentStateName: function() {
-        return (
-          PlayerTranscriptService.getCard(displayedCardIndex).getStateName());
+        try {
+          return (
+            PlayerTranscriptService.getCard(displayedCardIndex).getStateName());
+        } catch (e) {
+          var additionalInfo = ('\nUndefined card error debug logs:' +
+            '\nRequested card index: ' + displayedCardIndex +
+            '\nExploration ID: ' + ContextService.getExplorationId() +
+            '\nTotal cards: ' + PlayerTranscriptService.getNumCards() +
+            '\nLast state name: ' + PlayerTranscriptService.getLastStateName()
+          );
+          e.message += additionalInfo;
+          throw e;
+        }
       },
       setDisplayedCardIndex: function(index) {
         var oldIndex = displayedCardIndex;
