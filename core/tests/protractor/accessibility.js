@@ -70,8 +70,8 @@ describe('Meta Tags', function() {
     var nameMeta = element(by.css('meta[itemprop="name"]'));
     var descriptionMeta = element(by.css('meta[itemprop="description"]'));
     expect(nameMeta.getAttribute('content')).toEqual(GET_STARTED_META.name);
-    expect(descriptionMeta.getAttribute('content').toEqual(
-      GET_STARTED_META.description));
+    expect(descriptionMeta.getAttribute('content')).toEqual(
+      GET_STARTED_META.description);
   });
 
   it('should set the correct og meta tags', function() {
@@ -84,13 +84,8 @@ describe('Meta Tags', function() {
       GET_STARTED_META.description);
     expect(ogUrl.getAttribute('content')).toEqual(
       'http://localhost:9001/get_started');
-    if (general.isInDevMode()) {
-      expect(ogImage.getAttribute('content')).toEqual(
-        'http://localhost:9001/assets/images/logo/288x288_logo_mint.png');
-    } else {
-      expect(ogImage.getAttribute('content')).toEqual(
-        'http://localhost:9001/build/assets/images/logo/288x288_logo_mint.png');
-    }
+    expect(ogImage.getAttribute('content')).toEqual(
+      'http://localhost:9001/assets/images/logo/288x288_logo_mint.png');
   });
 
   it('should set the correct application name', function() {
