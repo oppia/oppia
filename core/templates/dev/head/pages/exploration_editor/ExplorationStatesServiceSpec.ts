@@ -22,6 +22,7 @@ describe('ExplorationStatesService', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector) {
+    this.$q = $injector.get('$q');
     this.ess = $injector.get('ExplorationStatesService');
 
     spyOn($injector.get('ContextService'), 'getExplorationId')
@@ -106,23 +107,9 @@ describe('ExplorationStatesService', function() {
       beforeEach(angular.mock.inject(function($injector) {
         spyOn(this.cls, 'deleteState');
 
-        var modalArgs = {
-          resolve: {
-            deleteStateName: function() {
-              return STATE_NAME;
-            }
-          }
-        };
-
         // When ExplorationStatesService tries to show the confirm-delete
         // modal, have it immediately confirm.
-        spyOn($injector.get('$uibModal'), 'open').and.callFake(
-          function(modalArgs) {
-            return {
-              result: Promise.resolve(STATE_NAME)
-            };
-          }
-        );
+        spyOn($injector.get('$uibModal'), 'open').and.callFake(this.$q.resolve);
       }));
 
       it('callsback when a state is deleted', function(done) {
