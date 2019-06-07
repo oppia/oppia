@@ -18,7 +18,7 @@
 
 require('components/StateGraphLayoutService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/exploration_editor/ExplorationWarningsService.ts');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
 

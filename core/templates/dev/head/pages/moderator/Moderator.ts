@@ -18,9 +18,9 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
-require('components/forms/ConvertHtmlToUnicodeFilter.ts');
-require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('filters/convert-unicode-with-params-to-html.filter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');
 require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
@@ -30,7 +30,7 @@ require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
-require('filters/UnderscoresToCamelCaseFilter.ts');
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-choices-editor.directive.ts');

@@ -18,9 +18,9 @@
 
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
-require('components/forms/ConvertHtmlToUnicodeFilter.ts');
-require('components/forms/ConvertUnicodeToHtmlFilter.ts');
-require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
+require('filters/convert-unicode-with-params-to-html.filter.ts');
 require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');

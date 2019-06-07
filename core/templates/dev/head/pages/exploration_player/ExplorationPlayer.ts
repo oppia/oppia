@@ -22,9 +22,9 @@ require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
-require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
-require('components/forms/ConvertHtmlToUnicodeFilter.ts');
-require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('filters/convert-unicode-with-params-to-html.filter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');
 require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
@@ -78,7 +78,7 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
