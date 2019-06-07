@@ -43,12 +43,12 @@ require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
 
 require('components/alerts/AlertMessageDirective.ts');
-require('components/create_button/CreateActivityButtonDirective.ts');
+require('components/button-directives/create-activity-button.directive.ts');
 
 require('components/forms/ObjectEditorDirective.ts');
 require('components/promo/PromoBarDirective.ts');
 require('components/side_navigation_bar/SideNavigationBarDirective.ts');
-require('components/social_buttons/SocialButtonsDirective.ts');
+require('components/button-directives/social-buttons.directive.ts');
 require('components/top_navigation_bar/TopNavigationBarDirective.ts');
 
 require('domain/sidebar/SidebarStatusService.ts');

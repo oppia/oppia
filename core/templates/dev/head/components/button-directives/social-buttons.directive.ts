@@ -25,8 +25,7 @@ oppia.directive('socialButtons', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/social_buttons/' +
-        'social_buttons_directive.html'),
+        '/components/button-directives/social-buttons.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

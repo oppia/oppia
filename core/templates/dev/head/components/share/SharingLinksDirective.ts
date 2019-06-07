@@ -16,7 +16,7 @@
  * @fileoverview Directive for the Social Sharing Links.
  */
 
-require('components/embed_modal/ExplorationEmbedButtonService.ts');
+require('components/button-directives/exploration-embed-button.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/SiteAnalyticsService.ts');
