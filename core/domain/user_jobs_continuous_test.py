@@ -253,38 +253,6 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'subject': 'Update exploration',
             }], recent_notifications)
 
-    def test_basic_computation_works_if_exploration_is_deleted(self):
-        with self._get_test_context():
-            self.save_new_valid_exploration(
-                EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
-            last_updated_ms_before_deletion = (
-                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
-            exp_services.delete_exploration(USER_ID, EXP_ID)
-
-            MockRecentUpdatesAggregator.start_computation()
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-            self.process_and_flush_pending_tasks()
-
-            recent_notifications = (
-                MockRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
-            self.assertEqual(len(recent_notifications), 1)
-            self.assertEqual(sorted(recent_notifications[0].keys()), [
-                'activity_id', 'activity_title', 'author_id',
-                'last_updated_ms', 'subject', 'type'])
-            self.assertDictContainsSubset({
-                'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                'activity_id': EXP_ID,
-                'activity_title': EXP_TITLE,
-                'author_id': USER_ID,
-                'subject': feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
-            }, recent_notifications[0])
-            self.assertLess(
-                last_updated_ms_before_deletion,
-                recent_notifications[0]['last_updated_ms'])
-
     def test_multiple_exploration_commits_and_feedback_messages(self):
         with self._get_test_context():
             self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
