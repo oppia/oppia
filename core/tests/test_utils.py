@@ -1685,6 +1685,24 @@ tags: []
         finally:
             setattr(obj, attr, original)
 
+    @contextlib.contextmanager
+    def login_session(self, email, is_super_admin=False):
+        """Log in with the given email under the context of a 'with' statement.
+
+        Args:
+            email: str. An email associated to a user account.
+            is_super_admin: bool. Whether the user is a super admin.
+
+        Yields:
+            str. The id of the user associated to the given email, who is now
+            'logged in'.
+        """
+        self.login(email, is_super_admin)
+        try:
+            yield self.get_user_id_from_email(email)
+        finally:
+            self.logout()
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
@@ -2022,20 +2040,3 @@ class FailingFunction(FunctionWrapper):
             self._num_tries_before_success >= self._times_called)
         if call_should_fail or self._always_fail:
             raise self._exception
-
-    @contextlib.contextmanager
-    def login_session(self, email):
-        """Context manager for logging in to Oppia using the given email.
-
-        Args:
-            email: str. The email associated with the account to login with.
-
-        Yields:
-            str. The user id of the logged-in user; the id of the account
-            associated to the given email.
-        """
-        self.login(email)
-        try:
-            yield self.get_user_id_from_email(email)
-        except:
-            self.logout()
