@@ -78,17 +78,19 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(self.translator_id, self.TRANSLATOR_EMAIL)
+        user_services.create_new_user(
+            self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
         user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
@@ -3019,7 +3021,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'translator_ids', 'viewer_ids',
+                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
@@ -3062,7 +3064,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'translator_ids', 'viewer_ids',
+                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']

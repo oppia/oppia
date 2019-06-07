@@ -262,7 +262,7 @@ oppia.directive('translationTab', ['UrlInterpolationService',
           };
 
           $scope.onStartTutorial = function() {
-            if (GLOBALS.can_translate) {
+            if (GLOBALS.can_voiceover) {
               EditabilityService.onStartTutorial();
               $scope.translationTutorial = true;
             }
