@@ -237,8 +237,8 @@ describe('Exploration history', function() {
         highlighted: true
       },
       42: {
-        text: 'solicit_answer_details',
-        highlighted: true
+        text: 'solicit_answer_details: false',
+        highlighted: false
       },
       43: {
         text: 'written_translations:',
