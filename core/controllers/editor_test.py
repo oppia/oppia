@@ -1889,3 +1889,48 @@ class HasSeenTutorialTests(BaseEditorControllerTests):
         self.assertFalse(response['show_state_translation_tutorial_on_load'])
 
         self.logout()
+
+
+class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
+
+    def test_get_invalid_exploration_id(self):
+        self.login(self.OWNER_EMAIL)
+        illegal_exp_id = '@#$%^&*'
+        self.get_json(
+            '%s/%s' % (
+                feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, illegal_exp_id),
+            expected_status_int=404)
+        self.logout()
+
+    def test_get_missing_exploration_id(self):
+        self.login(self.OWNER_EMAIL)
+        missing_exp_id = '0'
+        self.get_json(
+            '%s/%s' % (
+                feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, missing_exp_id),
+            expected_status_int=404)
+        self.logout()
+
+    def test_get_returns_empty_values_from_unvisited_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(exp_id, self.owner_id)
+
+        state_stats = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
+
+        self.assertEqual(state_stats['answers'], {'Introduction': []})
+        self.logout()
+
+    def test_get_returns_assigned_interaction_ids_of_exploration_states(self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(
+            exp_id, self.owner_id, interaction_id='FractionInput')
+
+        state_stats = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
+
+        self.assertEqual(
+            state_stats['interaction_ids'], {'Introduction': 'FractionInput'})
+        self.logout()
