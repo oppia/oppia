@@ -1924,12 +1924,14 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
     def test_get_returns_assigned_interaction_ids_of_exploration_states(self):
         with self.login_context(self.OWNER_EMAIL) as owner_id:
             exp_id = exp_services.get_new_exploration_id()
-            self.save_new_valid_exploration(
-                exp_id, owner_id, interaction_id='FractionInput')
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                exp_id, owner_id,
+                ['A', 'B', 'End'], ['FractionInput', 'TextInput'])
 
             state_stats = self.get_json(
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
 
         self.assertEqual(
-            state_stats['interaction_ids'], {'Introduction': 'FractionInput'})
+            state_stats['interaction_ids'],
+            {'A': 'FractionInput', 'B': 'TextInput', 'End': 'EndExploration'})
