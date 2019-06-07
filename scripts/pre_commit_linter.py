@@ -1402,7 +1402,7 @@ class LintChecksManager(object):
         for filepath in files_to_check:
             component_num = 0
             # Filename without its path and extension.
-            exact_filename = filepath.split('/')[-1][:-3]
+            # exact_filename = filepath.split('/')[-1][:-3].
             parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
@@ -1425,14 +1425,14 @@ class LintChecksManager(object):
                     arguments = expression.arguments
                     # The first argument of the expression is the
                     # name of the component.
-                    component_name = arguments[0].value
-                    component = expression.callee.property.name
-
+                    # component_name = arguments[0].value
+                    # component = expression.callee.property.name
+                    # 
                     # If the component is directive or filter and its name is
                     # xxx then the filename containing it should be
                     # XxxDirective.js or XxxFilter.js respectively.
                     # if component == 'directive' or component == 'filter':
-                    #     if (component_name[0].swapcase() + component_name[1:] +
+                    #     if (component_name[0].swapcase() + component_name[1:]+
                     #             component.capitalize() != (exact_filename)):
                     #         print (
                     #             '%s -> Please ensure that the %s name '
