@@ -1449,7 +1449,7 @@ class LintChecksManager(object):
                     #             '%s -> Please ensure that the %s name '
                     #             'matches the filename'
                     #             % (filepath, component))
-                    #         failed = True
+                    #         failed = True.
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -2332,8 +2332,8 @@ class LintChecksManager(object):
             self._check_sorted_dependencies())
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
-        html_directive_name_messages = (
-            self._check_html_directive_name())
+        # html_directive_name_messages = (
+        #     self._check_html_directive_name()).
         import_order_messages = self._check_import_order()
         docstring_messages = self._check_docstrings()
         comment_messages = self._check_comments()
@@ -2347,7 +2347,8 @@ class LintChecksManager(object):
         all_messages = (
             js_and_ts_component_messages + directive_scope_messages +
             sorted_dependencies_messages + controller_dependency_messages +
-            html_directive_name_messages + import_order_messages +
+            # html_directive_name_messages +.
+            import_order_messages +
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
