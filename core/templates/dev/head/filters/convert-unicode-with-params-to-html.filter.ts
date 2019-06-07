@@ -21,7 +21,7 @@
  * this is the end of a parameter.
  */
 
-require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('components/forms/convert-unicode-to-html.filter.ts');
 
 oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
   var assert = function(text) {

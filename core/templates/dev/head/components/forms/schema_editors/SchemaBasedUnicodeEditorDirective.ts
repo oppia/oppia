@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for unicode strings.
  */
 
-require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
+require('components/forms/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/DeviceInfoService.ts');
 

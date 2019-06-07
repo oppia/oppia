@@ -25,7 +25,7 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
-require('filters/ParameterizeRuleDescriptionFilter.ts');
+require('filters/parameterize-rule-description.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
 require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
