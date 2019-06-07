@@ -20,6 +20,7 @@ from core.domain import collection_domain
 from core.domain import commit_commands_domain
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import story_domain
 from core.tests import test_utils
 import utils
 
@@ -64,6 +65,9 @@ def validate_with_missing_keys_in_command(
         name: str. The command name.
         parameters: dict. Dict containing command parameters.
     """
+
+    if not len(parameters.keys()):
+        return
     parameter_key = sorted(parameters.keys())[0]
     parameters.pop(parameter_key, None)
     commit_cmd_domain_object = commit_cmd_class(
@@ -191,6 +195,81 @@ class ConfigPropertyCommitCmdUnitTests(test_utils.GenericTestBase):
         }]
 
         commit_cmd_class = commit_commands_domain.ConfigPropertyCommitCmd
+        for cmd in command_list:
+            validate_with_valid_command(
+                commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_missing_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_extra_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+
+
+class StoryCommitCmdUnitTests(test_utils.GenericTestBase):
+    """Test the story commit cmd domain object."""
+
+    def test_commands(self):
+        command_list = [{
+            'name': story_domain.CMD_UPDATE_STORY_PROPERTY,
+            'parameters': {
+                'property_name': 'name', 'new_value': 'new value',
+                'old_value': 'old value'}
+        }, {
+            'name': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+            'parameters': {
+                'node_id': 'node id', 'property_name': 'name',
+                'new_value': 'new value', 'old_value': 'old value'}
+        }, {
+            'name': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
+            'parameters': {
+                'property_name': 'name', 'new_value': 'new value',
+                'old_value': 'old value'}
+        }, {
+            'name': story_domain.CMD_ADD_STORY_NODE,
+            'parameters': {'node_id': 'node id'}
+        }, {
+            'name': story_domain.CMD_DELETE_STORY_NODE,
+            'parameters': {'node_id': 'node id'}
+        }, {
+            'name': story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
+            'parameters': {'node_id': 'node id'}
+        }, {
+            'name': story_domain.CMD_CREATE_NEW,
+            'parameters': {'title': 'title'}
+        }, {
+            'name': story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+            'parameters': {'from_version': 0, 'to_version': 1}
+        }]
+
+        commit_cmd_class = commit_commands_domain.StoryCommitCmd
+        for cmd in command_list:
+            validate_with_valid_command(
+                commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_missing_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+            validate_with_extra_keys_in_command(
+                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+
+
+class StoryRightsCommitCmdUnitTests(test_utils.GenericTestBase):
+    """Test the story rights commit cmd domain object."""
+
+    def test_commands(self):
+        command_list = [{
+            'name': story_domain.CMD_CREATE_NEW,
+            'parameters': {}
+        }, {
+            'name': story_domain.CMD_CHANGE_ROLE,
+            'parameters': {
+                'assignee_id': 'id', 'new_role': 'manager', 'old_role': 'none'}
+        }, {
+            'name': story_domain.CMD_PUBLISH_STORY,
+            'parameters': {}
+        }, {
+            'name': story_domain.CMD_UNPUBLISH_STORY,
+            'parameters': {}
+        }]
+
+        commit_cmd_class = commit_commands_domain.StoryRightsCommitCmd
         for cmd in command_list:
             validate_with_valid_command(
                 commit_cmd_class, cmd['name'], cmd['parameters'])
