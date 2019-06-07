@@ -2224,7 +2224,8 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
+    def _convert_states_v28_dict_to_v29_dict(
+            cls, states_dict, image_id_counter):
         """TODO.
             Converts from version 28 to 29. Version 29 added image assets field
             in state model.
@@ -2233,16 +2234,85 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
+            image_id_counter: int. Counter for an image id.
 
         Returns:
             dict. The converted states_dict.
         """
         image_assets = {}
         image_mapping = {}
+
         for state_dict in states_dict.itervalues():
+
+            content_html = state_dict['content']['html']
+            (new_content_html, image_id_counter, image_mapping) = (
+                html_validation_service.get_html_with_image_id_in_image_tag(
+                    content_html, image_id_counter, image_mapping))
+            state_dict['content']['html'] = new_content_html
+
+            if state_dict['interaction']['default_outcome']:
+                interaction_feedback_html = state_dict[
+                    'interaction']['default_outcome']['feedback']['html']
+                (new_interaction_feedback_html, image_id_counter, image_mapping) = (
+                    html_validation_service.get_html_with_image_id_in_image_tag(
+                        interaction_feedback_html, image_id_counter, image_mapping))
+                state_dict['interaction']['default_outcome']['feedback'][
+                    'html'] = new_interaction_feedback_html
+
+            for answer_group_index, answer_group in enumerate(
+                state_dict['interaction']['answer_groups']):
+                answer_group_html = answer_group['outcome']['feedback']['html']
+                (new_answer_group_html, image_id_counter, image_mapping) = (
+                    html_validation_service.get_html_with_image_id_in_image_tag(
+                        answer_group_html, image_id_counter, image_mapping))
+                state_dict['interaction']['answer_groups'][
+                    answer_group_index]['outcome']['feedback']['html'] = (
+                        new_answer_group_html)
+                if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                    for rule_spec_index, rule_spec in enumerate(
+                            answer_group['rule_specs']):
+                        for x_index, x in enumerate(rule_spec['inputs']['x']):
+                            (new_x, image_id_counter, image_mapping) = (
+                                html_validation_service.get_html_with_image_id_in_image_tag(
+                                    x, image_id_counter, image_mapping))
+                            state_dict['interaction']['answer_groups'][
+                                answer_group_index]['rule_specs'][
+                                    rule_spec_index]['inputs']['x'][x_index] = (
+                                        new_x)
+
+            for hint_index, hint in enumerate(
+                    state_dict['interaction']['hints']):
+                hint_html = hint['hint_content']['html']
+                (new_hint_html, image_id_counter, image_mapping) = (
+                    html_validation_service.get_html_with_image_id_in_image_tag(
+                        hint_html, image_id_counter, image_mapping))
+                state_dict['interaction']['hints'][hint_index][
+                    'hint_content']['html'] = new_hint_html
+
+            if state_dict['interaction']['solution']:
+                solution_html = state_dict[
+                'interaction']['solution']['explanation']['html']
+                (new_solution_html, image_id_counter, image_mapping) = (
+                html_validation_service.get_html_with_image_id_in_image_tag(
+                    solution_html, image_id_counter, image_mapping))
+                state_dict['interaction']['solution']['explanation']['html'] = (
+                    new_solution_html)
+
+            if state_dict['interaction']['id'] in (
+                'ItemSelectionInput', 'MultipleChoiceInput'):
+                for value_index, value in enumerate(
+                        state_dict['interaction']['customization_args'][
+                            'choices']['value']):
+                    (new_value, image_id_counter, image_mapping) = (
+                        html_validation_service.get_html_with_image_id_in_image_tag(
+                            value, image_id_counter, image_mapping))
+                    state_dict['interaction']['customization_args'][
+                        'choices']['value'][value_index] = new_value
+
             state_dict['image_assets'] = image_assets
             state_dict['image_assets']['image_mapping'] = image_mapping
-        return states_dict
+
+        return (states_dict, image_id_counter)
 
     @classmethod
     def update_states_from_model(
@@ -2875,13 +2945,12 @@ class Exploration(object):
     def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
         """Converts a v33 exploration dict into a v34 exploration dict."""
         exploration_dict['schema_version'] = 34
-
-        # TODO
-        # exploration_dict['image_id_counter'] = get_number_of_images_in_exploration()
         exploration_dict['image_id_counter'] = 0
 
-        exploration_dict['states'] = cls._convert_states_v28_dict_to_v29_dict(
-            exploration_dict['states'])
+        (exploration_dict['states'], exploration_dict['image_id_counter']) = (
+            cls._convert_states_v28_dict_to_v29_dict(
+                exploration_dict['states'],
+                exploration_dict['image_id_counter']))
         exploration_dict['states_schema_version'] = 29
 
         return exploration_dict

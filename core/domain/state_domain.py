@@ -322,6 +322,7 @@ class ImageAssets(object):
             instructions = image_info['instructions']
 
             image = Image(src, placeholder, author_id, instructions)
+            image_id = int(image_id)
             self.image_mapping[image_id] = image
 
     def delete_image(self, image_id):

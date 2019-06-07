@@ -264,7 +264,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             </oppia-noninteractive-image> hjkhjkhkjh
             <oppia-noninteractive-image image_id-with-value="2">
             </oppia-noninteractive-image> dgfsdgfd ggggggggggg
-            oppia-noninteractive-image image_id-with-value="3">\
+            <oppia-noninteractive-image image_id-with-value="3">\
             </oppia-noninteractive-image>ffffff ''')
 
         new_html_after_deleting_image = ('''
@@ -354,12 +354,17 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_object_6 = exp_domain.ExplorationChange(change_dict_6)
 
         change_list = ([change_object_1, change_object_2, change_object_3,
-            change_object_4, change_object_5, change_object_6])
+            change_object_4, change_object_5])
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, change_list, 'one commit')
 
+        change_list = ([change_object_6])
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, change_list, 'second commit')
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         image_ids = exp_services.get_images_ids_of_exploration(exploration)
+
         expected_image_ids_list = [1,2]
         self.assertEqual(expected_image_ids_list, image_ids)
 
@@ -395,324 +400,324 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                 image_ids_after_change, image_ids_before_change)
 
 
-class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
-    """Test that classifier models are correctly mapped when an exploration
-    is reverted.
-    """
+# class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
+#     """Test that classifier models are correctly mapped when an exploration
+#     is reverted.
+#     """
 
-    def test_reverting_an_exploration_maintains_classifier_models(self):
-        """Test that when exploration is reverted to previous version
-        it maintains appropriate classifier models mapping.
-        """
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            self.save_new_valid_exploration(
-                self.EXP_ID, self.owner_id, title='Bridges in England',
-                category='Architecture', language_code='en')
+#     def test_reverting_an_exploration_maintains_classifier_models(self):
+#         """Test that when exploration is reverted to previous version
+#         it maintains appropriate classifier models mapping.
+#         """
+#         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+#             self.save_new_valid_exploration(
+#                 self.EXP_ID, self.owner_id, title='Bridges in England',
+#                 category='Architecture', language_code='en')
 
-        interaction_answer_groups = [{
-            'rule_specs': [{
-                'rule_type': 'Equals',
-                'inputs': {'x': 'abc'},
-            }],
-            'outcome': {
-                'dest': feconf.DEFAULT_INIT_STATE_NAME,
-                'feedback': {
-                    'content_id': 'feedback_1',
-                    'html': 'Try again'
-                },
-                'labelled_as_correct': False,
-                'param_changes': [],
-                'refresher_exploration_id': None,
-                'missing_prerequisite_skill_id': None
-            },
-            'training_data': ['answer1', 'answer2', 'answer3'],
-            'tagged_misconception_id': None
-        }]
+#         interaction_answer_groups = [{
+#             'rule_specs': [{
+#                 'rule_type': 'Equals',
+#                 'inputs': {'x': 'abc'},
+#             }],
+#             'outcome': {
+#                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
+#                 'feedback': {
+#                     'content_id': 'feedback_1',
+#                     'html': 'Try again'
+#                 },
+#                 'labelled_as_correct': False,
+#                 'param_changes': [],
+#                 'refresher_exploration_id': None,
+#                 'missing_prerequisite_skill_id': None
+#             },
+#             'training_data': ['answer1', 'answer2', 'answer3'],
+#             'tagged_misconception_id': None
+#         }]
 
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'property_name': (
-                exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-            'new_value': interaction_answer_groups
-        })]
+#         change_list = [exp_domain.ExplorationChange({
+#             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+#             'state_name': feconf.DEFAULT_INIT_STATE_NAME,
+#             'property_name': (
+#                 exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
+#             'new_value': interaction_answer_groups
+#         })]
 
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.update_exploration(
-                        self.owner_id, self.EXP_ID, change_list, '')
+#         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+#             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+#                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+#                     exp_services.update_exploration(
+#                         self.owner_id, self.EXP_ID, change_list, '')
 
-        exp = exp_services.get_exploration_by_id(self.EXP_ID)
-        job = classifier_services.get_classifier_training_jobs(
-            self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
-        self.assertIsNotNone(job)
+#         exp = exp_services.get_exploration_by_id(self.EXP_ID)
+#         job = classifier_services.get_classifier_training_jobs(
+#             self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+#         self.assertIsNotNone(job)
 
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'property_name': 'title',
-            'new_value': 'A new title'
-        })]
+#         change_list = [exp_domain.ExplorationChange({
+#             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+#             'property_name': 'title',
+#             'new_value': 'A new title'
+#         })]
 
-        with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
-            with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
-                with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
-                    exp_services.update_exploration(
-                        self.owner_id, self.EXP_ID, change_list, '')
+#         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
+#             with self.swap(feconf, 'MIN_TOTAL_TRAINING_EXAMPLES', 2):
+#                 with self.swap(feconf, 'MIN_ASSIGNED_LABELS', 1):
+#                     exp_services.update_exploration(
+#                         self.owner_id, self.EXP_ID, change_list, '')
 
-                    exp = exp_services.get_exploration_by_id(self.EXP_ID)
-                    # Revert exploration to previous version.
-                    exp_services.revert_exploration(
-                        self.owner_id, self.EXP_ID, exp.version,
-                        exp.version - 1)
+#                     exp = exp_services.get_exploration_by_id(self.EXP_ID)
+#                     # Revert exploration to previous version.
+#                     exp_services.revert_exploration(
+#                         self.owner_id, self.EXP_ID, exp.version,
+#                         exp.version - 1)
 
-        exp = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_job = classifier_services.get_classifier_training_jobs(
-            self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
-        self.assertIsNotNone(new_job)
-        self.assertEqual(job.job_id, new_job.job_id)
-
-
-class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
-    """Tests query methods."""
-
-    def test_get_exploration_titles_and_categories(self):
-        self.assertEqual(
-            exp_services.get_exploration_titles_and_categories([]), {})
-
-        self.save_new_default_exploration('A', self.owner_id, title='TitleA')
-        self.assertEqual(
-            exp_services.get_exploration_titles_and_categories(['A']), {
-                'A': {
-                    'category': 'A category',
-                    'title': 'TitleA'
-                }
-            })
-
-        self.save_new_default_exploration('B', self.owner_id, title='TitleB')
-        self.assertEqual(
-            exp_services.get_exploration_titles_and_categories(['A']), {
-                'A': {
-                    'category': 'A category',
-                    'title': 'TitleA'
-                }
-            })
-        self.assertEqual(
-            exp_services.get_exploration_titles_and_categories(['A', 'B']), {
-                'A': {
-                    'category': 'A category',
-                    'title': 'TitleA',
-                },
-                'B': {
-                    'category': 'A category',
-                    'title': 'TitleB',
-                },
-            })
-        self.assertEqual(
-            exp_services.get_exploration_titles_and_categories(['A', 'C']), {
-                'A': {
-                    'category': 'A category',
-                    'title': 'TitleA'
-                }
-            })
+#         exp = exp_services.get_exploration_by_id(self.EXP_ID)
+#         new_job = classifier_services.get_classifier_training_jobs(
+#             self.EXP_ID, exp.version, [feconf.DEFAULT_INIT_STATE_NAME])[0]
+#         self.assertIsNotNone(new_job)
+#         self.assertEqual(job.job_id, new_job.job_id)
 
 
-class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
-    """Tests exploration query methods which operate on ExplorationSummary
-    objects.
-    """
-    EXP_ID_0 = '0_en_arch_bridges_in_england'
-    EXP_ID_1 = '1_fi_arch_sillat_suomi'
-    EXP_ID_2 = '2_en_welcome_introduce_oppia'
-    EXP_ID_3 = '3_en_welcome_introduce_oppia_interactions'
-    EXP_ID_4 = '4_en_welcome'
-    EXP_ID_5 = '5_fi_welcome_vempain'
-    EXP_ID_6 = '6_en_languages_learning_basic_verbs_in_spanish'
-    EXP_ID_7 = '7_en_languages_private_exploration_in_spanish'
+# class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
+#     """Tests query methods."""
 
-    def setUp(self):
-        super(ExplorationSummaryQueriesUnitTests, self).setUp()
+#     def test_get_exploration_titles_and_categories(self):
+#         self.assertEqual(
+#             exp_services.get_exploration_titles_and_categories([]), {})
 
-        # Setup the explorations to fit into 2 different categoriers and 2
-        # different language groups. Also, ensure 2 of them have similar
-        # titles.
-        self.save_new_valid_exploration(
-            self.EXP_ID_0, self.owner_id, title='Bridges in England',
-            category='Architecture', language_code='en')
-        self.save_new_valid_exploration(
-            self.EXP_ID_1, self.owner_id, title='Sillat Suomi',
-            category='Architecture', language_code='fi')
-        self.save_new_valid_exploration(
-            self.EXP_ID_2, self.owner_id, title='Introduce Oppia',
-            category='Welcome', language_code='en')
-        self.save_new_valid_exploration(
-            self.EXP_ID_3, self.owner_id,
-            title='Introduce Interactions in Oppia',
-            category='Welcome', language_code='en')
-        self.save_new_valid_exploration(
-            self.EXP_ID_4, self.owner_id, title='Welcome',
-            category='Welcome', language_code='en')
-        self.save_new_valid_exploration(
-            self.EXP_ID_5, self.owner_id, title='Tervetuloa Oppia',
-            category='Welcome', language_code='fi')
-        self.save_new_valid_exploration(
-            self.EXP_ID_6, self.owner_id,
-            title='Learning basic verbs in Spanish',
-            category='Languages', language_code='en')
-        self.save_new_valid_exploration(
-            self.EXP_ID_7, self.owner_id,
-            title='Private exploration in Spanish',
-            category='Languages', language_code='en')
+#         self.save_new_default_exploration('A', self.owner_id, title='TitleA')
+#         self.assertEqual(
+#             exp_services.get_exploration_titles_and_categories(['A']), {
+#                 'A': {
+#                     'category': 'A category',
+#                     'title': 'TitleA'
+#                 }
+#             })
 
-        # Publish explorations 0-6. Private explorations should not show up in
-        # a search query, even if they're indexed.
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_2)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_3)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_4)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_5)
-        rights_manager.publish_exploration(self.owner, self.EXP_ID_6)
+#         self.save_new_default_exploration('B', self.owner_id, title='TitleB')
+#         self.assertEqual(
+#             exp_services.get_exploration_titles_and_categories(['A']), {
+#                 'A': {
+#                     'category': 'A category',
+#                     'title': 'TitleA'
+#                 }
+#             })
+#         self.assertEqual(
+#             exp_services.get_exploration_titles_and_categories(['A', 'B']), {
+#                 'A': {
+#                     'category': 'A category',
+#                     'title': 'TitleA',
+#                 },
+#                 'B': {
+#                     'category': 'A category',
+#                     'title': 'TitleB',
+#                 },
+#             })
+#         self.assertEqual(
+#             exp_services.get_exploration_titles_and_categories(['A', 'C']), {
+#                 'A': {
+#                     'category': 'A category',
+#                     'title': 'TitleA'
+#                 }
+#             })
 
-        # Add the explorations to the search index.
-        exp_services.index_explorations_given_ids([
-            self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
-            self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
-    def _create_search_query(self, terms, categories, languages):
-        """Creates search query from list of arguments.
+# class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
+#     """Tests exploration query methods which operate on ExplorationSummary
+#     objects.
+#     """
+#     EXP_ID_0 = '0_en_arch_bridges_in_england'
+#     EXP_ID_1 = '1_fi_arch_sillat_suomi'
+#     EXP_ID_2 = '2_en_welcome_introduce_oppia'
+#     EXP_ID_3 = '3_en_welcome_introduce_oppia_interactions'
+#     EXP_ID_4 = '4_en_welcome'
+#     EXP_ID_5 = '5_fi_welcome_vempain'
+#     EXP_ID_6 = '6_en_languages_learning_basic_verbs_in_spanish'
+#     EXP_ID_7 = '7_en_languages_private_exploration_in_spanish'
 
-        Args:
-            terms: list(str). A list of terms to be added in the query.
-            categories: list(str). A list of categories to be added in the
-                query.
-            languages: list(str). A list of languages to be added in the query.
+#     def setUp(self):
+#         super(ExplorationSummaryQueriesUnitTests, self).setUp()
 
-        Returns:
-            str. A search query string.
-        """
-        query = ' '.join(terms)
-        if categories:
-            query += ' category=(' + ' OR '.join([
-                '"%s"' % category for category in categories]) + ')'
-        if languages:
-            query += ' language_code=(' + ' OR '.join([
-                '"%s"' % language for language in languages]) + ')'
-        return query
+#         # Setup the explorations to fit into 2 different categoriers and 2
+#         # different language groups. Also, ensure 2 of them have similar
+#         # titles.
+#         self.save_new_valid_exploration(
+#             self.EXP_ID_0, self.owner_id, title='Bridges in England',
+#             category='Architecture', language_code='en')
+#         self.save_new_valid_exploration(
+#             self.EXP_ID_1, self.owner_id, title='Sillat Suomi',
+#             category='Architecture', language_code='fi')
+#         self.save_new_valid_exploration(
+#             self.EXP_ID_2, self.owner_id, title='Introduce Oppia',
+#             category='Welcome', language_code='en')
+#         self.save_new_valid_exploration(
+#             self.EXP_ID_3, self.owner_id,
+#             title='Introduce Interactions in Oppia',
+#             category='Welcome', language_code='en')
+#         self.save_new_valid_exploration(
+#             self.EXP_ID_4, self.owner_id, title='Welcome',
+#             category='Welcome', language_code='en')
+#         self.save_new_valid_exploration(
+#             self.EXP_ID_5, self.owner_id, title='Tervetuloa Oppia',
+#             category='Welcome', language_code='fi')
+#         self.save_new_valid_exploration(
+#             self.EXP_ID_6, self.owner_id,
+#             title='Learning basic verbs in Spanish',
+#             category='Languages', language_code='en')
+#         self.save_new_valid_exploration(
+#             self.EXP_ID_7, self.owner_id,
+#             title='Private exploration in Spanish',
+#             category='Languages', language_code='en')
 
-    def test_get_exploration_summaries_with_no_query(self):
-        # An empty query should return all explorations.
-        (exp_ids, search_cursor) = (
-            exp_services.get_exploration_ids_matching_query(''))
-        self.assertEqual(sorted(exp_ids), [
-            self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
-            self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6
-        ])
-        self.assertIsNone(search_cursor)
+#         # Publish explorations 0-6. Private explorations should not show up in
+#         # a search query, even if they're indexed.
+#         rights_manager.publish_exploration(self.owner, self.EXP_ID_0)
+#         rights_manager.publish_exploration(self.owner, self.EXP_ID_1)
+#         rights_manager.publish_exploration(self.owner, self.EXP_ID_2)
+#         rights_manager.publish_exploration(self.owner, self.EXP_ID_3)
+#         rights_manager.publish_exploration(self.owner, self.EXP_ID_4)
+#         rights_manager.publish_exploration(self.owner, self.EXP_ID_5)
+#         rights_manager.publish_exploration(self.owner, self.EXP_ID_6)
 
-    def test_get_exploration_summaries_with_deleted_explorations(self):
-        # Ensure a deleted exploration does not show up in search results.
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_5)
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_6)
+#         # Add the explorations to the search index.
+#         exp_services.index_explorations_given_ids([
+#             self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
+#             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
-        exp_ids = (
-            exp_services.get_exploration_ids_matching_query(''))[0]
-        self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_4])
+#     def _create_search_query(self, terms, categories, languages):
+#         """Creates search query from list of arguments.
 
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_2)
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID_4)
+#         Args:
+#             terms: list(str). A list of terms to be added in the query.
+#             categories: list(str). A list of categories to be added in the
+#                 query.
+#             languages: list(str). A list of languages to be added in the query.
 
-        # If no explorations are loaded, a blank query should not get any
-        # explorations.
-        self.assertEqual(
-            exp_services.get_exploration_ids_matching_query(''),
-            ([], None))
+#         Returns:
+#             str. A search query string.
+#         """
+#         query = ' '.join(terms)
+#         if categories:
+#             query += ' category=(' + ' OR '.join([
+#                 '"%s"' % category for category in categories]) + ')'
+#         if languages:
+#             query += ' language_code=(' + ' OR '.join([
+#                 '"%s"' % language for language in languages]) + ')'
+#         return query
 
-    def test_search_exploration_summaries(self):
-        # Search within the 'Architecture' category.
-        exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], ['Architecture'], []))
-        self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_1])
+#     def test_get_exploration_summaries_with_no_query(self):
+#         # An empty query should return all explorations.
+#         (exp_ids, search_cursor) = (
+#             exp_services.get_exploration_ids_matching_query(''))
+#         self.assertEqual(sorted(exp_ids), [
+#             self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
+#             self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6
+#         ])
+#         self.assertIsNone(search_cursor)
 
-        # Search for explorations in Finnish.
-        exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], [], ['fi']))
-        self.assertEqual(sorted(exp_ids), [self.EXP_ID_1, self.EXP_ID_5])
+#     def test_get_exploration_summaries_with_deleted_explorations(self):
+#         # Ensure a deleted exploration does not show up in search results.
+#         exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
+#         exp_services.delete_exploration(self.owner_id, self.EXP_ID_1)
+#         exp_services.delete_exploration(self.owner_id, self.EXP_ID_3)
+#         exp_services.delete_exploration(self.owner_id, self.EXP_ID_5)
+#         exp_services.delete_exploration(self.owner_id, self.EXP_ID_6)
 
-        # Search for Finnish explorations in the 'Architecture' category.
-        exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query([], ['Architecture'], ['fi']))
-        self.assertEqual(sorted(exp_ids), [self.EXP_ID_1])
+#         exp_ids = (
+#             exp_services.get_exploration_ids_matching_query(''))[0]
+#         self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_4])
 
-        # Search for explorations containing 'Oppia'.
-        exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['Oppia'], [], []))
-        self.assertEqual(
-            sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5])
+#         exp_services.delete_exploration(self.owner_id, self.EXP_ID_2)
+#         exp_services.delete_exploration(self.owner_id, self.EXP_ID_4)
 
-        # Search for explorations containing 'Oppia' and 'Introduce'.
-        exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['Oppia', 'Introduce'], [], []))
-        self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3])
+#         # If no explorations are loaded, a blank query should not get any
+#         # explorations.
+#         self.assertEqual(
+#             exp_services.get_exploration_ids_matching_query(''),
+#             ([], None))
 
-        # Search for explorations containing 'England' in English.
-        exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['England'], [], ['en']))
-        self.assertEqual(sorted(exp_ids), [self.EXP_ID_0])
+#     def test_search_exploration_summaries(self):
+#         # Search within the 'Architecture' category.
+#         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+#             self._create_search_query([], ['Architecture'], []))
+#         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_1])
 
-        # Search for explorations containing 'in'.
-        exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['in'], [], []))
-        self.assertEqual(
-            sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3, self.EXP_ID_6])
+#         # Search for explorations in Finnish.
+#         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+#             self._create_search_query([], [], ['fi']))
+#         self.assertEqual(sorted(exp_ids), [self.EXP_ID_1, self.EXP_ID_5])
 
-        # Search for explorations containing 'in' in the 'Architecture' and
-        # 'Welcome' categories.
-        exp_ids, _ = exp_services.get_exploration_ids_matching_query(
-            self._create_search_query(['in'], ['Architecture', 'Welcome'], []))
-        self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
+#         # Search for Finnish explorations in the 'Architecture' category.
+#         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+#             self._create_search_query([], ['Architecture'], ['fi']))
+#         self.assertEqual(sorted(exp_ids), [self.EXP_ID_1])
 
-    def test_exploration_summaries_pagination_in_filled_search_results(self):
-        # Ensure the maximum number of explorations that can fit on the search
-        # results page is maintained by the summaries function.
-        with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
-            # Need to load 3 pages to find all of the explorations. Since the
-            # returned order is arbitrary, we need to concatenate the results
-            # to ensure all explorations are returned. We validate the correct
-            # length is returned each time.
-            found_exp_ids = []
+#         # Search for explorations containing 'Oppia'.
+#         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+#             self._create_search_query(['Oppia'], [], []))
+#         self.assertEqual(
+#             sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3, self.EXP_ID_5])
 
-            # Page 1: 3 initial explorations.
-            (exp_ids, search_cursor) = (
-                exp_services.get_exploration_ids_matching_query(
-                    ''))
-            self.assertEqual(len(exp_ids), 3)
-            self.assertIsNotNone(search_cursor)
-            found_exp_ids += exp_ids
+#         # Search for explorations containing 'Oppia' and 'Introduce'.
+#         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+#             self._create_search_query(['Oppia', 'Introduce'], [], []))
+#         self.assertEqual(sorted(exp_ids), [self.EXP_ID_2, self.EXP_ID_3])
 
-            # Page 2: 3 more explorations.
-            (exp_ids, search_cursor) = (
-                exp_services.get_exploration_ids_matching_query(
-                    '', cursor=search_cursor))
-            self.assertEqual(len(exp_ids), 3)
-            self.assertIsNotNone(search_cursor)
-            found_exp_ids += exp_ids
+#         # Search for explorations containing 'England' in English.
+#         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+#             self._create_search_query(['England'], [], ['en']))
+#         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0])
 
-            # Page 3: 1 final exploration.
-            (exp_ids, search_cursor) = (
-                exp_services.get_exploration_ids_matching_query(
-                    '', cursor=search_cursor))
-            self.assertEqual(len(exp_ids), 1)
-            self.assertIsNone(search_cursor)
-            found_exp_ids += exp_ids
+#         # Search for explorations containing 'in'.
+#         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+#             self._create_search_query(['in'], [], []))
+#         self.assertEqual(
+#             sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3, self.EXP_ID_6])
 
-            # Validate all explorations were seen.
-            self.assertEqual(sorted(found_exp_ids), [
-                self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
-                self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
+#         # Search for explorations containing 'in' in the 'Architecture' and
+#         # 'Welcome' categories.
+#         exp_ids, _ = exp_services.get_exploration_ids_matching_query(
+#             self._create_search_query(['in'], ['Architecture', 'Welcome'], []))
+#         self.assertEqual(sorted(exp_ids), [self.EXP_ID_0, self.EXP_ID_3])
+
+#     def test_exploration_summaries_pagination_in_filled_search_results(self):
+#         # Ensure the maximum number of explorations that can fit on the search
+#         # results page is maintained by the summaries function.
+#         with self.swap(feconf, 'SEARCH_RESULTS_PAGE_SIZE', 3):
+#             # Need to load 3 pages to find all of the explorations. Since the
+#             # returned order is arbitrary, we need to concatenate the results
+#             # to ensure all explorations are returned. We validate the correct
+#             # length is returned each time.
+#             found_exp_ids = []
+
+#             # Page 1: 3 initial explorations.
+#             (exp_ids, search_cursor) = (
+#                 exp_services.get_exploration_ids_matching_query(
+#                     ''))
+#             self.assertEqual(len(exp_ids), 3)
+#             self.assertIsNotNone(search_cursor)
+#             found_exp_ids += exp_ids
+
+#             # Page 2: 3 more explorations.
+#             (exp_ids, search_cursor) = (
+#                 exp_services.get_exploration_ids_matching_query(
+#                     '', cursor=search_cursor))
+#             self.assertEqual(len(exp_ids), 3)
+#             self.assertIsNotNone(search_cursor)
+#             found_exp_ids += exp_ids
+
+#             # Page 3: 1 final exploration.
+#             (exp_ids, search_cursor) = (
+#                 exp_services.get_exploration_ids_matching_query(
+#                     '', cursor=search_cursor))
+#             self.assertEqual(len(exp_ids), 1)
+#             self.assertIsNone(search_cursor)
+#             found_exp_ids += exp_ids
+
+#             # Validate all explorations were seen.
+#             self.assertEqual(sorted(found_exp_ids), [
+#                 self.EXP_ID_0, self.EXP_ID_1, self.EXP_ID_2, self.EXP_ID_3,
+#                 self.EXP_ID_4, self.EXP_ID_5, self.EXP_ID_6])
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
@@ -1271,7 +1276,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
             'content_id': 'content',
             'html': (
                 '<blockquote>Hello, this is state1</blockquote><p>'
-                '<oppia-noninteractive-image image_id-with-value='' filepath-with-value='
+                '<oppia-noninteractive-image image_id-with-value="" filepath-with-value='
                 '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
                 '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
                 '</oppia-noninteractive-image></p>')

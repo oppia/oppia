@@ -573,7 +573,7 @@ def get_images_ids_of_exploration(exploration):
     """Returns a list of image_ids of newly images.
 
     Args:
-        exploration_id: str. Id of an exploration.
+        exploration: An exploration object..
 
     Returns:
         list. List of ids, of all images present in an exploration.
@@ -839,7 +839,7 @@ def apply_change_list(exploration_id, change_list):
                     state.image_assets.add_image(
                         change.image_id, change.image_info)
 
-                # First deletes the image_ids of deleted images from the
+                # Deletes the image_ids of deleted images from the
                 # ImageAssets.
                 image_ids_after_change = get_images_ids_of_exploration(exploration)
                 deleted_image_ids = get_deleted_images_ids(

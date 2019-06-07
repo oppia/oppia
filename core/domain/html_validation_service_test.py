@@ -951,7 +951,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'tag_name': 'oppia-noninteractive-link'
         }, {
             'html_string': (
-                '<oppia-noninteractive-image caption-with-value="&amp;quot;'
+                '<oppia-noninteractive-image image_id-with-value="1" caption-with-value="&amp;quot;'
                 'abc&amp;quot;" filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image>'
             ),
