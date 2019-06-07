@@ -38,7 +38,7 @@
 /core/controllers/collection*.py @kevinlee12
 /core/domain/collection*.py @kevinlee12
 /core/storage/collection/ @kevinlee12
-/core/templates/dev/head/components/CollectionCreationService*.ts @kevinlee12
+/core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @kevinlee12
 /core/templates/dev/head/domain/collection/ @kevinlee12
 /core/templates/dev/head/pages/collection_editor/ @kevinlee12
 /core/templates/dev/head/pages/collection_player/ @kevinlee12
@@ -102,8 +102,8 @@
 /core/domain/summary_services*.py @aks681
 /core/domain/value_generators_domain*.py @seanlip
 /core/storage/exploration/ @aks681
-/core/templates/dev/head/components/ExplorationCreationService*.ts @DubeySandeep
-/core/templates/dev/head/components/HintAndSolutionButtonsDirective*.ts @aks681
+/core/templates/dev/head/components/entity-creation-services/exploration-creation.service*.ts @DubeySandeep
+/core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive*.ts @aks681
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive.html @aks681
 /core/templates/dev/head/components/state/ @aks681
 /core/templates/dev/head/components/StateGraphLayoutService*.ts @DubeySandeep
@@ -127,6 +127,8 @@
 
 # Forms pages.
 /core/templates/dev/head/components/forms/ @DubeySandeep
+/core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @DubeySandeep
+/core/templates/dev/head/components/ck-editor-helpers/customize-rte-component-modal.template.html @DubeySandeep
 /core/templates/dev/head/services/SchemaDefaultValueService.ts @DubeySandeep
 /core/templates/dev/head/services/SchemaUndefinedLastElementService.ts @DubeySandeep
 
@@ -141,15 +143,22 @@
 
 
 # Global components and filters.
-/core/templates/dev/head/components/alerts/ @ankita240796
-/core/templates/dev/head/components/attribution_guide/ @ankita240796
-/core/templates/dev/head/components/background/ @ankita240796
-/core/templates/dev/head/components/embed_modal/ @ankita240796
-/core/templates/dev/head/components/loading/ @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/alert-message.directive.ts @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/attribution-guide.directive.html @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/attribution-guide.directive.ts @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.ts @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/background-banner.directive.html @ankita240796
+/core/templates/dev/head/components/button-directives/exploration-embed-button.service.ts @ankita240796
+/core/templates/dev/head/components/button-directives/exploration-embed-button.directive.html @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/loading-dots.directive.ts @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/loading-dots.directive.html @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/promo-bar.directive.ts @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/promo-bar.directive.html @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/sharing-links.directive.html @ankita240796
+/core/templates/dev/head/components/common-layout-directives/common-elements/sharing-links.directive.ts @ankita240796
+/core/templates/dev/head/components/button-directives/social-buttons.directive.ts @ankita240796
+/core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
 /core/templates/dev/head/components/profile_link/ @ankita240796
-/core/templates/dev/head/components/promo/ @ankita240796
-/core/templates/dev/head/components/share/ @ankita240796
-/core/templates/dev/head/components/social_buttons/ @ankita240796
 /core/templates/dev/head/components/summary_tile/ @ankita240796
 /core/templates/dev/head/directives/FocusOnDirective*.ts @ankita240796
 /core/templates/dev/head/directives/AngularHtmlBindDirective*.ts @ankita240796
@@ -232,9 +241,9 @@
 
 # Navigation bar project.
 /core/templates/dev/head/domain/sidebar/ @nithusha21
-/core/templates/dev/head/components/create_button/ @nithusha21
-/core/templates/dev/head/components/side_navigation_bar/ @nithusha21
-/core/templates/dev/head/components/top_navigation_bar/ @nithusha21
+/core/templates/dev/head/components/button-directives/create-activity-button.directive.ts @nithusha21
+/core/templates/dev/head/components/button-directives/create-activity-button.directive.html @nithusha21
+/core/templates/dev/head/components/common-layout-directives/navigation-bars/ @nithusha21
 /core/templates/dev/head/services/NavigationService*.ts @nithusha21
 
 
@@ -244,7 +253,7 @@
 /core/controllers/question*.py @aks681
 /core/domain/question*.py @aks681
 /core/storage/question/ @aks681
-/core/templates/dev/head/components/QuestionCreationService*.ts @aks681
+/core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681
 /core/templates/dev/head/components/score_ring/ @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681
 /core/templates/dev/head/pages/practice_session/ @vinitamurthi
@@ -257,7 +266,7 @@
 /core/controllers/skill*.py @aks681
 /core/domain/skill*.py @aks681
 /core/storage/skill/ @aks681
-/core/templates/dev/head/components/SkillCreationService*.ts @aks681
+/core/templates/dev/head/components/entity-creation-services/skill-creation.service.ts @aks681
 /core/templates/dev/head/components/SummaryListHeaderDirective*.ts @aks681
 /core/templates/dev/head/components/summary_list_header_directive.html @aks681
 /core/templates/dev/head/domain/skill/ @aks681
