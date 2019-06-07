@@ -477,7 +477,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),
     get_redirect_route(
-        r'/createhandler/statistics/<exploration_id>',
+        r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_STATS_PREFIX,
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
