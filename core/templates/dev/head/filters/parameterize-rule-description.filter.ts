@@ -18,7 +18,7 @@
 
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('filters/FormatRtePreviewFilter.ts');
+require('filters/format-rte-preview.filter.ts');
 
 // Filter that changes {{...}} tags into the corresponding parameter input
 // values. Note that this returns an HTML string to accommodate the case of

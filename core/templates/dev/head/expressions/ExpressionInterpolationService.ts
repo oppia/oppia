@@ -16,7 +16,7 @@
  * @fileoverview Service for interpolating expressions.
  */
 
-require('components/forms/ConvertHtmlToUnicodeFilter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
 require('expressions/ExpressionEvaluatorService.ts');
 require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');

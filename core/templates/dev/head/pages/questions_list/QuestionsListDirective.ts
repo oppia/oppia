@@ -27,7 +27,7 @@ require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/topic_editor/TopicEditorStateService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
 require('services/AlertsService.ts');

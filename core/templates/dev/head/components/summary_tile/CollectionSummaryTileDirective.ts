@@ -17,7 +17,7 @@
  */
 
 require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
-require('filters/TruncateAndCapitalizeFilter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/DateTimeFormatService.ts');

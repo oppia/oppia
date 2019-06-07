@@ -18,7 +18,7 @@
 
 require('components/StateGraphLayoutService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 
 oppia.directive('roleGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {

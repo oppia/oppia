@@ -21,7 +21,7 @@ require('domain/collection/CollectionUpdateService.ts');
 require('domain/collection/SearchExplorationsBackendApiService.ts');
 require('domain/summary/ExplorationSummaryBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('pages/collection_editor/CollectionEditorStateService.ts');
 require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
 require('services/AlertsService.ts');

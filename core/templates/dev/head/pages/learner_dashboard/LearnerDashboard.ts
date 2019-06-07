@@ -20,7 +20,7 @@ require('components/background/BackgroundBannerDirective.ts');
 require('components/loading/LoadingDotsDirective.ts');
 require('components/summary_tile/CollectionSummaryTileDirective.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');

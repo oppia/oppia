@@ -16,7 +16,7 @@
  * @fileoverview TruncateInputBasedOnInteractionAnswerType filter for Oppia.
  */
 
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 
 /* Filter that trucates the input answer based on interaction type.
  * @param {string} input - The answer to truncate.

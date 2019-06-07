@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/GetAbbreviatedTextFilter.ts');
+require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
 require('pages/exploration_player/ExplorationEngineService.ts');
 require('pages/exploration_player/PlayerPositionService.ts');
 require('services/AlertsService.ts');

@@ -17,7 +17,7 @@
  * the learner and editor views.
  */
 
-require('filters/CamelCaseToHyphensFilter.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('services/ExtensionTagAssemblerService.ts');
 require('services/HtmlEscaperService.ts');
 

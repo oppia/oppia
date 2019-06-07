@@ -18,7 +18,7 @@
 
 require('components/background/BackgroundBannerDirective.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

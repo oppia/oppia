@@ -20,7 +20,7 @@
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
-require('filters/ConvertToPlainTextFilter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/HtmlEscaperService.ts');
 
