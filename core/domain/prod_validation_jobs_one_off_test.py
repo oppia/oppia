@@ -114,11 +114,8 @@ def run_job_and_check_output(
             sorted(expected_output_dict.keys()))
         for key in actual_output_dict:
             self.assertEqual(actual_output_dict[key], expected_output_dict[key])
-    if sort:
-        try:
-            self.assertEqual(sorted(actual_output), sorted(expected_output))
-        except Exception:
-            raise Exception(actual_output)
+    elif sort:
+        self.assertEqual(sorted(actual_output), sorted(expected_output))
     else:
         self.assertEqual(actual_output, expected_output)
 
