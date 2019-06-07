@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the learner view info section of the
+ * @fileoverview Directive for the learner view info section of the
  * footer.
  */
 

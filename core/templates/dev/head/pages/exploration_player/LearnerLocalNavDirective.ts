@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the local navigation in the learner view.
+ * @fileoverview Directive for the local navigation in the learner view.
  */
 
 
