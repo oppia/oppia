@@ -62,5 +62,4 @@ describe('HTML to text', function() {
         expect(fn).toEqual(results[i]);
       });
     }));
-
 });

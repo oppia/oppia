@@ -24,7 +24,7 @@ describe('Testing filters', function() {
   beforeEach(angular.mock.module('oppia'));
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
-      expect($filter(filterName)).not.toEqual(null);
+    expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should convert {{...}} tags to ...', angular.mock.inject(
@@ -41,5 +41,4 @@ describe('Testing filters', function() {
       expect(filter('{{}}{{hello}}')).toEqual('{{}}...');
     }
   ));
-
 });

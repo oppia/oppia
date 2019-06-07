@@ -23,22 +23,21 @@ describe('Testing filters', function() {
   beforeEach(angular.mock.module('oppia'));
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
-      expect($filter(filterName)).not.toEqual(null);
+    expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should truncate a string when it first sees a \'...\'',
-  angular.mock.inject(function($filter) {
-    var filter = $filter('truncateAtFirstEllipsis');
+    angular.mock.inject(function($filter) {
+      var filter = $filter('truncateAtFirstEllipsis');
 
-    expect(filter('')).toEqual('');
-    expect(filter(null)).toEqual('');
-    expect(filter(undefined)).toEqual('');
+      expect(filter('')).toEqual('');
+      expect(filter(null)).toEqual('');
+      expect(filter(undefined)).toEqual('');
 
-    expect(filter('hello')).toEqual('hello');
-    expect(filter('...')).toEqual('');
-    expect(filter('say ... and ...')).toEqual('say ');
-    expect(filter('... and ...')).toEqual('');
-    expect(filter('{{}}...')).toEqual('{{}}');
-  }));
-
+      expect(filter('hello')).toEqual('hello');
+      expect(filter('...')).toEqual('');
+      expect(filter('say ... and ...')).toEqual('say ');
+      expect(filter('... and ...')).toEqual('');
+      expect(filter('{{}}...')).toEqual('{{}}');
+    }));
 });

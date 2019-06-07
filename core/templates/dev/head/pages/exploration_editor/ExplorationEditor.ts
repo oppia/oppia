@@ -73,10 +73,13 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/format-rte-preview.filter.ts');
 require('filters/format-timer.filter.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('filters/string-utility-filters/normalize-whitespace-punctuation-and-case.filter.ts');
+require(
+  'filters/string-utility-filters/' +
+  'normalize-whitespace-punctuation-and-case.filter.ts');
 require('filters/parameterize-rule-description.filter.ts');
 require('filters/remove-duplicates-in-array.filter.ts');
-require('filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
+require(
+  'filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
 require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');

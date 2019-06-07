@@ -23,7 +23,7 @@ describe('Testing filters', function() {
   beforeEach(angular.mock.module('oppia'));
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
-      expect($filter(filterName)).not.toEqual(null);
+    expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should convert underscores to camelCase properly', angular.mock.inject(

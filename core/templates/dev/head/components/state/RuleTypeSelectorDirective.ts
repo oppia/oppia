@@ -16,7 +16,8 @@
  * @fileoverview Directive for the rule type selector.
  */
 
-require('filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
+require(
+  'filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
 require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
 require('pages/state_editor/state_properties/StatePropertyService.ts');
 

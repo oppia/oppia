@@ -23,65 +23,64 @@ describe('Testing filters', function() {
   beforeEach(angular.mock.module('oppia'));
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
-      expect($filter(filterName)).not.toEqual(null);
+    expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should truncate multi-line text to the first non-empty line',
-  angular.mock.inject(function($filter) {
-    var filter = $filter('truncateAtFirstLine');
+    angular.mock.inject(function($filter) {
+      var filter = $filter('truncateAtFirstLine');
 
-    expect(filter('')).toEqual('');
-    expect(filter(null)).toEqual(null);
-    expect(filter(undefined)).toEqual(undefined);
+      expect(filter('')).toEqual('');
+      expect(filter(null)).toEqual(null);
+      expect(filter(undefined)).toEqual(undefined);
 
-    expect(filter(' A   single line with spaces at either end. ')).toEqual(
-      ' A   single line with spaces at either end. ');
-    expect(filter('a\nb\nc')).toEqual('a...');
-    expect(filter('Removes newline at end\n')).toEqual(
-      'Removes newline at end');
-    expect(filter('\nRemoves newline at beginning.')).toEqual(
-      'Removes newline at beginning.');
+      expect(filter(' A   single line with spaces at either end. ')).toEqual(
+        ' A   single line with spaces at either end. ');
+      expect(filter('a\nb\nc')).toEqual('a...');
+      expect(filter('Removes newline at end\n')).toEqual(
+        'Removes newline at end');
+      expect(filter('\nRemoves newline at beginning.')).toEqual(
+        'Removes newline at beginning.');
 
-    expect(filter('\n')).toEqual('');
-    expect(filter('\n\n\n')).toEqual('');
+      expect(filter('\n')).toEqual('');
+      expect(filter('\n\n\n')).toEqual('');
 
-    // Windows
-    expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
-    expect(filter('Single line\u000D\u000AEOL')).toEqual('Single line...');
-    expect(filter('Single line\x0D\x0AEOL')).toEqual('Single line...');
-    expect(filter('Single line\u000D\x0AEOL')).toEqual('Single line...');
-    expect(filter('Single line\x0D\u000AEOL')).toEqual('Single line...');
+      // Windows
+      expect(filter('Single line\r\nWindows EOL')).toEqual('Single line...');
+      expect(filter('Single line\u000D\u000AEOL')).toEqual('Single line...');
+      expect(filter('Single line\x0D\x0AEOL')).toEqual('Single line...');
+      expect(filter('Single line\u000D\x0AEOL')).toEqual('Single line...');
+      expect(filter('Single line\x0D\u000AEOL')).toEqual('Single line...');
 
-    // Mac
-    expect(filter('Single line\rEOL')).toEqual('Single line...');
-    expect(filter('Single line\u000DEOL')).toEqual('Single line...');
-    expect(filter('Single line\x0DEOL')).toEqual('Single line...');
+      // Mac
+      expect(filter('Single line\rEOL')).toEqual('Single line...');
+      expect(filter('Single line\u000DEOL')).toEqual('Single line...');
+      expect(filter('Single line\x0DEOL')).toEqual('Single line...');
 
-    // Linux
-    expect(filter('Single line\nEOL')).toEqual('Single line...');
-    expect(filter('Single line\u000AEOL')).toEqual('Single line...');
-    expect(filter('Single line\x0AEOL')).toEqual('Single line...');
+      // Linux
+      expect(filter('Single line\nEOL')).toEqual('Single line...');
+      expect(filter('Single line\u000AEOL')).toEqual('Single line...');
+      expect(filter('Single line\x0AEOL')).toEqual('Single line...');
 
-    // Vertical Tab
-    expect(filter('Vertical Tab\vEOL')).toEqual('Vertical Tab...');
-    expect(filter('Vertical Tab\u000BEOL')).toEqual('Vertical Tab...');
-    expect(filter('Vertical Tab\x0BEOL')).toEqual('Vertical Tab...');
+      // Vertical Tab
+      expect(filter('Vertical Tab\vEOL')).toEqual('Vertical Tab...');
+      expect(filter('Vertical Tab\u000BEOL')).toEqual('Vertical Tab...');
+      expect(filter('Vertical Tab\x0BEOL')).toEqual('Vertical Tab...');
 
-    // Form Feed
-    expect(filter('Form Feed\fEOL')).toEqual('Form Feed...');
-    expect(filter('Form Feed\u000CEOL')).toEqual('Form Feed...');
-    expect(filter('Form Feed\x0CEOL')).toEqual('Form Feed...');
+      // Form Feed
+      expect(filter('Form Feed\fEOL')).toEqual('Form Feed...');
+      expect(filter('Form Feed\u000CEOL')).toEqual('Form Feed...');
+      expect(filter('Form Feed\x0CEOL')).toEqual('Form Feed...');
 
-    // Next Line
-    expect(filter('Next Line\u0085EOL')).toEqual('Next Line...');
-    expect(filter('Next Line\x85EOL')).toEqual('Next Line...');
+      // Next Line
+      expect(filter('Next Line\u0085EOL')).toEqual('Next Line...');
+      expect(filter('Next Line\x85EOL')).toEqual('Next Line...');
 
-    // Line Separator
-    expect(filter('Line Separator\u2028EOL')).toEqual('Line Separator...');
+      // Line Separator
+      expect(filter('Line Separator\u2028EOL')).toEqual('Line Separator...');
 
-    // Paragraph Separator
-    expect(filter('Paragraph Separator\u2029EOL')).toEqual(
-      'Paragraph Separator...');
-  }));
-
+      // Paragraph Separator
+      expect(filter('Paragraph Separator\u2029EOL')).toEqual(
+        'Paragraph Separator...');
+    }));
 });

@@ -16,9 +16,8 @@
  * @fileoverview Tests for the convert unicode to html filter.
  */
 
-require(
-  'filters/convert-unicode-to-html.filter.ts');
-  
+require('filters/convert-unicode-to-html.filter.ts');
+
 describe('HTML to text', function() {
   beforeEach(angular.mock.module('oppia'));
 

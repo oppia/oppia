@@ -24,7 +24,7 @@ describe('Testing filters', function() {
   beforeEach(angular.mock.module('oppia'));
 
   it('should have all expected filters', angular.mock.inject(function($filter) {
-      expect($filter(filterName)).not.toEqual(null);
+    expect($filter(filterName)).not.toEqual(null);
   }));
 
   it('should correctly parameterize rule description filter',
@@ -55,7 +55,7 @@ describe('Testing filters', function() {
       expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
         interactionIdMultipleChoice, choicesMultipleChoice)
       ).toEqual('is equal to \'$xyz should not become $$xyz\'');
-  }));
+    }));
 
   it('should correctly display RTE components in Answer Group Header',
     angular.mock.inject(function($filter) {
