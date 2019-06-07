@@ -514,32 +514,6 @@ tags: []
         """
         raise NotImplementedError
 
-    def _stash_current_user_env(self):
-        """Stashes the current user-specific env variables for later retrieval.
-
-        Developers: please don't use this method outside this class -- it makes
-        the individual tests harder to follow.
-        """
-        self.stashed_user_env = {  # pylint: disable=attribute-defined-outside-init
-            'USER_EMAIL': os.environ['USER_EMAIL'],
-            'USER_ID': os.environ['USER_ID'],
-            'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
-        }
-
-    def _restore_stashed_user_env(self):
-        """Restores a stashed set of user-specific env variables.
-
-        Developers: please don't use this method outside this class -- it makes
-        the individual tests harder to follow.
-        """
-        if not self.stashed_user_env:
-            raise Exception('No stashed user env to restore.')
-
-        for key in self.stashed_user_env:
-            os.environ[key] = self.stashed_user_env[key]
-
-        self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
-
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
 
@@ -884,21 +858,17 @@ tags: []
         """Sets a given configuration object's value to the new value specified
         using a POST request.
         """
-        self._stash_current_user_env()
-
-        self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminhandler', {
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    config_obj.name: new_config_value,
-                }
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        self._restore_stashed_user_env()
+        with self.login_context('tmpsuperadmin@example.com',
+                                is_super_admin=True):
+            response = self.get_html_response('/admin')
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'save_config_properties',
+                    'new_config_property_values': {
+                        config_obj.name: new_config_value,
+                    }
+                }, csrf_token=csrf_token)
 
     def set_user_role(self, username, user_role):
         """Sets the given role for this user.
@@ -907,19 +877,15 @@ tags: []
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
-        self._stash_current_user_env()
-
-        self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminrolehandler', {
-                'username': username,
-                'role': user_role
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        self._restore_stashed_user_env()
+        with self.login_context('tmpsuperadmin@example.com',
+                                is_super_admin=True):
+            response = self.get_html_response('/admin')
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '/adminrolehandler', {
+                    'username': username,
+                    'role': user_role
+                }, csrf_token=csrf_token)
 
     def set_admins(self, admin_usernames):
         """Sets role of given users as ADMIN.
@@ -1684,6 +1650,30 @@ tags: []
             yield
         finally:
             setattr(obj, attr, original)
+
+    @contextlib.contextmanager
+    def login_context(self, email, is_super_admin=False):
+        """Log in with the given email under the context of a 'with' statement.
+
+        Args:
+            email: str. An email associated to a user account.
+            is_super_admin: bool. Whether the user is a super admin.
+
+        Yields:
+            str. The id of the user associated to the given email, who is now
+            'logged in'.
+        """
+        initial_user_env = {
+            'USER_EMAIL': os.environ['USER_EMAIL'],
+            'USER_ID': os.environ['USER_ID'],
+            'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
+        }
+        self.login(email, is_super_admin=is_super_admin)
+        try:
+            yield self.get_user_id_from_email(email)
+        finally:
+            self.logout()
+            os.environ.update(initial_user_env)
 
 
 class AppEngineTestBase(TestBase):
