@@ -54,3 +54,47 @@ describe('Cache Slugs', function() {
     general.checkConsoleErrorsExist(expectedErrors);
   });
 });
+
+describe('Meta Tags', function() {
+  var GET_STARTED_URL = '/get_started';
+  var GET_STARTED_META = {
+    name: 'Personalized Online Learning from Oppia',
+    description: 'Learn how to get started using Oppia.'
+  };
+  beforeEach(function() {
+    browser.get(GET_STARTED_URL);
+    waitFor.pageToFullyLoad();
+  });
+
+  it('should set the correct itemprop meta tags', function() {
+    var nameMeta = element(by.css('meta[itemprop="name"]'));
+    var descriptionMeta = element(by.css('meta[itemprop="description"]'));
+    expect(nameMeta.getAttribute('content')).toEqual(GET_STARTED_META.name);
+    expect(descriptionMeta.getAttribute('content').toEqual(
+      GET_STARTED_META.description));
+  });
+
+  it('should set the correct og meta tags', function() {
+    var ogTitle = element(by.css('meta[property="og:title"]'));
+    var ogDescription = element(by.css('meta[property="og:description"]'));
+    var ogUrl = element(by.css('meta[property="og:url"]'));
+    var ogImage = element(by.css('meta[property="og:image"]'));
+    expect(ogTitle.getAttribute('content')).toEqual(GET_STARTED_META.name);
+    expect(ogDescription.getAttribute('content')).toEqual(
+      GET_STARTED_META.description);
+    expect(ogUrl.getAttribute('content')).toEqual(
+      'http://localhost:9001/get_started');
+    if (general.isInDevMode()) {
+      expect(ogImage.getAttribute('content')).toEqual(
+        'http://localhost:9001/assets/images/logo/288x288_logo_mint.png');
+    } else {
+      expect(ogImage.getAttribute('content')).toEqual(
+        'http://localhost:9001/build/assets/images/logo/288x288_logo_mint.png');
+    }
+  });
+
+  it('should set the correct application name', function() {
+    var appName = element(by.css('meta[name="application-name"]'));
+    expect(appName.getAttribute('content')).toEqual('Oppia.org');
+  });
+});
