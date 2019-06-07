@@ -20,7 +20,7 @@
 require('directives/AngularHtmlBindDirective.ts');
 require('pages/question_editor/QuestionEditorDirective.ts');
 
-require('components/QuestionCreationService.ts');
+require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/question/EditableQuestionBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');

@@ -18,7 +18,7 @@
 
 require('pages/topic_editor/main_editor/StoriesListDirective.ts');
 
-require('components/StoryCreationService.ts');
+require('components/entity-creation-services/story-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');

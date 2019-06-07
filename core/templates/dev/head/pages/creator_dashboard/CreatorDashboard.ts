@@ -91,7 +91,7 @@ require('components/summary_tile/CollectionSummaryTileDirective.ts');
 require('pages/exploration_player/PlayerConstants.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
 
-require('components/ExplorationCreationService.ts');
+require('components/entity-creation-services/exploration-creation.service.ts');
 require('components/RatingComputationService.ts');
 require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');

@@ -28,8 +28,8 @@ require(
 );
 require('pages/topics_and_skills_dashboard/TopicsListDirective.ts');
 
-require('components/SkillCreationService.ts');
-require('components/TopicCreationService.ts');
+require('components/entity-creation-services/skill-creation.service.ts');
+require('components/entity-creation-services/topic-creation.service.ts.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardBackendApiService.ts'
