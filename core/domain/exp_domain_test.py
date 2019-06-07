@@ -3746,7 +3746,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
-image_id_counter: 0
+image_counter: 0
 init_state_name: (untitled state)
 language_code: en
 objective: ''
@@ -4293,7 +4293,7 @@ auto_tts_enabled: true
 blurb: ''
 category: category
 correctness_feedback_enabled: false
-image_id_counter: 0
+image_counter: 0
 init_state_name: Introduction
 language_code: en
 objective: ''
@@ -4648,7 +4648,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
-image_id_counter: 1
+image_counter: 1
 init_state_name: (untitled state)
 language_code: en
 objective: ''

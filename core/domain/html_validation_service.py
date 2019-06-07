@@ -834,22 +834,22 @@ def get_filename_with_dimensions(old_filename, exp_id):
 
 
 def get_html_with_image_id_in_image_tag(
-        content_html, image_id_counter, image_mapping):
+        content_html, image_counter, image_mapping):
     """Adds image_id-with-value in image tag.
 
     Args:
         content_html: str. HTML of content in which image tag present.
-        image_id_counter: int. Counter for an image id.
+        image_counter: int. Counter for an image id.
         image_mapping: dict. Dict maps each image_id with image info.
 
     Returns:
-        (new_content_html, image_id_counter): Tuple. Tuple contains new html
+        (new_content_html, image_counter): Tuple. Tuple contains new html
             of content and image_id counter.
     """
     soup = bs4.BeautifulSoup(content_html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        image_id_counter += 1
-        image['image_id-with-value'] = image_id_counter
+        image_counter += 1
+        image['image_id-with-value'] = image_counter
 
         # Adds image info in image mapping
         image_info = {
@@ -858,10 +858,10 @@ def get_html_with_image_id_in_image_tag(
             'author_id': '',
             'instructions': ''
         }
-        image_mapping[image_id_counter] = image_info
+        image_mapping[image_counter] = image_info
 
         # Removes filepath from image tag.
         del image['filepath-with-value']
     new_content_html = str(soup)
 
-    return (new_content_html, image_id_counter, image_mapping)
+    return (new_content_html, image_counter, image_mapping)

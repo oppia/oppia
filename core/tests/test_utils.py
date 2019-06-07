@@ -333,7 +333,7 @@ auto_tts_enabled: true
 blurb: ''
 category: Category
 correctness_feedback_enabled: false
-image_id_counter: 0
+image_counter: 0
 init_state_name: %s
 language_code: en
 objective: ''
@@ -1126,7 +1126,7 @@ tags: []
             blurb='',
             author_notes='',
             states_schema_version=0,
-            image_id_counter=feconf.DEFAULT_IMAGE_ID_COUNTER,
+            image_counter=feconf.DEFAULT_IMAGE_COUNTER,
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             states=self.VERSION_0_STATES_DICT,
             param_specs={},

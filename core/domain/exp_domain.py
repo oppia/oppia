@@ -131,7 +131,7 @@ class ExplorationChange(object):
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        'image_id_counter')
+        'image_counter')
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'state_name', 'old_state_name', 'new_state_name',
@@ -401,7 +401,7 @@ class Exploration(object):
             states_schema_version, init_state_name, states_dict,
             param_specs_dict, param_changes_list, version,
             auto_tts_enabled, correctness_feedback_enabled,
-            image_id_counter, created_on=None, last_updated=None):
+            image_counter, created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -429,8 +429,8 @@ class Exploration(object):
                 enabled.
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
-            image_id_counter: int. The counter that is responsible for creating
-                image ids. Image Id is always <= image_id_counter.
+            image_counter: int. The counter that is responsible for creating
+                image ids. Image Id is always <= image_counter.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
@@ -446,7 +446,7 @@ class Exploration(object):
         self.author_notes = author_notes
         self.states_schema_version = states_schema_version
         self.init_state_name = init_state_name
-        self.image_id_counter = image_id_counter
+        self.image_counter = image_counter
 
         self.states = {}
         for (state_name, state_dict) in states_dict.iteritems():
@@ -473,7 +473,7 @@ class Exploration(object):
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             language_code=constants.DEFAULT_LANGUAGE_CODE,
-            image_id_counter=feconf.DEFAULT_IMAGE_ID_COUNTER):
+            image_counter=feconf.DEFAULT_IMAGE_COUNTER):
         """Returns a Exploration domain object with default values.
 
         'title', 'init_state_name', 'category', 'objective' if not provided are
@@ -490,7 +490,7 @@ class Exploration(object):
             category: str. The category of the exploration.
             objective: str. The objective of the exploration.
             language_code: str. The language code of the exploration.
-            image_id_counter: int. Counter for an image id.
+            image_counter: int. Counter for an image id.
 
         Returns:
             Exploration. The Exploration domain object with default
@@ -508,7 +508,7 @@ class Exploration(object):
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False,
-            image_id_counter)
+            image_counter)
 
     @classmethod
     def from_dict(
@@ -537,7 +537,7 @@ class Exploration(object):
             category=exploration_dict['category'],
             objective=exploration_dict['objective'],
             language_code=exploration_dict['language_code'],
-            image_id_counter=exploration_dict['image_id_counter'])
+            image_counter=exploration_dict['image_counter'])
         exploration.tags = exploration_dict['tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
@@ -660,10 +660,10 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Invalid language_code: %s' % self.language_code)
 
-        if not isinstance(self.image_id_counter, int):
+        if not isinstance(self.image_counter, int):
             raise utils.ValidationError(
-                'Expected image_id_counter to be a integer, received %s' %
-                self.image_id_counter)
+                'Expected image_counter to be a integer, received %s' %
+                self.image_counter)
 
         if not isinstance(self.tags, list):
             raise utils.ValidationError(
@@ -2214,7 +2214,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v28_dict_to_v29_dict(
-            cls, states_dict, image_id_counter):
+            cls, states_dict, image_counter):
         """Converts from version 28 to 29. Version 29 added image assets field
         in state model.
 
@@ -2222,7 +2222,7 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-            image_id_counter: int. Counter for an image id.
+            image_counter: int. Counter for an image id.
 
         Returns:
             dict. The converted states_dict.
@@ -2233,20 +2233,20 @@ class Exploration(object):
         for state_dict in states_dict.itervalues():
 
             content_html = state_dict['content']['html']
-            (new_content_html, image_id_counter, image_mapping) = (
+            (new_content_html, image_counter, image_mapping) = (
                 html_validation_service.get_html_with_image_id_in_image_tag(
-                    content_html, image_id_counter, image_mapping))
+                    content_html, image_counter, image_mapping))
             state_dict['content']['html'] = new_content_html
 
             if state_dict['interaction']['default_outcome']:
                 interaction_feedback_html = state_dict[
                     'interaction']['default_outcome']['feedback']['html']
                 (
-                    new_interaction_feedback_html, image_id_counter,
+                    new_interaction_feedback_html, image_counter,
                     image_mapping) = (
                         html_validation_service.
                         get_html_with_image_id_in_image_tag(
-                            interaction_feedback_html, image_id_counter,
+                            interaction_feedback_html, image_counter,
                             image_mapping))
                 state_dict['interaction']['default_outcome']['feedback'][
                     'html'] = new_interaction_feedback_html
@@ -2254,9 +2254,9 @@ class Exploration(object):
             for answer_group_index, answer_group in enumerate(
                     state_dict['interaction']['answer_groups']):
                 answer_group_html = answer_group['outcome']['feedback']['html']
-                (new_answer_group_html, image_id_counter, image_mapping) = (
+                (new_answer_group_html, image_counter, image_mapping) = (
                     html_validation_service.get_html_with_image_id_in_image_tag(
-                        answer_group_html, image_id_counter, image_mapping))
+                        answer_group_html, image_counter, image_mapping))
                 state_dict['interaction']['answer_groups'][
                     answer_group_index]['outcome']['feedback']['html'] = (
                         new_answer_group_html)
@@ -2265,10 +2265,10 @@ class Exploration(object):
                             answer_group['rule_specs']):
                         for x_index, x in enumerate(rule_spec['inputs']['x']):
                             (
-                                new_x, image_id_counter, image_mapping) = (
+                                new_x, image_counter, image_mapping) = (
                                     html_validation_service.
                                     get_html_with_image_id_in_image_tag(
-                                        x, image_id_counter, image_mapping))
+                                        x, image_counter, image_mapping))
                             state_dict['interaction']['answer_groups'][
                                 answer_group_index]['rule_specs'][
                                     rule_spec_index]['inputs']['x'][x_index] = (
@@ -2277,19 +2277,19 @@ class Exploration(object):
             for hint_index, hint in enumerate(
                     state_dict['interaction']['hints']):
                 hint_html = hint['hint_content']['html']
-                (new_hint_html, image_id_counter, image_mapping) = (
+                (new_hint_html, image_counter, image_mapping) = (
                     html_validation_service.get_html_with_image_id_in_image_tag(
-                        hint_html, image_id_counter, image_mapping))
+                        hint_html, image_counter, image_mapping))
                 state_dict['interaction']['hints'][hint_index][
                     'hint_content']['html'] = new_hint_html
 
             if state_dict['interaction']['solution']:
                 solution_html = state_dict[
                     'interaction']['solution']['explanation']['html']
-                (new_solution_html, image_id_counter, image_mapping) = (
+                (new_solution_html, image_counter, image_mapping) = (
                     html_validation_service.
                     get_html_with_image_id_in_image_tag(
-                        solution_html, image_id_counter, image_mapping))
+                        solution_html, image_counter, image_mapping))
                 state_dict['interaction']['solution']['explanation']['html'] = (
                     new_solution_html)
 
@@ -2298,10 +2298,10 @@ class Exploration(object):
                 for value_index, value in enumerate(
                         state_dict['interaction']['customization_args'][
                             'choices']['value']):
-                    (new_value, image_id_counter, image_mapping) = (
+                    (new_value, image_counter, image_mapping) = (
                         html_validation_service.
                         get_html_with_image_id_in_image_tag(
-                            value, image_id_counter, image_mapping))
+                            value, image_counter, image_mapping))
                     state_dict['interaction']['customization_args'][
                         'choices']['value'][value_index] = new_value
             print(image_mapping)
@@ -2309,7 +2309,7 @@ class Exploration(object):
             state_dict['image_assets'] = image_assets
             print(state_dict)
 
-        return (states_dict, image_id_counter)
+        return (states_dict, image_counter)
 
     @classmethod
     def update_states_from_model(
@@ -2942,12 +2942,12 @@ class Exploration(object):
     def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
         """Converts a v33 exploration dict into a v34 exploration dict."""
         exploration_dict['schema_version'] = 34
-        exploration_dict['image_id_counter'] = 0
+        exploration_dict['image_counter'] = 0
 
-        (exploration_dict['states'], exploration_dict['image_id_counter']) = (
+        (exploration_dict['states'], exploration_dict['image_counter']) = (
             cls._convert_states_v28_dict_to_v29_dict(
                 exploration_dict['states'],
-                exploration_dict['image_id_counter']))
+                exploration_dict['image_counter']))
         exploration_dict['states_schema_version'] = 29
         return exploration_dict
 
@@ -3247,7 +3247,7 @@ class Exploration(object):
             'author_notes': self.author_notes,
             'blurb': self.blurb,
             'states_schema_version': self.states_schema_version,
-            'image_id_counter': self.image_id_counter,
+            'image_counter': self.image_counter,
             'init_state_name': self.init_state_name,
             'language_code': self.language_code,
             'objective': self.objective,

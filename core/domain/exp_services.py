@@ -175,7 +175,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         exploration_model.param_specs, exploration_model.param_changes,
         exploration_model.version, exploration_model.auto_tts_enabled,
         exploration_model.correctness_feedback_enabled,
-        exploration_model.image_id_counter,
+        exploration_model.image_counter,
         created_on=exploration_model.created_on,
         last_updated=exploration_model.last_updated)
 
@@ -815,8 +815,8 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_ADD_NEW_IMAGE):
 
-                    # Increment image_id_counter
-                    exploration.image_id_counter += 1
+                    # Increment image_counter
+                    exploration.image_counter += 1
                     if (exploration.get_all_html_content_strings())[0] != '':
                         # Find image_ids of newly added images.
                         image_ids = get_images_ids_of_exploration(exploration)
@@ -834,7 +834,7 @@ def apply_change_list(exploration_id, change_list):
                             raise Exception(
                                 'Image Id does not exist in exploration, '
                                 'received image_id is %s' % change.image_id)
-                        if change.image_id > exploration.image_id_counter:
+                        if change.image_id > exploration.image_counter:
                             raise Exception(
                                 'Image Id is greater then image_id counter'
                                 'not possible, received image_id is %s' %
@@ -879,8 +879,8 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
                         change.new_value)
-                elif change.property_name == 'image_id_counter':
-                    exploration.update_image_id_counter(
+                elif change.property_name == 'image_counter':
+                    exploration.update_image_counter(
                         change.new_value)
             elif (
                     change.cmd ==
@@ -1040,7 +1040,7 @@ def _create_exploration(
         param_changes=exploration.param_change_dicts,
         auto_tts_enabled=exploration.auto_tts_enabled,
         correctness_feedback_enabled=exploration.correctness_feedback_enabled,
-        image_id_counter=exploration.image_id_counter
+        image_counter=exploration.image_counter
     )
     commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds_dict)

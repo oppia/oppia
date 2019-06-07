@@ -1584,7 +1584,7 @@ class State(object):
                 are ParamSpec value objects with an object type
                 property(obj_type). It is None if the state belongs to a
                 question.
-            image_id_counter: str. Counter for an image ids.
+            image_counter: str. Counter for an image ids.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
 
@@ -1648,7 +1648,7 @@ class State(object):
                 raise utils.ValidationError(
                     'Expected image_id to be int, received %s' %
                     image_id)
-            if image_id > image_id_counter:
+            if image_id > image_counter:
                 utils.ValidationError(
                     'Found image id to be greater then image counter %s' %
                     image_id)

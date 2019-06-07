@@ -125,10 +125,10 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'new_value': 5,
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'old_value': 0,
-            'property_name': 'image_id_counter'
+            'property_name': 'image_counter'
         }
 
-        # Invalid image_id (image_id > image_id_counter)
+        # Invalid image_id (image_id > image_counter)
         change_dict_3 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
@@ -228,7 +228,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'new_value': 5,
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'old_value': 0,
-            'property_name': 'image_id_counter'
+            'property_name': 'image_counter'
         }
         change_dict_3 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -290,7 +290,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'new_value': 5,
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'old_value': 0,
-            'property_name': 'image_id_counter'
+            'property_name': 'image_counter'
         }
 
         change_dict_3 = {
@@ -1532,7 +1532,7 @@ auto_tts_enabled: true
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
-image_id_counter: %s
+image_counter: %s
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -1616,7 +1616,7 @@ states_schema_version: %d
 tags: []
 title: A title
 """ % (
-    feconf.DEFAULT_IMAGE_ID_COUNTER,
+    feconf.DEFAULT_IMAGE_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
@@ -1628,7 +1628,7 @@ auto_tts_enabled: true
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
-image_id_counter: %s
+image_counter: %s
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -1712,7 +1712,7 @@ states_schema_version: %d
 tags: []
 title: A title
 """ % (
-    feconf.DEFAULT_IMAGE_ID_COUNTER,
+    feconf.DEFAULT_IMAGE_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
@@ -3398,7 +3398,7 @@ auto_tts_enabled: true
 blurb: ''
 category: category
 correctness_feedback_enabled: false
-image_id_counter: %s
+image_counter: %s
 init_state_name: %s
 language_code: en
 objective: Old objective
@@ -3468,7 +3468,7 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    feconf.DEFAULT_IMAGE_ID_COUNTER,
+    feconf.DEFAULT_IMAGE_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
