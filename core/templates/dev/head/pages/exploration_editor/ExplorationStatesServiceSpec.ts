@@ -23,6 +23,7 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(angular.mock.inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
+    this.$q = $injector.get('$q');
 
     spyOn($injector.get('ContextService'), 'getExplorationId')
       .and.returnValue('7');
@@ -104,6 +105,7 @@ describe('ExplorationStatesService', function() {
       var STATE_NAME = 'Hola';
 
       beforeEach(angular.mock.inject(function($injector) {
+        var spec = this;
         spyOn(this.cls, 'deleteState');
 
         var modalArgs = {
@@ -119,7 +121,7 @@ describe('ExplorationStatesService', function() {
         spyOn($injector.get('$uibModal'), 'open').and.callFake(
           function(modalArgs) {
             return {
-              result: Promise.resolve(STATE_NAME)
+              result: spec.$q.resolve(STATE_NAME)
             };
           }
         );
