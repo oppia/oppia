@@ -1397,7 +1397,7 @@ class LintChecksManager(object):
                 not filepath.endswith('App.ts'))]
         failed = False
         summary_messages = []
-        component_name = ''
+        # component_name = ''.
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         for filepath in files_to_check:
             component_num = 0
@@ -1422,12 +1422,12 @@ class LintChecksManager(object):
                         failed = True
                         break
                     # Separate the arguments of the expression.
-                    arguments = expression.arguments
+                    # arguments = expression.arguments
                     # The first argument of the expression is the
                     # name of the component.
                     # component_name = arguments[0].value
                     # component = expression.callee.property.name
-                    # 
+                    #
                     # If the component is directive or filter and its name is
                     # xxx then the filename containing it should be
                     # XxxDirective.js or XxxFilter.js respectively.
