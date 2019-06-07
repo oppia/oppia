@@ -32,7 +32,7 @@ oppia.directive('htmlSelect', [
         selection: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/html_select_directive.html'),
+        '/components/forms/custom-forms-directives/html-select.directive.html'),
       controller: ['$scope', function($scope) {
         $scope.select = function(id) {
           $scope.selection = id;

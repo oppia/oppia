@@ -13,23 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for booleans.
+ * @fileoverview Directive for a schema-based viewer for custom values.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-oppia.directive('schemaBasedBoolEditor', [
+oppia.directive('schemaBasedCustomViewer', [
+  'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
-  function(UrlInterpolationService) {
+  function(
+      NestedDirectivesRecursionTimeoutPreventionService,
+      UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
-        isDisabled: '&',
-        labelForFocusTarget: '&'
+        // The class of the object being edited.
+        objType: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_bool_editor_directive.html'),
-      restrict: 'E'
+        '/components/forms/schema-viewers/' +
+        'schema-based-custom-viewer.directive.html'),
+      restrict: 'E',
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };
-  }]);
+  }
+]);

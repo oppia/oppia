@@ -18,7 +18,7 @@
  * adding a new exploration.
  */
 
-require('components/forms/Select2DropdownDirective.ts');
+require('components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/collection/CollectionValidationService.ts');

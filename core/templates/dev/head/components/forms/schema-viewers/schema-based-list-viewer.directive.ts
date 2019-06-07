@@ -32,8 +32,8 @@ oppia.directive('schemaBasedListViewer', [
         itemSchema: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_list_viewer_directive.html'),
+        '/components/forms/schema-viewers/' +
+        'schema-based-list-viewer.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };

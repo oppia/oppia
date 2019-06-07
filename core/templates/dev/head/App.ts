@@ -47,7 +47,7 @@ require(
   'alert-message.directive.ts');
 require('components/button-directives/create-activity-button.directive.ts');
 
-require('components/forms/ObjectEditorDirective.ts');
+require('components/forms/custom-forms-directives/object-editor.directive.ts');
 require(
   '/components/common-layout-directives/common-elements/' +
   'promo-bar.directive.ts');

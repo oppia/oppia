@@ -16,15 +16,15 @@
  * @fileoverview Directive for general schema-based editors.
  */
 
-require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
+require('components/forms/schema-based-editors/schema-based-bool-editor.directive.ts');
+require('components/forms/schema-based-editors/schema-based-choices-editor.directive.ts');
+require('components/forms/schema-based-editors/schema-based-custom-editor.directive.ts');
+require('components/forms/schema-based-editors/schema-based-dict-editor.directive.ts');
+require('components/forms/schema-based-editors/schema-based-float-editor.directive.ts');
+require('components/forms/schema-based-editors/schema-based-html-editor.directive.ts');
+require('components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require('components/forms/schema-based-editors/schema-based-list-editor.directive.ts');
+require('components/forms/schema-based-editors/schema-based-unicode-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 
@@ -40,8 +40,8 @@ oppia.directive('schemaBasedEditor', [
         onInputFocus: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_editor_directive.html'),
+        '/components/forms/schema-based-editors/' +
+        'schema-based-editor.directive.html'),
       restrict: 'E'
     };
   }]);

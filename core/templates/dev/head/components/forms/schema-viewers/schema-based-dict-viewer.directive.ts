@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for custom values.
+ * @fileoverview Directive for a schema-based viewer for dicts.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-oppia.directive('schemaBasedCustomEditor', [
+oppia.directive('schemaBasedDictViewer', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(
@@ -28,14 +28,20 @@ oppia.directive('schemaBasedCustomEditor', [
     return {
       scope: {
         localValue: '=',
-        // The class of the object being edited.
-        objType: '='
+        // Read-only property. An object whose keys and values are the dict
+        // properties and the corresponding schemas.
+        propertySchemas: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_custom_editor_directive.html'),
+        '/components/forms/schema-viewers/' +
+        'schema-based-dict-viewer.directive.html'),
       restrict: 'E',
-      compile: NestedDirectivesRecursionTimeoutPreventionService.compile
+      compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
+      controller: ['$scope', function($scope) {
+        $scope.getHumanReadablePropertyDescription = function(property) {
+          return property.description || '[' + property.name + ']';
+        };
+      }]
     };
   }
 ]);

@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based viewer for dicts.
+ * @fileoverview Directive for a schema-based editor for multiple choice.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-oppia.directive('schemaBasedDictViewer', [
+oppia.directive('schemaBasedChoicesEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(
@@ -28,18 +28,23 @@ oppia.directive('schemaBasedDictViewer', [
     return {
       scope: {
         localValue: '=',
-        // Read-only property. An object whose keys and values are the dict
-        // properties and the corresponding schemas.
-        propertySchemas: '&'
+        // The choices for the object's value.
+        choices: '&',
+        // The schema for this object.
+        // TODO(sll): Validate each choice against the schema.
+        schema: '&',
+        isDisabled: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_dict_viewer_directive.html'),
+        '/components/forms/schema-based-editors/' +
+        'schema-based-choices-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
-        $scope.getHumanReadablePropertyDescription = function(property) {
-          return property.description || '[' + property.name + ']';
+        $scope.getReadonlySchema = function() {
+          var readonlySchema = angular.copy($scope.schema());
+          delete readonlySchema.choices;
+          return readonlySchema;
         };
       }]
     };

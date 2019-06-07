@@ -30,7 +30,7 @@ oppia.directive('audioFileUploader', [
         onFileCleared: '=',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/audio_file_uploader_directive.html'),
+        '/components/forms/custom-forms-directives/audio-file-uploader.directive.html'),
       link: function(scope: ICustomScope, elt) {
         var ALLOWED_AUDIO_FILE_TYPES = ['audio/mp3', 'audio/mpeg'];
 

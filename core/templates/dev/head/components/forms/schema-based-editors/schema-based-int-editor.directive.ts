@@ -13,26 +13,38 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for expressions.
+ * @fileoverview Directive for a schema-based editor for integers.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive('schemaBasedExpressionEditor', [
+oppia.directive('schemaBasedIntEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {
         localValue: '=',
         isDisabled: '&',
-        // TODO(sll): Currently only takes a string which is either 'bool',
-        // 'int' or 'float'. May need to generalize.
-        outputType: '&',
-        labelForFocusTarget: '&'
+        validators: '&',
+        labelForFocusTarget: '&',
+        onInputBlur: '=',
+        onInputFocus: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_expression_editor_directive.html'
-      ),
-      restrict: 'E'
+        '/components/forms/schema-based-editors/' +
+        'schema-based-int-editor.directive.html'),
+      restrict: 'E',
+      controller: [
+        '$scope', function($scope) {
+          if ($scope.localValue === undefined) {
+            $scope.localValue = 0;
+          }
+
+          $scope.onKeypress = function(evt) {
+            if (evt.keyCode === 13) {
+              $scope.$emit('submittedSchemaBasedIntForm');
+            }
+          };
+        }
+      ]
     };
   }]);

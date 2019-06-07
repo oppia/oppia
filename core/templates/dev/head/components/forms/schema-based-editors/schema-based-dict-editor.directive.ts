@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for dicts.
  */
 
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require('components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/IdGenerationService.ts');
@@ -38,8 +38,8 @@ oppia.directive('schemaBasedDictEditor', [
         labelForFocusTarget: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_dict_editor_directive.html'),
+        '/components/forms/schema-based-editors/' +
+        'schema-based-dict-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: [

@@ -33,8 +33,8 @@ oppia.directive('schemaBasedUnicodeEditor', [
         onInputFocus: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_unicode_editor_directive.html'),
+        '/components/forms/schema-based-editors/' +
+        'schema-based-unicode-editor.directive.html'),
       restrict: 'E',
       controller: [
         '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',

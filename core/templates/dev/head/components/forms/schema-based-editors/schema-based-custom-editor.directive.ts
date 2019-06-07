@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based viewer for custom values.
+ * @fileoverview Directive for a schema-based editor for custom values.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-oppia.directive('schemaBasedCustomViewer', [
+oppia.directive('schemaBasedCustomEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',
   function(
@@ -32,8 +32,8 @@ oppia.directive('schemaBasedCustomViewer', [
         objType: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_custom_viewer_directive.html'),
+        '/components/forms/schema-based-editors/' +
+        'schema-based-custom-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile
     };

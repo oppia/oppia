@@ -16,7 +16,8 @@
  * @fileoverview Directive for a schema-based editor for lists.
  */
 
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/IdGenerationService.ts');
@@ -50,8 +51,8 @@ oppia.directive('schemaBasedListEditor', [
         labelForFocusTarget: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_list_editor_directive.html'),
+        '/components/forms/schema-based-editors/' +
+        'schema-based-list-editor.directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {

@@ -13,21 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for general schema-based viewers.
+ * @fileoverview Directive for a schema-based editor for expressions.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive('schemaBasedViewer', [
+oppia.directive('schemaBasedExpressionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {
-        schema: '&',
-        localValue: '='
+        localValue: '=',
+        isDisabled: '&',
+        // TODO(sll): Currently only takes a string which is either 'bool',
+        // 'int' or 'float'. May need to generalize.
+        outputType: '&',
+        labelForFocusTarget: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_viewers/' +
-        'schema_based_viewer_directive.html'),
+        '/components/forms/schema-based-editors/' +
+        'schema-based-expression-editor.directive.html'
+      ),
       restrict: 'E'
     };
   }]);

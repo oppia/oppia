@@ -13,23 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for a schema-based editor for HTML.
+ * @fileoverview Directive for a schema-based viewer for unicode strings.
  */
 
+require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.directive('schemaBasedHtmlEditor', [
+oppia.directive('schemaBasedUnicodeViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       scope: {
-        localValue: '=',
-        isDisabled: '&',
-        labelForFocusTarget: '&',
-        uiConfig: '&'
+        localValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_html_editor_directive.html'),
+        '/components/forms/schema-viewers/' +
+        'schema-based-unicode-viewer.directive.html'),
       restrict: 'E',
+      controller: [
+        '$scope', '$filter', '$sce',
+        function($scope, $filter, $sce) {
+          $scope.getDisplayedValue = function() {
+            return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
+              $scope.localValue));
+          };
+        }]
     };
   }]);

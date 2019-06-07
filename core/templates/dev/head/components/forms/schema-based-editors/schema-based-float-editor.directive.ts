@@ -32,8 +32,8 @@ oppia.directive('schemaBasedFloatEditor', [
         onInputFocus: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/forms/schema_editors/' +
-        'schema_based_float_editor_directive.html'),
+        '/components/forms/schema-based-editors/' +
+        'schema-based-float-editor.directive.html'),
       restrict: 'E',
       controller: [
         '$scope', '$filter', '$timeout', 'FocusManagerService',
