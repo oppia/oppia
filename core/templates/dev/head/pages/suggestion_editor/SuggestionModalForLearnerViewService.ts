@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/suggestion_editor/SuggestionModalService.ts');
 
-oppia.factory('ShowSuggestionModalForLearnerViewService', [
+oppia.factory('SuggestionModalForLearnerViewService', [
   '$rootScope', '$uibModal', 'UrlInterpolationService',
   function($rootScope, $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(

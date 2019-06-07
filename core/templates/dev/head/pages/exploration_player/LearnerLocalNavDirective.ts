@@ -23,7 +23,7 @@ require('pages/exploration_player/ExplorationPlayerStateService.ts');
 require('pages/exploration_player/FeedbackPopupDirective.ts');
 require('pages/exploration_player/PlayerPositionService.ts');
 require(
-  'pages/suggestion_editor/ShowSuggestionModalForLearnerLocalViewService.ts');
+  'pages/suggestion_editor/SuggestionModalForLearnerLocalViewService.ts');
 require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/stateful/FocusManagerService.ts');
@@ -43,13 +43,13 @@ oppia.directive('learnerLocalNav', ['UrlInterpolationService', function(
     controller: [
       '$http', '$rootScope', '$uibModal', 'AlertsService',
       'ExplorationEngineService', 'ExplorationPlayerStateService',
-      'FocusManagerService', 'ShowSuggestionModalForLearnerLocalViewService',
+      'FocusManagerService', 'SuggestionModalForLearnerLocalViewService',
       'UrlInterpolationService', 'UserService', 'FEEDBACK_POPOVER_PATH',
       'FLAG_EXPLORATION_URL_TEMPLATE',
       function(
           $http, $rootScope, $uibModal, AlertsService,
           ExplorationEngineService, ExplorationPlayerStateService,
-          FocusManagerService, ShowSuggestionModalForLearnerLocalViewService,
+          FocusManagerService, SuggestionModalForLearnerLocalViewService,
           UrlInterpolationService, UserService, FEEDBACK_POPOVER_PATH,
           FLAG_EXPLORATION_URL_TEMPLATE) {
         var ctrl = this;
@@ -68,7 +68,7 @@ oppia.directive('learnerLocalNav', ['UrlInterpolationService', function(
         };
 
         ctrl.showLearnerSuggestionModal = function() {
-          ShowSuggestionModalForLearnerLocalViewService.showSuggestionModal(
+          SuggestionModalForLearnerLocalViewService.showSuggestionModal(
             'edit_exploration_state_content', {});
         };
         ctrl.showFlagExplorationModal = function() {

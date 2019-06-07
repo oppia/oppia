@@ -90,7 +90,7 @@ require(
   'MarkAllAudioAndTranslationsAsNeedingUpdateController.ts'
 );
 require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
-require('pages/suggestion_editor/ShowSuggestionModalForEditorViewService.ts');
+require('pages/suggestion_editor/SuggestionModalForEditorViewService.ts');
 require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^

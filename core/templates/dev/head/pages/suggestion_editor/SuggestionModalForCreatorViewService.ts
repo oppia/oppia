@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/suggestion_editor/SuggestionModalService.ts');
 
-oppia.factory('ShowSuggestionModalForCreatorViewService', [
+oppia.factory('SuggestionModalForCreatorViewService', [
   '$http', '$log', '$rootScope',
   '$uibModal', 'UrlInterpolationService',
   function($http, $log, $rootScope,

@@ -24,7 +24,7 @@ require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
 require('pages/suggestion_editor/SuggestionModalService.ts');
 require('services/EditabilityService.ts');
 
-oppia.factory('ShowSuggestionModalForEditorViewService', [
+oppia.factory('SuggestionModalForEditorViewService', [
   '$log', '$rootScope', '$uibModal',
   'ExplorationDataService', 'ExplorationStatesService',
   'StateObjectFactory', 'SuggestionModalService',

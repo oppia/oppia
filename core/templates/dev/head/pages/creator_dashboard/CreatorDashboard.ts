@@ -102,7 +102,7 @@ require(
   'TopicsAndSkillsDashboardBackendApiService.ts'
 );
 require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
-require('pages/suggestion_editor/ShowSuggestionModalForCreatorViewService.ts');
+require('pages/suggestion_editor/SuggestionModalForCreatorViewService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
@@ -142,7 +142,7 @@ oppia.controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',
   'AlertsService', 'CreatorDashboardBackendApiService', 'DateTimeFormatService',
   'ExplorationCreationService', 'QuestionObjectFactory',
-  'RatingComputationService', 'ShowSuggestionModalForCreatorViewService',
+  'RatingComputationService', 'SuggestionModalForCreatorViewService',
   'SuggestionObjectFactory', 'SuggestionThreadObjectFactory',
   'ThreadStatusDisplayService', 'TopicsAndSkillsDashboardBackendApiService',
   'UrlInterpolationService', 'UserService', 'EXPLORATIONS_SORT_BY_KEYS',
@@ -153,7 +153,7 @@ oppia.controller('CreatorDashboard', [
       $http, $log, $q, $rootScope, $scope, $uibModal, $window,
       AlertsService, CreatorDashboardBackendApiService, DateTimeFormatService,
       ExplorationCreationService, QuestionObjectFactory,
-      RatingComputationService, ShowSuggestionModalForCreatorViewService,
+      RatingComputationService, SuggestionModalForCreatorViewService,
       SuggestionObjectFactory, SuggestionThreadObjectFactory,
       ThreadStatusDisplayService, TopicsAndSkillsDashboardBackendApiService,
       UrlInterpolationService, UserService, EXPLORATIONS_SORT_BY_KEYS,
@@ -413,7 +413,7 @@ oppia.controller('CreatorDashboard', [
     };
 
     $scope.showSuggestionModal = function() {
-      ShowSuggestionModalForCreatorViewService.showSuggestionModal(
+      SuggestionModalForCreatorViewService.showSuggestionModal(
         $scope.activeThread.suggestion.suggestionType,
         {
           activeThread: $scope.activeThread,

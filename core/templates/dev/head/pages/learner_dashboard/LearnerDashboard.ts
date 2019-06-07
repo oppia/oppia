@@ -26,7 +26,7 @@ require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
-require('pages/suggestion_editor/ShowSuggestionModalForLearnerViewService.ts');
+require('pages/suggestion_editor/SuggestionModalForLearnerViewService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
@@ -91,7 +91,7 @@ oppia.controller('LearnerDashboard', [
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
   'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
-  'ShowSuggestionModalForLearnerViewService', 'UserService',
+  'SuggestionModalForLearnerViewService', 'UserService',
   function(
       $scope, $rootScope, $q, $window, $http, $uibModal,
       AlertsService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
@@ -101,7 +101,7 @@ oppia.controller('LearnerDashboard', [
       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
       DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
       FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory,
-      ShowSuggestionModalForLearnerViewService, UserService) {
+      SuggestionModalForLearnerViewService, UserService) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
     $scope.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -484,7 +484,7 @@ oppia.controller('LearnerDashboard', [
     };
 
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
-      ShowSuggestionModalForLearnerViewService.showSuggestionModal(
+      SuggestionModalForLearnerViewService.showSuggestionModal(
         'edit_exploration_state_content',
         {
           newContent: newContent,
