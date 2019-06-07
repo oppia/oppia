@@ -36,10 +36,10 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
             html_cleaner.filter_a('a', 'href', '<code>http://www.oppia.com'))
 
         self.assertTrue(
-            html_cleaner.filter_a('link', 'href', 'http://www.oppia.com'))
+            html_cleaner.filter_a('a', 'title', 'http://www.oppia.com'))
 
-        self.assertFalse(
-            html_cleaner.filter_a('p', 'style', 'http://www.oppia.com'))
+        with self.assertRaises(Exception):
+            html_cleaner.filter_a('link', 'href', 'http://www.oppia.com')
 
     def test_good_tags_allowed(self):
         test_data = [(
