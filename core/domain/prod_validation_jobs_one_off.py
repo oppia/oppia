@@ -631,8 +631,6 @@ class CollectionRightsModelValidator(BaseModelValidator):
                 user_models.UserSettingsModel, item.owner_ids),
             'editor_user_model': (
                 user_models.UserSettingsModel, item.editor_ids),
-            'translator_user_model': (
-                user_models.UserSettingsModel, item.translator_ids),
             'viewer_user_model': (
                 user_models.UserSettingsModel, item.viewer_ids),
             'snapshot_metadata_model': (
@@ -1631,8 +1629,6 @@ class ExplorationRightsModelValidator(BaseModelValidator):
                 user_models.UserSettingsModel, item.owner_ids),
             'editor_user_model': (
                 user_models.UserSettingsModel, item.editor_ids),
-            'translator_user_model': (
-                user_models.UserSettingsModel, item.translator_ids),
             'viewer_user_model': (
                 user_models.UserSettingsModel, item.viewer_ids),
             'snapshot_metadata_model': (
@@ -1884,8 +1880,6 @@ class ExpSummaryModelValidator(BaseModelValidator):
                 user_models.UserSettingsModel, item.owner_ids),
             'editor_user_model': (
                 user_models.UserSettingsModel, item.editor_ids),
-            'translator_user_model': (
-                user_models.UserSettingsModel, item.translator_ids),
             'viewer_user_model': (
                 user_models.UserSettingsModel, item.viewer_ids),
             'contributor_user_model': (
@@ -2038,13 +2032,6 @@ class ExpSummaryModelValidator(BaseModelValidator):
                 'corresponding exploration rights editor_ids field: %s') % (
                     item.id, (',').join(item.editor_ids),
                     (',').join(exploration_rights_model.editor_ids))
-
-        if item.translator_ids != exploration_rights_model.translator_ids:
-            cls.errors['translator_ids field check'] = (
-                'Model id %s: translator_ids field in model: %s does not match '
-                'corresponding exploration rights translator_ids field: %s') % (
-                    item.id, (',').join(item.translator_ids),
-                    (',').join(exploration_rights_model.translator_ids))
 
         if item.viewer_ids != exploration_rights_model.viewer_ids:
             cls.errors['viewer_ids field check'] = (

@@ -866,15 +866,12 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
         editor_email = 'user@editor.com'
-        translator_email = 'user@translator.com'
         viewer_email = 'user@viewer.com'
 
         self.signup(editor_email, 'editor')
-        self.signup(translator_email, 'translator')
         self.signup(viewer_email, 'viewer')
 
         self.editor_id = self.get_user_id_from_email(editor_email)
-        self.translator_id = self.get_user_id_from_email(translator_email)
         self.viewer_id = self.get_user_id_from_email(viewer_email)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
@@ -900,9 +897,6 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_collection(
             self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
-
-        rights_manager.assign_role_for_collection(
-            self.owner, '1', self.translator_id, rights_manager.ROLE_TRANSLATOR)
 
         rights_manager.assign_role_for_collection(
             self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
@@ -1008,19 +1002,6 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
-            u'[u\'fully-validated CollectionRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_translator_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.translator_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for translator_user_model '
-                'field check of CollectionRightsModel\', '
-                '[u"Model id 1: based on field translator_user_model having '
-                'value %s, expect model UserSettingsModel with id %s but '
-                'it doesn\'t exist"]]') % (
-                    self.translator_id, self.translator_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3036,15 +3017,12 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
         editor_email = 'user@editor.com'
-        translator_email = 'user@translator.com'
         viewer_email = 'user@viewer.com'
 
         self.signup(editor_email, 'editor')
-        self.signup(translator_email, 'translator')
         self.signup(viewer_email, 'viewer')
 
         self.editor_id = self.get_user_id_from_email(editor_email)
-        self.translator_id = self.get_user_id_from_email(translator_email)
         self.viewer_id = self.get_user_id_from_email(viewer_email)
 
         explorations = [exp_domain.Exploration.create_default_exploration(
@@ -3058,9 +3036,6 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.owner, '0', self.editor_id, rights_manager.ROLE_EDITOR)
-
-        rights_manager.assign_role_for_exploration(
-            self.owner, '1', self.translator_id, rights_manager.ROLE_TRANSLATOR)
 
         rights_manager.assign_role_for_exploration(
             self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
@@ -3177,19 +3152,6 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
-            u'[u\'fully-validated ExplorationRightsModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_translator_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.translator_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for translator_user_model '
-                'field check of ExplorationRightsModel\', '
-                '[u"Model id 1: based on field translator_user_model having '
-                'value %s, expect model UserSettingsModel with id %s but '
-                'it doesn\'t exist"]]') % (
-                    self.translator_id, self.translator_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3683,17 +3645,14 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
         editor_email = 'user@editor.com'
-        translator_email = 'user@translator.com'
         viewer_email = 'user@viewer.com'
         contributor_email = 'user@contributor.com'
 
         self.signup(editor_email, 'editor')
-        self.signup(translator_email, 'translator')
         self.signup(viewer_email, 'viewer')
         self.signup(contributor_email, 'contributor')
 
         self.editor_id = self.get_user_id_from_email(editor_email)
-        self.translator_id = self.get_user_id_from_email(translator_email)
         self.viewer_id = self.get_user_id_from_email(viewer_email)
         self.contributor_id = self.get_user_id_from_email(contributor_email)
 
@@ -3719,13 +3678,10 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             })], 'Changes.')
 
         rights_manager.assign_role_for_exploration(
-            self.owner, '1', self.translator_id, rights_manager.ROLE_TRANSLATOR)
-
-        rights_manager.assign_role_for_exploration(
             self.owner, '2', self.viewer_id, rights_manager.ROLE_VIEWER)
 
         rating_services.assign_rating_to_exploration(self.user_id, '0', 3)
-        rating_services.assign_rating_to_exploration(self.translator_id, '0', 4)
+        rating_services.assign_rating_to_exploration(self.viewer_id, '0', 4)
 
         self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')
         self.model_instance_1 = exp_models.ExpSummaryModel.get_by_id('1')
@@ -3835,19 +3791,6 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
-            u'[u\'fully-validated ExpSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_translator_user_model_failure(self):
-        user_models.UserSettingsModel.get_by_id(self.translator_id).delete()
-        expected_output = [
-            (
-                u'[u\'failed validation check for translator_user_model '
-                'field check of ExpSummaryModel\', '
-                '[u"Model id 1: based on field translator_user_model having '
-                'value %s, expect model UserSettingsModel with id %s but '
-                'it doesn\'t exist"]]') % (
-                    self.translator_id, self.translator_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3987,7 +3930,6 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             'first_published_msec': mock_published_time,
             'owner_ids': ['random1', 'random2'],
             'editor_ids': ['random1', 'random2'],
-            'translator_ids': ['random1', 'random2'],
             'viewer_ids': ['random1', 'random2']
         }
 
@@ -3997,7 +3939,6 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             'first_published_msec': mock_published_time,
             'owner_ids': 'random1,random2',
             'editor_ids': 'random1,random2',
-            'translator_ids': 'random1,random2',
             'viewer_ids': 'random1,random2'
         }
 
