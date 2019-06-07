@@ -40,6 +40,26 @@ ALLOWED_ENTITY_NAMES = [
     ENTITY_TYPE_STORY, ENTITY_TYPE_QUESTION]
 
 
+def _validate_entity_parameters(entity_name, entity_id):
+    """Checks whether the entity_id and entity_name passed in are valid.
+
+    Args:
+        entity_name: str. The name of the entity
+            (eg: exploration, topic etc).
+        entity_id: str. The ID of the corresponding entity.
+
+    Raises:
+        ValidationError. When parameters passed in are invalid.
+    """
+    if entity_name not in ALLOWED_ENTITY_NAMES:
+        raise utils.ValidationError(
+            'Invalid entity_name received: %s.' % entity_name)
+    if not isinstance(entity_id, basestring):
+        raise utils.ValidationError(
+            'Invalid entity_id received: %s' % entity_id)
+    if entity_id == '':
+        raise utils.ValidationError('Entity id cannot be empty')
+
 class FileMetadata(object):
     """A class representing the metadata of a file.
 
@@ -146,7 +166,7 @@ class EntityFileSystem(object):
                 (eg: exploration, topic etc).
             entity_id: str. The ID of the corresponding entity.
         """
-        self._validate_entity_parameters(entity_name, entity_id)
+        _validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
     @property
@@ -157,26 +177,6 @@ class EntityFileSystem(object):
             str. The path.
         """
         return self._assets_path
-
-    def _validate_entity_parameters(self, entity_name, entity_id):
-        """Checks whether the entity_id and entity_name passed in are valid.
-
-        Args:
-            entity_name: str. The name of the entity
-                (eg: exploration, topic etc).
-            entity_id: str. The ID of the corresponding entity.
-
-        Raises:
-            ValidationError. When parameters passed in are invalid.
-        """
-        if entity_name not in ALLOWED_ENTITY_NAMES:
-            raise utils.ValidationError(
-                'Invalid entity_name received: %s.' % entity_name)
-        if not isinstance(entity_id, basestring):
-            raise utils.ValidationError(
-                'Invalid entity_id received: %s' % entity_id)
-        if entity_id == '':
-            raise utils.ValidationError('Entity id cannot be empty')
 
     def _get_file_metadata(self, filepath, version):
         """Return the desired file metadata.
@@ -380,7 +380,7 @@ class GcsFileSystem(object):
                 (eg: exploration, topic etc).
             entity_id: str. The ID of the corresponding entity.
         """
-        self._validate_entity_parameters(entity_name, entity_id)
+        _validate_entity_parameters(entity_name, entity_id)
         self._assets_path = '%s/%s/assets' % (entity_name, entity_id)
 
     @property
@@ -391,27 +391,6 @@ class GcsFileSystem(object):
             str. The path.
         """
         return self._assets_path
-
-    def _validate_entity_parameters(self, entity_name, entity_id):
-        """Checks whether the entity_id and entity_name passed in are valid.
-
-        Args:
-            entity_name: str. The name of the entity
-                (eg: exploration, topic etc).
-            entity_id: str. The ID of the corresponding entity.
-
-        Raises:
-            ValidationError. When parameters passed in are invalid.
-        """
-        if entity_name not in ALLOWED_ENTITY_NAMES:
-            raise utils.ValidationError(
-                'Invalid entity_name received: %s.' % entity_name)
-
-        if not isinstance(entity_id, basestring):
-            raise utils.ValidationError(
-                'Invalid entity_id received: %s' % entity_id)
-        if entity_id == '':
-            raise utils.ValidationError('Entity id cannot be empty')
 
     def isfile(self, filepath):
         """Checks if the file with the given filepath exists in the GCS.
