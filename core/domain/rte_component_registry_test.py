@@ -204,7 +204,7 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
 
         rtc_html_file = os.path.join(
             feconf.FRONTEND_TEMPLATES_DIR, 'components',
-            'rich_text_components.html')
+            'rich-text-components.template.html')
         with open(rtc_html_file, 'r') as f:
             rtc_html_file_contents = f.read()
 
