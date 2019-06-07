@@ -19,7 +19,7 @@
 require('components/forms/Select2DropdownDirective.ts');
 require('components/forms/ImageUploaderDirective.ts');
 require('components/background/BackgroundBannerDirective.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/LanguageUtilService.ts');

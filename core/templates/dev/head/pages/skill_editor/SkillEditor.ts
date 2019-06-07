@@ -58,7 +58,7 @@ require(
 require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
 require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
 require('directives/MathjaxBindDirective.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('pages/skill_editor/SkillEditorNavbarDirective.ts');

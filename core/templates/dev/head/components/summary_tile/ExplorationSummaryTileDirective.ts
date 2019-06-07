@@ -19,8 +19,8 @@
 require('components/summary_tile/CircularImageDirective.ts');
 require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
 require('filters/SummarizeNonnegativeNumberFilter.ts');
-require('filters/TruncateAndCapitalizeFilter.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 
 require('components/RatingComputationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');

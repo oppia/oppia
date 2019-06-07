@@ -64,7 +64,7 @@ require('components/state/RuleEditorDirective.ts');
 require('components/state/RuleTypeSelectorDirective.ts');
 require('components/state/SolutionEditorDirective.ts');
 require('components/state/SolutionExplanationEditorDirective.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 

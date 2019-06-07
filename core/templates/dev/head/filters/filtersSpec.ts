@@ -16,20 +16,20 @@
  * @fileoverview Unit tests for custom filters.
  */
 
-require('filters/CamelCaseToHyphensFilter.ts');
-require('filters/CapitalizeFilter.ts');
-require('filters/ConvertToPlainTextFilter.ts');
-require('filters/GetAbbreviatedTextFilter.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/string-utility-filters/get-abbreviated-text.filter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('filters/ParameterizeRuleDescriptionFilter.ts');
-require('filters/ReplaceInputsWithEllipsesFilter.ts');
+require('filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
 require('filters/SummarizeNonnegativeNumberFilter.ts');
-require('filters/TruncateAndCapitalizeFilter.ts');
-require('filters/TruncateAtFirstEllipsisFilter.ts');
-require('filters/TruncateAtFirstLineFilter.ts');
-require('filters/TruncateFilter.ts');
-require('filters/UnderscoresToCamelCaseFilter.ts');
-require('filters/WrapTextWithEllipsisFilter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
 require('pages/question_editor/QuestionEditorDirective.ts');
 
 describe('Testing filters', function() {
