@@ -24,9 +24,9 @@ describe('ExplorationStatesService', function() {
   beforeEach(angular.mock.inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
     this.$q = $injector.get('$q');
+    this.ContextService = $injector.get('ContextService');
 
-    spyOn($injector.get('ContextService'), 'getExplorationId')
-      .and.returnValue('7');
+    spyOn(this.ContextService, 'getExplorationId').and.returnValue('7');
   }));
 
   describe('Callback Registration', function() {
