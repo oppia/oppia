@@ -85,7 +85,7 @@ describe('Meta Tags', function() {
     expect(ogUrl.getAttribute('content')).toEqual(
       'http://localhost:9001/get_started');
     expect(ogImage.getAttribute('content')).toEqual(
-      'http://localhost:9001/assets/images/logo/288x288_logo_mint.png');
+      'http://localhost:9001/build/build/assets/images/logo/288x288_logo_mint.png');
   });
 
   it('should set the correct application name', function() {
