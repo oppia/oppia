@@ -28,7 +28,7 @@ class FileSystemServicesTests(test_utils.GenericTestBase):
             file_system = fs_services.get_exploration_file_system_class()
             self.assertIsInstance(
                 file_system(fs_domain.ENTITY_TYPE_EXPLORATION, 'entity_id'),
-                fs_domain.EntityFileSystem)
+                fs_domain.DatastoreBackedFileSystem)
 
     def test_get_exploration_file_system_with_dev_mode_disabled(self):
         with self.swap(constants, 'DEV_MODE', False):

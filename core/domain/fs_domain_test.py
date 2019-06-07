@@ -30,15 +30,15 @@ app_identity_services = models.Registry.import_app_identity_services()
     [models.NAMES.file])
 
 
-class EntityFileSystemUnitTests(test_utils.GenericTestBase):
+class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
     """Tests for the datastore-backed exploration file system."""
 
     def setUp(self):
-        super(EntityFileSystemUnitTests, self).setUp()
+        super(DatastoreBackedFileSystemUnitTests, self).setUp()
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem(
+            fs_domain.DatastoreBackedFileSystem(
                 fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
@@ -48,16 +48,18 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
     def test_validate_entity_parameters(self):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid entity_id received: 1'):
-            fs_domain.EntityFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, 1)
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 1)
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Entity id cannot be empty'):
-            fs_domain.EntityFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, '')
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, '')
 
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid entity_name received: '
             'invalid_name.'):
-            fs_domain.EntityFileSystem('invalid_name', 'exp_id')
+            fs_domain.DatastoreBackedFileSystem('invalid_name', 'exp_id')
 
     def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
@@ -127,7 +129,7 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.listdir('fake_dir'), [])
 
         new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem(
+            fs_domain.DatastoreBackedFileSystem(
                 fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
@@ -156,7 +158,7 @@ class EntityFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
         fs2 = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem(
+            fs_domain.DatastoreBackedFileSystem(
                 fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             fs2.get('abc.png')
@@ -261,7 +263,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.EntityFileSystem(
+            fs_domain.DatastoreBackedFileSystem(
                 fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
 
         invalid_filepaths = [
