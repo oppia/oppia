@@ -487,11 +487,7 @@ def generate_random_string(length):
     Returns:
         str. Random string of specified length.
     """
-    random_string = ''
-    while len(random_string) < length:
-        random_string = base64.urlsafe_b64encode(os.urandom(length))
-    return random_string[0:length]
-
+    return base64.urlsafe_b64encode(os.urandom(length))[:length]
 
 def generate_new_session_id():
     """Generates a new session id.
