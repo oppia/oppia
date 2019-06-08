@@ -81,7 +81,7 @@ module.exports = {
       commonPrefix + '/pages/landing/stewards-landing-page/' +
       'stewards-landing-page.controller.ts',
     story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
-    teach: commonPrefix + '/pages/teach/Teach.ts',
+    teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks/Thanks.ts',
     topic_editor: commonPrefix + '/pages/topic_editor/TopicEditor.ts',
     topics_and_skills_dashboard: (
@@ -341,8 +341,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['teach'],
-      filename: 'teach.html',
-      template: commonPrefix + '/pages/teach/teach.html',
+      filename: 'teach-page.mainpage.html',
+      template: commonPrefix + '/pages/teach-page/teach-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
