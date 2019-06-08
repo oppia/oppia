@@ -60,11 +60,12 @@ oppia.factory('StateTopAnswersStatsService', [
       }
 
       // Update the isAddressed property of each answer.
-      var interactionRulesService = stateStats.interactionId ?
-        AngularNameService.getNameOfInteractionRulesService(
-          stateStats.interactionId) : null;
+      var interactionRulesService = stateStats.interactionId === null ?
+        null :
+        $injector.get(AngularNameService.getNameOfInteractionRulesService(
+          stateStats.interactionId));
       stateStats.answers.forEach(function(answerStats) {
-        answerStats.isAddressed = interactionRulesService &&
+        answerStats.isAddressed = interactionRulesService !== null &&
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
             stateName, state, answerStats.answer, interactionRulesService);
       });
