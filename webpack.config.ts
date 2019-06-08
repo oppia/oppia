@@ -65,7 +65,8 @@ module.exports = {
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
     moderator: commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
     notifications_dashboard:
-      commonPrefix + '/pages/notifications_dashboard/NotificationsDashboard.ts',
+      commonPrefix + '/pages/notifications-dashboard-page/' +
+      'notifications-dashboard-page.controller.ts',
     practice_session:
       commonPrefix + '/pages/practice_session/PracticeSession.ts',
     preferences: commonPrefix + '/pages/preferences/Preferences.ts',
@@ -249,10 +250,11 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['notifications_dashboard'],
-      filename: 'notifications_dashboard.html',
+      filename: 'notifications-dashboard-page.mainpage.html',
       template: (
         commonPrefix +
-        '/pages/notifications_dashboard/notifications_dashboard.html'
+        '/pages/notifications-dashboard-page/' +
+        'notifications-dashboard-page.mainpage.html'
       ),
       minify: htmlMinifyConfig,
       inject: false
