@@ -19,7 +19,7 @@ oppia.constant('TOTAL_QUESTIONS', 20);
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant(
   'PRACTICE_SESSIONS_DATA_URL',
-  '/practice_session/data/<topic_name>');
+  '/practice-session-page/data/<topic_name>');
 
 require(
   'components/common-layout-directives/common-elements/' +

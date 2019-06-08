@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the Preferences page.
  */
 
-require('pages/preferences/Preferences.ts');
+require('pages/preferences-page/preferences-page.controller.ts');
 
 describe('Preferences Controller', function() {
   describe('PreferencesCtrl', function() {

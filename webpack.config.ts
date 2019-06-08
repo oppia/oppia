@@ -63,13 +63,16 @@ module.exports = {
     library: commonPrefix + '/pages/library/Library.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
-    moderator: commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
+    moderator:
+      commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.controller.ts',
     practice_session:
-      commonPrefix + '/pages/practice_session/PracticeSession.ts',
-    preferences: commonPrefix + '/pages/preferences/Preferences.ts',
+      commonPrefix + '/pages/practice-session-page/' +
+      'practice-session-page.controller.ts',
+    preferences:
+      commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
     profile: commonPrefix + '/pages/profile/Profile.ts',
     signup: commonPrefix + '/pages/signup/Signup.ts',
     skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
@@ -261,15 +264,18 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['practice_session'],
-      filename: 'practice_session.html',
-      template: commonPrefix + '/pages/practice_session/practice_session.html',
+      filename: 'practice-session-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/practice-session-page/' +
+        'practice-session-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['preferences'],
-      filename: 'preferences.html',
-      template: commonPrefix + '/pages/preferences/preferences.html',
+      filename: 'preferences-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
