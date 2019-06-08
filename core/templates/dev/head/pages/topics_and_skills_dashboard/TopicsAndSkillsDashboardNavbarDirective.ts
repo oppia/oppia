@@ -16,8 +16,8 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
-require('components/SkillCreationService.ts');
-require('components/TopicCreationService.ts');
+require('components/entity-creation-services/skill-creation.service.ts');
+require('components/entity-creation-services/topic-creation.service.ts.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 

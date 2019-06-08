@@ -16,7 +16,9 @@
  * @fileoverview Directive for the translation tab.
  */
 
-require('components/attribution_guide/AttributionGuideDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
 require(
   'pages/exploration_editor/translation_tab/StateTranslationDirective.ts');
 require(
@@ -262,7 +264,7 @@ oppia.directive('translationTab', ['UrlInterpolationService',
           };
 
           $scope.onStartTutorial = function() {
-            if (GLOBALS.can_translate) {
+            if (GLOBALS.can_voiceover) {
               EditabilityService.onStartTutorial();
               $scope.translationTutorial = true;
             }

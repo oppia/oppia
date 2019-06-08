@@ -16,4 +16,7 @@
  * @fileoverview File to import necessary scripts for get_started page.
  */
 
-require('components/background/BackgroundBannerDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+require('pages/OppiaFooterDirective.ts');

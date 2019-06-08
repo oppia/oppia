@@ -26,7 +26,6 @@ from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
@@ -561,194 +560,6 @@ class ExplorationContentValidationJobForCKEditor(
         yield (key, list(set().union(*final_values)))
 
 
-class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for verifying the image and audio urls."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exp_model):
-        if not constants.DEV_MODE:
-            exp_id = exp_model.id
-            fs_old = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
-            # We have to make sure we pass the dir name without starting or
-            # ending with '/'.
-            image_urls = fs_old.listdir('image')
-            audio_urls = fs_old.listdir('audio')
-            for url in image_urls:
-                catched_groups = GCS_IMAGE_ID_REGEX.match(url)
-                if not catched_groups:
-                    yield (INVALID_GCS_URL, url.encode('utf-8'))
-                else:
-                    try:
-                        filename = GCS_IMAGE_ID_REGEX.match(url).group(3)
-                        if fs_old.isfile('image/%s' % filename.encode('utf-8')):
-                            yield (FILE_FOUND_IN_GCS, filename.encode('utf-8'))
-                    except Exception:
-                        yield (ERROR_IN_FILENAME, url.encode('utf-8'))
-            for url in audio_urls:
-                catched_groups = GCS_AUDIO_ID_REGEX.match(url)
-                if not catched_groups:
-                    yield (INVALID_GCS_URL, url)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == FILE_FOUND_IN_GCS:
-            yield (status, len(values))
-        else:
-            yield (status, values)
-
-
-class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for checking whether all images in {{exp_id}}/assets/image/
-    are also present in exploration/{{exp_id}}/assets/image/.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exp_model):
-        if exp_model.deleted:
-            return
-
-        if not constants.DEV_MODE:
-            exp_id = exp_model.id
-            fs_internal = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
-            fs_external = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/' + exp_id))
-            # We have to make sure we pass the dir name without starting or
-            # ending with '/'.
-            image_urls_internal = fs_internal.listdir('image')
-            image_urls_external = fs_external.listdir('image')
-
-            image_filenames_internal = set([
-                GCS_IMAGE_ID_REGEX.match(url).group(3)
-                for url in image_urls_internal])
-
-            image_filenames_external = set([
-                GCS_EXTERNAL_IMAGE_ID_REGEX.match(url).group(3)
-                for url in image_urls_external])
-
-            image_filenames_internal_with_dimensions = set([])
-
-            for image_name in image_filenames_internal:
-                raw_image = fs_internal.get(
-                    'image/%s' % image_name.encode('utf-8'))
-                height, width = gae_image_services.get_image_dimensions(
-                    raw_image)
-                image_filenames_internal_with_dimensions.add(
-                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
-                        image_name, height, width))
-
-            # Currently in editor.py and exp_services.py, all images are stored
-            # in exploration/{{exp_id}}/ external folder. So, we only need to
-            # check if all images in the internal folder are there in the
-            # external folder.
-            non_existent_images = (
-                image_filenames_internal_with_dimensions.difference(
-                    image_filenames_external))
-
-            if len(non_existent_images) > 0:
-                yield (
-                    exp_id,
-                    'Missing Images: %s' % list(non_existent_images))
-            else:
-                yield (
-                    ALL_IMAGES_VERIFIED, len(image_filenames_external))
-
-    @staticmethod
-    def reduce(status, values):
-        if status == ALL_IMAGES_VERIFIED:
-            yield (status, sum([int(elem) for elem in values]))
-        else:
-            yield (status, values)
-
-
-class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for copying the image/audio such that the url instead of
-    {{exp_id}}/assets/image/image.png is
-    exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
-    the images as well as renaming the filenames so that they have dimensions
-    as a part of their name.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exp_model):
-        if not constants.DEV_MODE:
-            exp_id = exp_model.id
-            fs_old = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
-            # We have to make sure we pass the dir name without starting or
-            # ending with '/'.
-            image_urls = fs_old.listdir('image')
-            audio_urls = fs_old.listdir('audio')
-
-            image_filenames = [
-                GCS_IMAGE_ID_REGEX.match(url).group(3) for url in image_urls]
-            audio_filenames = [
-                GCS_AUDIO_ID_REGEX.match(url).group(3) for url in audio_urls]
-
-            references_unicode_files = False
-            for image_filename in image_filenames:
-                try:
-                    fs_old.get('image/%s' % image_filename)
-                except Exception:
-                    references_unicode_files = True
-                    break
-
-            if references_unicode_files:
-                image_filenames_str = '%s' % image_filenames
-                yield (
-                    EXP_REFERENCES_UNICODE_FILES,
-                    'Exp: %s, image filenames: %s' % (
-                        exp_id, image_filenames_str.encode('utf-8')))
-
-            for image_filename in image_filenames:
-                try:
-                    raw_image = fs_old.get(
-                        'image/%s' % image_filename.encode('utf-8'))
-                    height, width = gae_image_services.get_image_dimensions(
-                        raw_image)
-                    filename_with_dimensions = (
-                        html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
-                            image_filename, height, width))
-                    exp_services.save_original_and_compressed_versions_of_image( # pylint: disable=line-too-long
-                        'ADMIN', filename_with_dimensions, exp_id, raw_image)
-                    yield ('Copied file', 1)
-                except Exception:
-                    error = traceback.format_exc()
-                    logging.error(
-                        'File %s in %s failed migration: %s' %
-                        (image_filename.encode('utf-8'), exp_id, error))
-                    yield (
-                        ERROR_IN_FILENAME, 'Error when copying %s in %s: %s' % (
-                            image_filename.encode('utf-8'), exp_id, error))
-
-            for audio_filename in audio_filenames:
-                filetype = audio_filename[audio_filename.rfind('.') + 1:]
-                raw_data = fs_old.get('audio/%s' % audio_filename)
-                fs = fs_domain.AbstractFileSystem(
-                    fs_domain.GcsFileSystem('exploration/%s' % exp_id))
-                fs.commit(
-                    'Admin', 'audio/%s' % audio_filename,
-                    raw_data, mimetype='audio/%s' % filetype)
-            yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_id)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == 'Copied file':
-            yield (status, len(values))
-        else:
-            yield (status, values)
-
-
 class InteractionCustomizationArgsValidationJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job for validating all the customizations arguments of
@@ -791,3 +602,50 @@ class InteractionCustomizationArgsValidationJob(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
+
+
+class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for migrating translator_ids to voice_artist_ids."""
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationRightsModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        translator_ids = item.translator_ids
+        commit_message = 'Migrate from translator to voice artist'
+        commit_cmds = [{
+            'cmd': 'change_role',
+            'assignee_id': translator_id,
+            # Using magic string because ROLE_TRANSLATOR is removed.
+            'old_role': 'translator',
+            'new_role': rights_manager.ROLE_VOICE_ARTIST
+        } for translator_id in translator_ids]
+
+        if len(translator_ids) > 0:
+            exp_summary_model = exp_models.ExpSummaryModel.get_by_id(item.id)
+
+            if exp_summary_model is None or exp_summary_model.deleted:
+                item.voice_artist_ids = translator_ids
+                item.translator_ids = []
+                item.commit('Admin', commit_message, commit_cmds)
+                yield ('Summary model does not exist or is deleted', item.id)
+            else:
+                exp_summary_model.voice_artist_ids = translator_ids
+                exp_summary_model.translator_ids = []
+                exp_summary_model.put()
+
+                item.voice_artist_ids = translator_ids
+                item.translator_ids = []
+                item.commit('Admin', commit_message, commit_cmds)
+                yield ('SUCCESS', item.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if key == 'SUCCESS':
+            yield (key, len(values))
+        else:
+            yield (key, values)
