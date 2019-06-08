@@ -196,7 +196,7 @@ describe('State Rules Stats Service', function() {
       StateRulesStatsService.computeStateRulesStats(MOCK_STATE)
         .then(successHandler, failureHandler);
 
-      expect($httpBackend.flush).toThrowError('No pending request to flush !');
+      expect($httpBackend.flush).toThrowError(/No pending request to flush/);
       expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining({
         visualizations_info: [],
       }));
