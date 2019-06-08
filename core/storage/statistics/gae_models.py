@@ -62,10 +62,8 @@ ISSUE_TYPE_KEYNAME_MAPPING = {
     'MultipleIncorrectSubmissions': 'state_name',
     'CyclicStateTransitions': 'state_names'
 }
-
-# Constants used for generating new ids.
-_MAX_RETRIES = 10
-_RAND_RANGE = 127 * 127
+# The choices of entity type valid for LearnerAnswerDetailsModel
+ENTITY_TYPE_CHOICES = [feconf.ENTITY_TYPE_TOPIC]
 
 
 class StateCounterModel(base_models.BaseModel):
@@ -1139,7 +1137,7 @@ class PlaythroughModel(base_models.BaseModel):
 
 
 class LearnerAnswerDetailsModel(base_models.BaseModel):
-    """Model for storing the answer details, learner enters when they
+    """Model for storing the answer details that a learner enters when they
     are asked for it.
 
     The id of instances of this class has the form
@@ -1149,11 +1147,17 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     entity_id = ndb.StringProperty(required=True, indexed=True)
     # The type of entity, that whether it is exploration, question, or any
     # other object if it is added in future.
-    entity_type = ndb.StringProperty(required=True, indexed=True)
+    entity_type = ndb.StringProperty(
+        required=True, indexed=True, choices=ENTITY_TYPE_CHOICES)
     # The answer submitted by the learner.
-    learner_answer = ndb.StringProperty(required=True, indexed=False)
+    learner_answer = ndb.JsonProperty(required=True, indexed=False)
     # The response submitted by the learner.
     learner_answer_details = ndb.StringProperty(required=True, indexed=False)
+    # The version of the submitted_answer_list currently supported by Oppia. If
+    # the internal JSON structure of submitted_answer_list changes,
+    # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
+    schema_version = ndb.IntegerProperty(
+        indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
     # The time at which the response was created.
     created_on = ndb.DateTimeProperty(required=True, indexed=True)
     # Whether the response received has been resolved.
@@ -1201,11 +1205,11 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
            Exception: There were too many collisions with existing answer
                detail IDs when attempting to generate a new answer detail ID.
         """
-        for _ in range(_MAX_RETRIES):
+        for _ in range(base_models.MAX_RETRIES):
             answer_details_id = (
                 entity_type + '.' + entity_id + '.' +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
-                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
+                utils.base64_from_int(utils.get_random_int(base_models.RAND_RANGE)))
             if not cls.get_by_id(answer_details_id):
                 return answer_details_id
         raise Exception(
