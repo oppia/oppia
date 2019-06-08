@@ -2130,19 +2130,19 @@ class TestDeleteStateIdMappingModelsOneOffJobs(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            "Entity for class StateIdMappingModel with id exp_id.1 not found"):
+            'Entity for class StateIdMappingModel with id exp_id.1 not found'):
             exp_models.StateIdMappingModel.get_state_id_mapping_model(
                 'exp_id', 1)
 
 
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            "Entity for class StateIdMappingModel with id exp_id.2 not found"):
+            'Entity for class StateIdMappingModel with id exp_id.2 not found'):
             exp_models.StateIdMappingModel.get_state_id_mapping_model(
                 'exp_id', 2)
 
         with self.assertRaisesRegexp(
             base_models.BaseModel.EntityNotFoundError,
-            "Entity for class StateIdMappingModel with id exp_id.3 not found"):
+            'Entity for class StateIdMappingModel with id exp_id.3 not found'):
             exp_models.StateIdMappingModel.get_state_id_mapping_model(
                 'exp_id', 3)
