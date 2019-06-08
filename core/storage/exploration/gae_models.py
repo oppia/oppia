@@ -504,13 +504,12 @@ class ExpSummaryModel(base_models.BaseModel):
 
 
 class StateIdMappingModel(base_models.BaseModel):
-    """State ID model for Oppia explorations.
-
+    """DEPRECATED: DO NOT USE.
+    State ID model for Oppia explorations.
     This model maps each exploration version's state to a unique id.
     Note: use the state id only for derived data, but not for data that’s
     regarded as the source of truth, as the rules for assigning state id may
     change in future.
-
     The key of each instance is a combination of exploration id and version.
     """
 
@@ -529,25 +528,10 @@ class StateIdMappingModel(base_models.BaseModel):
     largest_state_id_used = ndb.IntegerProperty(indexed=True, required=True)
 
     @classmethod
-    def _generate_instance_id(cls, exp_id, exp_version):
-        """Generates ID of the state id mapping model instance.
-
-        Args:
-            exp_id: str. The exploration id whose states are mapped.
-            exp_version: int. The version of the exploration.
-
-        Returns:
-            str. A string containing exploration ID and
-                exploration version.
-        """
-        return '%s.%d' % (exp_id, exp_version)
-
-    @classmethod
     def create(
             cls, exp_id, exp_version, state_names_to_ids,
             largest_state_id_used, overwrite=False):
         """Creates a new instance of state id mapping model.
-
         Args:
             exp_id: str. The exploration id whose states are mapped.
             exp_version: int. The version of that exploration.
@@ -556,7 +540,6 @@ class StateIdMappingModel(base_models.BaseModel):
                 used as a state ID for this exploration.
             overwrite: bool. Whether overwriting of an existing model should
                 be allowed.
-
         Returns:
             StateIdMappingModel. Instance of the state id mapping model.
         """
@@ -575,14 +558,23 @@ class StateIdMappingModel(base_models.BaseModel):
         return model
 
     @classmethod
+    def _generate_instance_id(cls, exp_id, exp_version):
+        """Generates ID of the state id mapping model instance.
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of the exploration.
+        Returns:
+            str. A string containing exploration ID and
+                exploration version.
+        """
+        return '%s.%d' % (exp_id, exp_version)
+
+    @classmethod
     def get_state_id_mapping_model(cls, exp_id, exp_version):
         """Retrieve state id mapping model from the datastore.
-
         Args:
             exp_id: str. The exploration id.
             exp_version: int. The exploration version.
-
-
         Returns:
             StateIdMappingModel. The model retrieved from the datastore.
         """
@@ -593,7 +585,6 @@ class StateIdMappingModel(base_models.BaseModel):
     @classmethod
     def delete_state_id_mapping_models(cls, exp_id, exp_versions):
         """Removes state id mapping models present in state_id_mapping_models.
-
         Args:
             exp_id: str. The id of the exploration.
             exp_versions: list(int). A list of exploration versions for which
