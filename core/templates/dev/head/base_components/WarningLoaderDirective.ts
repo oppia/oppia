@@ -23,8 +23,14 @@ oppia.directive('warningLoader', [
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base_components/warning_loader_directive.html')
+        '/base_components/warning_loader_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        function() {}
+      ]
     };
   }
 ]);
