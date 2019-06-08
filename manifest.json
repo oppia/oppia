@@ -340,17 +340,6 @@
           "js": []
         }
       },
-      "waveSurferJs": {
-        "version": "1.0.46",
-        "downloadFormat": "files",
-        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
-        "rootDirPrefix": "waveSurfer-js-",
-        "targetDirPrefix": "wave-surfer-js-",
-        "files": ["wavesurfer.min.js"],
-        "bundle": {
-          "js": ["wavesurfer.min.js"]
-        }
-      },
       "jquery": {
         "version": "3.4.1",
         "downloadFormat": "files",
@@ -388,16 +377,16 @@
         "files": ["math-expressions.js"]
       },
       "mathJax": {
-        "version": "2.6.0",
+        "version": "2.7.5",
         "downloadFormat": "zip",
-        "url": "https://github.com/mathjax/MathJax/archive/2.6.0.zip",
+        "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
       },
       "mathJs": {
-        "version": "4.2.2",
+        "version": "5.10.3",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.2.2",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.10.3",
         "rootDirPrefix": "math-js-",
         "targetDirPrefix": "math-js-",
         "files": ["math.js", "math.min.js", "math.min.map"],
@@ -524,6 +513,17 @@
         "targetDirPrefix": "ui-utils-",
         "bundle": {
           "js": ["ui-utils.js"]
+        }
+      },
+      "waveSurferJs": {
+        "version": "1.0.46",
+        "downloadFormat": "files",
+        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
+        "rootDirPrefix": "waveSurfer-js-",
+        "targetDirPrefix": "wave-surfer-js-",
+        "files": ["wavesurfer.min.js"],
+        "bundle": {
+          "js": ["wavesurfer.min.js"]
         }
       }
     },
