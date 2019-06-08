@@ -1948,8 +1948,8 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                 state_name: str. The name of the state to fetch answers for.
 
             Returns:
-                list(*). A list of the top 10 answers, sorted by decreasing
-                frequency.
+                list(dict(str: *)). A list of the top 10 answers, sorted by
+                decreasing frequency.
             """
             if (exploration_id, state_name) == (exp_id, exp.init_state_name):
                 return [
