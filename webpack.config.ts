@@ -241,13 +241,14 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['moderator'],
       filename: 'moderator-page.mainpage.html',
-      template: commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'privacy.html',
-      template: commonPrefix + '/pages/privacy/privacy.html',
+      filename: 'privacy-page.mainpage.html',
+      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
