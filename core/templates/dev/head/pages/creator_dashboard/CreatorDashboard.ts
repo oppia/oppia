@@ -39,7 +39,7 @@ require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require('components/RatingComputationService.ts');
+require('components/ratings/rating-computation/rating-computation.service.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
@@ -101,17 +101,31 @@ require(
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require(
   'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
-require('pages/question_editor/QuestionEditorDirective.ts');
-require('components/state/AnswerGroupEditorDirective.ts');
-require('components/state/HintEditorDirective.ts');
-require('components/state/OutcomeEditorDirective.ts');
-require('components/state/OutcomeDestinationEditorDirective.ts');
-require('components/state/OutcomeFeedbackEditorDirective.ts');
-require('components/state/ResponseHeaderDirective.ts');
-require('components/state/RuleEditorDirective.ts');
-require('components/state/RuleTypeSelectorDirective.ts');
-require('components/state/SolutionEditorDirective.ts');
-require('components/state/SolutionExplanationEditorDirective.ts');
+require(
+  'components/question-directives/question-editor/' +
+  'question-editor.directive.ts');
+require(
+  'components/state-directives/answer-group-editor/' +
+  'answer-group-editor.directive.ts');
+require('components/state-directives/hint-editor/hint-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require(
+  'components/state-directives/response-header/response-header.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.directive.ts');
+require(
+  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'components/state-directives/solution-editor/' +
+  'solution-explanation-editor.directive.ts');
 require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
@@ -122,12 +136,12 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('components/summary_tile/CollectionSummaryTileDirective.ts');
+require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/exploration_player/PlayerConstants.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
 
 require('components/entity-creation-services/exploration-creation.service.ts');
-require('components/RatingComputationService.ts');
+require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');

@@ -25,7 +25,8 @@ require(
   'TranslationTabActiveModeService.ts'
 );
 require(
-  'pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-written-translations.service.ts');
 
 describe('Translation status service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

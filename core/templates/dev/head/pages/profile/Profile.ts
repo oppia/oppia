@@ -19,7 +19,7 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('components/summary_tile/ExplorationSummaryTileDirective.ts');
+require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 
