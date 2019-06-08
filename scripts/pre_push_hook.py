@@ -339,7 +339,7 @@ def main():
         with ChangedBranch(branch):
             if not modified_files and not files_to_lint:
                 continue
-            '''if files_to_lint:
+            if files_to_lint:
                 lint_status = _start_linter(files_to_lint)
                 if lint_status != 0:
                     print 'Push failed, please correct the linting issues above'
@@ -349,7 +349,7 @@ def main():
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
                 print 'Push aborted due to failing frontend tests.'
-                sys.exit(1)'''
+                sys.exit(1)
     sys.exit(0)
 
 
