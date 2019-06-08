@@ -63,7 +63,7 @@ module.exports = {
     library: commonPrefix + '/pages/library/Library.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
-    moderator: commonPrefix + '/pages/moderator/Moderator.ts',
+    moderator: commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
     notifications_dashboard:
       commonPrefix + '/pages/notifications_dashboard/NotificationsDashboard.ts',
     practice_session:
@@ -236,8 +236,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['moderator'],
-      filename: 'moderator.html',
-      template: commonPrefix + '/pages/moderator/moderator.html',
+      filename: 'moderator-page.mainpage.html',
+      template: commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
