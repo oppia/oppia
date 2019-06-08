@@ -122,7 +122,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('components/summary_tile/CollectionSummaryTileDirective.ts');
+require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/exploration_player/PlayerConstants.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
 

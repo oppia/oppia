@@ -91,7 +91,7 @@ require('components/state-directives/rule-editor/rule-editor.directive.ts');
 require('components/state-directives/rule-editor/rule-type-selector.directive.ts');
 require('components/state-directives/solution-editor/solution-editor.directive.ts');
 require('components/state-directives/solution-editor/solution-explanation-editor.directive.ts');
-require('components/CodemirrorMergeviewDirective.ts');
+require('components/version-diff-visualization/codemirror-mergeview.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
@@ -124,7 +124,7 @@ require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/VersionDiffVisualizationDirective.ts');
+require('components/version-diff-visualization/version-diff-visualization.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');

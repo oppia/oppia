@@ -50,8 +50,7 @@ oppia.directive('collectionSummaryTile', [
         isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary_tile/' +
-        'collection_summary_tile_directive.html'),
+        '/components/summary-tile/collection-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'DateTimeFormatService', 'UserService',

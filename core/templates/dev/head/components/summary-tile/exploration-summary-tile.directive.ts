@@ -65,8 +65,7 @@ oppia.directive('explorationSummaryTile', [
         isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary_tile/' +
-        'exploration_summary_tile_directive.html'),
+        '/components/summary-tile/exploration-summary-tile.directive.html'),
       link: function(scope, element) {
         element.find('.exploration-summary-avatars').on('mouseenter',
           function() {

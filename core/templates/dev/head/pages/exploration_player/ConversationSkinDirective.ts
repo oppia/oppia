@@ -17,8 +17,8 @@
  */
 
 require('components/ratings/rating-display/rating-display.directive.ts');
-require('components/summary_tile/ExplorationSummaryTileDirective.ts');
-require('components/summary_tile/CollectionSummaryTileDirective.ts');
+require('components/summary-tile/exploration-summary-tile.directive.ts');
+require('components/summary-tile/collection-summary-tile.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('pages/exploration_player/CorrectnessFooterDirective.ts');
 require('pages/exploration_player/ProgressNavDirective.ts');

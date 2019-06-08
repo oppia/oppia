@@ -29,7 +29,7 @@ oppia.directive('storySummaryTile', [
         getStoryDescription: '&description',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary_tile/story_summary_tile_directive.html'),
+        '/components/summary-tile/story-summary-tile.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {
