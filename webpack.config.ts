@@ -76,7 +76,7 @@ module.exports = {
     profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
-    splash: commonPrefix + '/pages/splash/Splash.ts',
+    splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
     stewards:
       commonPrefix + '/pages/landing/stewards-landing-page/' +
       'stewards-landing-page.controller.ts',
@@ -303,22 +303,22 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['splash'],
-      filename: 'splash.html',
-      template: commonPrefix + '/pages/splash/splash.html',
+      filename: 'splash-page.mainpage.html',
+      template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash_at0.html',
-      template: commonPrefix + '/pages/splash/splash_at0.html',
+      template: commonPrefix + '/pages/splash-page/splash_at0.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash_at1.html',
-      template: commonPrefix + '/pages/splash/splash_at1.html',
+      template: commonPrefix + '/pages/splash-page/splash_at1.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
