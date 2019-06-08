@@ -56,7 +56,7 @@ module.exports = {
     get_started:
       commonPrefix + 'pages/get-started-page/get-started-page.scripts.ts',
     landing:
-      commonPrefix + '/pages/landing/topic-landing-page/' +
+      commonPrefix + '/pages/landing-pages/topic-landing-page/' +
       'topic-landing-page.controller.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
@@ -78,7 +78,7 @@ module.exports = {
     skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
     splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
     stewards:
-      commonPrefix + '/pages/landing/stewards-landing-page/' +
+      commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
       'stewards-landing-page.controller.ts',
     story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
@@ -210,7 +210,7 @@ module.exports = {
       chunks: ['landing'],
       filename: 'topic-landing-page.mainpage.html',
       template:
-        commonPrefix + '/pages/landing/topic-landing-page/' +
+        commonPrefix + '/pages/landing-pages/topic-landing-page/' +
         'topic-landing-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
