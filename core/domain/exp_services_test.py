@@ -32,6 +32,7 @@ from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -78,17 +79,19 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(self.translator_id, self.TRANSLATOR_EMAIL)
+        user_services.create_new_user(
+            self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
         user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
@@ -333,6 +336,22 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_ids_matching_query(''),
             ([], None))
+
+    def test_get_subscribed_users_activity_ids_with_deleted_explorations(self):
+        # Ensure a deleted exploration does not show up in subscribed users
+        # activity ids.
+        subscription_services.subscribe_to_exploration(
+            self.owner_id, self.EXP_ID_0)
+        self.assertIn(
+            self.EXP_ID_0,
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.owner_id))
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
+        self.process_and_flush_pending_tasks()
+        self.assertNotIn(
+            self.EXP_ID_0,
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.owner_id))
 
     def test_search_exploration_summaries(self):
         # Search within the 'Architecture' category.
@@ -3015,7 +3034,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'translator_ids', 'viewer_ids',
+                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
@@ -3058,7 +3077,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'translator_ids', 'viewer_ids',
+                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']

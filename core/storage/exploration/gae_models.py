@@ -169,8 +169,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this exploration.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to voiceover this exploration.
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
@@ -194,6 +194,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
+    # DEPRECATED in v2.8.3. Do not use.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -389,8 +391,8 @@ class ExpSummaryModel(base_models.BaseModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this exploration.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to voiceover this exploration.
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
@@ -403,6 +405,8 @@ class ExpSummaryModel(base_models.BaseModel):
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
+    # DEPRECATED in v2.8.3. Do not use.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     @classmethod
     def get_non_private(cls):
@@ -454,7 +458,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id,
-                   ExpSummaryModel.translator_ids == user_id,
+                   ExpSummaryModel.voice_artist_ids == user_id,
                    ExpSummaryModel.viewer_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison

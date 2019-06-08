@@ -20,7 +20,7 @@
 
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('pages/exploration_editor/AngularNameService.ts');
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationInitStateNameService.ts');

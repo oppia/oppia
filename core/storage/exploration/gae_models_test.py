@@ -55,7 +55,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
             id='id_0',
             owner_ids=['owner_id'],
             editor_ids=['editor_id'],
-            translator_ids=['translator_id'],
+            voice_artist_ids=['voice_artist_id'],
             viewer_ids=['viewer_id'],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
@@ -67,7 +67,7 @@ class ExplorationRightsModelUnitTest(test_utils.GenericTestBase):
         saved_model = exploration_models.ExplorationRightsModel.get('id_0')
         self.assertEqual(saved_model.id, 'id_0')
         self.assertEqual(saved_model.owner_ids, ['owner_id'])
-        self.assertEqual(saved_model.translator_ids, ['translator_id'])
+        self.assertEqual(saved_model.voice_artist_ids, ['voice_artist_id'])
         self.assertEqual(saved_model.viewer_ids, ['viewer_id'])
 
 
