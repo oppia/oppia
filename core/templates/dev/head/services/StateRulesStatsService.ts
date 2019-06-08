@@ -42,9 +42,6 @@ oppia.factory('StateRulesStatsService', [
        * @param {Object!} state
        */
       computeStateRulesStats: function(state) {
-        var interactionRulesService = $injector.get(
-          AngularNameService.getNameOfInteractionRulesService(
-            state.interaction.id));
         var explorationId = ContextService.getExplorationId();
 
         return $http.get(
@@ -68,6 +65,9 @@ oppia.factory('StateRulesStatsService', [
                           vizInfoDatum.answer).toString();
                   }
                   if (newVizInfo.addressed_info_is_supported) {
+                    var interactionRulesService = $injector.get(
+                      AngularNameService.getNameOfInteractionRulesService(
+                        state.interaction.id));
                     vizInfoDatum.is_addressed =
                       AnswerClassificationService
                         .isClassifiedExplicitlyOrGoesToNewState(
