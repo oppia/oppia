@@ -16,7 +16,7 @@
  * @fileoverview Controller for the questions editor directive.
  */
 
-require('pages/state_editor/StateEditorDirective.ts');
+require('components/state-editor/state-editor.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
 require('domain/question/EditableQuestionBackendApiService.ts');
@@ -24,7 +24,7 @@ require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/QuestionUpdateService.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 require('pages/topic_editor/TopicEditorStateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');

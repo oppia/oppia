@@ -22,7 +22,7 @@ require(
   'pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.ts');
 require(
   'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
-require('pages/state_editor/StateEditorDirective.ts');
+require('components/state-editor/state-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
@@ -31,7 +31,7 @@ require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/ExplorationWarningsService.ts');
 require('pages/exploration_editor/GraphDataService.ts');
 require('pages/exploration_editor/RouterService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');

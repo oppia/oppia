@@ -22,8 +22,8 @@ require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require('components/state-editor/state-editor-properties-services/state-interaction-id.service.ts');
 
 describe('TrainingDataService', function() {
   var $httpBackend;

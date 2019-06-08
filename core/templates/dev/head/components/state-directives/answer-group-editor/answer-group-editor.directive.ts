@@ -25,8 +25,8 @@ require('domain/exploration/RuleObjectFactory.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require(
   'pages/exploration_editor/editor_tab/TrainingDataEditorPanelService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require('components/state-editor/state-editor-properties-services/state-property.service.ts');
 require('services/AlertsService.ts');
 
 oppia.directive('answerGroupEditor', [

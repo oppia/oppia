@@ -180,7 +180,7 @@ require('pages/exploration_player/StateClassifierMappingService.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
 require('pages/exploration_editor/UserEmailPreferencesService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');

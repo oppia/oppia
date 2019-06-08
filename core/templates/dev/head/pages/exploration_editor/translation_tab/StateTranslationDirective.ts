@@ -37,7 +37,7 @@ require(
   'pages/exploration_editor/translation_tab/' +
   'TranslationTabActiveContentIdService.ts'
 );
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 
 oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

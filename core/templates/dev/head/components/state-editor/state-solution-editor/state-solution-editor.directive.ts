@@ -17,8 +17,10 @@
  * state editor.
  */
 
-require('components/state-directives/response-header/response-header.directive.ts');
-require('components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'components/state-directives/response-header/response-header.directive.ts');
+require(
+  'components/state-directives/solution-editor/solution-editor.directive.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
@@ -27,11 +29,21 @@ require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
 require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
 require('pages/exploration_player/CurrentInteractionService.ts');
-require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StateHintsService.ts');
-require('pages/state_editor/state_properties/StateInteractionIdService.ts');
-require('pages/state_editor/state_properties/StateSolutionService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-hints.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
@@ -48,7 +60,8 @@ oppia.directive('stateSolutionEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_solution_editor_directive.html'),
+        '/components/state-editor/state-solution-editor/' +
+        'state-solution-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'StateEditorService',
         'AlertsService', 'INTERACTION_SPECS', 'StateSolutionService',

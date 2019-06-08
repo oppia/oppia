@@ -26,7 +26,7 @@ require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('pages/skill_editor/SkillEditorStateService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 

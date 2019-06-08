@@ -29,7 +29,7 @@ require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/topic_editor/TopicEditorStateService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 

@@ -21,9 +21,9 @@ require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/state_editor/state_properties/StateContentService.ts');
+require('components/state-editor/state-editor-properties-services/state-content.service.ts');
 require(
-  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service.ts');
 require('services/EditabilityService.ts');
 
 describe('State content editor directive', function() {

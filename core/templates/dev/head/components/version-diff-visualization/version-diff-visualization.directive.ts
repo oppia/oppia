@@ -56,8 +56,8 @@ oppia.directive('versionDiffVisualization', [
         getLaterVersionHeader: '&laterVersionHeader',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/' +
-        'version_diff_visualization_directive.html'),
+        '/components/version-diff-visualization/' +
+        'version-diff-visualization.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$uibModal', function($uibModal) {
         var ctrl = this;

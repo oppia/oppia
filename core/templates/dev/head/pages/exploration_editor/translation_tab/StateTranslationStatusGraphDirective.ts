@@ -23,12 +23,12 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/GraphDataService.ts');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require('components/state-editor/state-editor-properties-services/state-property.service.ts');
 require(
-  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service.ts');
 require(
-  'pages/state_editor/state_properties/StateWrittenTranslationsService.ts');
+  'components/state-editor/state-editor-properties-services/state-written-translations.service.ts');
 
 oppia.directive('stateTranslationStatusGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -15,8 +15,11 @@
 /**
  * @fileoverview Directive for managing the state responses in the state editor.
  */
-require('components/state-directives/answer-group-editor/answer-group-editor.directive.ts');
-require('components/state-directives/response-header/response-header.directive.ts');
+require(
+  'components/state-directives/answer-group-editor/' +
+  'answer-group-editor.directive.ts');
+require(
+  'components/state-directives/response-header/response-header.directive.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/exploration/HintObjectFactory.ts');
@@ -33,12 +36,24 @@ require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 require(
   'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
-require('pages/state_editor/state_properties/StateContentService.ts');
-require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StateHintsService.ts');
-require('pages/state_editor/state_properties/StateInteractionIdService.ts');
-require('pages/state_editor/state_properties/StateSolutionService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-content.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-hints.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
@@ -60,7 +75,8 @@ oppia.directive('stateResponses', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_responses_directive.html'),
+        '/components/state-editor/state-responses-editor/' +
+        'state-responses.directive.html'),
       controller: [
         '$filter', '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService', 'EditabilityService',

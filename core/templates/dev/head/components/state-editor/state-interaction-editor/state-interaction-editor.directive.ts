@@ -24,12 +24,24 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 require(
   'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
-require('pages/state_editor/state_properties/StateContentService.ts');
-require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StateHintsService.ts');
-require('pages/state_editor/state_properties/StateInteractionIdService.ts');
-require('pages/state_editor/state_properties/StateSolutionService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-content.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-hints.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
@@ -54,7 +66,8 @@ oppia.directive('stateInteractionEditor', [
         recomputeGraph: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_interaction_editor_directive.html'),
+        '/components/state-editor/state-interaction-editor/' +
+        'state-interaction-editor.directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'HtmlEscaperService', 'StateEditorService',

@@ -22,7 +22,7 @@ require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
-require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('components/state-editor/state-editor-properties-services/state-property.service.ts');
 require('services/EditabilityService.ts');
 
 oppia.directive('stateContentEditor', [
@@ -42,7 +42,8 @@ oppia.directive('stateContentEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_content_editor_directive.html'),
+        '/components/state-editor/state-content-editor/' +
+        'state-content-editor.directive.html'),
       controller: [
         '$scope', 'StateContentService', 'EditabilityService',
         'EditorFirstTimeEventsService',

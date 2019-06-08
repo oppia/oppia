@@ -25,7 +25,7 @@ require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationParamSpecsService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 

@@ -19,8 +19,8 @@
 require('App.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/editor_tab/ExplorationEditorTabDirective.ts');
-require('pages/state_editor/state_properties/StateContentService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-content.service.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 
 describe('Exploration editor tab controller', function() {
   describe('ExplorationEditorTab', function() {

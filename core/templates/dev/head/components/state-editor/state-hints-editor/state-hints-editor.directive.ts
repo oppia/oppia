@@ -22,10 +22,10 @@ require('components/state-directives/response-header/response-header.directive.t
 
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StateHintsService.ts');
-require('pages/state_editor/state_properties/StateInteractionIdService.ts');
-require('pages/state_editor/state_properties/StateSolutionService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require('components/state-editor/state-editor-properties-services/state-hints.service.ts');
+require('components/state-editor/state-editor-properties-services/state-interaction-id.service.ts');
+require('components/state-editor/state-editor-properties-services/state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/GenerateContentIdService.ts');
@@ -40,7 +40,8 @@ oppia.directive('stateHintsEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/state_editor/state_hints_editor_directive.html'),
+        '/components/state-editor/state-hints-editor/' +
+        'state-hints-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',

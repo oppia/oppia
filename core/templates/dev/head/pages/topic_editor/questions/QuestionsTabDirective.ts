@@ -28,7 +28,7 @@ require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/suggestion/QuestionSuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
 require('pages/topic_editor/TopicEditorStateService.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');

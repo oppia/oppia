@@ -18,7 +18,7 @@
  */
 
 require(
-  'pages/state_editor/state_properties/StatePropertyService.ts');
+  'components/state-editor/state-editor-properties-services/state-property.service.ts');
 
 oppia.factory('StateRecordedVoiceoversService', [
   'StatePropertyService', function(StatePropertyService) {

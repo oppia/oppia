@@ -19,8 +19,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationRightsService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StatePropertyService.ts');
+require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require('components/state-editor/state-editor-properties-services/state-property.service.ts');
 require('services/EditabilityService.ts');
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
