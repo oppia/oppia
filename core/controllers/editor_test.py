@@ -1957,7 +1957,6 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                     {'answer': 'B', 'frequency': 11},
                     {'answer': 'A', 'frequency': 10},
                 ]
-            return []
 
         swap_get_answers = self.swap(
             stats_services, 'get_top_state_answer_stats',
