@@ -17,15 +17,16 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/suggestion_editor/SuggestionModalService.ts');
 
-oppia.factory('ShowSuggestionModalForCreatorViewService', [
+oppia.factory('SuggestionModalForCreatorDashboardService', [
   '$http', '$log', '$rootScope',
   '$uibModal', 'UrlInterpolationService',
   function($http, $log, $rootScope,
       $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
-      'creator_view_suggestion_modal_directive.html'
+      'creator_dashboard_suggestion_modal_directive.html'
     );
 
     var _showEditStateContentSuggestionModal = function(
@@ -61,7 +62,104 @@ oppia.factory('ShowSuggestionModalForCreatorViewService', [
             return activeThread.suggestion.suggestionType;
           }
         },
-        controller: 'ShowSuggestionModalForCreatorView'
+        controller: [
+          '$log', '$scope', '$uibModalInstance', 'SuggestionModalService',
+          'canReviewActiveThread', 'description', 'newContent',
+          'oldContent', 'stateName', 'suggestionIsHandled', 'suggestionStatus',
+          'suggestionType',
+          function(
+              $log, $scope, $uibModalInstance, SuggestionModalService,
+              canReviewActiveThread, description, newContent,
+              oldContent, stateName, suggestionIsHandled, suggestionStatus,
+              suggestionType
+          ) {
+            $scope.isNotHandled = !suggestionIsHandled;
+            $scope.canReject = $scope.isNotHandled;
+            $scope.canAccept = $scope.isNotHandled;
+            if (!$scope.isNotHandled) {
+              if (suggestionStatus === (
+                SuggestionModalService.SUGGESTION_ACCEPTED)) {
+                $scope.errorMessage = SuggestionModalService
+                  .SUGGESTION_ACCEPTED_MSG;
+                $scope.isSuggestionRejected = false;
+              } else {
+                $scope.errorMessage = SuggestionModalService
+                  .SUGGESTION_REJECTED_MSG;
+                $scope.isSuggestionRejected = true;
+              }
+            } else {
+              $scope.errorMessage = '';
+            }
+
+            $scope.oldContent = oldContent;
+            $scope.newContent = newContent;
+            $scope.stateName = stateName;
+            $scope.suggestionType = suggestionType;
+            $scope.commitMessage = description;
+            $scope.reviewMessage = null;
+            $scope.summaryMessage = null;
+            $scope.canReviewActiveThread = canReviewActiveThread;
+            // ng-model needs to bind to a property of an object on
+            // the scope (the property cannot sit directly on the scope)
+            // Reference https://stackoverflow.com/q/12618342
+            $scope.suggestionData = {newSuggestionHtml: newContent.html};
+            $scope.suggestionEditorIsShown = false;
+            $scope.acceptSuggestion = function() {
+              SuggestionModalService.acceptSuggestion(
+                $uibModalInstance,
+                {
+                  action: SuggestionModalService.ACTION_ACCEPT_SUGGESTION,
+                  commitMessage: $scope.commitMessage,
+                  reviewMessage: $scope.reviewMessage,
+                });
+            };
+
+            $scope.rejectSuggestion = function() {
+              SuggestionModalService.rejectSuggestion(
+                $uibModalInstance,
+                {
+                  action: SuggestionModalService.ACTION_REJECT_SUGGESTION,
+                  commitMessage: null,
+                  reviewMessage: $scope.reviewMessage
+                });
+            };
+            $scope.editSuggestion = function() {
+              $scope.suggestionEditorIsShown = true;
+            };
+            $scope.cancel = function() {
+              SuggestionModalService.cancelSuggestion($uibModalInstance);
+            };
+            $scope.isEditButtonShown = function() {
+              return (
+                !$scope.isNotHandled && $scope.isSuggestionRejected &&
+                !$scope.suggestionEditorIsShown);
+            };
+            $scope.isResubmitButtonShown = function() {
+              return (
+                !$scope.isNotHandled && $scope.isSuggestionRejected &&
+                $scope.suggestionEditorIsShown);
+            };
+            $scope.isResubmitButtonDisabled = function() {
+              return !(
+                $scope.summaryMessage &&
+                ($scope.suggestionData.newSuggestionHtml.trim() !==
+                  newContent.html.trim()));
+            };
+            $scope.cancelEditMode = function() {
+              $scope.suggestionEditorIsShown = false;
+            };
+            $scope.resubmitChanges = function() {
+              $uibModalInstance.close({
+                action: SuggestionModalService.ACTION_RESUBMIT_SUGGESTION,
+                newSuggestionHtml: $scope.suggestionData.newSuggestionHtml,
+                summaryMessage: $scope.summaryMessage,
+                stateName: $scope.stateName,
+                suggestionType: $scope.suggestionType,
+                oldContent: $scope.oldContent
+              });
+            };
+          }
+        ]
       }).result.then(function(result) {
         var RESUBMIT_SUGGESTION_URL_TEMPLATE = (
           '/suggestionactionhandler/resubmit/<suggestion_id>');

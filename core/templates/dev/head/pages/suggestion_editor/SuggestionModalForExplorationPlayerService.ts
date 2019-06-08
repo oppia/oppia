@@ -17,16 +17,18 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require(
-  'pages/suggestion_editor/ShowSuggestionModalForLearnerLocalView.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('pages/suggestion_editor/SuggestionModalService.ts');
 require('services/AlertsService.ts');
 
-oppia.factory('ShowSuggestionModalForLearnerLocalViewService', [
+oppia.factory('SuggestionModalForExplorationPlayerService', [
   '$http', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($http, $uibModal, AlertsService, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
-      'learner_local_view_suggestion_modal_directive.html'
+      'exploration_player_suggestion_modal_directive.html'
     );
 
     var _showEditStateContentSuggestionModal = function() {
@@ -34,7 +36,45 @@ oppia.factory('ShowSuggestionModalForLearnerLocalViewService', [
         templateUrl: _templateUrl,
         backdrop: 'static',
         resolve: {},
-        controller: 'ShowSuggestionModalForLearnerLocalView',
+        controller: [
+          '$scope', '$timeout', '$uibModalInstance', 'ExplorationEngineService',
+          'PlayerPositionService', 'PlayerTranscriptService',
+          'SuggestionModalService',
+          function(
+              $scope, $timeout, $uibModalInstance, ExplorationEngineService,
+              PlayerPositionService, PlayerTranscriptService,
+              SuggestionModalService) {
+            var stateName = PlayerPositionService.getCurrentStateName();
+            var displayedCard = PlayerTranscriptService.getCard(
+              PlayerPositionService.getDisplayedCardIndex());
+            $scope.originalHtml = displayedCard.getContentHtml();
+            $scope.description = '';
+            // ng-model needs to bind to a property of an object on
+            // the scope (the property cannot sit directly on the scope)
+            // Reference https://stackoverflow.com/q/12618342
+            $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
+            $scope.showEditor = false;
+            // Rte initially displays content unrendered for a split second
+            $timeout(function() {
+              $scope.showEditor = true;
+            }, 500);
+
+            $scope.cancelSuggestion = function() {
+              SuggestionModalService.cancelSuggestion($uibModalInstance);
+            };
+            $scope.submitSuggestion = function() {
+              var data = {
+                target_id: ExplorationEngineService.getExplorationId(),
+                version: ExplorationEngineService.getExplorationVersion(),
+                stateName: stateName,
+                suggestion_type: 'edit_exploration_state_content',
+                target_type: 'exploration',
+                description: $scope.description,
+                suggestionHtml: $scope.suggestionData.suggestionHtml,
+              };
+              $uibModalInstance.close(data);
+            };
+          }],
       }).result.then(function(result) {
         var data = {
           suggestion_type: result.suggestion_type,
