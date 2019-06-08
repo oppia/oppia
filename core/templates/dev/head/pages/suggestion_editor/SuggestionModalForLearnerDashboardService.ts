@@ -17,13 +17,14 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/suggestion_editor/SuggestionModalService.ts');
 
-oppia.factory('ShowSuggestionModalForLearnerViewService', [
+oppia.factory('SuggestionModalForLearnerDashboardService', [
   '$rootScope', '$uibModal', 'UrlInterpolationService',
   function($rootScope, $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
-      'learner_view_suggestion_modal_directive.html'
+      'learner_dashboard_suggestion_modal_directive.html'
     );
 
     var _showEditStateContentSuggestionModal = function(
@@ -42,7 +43,19 @@ oppia.factory('ShowSuggestionModalForLearnerViewService', [
             return description;
           }
         },
-        controller: 'ShowSuggestionModalForLearnerView'
+        controller: [
+          '$scope', '$uibModalInstance', 'SuggestionModalService',
+          'description', 'newContent', 'oldContent',
+          function($scope, $uibModalInstance, SuggestionModalService,
+              description, newContent, oldContent) {
+            $scope.newContent = newContent;
+            $scope.oldContent = oldContent;
+            $scope.description = description;
+            $scope.cancel = function() {
+              SuggestionModalService.cancelSuggestion($uibModalInstance);
+            };
+          }
+        ]
       });
     };
 
