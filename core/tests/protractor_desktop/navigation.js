@@ -134,7 +134,7 @@ describe('Meta Tags', function() {
   });
 
   it('should set the correct application name', function() {
-    expect(getStartedPage.getMetaTagContent('application-name')).toEqual(
-      'Oppia.org');
+    expect(getStartedPage.getMetaTagContent(
+      'application-name', 'name')).toEqual('Oppia.org');
   });
 });

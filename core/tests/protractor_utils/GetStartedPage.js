@@ -31,8 +31,10 @@ var GetStartedPage = function() {
       var tag = element(by.css('meta[itemprop="' + name + '"]'));
     } else if (type === 'og') {
       var tag = element(by.css('meta[property="og:' + name + '"]'));
-    } else {
+    } else if (type === 'name') {
       var tag = element(by.css('meta[name="' + name + '"]'));
+    } else {
+      throw Error('Unsupported tag type specified: ' + type);
     }
 
     return tag.getAttribute('content');
