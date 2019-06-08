@@ -61,7 +61,8 @@ module.exports = {
     learner_dashboard:
       commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
     library: commonPrefix + '/pages/library/Library.ts',
-    maintenance: commonPrefix + '/pages/maintenance/Maintenance.ts',
+    maintenance:
+      commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
     moderator: commonPrefix + '/pages/moderator/Moderator.ts',
     notifications_dashboard:
       commonPrefix + '/pages/notifications_dashboard/NotificationsDashboard.ts',
@@ -227,8 +228,9 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['app', 'maintenance'],
-      filename: 'maintenance.html',
-      template: commonPrefix + '/pages/maintenance/maintenance.html',
+      filename: 'maintenance-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

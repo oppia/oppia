@@ -195,4 +195,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('dist/maintenance.html')
+        self.render_template('dist/maintenance-page.mainpage.html')
