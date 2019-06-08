@@ -23,7 +23,7 @@ require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
-require('pages/suggestion_editor/SuggestionModalForEditorViewService.ts');
+require('pages/suggestion_editor/SuggestionModalForExplorationEditorService.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
@@ -41,7 +41,7 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
       '$log', '$q', '$rootScope', '$uibModal',
       'AlertsService', 'ChangeListService', 'DateTimeFormatService',
       'ExplorationDataService', 'ExplorationStatesService',
-      'SuggestionModalForEditorViewService',
+      'SuggestionModalForExplorationEditorService',
       'StateObjectFactory',
       'ThreadDataService', 'ThreadStatusDisplayService',
       'UrlInterpolationService', 'UserService',
@@ -50,7 +50,7 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
           $log, $q, $rootScope, $uibModal,
           AlertsService, ChangeListService, DateTimeFormatService,
           ExplorationDataService, ExplorationStatesService,
-          SuggestionModalForEditorViewService,
+          SuggestionModalForExplorationEditorService,
           StateObjectFactory,
           ThreadDataService, ThreadStatusDisplayService,
           UrlInterpolationService, UserService,
@@ -167,7 +167,7 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
 
         // TODO(Allan): Implement ability to edit suggestions before applying.
         ctrl.showSuggestionModal = function() {
-          SuggestionModalForEditorViewService.showSuggestionModal(
+          SuggestionModalForExplorationEditorService.showSuggestionModal(
             ctrl.activeThread.suggestion.suggestionType,
             {
               activeThread: ctrl.activeThread,

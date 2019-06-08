@@ -24,7 +24,7 @@ require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
 require('pages/suggestion_editor/SuggestionModalService.ts');
 require('services/EditabilityService.ts');
 
-oppia.factory('SuggestionModalForEditorViewService', [
+oppia.factory('SuggestionModalForExplorationEditorService', [
   '$log', '$rootScope', '$uibModal',
   'ExplorationDataService', 'ExplorationStatesService',
   'StateObjectFactory', 'SuggestionModalService',
@@ -35,7 +35,7 @@ oppia.factory('SuggestionModalForEditorViewService', [
       ThreadDataService, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/suggestion_editor/' +
-      'editor_view_suggestion_modal_directive.html'
+      'exploration_editor_suggestion_modal_directive.html'
     );
 
     var _showEditStateContentSuggestionModal = function(
