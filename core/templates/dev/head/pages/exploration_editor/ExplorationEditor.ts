@@ -119,7 +119,8 @@ require(
   'components/forms/forms-templates/' +
   'mark-all-audio-and-translations-as-needing-update.controller.ts');
 require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
-require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
+require(
+  'pages/suggestion_editor/SuggestionModalForExplorationEditorService.ts');
 require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
