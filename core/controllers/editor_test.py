@@ -1968,10 +1968,11 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
                 '%s/%s' % (
                     feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
 
-        self.assertEqual(state_stats['answers'], {
-            exp.init_state_name: [
-                {'answer': 'C', 'frequency': 12},
-                {'answer': 'B', 'frequency': 11},
-                {'answer': 'A', 'frequency': 10},
-            ],
-        })
+        self.assertEqual(
+            state_stats['answers'], {
+                exp.init_state_name: [
+                    {'answer': 'C', 'frequency': 12},
+                    {'answer': 'B', 'frequency': 11},
+                    {'answer': 'A', 'frequency': 10},
+                ],
+            })
