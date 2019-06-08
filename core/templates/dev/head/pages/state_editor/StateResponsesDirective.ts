@@ -24,11 +24,11 @@ require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/RuleObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/CamelCaseToHyphensFilter.ts');
-require('filters/ConvertToPlainTextFilter.ts');
-require('filters/ParameterizeRuleDescriptionFilter.ts');
-require('filters/TruncateFilter.ts');
-require('filters/WrapTextWithEllipsisFilter.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
 require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 require(
   'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');

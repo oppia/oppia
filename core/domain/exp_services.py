@@ -621,7 +621,8 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
@@ -1044,6 +1045,26 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # Remove associated state id mapping models.
     delete_state_id_mapping_model_for_exploration(
         exploration_id, exploration_version)
+
+    # Remove from subscribers.
+    taskqueue_services.defer(
+        delete_exploration_from_subscribed_users,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        exploration_id)
+
+
+def delete_exploration_from_subscribed_users(exploration_id):
+    """Remove exploration from all subscribers' activity_ids.
+
+    Args:
+        exploration_id: The id of the exploration to delete.
+    """
+    subscription_models = user_models.UserSubscriptionsModel.query(
+        user_models.UserSubscriptionsModel.activity_ids ==
+        exploration_id).fetch()
+    for model in subscription_models:
+        model.activity_ids.remove(exploration_id)
+    user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
 # Operations on exploration snapshots.
@@ -1504,7 +1525,8 @@ def save_new_exploration_from_yaml_and_assets(
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(committer_id, asset_filename, asset_content)
 
     if (exp_schema_version <=
@@ -1691,7 +1713,7 @@ def save_original_and_compressed_versions_of_image(
 
     file_system_class = fs_services.get_exploration_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
-        'exploration/%s' % exp_id))
+        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
 
     compressed_image_content = gae_image_services.compress_image(
         original_image_content, 0.8)

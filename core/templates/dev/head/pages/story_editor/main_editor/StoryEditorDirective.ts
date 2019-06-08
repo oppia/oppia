@@ -16,7 +16,8 @@
  * @fileoverview Controller for the main story editor.
  */
 
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('pages/story_editor/main_editor/StoryNodeEditorDirective.ts');
 

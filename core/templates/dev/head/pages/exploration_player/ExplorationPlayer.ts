@@ -18,50 +18,80 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('components/CkEditorRteDirective.ts');
-require('components/CkEditorWidgetsInitializer.ts');
+require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
-require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
-require('components/forms/ConvertHtmlToUnicodeFilter.ts');
-require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('filters/convert-unicode-with-params-to-html.filter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');
 require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
 require('components/forms/validators/IsIntegerFilter.ts');
 require('components/forms/validators/IsNonemptyFilter.ts');
-require('components/forms/ApplyValidationDirective.ts');
-require('components/forms/RequireIsFloatDirective.ts');
-require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
 require(
-  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
-  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/attribution_guide/AttributionGuideDirective.ts');
-require('components/background/BackgroundBannerDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/LearnerLocalNav.ts');
-require('pages/exploration_player/LearnerViewInfo.ts');
+require('pages/exploration_player/LearnerLocalNavDirective.ts');
+require('pages/exploration_player/LearnerViewInfoDirective.ts');
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('services/ContextService.ts');
