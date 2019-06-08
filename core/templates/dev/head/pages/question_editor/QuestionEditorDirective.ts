@@ -18,7 +18,7 @@
 
 require('pages/state_editor/StateEditorDirective.ts');
 
-require('components/QuestionCreationService.ts');
+require('components/entity-creation-services/question-creation.service.ts');
 require('domain/question/EditableQuestionBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/QuestionUpdateService.ts');
@@ -185,8 +185,8 @@ oppia.directive('questionEditor', [
             if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/components/forms/mark_all_audio_and_translations_as_' +
-                  'needing_update_modal_directive.html'),
+                  '/components/forms/forms-templates/mark-all-audio-and-' +
+                  'translations-as-needing-update-modal.directive.html'),
                 backdrop: true,
                 controller: (
                   'MarkAllAudioAndTranslationsAsNeedingUpdateController')

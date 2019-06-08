@@ -18,8 +18,8 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('components/CkEditorRteDirective.ts');
-require('components/CkEditorWidgetsInitializer.ts');
+require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
 require('components/state/AnswerGroupEditorDirective.ts');
 require('components/state/OutcomeEditorDirective.ts');
 require('components/state/OutcomeDestinationEditorDirective.ts');
@@ -28,7 +28,7 @@ require('components/state/RuleEditorDirective.ts');
 require('components/state/RuleTypeSelectorDirective.ts');
 require('components/state/SolutionEditorDirective.ts');
 require('components/state/SolutionExplanationEditorDirective.ts');
-require('components/forms/HtmlSelectDirective.ts');
+require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
@@ -37,26 +37,48 @@ require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
 require('components/forms/validators/IsIntegerFilter.ts');
 require('components/forms/validators/IsNonemptyFilter.ts');
-require('components/forms/ApplyValidationDirective.ts');
-require('components/forms/RequireIsFloatDirective.ts');
-require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
 require(
-  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
-  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^

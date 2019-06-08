@@ -16,11 +16,13 @@
  * @fileoverview Tests for the form builders.
  */
 
-require('components/forms/ApplyValidationDirective.ts');
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
-require('components/forms/RequireIsFloatDirective.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
 require('components/forms/validators/IsAtLeastFilter.ts');
 require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');

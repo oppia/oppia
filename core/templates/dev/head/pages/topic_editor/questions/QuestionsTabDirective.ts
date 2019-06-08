@@ -18,7 +18,7 @@
 
 require('pages/questions_list/QuestionsListDirective.ts');
 
-require('components/QuestionCreationService.ts');
+require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/question/EditableQuestionBackendApiService.ts');

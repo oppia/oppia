@@ -16,9 +16,12 @@
  * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  */
 
-require('components/forms/Select2DropdownDirective.ts');
-require('components/forms/ImageUploaderDirective.ts');
-require('components/background/BackgroundBannerDirective.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/OppiaFooterDirective.ts');
 

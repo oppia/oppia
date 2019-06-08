@@ -16,7 +16,9 @@
  * @fileoverview Controllers for the topics and skills dashboard.
  */
 
-require('components/background/BackgroundBannerDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 require('pages/topics_and_skills_dashboard/SkillsListDirective.ts');
 require(
   'pages/topics_and_skills_dashboard/' +
@@ -28,8 +30,8 @@ require(
 );
 require('pages/topics_and_skills_dashboard/TopicsListDirective.ts');
 
-require('components/SkillCreationService.ts');
-require('components/TopicCreationService.ts');
+require('components/entity-creation-services/skill-creation.service.ts');
+require('components/entity-creation-services/topic-creation.service.ts.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardBackendApiService.ts'

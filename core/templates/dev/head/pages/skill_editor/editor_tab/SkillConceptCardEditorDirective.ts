@@ -17,7 +17,8 @@
  */
 
 require('components/SummaryListHeaderDirective.ts');
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('pages/skill_editor/editor_tab/WorkedExampleEditorDirective.ts');
 

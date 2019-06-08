@@ -18,7 +18,9 @@
  */
 
 require('components/profile_link/ProfileLinkImageDirective.ts');
-require('components/share/SharingLinksDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'sharing-links.directive.ts');
 require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 

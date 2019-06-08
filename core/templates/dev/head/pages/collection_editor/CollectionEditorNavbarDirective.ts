@@ -16,8 +16,11 @@
  * @fileoverview Directive for the navbar of the collection editor.
  */
 
-require('components/forms/Select2DropdownDirective.ts');
-require('components/loading/LoadingDotsDirective.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 
 require('domain/collection/CollectionRightsBackendApiService.ts');
 require('domain/collection/CollectionUpdateService.ts');

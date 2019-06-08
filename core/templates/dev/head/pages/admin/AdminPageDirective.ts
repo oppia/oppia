@@ -24,21 +24,42 @@ require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
 require('components/forms/validators/IsIntegerFilter.ts');
 require('components/forms/validators/IsNonemptyFilter.ts');
-require('components/forms/ApplyValidationDirective.ts');
-require('components/forms/ObjectEditorDirective.ts');
-require('components/forms/RequireIsFloatDirective.ts');
-require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
 require(
-  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require('components/forms/custom-forms-directives/object-editor.directive.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require('pages/admin/AdminNavbarDirective.ts');
