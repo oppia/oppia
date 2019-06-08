@@ -21,7 +21,6 @@ var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var GetStartedPage = require('../protractio_utils/GetStartedPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
   var libraryPage = null;
@@ -53,36 +52,5 @@ describe('Cache Slugs', function() {
       'http://localhost:9001/build/fail/logo/288x128_logo_white.png'
     ];
     general.checkConsoleErrorsExist(expectedErrors);
-  });
-});
-
-describe('Meta Tags', function() {
-  var EXPECTED_META_NAME = 'Personalized Online Learning from Oppia';
-  var EXPECTED_META_DESCRIPTION = 'Learn how to get started using Oppia.';
-  var getStartedPage = new GetStartedPage.GetStartedPage();
-
-  beforeEach(function() {
-    getStartedPage.get();
-  });
-
-  it('should set the correct itemprop meta tags', function() {
-    expect(getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
-      EXPECTED_META_NAME);
-    expect(getStartedPage.getMetaTagContent('description', 'itemprop')).toEqual(
-      EXPECTED_META_DESCRIPTION);
-  });
-
-  it('should set the correct og meta tags', function() {
-    expect(getStartedPage.getMetaTagContent('title', 'og')).toEqual(
-      EXPECTED_META_NAME);
-    expect(getStartedPage.getMetaTagContent('description', 'og')).toEqual(
-      EXPECTED_META_DESCRIPTION);
-    expect(getStartedPage.getMetaTagContent('url', 'og')).toEqual(
-      'http://localhost:9001/get_started');
-  });
-
-  it('should set the correct application name', function() {
-    expect(getStartedPage.getMetaTagContent('application-name')).toEqual(
-      'Oppia.org');
   });
 });
