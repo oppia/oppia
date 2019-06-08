@@ -82,7 +82,7 @@ module.exports = {
       'stewards-landing-page.controller.ts',
     story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
-    thanks: commonPrefix + '/pages/thanks/Thanks.ts',
+    thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
     topic_editor: commonPrefix + '/pages/topic_editor/TopicEditor.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
@@ -347,15 +347,15 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'terms.html',
-      template: commonPrefix + '/pages/terms/terms.html',
+      filename: 'terms-page.mainpage.html',
+      template: commonPrefix + '/pages/terms-page/terms-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['thanks'],
-      filename: 'thanks.html',
-      template: commonPrefix + '/pages/thanks/thanks.html',
+      filename: 'thanks-page.mainpage.html',
+      template: commonPrefix + '/pages/thanks-page/thanks-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

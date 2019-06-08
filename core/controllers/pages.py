@@ -120,7 +120,7 @@ class ThanksPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/thanks.html')
+        self.render_template('dist/thanks-page.mainpage.html')
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -141,7 +141,7 @@ class TermsPage(base.BaseHandler):
             'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
         })
 
-        self.render_template('dist/terms.html')
+        self.render_template('dist/terms-page.mainpage.html')
 
 
 class PrivacyPage(base.BaseHandler):
