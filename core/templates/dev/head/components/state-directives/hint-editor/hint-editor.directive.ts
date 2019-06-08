@@ -36,7 +36,7 @@ oppia.directive('hintEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/hint_editor_directive.html'),
+        '/components/state-directives/hint-editor/hint-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditabilityService', 'StateHintsService',

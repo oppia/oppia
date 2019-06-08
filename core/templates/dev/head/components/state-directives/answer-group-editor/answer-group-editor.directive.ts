@@ -16,8 +16,8 @@
  * @fileoverview Directive for the answer group editor.
  */
 
-require('components/state/OutcomeEditorDirective.ts');
-require('components/state/RuleEditorDirective.ts');
+require('components/state-directives/outcome-editor/outcome-editor.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -51,7 +51,8 @@ oppia.directive('answerGroupEditor', [
         suppressWarnings: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/answer_group_editor_directive.html'),
+        '/components/state-directives/answer-group-editor/' +
+        'answer-group-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StateInteractionIdService',

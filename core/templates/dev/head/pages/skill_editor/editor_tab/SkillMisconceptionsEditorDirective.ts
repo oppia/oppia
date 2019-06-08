@@ -16,7 +16,7 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
-require('components/SummaryListHeaderDirective.ts');
+require('components/state-directives/answer-group-editor/summary-list-header.directive.ts');
 require('pages/skill_editor/editor_tab/MisconceptionEditorDirective.ts');
 
 require('domain/skill/MisconceptionObjectFactory.ts');

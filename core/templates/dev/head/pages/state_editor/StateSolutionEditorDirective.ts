@@ -17,8 +17,8 @@
  * state editor.
  */
 
-require('components/state/ResponseHeaderDirective.ts');
-require('components/state/SolutionEditorDirective.ts');
+require('components/state-directives/response-header/response-header.directive.ts');
+require('components/state-directives/solution-editor/solution-editor.directive.ts');
 
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');

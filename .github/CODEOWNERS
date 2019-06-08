@@ -268,7 +268,7 @@
 /core/storage/skill/ @aks681
 /core/templates/dev/head/components/entity-creation-services/skill-creation.service.ts @aks681
 /core/templates/dev/head/components/SummaryListHeaderDirective*.ts @aks681
-/core/templates/dev/head/components/summary_list_header_directive.html @aks681
+/core/templates/dev/head/components/state-directives/answer-group-editor/summary-list-header.directive.html @aks681
 /core/templates/dev/head/domain/skill/ @aks681
 /core/templates/dev/head/pages/skill_editor/ @aks681
 

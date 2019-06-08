@@ -16,7 +16,9 @@
  * @fileoverview Directive for the solution editor.
  */
 
-require('components/state/SolutionExplanationEditorDirective.ts');
+require(
+  'components/state-directives/solution-editor/' +
+  'solution-explanation-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -50,7 +52,8 @@ oppia.directive('solutionEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/solution_editor_directive.html'),
+        '/components/state-directives/solution-editor/' +
+        'solution-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'StateSolutionService',

@@ -31,7 +31,8 @@ oppia.directive('solutionExplanationEditor', [
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state/solution_explanation_editor_directive.html'),
+        '/components/state-directives/solution-editor/' +
+        'solution-explanation-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'EditabilityService', 'StateSolutionService',
