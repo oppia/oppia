@@ -188,28 +188,18 @@ describe('State Rules Stats Service', function() {
       );
     });
 
-    it('should not provide answers from null interaction ids', function() {
+    it('should not fetch or return answers for null interactions', function() {
       var MOCK_STATE = {name: 'Hola', interaction: {id: null}};
-      var MOCK_STATE_RULES_STATS_RESPONSE = {
-        visualizations_info: [{
-          data: [
-            {answer: 'Ni Hao', frequency: 5},
-            {answer: 'Aloha', frequency: 3},
-            {answer: 'Hola', frequency: 1},
-          ],
-        }],
-      };
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
-      $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola')
-        .respond(MOCK_STATE_RULES_STATS_RESPONSE);
 
       StateRulesStatsService.computeStateRulesStats(MOCK_STATE)
         .then(successHandler, failureHandler);
-      $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(
-        jasmine.objectContaining({visualizations_info: []}));
+      expect($httpBackend.flush).toThrowError('No pending request to flush !');
+      expect(successHandler).toHaveBeenCalledWith(jasmine.objectContaining({
+        visualizations_info: [],
+      }));
       expect(failureHandler).not.toHaveBeenCalled();
     });
   });
