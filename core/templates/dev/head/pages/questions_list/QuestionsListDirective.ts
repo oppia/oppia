@@ -20,14 +20,14 @@
 require('directives/AngularHtmlBindDirective.ts');
 require('pages/question_editor/QuestionEditorDirective.ts');
 
-require('components/QuestionCreationService.ts');
+require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/question/EditableQuestionBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/topic_editor/TopicEditorStateService.ts');
 require('pages/state_editor/state_properties/StateEditorService.ts');
 require('services/AlertsService.ts');
