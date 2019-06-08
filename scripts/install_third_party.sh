@@ -110,6 +110,19 @@ if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
 fi
 
+echo Checking if Pillow is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/Pillow-6.0.0" ]; then
+  echo Installing Pillow
+
+  pip_install Pillow==6.0.0 --target="$TOOLS_DIR/Pillow-6.0.0"
+
+  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
+    echo "  Pillow install failed. See troubleshooting instructions at:"
+    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
+  fi
+
+fi
+
 echo Checking if pylint-quotes is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/pylint-quotes-0.1.9" ]; then
   echo Installing pylint-quotes
@@ -172,18 +185,6 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
   pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
-fi
-
-echo Checking if PIL is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/PIL-1.1.7" ]; then
-  echo Installing PIL
-
-  pip_install http://effbot.org/downloads/Imaging-1.1.7.tar.gz --target="$TOOLS_DIR/PIL-1.1.7"
-
-  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
-    echo "  PIL install failed. See troubleshooting instructions at:"
-    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
-  fi
 fi
 
 echo Checking if PyGithub is installed in $TOOLS_DIR
