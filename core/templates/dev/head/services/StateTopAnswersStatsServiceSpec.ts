@@ -340,8 +340,11 @@ describe('StateTopAnswersStatsService', function() {
           .toContain(joC({answer: 'hola'}));
       });
 
-      it('deletes stats when interaction changes', function() {
-        expect(this.stass.hasStateStats('Hola')).toBe(true);
+      it('removes stat answers when interaction changes', function() {
+        expect(this.stass.getStateStats('Hola').length)
+          .toBeGreaterThan(0);
+        expect(this.stass.getUnresolvedStateStats('Hola').length)
+          .toBeGreaterThan(0);
 
         this.ess.saveInteractionId('Hola', 'FractionInput');
         this.ess.saveInteractionCustomizationArgs('Hola', {
@@ -351,7 +354,10 @@ describe('StateTopAnswersStatsService', function() {
           customPlaceholder: '',
         });
 
-        expect(this.stass.hasStateStats('Hola')).toBe(false);
+        expect(this.stass.getStateStats('Hola').length)
+          .toEqual(0);
+        expect(this.stass.getUnresolvedStateStats('Hola').length)
+          .toEqual(0);
       });
     });
   });

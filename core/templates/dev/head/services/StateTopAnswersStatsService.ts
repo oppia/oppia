@@ -56,7 +56,12 @@ oppia.factory('StateTopAnswersStatsService', [
       var stateStats = stateTopAnswersStatsCache[stateName];
 
       if (stateStats.interactionId !== state.interaction.id) {
-        delete stateTopAnswersStatsCache[stateName];
+        // Old answers are no longer helpful when the interaction changes, so
+        // remove them all.
+        stateTopAnswersStatsCache[stateName] = {
+          allAnswers: [],
+          unresolvedAnswers: []
+        };
         return;
       }
 
