@@ -72,7 +72,7 @@ class GetStartedPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.GET_STARTED_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/get_started.html')
+        self.render_template('dist/get-started-page.mainpage.html')
 
 
 class TeachPage(base.BaseHandler):

@@ -108,7 +108,7 @@ oppia.controller('Stewards', [
     };
 
     // Note: This should be kept in sync with the CSS media query on
-    // landing_page_stewards.html.
+    // stewards-landing-page.mainpage.html.
     var isWindowNarrow = function(windowWidthPx) {
       return windowWidthPx <= 890;
     };
