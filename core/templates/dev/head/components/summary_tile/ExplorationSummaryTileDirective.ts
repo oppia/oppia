@@ -16,7 +16,7 @@
  * @fileoverview Component for an exploration summary tile.
  */
 
-require('components/summary_tile/CircularImageDirective.ts');
+require('components/profile-link-directives/circular-image.directive.ts');
 require('domain/learner_dashboard/LearnerDashboardIconsDirective.ts');
 require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');

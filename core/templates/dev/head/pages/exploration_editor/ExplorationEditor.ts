@@ -130,7 +130,7 @@ require(
   'attribution-guide.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require('components/profile_link/ProfileLinkTextDirective.ts');
+require('components/profile-link-directives/profile-link-text.directive.ts');
 require('pages/exploration_editor/EditorNavbarBreadcrumbDirective.ts');
 require('pages/exploration_editor/EditorNavigationDirective.ts');
 require('pages/exploration_editor/ExplorationObjectiveEditorDirective.ts');

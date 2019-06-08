@@ -28,8 +28,8 @@ oppia.directive('profileLinkImage', [
         username: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile_link/' +
-        'profile_link_image_directive.html'),
+        '/components/profile-link-directives/' +
+        'profile-link-image.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http',

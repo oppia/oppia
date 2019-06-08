@@ -28,7 +28,7 @@ oppia.directive('circularImage', [
         link: '&?'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/summary_tile/circular_image_directive.html'),
+        '/components/profile-link-directives/circular-image.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
