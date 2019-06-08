@@ -71,6 +71,7 @@ module.exports = {
     stewards: commonPrefix + '/pages/landing/stewards/Stewards.ts',
     story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
     teach: commonPrefix + '/pages/teach/Teach.ts',
+    terms: commonPrefix + '/pages/terms/Terms.ts',
     thanks: commonPrefix + '/pages/thanks/Thanks.ts',
     topic_editor: commonPrefix + '/pages/topic_editor/TopicEditor.ts',
     topics_and_skills_dashboard: (
@@ -350,7 +351,14 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['app', 'terms'],
       filename: 'terms.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a 501(c)(3) registered non-profit open-source' +
+        ' e-learning platform. Learn about our terms and conditions for ' +
+        'creating and distributing learning material.'
+      },
       template: commonPrefix + '/pages/terms/terms.html',
       minify: htmlMinifyConfig,
       inject: false
