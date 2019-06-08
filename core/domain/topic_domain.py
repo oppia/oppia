@@ -554,34 +554,6 @@ class Topic(object):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
-    @classmethod
-    def update_subtopics_from_model(
-            cls, versioned_subtopics, current_version):
-        """Converts the subtopics blob contained in the given
-        versioned_subtopics dict from current_version to
-        current_version + 1. Note that the versioned_subtopics being
-        passed in is modified in-place.
-
-        Args:
-            versioned_subtopics: dict. A dict with two keys:
-                - schema_version: str. The schema version for the
-                    subtopics dict.
-                - subtopics: list(dict). The list of dicts comprising the
-                    subtopics of the skill.
-            current_version: int. The current schema version of subtopics.
-        """
-        versioned_subtopics['schema_version'] = current_version + 1
-
-        conversion_fn = getattr(
-            cls, '_convert_subtopic_v%s_dict_to_v%s_dict' % (
-                current_version, current_version + 1))
-
-        updated_subtopics = []
-        for subtopic in versioned_subtopics['subtopics']:
-            updated_subtopics.append(conversion_fn(subtopic))
-
-        versioned_subtopics['subtopics'] = updated_subtopics
-
     def update_name(self, new_name):
         """Updates the name of a topic object.
 

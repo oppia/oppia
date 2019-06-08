@@ -98,7 +98,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_get_topic_from_model(self):
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
         topic = topic_services.get_topic_from_model(topic_model)
-
         self.assertEqual(topic.to_dict(), self.topic.to_dict())
 
     def test_get_topic_summary_from_model(self):
@@ -166,6 +165,64 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_services.get_all_skill_ids_assigned_to_some_topic(),
             set([self.skill_id_1, self.skill_id_2, 'skill_3']))
+
+    def test_cannot_create_topic_change_class_with_invalid_changelist(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicChange({
+                'invalid_cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
+
+    def test_cannot_update_topic_property_with_invalid_changelist(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': 'invalid property',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
+
+    def test_cannot_update_subtopic_property_with_invalid_changelist(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                'property_name': 'invalid property',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
+
+    def test_update_subtopic_property(self):
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'Title')
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'title',
+            'subtopic_id': 1,
+            'old_value': 'Title',
+            'new_value': 'New Title'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Update title of subtopic.')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'New Title')
+
+    def test_cannot_create_topic_change_class_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicChange({
+                'cmd': 'invalid cmd',
+                'property_name': 'title',
+                'subtopic_id': 1,
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
 
     def test_update_topic(self):
         topic_services.assign_role(
