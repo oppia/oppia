@@ -851,6 +851,7 @@ class UserInfoHandlerTests(test_utils.GenericTestBase):
         """Test the language is saved in the preferences when handler is
         called.
         """
+        self.signup(self.EDITOR_EMAIL, None)
         self.login(self.EDITOR_EMAIL)
         json_response = self.get_json('/userinfohandler')
         self.assertDictEqual({
