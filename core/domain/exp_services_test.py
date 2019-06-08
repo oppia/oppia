@@ -1255,7 +1255,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         with prod_mode_swap, max_resize_dimension_px_swap:
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(
-                    'exploration/%s' % self.EXPLORATION_ID))
+                    fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
 
             self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
             self.assertFalse(
@@ -1298,7 +1298,7 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         with self.swap(constants, 'DEV_MODE', False):
             fs = fs_domain.AbstractFileSystem(
                 fs_domain.GcsFileSystem(
-                    'exploration/%s' % self.EXPLORATION_ID))
+                    fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
 
             self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
             self.assertFalse(
