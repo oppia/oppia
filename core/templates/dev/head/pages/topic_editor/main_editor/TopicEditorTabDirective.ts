@@ -15,6 +15,15 @@
 /**
  * @fileoverview Controller for the main topic editor.
  */
+
+require('pages/topic_editor/main_editor/StoriesListDirective.ts');
+
+require('components/entity-creation-services/story-creation.service.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/topic/TopicUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/topic_editor/TopicEditorStateService.ts');
+
 oppia.directive('topicEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

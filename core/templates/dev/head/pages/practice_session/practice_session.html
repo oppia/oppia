@@ -1,8 +1,16 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Practice Session: {{ topic_name }} - Oppia
 {% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+  </script>
+
+{% endblock header_js %}
 
 {% block navbar_breadcrumb %}
   <div class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
@@ -47,13 +55,30 @@
       }
     }
   </style>
+
 {% endblock %}
 
 {% block footer_js %}
-  {{ super() }}
-  <script src="/templates/dev/head/domain/question/QuestionPlayerBackendApiService.js"></script>
-  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
-  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
-  <script src="/templates/dev/head/pages/question_player/QuestionPlayerDirective.js"></script>
-  <script src="/templates/dev/head/pages/practice_session/PracticeSession.js"></script>
+ {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+
+  <script src="/templates/dev/head/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
+  <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
+
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+  {% include 'components/ck-editor-helpers/rich-text-components.template.html' %}
+  {{ interaction_templates }}
+  {{ dependencies_html }}
 {% endblock footer_js %}

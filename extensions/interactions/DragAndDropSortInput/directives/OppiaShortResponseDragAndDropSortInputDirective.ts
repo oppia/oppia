@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the DragAndDropSortInput short response.
+ * @fileoverview Directive for the DragAndDropSortInput short response.
  */
 
 oppia.directive('oppiaShortResponseDragAndDropSortInput', [
@@ -22,21 +22,24 @@ oppia.directive('oppiaShortResponseDragAndDropSortInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/DragAndDropSortInput/directives/' +
         'drag_and_drop_sort_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.chooseItemType = function(index) {
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.chooseItemType = function(index) {
           if (index === 0) {
-            $scope.itemtype = 'drag-and-drop-response-item';
+            ctrl.itemtype = 'drag-and-drop-response-item';
           } else {
-            $scope.itemtype = 'drag-and-drop-response-subitem';
+            ctrl.itemtype = 'drag-and-drop-response-subitem';
           }
           return true;
         };
 
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.isAnswerLengthGreaterThanZero = ($scope.answer.length > 0);
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.isAnswerLengthGreaterThanZero = (ctrl.answer.length > 0);
       }]
     };
   }

@@ -1,4 +1,4 @@
-{% extends 'pages/base.html' %}
+{% extends 'dist/base.html' %}
 
 {% block maintitle %}
   Profile - Oppia
@@ -423,20 +423,18 @@
 {% endblock %}
 
 {% block footer %}
-  {% include 'pages/footer.html' %}
+  <oppia-footer></oppia-footer>
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/templates/dev/head/filters/ConvertToPlainTextFilter.js"></script>
-  <script src="/templates/dev/head/filters/SummarizeNonnegativeNumberFilter.js"></script>
-  <script src="/templates/dev/head/filters/TruncateFilter.js"></script>
-  <script src="/templates/dev/head/filters/TruncateAndCapitalizeFilter.js"></script>
-
-  <script src="/templates/dev/head/pages/profile/Profile.js"></script>
-
-  <script src="/templates/dev/head/components/RatingComputationService.js"></script>
-  <script src="/templates/dev/head/components/summary_tile/ExplorationSummaryTileDirective.js"></script>
-  <script src="/templates/dev/head/components/summary_tile/CircularImageDirective.js"></script>
-  <script src="/templates/dev/head/components/background/BackgroundBannerDirective.js"></script>
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
 {% endblock footer_js %}

@@ -15,6 +15,37 @@
 /**
  * @fileoverview Directive for managing the state responses in the state editor.
  */
+require('components/state/AnswerGroupEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
+
+require('domain/exploration/AnswerGroupObjectFactory.ts');
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/RuleObjectFactory.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
+require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require(
+  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/state_editor/state_properties/StateContentService.ts');
+require('pages/state_editor/state_properties/StateCustomizationArgsService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateHintsService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+require('pages/state_editor/state_properties/StateSolutionService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
+require('services/GenerateContentIdService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -17,6 +17,9 @@
  * about the rights for this exploration.
  */
 
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('services/AlertsService.ts');
+
 oppia.factory('ExplorationRightsService', [
   '$http', 'AlertsService', 'ExplorationDataService', 'ACTIVITY_STATUS_PRIVATE',
   'ACTIVITY_STATUS_PUBLIC',
@@ -24,11 +27,11 @@ oppia.factory('ExplorationRightsService', [
       ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC) {
     return {
       init: function(
-          ownerNames, editorNames, translatorNames, viewerNames, status,
+          ownerNames, editorNames, voiceArtistNames, viewerNames, status,
           clonedFrom, isCommunityOwned, viewableIfPrivate) {
         this.ownerNames = ownerNames;
         this.editorNames = editorNames;
-        this.translatorNames = translatorNames;
+        this.voiceArtistNames = voiceArtistNames;
         this.viewerNames = viewerNames;
         this._status = status;
         // This is null if the exploration was not cloned from anything,
@@ -68,7 +71,7 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
             data.rights.status, data.rights.cloned_from,
             data.rights.community_owned, data.rights.viewable_if_private);
         });
@@ -86,7 +89,7 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
             data.rights.status, data.rights.cloned_from,
             data.rights.community_owned, data.rights.viewable_if_private);
         });
@@ -105,7 +108,7 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
             data.rights.status, data.rights.cloned_from,
             data.rights.community_owned, data.rights.viewable_if_private);
         });
@@ -122,7 +125,7 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
             data.rights.status, data.rights.cloned_from,
             data.rights.community_owned, data.rights.viewable_if_private);
         });
@@ -141,7 +144,7 @@ oppia.factory('ExplorationRightsService', [
           AlertsService.clearWarnings();
           that.init(
             data.rights.owner_names, data.rights.editor_names,
-            data.rights.translator_names, data.rights.viewer_names,
+            data.rights.voice_artist_names, data.rights.viewer_names,
             data.rights.status, data.rights.cloned_from,
             data.rights.community_owned, data.rights.viewable_if_private);
         });

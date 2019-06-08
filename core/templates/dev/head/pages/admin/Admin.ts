@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,36 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia admin page.
+ * @fileoverview Directives required in admin panel.
  */
 
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
-oppia.constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
-oppia.constant('PROFILE_URL_TEMPLATE', '/profile/<username>');
-oppia.constant(
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-oppia.constant(
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
-
-oppia.controller('Admin', [
-  '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
-  function($http, $location, $scope, AdminRouterService, DEV_MODE) {
-    $scope.userEmail = GLOBALS.USER_EMAIL;
-    $scope.inDevMode = DEV_MODE;
-
-    $scope.statusMessage = '';
-    $scope.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
-    $scope.isJobsTabOpen = AdminRouterService.isJobsTabOpen;
-    $scope.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
-    $scope.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
-    $scope.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
-
-    $scope.setStatusMessage = function(statusMessage) {
-      $scope.statusMessage = statusMessage;
-    };
-
-    $scope.$on('$locationChangeSuccess', function() {
-      AdminRouterService.showTab($location.path().replace('/', '#'));
-    });
-  }
-]);
+require('pages/admin/AdminPageDirective.ts');

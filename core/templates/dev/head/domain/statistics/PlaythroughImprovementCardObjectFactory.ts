@@ -16,6 +16,11 @@
  * @fileoverview Factory for creating Playthrough Cards in the Improvements Tab.
  */
 
+
+require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PlaythroughIssuesService.ts');
+
 oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
@@ -35,7 +40,8 @@ oppia.factory('PlaythroughImprovementCardObjectFactory', [
       var discardThis = function() {
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/confirmation_modal_directive.html'),
+            '/components/common-layout-directives/common-elements/' +
+            'confirmation-modal.template.html'),
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance',

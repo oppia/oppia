@@ -16,6 +16,31 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
+
+require('domain/exploration/StatesObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/AutosaveInfoModalsService.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationCategoryService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationDiffService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationLanguageCodeService.ts');
+require('pages/exploration_editor/ExplorationObjectiveService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationTagsService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('services/AlertsService.ts');
+require('services/ContextService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',

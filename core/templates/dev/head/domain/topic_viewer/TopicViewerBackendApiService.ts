@@ -15,6 +15,9 @@
 /**
  * @fileoverview Service to get topic data.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.constant(
   'TOPIC_DATA_URL_TEMPLATE', '/topic_data_handler/<topic_name>');
 

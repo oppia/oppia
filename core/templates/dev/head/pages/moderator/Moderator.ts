@@ -13,8 +13,43 @@
 // limitations under the License.
 
 /**
-* @fileoverview Data and controllers for the Oppia moderator page.
-*/
+ * @fileoverview Data and controllers for the Oppia moderator page.
+ */
+
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require('filters/convert-unicode-with-params-to-html.filter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
 
 oppia.controller('Moderator', [
   '$http', '$rootScope', '$scope', 'AlertsService', 'DateTimeFormatService',

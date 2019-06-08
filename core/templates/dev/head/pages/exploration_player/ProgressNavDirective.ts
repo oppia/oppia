@@ -16,6 +16,17 @@
  * @fileoverview Directive for navigation in the conversation skin.
  */
 
+require('pages/exploration_player/ContinueButtonDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/ExplorationEngineService.ts');
+require('pages/exploration_player/ExplorationPlayerStateService.ts');
+require('pages/exploration_player/PlayerConstants.ts');
+require('pages/exploration_player/PlayerPositionService.ts');
+require('pages/exploration_player/PlayerTranscriptService.ts');
+require('services/contextual/UrlService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 oppia.directive('progressNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -56,7 +67,7 @@ oppia.directive('progressNav', [
               $scope.displayedCardIndex);
             $scope.conceptCardIsBeingShown = (
               $scope.displayedCard.getStateName() === null &&
-              !ExplorationPlayerStateService.isInPretestMode());
+              !ExplorationPlayerStateService.isInQuestionMode());
             var interaction = $scope.displayedCard.getInteraction();
             if (!$scope.conceptCardIsBeingShown) {
               interactionIsInline = (
@@ -89,6 +100,7 @@ oppia.directive('progressNav', [
               PlayerPositionService.setDisplayedCardIndex(index);
               $rootScope.$broadcast('updateActiveStateIfInEditor',
                 PlayerPositionService.getCurrentStateName());
+              $rootScope.$broadcast('currentQuestionChanged', index);
             } else {
               throw Error('Target card index out of bounds.');
             }

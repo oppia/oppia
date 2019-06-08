@@ -16,6 +16,15 @@
  * @fileoverview Services for stats reporting.
  */
 
+require('domain/utilities/StopwatchObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_player/AnswerClassificationService.ts');
+require('pages/exploration_player/PlayerConstants.ts');
+require('services/ContextService.ts');
+require('services/MessengerService.ts');
+require('services/PlaythroughService.ts');
+require('services/SiteAnalyticsService.ts');
+
 oppia.constant('STATS_EVENT_TYPES', {
   EVENT_TYPE_START_EXPLORATION: 'start',
   EVENT_TYPE_ACTUAL_START_EXPLORATION: 'actual_start',
@@ -68,6 +77,7 @@ oppia.factory('StatsReportingService', [
     var explorationIsComplete = false;
 
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
+    var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
 
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for
@@ -106,7 +116,7 @@ oppia.factory('StatsReportingService', [
         });
     };
 
-    if (!_editorPreviewMode) {
+    if (!_editorPreviewMode && !_questionPlayerMode ) {
       $interval(function() {
         postStatsToBackend();
       }, 300000);

@@ -16,6 +16,15 @@
  * @fileoverview Unit tests for the training data service.
  */
 
+require('App.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/state_editor/state_properties/StateInteractionIdService.ts');
+
 describe('TrainingDataService', function() {
   var $httpBackend;
   var scope, siis, ecs, cls, rs, tds, ess, IS, oof;
@@ -67,10 +76,12 @@ describe('TrainingDataService', function() {
           content_id: 'content',
           html: 'State Content'
         },
-        content_ids_to_audio_translations: {
-          content: {},
-          default_outcome: {},
-          feedback_1: {}
+        recorded_voiceovers: {
+          voiceovers_mapping: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
+          }
         },
         interaction: {
           id: 'TextInput',

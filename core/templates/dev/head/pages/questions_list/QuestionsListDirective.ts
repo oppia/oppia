@@ -16,11 +16,29 @@
 /**
  * @fileoverview Controller for the questions list.
  */
+
+require('directives/AngularHtmlBindDirective.ts');
+require('pages/question_editor/QuestionEditorDirective.ts');
+
+require('components/entity-creation-services/question-creation.service.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/skill/EditableSkillBackendApiService.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+
 oppia.directive('questionsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getSkill: '&skill',
         getTopicId: '&topicId',
         getQuestionSummaries: '=',
@@ -32,6 +50,7 @@ oppia.directive('questionsList', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/questions_list/questions_list_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$uibModal', '$window',
         'AlertsService', 'QuestionCreationService', 'UrlService',
@@ -46,106 +65,107 @@ oppia.directive('questionsList', [
             EditableSkillBackendApiService, MisconceptionObjectFactory,
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             StateEditorService, QuestionUndoRedoService, UndoRedoService) {
-          $scope.currentPage = 0;
+          var ctrl = this;
+          ctrl.currentPage = 0;
 
           var _initTab = function() {
-            $scope.questionEditorIsShown = false;
-            $scope.question = null;
-            $scope.questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage);
-            $scope.truncatedQuestionSummaries = [];
-            if ($scope.questionSummaries) {
-              $scope.truncatedQuestionSummaries =
-                $scope.questionSummaries.map(function(question) {
+            ctrl.questionEditorIsShown = false;
+            ctrl.question = null;
+            ctrl.questionSummaries =
+              ctrl.getQuestionSummaries(ctrl.currentPage);
+            ctrl.truncatedQuestionSummaries = [];
+            if (ctrl.questionSummaries) {
+              ctrl.truncatedQuestionSummaries =
+                ctrl.questionSummaries.map(function(question) {
                   var summary = $filter(
                     'formatRtePreview')(question.summary.question_content);
                   summary = $filter('truncate')(summary, 100);
                   return summary;
                 });
             }
-            $scope.activeQuestion = null;
-            $scope.questionIsBeingUpdated = false;
-            $scope.misconceptions = [];
-            if ($scope.getSkill()) {
-              $scope.misconceptions = $scope.getSkill().getMisconceptions();
-              $scope.skillId = $scope.getSkill().getId();
-              $scope.entityId = $scope.skillId;
+            ctrl.activeQuestion = null;
+            ctrl.questionIsBeingUpdated = false;
+            ctrl.misconceptions = [];
+            if (ctrl.getSkill()) {
+              ctrl.misconceptions = ctrl.getSkill().getMisconceptions();
+              ctrl.skillId = ctrl.getSkill().getId();
+              ctrl.entityId = ctrl.skillId;
             } else {
-              $scope.entityId = $scope.getTopicId();
+              ctrl.entityId = ctrl.getTopicId();
             }
           };
 
-          $scope.getQuestionIndex = function(index) {
-            return $scope.currentPage * NUM_QUESTIONS_PER_PAGE + index + 1;
+          ctrl.getQuestionIndex = function(index) {
+            return ctrl.currentPage * NUM_QUESTIONS_PER_PAGE + index + 1;
           };
 
-          $scope.goToNextPage = function() {
-            $scope.currentPage++;
+          ctrl.goToNextPage = function() {
+            ctrl.currentPage++;
             var questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage);
+              ctrl.getQuestionSummaries(ctrl.currentPage);
             if (questionSummaries === null) {
-              $scope.fetchQuestionSummaries($scope.entityId, false);
+              ctrl.fetchQuestionSummaries(ctrl.entityId, false);
             } else {
-              $scope.questionSummaries = questionSummaries;
+              ctrl.questionSummaries = questionSummaries;
             }
           };
 
-          $scope.goToPreviousPage = function() {
-            $scope.currentPage--;
-            $scope.questionSummaries =
-              $scope.getQuestionSummaries($scope.currentPage);
+          ctrl.goToPreviousPage = function() {
+            ctrl.currentPage--;
+            ctrl.questionSummaries =
+              ctrl.getQuestionSummaries(ctrl.currentPage);
           };
 
-          $scope.saveAndPublishQuestion = function() {
-            var validationErrors = $scope.question.validate(
-              $scope.misconceptions);
+          ctrl.saveAndPublishQuestion = function() {
+            var validationErrors = ctrl.question.validate(
+              ctrl.misconceptions);
             if (validationErrors) {
               AlertsService.addWarning(validationErrors);
               return;
             }
-            if (!$scope.questionIsBeingUpdated) {
+            if (!ctrl.questionIsBeingUpdated) {
               EditableQuestionBackendApiService.createQuestion(
-                $scope.skillId, $scope.question.toBackendDict(true)
+                ctrl.skillId, ctrl.question.toBackendDict(true)
               ).then(function() {
-                $scope.fetchQuestionSummaries($scope.entityId, true);
-                $scope.questionIsBeingSaved = false;
-                $scope.currentPage = 0;
+                ctrl.fetchQuestionSummaries(ctrl.entityId, true);
+                ctrl.questionIsBeingSaved = false;
+                ctrl.currentPage = 0;
               });
             } else {
               if (QuestionUndoRedoService.hasChanges()) {
-                $scope.questionIsBeingSaved = true;
+                ctrl.questionIsBeingSaved = true;
                 // TODO(tjiang11): Allow user to specify a commit message.
                 EditableQuestionBackendApiService.updateQuestion(
-                  $scope.questionId, $scope.question.getVersion(), 'blank',
+                  ctrl.questionId, ctrl.question.getVersion(), 'blank',
                   QuestionUndoRedoService.getCommittableChangeList()).then(
                   function() {
                     QuestionUndoRedoService.clearChanges();
-                    $scope.questionIsBeingSaved = false;
-                    $scope.fetchQuestionSummaries($scope.entityId, true);
+                    ctrl.questionIsBeingSaved = false;
+                    ctrl.fetchQuestionSummaries(ctrl.entityId, true);
                   }, function(error) {
                     AlertsService.addWarning(
                       error || 'There was an error saving the question.');
-                    $scope.questionIsBeingSaved = false;
+                    ctrl.questionIsBeingSaved = false;
                   });
               }
             }
           };
 
-          $scope.initializeNewQuestionCreation = function() {
-            $scope.question =
+          ctrl.initializeNewQuestionCreation = function() {
+            ctrl.question =
               QuestionObjectFactory.createDefaultQuestion();
-            $scope.questionId = $scope.question.getId();
-            $scope.questionStateData = $scope.question.getStateData();
-            $scope.questionIsBeingUpdated = false;
-            $scope.openQuestionEditor();
+            ctrl.questionId = ctrl.question.getId();
+            ctrl.questionStateData = ctrl.question.getStateData();
+            ctrl.questionIsBeingUpdated = false;
+            ctrl.openQuestionEditor();
           };
 
-          $scope.createQuestion = function() {
-            if ($scope.getSkill()) {
-              $scope.initializeNewQuestionCreation();
+          ctrl.createQuestion = function() {
+            if (ctrl.getSkill()) {
+              ctrl.initializeNewQuestionCreation();
               return;
             }
-            var allSkillSummaries = $scope.getAllSkillSummaries();
+            var allSkillSummaries = ctrl.getAllSkillSummaries();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/questions/' +
@@ -181,55 +201,55 @@ oppia.directive('questionsList', [
             });
 
             modalInstance.result.then(function(skillId) {
-              $scope.skillId = skillId;
+              ctrl.skillId = skillId;
               EditableSkillBackendApiService.fetchSkill(
                 skillId).then(
                 function(skillDict) {
-                  $scope.misconceptions = skillDict.misconceptions.map(function(
+                  ctrl.misconceptions = skillDict.misconceptions.map(function(
                       misconceptionsBackendDict) {
                     return MisconceptionObjectFactory.createFromBackendDict(
                       misconceptionsBackendDict);
                   });
-                  $scope.initializeNewQuestionCreation();
+                  ctrl.initializeNewQuestionCreation();
                 }, function(error) {
                   AlertsService.addWarning();
                 });
             });
           };
 
-          $scope.editQuestion = function(questionSummary) {
-            $scope.misconceptions = [];
+          ctrl.editQuestion = function(questionSummary) {
+            ctrl.misconceptions = [];
             EditableQuestionBackendApiService.fetchQuestion(
               questionSummary.id).then(function(response) {
               if (response.associated_skill_dicts) {
                 response.associated_skill_dicts.forEach(function(skillDict) {
                   skillDict.misconceptions.forEach(function(misconception) {
-                    $scope.misconceptions.push(
+                    ctrl.misconceptions.push(
                       MisconceptionObjectFactory.createFromBackendDict(
                         misconception));
                   });
                 });
               }
-              $scope.question =
+              ctrl.question =
                 QuestionObjectFactory.createFromBackendDict(
                   response.question_dict);
-              $scope.questionId = $scope.question.getId();
-              $scope.questionStateData = $scope.question.getStateData();
-              $scope.questionIsBeingUpdated = true;
+              ctrl.questionId = ctrl.question.getId();
+              ctrl.questionStateData = ctrl.question.getStateData();
+              ctrl.questionIsBeingUpdated = true;
 
-              $scope.openQuestionEditor();
+              ctrl.openQuestionEditor();
             }, function(errorResponse) {
               AlertsService.addWarning(
                 errorResponse.error || 'Failed to fetch question.');
             });
           };
 
-          $scope.openQuestionEditor = function() {
-            var question = $scope.question;
-            var questionStateData = $scope.questionStateData;
-            var questionId = $scope.questionId;
-            var canEditQuestion = $scope.canEditQuestion();
-            var misconceptions = $scope.misconceptions;
+          ctrl.openQuestionEditor = function() {
+            var question = ctrl.question;
+            var questionStateData = ctrl.questionStateData;
+            var questionId = ctrl.questionId;
+            var canEditQuestion = ctrl.canEditQuestion();
+            var misconceptions = ctrl.misconceptions;
             QuestionUndoRedoService.clearChanges();
 
             var modalInstance = $uibModal.open({
@@ -303,27 +323,27 @@ oppia.directive('questionsList', [
             });
 
             modalInstance.result.then(function() {
-              $scope.saveAndPublishQuestion();
+              ctrl.saveAndPublishQuestion();
             });
           };
 
-          $scope.setActiveQuestion = function(questionSuggestionThread) {
+          ctrl.setActiveQuestion = function(questionSuggestionThread) {
             if (questionSuggestionThread.getSuggestionStatus() === 'review') {
-              $scope.activeQuestion = (
+              ctrl.activeQuestion = (
                 questionSuggestionThread.suggestion.question);
-              $scope.idOfActiveSuggestion = (
+              ctrl.idOfActiveSuggestion = (
                 questionSuggestionThread.suggestion.suggestionId);
             }
           };
 
-          $scope.clearActiveQuestion = function() {
-            $scope.activeQuestion = null;
-            $scope.idOfActiveSuggestion = null;
-            $scope.suggestionReviewMessage = null;
+          ctrl.clearActiveQuestion = function() {
+            ctrl.activeQuestion = null;
+            ctrl.idOfActiveSuggestion = null;
+            ctrl.suggestionReviewMessage = null;
           };
 
-          $scope.showSelectSkillModal = function() {
-            var allSkillSummaries = $scope.getAllSkillSummaries();
+          ctrl.showSelectSkillModal = function() {
+            var allSkillSummaries = ctrl.getAllSkillSummaries();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/questions/' +
@@ -351,10 +371,10 @@ oppia.directive('questionsList', [
                 }
               ]
             }).result.then(function(res) {
-              $scope.selectedSkillId = res.skillId;
+              ctrl.selectedSkillId = res.skillId;
               EditableSkillBackendApiService.fetchSkill(res.skillId).then(
                 function(skillDict) {
-                  $scope.misconceptions = skillDict.misconceptions.map(function(
+                  ctrl.misconceptions = skillDict.misconceptions.map(function(
                       misconceptionsBackendDict) {
                     return MisconceptionObjectFactory.createFromBackendDict(
                       misconceptionsBackendDict);
@@ -365,29 +385,29 @@ oppia.directive('questionsList', [
             });
           };
 
-          $scope.acceptQuestion = function(suggestionId, reviewMessage) {
+          ctrl.acceptQuestion = function(suggestionId, reviewMessage) {
             var suggestionActionHandlerUrl = (
               UrlInterpolationService.interpolateUrl(
                 '/suggestionactionhandler/topic/<topic_id>/<suggestion_id>', {
-                  topic_id: $scope.getTopicId(),
+                  topic_id: ctrl.getTopicId(),
                   suggestion_id: suggestionId
                 }));
             $http.put(suggestionActionHandlerUrl, {
               action: 'accept',
-              skill_id: $scope.selectedSkillId,
+              skill_id: ctrl.selectedSkillId,
               commit_message: 'unused_commit_message',
               review_message: reviewMessage
             }).then(function() {
-              $scope.clearActiveQuestion();
+              ctrl.clearActiveQuestion();
               $window.location.reload();
             });
           };
 
-          $scope.rejectQuestion = function(suggestionId, reviewMessage) {
+          ctrl.rejectQuestion = function(suggestionId, reviewMessage) {
             var suggestionActionHandlerUrl = (
               UrlInterpolationService.interpolateUrl(
                 '/suggestionactionhandler/topic/<topic_id>/<suggestion_id>', {
-                  topic_id: $scope.getTopicId(),
+                  topic_id: ctrl.getTopicId(),
                   suggestion_id: suggestionId
                 }));
             $http.put(suggestionActionHandlerUrl, {
@@ -395,7 +415,7 @@ oppia.directive('questionsList', [
               commit_message: 'unused_commit_message',
               review_message: reviewMessage
             }).then(function() {
-              $scope.clearActiveQuestion();
+              ctrl.clearActiveQuestion();
               $window.location.reload();
             });
           };

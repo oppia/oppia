@@ -11,12 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+/**
+ * @fileoverview Expression syntax tree service.
+ */
+
+require('expressions/ExpressionParserService.js');
+
 oppia.factory('ExpressionSyntaxTreeService', [
   '$log', 'ExpressionParserService', 'PARAMETER_TYPES',
   function($log, ExpressionParserService, PARAMETER_TYPES) {
     // Exceptions that can be thrown from the evaluation of expressions.
-    var ExpressionError = function() {
-    };
+    const ExpressionError = function() {};
     ExpressionError.prototype = new Error();
     ExpressionError.prototype.constructor = ExpressionError;
 
@@ -128,23 +134,17 @@ oppia.factory('ExpressionSyntaxTreeService', [
      * can be system or user defined functions and parameters, as well as
      * system operators.
      * @param {string} name The name to look up.
-     * @param {!Array.<!Object>} envs Represents a nested name space
+     * @param {!Array.<!object>} envs Represents a nested name space
      *     environment to look up the name in. The first element is looked up
      *     first (i.e. has higher precedence).
      * @throws {ExprUndefinedVarError} The named variable was not found in
      *     the given environment.
      */
-    var lookupEnvs = function(name, envs) {
-      // Parameter value look up.
-      var value;
-      if (envs.some(function(env) {
+    const lookupEnvs = (name: string, envs: object[]) => {
+      for (const env of envs) {
         if (env.hasOwnProperty(name)) {
-          value = env[name];
-          return true;
+          return env[name];
         }
-        return false;
-      })) {
-        return value;
       }
 
       throw new ExprUndefinedVarError(name, envs);

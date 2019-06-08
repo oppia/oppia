@@ -16,31 +16,47 @@
  * @fileoverview Directive for creating a new collection node.
  */
 
+require('domain/collection/CollectionNodeObjectFactory.ts');
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/collection/SearchExplorationsBackendApiService.ts');
+require('domain/summary/ExplorationSummaryBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require('services/AlertsService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/ValidatorsService.ts');
+
 oppia.directive('collectionNodeCreator', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/' +
         'collection_node_creator_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$http', '$window', '$filter', 'AlertsService',
+        '$http', '$window', '$filter', 'AlertsService',
         'ValidatorsService', 'CollectionEditorStateService',
         'CollectionLinearizerService', 'CollectionUpdateService',
         'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'SiteAnalyticsService',
         'INVALID_NAME_CHARS',
         function(
-            $scope, $http, $window, $filter, AlertsService,
+            $http, $window, $filter, AlertsService,
             ValidatorsService, CollectionEditorStateService,
             CollectionLinearizerService, CollectionUpdateService,
             CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
             SearchExplorationsBackendApiService, SiteAnalyticsService,
             INVALID_NAME_CHARS) {
-          $scope.collection = CollectionEditorStateService.getCollection();
-          $scope.newExplorationId = '';
-          $scope.newExplorationTitle = '';
-          $scope.searchQueryHasError = false;
+          var ctrl = this;
+          ctrl.collection = CollectionEditorStateService.getCollection();
+          ctrl.newExplorationId = '';
+          ctrl.newExplorationTitle = '';
+          ctrl.searchQueryHasError = false;
 
           var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
@@ -49,16 +65,16 @@ oppia.directive('collectionNodeCreator', [
            * a search query. It then extracts the title and id of the
            * exploration to prepare typeahead options.
            */
-          $scope.fetchTypeaheadResults = function(searchQuery) {
+          ctrl.fetchTypeaheadResults = function(searchQuery) {
             if (isValidSearchQuery(searchQuery)) {
-              $scope.searchQueryHasError = false;
+              ctrl.searchQueryHasError = false;
               return SearchExplorationsBackendApiService.fetchExplorations(
                 searchQuery
               ).then(function(explorationMetadataBackendDict) {
                 var options = [];
                 explorationMetadataBackendDict.collection_node_metadata_list.
                   map(function(item) {
-                    if (!$scope.collection.containsCollectionNode(item.id)) {
+                    if (!ctrl.collection.containsCollectionNode(item.id)) {
                       options.push(item.title + ' (' + item.id + ')');
                     }
                   });
@@ -69,7 +85,7 @@ oppia.directive('collectionNodeCreator', [
                   'explorations.');
               });
             } else {
-              $scope.searchQueryHasError = true;
+              ctrl.searchQueryHasError = true;
             }
           };
 
@@ -92,7 +108,7 @@ oppia.directive('collectionNodeCreator', [
               AlertsService.addWarning('Cannot add an empty exploration ID.');
               return;
             }
-            if ($scope.collection.containsCollectionNode(newExplorationId)) {
+            if (ctrl.collection.containsCollectionNode(newExplorationId)) {
               AlertsService.addWarning(
                 'There is already an exploration in this collection ' +
                 'with that id.');
@@ -109,7 +125,7 @@ oppia.directive('collectionNodeCreator', [
                 }
                 if (summaryBackendObject) {
                   CollectionLinearizerService.appendCollectionNode(
-                    $scope.collection, newExplorationId, summaryBackendObject);
+                    ctrl.collection, newExplorationId, summaryBackendObject);
                 } else {
                   AlertsService.addWarning(
                     'That exploration does not exist or you do not have edit ' +
@@ -131,9 +147,9 @@ oppia.directive('collectionNodeCreator', [
           };
 
           // Creates a new exploration, then adds it to the collection.
-          $scope.createNewExploration = function() {
+          ctrl.createNewExploration = function() {
             var title = $filter('normalizeWhitespace')(
-              $scope.newExplorationTitle);
+              ctrl.newExplorationTitle);
 
             if (!ValidatorsService.isValidExplorationTitle(title, true)) {
               return;
@@ -143,7 +159,7 @@ oppia.directive('collectionNodeCreator', [
             $http.post('/contributehandler/create_new', {
               title: title
             }).then(function(response) {
-              $scope.newExplorationTitle = '';
+              ctrl.newExplorationTitle = '';
               var newExplorationId = response.data.explorationId;
 
               SiteAnalyticsService
@@ -156,17 +172,17 @@ oppia.directive('collectionNodeCreator', [
           // Checks whether the user has left a '#' at the end of their ID
           // by accident (which can happen if it's being copy/pasted from the
           // editor page.
-          $scope.isMalformedId = function(typedExplorationId) {
+          ctrl.isMalformedId = function(typedExplorationId) {
             return (
               typedExplorationId &&
               typedExplorationId.lastIndexOf('#') ===
               typedExplorationId.length - 1);
           };
 
-          $scope.addExploration = function() {
+          ctrl.addExploration = function() {
             addExplorationToCollection(convertTypeaheadToExplorationId(
-              $scope.newExplorationId));
-            $scope.newExplorationId = '';
+              ctrl.newExplorationId));
+            ctrl.newExplorationId = '';
           };
         }
       ]

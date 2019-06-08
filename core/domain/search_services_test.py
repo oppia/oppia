@@ -38,17 +38,19 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(self.translator_id, self.TRANSLATOR_EMAIL)
+        user_services.create_new_user(
+            self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
         user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
@@ -145,31 +147,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
-    def test_patch_exploration_search_document(self):
-
-        def mock_get_doc(doc_id, index):
-            self.assertEqual(doc_id, self.EXP_ID)
-            self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
-            return {'a': 'b', 'c': 'd'}
-
-        def mock_add_docs(docs, index):
-            self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(docs, [{'a': 'b', 'c': 'e', 'f': 'g'}])
-
-        get_doc_swap = self.swap(
-            gae_search_services, 'get_document_from_index', mock_get_doc)
-
-        add_docs_counter = test_utils.CallCounter(mock_add_docs)
-        add_docs_swap = self.swap(
-            gae_search_services, 'add_documents_to_index', add_docs_counter)
-
-        with get_doc_swap, add_docs_swap:
-            patch = {'c': 'e', 'f': 'g'}
-            search_services.patch_exploration_search_document(
-                self.EXP_ID, patch)
-
-        self.assertEqual(add_docs_counter.times_called, 1)
-
     def test_search_collections(self):
         expected_query_string = 'a query string'
         expected_cursor = 'cursor'
@@ -202,61 +179,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(cursor, expected_result_cursor)
         self.assertEqual(result, doc_ids)
 
-    def test_patch_collection_search_document(self):
-
-        def mock_get_doc(doc_id, index):
-            self.assertEqual(doc_id, self.COLLECTION_ID)
-            self.assertEqual(
-                index, search_services.SEARCH_INDEX_COLLECTIONS)
-            return {'a': 'b', 'c': 'd'}
-
-        def mock_add_docs(docs, index):
-            self.assertEqual(
-                index, search_services.SEARCH_INDEX_COLLECTIONS)
-            self.assertEqual(docs, [{'a': 'b', 'c': 'e', 'f': 'g'}])
-
-        get_doc_swap = self.swap(
-            gae_search_services, 'get_document_from_index', mock_get_doc)
-
-        add_docs_counter = test_utils.CallCounter(mock_add_docs)
-        add_docs_swap = self.swap(
-            gae_search_services, 'add_documents_to_index', add_docs_counter)
-
-        with get_doc_swap, add_docs_swap:
-            patch = {'c': 'e', 'f': 'g'}
-            search_services.patch_collection_search_document(
-                self.COLLECTION_ID, patch)
-
-        self.assertEqual(add_docs_counter.times_called, 1)
-
-    def test_update_private_collection_status_in_search(self):
-
-        def mock_delete_docs(ids, index):
-            self.assertEqual(ids, [self.COLLECTION_ID])
-            self.assertEqual(
-                index, search_services.SEARCH_INDEX_COLLECTIONS)
-
-        def mock_get_rights(unused_collection_id):
-            return rights_manager.ActivityRights(
-                self.COLLECTION_ID, [self.owner_id], [self.editor_id],
-                [self.translator_id], [self.viewer_id],
-                status=rights_manager.ACTIVITY_STATUS_PRIVATE
-            )
-
-        delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
-
-        delete_docs_swap = self.swap(
-            gae_search_services, 'delete_documents_from_index',
-            delete_docs_counter)
-        get_rights_swap = self.swap(
-            rights_manager, 'get_collection_rights', mock_get_rights)
-
-        with get_rights_swap, delete_docs_swap:
-            search_services.update_collection_status_in_search(
-                self.COLLECTION_ID)
-
-        self.assertEqual(delete_docs_counter.times_called, 1)
-
     def test_demo_collections_are_added_to_search_index(self):
         results = search_services.search_collections('Welcome', 2)[0]
         self.assertEqual(results, [])
@@ -273,32 +195,6 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         results, _ = search_services.search_explorations('Welcome', 2)
         self.assertEqual(results, ['0'])
 
-    def test_update_private_exploration_status_in_search(self):
-
-        def mock_delete_docs(ids, index):
-            self.assertEqual(ids, [self.EXP_ID])
-            self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
-
-        def mock_get_rights(unused_exp_id):
-            return rights_manager.ActivityRights(
-                self.EXP_ID, [self.owner_id], [self.editor_id],
-                [self.translator_id], [self.viewer_id],
-                status=rights_manager.ACTIVITY_STATUS_PRIVATE
-            )
-
-        delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
-
-        delete_docs_swap = self.swap(
-            gae_search_services, 'delete_documents_from_index',
-            delete_docs_counter)
-        get_rights_swap = self.swap(
-            rights_manager, 'get_exploration_rights', mock_get_rights)
-
-        with get_rights_swap, delete_docs_swap:
-            search_services.update_exploration_status_in_search(self.EXP_ID)
-
-        self.assertEqual(delete_docs_counter.times_called, 1)
-
     def test_clear_exploration_search_index(self):
         exp_services.load_demo('0')
         result = search_services.search_explorations('Welcome', 2)[0]
@@ -314,3 +210,40 @@ class SearchServicesUnitTests(test_utils.GenericTestBase):
         search_services.clear_collection_search_index()
         result = search_services.search_collections('Welcome', 2)[0]
         self.assertEqual(result, [])
+
+    def test_delete_explorations_from_search_index(self):
+
+        def _mock_delete_docs(ids, index):
+            """Mocks delete_documents_from_index()."""
+            self.assertEqual(ids, [self.EXP_ID])
+            self.assertEqual(index, search_services.SEARCH_INDEX_EXPLORATIONS)
+
+        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
+
+        delete_docs_swap = self.swap(
+            gae_search_services, 'delete_documents_from_index',
+            delete_docs_counter)
+
+        with delete_docs_swap:
+            search_services.delete_explorations_from_search_index([self.EXP_ID])
+
+        self.assertEqual(delete_docs_counter.times_called, 1)
+
+    def test_delete_collections_from_search_index(self):
+
+        def _mock_delete_docs(ids, index):
+            """Mocks delete_documents_from_index()."""
+            self.assertEqual(ids, [self.COLLECTION_ID])
+            self.assertEqual(index, search_services.SEARCH_INDEX_COLLECTIONS)
+
+        delete_docs_counter = test_utils.CallCounter(_mock_delete_docs)
+
+        delete_docs_swap = self.swap(
+            gae_search_services, 'delete_documents_from_index',
+            delete_docs_counter)
+
+        with delete_docs_swap:
+            search_services.delete_collections_from_search_index(
+                [self.COLLECTION_ID])
+
+        self.assertEqual(delete_docs_counter.times_called, 1)

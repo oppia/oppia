@@ -27,11 +27,13 @@ oppia.directive('stateTranslationEditor', [
       controller: [
         '$scope', '$uibModal', 'EditabilityService', 'ExplorationStatesService',
         'StateEditorService', 'StateWrittenTranslationsService',
-        'TranslationLanguageService', 'TranslationTabActiveContentIdService',
+        'TranslationLanguageService', 'TranslationStatusService',
+        'TranslationTabActiveContentIdService',
         'WrittenTranslationObjectFactory', function(
             $scope, $uibModal, EditabilityService, ExplorationStatesService,
             StateEditorService, StateWrittenTranslationsService,
-            TranslationLanguageService, TranslationTabActiveContentIdService,
+            TranslationLanguageService, TranslationStatusService,
+            TranslationTabActiveContentIdService,
             WrittenTranslationObjectFactory) {
           $scope.HTML_SCHEMA = {
             type: 'html',
@@ -43,15 +45,13 @@ oppia.directive('stateTranslationEditor', [
               contentId, langaugeCode) {
             var stateName = StateEditorService.getActiveStateName();
             var state = ExplorationStatesService.getState(stateName);
-            var contentIdsToAudioTranslations = (
-              state.contentIdsToAudioTranslations);
+            var recordedVoiceovers = state.recordedVoiceovers;
             var availableAudioLanguages = (
-              contentIdsToAudioTranslations.getAudioLanguageCodes(contentId));
+              recordedVoiceovers.getVoiceoverLanguageCodes(contentId));
             if (availableAudioLanguages.indexOf(langaugeCode) !== -1) {
-              var audioTranslation = (
-                contentIdsToAudioTranslations.getAudioTranslation(
-                  contentId, langaugeCode));
-              if (audioTranslation.needsUpdate) {
+              var voiceover = recordedVoiceovers.getVoiceover(
+                contentId, langaugeCode);
+              if (voiceover.needsUpdate) {
                 return;
               }
               $uibModal.open({
@@ -70,10 +70,10 @@ oppia.directive('stateTranslationEditor', [
                   };
                 }]
               }).result.then(function() {
-                contentIdsToAudioTranslations.toggleNeedsUpdateAttribute(
+                recordedVoiceovers.toggleNeedsUpdateAttribute(
                   contentId, langaugeCode);
-                ExplorationStatesService.saveContentIdsToAudioTranslations(
-                  stateName, contentIdsToAudioTranslations);
+                ExplorationStatesService.saveRecordedVoiceovers(
+                  stateName, recordedVoiceovers);
               });
             }
           };
@@ -129,6 +129,7 @@ oppia.directive('stateTranslationEditor', [
               ExplorationStatesService.saveWrittenTranslations(
                 stateName, StateWrittenTranslationsService.displayed);
               StateWrittenTranslationsService.saveDisplayedValue();
+              TranslationStatusService.refresh();
             }
             $scope.translationEditorIsOpen = false;
           };

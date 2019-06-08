@@ -151,8 +151,8 @@ class TestBase(unittest.TestCase):
     EDITOR_USERNAME = 'editor'
     TOPIC_MANAGER_EMAIL = 'topicmanager@example.com'
     TOPIC_MANAGER_USERNAME = 'topicmanager'
-    TRANSLATOR_EMAIL = 'translator@example.com'
-    TRANSLATOR_USERNAME = 'translator'
+    VOICE_ARTIST_EMAIL = 'voiceartist@example.com'
+    VOICE_ARTIST_USERNAME = 'voiceartist'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -345,9 +345,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -365,6 +362,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -374,9 +375,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -394,6 +392,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -1151,11 +1153,6 @@ tags: []
         )
         exp_summary_model.put()
 
-        # Note: Also save state id mappping model for new exploration. If not
-        # saved, it may cause errors in test cases.
-        exploration = exp_services.get_exploration_from_model(exp_model)
-        exp_services.create_and_save_state_id_mapping_model(exploration, [])
-
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
         """Saves a new default exploration with a default version 21 states
         dictionary. Version 21 is where training data of exploration is stored
@@ -1216,11 +1213,6 @@ tags: []
             contributors_summary={},
         )
         exp_summary_model.put()
-
-        # Note: Also save state id mappping model for new exploration. If not
-        # saved, it may cause errors in test cases.
-        exploration = exp_services.get_exploration_from_model(exp_model)
-        exp_services.create_and_save_state_id_mapping_model(exploration, [])
 
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.

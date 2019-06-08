@@ -3,8 +3,8 @@
     <div id="tutorialTranslationLanguage">
       <span style="font-size: 16px;" class="protractor-test-langauge-selector-label">
         <strong>
-          <span ng-if="inVoiceoverMode"><[VOICEOVER_MODE]> </span>
-          <span ng-if="inTranslationMode"><[TRANSLATION_MODE]></span> in language:
+          <span ng-if="inVoiceoverMode">Voiceovers</span>
+          <span ng-if="inTranslationMode">Translations</span> for language:
         </strong>
       </span>
       <select id="audioTranslationLanguageCodeField" class="oppia-translation-language-selector protractor-test-translation-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
@@ -12,7 +12,6 @@
       </select>
     </div>
     <div ng-if="canShowTabModeSwitcher()" class="oppia-mode-change-section">
-      <i class="oppia-new-mode-feature-text">New!</i>
       <label class="oppia-mode-change-label">Mode: </label>
       <button class="oppia-translation-tab-mode-changer oppia-translation-mode protractor-test-translation-mode"
               uib-tooltip="Translation mode" tooltip-placement="bottom"
@@ -26,7 +25,6 @@
               ng-click="changeActiveMode(VOICEOVER_MODE)">
         <i class="material-icons md-18">record_voice_over</i>
       </button>
-      <img ng-if="canShowModeSwitchHelperImage()" class="oppia-mode-switcher-guide" ng-src="<[getStaticImageUrl('/icons/translation_tab_mode_switch.png')]>" alt="">
     </div>
   </div>
   <div class="oppia-translation-progress">
@@ -41,19 +39,6 @@
 </div>
 
 <style>
-  .oppia-mode-switcher-guide {
-    position: absolute;
-    right: 25px;
-    top: 30px;
-  }
-  .oppia-new-mode-feature-text {
-    bottom: 16px;
-    color: red;
-    font-size: 12px;
-    left: -8px;
-    position: absolute;
-    transform: rotate(-30deg);
-  }
   .oppia-translator-overview {
     height: 45px;
     margin: 0 auto;

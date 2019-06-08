@@ -16,13 +16,18 @@
  * @fileoverview Controller for the history tab of the collection editor.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('collectionHistoryTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/history_tab/' +
         'collection_history_tab_directive.html'),
+      controllerAs: '$ctrl',
       controller: [function() {}]
     };
   }]);

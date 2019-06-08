@@ -18,31 +18,40 @@
  * and also delete the collection node represented by this directive.
  */
 
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require('services/AlertsService.ts');
+
 oppia.directive('collectionNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getCollectionNode: '&collectionNode',
         getLinearIndex: '&linearIndex'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/' +
         'collection_node_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
+        'CollectionEditorStateService', 'CollectionLinearizerService',
         'CollectionUpdateService', 'AlertsService',
         function(
-            $scope, CollectionEditorStateService, CollectionLinearizerService,
+            CollectionEditorStateService, CollectionLinearizerService,
             CollectionUpdateService, AlertsService) {
-          $scope.collection = CollectionEditorStateService.getCollection();
+          var ctrl = this;
+          ctrl.collection = CollectionEditorStateService.getCollection();
 
           // Deletes this collection node from the frontend collection
           // object and also updates the changelist.
-          $scope.deleteNode = function() {
-            var explorationId = $scope.getCollectionNode().getExplorationId();
+          ctrl.deleteNode = function() {
+            var explorationId = ctrl.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.removeCollectionNode(
-              $scope.collection, explorationId)) {
+              ctrl.collection, explorationId)) {
               AlertsService.fatalWarning(
                 'Internal collection editor error. Could not delete ' +
                 'exploration by ID: ' + explorationId);
@@ -51,10 +60,10 @@ oppia.directive('collectionNodeEditor', [
 
           // Shifts this collection node left in the linearized list of the
           // collection, if possible.
-          $scope.shiftNodeLeft = function() {
-            var explorationId = $scope.getCollectionNode().getExplorationId();
+          ctrl.shiftNodeLeft = function() {
+            var explorationId = ctrl.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.shiftNodeLeft(
-              $scope.collection, explorationId)) {
+              ctrl.collection, explorationId)) {
               AlertsService.fatalWarning(
                 'Internal collection editor error. Could not shift node left ' +
                 'with ID: ' + explorationId);
@@ -63,10 +72,10 @@ oppia.directive('collectionNodeEditor', [
 
           // Shifts this collection node right in the linearized list of the
           // collection, if possible.
-          $scope.shiftNodeRight = function() {
-            var explorationId = $scope.getCollectionNode().getExplorationId();
+          ctrl.shiftNodeRight = function() {
+            var explorationId = ctrl.getCollectionNode().getExplorationId();
             if (!CollectionLinearizerService.shiftNodeRight(
-              $scope.collection, explorationId)) {
+              ctrl.collection, explorationId)) {
               AlertsService.fatalWarning(
                 'Internal collection editor error. Could not shift node ' +
                 'right with ID: ' + explorationId);

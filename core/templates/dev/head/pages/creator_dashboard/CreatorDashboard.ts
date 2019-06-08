@@ -16,6 +16,133 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require('directives/AngularHtmlBindDirective.ts');
+require('directives/MathjaxBindDirective.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/format-rte-preview.filter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require(
+  'filters/string-utility-filters/' +
+  'normalize-whitespace-punctuation-and-case.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/remove-duplicates-in-array.filter.ts');
+require(
+  'filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
+require('components/RatingComputationService.ts');
+require('filters/convert-unicode-with-params-to-html.filter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require(
+  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
+require('pages/question_editor/QuestionEditorDirective.ts');
+require('components/state/AnswerGroupEditorDirective.ts');
+require('components/state/HintEditorDirective.ts');
+require('components/state/OutcomeEditorDirective.ts');
+require('components/state/OutcomeDestinationEditorDirective.ts');
+require('components/state/OutcomeFeedbackEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
+require('components/state/RuleEditorDirective.ts');
+require('components/state/RuleTypeSelectorDirective.ts');
+require('components/state/SolutionEditorDirective.ts');
+require('components/state/SolutionExplanationEditorDirective.ts');
+require('components/forms/custom-forms-directives/html-select.directive.ts');
+require('services/AutoplayedVideosService.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require(
+  'components/common-layout-directives/common-elements/' +
+  'sharing-links.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+require('components/summary_tile/CollectionSummaryTileDirective.ts');
+require('pages/exploration_player/PlayerConstants.ts');
+require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
+
+require('components/entity-creation-services/exploration-creation.service.ts');
+require('components/RatingComputationService.ts');
+require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/suggestion/SuggestionObjectFactory.ts');
+require('domain/suggestion/SuggestionThreadObjectFactory.ts');
+require(
+  'domain/topics_and_skills_dashboard/' +
+  'TopicsAndSkillsDashboardBackendApiService.ts'
+);
+require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require('pages/suggestion_editor/ShowSuggestionModalForCreatorViewService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/DateTimeFormatService.ts');
+require('services/UserService.ts');
+
 oppia.constant('EXPLORATION_DROPDOWN_STATS', {
   OPEN_FEEDBACK: 'open_feedback'
 });

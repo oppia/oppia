@@ -18,7 +18,6 @@
 
 import ast
 import datetime
-import os
 
 from constants import constants
 from core import jobs_registry
@@ -63,7 +62,7 @@ def mock_save_original_and_compressed_versions_of_image(
     micro_image_filepath = 'image/%s' % micro_image_filename
 
     fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
-        'exploration/%s' % exp_id))
+        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
 
     if not fs.isfile(filepath.encode('utf-8')):
         fs.commit(
@@ -89,13 +88,15 @@ def run_job_for_deleted_exp(
     output or error condition.
     """
     job_id = job_class.create_new()
-    self.assertEqual(
-        self.count_jobs_in_taskqueue(
-            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
-    job_class.enqueue(job_id)
+    # Check there is one job in the taskqueue corresponding to
+    # delete_exploration_from_subscribed_users.
     self.assertEqual(
         self.count_jobs_in_taskqueue(
             taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+    job_class.enqueue(job_id)
+    self.assertEqual(
+        self.count_jobs_in_taskqueue(
+            taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 2)
     self.process_and_flush_pending_tasks()
 
     if check_error:
@@ -223,7 +224,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,
                     exp_rights_model.editor_ids,
-                    exp_rights_model.translator_ids,
+                    exp_rights_model.voice_artist_ids,
                     exp_rights_model.viewer_ids,
                     [self.admin_id],
                     {self.admin_id: 1},
@@ -245,9 +246,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 if exp_rights_model.editor_ids:
                     expected_job_output[exp_id].editor_ids = (
                         exp_rights_model.editor_ids)
-                if exp_rights_model.translator_ids:
-                    expected_job_output[exp_id].translator_ids = (
-                        exp_rights_model.translator_ids)
+                if exp_rights_model.voice_artist_ids:
+                    expected_job_output[exp_id].voice_artist_ids = (
+                        exp_rights_model.voice_artist_ids)
                 if exp_rights_model.viewer_ids:
                     expected_job_output[exp_id].viewer_ids = (
                         exp_rights_model.viewer_ids)
@@ -272,7 +273,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             simple_props = ['id', 'title', 'category', 'objective',
                             'language_code', 'tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
-                            'editor_ids', 'translator_ids', 'viewer_ids',
+                            'editor_ids', 'voice_artist_ids', 'viewer_ids',
                             'contributor_ids', 'contributors_summary',
                             'version', 'exploration_model_created_on']
             for exp_id in actual_job_output:
@@ -1242,17 +1243,8 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
             'tagged_misconception_id': None
         }]
 
-        content_ids_to_audio_translations_dict = {
-            'content': {},
-            'default_outcome': {},
-            'feedback': {}
-        }
-
         state1.update_interaction_customization_args(customization_args_dict1)
         state1.update_interaction_answer_groups(answer_group_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
-
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start ItemSelectionInteractionOneOff job on sample exploration.
@@ -1301,8 +1293,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state2.update_interaction_customization_args(customization_args_dict2)
         state2.update_interaction_answer_groups(answer_group_list2)
-        state2.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1331,12 +1321,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
 
         state1.update_interaction_id('ItemSelectionInput')
-
-        content_ids_to_audio_translations_dict = {
-            'content': {},
-            'default_outcome': {},
-            'feedback': {}
-        }
 
         customization_args_dict = {
             'choices': {'value': [
@@ -1374,8 +1358,6 @@ class ItemSelectionInteractionOneOffJobTests(test_utils.GenericTestBase):
 
         state1.update_interaction_customization_args(customization_args_dict)
         state1.update_interaction_answer_groups(answer_group_list)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
 
         exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1498,114 +1480,6 @@ class ViewableExplorationsAuditJobTests(test_utils.GenericTestBase):
             self, exp_jobs_one_off.ViewableExplorationsAuditJob)
 
 
-class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
-    """Tests for the ExplorationStateIdMapping one off job."""
-
-    EXP_ID = 'eid'
-
-    def setUp(self):
-        """Initialize owner before each test case."""
-        super(ExplorationStateIdMappingJobTest, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def test_that_mapreduce_job_works_for_first_version_of_exploration(self):
-        """Tests that mapreduce job works correctly when the only first
-        exploration version exists.
-        """
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
-        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
-
-        self.process_and_flush_pending_tasks()
-
-        expected_mapping = {
-            exploration.init_state_name: 0
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 1)
-        self.assertEqual(mapping.largest_state_id_used, 0)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-    def test_that_mapreduce_job_works(self):
-        """Test that mapreduce job is working as expected."""
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            })], 'Add state name')
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state 2',
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_DELETE_STATE,
-                'state_name': 'new state'
-            })], 'Modify states')
-
-        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
-
-        job_id = exp_jobs_one_off.ExplorationStateIdMappingJob.create_new()
-        exp_jobs_one_off.ExplorationStateIdMappingJob.enqueue(job_id)
-
-        self.process_and_flush_pending_tasks()
-
-        expected_mapping = {
-            exploration.init_state_name: 0
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 1)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 1)
-        self.assertEqual(mapping.largest_state_id_used, 0)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-        expected_mapping = {
-            exploration.init_state_name: 0,
-            'new state': 1
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 2)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 2)
-        self.assertEqual(mapping.largest_state_id_used, 1)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-        expected_mapping = {
-            exploration.init_state_name: 0,
-            'new state 2': 2
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 3)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 3)
-        self.assertEqual(mapping.largest_state_id_used, 2)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-        expected_mapping = {
-            exploration.init_state_name: 0
-        }
-        mapping = exp_services.get_state_id_mapping(self.EXP_ID, 4)
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 4)
-        self.assertEqual(mapping.largest_state_id_used, 2)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-    def test_no_action_is_performed_for_deleted_exploration(self):
-        """Test that no action is performed on deleted explorations."""
-
-        self.save_new_valid_exploration(self.EXP_ID, self.owner_id)
-
-        exp_services.delete_exploration(self.owner_id, self.EXP_ID)
-
-        run_job_for_deleted_exp(
-            self, exp_jobs_one_off.ExplorationStateIdMappingJob)
-
-
 class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
@@ -1655,27 +1529,8 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
 
-        content_ids_to_audio_translations_dict1 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-            'hint2': {}
-        }
-
-        content_ids_to_audio_translations_dict2 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-        }
-
         state1.update_interaction_hints(hint_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict1)
-
         state2.update_interaction_hints(hint_list2)
-        state2.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict2)
-
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start HintsAuditOneOff job on sample exploration.
@@ -1722,26 +1577,9 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
 
-        content_ids_to_audio_translations_dict1 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-            'hint2': {}
-        }
-
-        content_ids_to_audio_translations_dict2 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-        }
-
         state1.update_interaction_hints(hint_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict1)
 
         state2.update_interaction_hints(hint_list2)
-        state2.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict2)
 
         exp_services.save_new_exploration(self.albert_id, exploration1)
 
@@ -1759,15 +1597,7 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
 
-        content_ids_to_audio_translations_dict1 = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-        }
-
         state1.update_interaction_hints(hint_list1)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict1)
 
         exp_services.save_new_exploration(self.albert_id, exploration2)
 
@@ -1812,19 +1642,8 @@ class HintsAuditOneOffJobTests(test_utils.GenericTestBase):
             }
         }]
 
-        content_ids_to_audio_translations_dict = {
-            'content': {},
-            'default_outcome': {},
-            'hint1': {},
-            'hint2': {}
-        }
-
         state1.update_interaction_hints(hint_list)
-        state1.update_content_ids_to_audio_translations(
-            content_ids_to_audio_translations_dict)
-
         exp_services.save_new_exploration(self.albert_id, exploration)
-
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
         run_job_for_deleted_exp(self, exp_jobs_one_off.HintsAuditOneOffJob)
@@ -2014,158 +1833,6 @@ class ExplorationContentValidationJobForCKEditorTests(
             exp_jobs_one_off.ExplorationContentValidationJobForCKEditor)
 
 
-class VerifyAllUrlsMatchGcsIdRegexJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(VerifyAllUrlsMatchGcsIdRegexJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.process_and_flush_pending_tasks()
-
-    def test_verification_of_image_and_audio_urls(self):
-        """Checks that image and auido urls are verified correctly."""
-
-        with self.swap(constants, 'DEV_MODE', False):
-
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.VALID_EXP_ID, title='title', category='category')
-
-            fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(self.VALID_EXP_ID))
-
-            with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-                raw_image = f.read()
-
-            with open(os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3')) as f:
-                raw_audio = f.read()
-
-            fs.commit(
-                self.albert_id, 'image/abc.png', raw_image,
-                mimetype='image/png'
-            )
-            fs.commit(
-                self.albert_id, 'image/abc.xyz', raw_image,
-                mimetype='image/png'
-            )
-            fs.commit(
-                self.albert_id, 'image/xyz/abc.png', raw_image,
-                mimetype='image/png'
-            )
-            fs.commit(
-                self.albert_id, 'audio/abc.mp3', raw_audio,
-                mimetype='audio/mp3'
-            )
-            fs.commit(
-                self.albert_id, 'audio/abc.png', raw_audio,
-                mimetype='audio/mp3'
-            )
-            fs.commit(
-                self.albert_id, 'audio/image/abc.mp3', raw_audio,
-                mimetype='audio/mp3'
-            )
-
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
-            # Start VerifyAllUrlsMatchGcsIdRegex job on sample exploration.
-            job_id = (
-                exp_jobs_one_off
-                .VerifyAllUrlsMatchGcsIdRegexJob.create_new())
-            exp_jobs_one_off.VerifyAllUrlsMatchGcsIdRegexJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
-
-            actual_output = (
-                exp_jobs_one_off
-                .VerifyAllUrlsMatchGcsIdRegexJob.get_output(job_id))
-            expected_output = [
-                '[u\'File is there in GCS\', 1]',
-                (
-                    '[u\'The url for the entity on GCS is invalid\', '
-                    '[u\'/testbed-test-resources/exp_id0/assets/image/abc.xyz\''
-                    ', u\'/testbed-test-resources/exp_id0/assets/image/xyz/'
-                    'abc.png\', u\'/testbed-test-resources/exp_id0/assets/audio'
-                    '/abc.png\', u\'/testbed-test-resources/exp_id0/assets/'
-                    'audio/image/abc.mp3\']]'
-                )
-            ]
-            self.assertEqual(actual_output, expected_output)
-
-
-class CopyToNewDirectoryJobTests(test_utils.GenericTestBase):
-
-    ALBERT_EMAIL = 'albert@example.com'
-    ALBERT_NAME = 'albert'
-
-    VALID_EXP_ID = 'exp_id0'
-    NEW_EXP_ID = 'exp_id1'
-    EXP_TITLE = 'title'
-
-    def setUp(self):
-        super(CopyToNewDirectoryJobTests, self).setUp()
-
-        # Setup user who will own the test explorations.
-        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
-        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
-        self.process_and_flush_pending_tasks()
-
-    def test_copying_of_image_and_audio_files(self):
-        """Checks that image and auido files are copied correctly."""
-
-        with self.swap(constants, 'DEV_MODE', False), self.swap(
-            exp_services, 'save_original_and_compressed_versions_of_image',
-            mock_save_original_and_compressed_versions_of_image):
-
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.VALID_EXP_ID, title='title', category='category')
-
-            fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(self.VALID_EXP_ID))
-
-            with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-                raw_image = f.read()
-
-            with open(os.path.join(feconf.TESTS_DATA_DIR, 'cafe.mp3')) as f:
-                raw_audio = f.read()
-
-            fs.commit(
-                self.albert_id, 'image/abc.png', raw_image,
-                mimetype='image/png'
-            )
-            fs.commit(
-                self.albert_id, 'image/xyz.png', 'file_content',
-                mimetype='image/png'
-            )
-            fs.commit(
-                self.albert_id, 'audio/abc.mp3', raw_audio,
-                mimetype='audio/mp3'
-            )
-
-            exp_services.save_new_exploration(self.albert_id, exploration)
-
-            # Start CopyToNewDirectory job on sample exploration.
-            job_id = exp_jobs_one_off.CopyToNewDirectoryJob.create_new()
-            exp_jobs_one_off.CopyToNewDirectoryJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
-
-            actual_output = exp_jobs_one_off.CopyToNewDirectoryJob.get_output(
-                job_id)
-            expected_output = [
-                '[u\'Added compressed versions of images in exploration\', '
-                '[u\'exp_id0\']]',
-                '[u\'Copied file\', 1]'
-            ]
-            self.assertEqual(len(actual_output), 3)
-            self.assertEqual(actual_output[0], expected_output[0])
-
-
 class InteractionCustomizationArgsValidationJobTests(
         test_utils.GenericTestBase):
 
@@ -2295,3 +1962,143 @@ class InteractionCustomizationArgsValidationJobTests(
         run_job_for_deleted_exp(
             self,
             exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
+
+
+class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
+        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob]
+
+    EXP_ID = 'exp_id'
+
+    USERNAME_A = 'usernamea'
+    USERNAME_B = 'usernameb'
+    EMAIL_A = 'emaila@example.com'
+    EMAIL_B = 'emailb@example.com'
+
+    def setUp(self):
+        super(TranslatorToVoiceArtistOneOffJobTests, self).setUp()
+        self.signup(self.EMAIL_A, self.USERNAME_A)
+        self.signup(self.EMAIL_B, self.USERNAME_B)
+
+        self.user_a_id = self.get_user_id_from_email(self.EMAIL_A)
+        self.user_b_id = self.get_user_id_from_email(self.EMAIL_B)
+
+    def test_action_is_performed_when_translator_ids_exists(self):
+        """Test translator_ids are migrated to voice_artist_ids successfully."""
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
+
+        rights_manager.create_new_exploration_rights(
+            exploration.id, self.user_a_id)
+        exp_rights_model = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        exp_rights_model.translator_ids = [self.user_a_id, self.user_b_id]
+        commit_message = 'Assign a translator for test'
+        commit_cmds = [{
+            'cmd': 'change_role',
+            'assignee_id': self.user_a_id,
+            'new_role': 'translator'
+            }, {
+                'cmd': 'change_role',
+                'assignee_id': self.user_b_id,
+                'new_role': 'translator'
+            }]
+        exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
+
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exploration.id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            community_owned=exp_rights_model.community_owned,
+            translator_ids=[self.user_a_id, self.user_b_id]
+        )
+        exp_summary_model.put()
+
+        job_id = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())
+        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(
+                job_id)
+            )
+        expected_output = ['[u\'SUCCESS\', 1]']
+        self.assertEqual(actual_output, expected_output)
+
+        exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        self.assertEqual([], exp_rights_model_2.translator_ids)
+        self.assertEqual(
+            [self.user_a_id, self.user_b_id],
+            exp_rights_model_2.voice_artist_ids
+        )
+
+        exp_summary_model_2 = exp_models.ExpSummaryModel.get(exploration.id)
+        self.assertEqual([], exp_summary_model_2.translator_ids)
+        self.assertEqual(
+            [self.user_a_id, self.user_b_id],
+            exp_summary_model_2.voice_artist_ids
+        )
+
+    def test_partial_job_is_performed_for_deleted_exploration_summary(self):
+        """Tests that when ExplorationRightsModel exists but ExpSummaryModel
+        does not exist or is deleted, action is only performed for rights model,
+        and returns the id of corresponding exploration.
+        """
+        exploration = self.save_new_valid_exploration(
+            self.EXP_ID, self.user_a_id, title='Exploration Title 1')
+
+        rights_manager.create_new_exploration_rights(
+            exploration.id, self.user_a_id)
+        exp_rights_model = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        exp_rights_model.translator_ids = [self.user_b_id]
+        commit_message = 'Assign a translator for test'
+        commit_cmds = [{
+            'cmd': 'change_role',
+            'assignee_ids': self.user_b_id,
+            'new_role': 'translator'
+        }]
+        exp_rights_model.commit(self.user_a_id, commit_message, commit_cmds)
+
+        exp_summary_model = exp_models.ExpSummaryModel(
+            id=exploration.id,
+            title='title',
+            category='category',
+            objective='Old objective',
+            language_code='en',
+            community_owned=exp_rights_model.community_owned,
+            translator_ids=[self.user_b_id]
+        )
+        exp_summary_model.put()
+        exp_services.delete_exploration_summary(exploration.id)
+
+        job_id = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.create_new())
+        exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob.get_output(
+                job_id)
+            )
+        expected_output = ['[u\'Summary model does not exist or is '
+                           'deleted\', [u\'exp_id\']]']
+        self.assertEqual(actual_output, expected_output)
+
+        exp_rights_model_2 = exp_models.ExplorationRightsModel.get(
+            exploration.id)
+        self.assertEqual([], exp_rights_model_2.translator_ids)
+        self.assertEqual([self.user_b_id], exp_rights_model_2.voice_artist_ids)
+
+    def test_no_action_is_performed_for_deleted_exploration(self):
+        """Tests that no action is performed when an exploration is deleted."""
+        exp_id = '100'
+        self.save_new_valid_exploration(exp_id, self.user_a_id)
+        exp_services.delete_exploration(self.user_a_id, exp_id)
+
+        run_job_for_deleted_exp(
+            self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob)

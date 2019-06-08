@@ -16,6 +16,19 @@
  * @fileoverview Directive for the concept card editor.
  */
 
+require('components/SummaryListHeaderDirective.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require('pages/skill_editor/editor_tab/WorkedExampleEditorDirective.ts');
+
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/skill/SkillUpdateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('filters/format-rte-preview.filter.ts');
+require('pages/skill_editor/SkillEditorStateService.ts');
+require('services/GenerateContentIdService.ts');
+
 oppia.directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',

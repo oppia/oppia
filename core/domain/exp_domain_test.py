@@ -578,51 +578,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.validate(strict=True)
 
-    def test_content_ids_to_audio_translations_validation(self):
-        """Test validation of content_ids_to_audio_translations."""
-        exploration = exp_domain.Exploration.create_default_exploration('eid')
-        exploration.objective = 'Objective'
-        init_state = exploration.states[exploration.init_state_name]
-        init_state.update_interaction_id('TextInput')
-        exploration.validate()
-
-        hints_list = []
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': {}
-            }
-        })
-        init_state.update_interaction_hints(hints_list)
-
-        # Removing content id directly from content_ids_to_audio_translation for
-        # testing validation error.
-        init_state.content_ids_to_audio_translations.pop('hint_1')
-
-        self._assert_validation_error(
-            exploration,
-            r'Expected state content_ids_to_audio_translations to match '
-            r'the listed content ids \[\'content\', \'default_outcome\', '
-            r'\'hint_1\'\], found \[\'content\', \'default_outcome\'\]')
-
-        # Undo above changes.
-        init_state.content_ids_to_audio_translations['hint_1'] = {}
-
-        hints_list.append({
-            'hint_content': {
-                'content_id': 'hint_1',
-                'html': {}
-            }
-        })
-        init_state.update_interaction_hints(hints_list)
-
-        self._assert_validation_error(
-            exploration, 'Found a duplicate content id hint_1')
-
-        hints_list[1]['hint_content']['content_id'] = 'hint_2'
-        init_state.update_interaction_hints(hints_list)
-        exploration.validate()
-
     def test_get_trainable_states_dict(self):
         """Test the get_trainable_states_dict() method."""
         exp_id = 'exp_id1'
@@ -3661,7 +3616,131 @@ states_schema_version: 27
 tags: []
 title: Title
 """)
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V32
+
+    YAML_CONTENT_V33 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 33
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+    written_translations:
+      translations_mapping:
+        content: {}
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+    written_translations:
+      translations_mapping:
+        content: {}
+        default_outcome: {}
+states_schema_version: 28
+tags: []
+title: Title
+""")
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V33
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -3847,6 +3926,12 @@ title: Title
         """Test direct loading from a v31 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V31)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v32(self):
+        """Test direct loading from a v32 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V32)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 
@@ -4066,7 +4151,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V32_IMAGE_DIMENSIONS = ("""author_notes: ''
+    YAML_CONTENT_V33_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -4076,16 +4161,13 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 32
+schema_version: 33
 states:
   Introduction:
     classifier_model_id: null
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4103,6 +4185,10 @@ states:
       id: null
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -4112,10 +4198,6 @@ states:
     content:
       content_id: content
       html: <blockquote><p>Hello, this is state1</p></blockquote>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      solution: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4142,6 +4224,11 @@ states:
           content_id: solution
           html: <p>This is <em>solution</em> for state1</p>
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        solution: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -4152,13 +4239,6 @@ states:
     content:
       content_id: content
       html: <p>Hello, </p><p>this <em>is </em>state2</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
-      feedback_2: {}
-      hint_1: {}
-      hint_2: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4221,6 +4301,14 @@ states:
       id: MultipleChoiceInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
+        feedback_2: {}
+        hint_1: {}
+        hint_2: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -4234,10 +4322,6 @@ states:
     content:
       content_id: content
       html: <p>Hello, this is state3</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4288,12 +4372,17 @@ states:
       id: ItemSelectionInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
         feedback_1: {}
-states_schema_version: 27
+states_schema_version: 28
 tags: []
 title: title
 """)
@@ -4408,7 +4497,7 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V32_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V33_WITH_IMAGE_CAPTION = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4418,7 +4507,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 32
+schema_version: 33
 states:
   (untitled state):
     classifier_model_id: null
@@ -4427,10 +4516,6 @@ states:
       html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
         filepath-with-value="&amp;quot;random_height_490_width_120.png&amp;quot;"></oppia-noninteractive-image><p>Hello
         this is test case to check image tag inside p tag</p>
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
-      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
@@ -4467,6 +4552,11 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
+        feedback_1: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -4477,8 +4567,6 @@ states:
     content:
       content_id: content
       html: <p>Congratulations, you have finished!</p>
-    content_ids_to_audio_translations:
-      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4490,6 +4578,9 @@ states:
       id: EndExploration
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
     written_translations:
       translations_mapping:
         content: {}
@@ -4498,9 +4589,6 @@ states:
     content:
       content_id: content
       html: ''
-    content_ids_to_audio_translations:
-      content: {}
-      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -4522,11 +4610,15 @@ states:
       id: TextInput
       solution: null
     param_changes: []
+    recorded_voiceovers:
+      voiceovers_mapping:
+        content: {}
+        default_outcome: {}
     written_translations:
       translations_mapping:
         content: {}
         default_outcome: {}
-states_schema_version: 27
+states_schema_version: 28
 tags: []
 title: Title
 """)
@@ -4543,7 +4635,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V32_IMAGE_DIMENSIONS)
+            exploration.to_yaml(), self.YAML_CONTENT_V33_IMAGE_DIMENSIONS)
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
@@ -4554,7 +4646,7 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V32_WITH_IMAGE_CAPTION)
+            exploration.to_yaml(), self.YAML_CONTENT_V33_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -4576,9 +4668,11 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'content_id': 'content',
                     'html': content_str,
                 },
-                'content_ids_to_audio_translations': {
-                    'content': {},
-                    'default_outcome': {}
+                'recorded_voiceovers': {
+                    'voiceovers_mapping': {
+                        'content': {},
+                        'default_outcome': {}
+                    }
                 },
                 'written_translations': {
                     'translations_mapping': {
@@ -4643,474 +4737,6 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(ValueError, 'fake state does not exist'):
             exploration.delete_state('fake state')
-
-
-class StateIdMappingTests(test_utils.GenericTestBase):
-    """Tests for StateIdMapping domain class."""
-
-    EXP_ID = 'eid'
-
-    EXPLORATION_CONTENT_1 = ("""default_skin: conversation_v1
-param_changes: []
-param_specs: {}
-schema_version: 1
-states:
-- content:
-  - type: text
-    value: ''
-  name: (untitled state)
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: InputString
-          name: Equals
-          rule_type: atomic
-        dest: END
-        feedback:
-          - Correct!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: ''
-  name: New state
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: END
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-""")
-
-    EXPLORATION_CONTENT_2 = ("""default_skin: conversation_v1
-param_changes: []
-param_specs: {}
-schema_version: 1
-states:
-- content:
-  - type: text
-    value: ''
-  name: (untitled state)
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: InputString
-          name: Equals
-          rule_type: atomic
-        dest: New state
-        feedback:
-          - Correct!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: (untitled state)
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: ''
-  name: New state
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: New state
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-""")
-
-    def setUp(self):
-        """Initialize owner and store default exploration before each
-        test case.
-        """
-        super(StateIdMappingTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        # Create a default exploration.
-        self.exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        self.mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, self.exploration.version)
-
-    def test_that_correct_mapping_is_stored_for_new_exp(self):
-        """Test that initial state id mapping is correct."""
-        expected_mapping = {
-            self.exploration.init_state_name: 0
-        }
-
-        self.assertEqual(self.mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(self.mapping.exploration_version, 1)
-        self.assertEqual(
-            self.mapping.largest_state_id_used, 0)
-        self.assertDictEqual(self.mapping.state_names_to_ids, expected_mapping)
-
-    def test_that_mapping_remains_same_when_exp_params_changes(self):
-        """Test that state id mapping is unchanged when exploration params are
-        changed.
-        """
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'New title'
-            })], 'Changes.')
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        expected_mapping = {
-            new_exploration.init_state_name: 0
-        }
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 0)
-
-    def test_that_mapping_is_correct_when_new_state_is_added(self):
-        """Test that new state id is added in state id mapping when new state is
-        added in exploration.
-        """
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            })], 'Add state name')
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        expected_mapping = {
-            new_exploration.init_state_name: 0,
-            'new state': 1
-        }
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 1)
-
-    def test_that_mapping_is_correct_when_old_state_is_deleted(self):
-        """Test that state id is removed from state id mapping when the
-        state is removed from exploration.
-        """
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            })], 'Add state name')
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_DELETE_STATE,
-                'state_name': 'new state',
-            })], 'delete state')
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        expected_mapping = {
-            new_exploration.init_state_name: 0
-        }
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 1)
-
-    def test_that_mapping_remains_when_state_is_renamed(self):
-        """Test that state id mapping is changed accordingly when a state
-        is renamed in exploration.
-        """
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            })], 'Add state name')
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'new state',
-                'new_state_name': 'state',
-            })], 'Change state name')
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        expected_mapping = {
-            new_exploration.init_state_name: 0,
-            'state': 1
-        }
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 1)
-
-    def test_that_mapping_is_changed_when_interaction_id_is_changed(self):
-        """Test that state id mapping is changed accordingly when interaction
-        id of state is changed.
-        """
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': self.exploration.init_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput'
-            })], 'Update interaction.')
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        expected_mapping = {
-            new_exploration.init_state_name: 1,
-        }
-
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 1)
-
-    def test_that_mapping_is_correct_for_series_of_changes(self):
-        """Test that state id mapping is changed accordingly for series
-        of add, rename, remove and update state changes.
-        """
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'new state',
-                'new_state_name': 'state'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'extra state'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'extra state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'new state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput'
-            })], 'Heavy changes')
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        expected_mapping = {
-            new_exploration.init_state_name: 0,
-            'extra state': 1,
-            'new state': 2,
-            'state': 3,
-        }
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 3)
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_DELETE_STATE,
-                'state_name': 'state',
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'extra state',
-                'new_state_name': 'state'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'extra state'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': 'extra state',
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput'
-            }), exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_RENAME_STATE,
-                'old_state_name': 'new state',
-                'new_state_name': 'other state'
-            })], 'Heavy changes 2')
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        expected_mapping = {
-            new_exploration.init_state_name: 0,
-            'other state': 2,
-            'extra state': 4,
-            'state': 5
-        }
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 5)
-
-    def test_correct_mapping_is_generated_for_exp_with_old_states_schema(self):
-        """Test that correct state id mapping is generated for explorations
-        having old states schema version.
-        """
-
-        # Make sure that END is present in generated state id mapping if
-        # exploration contains rules which have END as their destination state
-        # but exploration itself does not have END state.
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
-        expected_mapping = {
-            '(untitled state)': 0,
-            'New state': 1,
-            'END': 2
-        }
-        state_id_map = (
-            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
-                exploration))
-        self.assertDictEqual(state_id_map.state_names_to_ids, expected_mapping)
-        self.assertEqual(state_id_map.largest_state_id_used, 2)
-
-    def test_mapping_for_exp_with_no_end_reference(self):
-        """Test that correct mapping is generated when old exploration has
-        END state references but new exploration does not have END
-        references.
-        """
-
-        old_exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
-        state_id_map = (
-            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
-                old_exploration))
-
-        # Make sure that END is not present in generated state id mapping, even
-        # though END state may be present in state id mapping of previous
-        # version, if exploration does not contain any rule which has END
-        # as its destination state.
-        new_exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_2)
-        expected_mapping = {
-            '(untitled state)': 0,
-            'New state': 1
-        }
-        state_id_map = state_id_map.create_mapping_for_new_version(
-            old_exploration, new_exploration, [])
-        self.assertDictEqual(
-            state_id_map.state_names_to_ids, expected_mapping)
-        self.assertEqual(state_id_map.largest_state_id_used, 2)
-
-    def test_mapping_for_exploration_with_end_references(self):
-        """Test that correct mapping is generated when old exploration does not
-        have END state reference but new exploration does.
-        """
-
-        old_exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_2)
-        state_id_map = (
-            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
-                old_exploration))
-
-        # Make sure that END is not present in generated state id mapping, even
-        # though END state may be present in state id mapping of previous
-        # version, if exploration does not contain any rule which has END
-        # as its destination state.
-        new_exploration = exp_domain.Exploration.from_untitled_yaml(
-            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
-        expected_mapping = {
-            '(untitled state)': 0,
-            'New state': 1,
-            'END': 2
-        }
-        state_id_map = state_id_map.create_mapping_for_new_version(
-            old_exploration, new_exploration, [])
-        self.assertDictEqual(
-            state_id_map.state_names_to_ids, expected_mapping)
-        self.assertEqual(state_id_map.largest_state_id_used, 2)
-
-    def test_validation(self):
-        """Test validation checks for state id mapping domain object."""
-
-        state_names_to_ids = {
-            'first': 0,
-            'second': 0
-        }
-        largest_state_id_used = 0
-        state_id_mapping = exp_domain.StateIdMapping(
-            'exp_id', 0, state_names_to_ids, largest_state_id_used)
-        with self.assertRaisesRegexp(
-            Exception, 'Assigned state ids should be unique.'):
-            state_id_mapping.validate()
-
-        state_names_to_ids = {
-            'first': 0,
-            'second': 1
-        }
-        largest_state_id_used = 0
-        state_id_mapping = exp_domain.StateIdMapping(
-            'exp_id', 0, state_names_to_ids, largest_state_id_used)
-        with self.assertRaisesRegexp(
-            Exception,
-            'Assigned state ids should be smaller than last state id used.'):
-            state_id_mapping.validate()
-
-        state_names_to_ids = {
-            'first': 0,
-            'second': None
-        }
-        largest_state_id_used = 0
-        state_id_mapping = exp_domain.StateIdMapping(
-            'exp_id', 0, state_names_to_ids, largest_state_id_used)
-        with self.assertRaisesRegexp(
-            Exception, 'Assigned state ids should be integer values'):
-            state_id_mapping.validate()
 
 
 class HtmlCollectionTests(test_utils.GenericTestBase):

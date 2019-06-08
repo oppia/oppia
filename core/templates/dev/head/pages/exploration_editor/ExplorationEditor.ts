@@ -17,6 +17,180 @@
  *               help tab in the navbar.
  */
 
+// TODO(vojtechjelinek): this block of requires should be removed after we
+// introduce webpack for /extensions
+require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
+require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require(
+  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
+require('filters/convert-unicode-with-params-to-html.filter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require('components/forms/custom-forms-directives/html-select.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/state/AnswerGroupEditorDirective.ts');
+require('components/state/HintEditorDirective.ts');
+require('components/state/OutcomeEditorDirective.ts');
+require('components/state/OutcomeDestinationEditorDirective.ts');
+require('components/state/OutcomeFeedbackEditorDirective.ts');
+require('components/state/ResponseHeaderDirective.ts');
+require('components/state/RuleEditorDirective.ts');
+require('components/state/RuleTypeSelectorDirective.ts');
+require('components/state/SolutionEditorDirective.ts');
+require('components/state/SolutionExplanationEditorDirective.ts');
+require('components/CodemirrorMergeviewDirective.ts');
+require('directives/AngularHtmlBindDirective.ts');
+require('directives/MathjaxBindDirective.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/format-rte-preview.filter.ts');
+require('filters/format-timer.filter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require(
+  'filters/string-utility-filters/' +
+  'normalize-whitespace-punctuation-and-case.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/remove-duplicates-in-array.filter.ts');
+require(
+  'filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
+require('filters/summarize-nonnegative-number.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
+require(
+  'components/forms/forms-templates/' +
+  'mark-all-audio-and-translations-as-needing-update.controller.ts');
+require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
+require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
+require('services/AutoplayedVideosService.ts');
+require('services/CodeNormalizerService.ts');
+// ^^^ this block of requires should be removed ^^^
+
+require('components/VersionDiffVisualizationDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require('components/profile_link/ProfileLinkTextDirective.ts');
+require('pages/exploration_editor/EditorNavbarBreadcrumbDirective.ts');
+require('pages/exploration_editor/EditorNavigationDirective.ts');
+require('pages/exploration_editor/ExplorationObjectiveEditorDirective.ts');
+require(
+  'pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.ts');
+require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
+require('pages/exploration_editor/ParamChangesEditorDirective.ts');
+require('pages/exploration_editor/editor_tab/ExplorationEditorTabDirective.ts');
+require('pages/exploration_editor/feedback_tab/FeedbackTabDirective.ts');
+require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
+require('pages/exploration_editor/history_tab/HistoryTabDirective.ts');
+require(
+  'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
+require('pages/exploration_editor/preview_tab/PreviewTabDirective.ts');
+require('pages/exploration_editor/settings_tab/SettingsTabDirective.ts');
+require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');
+require(
+  'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
+require('pages/exploration_editor/statistics_tab/StatisticsTabDirective.ts');
+require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
+require('pages/exploration_player/ConversationSkinDirective.ts');
+require('pages/exploration_player/ExplorationFooterDirective.ts');
+require('pages/exploration_player/PlayerConstants.ts');
+
+require('domain/exploration/ParamChangesObjectFactory.ts');
+require('domain/exploration/ParamSpecsObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration_editor/AutosaveInfoModalsService.ts');
+require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration_editor/ExplorationAutomaticTextToSpeechService.ts');
+require('pages/exploration_editor/ExplorationCategoryService.ts');
+require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
+require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration_editor/ExplorationLanguageCodeService.ts');
+require('pages/exploration_editor/ExplorationObjectiveService.ts');
+require('pages/exploration_editor/ExplorationParamChangesService.ts');
+require('pages/exploration_editor/ExplorationParamSpecsService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/ExplorationTagsService.ts');
+require('pages/exploration_editor/ExplorationTitleService.ts');
+require('pages/exploration_editor/ExplorationWarningsService.ts');
+require('pages/exploration_editor/GraphDataService.ts');
+require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration_player/StateClassifierMappingService.ts');
+require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
+require('pages/exploration_editor/UserEmailPreferencesService.ts');
+require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('services/ContextService.ts');
+require('services/EditabilityService.ts');
+require('services/ExplorationFeaturesBackendApiService.ts');
+require('services/ExplorationFeaturesService.ts');
+require('services/PageTitleService.ts');
+require('services/PlaythroughIssuesService.ts');
+require('services/SiteAnalyticsService.ts');
+require('services/StateTopAnswersStatsBackendApiService.ts');
+require('services/StateTopAnswersStatsService.ts');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
@@ -31,11 +205,14 @@ oppia.constant(
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>');
 oppia.constant(
-  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/translate/<exploration_id>');
+  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/voiceover/<exploration_id>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+oppia.constant(
+  'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
+
 
 oppia.controller('ExplorationEditor', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',
@@ -49,12 +226,13 @@ oppia.controller('ExplorationEditor', [
   'ExplorationParamSpecsService', 'ExplorationRightsService',
   'ExplorationStatesService', 'ExplorationTagsService',
   'ExplorationTitleService', 'ExplorationWarningsService', 'GraphDataService',
-  'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+  'PageTitleService', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
   'StateClassifierMappingService', 'StateEditorService',
   'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
   'StateTutorialFirstTimeService', 'ThreadDataService',
   'UrlInterpolationService', 'UserEmailPreferencesService',
+  'EVENT_EXPLORATION_PROPERTY_CHANGED',
   function(
       $http, $log, $q, $rootScope, $scope, $templateCache, $timeout,
       $uibModal, $window, AutosaveInfoModalsService, ChangeListService,
@@ -67,12 +245,13 @@ oppia.controller('ExplorationEditor', [
       ExplorationParamSpecsService, ExplorationRightsService,
       ExplorationStatesService, ExplorationTagsService,
       ExplorationTitleService, ExplorationWarningsService, GraphDataService,
-      ParamChangesObjectFactory, ParamSpecsObjectFactory,
+      PageTitleService, ParamChangesObjectFactory, ParamSpecsObjectFactory,
       PlaythroughIssuesService, RouterService, SiteAnalyticsService,
       StateClassifierMappingService, StateEditorService,
       StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
       StateTutorialFirstTimeService, ThreadDataService,
-      UrlInterpolationService, UserEmailPreferencesService) {
+      UrlInterpolationService, UserEmailPreferencesService,
+      EVENT_EXPLORATION_PROPERTY_CHANGED) {
     $scope.EditabilityService = EditabilityService;
     $scope.StateEditorService = StateEditorService;
 
@@ -87,6 +266,17 @@ oppia.controller('ExplorationEditor', [
       '/createhandler/download/' + $scope.explorationId);
     $scope.revertExplorationUrl = (
       '/createhandler/revert/' + $scope.explorationId);
+
+    var setPageTitle = function() {
+      if (ExplorationTitleService.savedMemento) {
+        PageTitleService.setPageTitle(
+          ExplorationTitleService.savedMemento + ' - Oppia Editor');
+      } else {
+        PageTitleService.setPageTitle('Untitled Exploration - Oppia Editor');
+      }
+    };
+
+    $scope.$on(EVENT_EXPLORATION_PROPERTY_CHANGED, setPageTitle);
 
     $scope.getActiveTabName = RouterService.getActiveTabName;
 
@@ -165,7 +355,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationRightsService.init(
           explorationData.rights.owner_names,
           explorationData.rights.editor_names,
-          explorationData.rights.translator_names,
+          explorationData.rights.voice_artist_names,
           explorationData.rights.viewer_names, explorationData.rights.status,
           explorationData.rights.cloned_from,
           explorationData.rights.community_owned,
@@ -178,7 +368,7 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markEditable();
         }
 
-        if (GLOBALS.can_translate || GLOBALS.can_edit) {
+        if (GLOBALS.can_voiceover || GLOBALS.can_edit) {
           EditabilityService.markTranslatable();
         }
 
@@ -239,6 +429,10 @@ oppia.controller('ExplorationEditor', [
         StateTutorialFirstTimeService.initEditor(
           explorationData.show_state_editor_tutorial_on_load,
           $scope.explorationId);
+
+        if (explorationData.show_state_translation_tutorial_on_load) {
+          StateTutorialFirstTimeService.markTranslationTutorialNotSeenBefore();
+        }
 
         if (ExplorationRightsService.isPublic()) {
           // Stats are loaded asynchronously after the exploration data because

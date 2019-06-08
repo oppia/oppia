@@ -197,7 +197,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
         exp_summary_model.status, exp_summary_model.community_owned,
         exp_summary_model.owner_ids, exp_summary_model.editor_ids,
-        exp_summary_model.translator_ids, exp_summary_model.viewer_ids,
+        exp_summary_model.voice_artist_ids, exp_summary_model.viewer_ids,
         exp_summary_model.contributor_ids,
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
@@ -621,7 +621,8 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
@@ -737,9 +738,15 @@ def apply_change_list(exploration_id, change_list):
 
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS): # pylint: disable=line-too-long
-                    state.update_content_ids_to_audio_translations(
-                        change.new_value)
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
+                    if not isinstance(change.new_value, dict):
+                        raise Exception(
+                            'Expected recorded_voiceovers to be a dict, '
+                            'received %s' % change.new_value)
+                    recorded_voiceovers = (
+                        state_domain.RecordedVoiceovers.from_dict(
+                            change.new_value))
+                    state.update_recorded_voiceovers(recorded_voiceovers)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_WRITTEN_TRANSLATIONS):
@@ -893,9 +900,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         exploration, exp_versions_diff=exp_versions_diff,
         revert_to_version=None)
 
-    # Save state id mapping model for exploration.
-    create_and_save_state_id_mapping_model(exploration, change_list)
-
 
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
@@ -960,8 +964,6 @@ def _create_exploration(
     stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
-    # Save state id mapping model for new exploration.
-    create_and_save_state_id_mapping_model(exploration, commit_cmds)
     create_exploration_summary(exploration.id, committer_id)
 
 
@@ -1013,7 +1015,6 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         committer_id, '', force_deletion=force_deletion)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration_version = exploration_model.version
     exploration_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
@@ -1035,9 +1036,25 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     activity_services.remove_featured_activity(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
-    # Remove associated state id mapping models.
-    delete_state_id_mapping_model_for_exploration(
-        exploration_id, exploration_version)
+    # Remove from subscribers.
+    taskqueue_services.defer(
+        delete_exploration_from_subscribed_users,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        exploration_id)
+
+
+def delete_exploration_from_subscribed_users(exploration_id):
+    """Remove exploration from all subscribers' activity_ids.
+
+    Args:
+        exploration_id: The id of the exploration to delete.
+    """
+    subscription_models = user_models.UserSubscriptionsModel.query(
+        user_models.UserSubscriptionsModel.activity_ids ==
+        exploration_id).fetch()
+    for model in subscription_models:
+        model.activity_ids.remove(exploration_id)
+    user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
 # Operations on exploration snapshots.
@@ -1115,7 +1132,7 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
 
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
-        is_suggestion=False, is_by_translator=False):
+        is_suggestion=False, is_by_voice_artist=False):
     """Update an exploration. Commits changes.
 
     Args:
@@ -1131,8 +1148,8 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
         is_suggestion: bool. Whether the update is due to a suggestion being
             accepted.
-        is_by_translator: bool. Whether the changes are made by a
-            translator.
+        is_by_voice_artist: bool. Whether the changes are made by a
+            voice artist.
 
     Raises:
         ValueError: No commit message is supplied and the exploration is public.
@@ -1142,9 +1159,9 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
-    if is_by_translator and not is_translation_change_list(change_list):
+    if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
-            'Translator does not have permission to make some '
+            'Voice artist does not have permission to make some '
             'changes in the change list.')
 
     is_public = rights_manager.is_exploration_public(exploration_id)
@@ -1275,10 +1292,10 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, scaled_average_rating, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.translator_ids, exp_rights.viewer_ids,
-        contributor_ids, contributors_summary, exploration.version,
-        exploration_model_created_on, exploration_model_last_updated,
-        first_published_msec)
+        exp_rights.editor_ids, exp_rights.voice_artist_ids,
+        exp_rights.viewer_ids, contributor_ids, contributors_summary,
+        exploration.version, exploration_model_created_on,
+        exploration_model_last_updated, first_published_msec)
 
     return exp_summary
 
@@ -1337,7 +1354,7 @@ def save_exploration_summary(exp_summary):
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
-        translator_ids=exp_summary.translator_ids,
+        voice_artist_ids=exp_summary.voice_artist_ids,
         viewer_ids=exp_summary.viewer_ids,
         contributor_ids=exp_summary.contributor_ids,
         contributors_summary=exp_summary.contributors_summary,
@@ -1430,10 +1447,6 @@ def revert_exploration(
         classifier_services.create_classifier_training_job_for_reverted_exploration( # pylint: disable=line-too-long
             current_exploration, exploration_to_revert_to)
 
-    # Save state id mapping model for the new exploration version.
-    create_and_save_state_id_mapping_model_for_reverted_exploration(
-        exploration_id, current_version, revert_to_version)
-
 
 # Creation and deletion methods.
 def get_demo_exploration_components(demo_path):
@@ -1465,7 +1478,7 @@ def get_demo_exploration_components(demo_path):
 
 def save_new_exploration_from_yaml_and_assets(
         committer_id, yaml_content, exploration_id, assets_list,
-        strip_audio_translations=False):
+        strip_voiceovers=False):
     """Note that the default title and category will be used if the YAML
     schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
@@ -1478,8 +1491,8 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(list(str)). A list of lists of assets, which contains
             asset's filename and content.
-        strip_audio_translations: bool. Whether to strip away all audio
-            translations from the imported exploration.
+        strip_voiceovers: bool. Whether to strip away all audio voiceovers
+            from the imported exploration.
 
     Raises:
         Exception: The yaml file is invalid due to a missing schema version.
@@ -1498,7 +1511,8 @@ def save_new_exploration_from_yaml_and_assets(
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(committer_id, asset_filename, asset_content)
 
     if (exp_schema_version <=
@@ -1513,10 +1527,9 @@ def save_new_exploration_from_yaml_and_assets(
             exploration_id, yaml_content)
 
     # Check whether audio translations should be stripped.
-    if strip_audio_translations:
+    if strip_voiceovers:
         for state in exploration.states.values():
-            for content_id in state.content_ids_to_audio_translations:
-                state.content_ids_to_audio_translations[content_id] = {}
+            state.recorded_voiceovers.strip_all_existing_voiceovers()
 
     create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
@@ -1686,7 +1699,7 @@ def save_original_and_compressed_versions_of_image(
 
     file_system_class = fs_services.get_exploration_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
-        'exploration/%s' % exp_id))
+        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
 
     compressed_image_content = gae_image_services.compress_image(
         original_image_content, 0.8)
@@ -1802,9 +1815,9 @@ def index_explorations_given_ids(exp_ids):
         if exploration_summary is not None])
 
 
-def is_translation_change_list(change_list):
+def is_voiceover_change_list(change_list):
     """Checks whether the change list contains only the changes which are
-    allowed for translator to do.
+    allowed for voice artist to do.
 
     Args:
         change_list: list(ExplorationChange). A list that contains the changes
@@ -1812,11 +1825,11 @@ def is_translation_change_list(change_list):
 
     Returns:
         bool. Whether the change_list contains only the changes which are
-        allowed for translator to do.
+        allowed for voice artist to do.
     """
     for change in change_list:
         if (change.property_name !=
-                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS):
+                exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
             return False
     return True
 
@@ -1913,7 +1926,7 @@ def get_user_exploration_data(
 
 def create_or_update_draft(
         exp_id, user_id, change_list, exp_version, current_datetime,
-        is_by_translator=False):
+        is_by_voice_artist=False):
     """Create a draft with the given change list, or update the change list
     of the draft if it already exists. A draft is updated only if the change
     list timestamp of the new change list is greater than the change list
@@ -1928,12 +1941,12 @@ def create_or_update_draft(
             to be made to the ExplorationUserDataModel object.
         exp_version: int. The current version of the exploration.
         current_datetime: datetime.datetime. The current date and time.
-        is_by_translator: bool. Whether the changes are made by a
-            translator.
+        is_by_voice_artist: bool. Whether the changes are made by a
+            voice artist.
     """
-    if is_by_translator and not is_translation_change_list(change_list):
+    if is_by_voice_artist and not is_voiceover_change_list(change_list):
         raise utils.ValidationError(
-            'Translator does not have permission to make some '
+            'Voice artist does not have permission to make some '
             'changes in the change list.')
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
@@ -1999,148 +2012,3 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
         exp_user_data.put()
-
-
-def get_state_id_mapping(exp_id, exp_version):
-    """Retrieve state id mapping model instance from the datastore.
-
-    Args:
-        exp_id: str. The exploration id.
-        exp_version: int. The exploration version.
-
-    Returns:
-        StateIdMapping. Domain object for state id mapping model instance.
-    """
-    model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
-        exp_id, exp_version)
-    state_id_mapping = exp_domain.StateIdMapping(
-        model.exploration_id, model.exploration_version,
-        copy.deepcopy(model.state_names_to_ids), model.largest_state_id_used)
-    return state_id_mapping
-
-
-def _save_state_id_mapping(state_id_mapping):
-    """Stores state id mapping instance in datastore.
-
-    Args:
-        state_id_mapping: StateIdMapping. State ID mapping which is to be
-            stored in database.
-    """
-    exp_models.StateIdMappingModel.create(
-        state_id_mapping.exploration_id,
-        state_id_mapping.exploration_version,
-        state_id_mapping.state_names_to_ids,
-        state_id_mapping.largest_state_id_used)
-
-
-def generate_state_id_mapping_model(exploration, change_list):
-    """Create and store state id mapping for new exploration.
-
-    Args:
-        exploration: Exploration. Exploration for which state id mapping is
-            to be stored.
-        change_list: list(ExplorationChange). A list of changes made in the
-            exploration.
-
-    Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
-    """
-    if exploration.version > 1:
-        # Get state id mapping for new exploration from old exploration with
-        # the help of change list.
-        old_exploration = get_exploration_by_id(
-            exploration.id, version=exploration.version - 1)
-        old_state_id_mapping = get_state_id_mapping(
-            old_exploration.id, old_exploration.version)
-        new_state_id_mapping = (
-            old_state_id_mapping.create_mapping_for_new_version(
-                old_exploration, exploration, change_list))
-    else:
-        # Get state id mapping for first version of exploration.
-        new_state_id_mapping = (
-            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
-                exploration))
-
-    new_state_id_mapping.validate()
-    return new_state_id_mapping
-
-
-def create_and_save_state_id_mapping_model(exploration, change_list):
-    """Create and store state id mapping for new exploration.
-
-    Args:
-        exploration: Exploration. Exploration for which state id mapping is
-            to be stored.
-        change_list: list(ExplorationChange). A list of changes made in the
-            exploration.
-
-    Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
-    """
-    new_state_id_mapping = generate_state_id_mapping_model(
-        exploration, change_list)
-    _save_state_id_mapping(new_state_id_mapping)
-    return new_state_id_mapping
-
-
-def generate_state_id_mapping_model_for_reverted_exploration(
-        exploration_id, current_version, revert_to_version):
-    """Generates state id mapping model for when exploration is reverted.
-
-    Args:
-        exploration_id: str. The ID of the exploration.
-        current_version: str. The current version of the exploration.
-        revert_to_version: int. The version to which the given exploration
-            is to be reverted.
-
-    Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
-    """
-    old_state_id_mapping = get_state_id_mapping(
-        exploration_id, revert_to_version)
-    previous_state_id_mapping = get_state_id_mapping(
-        exploration_id, current_version)
-
-    # Note: when an exploration is reverted state id mapping should
-    # be same as reverted version of the exploration but largest
-    # state id used should be kept as it is as in old exploration.
-    new_version = current_version + 1
-    new_state_id_mapping = exp_domain.StateIdMapping(
-        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
-        previous_state_id_mapping.largest_state_id_used)
-    new_state_id_mapping.validate()
-
-    return new_state_id_mapping
-
-
-def create_and_save_state_id_mapping_model_for_reverted_exploration(
-        exploration_id, current_version, revert_to_version):
-    """Create and save state id mapping model for when exploration is reverted.
-
-    Args:
-        exploration_id: str. The ID of the exploration.
-        current_version: str. The current version of the exploration.
-        revert_to_version: int. The version to which the given exploration
-            is to be reverted.
-
-    Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
-    """
-    new_state_id_mapping = (
-        generate_state_id_mapping_model_for_reverted_exploration(
-            exploration_id, current_version, revert_to_version))
-    _save_state_id_mapping(new_state_id_mapping)
-    return new_state_id_mapping
-
-
-def delete_state_id_mapping_model_for_exploration(
-        exploration_id, exploration_version):
-    """Removes state id mapping model for the exploration.
-
-    Args:
-        exploration_id: str. Id of the exploration.
-        exploration_version: int. Latest version of the exploration.
-    """
-    exp_versions = range(1, exploration_version + 1)
-    exp_models.StateIdMappingModel.delete_state_id_mapping_models(
-        exploration_id, exp_versions)

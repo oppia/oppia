@@ -15,13 +15,29 @@
 /**
  * @fileoverview Controller for the questions editor directive.
  */
+
+require('pages/state_editor/StateEditorDirective.ts');
+
+require('components/entity-creation-services/question-creation.service.ts');
+require('domain/question/EditableQuestionBackendApiService.ts');
+require('domain/question/QuestionObjectFactory.ts');
+require('domain/question/QuestionUpdateService.ts');
+require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require('pages/state_editor/state_properties/StateEditorService.ts');
+require('pages/topic_editor/TopicEditorStateService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+require('services/EditabilityService.ts');
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 oppia.directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getQuestionId: '&questionId',
         getMisconceptions: '&misconceptions',
         canEditQuestion: '&',
@@ -31,6 +47,7 @@ oppia.directive('questionEditor', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$uibModal',
         'AlertsService', 'QuestionCreationService',
@@ -45,38 +62,39 @@ oppia.directive('questionEditor', [
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
             INTERACTION_SPECS, StateEditorService, ResponsesService,
             SolutionValidityService, QuestionUpdateService) {
-          if ($scope.canEditQuestion()) {
+          var ctrl = this;
+          if (ctrl.canEditQuestion()) {
             EditabilityService.markEditable();
           } else {
             EditabilityService.markNotEditable();
           }
           StateEditorService.setActiveStateName('question');
-          StateEditorService.setMisconceptions($scope.getMisconceptions());
-          $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+          StateEditorService.setMisconceptions(ctrl.getMisconceptions());
+          ctrl.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
 
-          $scope.interactionIsShown = false;
+          ctrl.interactionIsShown = false;
 
-          $scope.stateEditorInitialized = false;
+          ctrl.stateEditorInitialized = false;
 
-          $scope.getStateContentPlaceholder = function() {
+          ctrl.getStateContentPlaceholder = function() {
             return (
               'You can speak to the learner here, then ask them a question.');
           };
 
-          $scope.navigateToState = function() {
+          ctrl.navigateToState = function() {
             return;
           };
 
-          $scope.addState = function() {
+          ctrl.addState = function() {
             return;
           };
 
-          $scope.recomputeGraph = function() {
+          ctrl.recomputeGraph = function() {
             return;
           };
 
-          $scope.refreshWarnings = function() {
+          ctrl.refreshWarnings = function() {
             return;
           };
 
@@ -85,98 +103,96 @@ oppia.directive('questionEditor', [
             StateEditorService.setCorrectnessFeedbackEnabled(true);
             StateEditorService.setInQuestionMode(true);
             SolutionValidityService.init(['question']);
-            var stateData = $scope.questionStateData;
+            var stateData = ctrl.questionStateData;
             stateData.interaction.defaultOutcome.setDestination(null);
             if (stateData) {
               $rootScope.$broadcast('stateEditorInitialized', stateData);
 
               if (stateData.content.getHtml() || stateData.interaction.id) {
-                $scope.interactionIsShown = true;
+                ctrl.interactionIsShown = true;
               }
 
               $rootScope.loadingMessage = '';
             }
-            $scope.stateEditorInitialized = true;
+            ctrl.stateEditorInitialized = true;
           };
 
           var _updateQuestion = function(updateFunction) {
-            if ($scope.questionChanged) {
-              $scope.questionChanged();
+            if (ctrl.questionChanged) {
+              ctrl.questionChanged();
             }
             QuestionUpdateService.setQuestionStateData(
-              $scope.question, updateFunction);
+              ctrl.question, updateFunction);
           };
 
-          $scope.saveStateContent = function(displayedValue) {
+          ctrl.saveStateContent = function(displayedValue) {
             // Show the interaction when the text content is saved, even if no
             // content is entered.
             _updateQuestion(function() {
-              var stateData = $scope.question.getStateData();
+              var stateData = ctrl.question.getStateData();
               stateData.content = angular.copy(displayedValue);
-              $scope.interactionIsShown = true;
+              ctrl.interactionIsShown = true;
             });
           };
 
-          $scope.saveInteractionId = function(displayedValue) {
+          ctrl.saveInteractionId = function(displayedValue) {
             _updateQuestion(function() {
               StateEditorService.setInteractionId(angular.copy(displayedValue));
             });
           };
 
-          $scope.saveInteractionAnswerGroups = function(newAnswerGroups) {
+          ctrl.saveInteractionAnswerGroups = function(newAnswerGroups) {
             _updateQuestion(function() {
               StateEditorService.setInteractionAnswerGroups(
                 angular.copy(newAnswerGroups));
             });
           };
 
-          $scope.saveInteractionDefaultOutcome = function(newOutcome) {
+          ctrl.saveInteractionDefaultOutcome = function(newOutcome) {
             _updateQuestion(function() {
               StateEditorService.setInteractionDefaultOutcome(
                 angular.copy(newOutcome));
             });
           };
 
-          $scope.saveInteractionCustomizationArgs = function(displayedValue) {
+          ctrl.saveInteractionCustomizationArgs = function(displayedValue) {
             _updateQuestion(function() {
               StateEditorService.setInteractionCustomizationArgs(
                 angular.copy(displayedValue));
             });
           };
 
-          $scope.saveSolution = function(displayedValue) {
+          ctrl.saveSolution = function(displayedValue) {
             _updateQuestion(function() {
               StateEditorService.setInteractionSolution(
                 angular.copy(displayedValue));
             });
           };
 
-          $scope.saveHints = function(displayedValue) {
+          ctrl.saveHints = function(displayedValue) {
             _updateQuestion(function() {
               StateEditorService.setInteractionHints(
                 angular.copy(displayedValue));
             });
           };
 
-          $scope.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
+          ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(
               contentId) {
-            var state = $scope.question.getStateData();
-            var contentIdsToAudioTranslations = (
-              state.contentIdsToAudioTranslations);
+            var state = ctrl.question.getStateData();
+            var recordedVoiceovers = state.recordedVoiceovers;
             var writtenTranslations = state.writtenTranslations;
             var updateQuestion = _updateQuestion;
-            if (contentIdsToAudioTranslations.hasUnflaggedAudioTranslations(
-              contentId)) {
+            if (recordedVoiceovers.hasUnflaggedVoiceovers(contentId)) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/components/forms/mark_all_audio_and_translations_as_' +
-                  'needing_update_modal_directive.html'),
+                  '/components/forms/forms-templates/mark-all-audio-and-' +
+                  'translations-as-needing-update-modal.directive.html'),
                 backdrop: true,
                 controller: (
                   'MarkAllAudioAndTranslationsAsNeedingUpdateController')
               }).result.then(function() {
                 updateQuestion(function() {
-                  contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+                  recordedVoiceovers.markAllVoiceoversAsNeedingUpdate(
                     contentId);
                   writtenTranslations.markAllTranslationsAsNeedingUpdate(
                     contentId);

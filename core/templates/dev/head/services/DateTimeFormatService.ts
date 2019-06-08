@@ -13,9 +13,9 @@
 // limitations under the License.
 
 /**
-* @fileoverview Service for converting dates in milliseconds
-* since the Epoch to human-readable dates.
-*/
+ * @fileoverview Service for converting dates in milliseconds
+ * since the Epoch to human-readable dates.
+ */
 
 oppia.factory('DateTimeFormatService', ['$filter', function($filter) {
   return {

@@ -17,6 +17,11 @@
  * that it can be displayed and edited in multiple places in the UI.
  */
 
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('pages/exploration_editor/ExplorationPropertyService.ts');
+require('pages/exploration_editor/ExplorationRightsService.ts');
+require('services/ValidatorsService.ts');
+
 oppia.factory('ExplorationObjectiveService', [
   '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
   'ValidatorsService',

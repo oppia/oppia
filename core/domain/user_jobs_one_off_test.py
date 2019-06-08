@@ -37,8 +37,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(user_models, feedback_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.feedback])
+(user_models, feedback_models, exp_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.feedback, models.NAMES.exploration])
 taskqueue_services = models.Registry.import_taskqueue_services()
 search_services = models.Registry.import_search_services()
 
@@ -552,6 +552,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+            self.process_and_flush_pending_tasks()
 
         self._run_one_off_job()
 
@@ -651,6 +652,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration from earlier.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+            self.process_and_flush_pending_tasks()
 
         self._run_one_off_job()
 
@@ -1251,3 +1253,66 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         owner_settings = user_services.get_user_settings(self.owner_id)
         self.assertIsNone(owner_settings.last_created_an_exploration)
         self.assertIsNone(owner_settings.last_edited_an_exploration)
+
+
+class CleanupUserSubscriptionsModelUnitTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(CleanupUserSubscriptionsModelUnitTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email('user@email')
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i
+        ) for i in xrange(3)]
+
+        for exp in explorations:
+            exp_services.save_new_exploration(self.owner_id, exp)
+            rights_manager.publish_exploration(self.owner, exp.id)
+
+        for exp in explorations:
+            subscription_services.subscribe_to_exploration(
+                self.user_id, exp.id)
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operation(self):
+        for exp_id in xrange(3):
+            exp_models.ExplorationModel.get('%s' % exp_id).delete(
+                self.owner_id, 'deleted exploration')
+
+        self.assertEqual(
+            len(user_models.UserSubscriptionsModel.get(self.owner_id)
+                .activity_ids), 3)
+        self.assertEqual(
+            len(user_models.UserSubscriptionsModel.get(self.user_id)
+                .activity_ids), 3)
+
+        job = user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob # pylint: disable=line-too-long
+        job_id = job.create_new()
+        job.enqueue(job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            len(user_models.UserSubscriptionsModel.get(self.owner_id)
+                .activity_ids), 0)
+        self.assertEqual(
+            len(user_models.UserSubscriptionsModel.get(self.user_id)
+                .activity_ids), 0)
+        actual_output = job.get_output(job_id)
+        expected_output = [
+            u'[u\"Successfully cleaned up UserSubscriptionsModel %s and '
+            'removed explorations [u\'0\', u\'1\', u\'2\']\", 1]' %
+            self.owner_id,
+            u'[u\"Successfully cleaned up UserSubscriptionsModel %s and '
+            'removed explorations [u\'0\', u\'1\', u\'2\']\", 1]' %
+            self.user_id]
+        self.assertEqual(sorted(actual_output), sorted(expected_output))

@@ -16,11 +16,14 @@
  * @fileoverview Unit tests for the controller of the library page.
  */
 
+require('pages/library/LibraryPageDirective.ts');
+
 describe('Library controller', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('Library', function() {
-    var scope, ctrl, rootScope, $httpBackend;
+    var scope, ctrl, $httpBackend;
+    var $componentController;
 
     beforeEach(function() {
       angular.mock.module('ui.bootstrap');
@@ -30,7 +33,8 @@ describe('Library controller', function() {
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(angular.mock.inject(function(
-        $controller, _$httpBackend_, $rootScope) {
+        _$componentController_, _$httpBackend_) {
+      $componentController = _$componentController_;
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/searchhandler/data').respond({
         allow_yaml_file_upload: false,
@@ -65,13 +69,10 @@ describe('Library controller', function() {
         preferred_language_codes: ['en']
       });
 
-      scope = $rootScope.$new();
-      rootScope = $rootScope;
-      ctrl = $controller('Library', {
-        $scope: scope,
+      ctrl = $componentController('libraryPage', {
         AlertsService: null,
         DateTimeFormatService: null
-      });
+      }, {});
     }));
 
     it('should show correct explorations', function() {

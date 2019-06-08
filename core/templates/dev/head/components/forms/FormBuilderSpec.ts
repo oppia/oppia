@@ -16,6 +16,19 @@
  * @fileoverview Tests for the form builders.
  */
 
+require(
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
+require('filters/convert-unicode-with-params-to-html.filter.ts');
+require(
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require('components/forms/validators/IsAtLeastFilter.ts');
+require('components/forms/validators/IsAtMostFilter.ts');
+require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/IsIntegerFilter.ts');
+require('components/forms/validators/IsNonemptyFilter.ts');
+
 describe('HTML to text', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -182,6 +195,11 @@ describe('Testing requireIsFloat directive', function() {
       '<input name="floatValue" type="number" ng-model="localValue" ' +
       'require-is-float apply-validation>' +
       '</form>';
+    scope.validators = function() {
+      return [{
+        id: 'isFloat'
+      }];
+    };
     $compile(element)(scope);
     testInput = scope.testForm.floatValue;
   }));

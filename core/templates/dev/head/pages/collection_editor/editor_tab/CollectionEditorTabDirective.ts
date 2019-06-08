@@ -16,28 +16,38 @@
  * @fileoverview Controller for the main tab of the collection editor.
  */
 
+require('pages/collection_editor/editor_tab/CollectionNodeCreatorDirective.ts');
+require('pages/collection_editor/editor_tab/CollectionNodeEditorDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('pages/collection_editor/CollectionEditorStateService.ts');
+require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+
 oppia.directive('collectionEditorTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_editor/editor_tab/' +
         'collection_editor_tab_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', 'CollectionEditorStateService', 'CollectionLinearizerService',
+        'CollectionEditorStateService', 'CollectionLinearizerService',
         function(
-            $scope, CollectionEditorStateService, CollectionLinearizerService) {
-          $scope.hasLoadedCollection = (
+            CollectionEditorStateService, CollectionLinearizerService) {
+          var ctrl = this;
+          ctrl.hasLoadedCollection = (
             CollectionEditorStateService.hasLoadedCollection);
-          $scope.collection = CollectionEditorStateService.getCollection();
+          ctrl.collection = CollectionEditorStateService.getCollection();
 
           // Returns a list of collection nodes which represents a valid linear
           // path through the collection.
-          $scope.getLinearlySortedNodes = function() {
+          ctrl.getLinearlySortedNodes = function() {
             return (
               CollectionLinearizerService.getCollectionNodesInPlayableOrder(
-                $scope.collection));
+                ctrl.collection));
           };
         }
       ]

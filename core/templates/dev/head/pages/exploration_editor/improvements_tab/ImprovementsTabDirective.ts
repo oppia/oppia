@@ -13,9 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the exploration improvements tab in the
+ * @fileoverview Directive for the exploration improvements tab in the
  * exploration editor.
  */
+
+require(
+  'pages/exploration_editor/improvements_tab/' +
+  'PlaythroughImprovementCardDirective.ts'
+);
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ImprovementCardService.ts');
 
 oppia.directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

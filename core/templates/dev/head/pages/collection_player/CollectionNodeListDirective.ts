@@ -17,16 +17,21 @@
  * playing the exploration in each node.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+
 oppia.directive('collectionNodeList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getCollectionId: '&collectionId',
         getCollectionNodes: '&collectionNodes'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_player/' +
-        'collection_node_list_directive.html')
+        'collection_node_list_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [function() {}]
     };
   }]);

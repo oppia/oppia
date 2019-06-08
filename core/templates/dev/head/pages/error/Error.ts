@@ -16,6 +16,11 @@
  * @fileoverview Controllers for the error page.
  */
 
+require('pages/OppiaFooterDirective.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/PageTitleService.ts');
+
 oppia.controller('Error', [
   '$scope', 'PageTitleService', 'UrlInterpolationService',
   function(
