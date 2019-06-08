@@ -28,8 +28,8 @@ oppia.directive('profileLinkText', [
         username: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/profile_link/' +
-        'profile_link_text_directive.html'),
+        '/components/profile-link-directives/' +
+        'profile-link-text.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
