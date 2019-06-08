@@ -1911,7 +1911,6 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 
     def test_get_returns_empty_values_from_unvisited_exploration(self):
         with self.login_context(self.OWNER_EMAIL) as owner_id:
-            self.login(self.OWNER_EMAIL)
             exp_id = exp_services.get_new_exploration_id()
             self.save_new_valid_exploration(exp_id, owner_id)
 
@@ -1935,3 +1934,44 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
         self.assertEqual(
             state_stats['interaction_ids'],
             {'A': 'FractionInput', 'B': 'TextInput', 'End': 'EndExploration'})
+
+    def test_get_returns_recorded_answers_from_exploration(self):
+        with self.login_context(self.OWNER_EMAIL) as owner_id:
+            exp_id = exp_services.get_new_exploration_id()
+            exp = self.save_new_valid_exploration(exp_id, owner_id)
+
+        def mock_get_top_state_answer_stats(exploration_id, state_name):
+            """Returns a fake list of top answers for a particular state.
+
+            Args:
+                exploration_id: str. The exploration ID.
+                state_name: str. The name of the state to fetch answers for.
+
+            Returns:
+                list(*). A list of the top 10 answers, sorted by decreasing
+                frequency.
+            """
+            if (exploration_id, state_name) == (exp_id, exp.init_state_name):
+                return [
+                    {'answer': 'C', 'frequency': 12},
+                    {'answer': 'B', 'frequency': 11},
+                    {'answer': 'A', 'frequency': 10},
+                ]
+            return []
+
+        swap_get_answers = self.swap(
+            stats_services, 'get_top_state_answer_stats',
+            mock_get_top_state_answer_stats)
+
+        with self.login_context(self.OWNER_EMAIL), swap_get_answers:
+            state_stats = self.get_json(
+                '%s/%s' % (
+                    feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX, exp_id))
+
+        self.assertEqual(state_stats['answers'], {
+            exp.init_state_name: [
+                {'answer': 'C', 'frequency': 12},
+                {'answer': 'B', 'frequency': 11},
+                {'answer': 'A', 'frequency': 10},
+            ],
+        })
