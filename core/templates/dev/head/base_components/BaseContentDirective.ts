@@ -24,6 +24,8 @@ oppia.directive('baseContent', [
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
+      scope: {},
+      bindToController: {},
       transclude: {
         breadcrumb: '?navbarBreadcrumb',
         content: 'content',
@@ -31,7 +33,11 @@ oppia.directive('baseContent', [
         navOptions: '?localTopNavOptions',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/base_components/base_content_directive.html')
+        '/base_components/base_content_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        function() {}
+      ]
     };
   }
 ]);
