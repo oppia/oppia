@@ -23,7 +23,8 @@ require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
-require('pages/suggestion_editor/SuggestionModalForExplorationEditorService.ts');
+require(
+  'pages/suggestion_editor/SuggestionModalForExplorationEditorService.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
