@@ -48,7 +48,7 @@ oppia.factory('StateTopAnswersStatsService', [
      */
     var refreshAddressedInfo = function(stateName) {
       if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
-        return;
+        throw Error(stateName + ' does not exist.');
       }
 
       var explorationId = ContextService.getExplorationId();
