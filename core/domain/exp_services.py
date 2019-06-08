@@ -887,13 +887,17 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'state_names_with_changed_answer_groups']
         state_names_with_unchanged_answer_groups = trainable_states_dict[
             'state_names_with_unchanged_answer_groups']
-        if state_names_with_changed_answer_groups:
-            classifier_services.handle_trainable_states(
-                exploration, state_names_with_changed_answer_groups)
+        state_names_to_train_classifier = state_names_with_changed_answer_groups
         if state_names_with_unchanged_answer_groups:
-            classifier_services.handle_non_retrainable_states(
-                exploration, state_names_with_unchanged_answer_groups,
-                exp_versions_diff)
+            state_names_without_classifier = (
+                classifier_services.handle_non_retrainable_states(
+                    exploration, state_names_with_unchanged_answer_groups,
+                    exp_versions_diff))
+            state_names_to_train_classifier.extend(
+                state_names_without_classifier)
+        if state_names_to_train_classifier:
+            classifier_services.handle_trainable_states(
+                exploration, state_names_to_train_classifier)
 
     # Trigger exploration issues model updation.
     stats_services.update_exp_issues_for_new_exp_version(
