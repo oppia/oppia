@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/CapitalizeFilter.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
 require('pages/landing/TopicLandingPage.ts');
 require('services/PageTitleService.ts');
 require('services/SiteAnalyticsService.ts');

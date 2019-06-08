@@ -16,7 +16,8 @@
  * @fileoverview Directive for the state content editor.
  */
 
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

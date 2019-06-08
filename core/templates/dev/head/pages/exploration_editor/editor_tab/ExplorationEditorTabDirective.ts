@@ -16,9 +16,12 @@
  * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
+require('pages/exploration_editor/editor_tab/ExplorationGraphDirective.ts');
 require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
 require(
   'pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.ts');
+require(
+  'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
 require('pages/state_editor/StateEditorDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -185,8 +188,8 @@ oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
               writtenTranslations.hasUnflaggedWrittenTranslations(contentId)) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/components/forms/mark_all_audio_and_translations_as_' +
-                'needing_update_modal_directive.html'),
+                '/components/forms/forms-templates/mark-all-audio-and-' +
+                'translations-as-needing-update-modal.directive.html'),
               backdrop: true,
               controller: 'MarkAllAudioAndTranslationsAsNeedingUpdateController'
             }).result.then(function() {

@@ -64,9 +64,8 @@
         </div>
       </div>
 
-      <div ng-show="getActiveTabName() === 'main'">
-        {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
-      </div>
+      <exploration-editor-tab ng-show="getActiveTabName() === 'main'">
+      </exploration-editor-tab>
 
       <translation-tab ng-if="getActiveTabName() === 'translation'">
       </translation-tab>
@@ -165,7 +164,7 @@
       <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
-  {% include 'components/rich_text_components.html' %}
+  {% include 'components/ck-editor-helpers/rich-text-components.template.html' %}
   {{ interaction_templates }}
   {{ visualizations_html }}
   {{ dependencies_html }}

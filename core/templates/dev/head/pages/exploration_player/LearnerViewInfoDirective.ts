@@ -18,9 +18,11 @@
  */
 
 require('components/profile_link/ProfileLinkImageDirective.ts');
-require('components/share/SharingLinksDirective.ts');
-require('filters/SummarizeNonnegativeNumberFilter.ts');
-require('filters/TruncateAndCapitalizeFilter.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'sharing-links.directive.ts');
+require('filters/summarize-nonnegative-number.filter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 
 require('components/RatingComputationService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
