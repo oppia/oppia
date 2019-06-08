@@ -23,9 +23,9 @@ require('components/CkEditorRteDirective.ts');
 require('components/CkEditorWidgetsInitializer.ts');
 require('components/forms/ApplyValidationDirective.ts');
 require('components/forms/AudioFileUploaderDirective.ts');
-require('components/forms/ConvertUnicodeWithParamsToHtmlFilter.ts');
-require('components/forms/ConvertHtmlToUnicodeFilter.ts');
-require('components/forms/ConvertUnicodeToHtmlFilter.ts');
+require('filters/convert-unicode-with-params-to-html.filter.ts');
+require('filters/convert-html-to-unicode.filter.ts');
+require('filters/convert-unicode-to-html.filter.ts');
 require('components/forms/RequireIsFloatDirective.ts');
 require('components/forms/ImageUploaderDirective.ts');
 require('components/forms/HtmlSelectDirective.ts');
@@ -67,24 +67,27 @@ require('components/state/SolutionExplanationEditorDirective.ts');
 require('components/CodemirrorMergeviewDirective.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
-require('filters/CamelCaseToHyphensFilter.ts');
-require('filters/CapitalizeFilter.ts');
-require('filters/ConvertToPlainTextFilter.ts');
-require('filters/FormatRtePreviewFilter.ts');
-require('filters/FormatTimerFilter.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
-require('filters/NormalizeWhitespacePunctuationAndCaseFilter.ts');
-require('filters/ParameterizeRuleDescriptionFilter.ts');
-require('filters/RemoveDuplicatesInArrayFilter.ts');
-require('filters/ReplaceInputsWithEllipsesFilter.ts');
-require('filters/SummarizeNonnegativeNumberFilter.ts');
-require('filters/TruncateFilter.ts');
-require('filters/TruncateAndCapitalizeFilter.ts');
-require('filters/TruncateAtFirstEllipsisFilter.ts');
-require('filters/TruncateAtFirstLineFilter.ts');
-require('filters/TruncateInputBasedOnInteractionAnswerTypeFilter.ts');
-require('filters/UnderscoresToCamelCaseFilter.ts');
-require('filters/WrapTextWithEllipsisFilter.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
+require('filters/string-utility-filters/capitalize.filter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/format-rte-preview.filter.ts');
+require('filters/format-timer.filter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require(
+  'filters/string-utility-filters/' +
+  'normalize-whitespace-punctuation-and-case.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/remove-duplicates-in-array.filter.ts');
+require(
+  'filters/string-utility-filters/replace-inputs-with-ellipses.filter.ts');
+require('filters/summarize-nonnegative-number.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-ellipsis.filter.ts');
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
+require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
 require(
   'pages/exploration_editor/' +
   'MarkAllAudioAndTranslationsAsNeedingUpdateController.ts'
@@ -106,21 +109,18 @@ require(
   'pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.ts');
 require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
 require('pages/exploration_editor/ParamChangesEditorDirective.ts');
-require('pages/exploration_editor/editor_tab/ExplorationEditorTab.ts');
-require('pages/exploration_editor/editor_tab/ExplorationGraph.ts');
-require(
-  'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
-require('pages/exploration_editor/feedback_tab/FeedbackTab.ts');
+require('pages/exploration_editor/editor_tab/ExplorationEditorTabDirective.ts');
+require('pages/exploration_editor/feedback_tab/FeedbackTabDirective.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
-require('pages/exploration_editor/history_tab/HistoryTab.ts');
+require('pages/exploration_editor/history_tab/HistoryTabDirective.ts');
 require(
   'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
-require('pages/exploration_editor/preview_tab/PreviewTab.ts');
-require('pages/exploration_editor/settings_tab/SettingsTab.ts');
+require('pages/exploration_editor/preview_tab/PreviewTabDirective.ts');
+require('pages/exploration_editor/settings_tab/SettingsTabDirective.ts');
 require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');
 require(
   'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
-require('pages/exploration_editor/statistics_tab/StatisticsTab.ts');
+require('pages/exploration_editor/statistics_tab/StatisticsTabDirective.ts');
 require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');
@@ -176,8 +176,8 @@ oppia.constant(
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>');
 oppia.constant(
-  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/translate/<exploration_id>');
+  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/voiceover/<exploration_id>');
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
@@ -326,7 +326,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationRightsService.init(
           explorationData.rights.owner_names,
           explorationData.rights.editor_names,
-          explorationData.rights.translator_names,
+          explorationData.rights.voice_artist_names,
           explorationData.rights.viewer_names, explorationData.rights.status,
           explorationData.rights.cloned_from,
           explorationData.rights.community_owned,
@@ -339,7 +339,7 @@ oppia.controller('ExplorationEditor', [
           EditabilityService.markEditable();
         }
 
-        if (GLOBALS.can_translate || GLOBALS.can_edit) {
+        if (GLOBALS.can_voiceover || GLOBALS.can_edit) {
           EditabilityService.markTranslatable();
         }
 

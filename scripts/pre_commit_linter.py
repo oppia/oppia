@@ -1431,7 +1431,7 @@ class LintChecksManager(object):
                     # If the component is directive or filter and its name is
                     # xxx then the filename containing it should be
                     # XxxDirective.js or XxxFilter.js respectively.
-                    if component == 'directive' or component == 'filter':
+                    if component == 'directive':
                         if (component_name[0].swapcase() + component_name[1:] +
                                 component.capitalize() != (exact_filename)):
                             print (
@@ -1443,7 +1443,7 @@ class LintChecksManager(object):
                     # component name should exactly match the filename
                     # containing it. If the component's name is xxx then the
                     # filename should be xxx.js.
-                    else:
+                    elif component == 'controller' or component == 'factory':
                         if component_name != exact_filename:
                             print (
                                 '%s -> Please ensure that the %s name '

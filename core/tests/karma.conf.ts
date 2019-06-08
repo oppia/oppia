@@ -26,8 +26,6 @@ module.exports = function(config) {
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.9.2/ckeditor.js',
-      'third_party/static/angular-recorder-1.4.1/dist' +
-      '/angular-audio-recorder.min.js',
       generatedJs,
       'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
@@ -36,6 +34,8 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*Spec.ts',
       'core/templates/dev/head/*Spec.ts',
+      'core/templates/dev/head/**/*.spec.ts',
+      'core/templates/dev/head/*.spec.ts',
       'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
       {
@@ -83,6 +83,8 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.ts': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/!(*.spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*.spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no

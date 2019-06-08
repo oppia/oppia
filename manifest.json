@@ -128,12 +128,12 @@
           "js": ["app/angular.audio.js"]
         }
       },
-      "angularRecorder": {
-        "version": "1.4.1",
+      "lamejs": {
+        "version": "1.2.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/logbon72/angular-recorder/archive/1.4.1.zip",
-        "rootDirPrefix": "angular-recorder-",
-        "targetDirPrefix": "angular-recorder-"
+        "url": "https://github.com/zhuker/lamejs/archive/1.2.0.zip",
+        "rootDirPrefix": "lamejs-",
+        "targetDirPrefix": "lamejs-"
       },
       "angularTest": {
         "version": "1.5.8",

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "lib": ["es2017", "dom"],
+    "lib": ["es2017", "dom", "webworker"],
     "noImplicitUseStrict": true,
     "outDir": "local_compiled_js",
     "rootDir": ".",
@@ -18,8 +18,8 @@
     "core/templates/dev/head/mathjaxConfig.ts",
     "core/templates/dev/head/domain/classifier/PredictionResultObjectFactory.ts",
     "core/templates/dev/head/expressions/ExpressionParserService.js",
-    "core/templates/dev/head/filters/ConvertToPlainTextFilter.ts",
-    "core/templates/dev/head/filters/TruncateAtFirstLineFilter.ts"
+    "core/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.ts",
+    "core/templates/dev/head/filters/string-utility-filters/truncate-at-first-line.filter.ts"
   ],
   "include": ["extensions", "typings"]
 }
