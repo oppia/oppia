@@ -23,7 +23,7 @@ oppia.factory('MathExpressionInputRulesService', [function() {
         MathExpression.fromLatex(answer.latex);
       } catch (e) {
         throw Error(
-          'Bad answer: ' + e.message() + ' inputs: ' +
+          'Bad expression in answer.latex: ' + e.message() + ' inputs: ' +
           JSON.stringify(answer));
       }
 
@@ -31,7 +31,7 @@ oppia.factory('MathExpressionInputRulesService', [function() {
         MathExpression.fromLatex(inputs.x);
       } catch (e) {
         throw Error(
-          'Bad input: ' + e.message() + ' inputs: ' +
+          'Bad expression in inputs.x: ' + e.message() + ' inputs: ' +
           JSON.stringify(inputs));
       }
 
