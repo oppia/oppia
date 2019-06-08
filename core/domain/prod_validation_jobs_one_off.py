@@ -1423,9 +1423,6 @@ class ExplorationModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        state_id_mapping_model_ids = [
-            '%s.%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
         exploration_commit_log_entry_model_ids = [
             'exploration-%s-%s' % (item.id, version) for version in range(
                 1, item.version + 1)]
@@ -1435,9 +1432,6 @@ class ExplorationModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
-            'state_id_mapping_model': (
-                exp_models.StateIdMappingModel,
-                state_id_mapping_model_ids),
             'exploration_commit_log_entry_model': (
                 exp_models.ExplorationCommitLogEntryModel,
                 exploration_commit_log_entry_model_ids),
@@ -1455,37 +1449,8 @@ class ExplorationModelValidator(BaseModelValidator):
         }
 
     @classmethod
-    def _validate_state_name(cls, item):
-        """Validate that state name of StateIdMappingModel matches
-        corresponding ExplorationModel states.
-
-        Args:
-            item: ExplorationModel to validate.
-        """
-        _, state_id_mapping_model_tuples = (
-            cls.external_models['state_id_mapping_model'])
-        state_id_mapping_model = state_id_mapping_model_tuples[0][1]
-        if state_id_mapping_model:
-            if (
-                    len(state_id_mapping_model.state_names_to_ids) !=
-                    len(item.states)):
-                cls.errors['exploration state check'] = (
-                    'Model id %s: Corresponding StateIdMappingModel %s has '
-                    '%d states but model has %d' % (
-                        item.id, state_id_mapping_model.id,
-                        len(state_id_mapping_model.state_names_to_ids),
-                        len(item.states)))
-            for state_name in (
-                    state_id_mapping_model.state_names_to_ids.iterkeys()):
-                if state_name not in item.states:
-                    cls.errors['exploration state check'] = (
-                        'Model id %s: Corresponding StateIdMappingModel %s has '
-                        'state name %s but model doesn\'t' %
-                        (item.id, state_id_mapping_model.id, state_name))
-
-    @classmethod
     def _get_validation_functions(cls):
-        return [cls._validate_state_name]
+        return []
 
 
 class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):

@@ -48,31 +48,59 @@ require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
 require('components/forms/validators/IsIntegerFilter.ts');
 require('components/forms/validators/IsNonemptyFilter.ts');
-require('components/forms/ApplyValidationDirective.ts');
-require('components/forms/RequireIsFloatDirective.ts');
-require('components/forms/schema_editors/SchemaBasedBoolEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedChoicesEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedCustomEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedDictEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedEditorDirective.ts');
 require(
-  'components/forms/schema_editors/SchemaBasedExpressionEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedFloatEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedHtmlEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedIntEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedListEditorDirective.ts');
-require('components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedCustomViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedDictViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedListViewerDirective.ts');
+  'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
-  'components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.ts');
-require('components/forms/schema_viewers/SchemaBasedViewerDirective.ts');
-require('components/forms/Select2DropdownDirective.ts');
-require('components/forms/ImageUploaderDirective.ts');
-require('components/forms/AudioFileUploaderDirective.ts');
+  'components/forms/custom-forms-directives/require-is-float.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-bool-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-choices-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-custom-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-dict-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-expression-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-float-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-html-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/schema-based-int-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-list-editor.directive.ts');
+require(
+  'components/forms/schema-based-editors/' +
+  'schema-based-unicode-editor.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-dict-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-html-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-list-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
+require(
+  'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
+require('components/forms/custom-forms-directives/image-uploader.directive.ts');
+require(
+  'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
 require('pages/question_editor/QuestionEditorDirective.ts');
 require('components/state/AnswerGroupEditorDirective.ts');
 require('components/state/HintEditorDirective.ts');
@@ -84,17 +112,21 @@ require('components/state/RuleEditorDirective.ts');
 require('components/state/RuleTypeSelectorDirective.ts');
 require('components/state/SolutionEditorDirective.ts');
 require('components/state/SolutionExplanationEditorDirective.ts');
-require('components/forms/HtmlSelectDirective.ts');
+require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/share/SharingLinksDirective.ts');
-require('components/background/BackgroundBannerDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'sharing-links.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 require('components/summary_tile/CollectionSummaryTileDirective.ts');
 require('pages/exploration_player/PlayerConstants.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
 
-require('components/ExplorationCreationService.ts');
+require('components/entity-creation-services/exploration-creation.service.ts');
 require('components/RatingComputationService.ts');
 require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');

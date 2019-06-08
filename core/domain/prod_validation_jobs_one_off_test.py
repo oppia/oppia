@@ -2610,11 +2610,6 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.id,
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
-            ), (
-                u'[u\'failed validation check for state_id_mapping_model field '
-                'check of ExplorationModel\', [u"Model id 0: based on field '
-                'state_id_mapping_model having value 0.2, expect model '
-                'StateIdMappingModel with id 0.2 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -2646,25 +2641,6 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             constants, 'ALL_LANGUAGE_CODES', [{
                 'code': 'en', 'description': 'English'}]):
             run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_missing_state_id_mapping_model_failure(self):
-        exp_services.update_exploration(
-            self.owner_id, '0', [exp_domain.ExplorationChange({
-                'cmd': 'edit_exploration_property',
-                'property_name': 'title',
-                'new_value': 'New title'
-            })], 'Changes.')
-        exp_services.delete_state_id_mapping_model_for_exploration('0', 1)
-
-        expected_output = [
-            (
-                u'[u\'failed validation check for state_id_mapping_model '
-                'field check of ExplorationModel\', '
-                '[u"Model id 0: based on field state_id_mapping_model having '
-                'value 0.1, expect model StateIdMappingModel with id 0.1 but '
-                'it doesn\'t exist"]]'),
-            u'[u\'fully-validated ExplorationModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_missing_exploration_commit_log_entry_model_failure(self):
         exp_services.update_exploration(
