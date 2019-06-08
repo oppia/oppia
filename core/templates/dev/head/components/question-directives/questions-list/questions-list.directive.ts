@@ -18,7 +18,9 @@
  */
 
 require('directives/AngularHtmlBindDirective.ts');
-require('components/question-directives/question-editor/question-editor.directive.ts');
+require(
+  'components/question-directives/question-editor/' +
+  'question-editor.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
@@ -29,7 +31,9 @@ require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/topic_editor/TopicEditorStateService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 

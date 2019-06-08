@@ -34,7 +34,8 @@ oppia.directive('summaryListHeader', [
         getNumItems: '&numItems',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/state-directives/answer-group-editor/summary-list-header.directive.html'),
+        '/components/state-directives/answer-group-editor/' +
+        'summary-list-header.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {

@@ -26,7 +26,7 @@ describe('Rating display directive', function() {
   beforeEach(
     angular.mock.inject(function($compile, $rootScope, $templateCache) {
       var templateHtml = $templateCache.get(
-        '/core/templates/dev/head/components/ratings/rating-display/rating-display.directive.html');
+        '/components/ratings/rating-display/rating-display.directive.html');
       $compile(templateHtml)($rootScope);
       $rootScope.$digest();
       outerScope = $rootScope.$new();

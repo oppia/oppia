@@ -25,10 +25,15 @@ require(
   'TranslationTabActiveContentIdService.ts');
 require(
   'pages/exploration_editor/translation_tab/VoiceoverRecordingService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
-require('components/state-editor/state-editor-properties-services/state-property.service.ts');
 require(
-  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
 require('services/AlertsService.ts');
 require('services/AssetsBackendApiService.ts');
 require('services/AudioPlayerService.ts');

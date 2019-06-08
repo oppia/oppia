@@ -19,7 +19,9 @@
 require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/EditabilityService.ts');
 require('services/UserService.ts');
 require('services/stateful/FocusManagerService.ts');

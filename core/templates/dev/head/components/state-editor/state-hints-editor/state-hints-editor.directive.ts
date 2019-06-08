@@ -18,14 +18,23 @@
  */
 
 require('components/state-directives/hint-editor/hint-editor.directive.ts');
-require('components/state-directives/response-header/response-header.directive.ts');
+require(
+  'components/state-directives/response-header/response-header.directive.ts');
 
 require('domain/exploration/HintObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
-require('components/state-editor/state-editor-properties-services/state-hints.service.ts');
-require('components/state-editor/state-editor-properties-services/state-interaction-id.service.ts');
-require('components/state-editor/state-editor-properties-services/state-solution.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-hints.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/GenerateContentIdService.ts');

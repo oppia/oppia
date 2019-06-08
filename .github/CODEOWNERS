@@ -105,10 +105,10 @@
 /core/templates/dev/head/components/entity-creation-services/exploration-creation.service*.ts @DubeySandeep
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive*.ts @aks681
 /core/templates/dev/head/components/button-directives/hint-and-solution-buttons.directive.html @aks681
-/core/templates/dev/head/components/state/ @aks681
-/core/templates/dev/head/components/StateGraphLayoutService*.ts @DubeySandeep
-/core/templates/dev/head/components/version_diff_visualization_directive.html @DubeySandeep
-/core/templates/dev/head/components/VersionDiffVisualizationDirective*.ts @DubeySandeep
+/core/templates/dev/head/components/state-directives/ @aks681
+/core/templates/dev/head/components/graph-services/ @DubeySandeep
+/core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.html @DubeySandeep
+/core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.ts @DubeySandeep
 /core/templates/dev/head/domain/editor/ @DubeySandeep
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
 /core/templates/dev/head/domain/state/ @aks681
@@ -116,7 +116,7 @@
 /core/templates/dev/head/domain/state_card/ @aks681
 /core/templates/dev/head/pages/exploration_editor/ @DubeySandeep
 /core/templates/dev/head/pages/exploration_player/ @aks681
-/core/templates/dev/head/pages/state_editor/ @aks681
+/core/templates/dev/head/components/state-editor/ @aks681
 /core/templates/dev/head/services/ComputeGraphService.ts @DubeySandeep
 /core/templates/dev/head/services/ContextService*.ts @aks681
 /core/templates/dev/head/services/EditabilityService*.ts @DubeySandeep
@@ -158,8 +158,8 @@
 /core/templates/dev/head/components/common-layout-directives/common-elements/sharing-links.directive.ts @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons.directive.ts @ankita240796
 /core/templates/dev/head/components/button-directives/social-buttons.directive.html @ankita240796
-/core/templates/dev/head/components/profile_link/ @ankita240796
-/core/templates/dev/head/components/summary_tile/ @ankita240796
+/core/templates/dev/head/components/profile-link-directives/ @ankita240796
+/core/templates/dev/head/components/summary-tile/ @ankita240796
 /core/templates/dev/head/directives/FocusOnDirective*.ts @ankita240796
 /core/templates/dev/head/directives/AngularHtmlBindDirective*.ts @ankita240796
 /core/templates/dev/head/filters/ @ankita240796
@@ -193,7 +193,7 @@
 /core/domain/customization_args_util*.py @DubeySandeep
 /core/domain/interaction_registry*.py @aks681
 /core/domain/obj_services*.py @aks681
-/core/templates/dev/head/components/CodemirrorMergeviewDirective*.ts @kevinlee12
+/core/templates/dev/head/components/version-diff-visualization/codemirror-mergeview.directive.ts @kevinlee12
 /core/templates/dev/head/domain/objects/ @kevinlee12
 /core/templates/dev/head/expressions/ @seanlip
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
@@ -254,12 +254,12 @@
 /core/domain/question*.py @aks681
 /core/storage/question/ @aks681
 /core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681
-/core/templates/dev/head/components/score_ring/ @vinitamurthi
+/core/templates/dev/head/components/score-ring/ @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681
 /core/templates/dev/head/pages/practice_session/ @vinitamurthi
-/core/templates/dev/head/pages/question_editor/ @aks681
-/core/templates/dev/head/pages/questions_list/ @aks681
-/core/templates/dev/head/pages/question_player/ @vinitamurthi
+/core/templates/dev/head/components/question-directives/question-editor/ @aks681
+/core/templates/dev/head/components/question-directives/questions-list/ @aks681
+/core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
 
 # Skill project.
 /core/controllers/concept_card_viewer*.py @aks681
@@ -267,8 +267,6 @@
 /core/domain/skill*.py @aks681
 /core/storage/skill/ @aks681
 /core/templates/dev/head/components/entity-creation-services/skill-creation.service.ts @aks681
-/core/templates/dev/head/components/SummaryListHeaderDirective*.ts @aks681
-/core/templates/dev/head/components/state-directives/answer-group-editor/summary-list-header.directive.html @aks681
 /core/templates/dev/head/domain/skill/ @aks681
 /core/templates/dev/head/pages/skill_editor/ @aks681
 
@@ -373,8 +371,7 @@
 /core/domain/feedback*.py @nithusha21
 /core/storage/feedback/ @nithusha21
 /core/templates/dev/head/components/ratings/rating-display/rating-display.directive.html @nithusha21
-/core/templates/dev/head/components/RatingComputationService*.ts @nithusha21
-/core/templates/dev/head/components/RatingDisplayDirective*.ts  @nithusha21
+/core/templates/dev/head/components/ratings/  @nithusha21
 /core/templates/dev/head/domain/feedback_message/ @nithusha21
 /core/templates/dev/head/domain/feedback_thread/ @nithusha21
 /core/templates/dev/head/pages/exploration_editor/feedback_tab/ @nithusha21

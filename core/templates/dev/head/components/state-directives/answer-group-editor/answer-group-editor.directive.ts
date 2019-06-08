@@ -16,7 +16,8 @@
  * @fileoverview Directive for the answer group editor.
  */
 
-require('components/state-directives/outcome-editor/outcome-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 
@@ -25,8 +26,12 @@ require('domain/exploration/RuleObjectFactory.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require(
   'pages/exploration_editor/editor_tab/TrainingDataEditorPanelService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
-require('components/state-editor/state-editor-properties-services/state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
 require('services/AlertsService.ts');
 
 oppia.directive('answerGroupEditor', [

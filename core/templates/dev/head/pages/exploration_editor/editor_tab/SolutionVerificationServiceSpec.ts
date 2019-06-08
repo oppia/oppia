@@ -22,9 +22,15 @@ require('pages/exploration_editor/ExplorationStatesService.ts');
 require(
   'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
 require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
-require('components/state-editor/state-editor-properties-services/state-customization-args.service.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
-require('components/state-editor/state-editor-properties-services/state-interaction-id.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
 
 describe('Solution Verification Service', function() {
   beforeEach(function() {

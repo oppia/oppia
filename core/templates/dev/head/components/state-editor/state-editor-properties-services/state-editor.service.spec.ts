@@ -16,7 +16,9 @@
  * @fileoverview Unit test for the Editor state service.
  */
 
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 
 describe('Editor state service', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -20,7 +20,9 @@ require('App.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
 describe('Sidebar state name controller', function() {

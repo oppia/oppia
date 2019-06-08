@@ -68,10 +68,10 @@ module.exports = function(config) {
        'SolutionVerificationServiceSpec.ts'),
       ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
        'StateNameEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state_editor/' +
-       'StateContentEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state_editor/' +
-       'StateInteractionEditorDirectiveSpec.ts'),
+      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
+       'state-content-editor.directive.spec.ts'),
+      ('core/templates/dev/head/components/state-editor/' +
+       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {
       // Karma serves files under the /base directory.

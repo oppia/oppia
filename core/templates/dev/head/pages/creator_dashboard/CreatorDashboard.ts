@@ -101,17 +101,31 @@ require(
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require(
   'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
-require('components/question-directives/question-editor/question-editor.directive.ts');
-require('components/state-directives/answer-group-editor/answer-group-editor.directive.ts');
+require(
+  'components/question-directives/question-editor/' +
+  'question-editor.directive.ts');
+require(
+  'components/state-directives/answer-group-editor/' +
+  'answer-group-editor.directive.ts');
 require('components/state-directives/hint-editor/hint-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-destination-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-feedback-editor.directive.ts');
-require('components/state-directives/response-header/response-header.directive.ts');
+require(
+  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require(
+  'components/state-directives/response-header/response-header.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
-require('components/state-directives/rule-editor/rule-type-selector.directive.ts');
-require('components/state-directives/solution-editor/solution-editor.directive.ts');
-require('components/state-directives/solution-editor/solution-explanation-editor.directive.ts');
+require(
+  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'components/state-directives/solution-editor/' +
+  'solution-explanation-editor.directive.ts');
 require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^

@@ -21,7 +21,9 @@ require(
 require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('components/state-editor/state-editor-properties-services/state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
 require('services/EditabilityService.ts');
 
 oppia.directive('hintEditor', [

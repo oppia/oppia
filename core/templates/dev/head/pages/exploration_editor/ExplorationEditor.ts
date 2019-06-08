@@ -81,17 +81,30 @@ require('components/forms/validators/IsAtMostFilter.ts');
 require('components/forms/validators/IsFloatFilter.ts');
 require('components/forms/validators/IsIntegerFilter.ts');
 require('components/forms/validators/IsNonemptyFilter.ts');
-require('components/state-directives/answer-group-editor/answer-group-editor.directive.ts');
+require(
+  'components/state-directives/answer-group-editor/' +
+  'answer-group-editor.directive.ts');
 require('components/state-directives/hint-editor/hint-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-destination-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-feedback-editor.directive.ts');
-require('components/state-directives/response-header/response-header.directive.ts');
+require(
+  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require(
+  'components/state-directives/response-header/response-header.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
-require('components/state-directives/rule-editor/rule-type-selector.directive.ts');
-require('components/state-directives/solution-editor/solution-editor.directive.ts');
-require('components/state-directives/solution-editor/solution-explanation-editor.directive.ts');
-require('components/version-diff-visualization/codemirror-mergeview.directive.ts');
+require(
+  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'components/state-directives/solution-editor/' +
+  'solution-explanation-editor.directive.ts');
+require(
+  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
@@ -124,7 +137,9 @@ require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/version-diff-visualization/version-diff-visualization.directive.ts');
+require(
+  'components/version-diff-visualization/' +
+  'version-diff-visualization.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
@@ -180,7 +195,9 @@ require('pages/exploration_player/StateClassifierMappingService.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
 require('pages/exploration_editor/UserEmailPreferencesService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');

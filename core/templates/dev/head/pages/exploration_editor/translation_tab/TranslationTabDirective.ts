@@ -32,10 +32,15 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
-require('components/state-editor/state-editor-properties-services/state-property.service.ts');
 require(
-  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 

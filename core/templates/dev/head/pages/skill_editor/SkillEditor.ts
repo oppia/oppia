@@ -20,14 +20,25 @@
 // introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
-require('components/state-directives/answer-group-editor/answer-group-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-destination-editor.directive.ts');
-require('components/state-directives/outcome-editor/outcome-feedback-editor.directive.ts');
+require(
+  'components/state-directives/answer-group-editor/' +
+  'answer-group-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
 require('components/state-directives/rule-editor/rule-editor.directive.ts');
-require('components/state-directives/rule-editor/rule-type-selector.directive.ts');
-require('components/state-directives/solution-editor/solution-editor.directive.ts');
-require('components/state-directives/solution-editor/solution-explanation-editor.directive.ts');
+require(
+  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'components/state-directives/solution-editor/' +
+  'solution-explanation-editor.directive.ts');
 require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');

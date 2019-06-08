@@ -16,7 +16,9 @@
  * @fileoverview Controller for the questions tab.
  */
 
-require('components/question-directives/questions-list/questions-list.directive.ts');
+require(
+  'components/question-directives/questions-list/' +
+  'questions-list.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
@@ -28,7 +30,9 @@ require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/suggestion/QuestionSuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('pages/topic_editor/TopicEditorStateService.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');

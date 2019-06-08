@@ -24,11 +24,15 @@ require(
   'pages/exploration_editor/translation_tab/' +
   'TranslationTabActiveModeService.ts'
 );
-require('components/state-editor/state-editor-properties-services/state-property.service.ts');
 require(
-  'components/state-editor/state-editor-properties-services/state-recorded-voiceovers.service.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
 require(
-  'components/state-editor/state-editor-properties-services/state-written-translations.service.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-written-translations.service.ts');
 
 oppia.factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',

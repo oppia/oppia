@@ -20,10 +20,18 @@ require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require(
   'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
-require('components/state-editor/state-editor-properties-services/state-content.service.ts');
-require('components/state-editor/state-editor-properties-services/state-customization-args.service.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
-require('components/state-editor/state-editor-properties-services/state-interaction-id.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-content.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-customization-args.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-interaction-id.service.ts');
 
 describe('State Interaction controller', function() {
   describe('StateInteraction', function() {

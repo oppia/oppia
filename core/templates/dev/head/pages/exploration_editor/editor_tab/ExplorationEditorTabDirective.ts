@@ -31,7 +31,9 @@ require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/ExplorationWarningsService.ts');
 require('pages/exploration_editor/GraphDataService.ts');
 require('pages/exploration_editor/RouterService.ts');
-require('components/state-editor/state-editor-properties-services/state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');

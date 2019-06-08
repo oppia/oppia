@@ -23,8 +23,10 @@ require(
   'state-editor.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
-  'state-param-changes.service.ts')
-require('components/state-editor/state-editor-properties-services/state-property.service.ts');
+  'state-param-changes.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
 
 oppia.directive('stateParamChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
