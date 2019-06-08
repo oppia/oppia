@@ -27,7 +27,7 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('components/summary_tile/ExplorationSummaryTileDirective.ts');
+require('components/summary-tile/exploration-summary-tile.directive.ts');
 
 require('domain/collection/CollectionObjectFactory.ts');
 require('domain/collection/CollectionPlaythroughObjectFactory.ts');
