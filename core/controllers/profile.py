@@ -45,7 +45,7 @@ class ProfilePage(base.BaseHandler):
         self.values.update({
             'PROFILE_USERNAME': user_settings.username,
         })
-        self.render_template('dist/profile.html')
+        self.render_template('dist/profile-page.mainpage.html')
 
 
 class ProfileHandler(base.BaseHandler):

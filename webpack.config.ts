@@ -73,7 +73,7 @@ module.exports = {
       'practice-session-page.controller.ts',
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
-    profile: commonPrefix + '/pages/profile/Profile.ts',
+    profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
     signup: commonPrefix + '/pages/signup/Signup.ts',
     skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
     splash: commonPrefix + '/pages/splash/Splash.ts',
@@ -282,8 +282,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['profile'],
-      filename: 'profile.html',
-      template: commonPrefix + '/pages/profile/profile.html',
+      filename: 'profile-page.mainpage.html',
+      template: commonPrefix + '/pages/profile-page/profile-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
