@@ -97,8 +97,14 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['about'],
+      chunks: ['app', 'about'],
       filename: 'about.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is an open source learning platform that ' +
+        'connects a community of teachers and learners. You can use this ' +
+        'site to create 1-1 learning scenarios for others.'
+      },
       template: commonPrefix + '/pages/about/about.html',
       minify: htmlMinifyConfig,
       inject: false
