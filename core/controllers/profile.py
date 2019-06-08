@@ -379,7 +379,7 @@ class UserInfoHandler(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        if self.user_id and self.username:
+        if self.username:
             user_actions = user_services.UserActionsInfo(self.user_id).actions
             user_settings = user_services.get_user_settings(
                 self.user_id, strict=False)
