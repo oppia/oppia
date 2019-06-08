@@ -24,16 +24,27 @@ require('services/StateTopAnswersStatsService.ts');
 var joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', function() {
+  var $q = null;
+  var $rootScope = null;
+  var $uibModal = null;
+  var ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
+  var RuleObjectFactory = null;
   var StateTopAnswersStatsService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
-      _ContextService_, _ExplorationStatesService_,
+      _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
+      _ExplorationStatesService_, _RuleObjectFactory_,
       _StateTopAnswersStatsService_) {
+    $q = _$q_;
+    $rootScope = _$rootScope_;
+    $uibModal = _$uibModal_;
+    ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
+    RuleObjectFactory = _RuleObjectFactory_;
     StateTopAnswersStatsService = _StateTopAnswersStatsService_;
 
     ExplorationStatesService.init({
@@ -215,11 +226,6 @@ describe('StateTopAnswersStatsService', function() {
   });
 
   describe('Cache Maintenance', function() {
-    beforeEach(angular.mock.inject(function($injector) {
-      // ChangeListService will need its calls mocked out since it isn't
-      // configured correctly in, or interesting to, the tests of this block.
-      this.cls = $injector.get('ChangeListService');
-    }));
     beforeEach(function() {
       StateTopAnswersStatsService.init({
         answers: {
@@ -234,12 +240,8 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     describe('State Addition', function() {
-      beforeEach(function() {
-        // Disable ChangeListService.addState.
-        spyOn(this.cls, 'addState');
-      });
-
       it('creates a new empty list of stats for the new state', function() {
+        spyOn(ChangeListService, 'addState');
         expect(function() {
           StateTopAnswersStatsService.getStateStats('Me Llamo');
         }).toThrow();
@@ -252,27 +254,24 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     describe('State Deletion', function() {
-      beforeEach(function() {
-        // Disable ChangeListService.deleteState.
-        spyOn(this.cls, 'deleteState');
-      });
+      it('throws an error after deleting the stats', function(done) {
+        spyOn($uibModal, 'open').and.callFake(function() {
+          return {result: $q.resolve()};
+        });
+        spyOn(ChangeListService, 'deleteState');
 
-      it('throws an error after deleting the stats', function() {
-        ExplorationStatesService.deleteState('Hola');
-
-        expect(function() {
-          StateTopAnswersStatsService.getStateStats('Hola');
-        }).toThrow();
+        ExplorationStatesService.deleteState('Hola').then(function() {
+          expect(function() {
+            StateTopAnswersStatsService.getStateStats('Hola');
+          }).toThrow();
+        }).then(done, done.fail);
+        $rootScope.$digest();
       });
     });
 
     describe('State Renaming', function() {
-      beforeEach(function() {
-        // Disable ChangeListService.renameState.
-        spyOn(this.cls, 'renameState');
-      });
-
       it('only recognizes the renamed state', function() {
+        spyOn(ChangeListService, 'renameState');
         var oldStats = StateTopAnswersStatsService.getStateStats('Hola');
 
         ExplorationStatesService.renameState('Hola', 'Bonjour');
@@ -288,12 +287,8 @@ describe('StateTopAnswersStatsService', function() {
 
     describe('State Answer Groups Changes', function() {
       beforeEach(function() {
-        // Disable ChangeListService.editStateProperty.
-        spyOn(this.cls, 'editStateProperty');
+        spyOn(ChangeListService, 'editStateProperty');
       });
-      beforeEach(angular.mock.inject(function($injector) {
-        this.rof = $injector.get('RuleObjectFactory');
-      }));
 
       it('recognizes newly resolved answers', function() {
         expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
@@ -302,7 +297,7 @@ describe('StateTopAnswersStatsService', function() {
         var newAnswerGroups = angular.copy(
           ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
-          this.rof.createNew('Contains', {x: 'adios'})
+          RuleObjectFactory.createNew('Contains', {x: 'adios'})
         ];
         ExplorationStatesService.saveInteractionAnswerGroups(
           'Hola', newAnswerGroups);
@@ -318,7 +313,7 @@ describe('StateTopAnswersStatsService', function() {
         var newAnswerGroups = angular.copy(
           ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
-          this.rof.createNew('Contains', {x: 'bonjour'})
+          RuleObjectFactory.createNew('Contains', {x: 'bonjour'})
         ];
         ExplorationStatesService.saveInteractionAnswerGroups(
           'Hola', newAnswerGroups);
