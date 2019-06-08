@@ -1036,6 +1036,12 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     activity_services.remove_featured_activity(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
+    # Remove from subscribers.
+    taskqueue_services.defer(
+        delete_exploration_from_subscribed_users,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        exploration_id)
+
 
 def delete_exploration_from_subscribed_users(exploration_id):
     """Remove exploration from all subscribers' activity_ids.
