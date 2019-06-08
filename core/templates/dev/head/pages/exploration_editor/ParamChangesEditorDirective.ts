@@ -17,7 +17,8 @@
  * both the exploration settings tab and the state editor page).
  */
 
-require('components/forms/Select2DropdownDirective.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('pages/exploration_editor/ValueGeneratorEditorDirective.ts');
 
 require('domain/exploration/ParamChangeObjectFactory.ts');

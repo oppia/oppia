@@ -944,19 +944,19 @@ def can_edit_exploration(handler):
     return test_can_edit
 
 
-def can_translate_exploration(handler):
-    """Decorator to check whether the user can translate given exploration.
+def can_voiceover_exploration(handler):
+    """Decorator to check whether the user can voiceover given exploration.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if a
-            user has permission to translate a given exploration.
+            user has permission to voiceover a given exploration.
     """
 
-    def test_can_translate(self, exploration_id, **kwargs):
-        """Checks if the user can translate the exploration.
+    def test_can_voiceover(self, exploration_id, **kwargs):
+        """Checks if the user can voiceover the exploration.
 
         Args:
             exploration_id: str. The exploration id.
@@ -969,7 +969,7 @@ def can_translate_exploration(handler):
             NotLoggedInException: The user is not logged in.
             PageNotFoundException: The page is not found.
             UnauthorizedUserException: The user does not have
-                credentials to translate an exploration.
+                credentials to voiceover an exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -979,15 +979,15 @@ def can_translate_exploration(handler):
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if rights_manager.check_can_translate_activity(
+        if rights_manager.check_can_voiceover_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to translate this exploration.')
-    test_can_translate.__wrapped__ = True
+                'You do not have credentials to voiceover this exploration.')
+    test_can_voiceover.__wrapped__ = True
 
-    return test_can_translate
+    return test_can_voiceover
 
 
 def can_delete_exploration(handler):

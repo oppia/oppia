@@ -891,9 +891,9 @@ class SendModeratorEmailsTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class TranslateExplorationTests(test_utils.GenericTestBase):
-    """Tests for can_translate_exploration decorator."""
-    role = rights_manager.ROLE_TRANSLATOR
+class VoiceoverExplorationTests(test_utils.GenericTestBase):
+    """Tests for can_voiceover_exploration decorator."""
+    role = rights_manager.ROLE_VOICE_ARTIST
     username = 'user'
     user_email = 'user@example.com'
     banned_username = 'banneduser'
@@ -906,20 +906,21 @@ class TranslateExplorationTests(test_utils.GenericTestBase):
     class MockHandler(base.BaseHandler):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-        @acl_decorators.can_translate_exploration
+        @acl_decorators.can_voiceover_exploration
         def get(self, exploration_id):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(TranslateExplorationTests, self).setUp()
+        super(VoiceoverExplorationTests, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
-        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.set_banned_users([self.banned_username])
@@ -940,81 +941,82 @@ class TranslateExplorationTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id_1, self.translator_id, self.role)
+            self.owner, self.published_exp_id_1, self.voice_artist_id,
+            self.role)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id_1, self.translator_id, self.role)
+            self.owner, self.private_exp_id_1, self.voice_artist_id, self.role)
 
-    def test_banned_user_cannot_translate_exploration(self):
+    def test_banned_user_cannot_voiceover_exploration(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
         self.logout()
 
-    def test_owner_can_translate_exploration(self):
+    def test_owner_can_voiceover_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
-    def test_moderator_can_translate_public_exploration(self):
+    def test_moderator_can_voiceover_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id_1)
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
         self.logout()
 
-    def test_moderator_cannot_translate_private_exploration(self):
+    def test_moderator_cannot_voiceover_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_1, expected_status_int=401)
         self.logout()
 
-    def test_admin_can_translate_private_exploration(self):
+    def test_admin_can_voiceover_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
-    def test_translator_can_only_translate_assigned_public_exploration(self):
-        self.login(self.TRANSLATOR_EMAIL)
-        # Checking translator can translate assigned public exploration.
+    def test_voice_artist_can_only_voiceover_assigned_public_exploration(self):
+        self.login(self.VOICE_ARTIST_EMAIL)
+        # Checking voice artist can voiceover assigned public exploration.
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id_1)
         self.assertEqual(response['exploration_id'], self.published_exp_id_1)
 
-        # Checking translator cannot translate public exploration which he/she
+        # Checking voice artist cannot voiceover public exploration which he/she
         # is not assigned for.
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_2, expected_status_int=401)
         self.logout()
 
-    def test_translator_can_only_translate_assigned_private_exploration(self):
-        self.login(self.TRANSLATOR_EMAIL)
-        # Checking translator can translate assigned private exploration.
+    def test_voice_artist_can_only_voiceover_assigned_private_exploration(self):
+        self.login(self.VOICE_ARTIST_EMAIL)
+        # Checking voice artist can voiceover assigned private exploration.
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.private_exp_id_1)
         self.assertEqual(response['exploration_id'], self.private_exp_id_1)
 
-        # Checking translator cannot translate private exploration which he/she
-        # is not assigned for.
+        # Checking voice artist cannot voiceover private exploration which
+        # he/she is not assigned for.
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id_2, expected_status_int=401)
         self.logout()
 
-    def test_user_without_translator_role_of_exploration_cannot_translate_public_exploration(self): # pylint: disable=line-too-long
+    def test_user_without_voice_artist_role_of_exploration_cannot_voiceover_public_exploration(self): # pylint: disable=line-too-long
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.published_exp_id_1, expected_status_int=401)
         self.logout()
 
-    def test_user_without_translator_role_of_exploration_cannot_translate_private_exploration(self): # pylint: disable=line-too-long
+    def test_user_without_voice_artist_role_of_exploration_cannot_voiceover_private_exploration(self): # pylint: disable=line-too-long
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
