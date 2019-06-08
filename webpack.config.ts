@@ -74,7 +74,7 @@ module.exports = {
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
-    signup: commonPrefix + '/pages/signup/Signup.ts',
+    signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
     splash: commonPrefix + '/pages/splash/Splash.ts',
     stewards:
@@ -289,8 +289,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['signup'],
-      filename: 'signup.html',
-      template: commonPrefix + '/pages/signup/signup.html',
+      filename: 'signup-page.mainpage.html',
+      template: commonPrefix + '/pages/signup-page/signup-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

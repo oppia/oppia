@@ -64,7 +64,8 @@ oppia.controller('Signup', [
     $scope.showLicenseExplanationModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/signup/licence_explanation_modal_directive.html'),
+          '/pages/signup-page/modal-templates/' +
+          'licence-explanation-modal.template.directive.html'),
         backdrop: true,
         resolve: {},
         controller: [
@@ -191,7 +192,8 @@ oppia.controller('Signup', [
     $scope.showRegistrationSessionExpiredModal = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/signup/registration_session_expired_modal_directive.html'),
+          '/pages/signup-page/modal-templates/' +
+          'registration-session-expired-modal.template.html'),
         backdrop: 'static',
         keyboard: false,
         resolve: {},
