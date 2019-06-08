@@ -43,11 +43,11 @@ require('components/RatingComputationService.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
-require('components/forms/validators/IsAtLeastFilter.ts');
-require('components/forms/validators/IsAtMostFilter.ts');
-require('components/forms/validators/IsFloatFilter.ts');
-require('components/forms/validators/IsIntegerFilter.ts');
-require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
