@@ -153,6 +153,12 @@ describe('State card object factory', function() {
     expect(_sampleCard.getInputResponsePairs()).toEqual(['pair 1']);
   });
 
+  it('should add not add response if input response pair is empty', function() {
+    _sampleCard._inputResponsePairs = [];
+    _sampleCard.setLastOppiaResponse('response');
+    expect(_sampleCard.getInputResponsePairs()).toEqual([]);
+  });
+
   it('should be able to set the various fields', function() {
     _sampleCard.setInteractionHtml('<interaction_2></interaction_2>');
     expect(_sampleCard.getInteractionHtml()).toEqual(
