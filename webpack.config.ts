@@ -31,17 +31,17 @@ var commonPrefix = './core/templates/dev/head';
 
 module.exports = {
   entries: {
-    about: commonPrefix + '/pages/about/About.ts',
+    about: commonPrefix + '/pages/about-page/about-page.controller.ts',
     admin: commonPrefix + '/pages/admin/Admin.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
       commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
     collection_player:
       commonPrefix + '/pages/collection_player/CollectionPlayer.ts',
-    contact: commonPrefix + '/pages/contact/Contact.ts',
+    contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator_dashboard/CreatorDashboard.ts',
-    donate: commonPrefix + '/pages/donate/Donate.ts',
+    donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
     email_dashboard:
       commonPrefix + '/pages/email_dashboard/EmailDashboard.ts',
     email_dashboard_result:
@@ -96,8 +96,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['about'],
-      filename: 'about.html',
-      template: commonPrefix + '/pages/about/about.html',
+      filename: 'about-page.mainpage.html',
+      template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -125,8 +125,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['contact'],
-      filename: 'contact.html',
-      template: commonPrefix + '/pages/contact/contact.html',
+      filename: 'contact-page.mainpage.html',
+      template: commonPrefix + '/pages/contact-page/contact-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -140,8 +140,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['donate'],
-      filename: 'donate.html',
-      template: commonPrefix + '/pages/donate/donate.html',
+      filename: 'donate-page.mainpage.html',
+      template: commonPrefix + '/pages/donate-page/donate-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

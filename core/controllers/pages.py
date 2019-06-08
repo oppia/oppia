@@ -60,7 +60,7 @@ class AboutPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/about.html')
+        self.render_template('dist/about-page.mainpage.html')
 
 
 class GetStartedPage(base.BaseHandler):
@@ -96,7 +96,7 @@ class ContactPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/contact.html')
+        self.render_template('dist/contact-page.mainpage.html')
 
 
 class DonatePage(base.BaseHandler):
