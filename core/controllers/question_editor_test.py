@@ -316,10 +316,13 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         self.logout()
 
     def test_delete_with_guest_does_not_allow_question_deletion(self):
-        self.delete_json(
+        response = self.delete_json(
             '%s/%s' % (
                 feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
             expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_delete_with_new_user_does_not_allow_question_deletion(self):
         self.login(self.NEW_USER_EMAIL)

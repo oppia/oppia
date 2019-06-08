@@ -522,6 +522,9 @@ def can_upload_exploration(handler):
             UnauthorizedUserException: The user does not have
                 credentials to upload an exploration.
         """
+        if not self.user_id:
+            raise self.NotLoggedInException
+
         if not current_user_services.is_current_user_super_admin():
             raise self.UnauthorizedUserException(
                 'You do not have credentials to upload exploration.')
@@ -1758,27 +1761,6 @@ def can_edit_skill(handler):
         function. The newly decorated function that now also checks if
             the user has permission to edit a skill.
     """
-    def can_user_edit_skill(user, skill_rights):
-        """Checks whether the user can edit the given skill.
-
-        Args:
-            user: UserActionsInfo. Object having user id, role and actions for
-                given user.
-            skill_rights: SkillRights or None. Rights object for the given
-                skill.
-
-        Returns:
-            bool. Whether the given user can edit the given skill.
-        """
-
-        if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
-            if not skill_rights.is_private():
-                return True
-            if skill_rights.is_private() and skill_rights.is_creator(
-                    user.user_id):
-                return True
-        return False
-
     def test_can_edit_skill(self, skill_id, **kwargs):
         """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
@@ -1803,8 +1785,13 @@ def can_edit_skill(handler):
         if skill_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if can_user_edit_skill(self.user, skill_rights):
-            return handler(self, skill_id, **kwargs)
+        if role_services.ACTION_EDIT_PUBLIC_SKILLS in self.user.actions:
+            if not skill_rights.is_private():
+                return handler(self, skill_id, **kwargs)
+            if skill_rights.is_private() and skill_rights.is_creator(
+                    self.user.user_id):
+                return handler(self, skill_id, **kwargs)
+
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
@@ -1903,25 +1890,6 @@ def can_publish_skill(handler):
             checks whether the user has permission to publish
             a skill.
     """
-
-    def can_user_publish_skill(user, skill_rights):
-        """Checks whether the user can publish the given skill.
-
-        Args:
-            user: UserActionsInfo. Object having user id, role and actions
-                for given user.
-            skill_rights: SkillRights or None. Rights object for the given
-                skill.
-
-        Returns:
-            bool. Whether the given user can publish the given skill.
-        """
-        if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
-            return False
-        if skill_rights.is_creator(user.user_id):
-            return True
-        return False
-
     def test_can_publish_skill(self, skill_id, **kwargs):
         """Tests whether the user can publish a given skill by checking
         if the user is logged in and using can_user_publish_skill.
@@ -1946,11 +1914,15 @@ def can_publish_skill(handler):
         if skill_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if can_user_publish_skill(self.user, skill_rights):
+        if role_services.ACTION_PUBLISH_OWNED_SKILL not in self.user.actions:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this skill.')
+        elif skill_rights.is_creator(self.user.user_id):
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
+
     test_can_publish_skill.__wrapped__ = True
 
     return test_can_publish_skill

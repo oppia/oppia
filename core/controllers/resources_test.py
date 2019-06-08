@@ -263,13 +263,16 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
                   mode='rb') as f:
             raw_audio = f.read()
-        self.post_json(
+        response = self.post_json(
             '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
             {'filename': self.TEST_AUDIO_FILE_MP3},
             csrf_token=csrf_token,
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),),
             expected_status_int=401
         )
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_cannot_upload_audio_with_invalid_exp_id(self):
         self.login(self.EDITOR_EMAIL)

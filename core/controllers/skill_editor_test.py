@@ -163,7 +163,10 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         }
 
     def test_guest_can_not_delete_skill(self):
-        self.delete_json(self.url, expected_status_int=401)
+        response = self.delete_json(self.url, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_new_user_can_not_delete_skill(self):
         self.login(self.NEW_USER_EMAIL)

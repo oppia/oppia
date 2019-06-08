@@ -1149,6 +1149,50 @@ class ManageOwnProfileTests(test_utils.GenericTestBase):
         self.logout()
 
 
+class UploadExplorationTests(test_utils.GenericTestBase):
+    """Tests for can_upload_exploration decorator."""
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_upload_exploration
+        def get(self):
+            return self.render_json({})
+
+    def setUp(self):
+        super(UploadExplorationTests, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock_upload_exploration/', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_super_admin_can_upload_explorations(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock_upload_exploration/')
+        self.logout()
+
+    def test_normal_user_cannot_upload_explorations(self):
+        self.login(self.EDITOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_upload_exploration/', expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to upload exploration.')
+        self.logout()
+
+    def test_guest_cannot_upload_explorations(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json(
+                '/mock_upload_exploration/', expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+
 class DeleteExplorationTests(test_utils.GenericTestBase):
     """Tests for can_delete_exploration decorator."""
     private_exp_id = 'exp_0'
@@ -1181,8 +1225,11 @@ class DeleteExplorationTests(test_utils.GenericTestBase):
 
     def test_guest_can_not_delete_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock/%s' % self.private_exp_id, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_owner_can_delete_owned_private_exploration(self):
         self.login(self.OWNER_EMAIL)
@@ -1366,8 +1413,8 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     """Tests for get_decorator_for_accepting_suggestion decorator."""
     AUTHOR_USERNAME = 'author'
     AUTHOR_EMAIL = 'author@example.com'
-    USERNAME = 'user'
-    USER_EMAIL = 'user@example.com'
+    VIEWER_USERNAME = 'user'
+    VIEWER_EMAIL = 'user@example.com'
     TARGET_TYPE = 'exploration'
     SUGGESTION_TYPE = 'edit_exploration_state_content'
     EXPLORATION_ID = 'exp_id'
@@ -1393,7 +1440,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
     def setUp(self):
         super(DecoratorForAcceptingSuggestionTests, self).setUp()
         self.signup(self.AUTHOR_EMAIL, self.AUTHOR_USERNAME)
-        self.signup(self.USER_EMAIL, self.USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -1418,10 +1465,13 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_accept_suggestion(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock_accept_suggestion/%s/%s'
                 % (self.EXPLORATION_ID, self.suggestion_id),
                 expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_owner_can_accept_suggestion(self):
         self.login(self.OWNER_EMAIL)
@@ -1434,7 +1484,7 @@ class DecoratorForAcceptingSuggestionTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_viewer_cannot_accept_suggestion(self):
-        self.login(self.USER_EMAIL)
+        self.login(self.VIEWER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock_accept_suggestion/%s/%s'
@@ -1847,9 +1897,12 @@ class AddStoryToTopicTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_add_story_to_topic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock_add_story_to_topic/%s' % self.topic_id,
                 expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
 
 class CreateSkillTests(test_utils.GenericTestBase):
@@ -1897,7 +1950,12 @@ class CreateSkillTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_add_create_skill(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_create_skill', expected_status_int=401)
+            response = self.get_json(
+                '/mock_create_skill', expected_status_int=401)
+
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
 
 class PublishSkillTests(test_utils.GenericTestBase):
@@ -1977,9 +2035,12 @@ class PublishSkillTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_publish_skill(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock_publish_skill/%s' % self.skill_id_1,
                 expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
 
 class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
@@ -2038,9 +2099,12 @@ class ManageQuestionSkillStatusTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_manage_question_skill_status(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock_manage_question_skill_status/%s' % self.skill_id,
                 expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
 
 class CreateTopicTests(test_utils.GenericTestBase):
@@ -2088,7 +2152,11 @@ class CreateTopicTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_create_topic(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock_create_topic', expected_status_int=401)
+            response = self.get_json(
+                '/mock_create_topic', expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
 
 class ManageRightsForTopicTests(test_utils.GenericTestBase):
@@ -2140,9 +2208,12 @@ class ManageRightsForTopicTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_manage_rights(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock_manage_rights_for_topic/%s' % self.topic_id,
                 expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
 
 class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
@@ -2191,8 +2262,11 @@ class ChangeTopicPublicationStatusTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_change_topic_publication_status(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock_change_publication_status', expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
 
 class PerformCronTaskTests(test_utils.GenericTestBase):
@@ -2369,8 +2443,11 @@ class EditQuestionDecoratorTests(test_utils.GenericTestBase):
 
     def test_guest_cannot_edit_question(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
+            response = self.get_json(
                 '/mock/%s' % self.question_id, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_cannot_edit_question_with_invalid_question_id(self):
         self.login(self.ADMIN_EMAIL)

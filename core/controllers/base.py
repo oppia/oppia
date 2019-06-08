@@ -435,7 +435,10 @@ class BaseHandler(webapp2.RequestHandler):
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
                     feconf.HANDLER_TYPE_JSON):
                 self.error(401)
-                self._render_exception(401, {'error': unicode(exception)})
+                self._render_exception(
+                    401, {
+                        'error': (
+                            'You must be logged in to access this resource.')})
             else:
                 self.redirect(
                     current_user_services.create_login_url(self.request.uri))
