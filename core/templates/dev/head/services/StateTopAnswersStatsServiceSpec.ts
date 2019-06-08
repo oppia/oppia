@@ -24,38 +24,35 @@ require('services/StateTopAnswersStatsService.ts');
 var joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', function() {
+  var ContextService = null;
+  var ExplorationStatesService = null;
+  var StateTopAnswersStatsService = null;
+
   beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.inject(function(
+      _ContextService_, _ExplorationStatesService_,
+      _StateTopAnswersStatsService_) {
+    ContextService = _ContextService_;
+    ExplorationStatesService = _ExplorationStatesService_;
+    StateTopAnswersStatsService = _StateTopAnswersStatsService_;
 
-  beforeEach(angular.mock.inject(function($injector) {
-    this.stass = $injector.get('StateTopAnswersStatsService');
-    this.ess = $injector.get('ExplorationStatesService');
-
-    this.ess.init({
+    ExplorationStatesService.init({
       Hola: {
-        content: {
-          content_id: 'content',
-          html: ''
-        },
+        content: {content_id: 'content', html: ''},
         param_changes: [],
         interaction: {
           answer_groups: [{
             rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
             outcome: {
               dest: 'Me Llamo',
-              feedback: {
-                content_id: 'feedback_1',
-                html: 'buen trabajo!'
-              },
-              labelled_as_correct: true
-            }
+              feedback: {content_id: 'feedback_1', html: 'buen trabajo!'},
+              labelled_as_correct: true,
+            },
           }],
           default_outcome: {
             dest: 'Hola',
-            feedback: {
-              content_id: 'default_outcome',
-              html: 'try again!'
-            },
-            labelled_as_correct: false
+            feedback: {content_id: 'default_outcome', html: 'try again!'},
+            labelled_as_correct: false,
           },
           hints: [],
           id: 'TextInput',
@@ -65,38 +62,37 @@ describe('StateTopAnswersStatsService', function() {
           voiceovers_mapping: {
             content: {},
             default_outcome: {},
-            feedback_1: {}
-          }
+            feedback_1: {},
+          },
         },
         written_translations: {
           translations_mapping: {
             content: {},
             default_outcome: {},
-            feedback_1: {}
-          }
-        }
-      }
+            feedback_1: {},
+          },
+        },
+      },
     });
 
-    spyOn($injector.get('ContextService'), 'getExplorationId')
-      .and.returnValue('7');
+    spyOn(ContextService, 'getExplorationId').and.returnValue('7');
   }));
 
   describe('.isInitialized', function() {
     it('begins uninitialized', function() {
-      expect(this.stass.isInitialized()).toBe(false);
+      expect(StateTopAnswersStatsService.isInitialized()).toBe(false);
     });
 
     it('is true after call to .init', function() {
-      this.stass.init({answers: {}, interaction_ids: {}});
+      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
 
-      expect(this.stass.isInitialized()).toBe(true);
+      expect(StateTopAnswersStatsService.isInitialized()).toBe(true);
     });
   });
 
   describe('.init', function() {
     it('correctly identifies unaddressed issues', function() {
-      this.stass.init({
+      StateTopAnswersStatsService.init({
         answers: {
           Hola: [
             {answer: 'hola', frequency: 7},
@@ -107,14 +103,14 @@ describe('StateTopAnswersStatsService', function() {
         interaction_ids: {Hola: 'TextInput'},
       });
 
-      var stateStats = this.stass.getStateStats('Hola');
+      var stateStats = StateTopAnswersStatsService.getStateStats('Hola');
       expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
       expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
       expect(stateStats).toContain(joC({answer: 'que?', isAddressed: false}));
     });
 
     it('maintains frequency in order', function() {
-      this.stass.init({
+      StateTopAnswersStatsService.init({
         answers: {
           Hola: [
             {answer: 'hola', frequency: 7},
@@ -125,7 +121,7 @@ describe('StateTopAnswersStatsService', function() {
         interaction_ids: {Hola: 'TextInput'},
       });
 
-      expect(this.stass.getStateStats('Hola')).toEqual([
+      expect(StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
         joC({answer: 'hola', frequency: 7}),
         joC({answer: 'adios', frequency: 4}),
         joC({answer: 'que?', frequency: 2}),
@@ -134,22 +130,20 @@ describe('StateTopAnswersStatsService', function() {
 
     it('throws when fetching stats about non-existent states', function() {
       expect(function() {
-        this.stass.getStateStats('Me Llamo');
-      }).toThrow();
-      expect(function() {
-        this.stass.getUnresolvedStateStats('Me Llamo');
+        StateTopAnswersStatsService.getStateStats('Me Llamo');
       }).toThrow();
     });
 
     it('registers handlers to ExplorationStatesService', function() {
       var expectedRegistrationFunctions = [
-        spyOn(this.ess, 'registerOnStateAddedCallback'),
-        spyOn(this.ess, 'registerOnStateDeletedCallback'),
-        spyOn(this.ess, 'registerOnStateRenamedCallback'),
-        spyOn(this.ess, 'registerOnStateInteractionSavedCallback')
+        spyOn(ExplorationStatesService, 'registerOnStateAddedCallback'),
+        spyOn(ExplorationStatesService, 'registerOnStateDeletedCallback'),
+        spyOn(ExplorationStatesService, 'registerOnStateRenamedCallback'),
+        spyOn(ExplorationStatesService,
+          'registerOnStateInteractionSavedCallback')
       ];
 
-      this.stass.init({answers: {}, interaction_ids: {}});
+      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
 
       expectedRegistrationFunctions.forEach(function(registrationFunction) {
         expect(registrationFunction).toHaveBeenCalled();
@@ -158,15 +152,16 @@ describe('StateTopAnswersStatsService', function() {
 
     it('does not register duplicate handlers if called again', function() {
       var expectedRegistrationFunctions = [
-        spyOn(this.ess, 'registerOnStateAddedCallback'),
-        spyOn(this.ess, 'registerOnStateDeletedCallback'),
-        spyOn(this.ess, 'registerOnStateRenamedCallback'),
-        spyOn(this.ess, 'registerOnStateInteractionSavedCallback')
+        spyOn(ExplorationStatesService, 'registerOnStateAddedCallback'),
+        spyOn(ExplorationStatesService, 'registerOnStateDeletedCallback'),
+        spyOn(ExplorationStatesService, 'registerOnStateRenamedCallback'),
+        spyOn(ExplorationStatesService,
+          'registerOnStateInteractionSavedCallback')
       ];
 
-      this.stass.init({answers: {}, interaction_ids: {}});
+      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
       // Second call should not add more callbacks.
-      this.stass.init({answers: {}, interaction_ids: {}});
+      StateTopAnswersStatsService.init({answers: {}, interaction_ids: {}});
 
       expectedRegistrationFunctions.forEach(function(registrationFunction) {
         expect(registrationFunction.calls.count()).toEqual(1);
@@ -176,45 +171,46 @@ describe('StateTopAnswersStatsService', function() {
 
   describe('.hasStateStats', function() {
     it('is false when uninitialized', function() {
-      expect(this.stass.isInitialized()).toBe(false);
-      expect(this.stass.hasStateStats('Hola')).toBe(false);
+      expect(StateTopAnswersStatsService.isInitialized()).toBe(false);
+      expect(StateTopAnswersStatsService.hasStateStats('Hola')).toBe(false);
     });
 
     it('is true when the state contains answers', function() {
-      this.stass.init({
+      StateTopAnswersStatsService.init({
         answers: {Hola: [{answer: 'hola', frequency: 3}]},
         interaction_ids: {Hola: 'TextInput'},
       });
 
-      expect(this.stass.hasStateStats('Hola')).toBe(true);
+      expect(StateTopAnswersStatsService.hasStateStats('Hola')).toBe(true);
     });
 
     it('is true even when the state contains no answers', function() {
-      this.stass.init(
+      StateTopAnswersStatsService.init(
         {answers: {Hola: []}, interaction_ids: {Hola: 'TextInput'}}
       );
 
-      expect(this.stass.hasStateStats('Hola')).toBe(true);
+      expect(StateTopAnswersStatsService.hasStateStats('Hola')).toBe(true);
     });
 
     it('is false when the state does not exist', function() {
-      this.stass.init({
+      StateTopAnswersStatsService.init({
         answers: {Hola: [{answer: 'hola', frequency: 3}]},
         interaction_ids: {Hola: 'TextInput'},
       });
 
-      expect(this.stass.hasStateStats('Me Llamo')).toBe(false);
+      expect(StateTopAnswersStatsService.hasStateStats('Me Llamo')).toBe(false);
     });
   });
 
   describe('.getStateNamesWithStats', function() {
     it('only returns state names that have stats', function() {
-      this.stass.init({
+      StateTopAnswersStatsService.init({
         answers: {Hola: [{answer: 'hola', frequency: 3}]},
         interaction_ids: {Hola: 'TextInput'},
       });
 
-      expect(this.stass.getStateNamesWithStats()).toEqual(['Hola']);
+      expect(StateTopAnswersStatsService.getStateNamesWithStats())
+        .toEqual(['Hola']);
     });
   });
 
@@ -225,7 +221,7 @@ describe('StateTopAnswersStatsService', function() {
       this.cls = $injector.get('ChangeListService');
     }));
     beforeEach(function() {
-      this.stass.init({
+      StateTopAnswersStatsService.init({
         answers: {
           Hola: [
             {answer: 'hola', frequency: 7},
@@ -245,16 +241,13 @@ describe('StateTopAnswersStatsService', function() {
 
       it('creates a new empty list of stats for the new state', function() {
         expect(function() {
-          this.stass.getStateStats('Me Llamo');
-        }).toThrow();
-        expect(function() {
-          this.stass.getUnresolvedStateStats('Me Llamo');
+          StateTopAnswersStatsService.getStateStats('Me Llamo');
         }).toThrow();
 
-        this.ess.addState('Me Llamo');
+        ExplorationStatesService.addState('Me Llamo');
 
-        expect(this.stass.getStateStats('Me Llamo')).toEqual([]);
-        expect(this.stass.getUnresolvedStateStats('Me Llamo')).toEqual([]);
+        expect(StateTopAnswersStatsService.getStateStats('Me Llamo'))
+          .toEqual([]);
       });
     });
 
@@ -265,13 +258,10 @@ describe('StateTopAnswersStatsService', function() {
       });
 
       it('throws an error after deleting the stats', function() {
-        this.ess.deleteState('Hola');
+        ExplorationStatesService.deleteState('Hola');
 
         expect(function() {
-          this.stass.getStateStats('Hola');
-        }).toThrow();
-        expect(function() {
-          this.stass.getUnresolvedStateStats('Hola');
+          StateTopAnswersStatsService.getStateStats('Hola');
         }).toThrow();
       });
     });
@@ -283,20 +273,15 @@ describe('StateTopAnswersStatsService', function() {
       });
 
       it('only recognizes the renamed state', function() {
-        var oldStats = this.stass.getStateStats('Hola');
-        var oldUnresolvedStats = this.stass.getUnresolvedStateStats('Hola');
+        var oldStats = StateTopAnswersStatsService.getStateStats('Hola');
 
-        this.ess.renameState('Hola', 'Bonjour');
+        ExplorationStatesService.renameState('Hola', 'Bonjour');
 
-        expect(this.stass.getStateStats('Bonjour')).toBe(oldStats);
-        expect(this.stass.getUnresolvedStateStats('Bonjour'))
-          .toBe(oldUnresolvedStats);
+        expect(StateTopAnswersStatsService.getStateStats('Bonjour'))
+          .toBe(oldStats);
 
         expect(function() {
-          this.stass.getStateStats('Hola');
-        }).toThrow();
-        expect(function() {
-          this.stass.getUnresolvedStateStats('Hola');
+          StateTopAnswersStatsService.getStateStats('Hola');
         }).toThrow();
       });
     });
@@ -311,52 +296,61 @@ describe('StateTopAnswersStatsService', function() {
       }));
 
       it('recognizes newly resolved answers', function() {
-        expect(this.stass.getUnresolvedStateStats('Hola'))
+        expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
           .toContain(joC({answer: 'adios'}));
 
         var newAnswerGroups = angular.copy(
-          this.ess.getState('Hola').interaction.answerGroups);
+          ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
           this.rof.createNew('Contains', {x: 'adios'})
         ];
-        this.ess.saveInteractionAnswerGroups('Hola', newAnswerGroups);
+        ExplorationStatesService.saveInteractionAnswerGroups(
+          'Hola', newAnswerGroups);
 
-        expect(this.stass.getUnresolvedStateStats('Hola'))
+        expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
           .not.toContain(joC({answer: 'adios'}));
       });
 
       it('recognizes newly unresolved answers', function() {
-        expect(this.stass.getUnresolvedStateStats('Hola'))
+        expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
           .not.toContain(joC({answer: 'hola'}));
 
         var newAnswerGroups = angular.copy(
-          this.ess.getState('Hola').interaction.answerGroups);
+          ExplorationStatesService.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
           this.rof.createNew('Contains', {x: 'bonjour'})
         ];
-        this.ess.saveInteractionAnswerGroups('Hola', newAnswerGroups);
+        ExplorationStatesService.saveInteractionAnswerGroups(
+          'Hola', newAnswerGroups);
 
-        expect(this.stass.getUnresolvedStateStats('Hola'))
+        expect(StateTopAnswersStatsService.getUnresolvedStateStats('Hola'))
           .toContain(joC({answer: 'hola'}));
       });
 
       it('removes stat answers when interaction changes', function() {
-        expect(this.stass.getStateStats('Hola').length)
-          .toBeGreaterThan(0);
-        expect(this.stass.getUnresolvedStateStats('Hola').length)
+        expect(StateTopAnswersStatsService.getStateStats('Hola').length)
           .toBeGreaterThan(0);
 
-        this.ess.saveInteractionId('Hola', 'FractionInput');
-        this.ess.saveInteractionCustomizationArgs('Hola', {
+        ExplorationStatesService.saveInteractionId('Hola', 'FractionInput');
+        ExplorationStatesService.saveInteractionCustomizationArgs('Hola', {
           requireSimplestForm: false,
           allowImproperFraction: true,
           allowNonzeroIntegerPart: true,
           customPlaceholder: '',
         });
 
-        expect(this.stass.getStateStats('Hola').length)
+        expect(StateTopAnswersStatsService.getStateStats('Hola').length)
           .toEqual(0);
-        expect(this.stass.getUnresolvedStateStats('Hola').length)
+      });
+
+      it('permits null interaction ids', function() {
+        expect(StateTopAnswersStatsService.getStateStats('Hola').length)
+          .toBeGreaterThan(0);
+
+        ExplorationStatesService.saveInteractionId('Hola', null);
+        ExplorationStatesService.saveInteractionCustomizationArgs('Hola', {});
+
+        expect(StateTopAnswersStatsService.getStateStats('Hola').length)
           .toEqual(0);
       });
     });
