@@ -1668,9 +1668,10 @@ tags: []
             'USER_ID': os.environ['USER_ID'],
             'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
         }
+        self.login(email, is_super_admin=is_super_admin)
+        user_id = self.get_user_id_from_email(email)
         try:
-            self.login(email, is_super_admin=is_super_admin)
-            yield self.get_user_id_from_email(email)
+            yield user_id
         finally:
             self.logout()
             os.environ.update(initial_user_env)
