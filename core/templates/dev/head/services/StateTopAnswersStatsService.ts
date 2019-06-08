@@ -138,7 +138,7 @@ oppia.factory('StateTopAnswersStatsService', [
        */
       hasStateStats: function(stateName) {
         return this.isInitialized() &&
-          this.getStateNamesWithStats().includes(stateName);
+          workingStateTopAnswersStats.hasOwnProperty(stateName);
       },
 
       /**
