@@ -189,10 +189,8 @@ describe('State Rules Stats Service', function() {
     });
 
     it('should not provide answers from null interaction ids', function() {
-      // Only including properties required for stat computation.
-      var HOLA_STATE = {name: 'Hola', interaction: {id: null}};
-      // Only including properties required for stat computation.
-      var HOLA_STATE_RULES_STATS_RESPONSE = {
+      var MOCK_STATE = {name: 'Hola', interaction: {id: null}};
+      var MOCK_STATE_RULES_STATS_RESPONSE = {
         visualizations_info: [{
           data: [
             {answer: 'Ni Hao', frequency: 5},
@@ -204,9 +202,9 @@ describe('State Rules Stats Service', function() {
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
       $httpBackend.expectGET('/createhandler/state_rules_stats/7/Hola')
-        .respond(HOLA_STATE_RULES_STATS_RESPONSE);
+        .respond(MOCK_STATE_RULES_STATS_RESPONSE);
 
-      StateRulesStatsService.computeStateRulesStats(HOLA_STATE)
+      StateRulesStatsService.computeStateRulesStats(MOCK_STATE)
         .then(successHandler, failureHandler);
       $httpBackend.flush();
 
