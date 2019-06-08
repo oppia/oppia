@@ -17,7 +17,7 @@
  * @fileoverview Controller for the questions tab.
  */
 
-require('pages/questions_list/QuestionsListDirective.ts');
+require('components/question-directives/questions-list/questions-list.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');

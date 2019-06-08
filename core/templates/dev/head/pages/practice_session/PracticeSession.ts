@@ -24,7 +24,7 @@ oppia.constant(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('pages/question_player/QuestionPlayerDirective.ts');
+require('components/question-directives/question-player/question-player.directive.ts');
 
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');

@@ -101,7 +101,7 @@ require(
 require('components/forms/custom-forms-directives/image-uploader.directive.ts');
 require(
   'components/forms/custom-forms-directives/audio-file-uploader.directive.ts');
-require('pages/question_editor/QuestionEditorDirective.ts');
+require('components/question-directives/question-editor/question-editor.directive.ts');
 require('components/state/AnswerGroupEditorDirective.ts');
 require('components/state/HintEditorDirective.ts');
 require('components/state/OutcomeEditorDirective.ts');

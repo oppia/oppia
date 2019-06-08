@@ -18,7 +18,7 @@
  */
 
 require('directives/AngularHtmlBindDirective.ts');
-require('pages/question_editor/QuestionEditorDirective.ts');
+require('components/question-directives/question-editor/question-editor.directive.ts');
 
 require('components/entity-creation-services/question-creation.service.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
@@ -49,7 +49,8 @@ oppia.directive('questionsList', [
         getQuestionSuggestionThreads: '&questionSuggestionThreads'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/questions_list/questions_list_directive.html'),
+        '/components/question-directives/questions-list/' +
+        'questions-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$filter', '$http', '$q', '$uibModal', '$window',

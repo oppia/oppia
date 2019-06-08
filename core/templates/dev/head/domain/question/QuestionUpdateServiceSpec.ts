@@ -22,7 +22,7 @@ require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/QuestionUpdateService.ts');
 require('domain/state/StateObjectFactory.ts');
-require('pages/question_editor/QuestionEditorDirective.ts');
+require('components/question-directives/question-editor/question-editor.directive.ts');
 
 describe('Question update service', function() {
   var QuestionUpdateService = null;

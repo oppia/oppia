@@ -22,7 +22,7 @@ require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/VoiceoverObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
-require('pages/question_editor/QuestionEditorDirective.ts');
+require('components/question-directives/question-editor/question-editor.directive.ts');
 
 describe('State card object factory', function() {
   var StateCardObjectFactory = null;

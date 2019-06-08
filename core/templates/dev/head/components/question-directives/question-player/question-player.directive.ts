@@ -105,7 +105,8 @@ oppia.directive('questionPlayer', [
         getQuestionPlayerConfig: '&playerConfig',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/question_player/question_player_directive.html'),
+        '/components/question-directives/question-player/' +
+        'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$rootScope', '$scope', 'QuestionPlayerBackendApiService',
