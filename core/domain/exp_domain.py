@@ -45,8 +45,7 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
-STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = (
-    'solicit_answer_details')
+STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
@@ -2213,7 +2212,6 @@ class Exploration(object):
         for state_dict in states_dict.itervalues():
             state_dict['solicit_answer_details'] = False
         return states_dict
-
 
     @classmethod
     def update_states_from_model(

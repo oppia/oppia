@@ -2134,13 +2134,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_solicit_answer_details(self):
         """Test updating of solicit_answer_details."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, False)
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
                 True),
             '')
-
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.init_state.solicit_answer_details, True)
