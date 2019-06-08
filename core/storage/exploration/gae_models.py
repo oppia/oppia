@@ -528,6 +528,36 @@ class StateIdMappingModel(base_models.BaseModel):
     largest_state_id_used = ndb.IntegerProperty(indexed=True, required=True)
 
     @classmethod
+    def create(
+            cls, exp_id, exp_version, state_names_to_ids,
+            largest_state_id_used, overwrite=False):
+        """Creates a new instance of state id mapping model.
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of that exploration.
+            state_names_to_ids: dict. A dict storing state name to ids mapping.
+            largest_state_id_used: int. The largest integer so far that has been
+                used as a state ID for this exploration.
+            overwrite: bool. Whether overwriting of an existing model should
+                be allowed.
+        Returns:
+            StateIdMappingModel. Instance of the state id mapping model.
+        """
+        instance_id = cls._generate_instance_id(exp_id, exp_version)
+        if not overwrite and cls.get_by_id(instance_id):
+            raise Exception(
+                'State id mapping model already exists for exploration %s,'
+                ' version %d' % (exp_id, exp_version))
+        model = cls(
+            id=instance_id, exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_names_to_ids=state_names_to_ids,
+            largest_state_id_used=largest_state_id_used)
+        model.put()
+
+        return model
+
+    @classmethod
     def _generate_instance_id(cls, exp_id, exp_version):
         """Generates ID of the state id mapping model instance.
         Args:
