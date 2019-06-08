@@ -108,7 +108,7 @@ class DonatePage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/donate.html')
+        self.render_template('dist/donate-page.mainpage.html')
 
 
 class ThanksPage(base.BaseHandler):
