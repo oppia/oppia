@@ -25,7 +25,7 @@ oppia.directive('scoreRing', [
       },
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/score_ring/score_ring_directive.html'),
+        '/components/score-ring/score-ring.directive.html'),
       controllerAs: '$ctrl',
       controller: ['$scope', '$window',
         function($scope, $window) {
