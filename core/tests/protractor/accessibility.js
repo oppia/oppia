@@ -21,6 +21,7 @@ var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var GetStartedPage = require('../protractio_utils/GetStartedPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
   var libraryPage = null;
@@ -56,38 +57,32 @@ describe('Cache Slugs', function() {
 });
 
 describe('Meta Tags', function() {
-  var GET_STARTED_URL = '/get_started';
-  var GET_STARTED_META = {
-    name: 'Personalized Online Learning from Oppia',
-    description: 'Learn how to get started using Oppia.'
-  };
+  var EXPECTED_META_NAME = 'Personalized Online Learning from Oppia';
+  var EXPECTED_META_DESCRIPTION = 'Learn how to get started using Oppia.';
+  var getStartedPage = new GetStartedPage.GetStartedPage();
+
   beforeEach(function() {
-    browser.get(GET_STARTED_URL);
-    waitFor.pageToFullyLoad();
+    getStartedPage.get();
   });
 
   it('should set the correct itemprop meta tags', function() {
-    var nameMeta = element(by.css('meta[itemprop="name"]'));
-    var descriptionMeta = element(by.css('meta[itemprop="description"]'));
-    expect(nameMeta.getAttribute('content')).toEqual(GET_STARTED_META.name);
-    expect(descriptionMeta.getAttribute('content')).toEqual(
-      GET_STARTED_META.description);
+    expect(getStartedPage.getMetaTagContent('name', 'itemprop')).toEqual(
+      EXPECTED_META_NAME);
+    expect(getStartedPage.getMetaTagContent('description', 'itemprop')).toEqual(
+      EXPECTED_META_DESCRIPTION);
   });
 
   it('should set the correct og meta tags', function() {
-    var ogTitle = element(by.css('meta[property="og:title"]'));
-    var ogDescription = element(by.css('meta[property="og:description"]'));
-    var ogUrl = element(by.css('meta[property="og:url"]'));
-    var ogImage = element(by.css('meta[property="og:image"]'));
-    expect(ogTitle.getAttribute('content')).toEqual(GET_STARTED_META.name);
-    expect(ogDescription.getAttribute('content')).toEqual(
-      GET_STARTED_META.description);
-    expect(ogUrl.getAttribute('content')).toEqual(
+    expect(getStartedPage.getMetaTagContent('title', 'og')).toEqual(
+      EXPECTED_META_NAME);
+    expect(getStartedPage.getMetaTagContent('description', 'og')).toEqual(
+      EXPECTED_META_DESCRIPTION);
+    expect(getStartedPage.getMetaTagContent('url', 'og')).toEqual(
       'http://localhost:9001/get_started');
   });
 
   it('should set the correct application name', function() {
-    var appName = element(by.css('meta[name="application-name"]'));
-    expect(appName.getAttribute('content')).toEqual('Oppia.org');
+    expect(getStartedPage.getMetaTagContent('application-name')).toEqual(
+      'Oppia.org');
   });
 });
