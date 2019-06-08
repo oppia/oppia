@@ -16,7 +16,7 @@
  * @fileoverview Tests that ratings are being displayed correctly.
  */
 
-require('components/RatingDisplayDirective.ts');
+require('components/ratings/rating-display/rating-display.directive.ts');
 
 describe('Rating display directive', function() {
   var outerScope, ctrlScope;
@@ -26,7 +26,7 @@ describe('Rating display directive', function() {
   beforeEach(
     angular.mock.inject(function($compile, $rootScope, $templateCache) {
       var templateHtml = $templateCache.get(
-        '/core/templates/dev/head/components/rating_display_directive.html');
+        '/core/templates/dev/head/components/ratings/rating-display/rating-display.directive.html');
       $compile(templateHtml)($rootScope);
       $rootScope.$digest();
       outerScope = $rootScope.$new();

@@ -16,7 +16,7 @@
  * @fileoverview Controller for the conversation skin.
  */
 
-require('components/RatingDisplayDirective.ts');
+require('components/ratings/rating-display/rating-display.directive.ts');
 require('components/summary_tile/ExplorationSummaryTileDirective.ts');
 require('components/summary_tile/CollectionSummaryTileDirective.ts');
 require('directives/AngularHtmlBindDirective.ts');

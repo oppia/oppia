@@ -16,7 +16,7 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
-require('components/RatingComputationService.ts');
+require('components/ratings/rating-computation/rating-computation.service.ts');
 
 describe('Rating computation service', function() {
   var RatingComputationService;

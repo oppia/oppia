@@ -372,7 +372,7 @@
 /core/controllers/feedback*.py @nithusha21
 /core/domain/feedback*.py @nithusha21
 /core/storage/feedback/ @nithusha21
-/core/templates/dev/head/components/rating_display_directive.html @nithusha21
+/core/templates/dev/head/components/ratings/rating-display/rating-display.directive.html @nithusha21
 /core/templates/dev/head/components/RatingComputationService*.ts @nithusha21
 /core/templates/dev/head/components/RatingDisplayDirective*.ts  @nithusha21
 /core/templates/dev/head/domain/feedback_message/ @nithusha21

@@ -22,7 +22,7 @@ require('filters/summarize-nonnegative-number.filter.ts');
 require('filters/string-utility-filters/truncate-and-capitalize.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
-require('components/RatingComputationService.ts');
+require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');

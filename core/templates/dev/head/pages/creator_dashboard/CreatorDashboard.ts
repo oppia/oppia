@@ -39,7 +39,7 @@ require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
 require('filters/truncate-input-based-on-interaction-answer-type.filter.ts');
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require('components/RatingComputationService.ts');
+require('components/ratings/rating-computation/rating-computation.service.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
@@ -127,7 +127,7 @@ require('pages/exploration_player/PlayerConstants.ts');
 require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
 
 require('components/entity-creation-services/exploration-creation.service.ts');
-require('components/RatingComputationService.ts');
+require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');

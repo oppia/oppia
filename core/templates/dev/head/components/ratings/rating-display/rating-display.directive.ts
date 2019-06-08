@@ -35,7 +35,7 @@ oppia.directive('ratingDisplay', [
         ratingValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/components/rating_display_directive.html'),
+        '/components/ratings/rating-display/rating-display.directive.html'),
       link: function(scope, element) {
         // This is needed in order for the scope to be retrievable during Karma
         // unit testing. See http://stackoverflow.com/a/29833832 for more
