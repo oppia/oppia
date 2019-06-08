@@ -311,7 +311,6 @@ class ImageAssets(object):
             image_id: int. The image_id of an image.
             image_info: dict. The dicts representation of image info.
         """
-
         if image_id in self.image_mapping:
             raise utils.ValidationError('Image Id already exist. %s' %
                                         image_id)
@@ -322,8 +321,7 @@ class ImageAssets(object):
             instructions = image_info['instructions']
 
             image = Image(src, placeholder, author_id, instructions)
-            image_id = int(image_id)
-            self.image_mapping[image_id] = image
+            self.image_mapping[unicode(image_id)] = image
 
     def delete_image(self, image_id):
         """Deletes an image from the state.
@@ -331,7 +329,7 @@ class ImageAssets(object):
         Args:
             image_id: str. ID of an image.
         """
-        del self.image_mapping[image_id]
+        del self.image_mapping[unicode(image_id)]
 
     def get_all_image_ids(self):
         """Returns all image ids of images in the state.
@@ -1575,7 +1573,8 @@ class State(object):
         self.written_translations = written_translations
 
     def validate(
-            self, exp_param_specs_dict, allow_null_interaction):
+            self, exp_param_specs_dict, image_counter,
+            allow_null_interaction):
         """Validates various properties of the State.
 
         Args:
@@ -1644,9 +1643,9 @@ class State(object):
         image_ids = self.image_assets.get_all_image_ids()
         copied_image_ids = copy.deepcopy(image_ids)
         for image_id in image_ids:
-            if not isinstance(image_id, int):
+            if not isinstance(image_id, unicode):
                 raise utils.ValidationError(
-                    'Expected image_id to be int, received %s' %
+                    'Expected image_id to be unicode, received %s' %
                     image_id)
             if image_id > image_counter:
                 utils.ValidationError(

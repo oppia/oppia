@@ -32,6 +32,7 @@ import pprint
 import re
 import traceback
 import zipfile
+import bs4
 
 from constants import constants
 from core.domain import activity_services
@@ -579,19 +580,14 @@ def get_images_ids_of_exploration(exploration):
         list. List of ids, of all images present in an exploration.
     """
     image_ids = []
+
     exploration_content = (exploration.get_all_html_content_strings())[0]
+    soup = bs4.BeautifulSoup(exploration_content.encode('utf-8'), 'html.parser')
 
-    image_ids_with_value = (
-        re.findall('image_id-with-value=["][0-9]*["]', exploration_content))
-    # image_ids_with_value is a list whose value be like
-    # ['image_id="4"', 'image_id="2"', 'image_id="5555"'].
-    # So to get all individual image id with type int, a loop is run to
-    # get the desired result i.e [4,2,555].
-
-    for each_image_id in image_ids_with_value:
-        image_id = each_image_id.replace('image_id-with-value="', '')
-        image_id = image_id.replace('"', '')
+    for image in soup.findAll(name='oppia-noninteractive-image'):
+        image_id = image['image_id-with-value']
         image_ids.append(int(image_id))
+
     return image_ids
 
 
@@ -816,7 +812,8 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_ADD_NEW_IMAGE):
 
                     # Increment image_counter
-                    exploration.image_counter += 1
+                    image_counter = exploration.image_counter
+                    image_counter += 1
                     if (exploration.get_all_html_content_strings())[0] != '':
                         # Find image_ids of newly added images.
                         image_ids = get_images_ids_of_exploration(exploration)
@@ -834,7 +831,7 @@ def apply_change_list(exploration_id, change_list):
                             raise Exception(
                                 'Image Id does not exist in exploration, '
                                 'received image_id is %s' % change.image_id)
-                        if change.image_id > exploration.image_counter:
+                        if change.image_id > image_counter:
                             raise Exception(
                                 'Image Id is greater then image_id counter'
                                 'not possible, received image_id is %s' %
@@ -842,6 +839,7 @@ def apply_change_list(exploration_id, change_list):
 
                     state.image_assets.add_image(
                         change.image_id, change.image_info)
+                    exploration.update_image_counter(image_counter)
 
                 # Deletes the image_ids of deleted images from the
                 # ImageAssets.
@@ -878,9 +876,6 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_auto_tts_enabled(change.new_value)
                 elif change.property_name == 'correctness_feedback_enabled':
                     exploration.update_correctness_feedback_enabled(
-                        change.new_value)
-                elif change.property_name == 'image_counter':
-                    exploration.update_image_counter(
                         change.new_value)
             elif (
                     change.cmd ==
@@ -952,6 +947,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.tags = exploration.tags
     exploration_model.blurb = exploration.blurb
     exploration_model.author_notes = exploration.author_notes
+    exploration_model.image_counter = exploration.image_counter
 
     exploration_model.states_schema_version = exploration.states_schema_version
     exploration_model.init_state_name = exploration.init_state_name

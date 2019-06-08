@@ -713,6 +713,7 @@ class Exploration(object):
             state = self.states[state_name]
             state.validate(
                 self.param_specs,
+                self.image_counter,
                 allow_null_interaction=not strict)
             # The checks below perform validation on the Outcome domain object
             # that is specific to answer groups in explorations, but not
@@ -1158,6 +1159,14 @@ class Exploration(object):
                 is enabled or not.
         """
         self.correctness_feedback_enabled = correctness_feedback_enabled
+
+    def update_image_counter(self, image_counter):
+        """Update image counter.
+
+        Args:
+            image_counter: int. Counter for an image_id.
+        """
+        self.image_counter = image_counter
 
     # Methods relating to states.
     def add_states(self, state_names):

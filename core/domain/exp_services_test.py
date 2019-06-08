@@ -224,13 +224,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                 },
             'property_name': 'content',
             }
+
         change_dict_2 = {
-            'new_value': 5,
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'old_value': 0,
-            'property_name': 'image_counter'
-        }
-        change_dict_3 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
             'property_name': 'add_new_image',
@@ -244,15 +239,82 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             }
         change_object_1 = exp_domain.ExplorationChange(change_dict_1)
         change_object_2 = exp_domain.ExplorationChange(change_dict_2)
-        change_object_3 = exp_domain.ExplorationChange(change_dict_3)
 
-        change_list = [change_object_1, change_object_2, change_object_3]
+        change_list = [change_object_1, change_object_2]
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, change_list, 'one commit')
+
+        expected_exploration_dict = {
+    'category': u'A category',
+    'param_changes': [],
+    'auto_tts_enabled': True,
+    'tags': [],
+    'states_schema_version': 29,
+    'title': u'A title',
+    'id': 'An_exploration_id',
+    'states': {
+        u'Introduction': {
+            'param_changes': [],
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': u'default_outcome',
+                        'html': u''
+                    },
+                    'dest': u'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    u'content': {},
+                    u'default_outcome': {}
+                }
+            },
+            'classifier_model_id': None,
+            'content': {
+                'content_id': u'content',
+                'html': new_html
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    u'content': {},
+                    u'default_outcome': {}
+                }
+            },
+            'image_assets': {
+                'image_mapping': {
+                    u'1': {
+                        'src': u'',
+                        'author_id': u'random',
+                        'placeholder': True,
+                        'instructions': u'no instructions'
+                    }
+                }
+            }
+        }
+    },
+    'param_specs': {},
+    'language_code': u'en',
+    'objective': u'',
+    'author_notes': u'',
+    'correctness_feedback_enabled': False,
+    'init_state_name': u'Introduction',
+    'blurb': u'',
+    'image_counter': 1
+}
+
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        image_ids = exp_services.get_images_ids_of_exploration(exploration)
-        expected_image_ids_list = [1]
-        self.assertEqual(expected_image_ids_list, image_ids)
+        self.assertEqual(exploration.to_dict(), expected_exploration_dict)
 
 
     def test_delete_image(self):
@@ -286,14 +348,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'property_name': 'content',
             }
 
-        change_dict_2 = {
-            'new_value': 5,
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'old_value': 0,
-            'property_name': 'image_counter'
-        }
 
-        change_dict_3 = {
+        change_dict_2 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
             'property_name': 'add_new_image',
@@ -306,7 +362,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             }
         }
 
-        change_dict_4 = {
+        change_dict_3 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
             'property_name': 'add_new_image',
@@ -319,7 +375,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             }
         }
 
-        change_dict_5 = {
+        change_dict_4 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
             'property_name': 'add_new_image',
@@ -332,7 +388,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             }
         }
 
-        change_dict_6 = {
+        change_dict_5 = {
             'new_value': {
                 'html': new_html_after_deleting_image,
                 'content_id': 'content'
@@ -346,33 +402,146 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'property_name': 'content',
         }
 
+        expected_exploration_dict = {
+    'category': u'A category',
+    'param_changes': [],
+    'auto_tts_enabled': True,
+    'tags': [],
+    'states_schema_version': 29,
+    'title': u'A title',
+    'id': 'An_exploration_id',
+    'states': {
+        u'Introduction': {
+            'param_changes': [],
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [],
+                    'feedback': {
+                        'content_id': u'default_outcome',
+                        'html': u''
+                    },
+                    'dest': u'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            },
+            'recorded_voiceovers': {
+                'voiceovers_mapping': {
+                    u'content': {},
+                    u'default_outcome': {}
+                }
+            },
+            'classifier_model_id': None,
+            'content': {
+                'content_id': u'content',
+                'html': u'''
+            <p>ssssssssssssssss</p><oppia-noninteractive-image image_id-with-value="1">
+            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image image_id-with-value="2">
+            </oppia-noninteractive-image>dgfsdgfd
+            '''
+            },
+            'written_translations': {
+                'translations_mapping': {
+                    u'content': {},
+                    u'default_outcome': {}
+                }
+            },
+            'image_assets': {
+                'image_mapping': {
+                    u'1': {
+                        'src': u'',
+                        'author_id': u'random',
+                        'placeholder': True,
+                        'instructions': u'no instructions'
+                    },
+                    u'2': {
+                        'src': u'',
+                        'author_id':u'random 2',
+                        'placeholder': False,
+                        'instructions': u'no instructions'
+                    }
+                }
+            }
+        }
+    },
+    'param_specs': {},
+    'language_code': u'en',
+    'objective': u'',
+    'author_notes': u'',
+    'correctness_feedback_enabled': False,
+    'init_state_name': u'Introduction',
+    'blurb': u'',
+    'image_counter': 3
+}
+
         change_object_1 = exp_domain.ExplorationChange(change_dict_1)
         change_object_2 = exp_domain.ExplorationChange(change_dict_2)
         change_object_3 = exp_domain.ExplorationChange(change_dict_3)
         change_object_4 = exp_domain.ExplorationChange(change_dict_4)
         change_object_5 = exp_domain.ExplorationChange(change_dict_5)
-        change_object_6 = exp_domain.ExplorationChange(change_dict_6)
 
         change_list = ([change_object_1, change_object_2, change_object_3,
-            change_object_4, change_object_5])
+            change_object_4])
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, change_list, 'one commit')
 
-        change_list = ([change_object_6])
+        change_list = ([change_object_5])
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, change_list, 'second commit')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(exploration.to_dict(), expected_exploration_dict)
+
+    def test_get_images_ids_of_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_default_exploration(self.EXP_ID, self.owner_id)
+
+        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
+                    'image_id-with-value="1"></oppia-noninteractive-image>')
+        change_dict_1 = {
+            'new_value': {
+                'html': new_html,
+                'content_id': 'content'
+            },
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'old_value': {
+                'html': '',
+                'content_id': 'content'
+                },
+            'property_name': 'content',
+            }
+
+        change_dict_2 = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': 'Introduction',
+            'property_name': 'add_new_image',
+            'image_id': 1,
+            'image_info': {
+                'src': '',
+                'placeholder': True,
+                'author_id': 'random',
+                'instructions': 'no instructions'
+                }
+            }
+        change_object_1 = exp_domain.ExplorationChange(change_dict_1)
+        change_object_2 = exp_domain.ExplorationChange(change_dict_2)
+
+        change_list = [change_object_1, change_object_2]
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, change_list, 'one commit')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         image_ids = exp_services.get_images_ids_of_exploration(exploration)
-
-        expected_image_ids_list = [1,2]
+        expected_image_ids_list = [1]
         self.assertEqual(expected_image_ids_list, image_ids)
-
-    # def test_get_images_ids_of_exploration(self):
-    #     exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-    #     image_ids = exp_services.get_images_ids_of_exploration(exploration)
-    #     expected_image_ids_list = [1,2]
-    #     self.assertEqual(expected_image_ids_list, image_ids)
 
     def test_get_deleted_images_ids(self):
         """Test function get_deleted_images_ids()."""
