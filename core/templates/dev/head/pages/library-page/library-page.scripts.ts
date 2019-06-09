@@ -16,6 +16,6 @@
  * @fileoverview Directives required in library.
  */
 
-require('pages/library/LibraryPageDirective.ts');
-require('pages/library/LibraryFooterDirective.ts');
-require('pages/library/SearchBarDirective.ts');
+require('pages/library-page/library-page.directive.ts');
+require('pages/library-page/library-footer/library-footer.directive.ts');
+require('pages/library-page/search-bar/search-bar.directive.ts');

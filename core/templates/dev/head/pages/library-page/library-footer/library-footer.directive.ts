@@ -25,7 +25,7 @@ oppia.directive('libraryFooter', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/library/library_footer_directive.html'),
+      '/pages/library-page/library-footer/library-footer.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$window', 'LIBRARY_PAGE_MODES', 'LIBRARY_PATHS_TO_MODES',

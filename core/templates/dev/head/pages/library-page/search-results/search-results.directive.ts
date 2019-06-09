@@ -16,7 +16,9 @@
  * @fileoverview Directive for showing search results.
  */
 
-require('pages/library/ActivityTilesInfinityGridDirective.ts');
+require(
+  'pages/library-page/search-results/' +
+  'activity-tiles-infinity-grid.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -29,7 +31,7 @@ oppia.directive('searchResults', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/search_results_directive.html'),
+        '/pages/library-page/search-results/search-results.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$rootScope', '$q', '$timeout', '$window',

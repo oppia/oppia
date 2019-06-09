@@ -34,8 +34,7 @@ oppia.directive('searchBar', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/' +
-        'search_bar_directive.html'),
+        '/pages/library-page/search-bar/search-bar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$location', '$rootScope', '$scope', '$timeout', '$translate',

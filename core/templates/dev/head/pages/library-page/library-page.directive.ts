@@ -21,7 +21,7 @@ require(
   'loading-dots.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('pages/library/SearchResultsDirective.ts');
+require('pages/library-page/search-results/search-results.directive.ts');
 
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardIdsBackendApiService.ts');
@@ -59,7 +59,7 @@ oppia.directive('libraryPage', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/library/library_page_directive.html'),
+        '/pages/library-page/library-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$log', '$rootScope', '$scope', '$timeout', '$uibModal',
