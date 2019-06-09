@@ -48,13 +48,13 @@ module.exports = {
     email_dashboard_result:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.controller.ts',
-    error: commonPrefix + '/pages/error/Error.ts',
+    error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration_editor/ExplorationEditor.ts',
     exploration_player:
       commonPrefix + '/pages/exploration_player/ExplorationPlayer.ts',
     get_started:
-      commonPrefix + 'pages/get-started-page/get-started-page.scripts.ts',
+      commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
       commonPrefix + '/pages/landing-pages/topic-landing-page/' +
       'topic-landing-page.controller.ts',
@@ -131,7 +131,7 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       filename: 'console_errors.html',
-      template: commonPrefix + '/pages/tests/console_errors.html',
+      template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
