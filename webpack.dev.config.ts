@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Dev environment config file for Webpack.
+ * @fileoverview Development environment config file for Webpack.
  */
 
 var commonWebpackConfig = require('./webpack.config.ts');
@@ -34,8 +34,8 @@ module.exports = {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'core/templates/dev/head'),
-        path.resolve(__dirname, 'typings'),
         path.resolve(__dirname, 'extensions'),
+        path.resolve(__dirname, 'typings'),
       ],
       use: [
         'cache-loader',
