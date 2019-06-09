@@ -30,7 +30,8 @@ oppia.directive('topicsList', [
         selectedTopicIds: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/topics_list_directive.html'),
+        '/pages/topics-and-skills-dashboard-page/topics-list/' +
+        'topics-list.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
         'AlertsService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
@@ -58,8 +59,8 @@ oppia.directive('topicsList', [
           $scope.deleteTopic = function(topicId) {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics_and_skills_dashboard/' +
-                'delete_topic_modal_directive.html'),
+                '/pages/topics-and-skills-dashboard-page/templates/' +
+                'delete-topic-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

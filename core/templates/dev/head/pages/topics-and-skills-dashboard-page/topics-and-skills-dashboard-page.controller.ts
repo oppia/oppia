@@ -19,16 +19,20 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('pages/topics_and_skills_dashboard/SkillsListDirective.ts');
 require(
-  'pages/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardNavbarBreadcrumbDirective.ts'
+  'pages/topics-and-skills-dashboard-page/skills-list/' +
+  'skills-list.directive.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/navbar/' +
+  'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts'
 );
 require(
-  'pages/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardNavbarDirective.ts'
+  'pages/topics-and-skills-dashboard-page/navbar/' +
+  'topics-and-skills-dashboard-navbar.directive.ts'
 );
-require('pages/topics_and_skills_dashboard/TopicsListDirective.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/topics-list/' +
+  'topics-list.directive.ts');
 
 require('components/entity-creation-services/skill-creation.service.ts');
 require('components/entity-creation-services/topic-creation.service.ts.ts');
@@ -137,8 +141,8 @@ oppia.controller('TopicsAndSkillsDashboard', [
     $scope.createSkill = function() {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/topics_and_skills_dashboard/' +
-          'create_new_skill_modal_directive.html'),
+          '/pages/topics-and-skills-dashboard-page/templates/' +
+          'create-new-skill-modal.template.html'),
         backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance',

@@ -26,8 +26,8 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/' +
-        'topics_and_skills_dashboard_navbar_directive.html'),
+        '/pages/topics-and-skills-dashboard-page/navbar/' +
+        'topics-and-skills-dashboard-navbar.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
         'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
@@ -44,8 +44,8 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
           $scope.createSkill = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topics_and_skills_dashboard/' +
-                'create_new_skill_modal_directive.html'),
+                '/pages/topics-and-skills-dashboard-page/templates/' +
+                'create-new-skill-modal.template.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',

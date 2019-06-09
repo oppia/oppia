@@ -27,7 +27,8 @@ oppia.directive('selectTopics', [
         selectedTopicIds: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/select_topics_directive.html'),
+        '/pages/topics-and-skills-dashboard-page/topic-selector/' +
+        'topic-selector.directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope',
         function(
