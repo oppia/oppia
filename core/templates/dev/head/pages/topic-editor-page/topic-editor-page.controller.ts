@@ -107,13 +107,15 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.ts');
-require('pages/topic_editor/TopicEditorNavbarDirective.ts');
-require('pages/topic_editor/main_editor/TopicEditorTabDirective.ts');
-require('pages/topic_editor/questions/QuestionsTabDirective.ts');
-require('pages/topic_editor/subtopics_editor/SubtopicsListTabDirective.ts');
+require(
+  'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');
+require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');
+require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
+require('pages/topic-editor-page/questions-tab/questions-tab.directive.ts');
+require(
+  'pages/topic-editor-page/subtopics-list-tab/subtopics-list-tab.directive.ts');
 
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 

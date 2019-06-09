@@ -20,7 +20,7 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/topic/TopicUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/contextual/UrlService.ts');
 
 oppia.directive('storiesList', [
@@ -32,7 +32,7 @@ oppia.directive('storiesList', [
         getTopic: '&topic'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/main_editor/stories_list_directive.html'),
+        '/pages/topic-editor-page/editor-tab/stories-list.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$window',
         'EditableTopicBackendApiService', 'UrlService', 'UndoRedoService',
@@ -50,8 +50,8 @@ oppia.directive('storiesList', [
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/topic_editor/main_editor/' +
-                  'save_pending_changes_modal_directive.html'),
+                  '/pages/topic-editor-page/modal-templates/' +
+                  'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
@@ -75,8 +75,8 @@ oppia.directive('storiesList', [
           $scope.deleteCanonicalStory = function(storyId) {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic_editor/main_editor/' +
-                'delete_story_modal_directive.html'),
+                '/pages/topic-editor-page/modal-templates/' +
+                'delete-story-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

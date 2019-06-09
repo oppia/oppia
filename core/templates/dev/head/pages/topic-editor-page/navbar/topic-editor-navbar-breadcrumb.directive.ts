@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
 oppia.directive('topicEditorNavbarBreadcrumb', [
@@ -26,7 +26,8 @@ oppia.directive('topicEditorNavbarBreadcrumb', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/topic_editor_navbar_breadcrumb_directive.html'),
+        '/pages/topic-editor-page/navbar/' +
+        'topic-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', 'TopicEditorStateService',
         'FocusManagerService', 'TOPIC_NAME_INPUT_FOCUS_LABEL',

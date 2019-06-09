@@ -27,7 +27,7 @@ require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');

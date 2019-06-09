@@ -33,7 +33,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
-require('pages/topic_editor/TopicEditorStateService.ts');
+require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
@@ -43,7 +43,7 @@ oppia.directive('questionsTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_editor/questions/questions_tab_directive.html'),
+        '/pages/topic-editor-page/questions-tab/questions-tab.directive.html'),
       controller: [
         '$scope', '$http', '$log', '$q', '$uibModal', '$window',
         'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',

@@ -84,7 +84,8 @@ module.exports = {
     story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
-    topic_editor: commonPrefix + '/pages/topic_editor/TopicEditor.ts',
+    topic_editor:
+      commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
       '/pages/topics_and_skills_dashboard/' +
@@ -363,8 +364,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['topic_editor'],
-      filename: 'topic_editor.html',
-      template: commonPrefix + '/pages/topic_editor/topic_editor.html',
+      filename: 'topic-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/topic-editor-page/' +
+        'topic-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
