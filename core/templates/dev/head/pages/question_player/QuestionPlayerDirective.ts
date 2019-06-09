@@ -93,6 +93,9 @@ oppia.directive('questionPlayer', [
           $scope.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.showResultsView = false;
           $scope.resultsLoaded = false;
+          ctrl.currentQuestion = 0;
+          ctrl.totalQuestions = 0;
+          ctrl.currentProgress = 0;
 
           var VIEW_HINT_PENALTY = 0.1;
           var WRONG_ANSWER_PENALTY = 0.1;

@@ -45,7 +45,7 @@ oppia.directive('scoreRing', [
             return ctrl.getScore();
           }, function(newScore) {
             if(newScore && newScore > 0) {
-              $timeout(setScore(newScore),5000);
+              setScore(newScore);
             }
           });
         }
