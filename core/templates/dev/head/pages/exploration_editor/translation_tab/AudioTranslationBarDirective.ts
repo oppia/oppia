@@ -16,7 +16,7 @@
  * @fileoverview Directive for the audio translation bar.
  */
 
-require('filters/FormatTimerFilter.ts');
+require('filters/format-timer.filter.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require(
   'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
@@ -25,10 +25,15 @@ require(
   'TranslationTabActiveContentIdService.ts');
 require(
   'pages/exploration_editor/translation_tab/VoiceoverRecordingService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StatePropertyService.ts');
 require(
-  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
 require('services/AlertsService.ts');
 require('services/AssetsBackendApiService.ts');
 require('services/AudioPlayerService.ts');
