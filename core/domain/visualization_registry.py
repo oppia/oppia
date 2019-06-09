@@ -47,19 +47,6 @@ class Registry(object):
                 cls.visualizations_dict[clazz.__name__] = clazz
 
     @classmethod
-    def get_full_html(cls):
-        """Returns the HTML bodies for all visualizations."""
-        js_directives = ''
-        for visualization_class in cls.get_all_visualization_ids():
-            filename = (
-                'OppiaVisualization%sDirective.js' % (visualization_class))
-            js_directives += (
-                utils.get_file_contents(os.path.join(
-                    feconf.VISUALIZATIONS_DIR_FOR_JS, filename)))
-
-        return '<script>%s</script>\n' % (js_directives)
-
-    @classmethod
     def get_visualization_class(cls, visualization_id):
         """Gets a visualization class by its id (which is also its class name).
 

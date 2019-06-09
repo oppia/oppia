@@ -39,7 +39,6 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
-from core.domain import visualization_registry
 from core.platform import models
 import feconf
 import utils
@@ -105,8 +104,6 @@ class ExplorationPage(EditorHandler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
 
-        visualizations_html = visualization_registry.Registry.get_full_html()
-
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
 
@@ -150,7 +147,6 @@ class ExplorationPage(EditorHandler):
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
             'value_generators_js': jinja2.utils.Markup(
                 get_value_generators_js()),
-            'visualizations_html': jinja2.utils.Markup(visualizations_html),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
