@@ -151,7 +151,9 @@ require(
   'TopicsAndSkillsDashboardBackendApiService.ts'
 );
 require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
-require('pages/suggestion_editor/SuggestionModalForCreatorDashboardService.ts');
+require(
+  'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
+  'suggestion-modal-for-creator-view.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
@@ -500,7 +502,8 @@ oppia.controller('CreatorDashboard', [
       var topicSummaries = $scope.topicSummaries;
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/creator_dashboard/create_question_modal_directive.html'),
+          '/pages/creator-dashboard-page/modal-templates/' +
+          'create-question-modal.directive.html'),
         backdrop: 'static',
         keyboard: false,
         size: 'lg',

@@ -40,7 +40,8 @@ module.exports = {
       commonPrefix + '/pages/collection_player/CollectionPlayer.ts',
     contact: commonPrefix + '/pages/contact/Contact.ts',
     creator_dashboard:
-      commonPrefix + '/pages/creator_dashboard/CreatorDashboard.ts',
+      commonPrefix + '/pages/creator-dashboard-page/' +
+      'creator-dashboard-page.controller.ts',
     donate: commonPrefix + '/pages/donate/Donate.ts',
     email_dashboard:
       commonPrefix + '/pages/email_dashboard/EmailDashboard.ts',
@@ -133,9 +134,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['creator_dashboard'],
-      filename: 'creator_dashboard.html',
+      filename: 'creator-dashboard-page.mainpage.html',
       template:
-        commonPrefix + '/pages/creator_dashboard/creator_dashboard.html',
+        commonPrefix + '/pages/creator-dashboard-page/' +
+        'creator-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
