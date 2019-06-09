@@ -17,11 +17,8 @@
 """Registry for visualizations."""
 
 import inspect
-import os
 
 from extensions.visualizations import models
-import feconf
-import utils
 
 
 class Registry(object):
