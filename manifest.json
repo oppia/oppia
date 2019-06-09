@@ -80,9 +80,9 @@
         "targetDirPrefix": "beautifulsoup4-"
       },
       "mutagen": {
-        "version": "1.38",
+        "version": "1.42.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/57/ec/d7534cdb2766f1fee534a3aabdbdfbf05d6cf77cde617d77b526336a1a72/mutagen-1.38.tar.gz#md5=c54443dfb8d4ac088eb2a0c4fd569772",
+        "url": "https://files.pythonhosted.org/packages/30/4c/5ad1a6e1ccbcfaf6462db727989c302d9d721beedd9b09c11e6f0c7065b0/mutagen-1.42.0.tar.gz",
         "tarRootDirPrefix": "mutagen-",
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
@@ -119,11 +119,11 @@
         }
       },
       "angularAudio": {
-        "version": "f403ea9e86de141278d410bade8ef1f43e6d188c",
+        "version": "1.7.4",
         "downloadFormat": "zip",
-        "url": "https://github.com/danielstern/ngAudio/archive/f403ea9e86de141278d410bade8ef1f43e6d188c.zip",
+        "url": "https://github.com/danielstern/ngAudio/archive/1.7.4.zip",
         "rootDirPrefix": "ngAudio-",
-        "targetDir": "angular-audio-f403ea",
+        "targetDirPrefix": "ngAudio-",
         "bundle": {
           "js": ["app/angular.audio.js"]
         }

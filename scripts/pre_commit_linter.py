@@ -360,7 +360,7 @@ _PATHS_TO_INSERT = [
     os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
     os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
-    os.path.join('third_party', 'mutagen-1.38'),
+    os.path.join('third_party', 'mutagen-1.42.0'),
     os.path.join('third_party', 'soupsieve-1.8'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
 ]
