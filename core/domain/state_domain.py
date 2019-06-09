@@ -1470,6 +1470,12 @@ class State(object):
             raise utils.ValidationError(
                 'Expected solicit_answer_details to be a boolean, ' +
                 'received %s' % self.solicit_answer_details)
+        if self.solicit_answer_details:
+            if self.interaction.id != 'TextInput':
+                raise utils.ValidationError(
+                    'This state cannont have true instance of ' +
+                    'solicit_answer_details, because the interaction is ' +
+                    'of type %s.' % self.interaction.id)
 
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)

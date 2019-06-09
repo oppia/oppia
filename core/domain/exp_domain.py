@@ -2846,6 +2846,13 @@ class Exploration(object):
 
         Adds solicit_answer_details in state to ask learners for the
         answer details.
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v33.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v34.
         """
         exploration_dict['schema_version'] = 34
 

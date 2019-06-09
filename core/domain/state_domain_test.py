@@ -568,6 +568,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_solution(solution)
         exploration.validate()
 
+    def test_validate_state_solicit_answer_details(self):
+        """Test validation of solicit_answer_details."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected solicit_answer_details to be ' +
+            'a boolean, received'):
+            with self.swap(init_state, 'solicit_answer_details', 'abc'):
+                exploration.validate()
+        self.assertEqual(init_state.solicit_answer_details, False)
+        init_state.update_interaction_id('GraphInput')
+        self.assertEqual(init_state.interaction.id, 'GraphInput')
+        exploration.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'This state cannont have true instance of' +
+            ' solicit_answer_details, because the interaction is '):
+            with self.swap(init_state, 'solicit_answer_details', True):
+                exploration.validate()
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
+
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""
