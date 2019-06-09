@@ -30,7 +30,7 @@ oppia.directive('misconceptionEditor', [
         isEditable: '&isEditable'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
+        '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
         'misconception-editor.directive.html'),
       controller: [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
