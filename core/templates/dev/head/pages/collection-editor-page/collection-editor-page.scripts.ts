@@ -18,8 +18,8 @@
 
 require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
-    'pages/collection-editor-page/navbar/' +
-    'collection-editor-navbar-breadcrumb.directive.ts');
+  'pages/collection-editor-page/navbar/' +
+  'collection-editor-navbar-breadcrumb.directive.ts');
 require(
-    'pages/collection-editor-page/navbar/' +
-    'collection-editor-navbar.directive.ts');
+  'pages/collection-editor-page/navbar/' +
+  'collection-editor-navbar.directive.ts');
