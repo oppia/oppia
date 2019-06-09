@@ -1788,10 +1788,12 @@ def can_edit_skill(handler):
         if role_services.ACTION_EDIT_PUBLIC_SKILLS in self.user.actions:
             if not skill_rights.is_private():
                 return handler(self, skill_id, **kwargs)
-            if skill_rights.is_private() and skill_rights.is_creator(
+            elif skill_rights.is_private() and skill_rights.is_creator(
                     self.user.user_id):
                 return handler(self, skill_id, **kwargs)
-
+            else:
+                raise self.UnauthorizedUserException(
+                    'You do not have credentials to edit this skill.')
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
