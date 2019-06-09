@@ -160,7 +160,7 @@ class EditorTests(BaseEditorControllerTests):
         self.assertEqual(new_state_dict, constants.NEW_STATE_TEMPLATE)
         # Validates if the current NEW_STATE_TEMPLATE is the latest version
         # by validating it.
-        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, True)
+        exploration.states[feconf.DEFAULT_INIT_STATE_NAME].validate(None, 0, True)
 
 
     def test_that_default_exploration_cannot_be_published(self):
