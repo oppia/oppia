@@ -1816,6 +1816,10 @@ class State(object):
             solicit_answer_details: bool. The new value of
                 solicit_answer_details for the state.
         """
+        if not isinstance(solicit_answer_details, bool):
+            raise Exception(
+                'Expected solicit_answer_details to be a boolean, received %s'
+                % solicit_answer_details)
         self.solicit_answer_details = solicit_answer_details
 
     def to_dict(self):

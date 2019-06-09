@@ -2161,6 +2161,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
                     'abc'),
                 '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, False)
+
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""

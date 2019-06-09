@@ -216,20 +216,20 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
     def test_update_solicit_answer_details(self):
         """Test updating solicit_answer_details."""
         state = state_domain.State.create_default_state('state_1')
-        self.assertEqual(
-            state.solicit_answer_details, False)
+        self.assertEqual(state.solicit_answer_details, False)
         state.update_solicit_answer_details(True)
-        self.assertEqual(
-            state.solicit_answer_details, True)
+        self.assertEqual(state.solicit_answer_details, True)
 
     def test_update_solicit_answer_details_with_non_bool_fails(self):
         """Test updating solicit_answer_details with non bool value."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         init_state = exploration.states[exploration.init_state_name]
-        init_state.update_solicit_answer_details('abc')
-        with self.assertRaisesRegexp(utils.ValidationError, (
+        self.assertEqual(init_state.solicit_answer_details, False)
+        with self.assertRaisesRegexp(Exception, (
             'Expected solicit_answer_details to be a boolean, received')):
-            exploration.validate()
+            init_state.update_solicit_answer_details('abc')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
 
     def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
