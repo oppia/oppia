@@ -31,46 +31,58 @@ var commonPrefix = './core/templates/dev/head';
 
 module.exports = {
   entries: {
-    about: commonPrefix + '/pages/about/About.ts',
+    about: commonPrefix + '/pages/about-page/about-page.controller.ts',
     admin: commonPrefix + '/pages/admin/Admin.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
       commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
     collection_player:
       commonPrefix + '/pages/collection_player/CollectionPlayer.ts',
-    contact: commonPrefix + '/pages/contact/Contact.ts',
+    contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator_dashboard/CreatorDashboard.ts',
-    donate: commonPrefix + '/pages/donate/Donate.ts',
+    donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
     email_dashboard:
-      commonPrefix + '/pages/email_dashboard/EmailDashboard.ts',
+      commonPrefix +
+      '/pages/email-dashboard-pages/email-dashboard-page.controller.ts',
     email_dashboard_result:
-      commonPrefix + '/pages/email_dashboard/EmailDashboardResult.ts',
-    error: commonPrefix + '/pages/error/Error.ts',
+      commonPrefix +
+      '/pages/email-dashboard-pages/email-dashboard-result.controller.ts',
+    error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration_editor/ExplorationEditor.ts',
     exploration_player:
       commonPrefix + '/pages/exploration_player/ExplorationPlayer.ts',
-    get_started: commonPrefix + '/pages/get_started/GetStarted.ts',
-    landing: commonPrefix + '/pages/landing/TopicLandingPage.ts',
+    get_started:
+      commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
+    landing:
+      commonPrefix + '/pages/landing-pages/topic-landing-page/' +
+      'topic-landing-page.controller.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
     library: commonPrefix + '/pages/library/Library.ts',
-    maintenance: commonPrefix + '/pages/maintenance/Maintenance.ts',
-    moderator: commonPrefix + '/pages/moderator/Moderator.ts',
+    maintenance:
+      commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
+    moderator:
+      commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
     notifications_dashboard:
-      commonPrefix + '/pages/notifications_dashboard/NotificationsDashboard.ts',
+      commonPrefix + '/pages/notifications-dashboard-page/' +
+      'notifications-dashboard-page.controller.ts',
     practice_session:
-      commonPrefix + '/pages/practice_session/PracticeSession.ts',
-    preferences: commonPrefix + '/pages/preferences/Preferences.ts',
-    profile: commonPrefix + '/pages/profile/Profile.ts',
-    signup: commonPrefix + '/pages/signup/Signup.ts',
+      commonPrefix + '/pages/practice-session-page/' +
+      'practice-session-page.controller.ts',
+    preferences:
+      commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
+    profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
+    signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
-    splash: commonPrefix + '/pages/splash/Splash.ts',
-    stewards: commonPrefix + '/pages/landing/stewards/Stewards.ts',
+    splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
+    stewards:
+      commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
+      'stewards-landing-page.controller.ts',
     story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
-    teach: commonPrefix + '/pages/teach/Teach.ts',
-    thanks: commonPrefix + '/pages/thanks/Thanks.ts',
+    teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
+    thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
     topic_editor: commonPrefix + '/pages/topic_editor/TopicEditor.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
@@ -96,8 +108,8 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['about'],
-      filename: 'about.html',
-      template: commonPrefix + '/pages/about/about.html',
+      filename: 'about-page.mainpage.html',
+      template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -119,14 +131,14 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       filename: 'console_errors.html',
-      template: commonPrefix + '/pages/tests/console_errors.html',
+      template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['contact'],
-      filename: 'contact.html',
-      template: commonPrefix + '/pages/contact/contact.html',
+      filename: 'contact-page.mainpage.html',
+      template: commonPrefix + '/pages/contact-page/contact-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -140,30 +152,33 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['donate'],
-      filename: 'donate.html',
-      template: commonPrefix + '/pages/donate/donate.html',
+      filename: 'donate-page.mainpage.html',
+      template: commonPrefix + '/pages/donate-page/donate-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['email_dashboard'],
-      filename: 'email_dashboard.html',
-      template: commonPrefix + '/pages/email_dashboard/email_dashboard.html',
+      filename: 'email-dashboard-page.mainpage.html',
+      template: (
+        commonPrefix +
+        '/pages/email-dashboard-pages/email-dashboard-page.mainpage.html'),
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['email_dashboard_result'],
-      filename: 'email_dashboard_result.html',
+      filename: 'email-dashboard-result.mainpage.html',
       template:
-        commonPrefix + '/pages/email_dashboard/email_dashboard_result.html',
+        commonPrefix +
+        '/pages/email-dashboard-pages/email-dashboard-result.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['error'],
-      filename: 'error.html',
-      template: commonPrefix + '/pages/error/error.html',
+      filename: 'error-page.mainpage.html',
+      template: commonPrefix + '/pages/error-pages/error-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -185,15 +200,18 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['get_started'],
-      filename: 'get_started.html',
-      template: commonPrefix + '/pages/get_started/get_started.html',
+      filename: 'get-started-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['landing'],
-      filename: 'topic_landing_page.html',
-      template: commonPrefix + '/pages/landing/topic_landing_page.html',
+      filename: 'topic-landing-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/landing-pages/topic-landing-page/' +
+        'topic-landing-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -214,59 +232,65 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['app', 'maintenance'],
-      filename: 'maintenance.html',
-      template: commonPrefix + '/pages/maintenance/maintenance.html',
+      filename: 'maintenance-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['moderator'],
-      filename: 'moderator.html',
-      template: commonPrefix + '/pages/moderator/moderator.html',
+      filename: 'moderator-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/moderator-page/moderator-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'privacy.html',
-      template: commonPrefix + '/pages/privacy/privacy.html',
+      filename: 'privacy-page.mainpage.html',
+      template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['notifications_dashboard'],
-      filename: 'notifications_dashboard.html',
+      filename: 'notifications-dashboard-page.mainpage.html',
       template: (
         commonPrefix +
-        '/pages/notifications_dashboard/notifications_dashboard.html'
+        '/pages/notifications-dashboard-page/' +
+        'notifications-dashboard-page.mainpage.html'
       ),
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['practice_session'],
-      filename: 'practice_session.html',
-      template: commonPrefix + '/pages/practice_session/practice_session.html',
+      filename: 'practice-session-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/practice-session-page/' +
+        'practice-session-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['preferences'],
-      filename: 'preferences.html',
-      template: commonPrefix + '/pages/preferences/preferences.html',
+      filename: 'preferences-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['profile'],
-      filename: 'profile.html',
-      template: commonPrefix + '/pages/profile/profile.html',
+      filename: 'profile-page.mainpage.html',
+      template: commonPrefix + '/pages/profile-page/profile-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['signup'],
-      filename: 'signup.html',
-      template: commonPrefix + '/pages/signup/signup.html',
+      filename: 'signup-page.mainpage.html',
+      template: commonPrefix + '/pages/signup-page/signup-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -279,30 +303,32 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['splash'],
-      filename: 'splash.html',
-      template: commonPrefix + '/pages/splash/splash.html',
+      filename: 'splash-page.mainpage.html',
+      template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash_at0.html',
-      template: commonPrefix + '/pages/splash/splash_at0.html',
+      template: commonPrefix + '/pages/splash-page/splash_at0.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash_at1.html',
-      template: commonPrefix + '/pages/splash/splash_at1.html',
+      template: commonPrefix + '/pages/splash-page/splash_at1.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['stewards'],
-      filename: 'landing_page_stewards.html',
+      filename: 'stewards-landing-page.mainpage.html',
       template:
-        commonPrefix + '/pages/landing/stewards/landing_page_stewards.html',
+        commonPrefix +
+        '/pages/landing-pages/stewards-landing-page/' +
+        'stewards-landing-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -315,21 +341,21 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['teach'],
-      filename: 'teach.html',
-      template: commonPrefix + '/pages/teach/teach.html',
+      filename: 'teach-page.mainpage.html',
+      template: commonPrefix + '/pages/teach-page/teach-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      filename: 'terms.html',
-      template: commonPrefix + '/pages/terms/terms.html',
+      filename: 'terms-page.mainpage.html',
+      template: commonPrefix + '/pages/terms-page/terms-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['thanks'],
-      filename: 'thanks.html',
-      template: commonPrefix + '/pages/thanks/thanks.html',
+      filename: 'thanks-page.mainpage.html',
+      template: commonPrefix + '/pages/thanks-page/thanks-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -379,9 +379,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
-                    'pages/error/error_iframed.html', iframe_restriction=None)
+                    'pages/error-pages/error-iframed.mainpage.html',
+                    iframe_restriction=None)
             else:
-                self.render_template('dist/error.html')
+                self.render_template('dist/error-page.mainpage.html')
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
