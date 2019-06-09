@@ -19,8 +19,6 @@
 require('components/background/BackgroundBannerDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/CapitalizeFilter.ts');
-require('filters/HyphensToSpacesFilter.ts');
 require('pages/landing/TopicLandingPage.ts');
 require('services/PageTitleService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -30,6 +28,7 @@ require('services/SiteAnalyticsService.ts');
 oppia.constant('TOPIC_LANDING_PAGE_DATA', {
   maths: {
     fractions: {
+      topic_title: 'Fractions',
       collection_id: '4UgTQUc1tala',
       page_data: {
         image_1: {
@@ -45,11 +44,12 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
           'What is a Fraction?',
           'Comparing Fractions',
           'The Meaning of "Equal Parts"',
-          'Adding and Subtracting Fractions'
+          'Adding & Subtracting Fractions'
         ]
       }
     },
     'negative-numbers': {
+      topic_title: 'Negative Numbers',
       collection_id: 'GdYIgsfRZwG7',
       page_data: {
         image_1: {
@@ -62,13 +62,15 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
         },
         video: 'negative-numbers_video.mp4',
         lessons: [
-          'The number line',
+          'The Number Line',
           'What is a Negative Number?',
-          'Adding and subtracting Negative Numbers'
+          'Adding & Subtracting Negative Numbers',
+          'Multiplying & Dividing Negative Numbers'
         ]
       }
     },
     ratios: {
+      topic_title: 'Ratios',
       collection_id: '53gXGLIR044l',
       page_data: {
         image_1: {
@@ -92,8 +94,6 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
   }
 });
 
-
-
 oppia.controller('TopicLandingPage', [
   '$filter', '$scope', '$timeout', '$window', 'PageTitleService',
   'SiteAnalyticsService', 'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA',
@@ -102,19 +102,16 @@ oppia.controller('TopicLandingPage', [
       SiteAnalyticsService, UrlInterpolationService, TOPIC_LANDING_PAGE_DATA) {
     var pathArray = $window.location.pathname.split('/');
     $scope.subject = pathArray[2];
-    $scope.topic = pathArray[3];
-    var landingPageData = (
-      TOPIC_LANDING_PAGE_DATA[$scope.subject][$scope.topic].page_data);
+    var topic = pathArray[3];
+    var topicData = TOPIC_LANDING_PAGE_DATA[$scope.subject][topic];
+    var landingPageData = topicData.page_data;
     var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
-
-    var capitalizedTopic = $filter('capitalize')($scope.topic);
-    var pageTitle = 'Learn ' + capitalizedTopic + ' - Oppia';
-    PageTitleService.setPageTitle(pageTitle);
-
+    $scope.topicTitle = topicData.topic_title;
     $scope.lessons = landingPageData.lessons;
+    var pageTitle = 'Learn ' + $scope.topicTitle + ' - Oppia';
+    PageTitleService.setPageTitle(pageTitle);
     $scope.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
       '/splash/books.svg');
-
 
     var getImageData = function(index) {
       var imageKey = 'image_' + index;
@@ -122,7 +119,7 @@ oppia.controller('TopicLandingPage', [
         var imagePath = UrlInterpolationService.interpolateUrl(
           angular.copy(assetsPathFormat), {
             subject: $scope.subject,
-            topic: $scope.topic,
+            topic: topic,
             file_name: landingPageData[imageKey].file_name
           });
         return {
@@ -140,7 +137,7 @@ oppia.controller('TopicLandingPage', [
         var videoPath = UrlInterpolationService.interpolateUrl(
           angular.copy(assetsPathFormat), {
             subject: $scope.subject,
-            topic: $scope.topic,
+            topic: topic,
             file_name: landingPageData.video
           });
         return UrlInterpolationService.getStaticVideoUrl(videoPath);
@@ -150,8 +147,7 @@ oppia.controller('TopicLandingPage', [
     };
 
     $scope.onClickGetStartedButton = function() {
-      var collectionId = (
-        TOPIC_LANDING_PAGE_DATA[$scope.subject][$scope.topic].collection_id);
+      var collectionId = topicData.collection_id;
       SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
         collectionId);
       $timeout(function() {

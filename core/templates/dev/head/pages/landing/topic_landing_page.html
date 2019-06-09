@@ -12,7 +12,7 @@
             </div>
             <div class="col-sm-6 col-sm-pull-6">
               <div class="oppia-landing-text-box-1">
-                <h1 class="oppia-landing-h1 oppia-text-color-green"><[topic | capitalize | hyphensToSpaces]> just got easier</h1>
+                <h1 class="oppia-landing-h1 oppia-text-color-green"><[topicTitle]> just got easier</h1>
                 <h2 class="oppia-landing-h2 oppia-text-color-green">Get your students and kids started with our free, effective <[subject]> lessons.</h2>
               </div>
               <button class="btn oppia-landing-page-button" ng-click="onClickGetStartedButton('teacher')">Get Started</button>
@@ -79,8 +79,8 @@
               <div class="oppia-landing-text-box-1">
                 <h1 class="oppia-landing-h1 text-center">Topics covered in this lesson</h1>
                 <br>
-                <h2 class="oppia-landing-h2 oppia-lessons-title" ng-repeat="lessonTitle in lessons"><[lessonTitle]></h2>
-                <h2 class="oppia-landing-h2 oppia-lessons-title">and more!</h2>
+                <h2 class="oppia-landing-h2 oppia-lessons-title oppia-text-color-green" ng-repeat="lessonTitle in lessons"><[lessonTitle]></h2>
+                <h2 class="oppia-landing-h2 oppia-lessons-title oppia-text-color-black">... and more!</h2>
               </div>
             </div>
           </div>
@@ -105,7 +105,7 @@
           <div class="row oppia-landing-section-row">
             <div class="col-sm-12">
               <h2 class="oppia-landing-h2 oppia-text-centered oppia-text-color-green">
-                To see high quality lessons on subjects other than <[topic | capitalize]>, visit our Library.
+                To see high quality lessons on subjects other than <[topicTitle]>, visit our Library.
               </h2>
             </div>
           </div>
@@ -222,7 +222,7 @@
       border-bottom-width: 50px;
       border-radius: 36px;
       background: #000000;
-      height: 600px;
+      min-height: 500px;
       margin: auto;
       position: relative;
       width: 270px;
