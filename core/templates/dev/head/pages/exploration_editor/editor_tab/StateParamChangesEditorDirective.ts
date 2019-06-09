@@ -18,8 +18,15 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StatePropertyService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-param-changes.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
 
 oppia.directive('stateParamChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
