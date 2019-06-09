@@ -173,7 +173,7 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
                   return stateName;
                 },
                 stateStats: function() {
-                  return $scope.stateStats[stateName];
+                  return ctrl.stateStats[stateName];
                 },
                 improvementType: function() {
                   return improvementType;

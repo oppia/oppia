@@ -480,7 +480,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateRulesStatsHandler),
     get_redirect_route(
-        r'/createhandler/state_answer_stats/<exploration_id>',
+        r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
         editor.StateAnswerStatisticsHandler),
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
