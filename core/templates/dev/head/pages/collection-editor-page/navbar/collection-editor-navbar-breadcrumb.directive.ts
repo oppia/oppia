@@ -17,7 +17,8 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require(
+  'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('pages/exploration_editor/RouterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
@@ -34,8 +35,8 @@ oppia.directive('collectionEditorNavbarBreadcrumb', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/' +
-        'collection_editor_navbar_breadcrumb_directive.html'),
+        '/pages/collection-editor-page/navbar/' +
+        'collection-editor-navbar-breadcrumb.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'RouterService', 'CollectionEditorStateService',

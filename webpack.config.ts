@@ -35,7 +35,8 @@ module.exports = {
     admin: commonPrefix + '/pages/admin/Admin.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
-      commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
+      commonPrefix + '/pages/collection-editor-page/' +
+      'collection-editor-page.scripts.ts',
     collection_player:
       commonPrefix + '/pages/collection_player/CollectionPlayer.ts',
     contact: commonPrefix + '/pages/contact/Contact.ts',
@@ -103,9 +104,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['collection_editor'],
-      filename: 'collection_editor.html',
+      filename: 'collection-editor-page.mainpage.html',
       template:
-        commonPrefix + '/pages/collection_editor/collection_editor.html',
+        commonPrefix + '/pages/collection-editor-page/' +
+        'collection-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -16,14 +16,20 @@
  * @fileoverview Primary directive for the collection editor page.
  */
 
-require('pages/collection_editor/editor_tab/CollectionEditorTabDirective.ts');
-require('pages/collection_editor/history_tab/CollectionHistoryTabDirective.ts');
 require(
-  'pages/collection_editor/settings_tab/CollectionSettingsTabDirective.ts');
+  'pages/collection-editor-page/editor-tab/collection-editor-tab.directive.ts');
 require(
-  'pages/collection_editor/statistics_tab/CollectionStatisticsTabDirective.ts');
+  'pages/collection-editor-page/history-tab/' +
+  'collection-history-tab.directive.ts');
+require(
+  'pages/collection-editor-page/settings-tab/' +
+  'collection-settings-tab.directive.ts');
+require(
+  'pages/collection-editor-page/statistics-tab/' +
+  'collection-statistics-tab.directive.ts');
 
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require(
+  'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/PageTitleService.ts');
 
 // TODO(bhenning): These constants should be provided by the backend.
@@ -52,7 +58,7 @@ oppia.directive('collectionEditorPage', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/collection_editor_page_directive.html'),
+        '/pages/collection-editor-page/collection-editor-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', 'CollectionEditorStateService', 'PageTitleService',

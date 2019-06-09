@@ -20,8 +20,10 @@
 
 require('domain/collection/CollectionUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
-require('pages/collection_editor/editor_tab/CollectionLinearizerService.ts');
+require(
+  'pages/collection-editor-page/services/collection-editor-state.service.ts');
+require(
+  'pages/collection-editor-page/services/collection-linearizer.service.ts');
 require('services/AlertsService.ts');
 
 oppia.directive('collectionNodeEditor', [
@@ -34,8 +36,8 @@ oppia.directive('collectionNodeEditor', [
         getLinearIndex: '&linearIndex'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/editor_tab/' +
-        'collection_node_editor_directive.html'),
+        '/pages/collection-editor-page/editor-tab/' +
+        'collection-node-editor.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         'CollectionEditorStateService', 'CollectionLinearizerService',

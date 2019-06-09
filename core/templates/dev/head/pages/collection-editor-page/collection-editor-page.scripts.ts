@@ -16,6 +16,10 @@
  * @fileoverview Directives required in collection editor.
  */
 
-require('pages/collection_editor/CollectionEditorPageDirective.ts');
-require('pages/collection_editor/CollectionEditorNavbarBreadcrumbDirective.ts');
-require('pages/collection_editor/CollectionEditorNavbarDirective.ts');
+require('pages/collection-editor-page/collection-editor-page.directive.ts');
+require(
+    'pages/collection-editor-page/navbar/' +
+    'collection-editor-navbar-breadcrumb.directive.ts');
+require(
+    'pages/collection-editor-page/navbar/' +
+    'collection-editor-navbar.directive.ts');

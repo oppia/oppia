@@ -13,32 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for displaying the collection's owner name and
- * permissions.
+ * @fileoverview Controller for the statistics tab of the collection editor.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
 
-oppia.directive('collectionPermissionsCard', [
+oppia.directive('collectionStatisticsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/settings_tab/' +
-        'collection_permissions_card_directive.html'),
+        '/pages/collection-editor-page/statistics-tab/' +
+        'collection-statistics-tab.directive.html'),
       controllerAs: '$ctrl',
-      controller: [
-        'CollectionEditorStateService',
-        function(CollectionEditorStateService) {
-          var ctrl = this;
-          ctrl.collectionRights =
-            CollectionEditorStateService.getCollectionRights();
-          ctrl.hasPageLoaded =
-            CollectionEditorStateService.hasLoadedCollection;
-        }
-      ]
+      controller: [function() {}]
     };
   }]);

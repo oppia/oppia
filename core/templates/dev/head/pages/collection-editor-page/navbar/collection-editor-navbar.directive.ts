@@ -28,7 +28,8 @@ require('domain/collection/CollectionValidationService.ts');
 require('domain/collection/EditableCollectionBackendApiService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/collection_editor/CollectionEditorStateService.ts');
+require(
+  'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('pages/exploration_editor/RouterService.ts');
 require('services/AlertsService.ts');
 
@@ -39,7 +40,8 @@ oppia.directive('collectionEditorNavbar', [
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_editor/collection_editor_navbar_directive.html'),
+        '/pages/collection-editor-page/navbar/' +
+        'collection-editor-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'RouterService',
@@ -133,8 +135,8 @@ oppia.directive('collectionEditorNavbar', [
             var isPrivate = ctrl.collectionRights.isPrivate();
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/collection_editor/' +
-                'collection_editor_save_modal_directive.html'),
+                '/pages/collection-editor-page/templates/' +
+                'collection-editor-save-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -165,8 +167,8 @@ oppia.directive('collectionEditorNavbar', [
             if (additionalMetadataNeeded) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/collection_editor/' +
-                  'collection_editor_pre_publish_modal_directive.html'),
+                  '/pages/collection-editor-page/templates/' +
+                  'collection-editor-pre-publish-modal.directive.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance', 'CollectionEditorStateService',
