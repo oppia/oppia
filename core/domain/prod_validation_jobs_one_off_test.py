@@ -52,9 +52,10 @@ USER_NAME = 'username'
 CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
-    activity_models, audit_models, base_models, collection_models,
-    config_models, email_models, exp_models, feedback_models,
-    file_models, recommendations_models, story_models,
+    activity_models, audit_models, base_models,
+    collection_models, config_models, email_models,
+    exp_models, feedback_models, file_models,
+    recommendations_models, story_models,
     user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
@@ -145,10 +146,8 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
         super(ActivityReferencesModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
         self.owner = user_services.UserActionsInfo(self.owner_id)
 
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -186,7 +185,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ActivityReferencesModel\', '
-            '[u\'Model id featured: The created_on field has a value '
+            '[u\'Entity id featured: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance.created_on, self.model_instance.last_updated
@@ -197,7 +196,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ActivityReferencesModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -214,12 +213,12 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for activity_references schema check '
             'of ActivityReferencesModel\', '
-            '[u"Model id featured: Property does not match the schema with the '
-            'error Missing keys: [\'id\'], Extra keys: []"]]'
+            '[u"Entity id featured: Property does not match the schema with '
+            'the error Missing keys: [\'id\'], Extra keys: []"]]'
         ), (
             u'[u\'failed validation check for fetch properties of '
             'ActivityReferencesModel\', '
-            '[u"Model id featured: Model properties cannot be fetched '
+            '[u"Entity id featured: Entity properties cannot be fetched '
             'completely with the error \'id\'"]]')]
 
         run_job_and_check_output(self, expected_output, sort=True)
@@ -233,7 +232,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for domain object check of '
             'ActivityReferencesModel\', '
-            '[u\'Model id featured: Model fails domain validation with the '
+            '[u\'Entity id featured: Entity fails domain validation with the '
             'error Invalid activity type: random_type\']]')]
         run_job_and_check_output(self, expected_output)
 
@@ -246,7 +245,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for exploration_ids field check of '
             'ActivityReferencesModel\', '
-            '[u"Model id featured: based on field exploration_ids having '
+            '[u"Entity id featured: based on field exploration_ids having '
             'value 1col, expect model ExplorationModel with id 1col but '
             'it doesn\'t exist"]]')]
         run_job_and_check_output(self, expected_output)
@@ -260,7 +259,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
         ), (
             u'[u\'failed validation check for model id check of '
             'ActivityReferencesModel\', '
-            '[u\'Model id random: Model id does not match regex pattern\']]'
+            '[u\'Entity id random: Entity id does not match regex pattern\']]'
         )]
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -274,7 +273,6 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
         self.signup(USER_EMAIL, USER_NAME)
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
         admin_model = user_models.UserSettingsModel.get_by_id(self.admin_id)
         admin_model.role = feconf.ROLE_ID_ADMIN
@@ -302,7 +300,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of RoleQueryAuditModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance.id, self.model_instance.created_on,
@@ -314,7 +312,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'RoleQueryAuditModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -323,35 +321,17 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output)
 
-    def test_model_with_non_existent_admin_id(self):
+    def test_model_with_non_existent_user_id(self):
         user_models.UserSettingsModel.get(self.admin_id).delete()
         expected_output = [(
-            u'[u\'failed validation check for user_id field check of '
+            u'[u\'failed validation check for user_ids field check of '
             'RoleQueryAuditModel\', '
-            '[u"Model id %s: based on field user_id having value '
+            '[u"Entity id %s: based on field user_ids having value '
             '%s, expect model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.admin_id, self.admin_id)]
 
         run_job_and_check_output(self, expected_output)
-
-    def test_model_with_non_admin_user_id(self):
-        model_id_with_non_admin_user_id = '%s.%s.%s.%s' % (
-            self.user_id, int(math.floor(time.time())),
-            feconf.ROLE_ACTION_UPDATE, random.randint(0, 1000))
-        model_instance_with_non_admin_user_id = (
-            audit_models.RoleQueryAuditModel(
-                id=model_id_with_non_admin_user_id, user_id=self.user_id,
-                intent=feconf.ROLE_ACTION_UPDATE, role='c', username='d'))
-        model_instance_with_non_admin_user_id.put()
-        expected_output = [(
-            u'[u\'fully-validated RoleQueryAuditModel\', 1]'
-        ), (
-            u'[u\'failed validation check for admin check of '
-            'RoleQueryAuditModel\', '
-            '[u\'Model id %s: User id %s in model does not belong to an '
-            'admin\']]') % (model_id_with_non_admin_user_id, self.user_id)]
-        run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_id(self):
         model_invalid_id = '%s.%s.%s.%s' % (
@@ -366,7 +346,7 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
         ), (
             u'[u\'failed validation check for model id check of '
             'RoleQueryAuditModel\', '
-            '[u\'Model id %s: Model id does not match regex pattern\']]'
+            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
         ) % model_invalid_id]
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -432,7 +412,7 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for time field relation check '
                 'of CollectionModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance_0.id,
@@ -448,7 +428,7 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -462,8 +442,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for domain object check of '
                 'CollectionModel\', '
-                '[u\'Model id %s: Model fails domain validation with the error '
-                'Invalid language code: %s\']]'
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error Invalid language code: %s\']]'
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated CollectionModel\', 2]']
         with self.swap(
@@ -477,8 +457,8 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for '
-                'exploration_model field check of CollectionModel\', '
-                '[u"Model id 0: based on field exploration_model having value '
+                'exploration_ids field check of CollectionModel\', '
+                '[u"Entity id 0: based on field exploration_ids having value '
                 '1, expect model ExplorationModel '
                 'with id 1 but it doesn\'t exist"]]'
             ),
@@ -498,10 +478,10 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for '
-                'collection_commit_log_entry_model field check of '
+                'collection_commit_log_entry_ids field check of '
                 'CollectionModel\', '
-                '[u"Model id 0: based on field '
-                'collection_commit_log_entry_model having value '
+                '[u"Entity id 0: based on field '
+                'collection_commit_log_entry_ids having value '
                 'collection-0-1, expect model CollectionCommitLogEntryModel '
                 'with id collection-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
@@ -512,11 +492,11 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for collection_summary_model '
+                u'[u\'failed validation check for collection_summary_ids '
                 'field check of CollectionModel\', '
-                '[u"Model id 0: based on field collection_summary_model having '
-                'value 0, expect model CollectionSummaryModel with id 0 '
-                'but it doesn\'t exist"]]'),
+                '[u"Entity id 0: based on field collection_summary_ids '
+                'having value 0, expect model CollectionSummaryModel with '
+                'id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -526,9 +506,9 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for collection_rights_model '
+                u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionModel\', '
-                '[u"Model id 0: based on field collection_rights_model having '
+                '[u"Entity id 0: based on field collection_rights_ids having '
                 'value 0, expect model CollectionRightsModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
@@ -539,9 +519,9 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of CollectionModel\', '
-                '[u"Model id 0: based on field snapshot_metadata_model having '
+                '[u"Entity id 0: based on field snapshot_metadata_ids having '
                 'value 0-1, expect model CollectionSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
@@ -552,9 +532,9 @@ class CollectionModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of CollectionModel\', '
-                '[u"Model id 0: based on field snapshot_content_model having '
+                '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model CollectionSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionModel\', 2]']
@@ -629,7 +609,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionSnapshotMetadataModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -646,7 +626,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionSnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -660,12 +640,12 @@ class CollectionSnapshotMetadataModelValidatorTests(
             self.user_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for collection_model '
+                u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field collection_model '
+                '[u"Entity id 0-1: based on field collection_ids '
                 'having value 0, expect model CollectionModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'collection_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'collection_ids having value 0, expect model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -676,9 +656,9 @@ class CollectionSnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of CollectionSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field committer_model having '
+                '[u"Entity id 0-1: based on field committer_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
@@ -696,7 +676,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for collection model '
                 'version check of CollectionSnapshotMetadataModel\', '
-                '[u\'Model id 0-3: Collection model corresponding to '
+                '[u\'Entity id 0-3: Collection model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -717,16 +697,16 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for commit cmd '
                 'delete_collection_node '
                 'check of CollectionSnapshotMetadataModel\', '
-                '[u\'Model id 0-1: Commit command domain validation failed '
-                'with error: Following required keys are missing: '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required keys are missing: '
                 'exploration_id, '
-                'Following extra keys are present: random_key\']]'
+                'The following extra keys are present: random_key\']]'
             ), (
                 u'[u\'failed validation check for commit cmd '
                 'add_collection_node '
                 'check of CollectionSnapshotMetadataModel\', '
-                '[u\'Model id 0-1: Commit command domain validation failed '
-                'with error: Following required keys are missing: '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required keys are missing: '
                 'exploration_id\']]'
             ),
             u'[u\'fully-validated CollectionSnapshotMetadataModel\', 2]']
@@ -792,7 +772,7 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionSnapshotContentModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -809,7 +789,7 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionSnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -823,12 +803,12 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for collection_model '
+                u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSnapshotContentModel\', '
-                '[u"Model id 0-1: based on field collection_model '
+                '[u"Entity id 0-1: based on field collection_ids '
                 'having value 0, expect model CollectionModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'collection_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'collection_ids having value 0, expect model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -845,7 +825,7 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for collection model '
                 'version check of CollectionSnapshotContentModel\', '
-                '[u\'Model id 0-3: Collection model corresponding to '
+                '[u\'Entity id 0-3: Collection model corresponding to '
                 'id 0 has a version 1 which is less than '
                 'the version 3 in snapshot content model id\']]'
             ), (
@@ -926,7 +906,7 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionRightsModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -941,7 +921,7 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionRightsModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -960,8 +940,9 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for first published msec check '
                 'of CollectionRightsModel\', '
-                '[u\'Model id 0: The first_published_msec field has a value %s '
-                'which is greater than the time when the job was run\']]'
+                '[u\'Entity id 0: The first_published_msec field has a '
+                'value %s which is greater than the time when the job was '
+                'run\']]'
             ) % (self.model_instance_0.first_published_msec),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -971,9 +952,9 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for collection_model '
+                u'[u\'failed validation check for collection_ids '
                 'field check of CollectionRightsModel\', '
-                '[u"Model id 0: based on field collection_model having '
+                '[u"Entity id 0: based on field collection_ids having '
                 'value 0, expect model CollectionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
@@ -985,9 +966,9 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for owner_user_model '
+                u'[u\'failed validation check for owner_user_ids '
                 'field check of CollectionRightsModel\', '
-                '[u"Model id 0: based on field owner_user_model having '
+                '[u"Entity id 0: based on field owner_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
@@ -997,9 +978,9 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for editor_user_model '
+                u'[u\'failed validation check for editor_user_ids '
                 'field check of CollectionRightsModel\', '
-                '[u"Model id 0: based on field editor_user_model having '
+                '[u"Entity id 0: based on field editor_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
@@ -1010,9 +991,9 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for viewer_user_model '
+                u'[u\'failed validation check for viewer_user_ids '
                 'field check of CollectionRightsModel\', '
-                '[u"Model id 2: based on field viewer_user_model having '
+                '[u"Entity id 2: based on field viewer_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
@@ -1024,9 +1005,9 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of CollectionRightsModel\', '
-                '[u"Model id 0: based on field snapshot_metadata_model having '
+                '[u"Entity id 0: based on field snapshot_metadata_ids having '
                 'value 0-1, expect model '
                 'CollectionRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
@@ -1039,9 +1020,9 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of CollectionRightsModel\', '
-                '[u"Model id 0: based on field snapshot_content_model having '
+                '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model CollectionRightsSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionRightsModel\', 2]']
@@ -1111,7 +1092,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionRightsSnapshotMetadataModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -1128,7 +1109,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionRightsSnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -1142,12 +1123,12 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             self.user_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for collection_rights_model '
+                u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionRightsSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field collection_rights_model '
+                '[u"Entity id 0-1: based on field collection_rights_ids '
                 'having value 0, expect model CollectionRightsModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'collection_rights_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'collection_rights_ids having value 0, expect model '
                 'CollectionRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -1158,9 +1139,9 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of CollectionRightsSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field committer_model having '
+                '[u"Entity id 0-1: based on field committer_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
@@ -1178,7 +1159,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for collection rights model '
                 'version check of CollectionRightsSnapshotMetadataModel\', '
-                '[u\'Model id 0-3: Collection Rights model corresponding to '
+                '[u\'Entity id 0-3: Collection Rights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -1243,7 +1224,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionRightsSnapshotContentModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -1260,7 +1241,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionRightsSnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -1274,12 +1255,12 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for collection_rights_model '
+                u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionRightsSnapshotContentModel\', '
-                '[u"Model id 0-1: based on field collection_rights_model '
+                '[u"Entity id 0-1: based on field collection_rights_ids '
                 'having value 0, expect model CollectionRightsModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'collection_rights_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'collection_rights_ids having value 0, expect model '
                 'CollectionRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -1296,7 +1277,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for collection rights model '
                 'version check of CollectionRightsSnapshotContentModel\', '
-                '[u\'Model id 0-3: Collection Rights model corresponding to '
+                '[u\'Entity id 0-3: Collection Rights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot content model id\']]'
             ), (
@@ -1311,7 +1292,6 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         super(CollectionCommitLogEntryModelValidatorTests, self).setUp()
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.signup(USER_EMAIL, USER_NAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
@@ -1366,7 +1346,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionCommitLogEntryModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -1381,7 +1361,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionCommitLogEntryModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -1395,12 +1375,12 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for collection_model '
+                u'[u\'failed validation check for collection_ids '
                 'field check of CollectionCommitLogEntryModel\', '
-                '[u"Model id collection-0-1: based on field collection_model '
+                '[u"Entity id collection-0-1: based on field collection_ids '
                 'having value 0, expect model CollectionModel with id 0 '
-                'but it doesn\'t exist", u"Model id collection-0-2: based '
-                'on field collection_model having value 0, expect model '
+                'but it doesn\'t exist", u"Entity id collection-0-2: based '
+                'on field collection_ids having value 0, expect model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(
@@ -1418,7 +1398,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for collection model '
                 'version check of CollectionCommitLogEntryModel\', '
-                '[u\'Model id %s: Collection model corresponding '
+                '[u\'Entity id %s: Collection model corresponding '
                 'to collection id 0 has a version 1 which is less than '
                 'the version 3 in commit log model id\']]'
             ) % (model_with_invalid_version_in_id.id),
@@ -1439,7 +1419,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for model id check of '
                 'CollectionCommitLogEntryModel\', '
-                '[u\'Model id %s: Model id does not match regex pattern\']]'
+                '[u\'Entity id %s: Entity id does not match regex pattern\']]'
             ) % (model_with_invalid_id.id),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -1451,7 +1431,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for commit type check of '
                 'CollectionCommitLogEntryModel\', '
-                '[u\'Model id collection-0-1: Commit type random is '
+                '[u\'Entity id collection-0-1: Commit type random is '
                 'not allowed\']]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -1463,13 +1443,14 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit status check '
                 'of CollectionCommitLogEntryModel\', '
-                '[u\'Model id collection-0-1: Post commit status random '
+                '[u\'Entity id collection-0-1: Post commit status random '
                 'is invalid\']]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'public'
+        self.model_instance_0.post_commit_status = (
+            feconf.POST_COMMIT_STATUS_PUBLIC)
         self.model_instance_0.post_commit_is_private = True
         self.model_instance_0.put()
 
@@ -1477,14 +1458,15 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit is private '
                 'check of CollectionCommitLogEntryModel\', '
-                '[u\'Model id %s: Post commit status is '
-                'public but post_commit_is_private is True\']]'
-            ) % self.model_instance_0.id,
+                '[u\'Entity id %s: Post commit status is '
+                '%s but post_commit_is_private is True\']]'
+            ) % (self.model_instance_0.id, feconf.POST_COMMIT_STATUS_PUBLIC),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
-        self.model_instance_0.post_commit_status = 'private'
+        self.model_instance_0.post_commit_status = (
+            feconf.POST_COMMIT_STATUS_PRIVATE)
         self.model_instance_0.post_commit_is_private = False
         self.model_instance_0.put()
 
@@ -1492,9 +1474,9 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit is private '
                 'check of CollectionCommitLogEntryModel\', '
-                '[u\'Model id %s: Post commit status is '
-                'private but post_commit_is_private is False\']]'
-            ) % self.model_instance_0.id,
+                '[u\'Entity id %s: Post commit status is '
+                '%s but post_commit_is_private is False\']]'
+            ) % (self.model_instance_0.id, feconf.POST_COMMIT_STATUS_PUBLIC),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -1511,16 +1493,16 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for commit cmd '
                 'delete_collection_node '
                 'check of CollectionCommitLogEntryModel\', '
-                '[u\'Model id collection-0-1: Commit command domain '
-                'validation failed with error: Following required keys '
-                'are missing: exploration_id, Following extra keys are '
+                '[u\'Entity id collection-0-1: Commit command domain '
+                'validation failed with error: The following required keys '
+                'are missing: exploration_id, The following extra keys are '
                 'present: random_key\']]'
             ), (
                 u'[u\'failed validation check for commit cmd '
                 'add_collection_node '
                 'check of CollectionCommitLogEntryModel\', '
-                '[u\'Model id collection-0-1: Commit command domain '
-                'validation failed with error: Following required '
+                '[u\'Entity id collection-0-1: Commit command domain '
+                'validation failed with error: The following required '
                 'keys are missing: exploration_id\']]'
             ),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
@@ -1619,7 +1601,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of CollectionSummaryModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -1634,7 +1616,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionSummaryModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -1648,9 +1630,9 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for collection_model '
+                u'[u\'failed validation check for collection_ids '
                 'field check of CollectionSummaryModel\', '
-                '[u"Model id 0: based on field collection_model having '
+                '[u"Entity id 0: based on field collection_ids having '
                 'value 0, expect model CollectionModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -1662,9 +1644,9 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for owner_user_model '
+                u'[u\'failed validation check for owner_user_ids '
                 'field check of CollectionSummaryModel\', '
-                '[u"Model id 0: based on field owner_user_model having '
+                '[u"Entity id 0: based on field owner_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -1674,9 +1656,9 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for editor_user_model '
+                u'[u\'failed validation check for editor_user_ids '
                 'field check of CollectionSummaryModel\', '
-                '[u"Model id 0: based on field editor_user_model having '
+                '[u"Entity id 0: based on field editor_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
@@ -1687,9 +1669,9 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for viewer_user_model '
+                u'[u\'failed validation check for viewer_user_ids '
                 'field check of CollectionSummaryModel\', '
-                '[u"Model id 2: based on field viewer_user_model having '
+                '[u"Entity id 2: based on field viewer_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
@@ -1700,9 +1682,9 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.contributor_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for contributor_user_model '
+                u'[u\'failed validation check for contributor_user_ids '
                 'field check of CollectionSummaryModel\', '
-                '[u"Model id 0: based on field contributor_user_model having '
+                '[u"Entity id 0: based on field contributor_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.contributor_id, self.contributor_id),
@@ -1716,7 +1698,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for ratings schema check of '
                 'CollectionSummaryModel\', '
-                '[u"Model id 0: Property does not match the schema with '
+                '[u"Entity id 0: Property does not match the schema with '
                 'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
                 'Extra keys: [u\'10\']"]]'
             ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -1727,7 +1709,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for language code check of '
                 'CollectionSummaryModel\', '
-                '[u\'Model id %s: Language code %s for model is unsupported'
+                '[u\'Entity id %s: Language code %s for model is unsupported'
                 '\']]'
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
@@ -1743,7 +1725,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for contributors summary check '
                 'of CollectionSummaryModel\', '
-                '[u\'Model id %s: Contributor ids: %s do not match the '
+                '[u\'Entity id %s: Contributor ids: %s do not match the '
                 'contributor ids obtained using contributors summary: %s'
                 '\']]'
             ) % (
@@ -1761,7 +1743,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for node count check '
                 'of CollectionSummaryModel\', '
-                '[u\'Model id 0: Node count: 10 does not match the '
+                '[u\'Entity id 0: Node count: 10 does not match the '
                 'number of nodes in collection_contents dict: 2'
                 '\']]'
             ),
@@ -1804,7 +1786,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 (
                     u'[u\'failed validation check for %s field check of '
                     'CollectionSummaryModel\', '
-                    '[u\'Model id %s: %s field in model: %s does not match '
+                    '[u\'Entity id %s: %s field in entity: %s does not match '
                     'corresponding collection %s field: %s\']]'
                 ) % (
                     property_name, self.model_instance_0.id, property_name,
@@ -1851,7 +1833,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 (
                     u'[u\'failed validation check for %s field check of '
                     'CollectionSummaryModel\', '
-                    '[u\'Model id %s: %s field in model: %s does not match '
+                    '[u\'Entity id %s: %s field in entity: %s does not match '
                     'corresponding collection rights %s field: %s\']]'
                 ) % (
                     property_name, self.model_instance_0.id, property_name,
@@ -1894,7 +1876,7 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for time field relation check '
                 'of ConfigPropertyModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance.id,
@@ -1909,7 +1891,7 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ConfigPropertyModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -1923,10 +1905,10 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
             'config_model-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of ConfigPropertyModel\', '
-                '[u"Model id config_model: based on field '
-                'snapshot_metadata_model having '
+                '[u"Entity id config_model: based on field '
+                'snapshot_metadata_ids having '
                 'value config_model-1, expect model '
                 'ConfigPropertySnapshotMetadataModel '
                 'with id config_model-1 but it doesn\'t exist"]]'),
@@ -1938,10 +1920,10 @@ class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
             'config_model-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of ConfigPropertyModel\', '
-                '[u"Model id config_model: based on field '
-                'snapshot_content_model having '
+                '[u"Entity id config_model: based on field '
+                'snapshot_content_ids having '
                 'value config_model-1, expect model '
                 'ConfigPropertySnapshotContentModel '
                 'with id config_model-1 but it doesn\'t exist"]]'),
@@ -1987,7 +1969,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for time field relation check '
                 'of ConfigPropertySnapshotMetadataModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance.id,
@@ -2001,7 +1983,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ConfigPropertySnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -2014,14 +1996,14 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
         self.config_model.delete(self.admin_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for config_property_model '
+                u'[u\'failed validation check for config_property_ids '
                 'field check of ConfigPropertySnapshotMetadataModel\', '
-                '[u"Model id config_model-1: based on field '
-                'config_property_model having value config_model, '
+                '[u"Entity id config_model-1: based on field '
+                'config_property_ids having value config_model, '
                 'expect model ConfigPropertyModel with '
                 'id config_model but it doesn\'t exist", '
-                'u"Model id config_model-2: based on field '
-                'config_property_model having value config_model, expect model '
+                'u"Entity id config_model-2: based on field '
+                'config_property_ids having value config_model, expect model '
                 'ConfigPropertyModel with id config_model but it doesn\'t '
                 'exist"]]'
             ),
@@ -2032,9 +2014,9 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of ConfigPropertySnapshotMetadataModel\', '
-                '[u"Model id config_model-1: based on field committer_model '
+                '[u"Entity id config_model-1: based on field committer_ids '
                 'having value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.admin_id, self.admin_id),
@@ -2052,7 +2034,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for config property model '
                 'version check of ConfigPropertySnapshotMetadataModel\', '
-                '[u\'Model id config_model-3: ConfigProperty model '
+                '[u\'Entity id config_model-3: ConfigProperty model '
                 'corresponding to id config_model has a version 1 '
                 'which is less than the version 3 in '
                 'snapshot metadata model id\']]'
@@ -2071,9 +2053,9 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for commit cmd '
                 'change_property_value '
                 'check of ConfigPropertySnapshotMetadataModel\', '
-                '[u\'Model id config_model-1: Commit command domain '
-                'validation failed with error: Following required keys '
-                'are missing: new_value, Following extra keys are '
+                '[u\'Entity id config_model-1: Commit command domain '
+                'validation failed with error: The following required keys '
+                'are missing: new_value, The following extra keys are '
                 'present: random_key\']]'
             ),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
@@ -2118,7 +2100,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for time field relation check '
                 'of ConfigPropertySnapshotContentModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance.id,
@@ -2133,7 +2115,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ConfigPropertySnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -2146,14 +2128,14 @@ class ConfigPropertySnapshotContentModelValidatorTests(
         self.config_model.delete(self.admin_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for config_property_model '
+                u'[u\'failed validation check for config_property_ids '
                 'field check of ConfigPropertySnapshotContentModel\', '
-                '[u"Model id config_model-1: based on field '
-                'config_property_model having value config_model, '
+                '[u"Entity id config_model-1: based on field '
+                'config_property_ids having value config_model, '
                 'expect model ConfigPropertyModel with '
                 'id config_model but it doesn\'t exist", '
-                'u"Model id config_model-2: based on field '
-                'config_property_model having value config_model, expect model '
+                'u"Entity id config_model-2: based on field '
+                'config_property_ids having value config_model, expect model '
                 'ConfigPropertyModel with id config_model but it '
                 'doesn\'t exist"]]'
             ),
@@ -2170,7 +2152,7 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for config property model '
                 'version check of ConfigPropertySnapshotContentModel\', '
-                '[u\'Model id config_model-3: ConfigProperty model '
+                '[u\'Entity id config_model-3: ConfigProperty model '
                 'corresponding to id config_model has a version 1 '
                 'which is less than the version 3 in snapshot '
                 'content model id\']]'
@@ -2226,7 +2208,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of SentEmailModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance.id, self.model_instance.created_on,
@@ -2241,7 +2223,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'SentEmailModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -2255,7 +2237,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for sender_id field check of '
             'SentEmailModel\', '
-            '[u"Model id %s: based on field sender_id having value '
+            '[u"Entity id %s: based on field sender_id having value '
             '%s, expect model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.sender_id, self.sender_id)]
@@ -2267,7 +2249,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for recipient_id field check of '
             'SentEmailModel\', '
-            '[u"Model id %s: based on field recipient_id having value '
+            '[u"Entity id %s: based on field recipient_id having value '
             '%s, expect model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.recipient_id, self.recipient_id)]
@@ -2280,7 +2262,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for sender email check of '
             'SentEmailModel\', '
-            '[u\'Model id %s: Sender email %s in model does not match with '
+            '[u\'Entity id %s: Sender email %s in entity does not match with '
             'email %s of user obtained through sender id\']]') % (
                 self.model_instance.id, self.model_instance.sender_email,
                 self.sender_model.email)]
@@ -2292,8 +2274,8 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for recipient email check of '
             'SentEmailModel\', '
-            '[u\'Model id %s: Recipient email %s in model does not match with '
-            'email %s of user obtained through recipient id\']]') % (
+            '[u\'Entity id %s: Recipient email %s in entity does not match '
+            'with email %s of user obtained through recipient id\']]') % (
                 self.model_instance.id, self.model_instance.recipient_email,
                 self.recipient_model.email)]
         run_job_and_check_output(self, expected_output)
@@ -2305,7 +2287,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for sent datetime check of '
             'SentEmailModel\', '
-            '[u\'Model id %s: The sent_datetime field has a value %s '
+            '[u\'Entity id %s: The sent_datetime field has a value %s '
             'which is greater than the time when the job was run\']]') % (
                 self.model_instance.id, self.model_instance.sent_datetime)]
         run_job_and_check_output(self, expected_output)
@@ -2323,7 +2305,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         ), (
             u'[u\'failed validation check for model id check of '
             'SentEmailModel\', '
-            '[u\'Model id %s: Model id does not match regex pattern\']]'
+            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
         ) % 'random']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -2369,7 +2351,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of BulkEmailModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance.id, self.model_instance.created_on,
@@ -2384,7 +2366,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'BulkEmailModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -2398,7 +2380,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for sender_id field check of '
             'BulkEmailModel\', '
-            '[u"Model id %s: based on field sender_id having value '
+            '[u"Entity id %s: based on field sender_id having value '
             '%s, expect model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.sender_id, self.sender_id)]
@@ -2410,7 +2392,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for recipient_id field check of '
             'BulkEmailModel\', '
-            '[u"Model id %s: based on field recipient_id having value '
+            '[u"Entity id %s: based on field recipient_id having value '
             '%s, expect model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.recipient_ids[0],
@@ -2424,7 +2406,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for sender email check of '
             'BulkEmailModel\', '
-            '[u\'Model id %s: Sender email %s in model does not match with '
+            '[u\'Entity id %s: Sender email %s in entity does not match with '
             'email %s of user obtained through sender id\']]') % (
                 self.model_instance.id, self.model_instance.sender_email,
                 self.sender_model.email)]
@@ -2437,7 +2419,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for sent datetime check of '
             'BulkEmailModel\', '
-            '[u\'Model id %s: The sent_datetime field has a value %s '
+            '[u\'Entity id %s: The sent_datetime field has a value %s '
             'which is greater than the time when the job was run\']]') % (
                 self.model_instance.id, self.model_instance.sent_datetime)]
         run_job_and_check_output(self, expected_output)
@@ -2455,9 +2437,9 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         ), (
             u'[u\'failed validation check for model id length check of '
             'BulkEmailModel\', '
-            '[u\'Model id %s: Model id should be of length 12 but instead has '
-            'length 6\']]'
-        ) % 'random']
+            '[u\'Entity id %s: Entity id should be of length 12 but instead '
+            'has length 6\']]'
+        ) % model_instance_with_invalid_id.id]
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -2492,7 +2474,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance.id, self.model_instance.created_on,
@@ -2504,7 +2486,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -2518,7 +2500,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for item.id.user_id field check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u"Model id %s: based on field item.id.user_id having value '
+            '[u"Entity id %s: based on field item.id.user_id having value '
             '%s, expect model UserSettingsModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.user_id, self.user_id)]
@@ -2531,7 +2513,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for item.id.thread_id field check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u"Model id %s: based on field item.id.thread_id having value '
+            '[u"Entity id %s: based on field item.id.thread_id having value '
             '%s, expect model GeneralFeedbackThreadModel with '
             'id %s but it doesn\'t exist"]]') % (
                 self.model_instance.id, self.thread_id, self.thread_id)]
@@ -2548,7 +2530,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for reply_to_id length check of '
             'GeneralFeedbackEmailReplyToIdModel\', '
-            '[u\'Model id %s: reply_to_id %s should have length less than or '
+            '[u\'Entity id %s: reply_to_id %s should have length less than or '
             'equal to %s but instead has length %s\']]'
         ) % (
             self.model_instance.id, self.model_instance.reply_to_id,
@@ -2604,7 +2586,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExplorationModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -2619,7 +2601,7 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -2633,8 +2615,8 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for domain object check of '
                 'ExplorationModel\', '
-                '[u\'Model id %s: Model fails domain validation with the error '
-                'Invalid language_code: %s\']]'
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error Invalid language_code: %s\']]'
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated ExplorationModel\', 2]']
         with self.swap(
@@ -2655,10 +2637,10 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for '
-                'exploration_commit_log_entry_model field check of '
+                'exploration_commit_log_entry_ids field check of '
                 'ExplorationModel\', '
-                '[u"Model id 0: based on field '
-                'exploration_commit_log_entry_model having value '
+                '[u"Entity id 0: based on field '
+                'exploration_commit_log_entry_ids having value '
                 'exploration-0-1, expect model ExplorationCommitLogEntryModel '
                 'with id exploration-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
@@ -2669,9 +2651,9 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for exp_summary_model '
+                u'[u\'failed validation check for exp_summary_ids '
                 'field check of ExplorationModel\', '
-                '[u"Model id 0: based on field exp_summary_model having '
+                '[u"Entity id 0: based on field exp_summary_ids having '
                 'value 0, expect model ExpSummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
@@ -2683,11 +2665,11 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_rights_model '
+                u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationModel\', '
-                '[u"Model id 0: based on field exploration_rights_model having '
-                'value 0, expect model ExplorationRightsModel with id 0 but '
-                'it doesn\'t exist"]]'),
+                '[u"Entity id 0: based on field exploration_rights_ids '
+                'having value 0, expect model ExplorationRightsModel '
+                'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -2696,9 +2678,9 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of ExplorationModel\', '
-                '[u"Model id 0: based on field snapshot_metadata_model having '
+                '[u"Entity id 0: based on field snapshot_metadata_ids having '
                 'value 0-1, expect model ExplorationSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
@@ -2709,9 +2691,9 @@ class ExplorationModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of ExplorationModel\', '
-                '[u"Model id 0: based on field snapshot_content_model having '
+                '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model ExplorationSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationModel\', 2]']
@@ -2771,7 +2753,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExplorationSnapshotMetadataModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -2788,7 +2770,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationSnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -2802,12 +2784,12 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             self.user_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model '
+                u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field exploration_model '
+                '[u"Entity id 0-1: based on field exploration_ids '
                 'having value 0, expect model ExplorationModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'exploration_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'exploration_ids having value 0, expect model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -2819,9 +2801,9 @@ class ExplorationSnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of ExplorationSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field committer_model having '
+                '[u"Entity id 0-1: based on field committer_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
@@ -2839,7 +2821,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for exploration model '
                 'version check of ExplorationSnapshotMetadataModel\', '
-                '[u\'Model id 0-3: Exploration model corresponding to '
+                '[u\'Entity id 0-3: Exploration model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -2859,14 +2841,15 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for commit cmd delete_state '
                 'check of ExplorationSnapshotMetadataModel\', '
-                '[u\'Model id 0-1: Commit command domain validation failed '
-                'with error: Following required keys are missing: state_name, '
-                'Following extra keys are present: random_key\']]'
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required keys are missing: '
+                'state_name, The following extra keys are present: '
+                'random_key\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_state '
                 'check of ExplorationSnapshotMetadataModel\', '
-                '[u\'Model id 0-1: Commit command domain validation failed '
-                'with error: Following required keys are missing: '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required keys are missing: '
                 'state_name\']]'
             ),
             u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]']
@@ -2920,7 +2903,7 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExplorationSnapshotContentModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -2937,7 +2920,7 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationSnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -2950,12 +2933,12 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         exp_models.ExplorationModel.get_by_id('0').delete(self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model '
+                u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationSnapshotContentModel\', '
-                '[u"Model id 0-1: based on field exploration_model '
+                '[u"Entity id 0-1: based on field exploration_ids '
                 'having value 0, expect model ExplorationModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'exploration_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'exploration_ids having value 0, expect model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -2972,7 +2955,7 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for exploration model '
                 'version check of ExplorationSnapshotContentModel\', '
-                '[u\'Model id 0-3: Exploration model corresponding to '
+                '[u\'Entity id 0-3: Exploration model corresponding to '
                 'id 0 has a version 1 which is less than '
                 'the version 3 in snapshot content model id\']]'
             ), (
@@ -3038,7 +3021,7 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExplorationRightsModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -3053,7 +3036,7 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationRightsModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -3072,8 +3055,9 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for first published msec check '
                 'of ExplorationRightsModel\', '
-                '[u\'Model id 0: The first_published_msec field has a value %s '
-                'which is greater than the time when the job was run\']]'
+                '[u\'Entity id 0: The first_published_msec field has a '
+                'value %s which is greater than the time when the job was '
+                'run\']]'
             ) % (self.model_instance_0.first_published_msec),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3083,9 +3067,9 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model '
+                u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationRightsModel\', '
-                '[u"Model id 0: based on field exploration_model having '
+                '[u"Entity id 0: based on field exploration_ids having '
                 'value 0, expect model ExplorationModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
@@ -3097,9 +3081,9 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for '
-                'cloned_from_exploration_model '
+                'cloned_from_exploration_ids '
                 'field check of ExplorationRightsModel\', '
-                '[u"Model id 0: based on field cloned_from_exploration_model '
+                '[u"Entity id 0: based on field cloned_from_exploration_ids '
                 'having value random, expect model ExplorationModel with id '
                 'random but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
@@ -3111,9 +3095,9 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for owner_user_model '
+                u'[u\'failed validation check for owner_user_ids '
                 'field check of ExplorationRightsModel\', '
-                '[u"Model id 0: based on field owner_user_model having '
+                '[u"Entity id 0: based on field owner_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
@@ -3123,9 +3107,9 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for editor_user_model '
+                u'[u\'failed validation check for editor_user_ids '
                 'field check of ExplorationRightsModel\', '
-                '[u"Model id 0: based on field editor_user_model having '
+                '[u"Entity id 0: based on field editor_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
@@ -3136,9 +3120,9 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for viewer_user_model '
+                u'[u\'failed validation check for viewer_user_ids '
                 'field check of ExplorationRightsModel\', '
-                '[u"Model id 2: based on field viewer_user_model having '
+                '[u"Entity id 2: based on field viewer_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
@@ -3150,9 +3134,9 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of ExplorationRightsModel\', '
-                '[u"Model id 0: based on field snapshot_metadata_model having '
+                '[u"Entity id 0: based on field snapshot_metadata_ids having '
                 'value 0-1, expect model '
                 'ExplorationRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
@@ -3165,9 +3149,9 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of ExplorationRightsModel\', '
-                '[u"Model id 0: based on field snapshot_content_model having '
+                '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model ExplorationRightsSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
@@ -3222,7 +3206,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExplorationRightsSnapshotMetadataModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -3239,7 +3223,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationRightsSnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -3253,12 +3237,12 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             self.user_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_rights_model '
+                u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationRightsSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field exploration_rights_model '
+                '[u"Entity id 0-1: based on field exploration_rights_ids '
                 'having value 0, expect model ExplorationRightsModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'exploration_rights_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'exploration_rights_ids having value 0, expect model '
                 'ExplorationRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -3269,9 +3253,9 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of ExplorationRightsSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field committer_model having '
+                '[u"Entity id 0-1: based on field committer_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
@@ -3289,7 +3273,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for exploration rights model '
                 'version check of ExplorationRightsSnapshotMetadataModel\', '
-                '[u\'Model id 0-3: Exploration Rights model corresponding to '
+                '[u\'Entity id 0-3: Exploration Rights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -3341,7 +3325,7 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExplorationRightsSnapshotContentModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -3358,7 +3342,7 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationRightsSnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -3372,12 +3356,12 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_rights_model '
+                u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationRightsSnapshotContentModel\', '
-                '[u"Model id 0-1: based on field exploration_rights_model '
+                '[u"Entity id 0-1: based on field exploration_rights_ids '
                 'having value 0, expect model ExplorationRightsModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'exploration_rights_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'exploration_rights_ids having value 0, expect model '
                 'ExplorationRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -3394,7 +3378,7 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for exploration rights model '
                 'version check of ExplorationRightsSnapshotContentModel\', '
-                '[u\'Model id 0-3: Exploration Rights model corresponding to '
+                '[u\'Entity id 0-3: Exploration Rights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot content model id\']]'
             ), (
@@ -3451,7 +3435,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExplorationCommitLogEntryModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -3466,7 +3450,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationCommitLogEntryModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -3480,12 +3464,13 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model '
+                u'[u\'failed validation check for exploration_ids '
                 'field check of ExplorationCommitLogEntryModel\', '
-                '[u"Model id exploration-0-1: based on field exploration_model '
-                'having value 0, expect model ExplorationModel with id 0 '
-                'but it doesn\'t exist", u"Model id exploration-0-2: based '
-                'on field exploration_model having value 0, expect model '
+                '[u"Entity id exploration-0-1: based on field '
+                'exploration_ids having value 0, expect model '
+                'ExplorationModel with id 0 '
+                'but it doesn\'t exist", u"Entity id exploration-0-2: based '
+                'on field exploration_ids having value 0, expect model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3502,7 +3487,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for exploration model '
                 'version check of ExplorationCommitLogEntryModel\', '
-                '[u\'Model id %s: Exploration model corresponding '
+                '[u\'Entity id %s: Exploration model corresponding '
                 'to exploration id 0 has a version 1 which is less than '
                 'the version 3 in commit log model id\']]'
             ) % (model_with_invalid_version_in_id.id),
@@ -3523,7 +3508,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for model id check of '
                 'ExplorationCommitLogEntryModel\', '
-                '[u\'Model id %s: Model id does not match regex pattern\']]'
+                '[u\'Entity id %s: Entity id does not match regex pattern\']]'
             ) % (model_with_invalid_id.id),
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3535,7 +3520,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for commit type check of '
                 'ExplorationCommitLogEntryModel\', '
-                '[u\'Model id exploration-0-1: Commit type random is '
+                '[u\'Entity id exploration-0-1: Commit type random is '
                 'not allowed\']]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3547,7 +3532,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit status check '
                 'of ExplorationCommitLogEntryModel\', '
-                '[u\'Model id exploration-0-1: Post commit status random '
+                '[u\'Entity id exploration-0-1: Post commit status random '
                 'is invalid\']]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3561,7 +3546,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit is private '
                 'check of ExplorationCommitLogEntryModel\', '
-                '[u\'Model id %s: Post commit status is '
+                '[u\'Entity id %s: Post commit status is '
                 'public but post_commit_is_private is True\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
@@ -3576,7 +3561,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit is private '
                 'check of ExplorationCommitLogEntryModel\', '
-                '[u\'Model id %s: Post commit status is '
+                '[u\'Entity id %s: Post commit status is '
                 'private but post_commit_is_private is False\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
@@ -3594,15 +3579,15 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for commit cmd delete_state '
                 'check of ExplorationCommitLogEntryModel\', '
-                '[u\'Model id exploration-0-1: Commit command domain '
-                'validation failed with error: Following required keys '
-                'are missing: state_name, Following extra keys are '
+                '[u\'Entity id exploration-0-1: Commit command domain '
+                'validation failed with error: The following required keys '
+                'are missing: state_name, The following extra keys are '
                 'present: random_key\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_state '
                 'check of ExplorationCommitLogEntryModel\', '
-                '[u\'Model id exploration-0-1: Commit command domain '
-                'validation failed with error: Following required '
+                '[u\'Entity id exploration-0-1: Commit command domain '
+                'validation failed with error: The following required '
                 'keys are missing: state_name\']]'
             ),
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
@@ -3686,7 +3671,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of ExpSummaryModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -3696,12 +3681,16 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_last_updated_greater_than_current_time(self):
-        exp_services.delete_exploration(self.owner_id, '1')
-        exp_services.delete_exploration(self.owner_id, '2')
+        exp_models.ExplorationModel.get_by_id('1').delete(
+            self.owner_id, '')
+        exp_models.ExplorationModel.get_by_id('2').delete(
+            self.owner_id, '')
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExpSummaryModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -3725,8 +3714,9 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for first published msec check '
                 'of ExpSummaryModel\', '
-                '[u\'Model id 0: The first_published_msec field has a value %s '
-                'which is greater than the time when the job was run\']]'
+                '[u\'Entity id 0: The first_published_msec field has a '
+                'value %s which is greater than the time when the '
+                'job was run\']]'
             ) % (self.model_instance_0.first_published_msec),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3736,9 +3726,9 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model '
+                u'[u\'failed validation check for exploration_ids '
                 'field check of ExpSummaryModel\', '
-                '[u"Model id 0: based on field exploration_model having '
+                '[u"Entity id 0: based on field exploration_ids having '
                 'value 0, expect model ExplorationModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -3750,9 +3740,9 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for owner_user_model '
+                u'[u\'failed validation check for owner_user_ids '
                 'field check of ExpSummaryModel\', '
-                '[u"Model id 0: based on field owner_user_model having '
+                '[u"Entity id 0: based on field owner_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (self.user_id, self.user_id),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -3762,9 +3752,9 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.editor_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for editor_user_model '
+                u'[u\'failed validation check for editor_user_ids '
                 'field check of ExpSummaryModel\', '
-                '[u"Model id 0: based on field editor_user_model having '
+                '[u"Entity id 0: based on field editor_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.editor_id, self.editor_id),
@@ -3775,9 +3765,9 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.viewer_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for viewer_user_model '
+                u'[u\'failed validation check for viewer_user_ids '
                 'field check of ExpSummaryModel\', '
-                '[u"Model id 2: based on field viewer_user_model having '
+                '[u"Entity id 2: based on field viewer_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.viewer_id, self.viewer_id),
@@ -3788,12 +3778,32 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.contributor_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for contributor_user_model '
+                u'[u\'failed validation check for contributor_user_ids '
                 'field check of ExpSummaryModel\', '
-                '[u"Model id 0: based on field contributor_user_model having '
+                '[u"Entity id 0: based on field contributor_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s but '
                 'it doesn\'t exist"]]') % (
                     self.contributor_id, self.contributor_id),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_exploration_model_last_updated(self):
+        last_human_update_time = (
+            self.model_instance_0.exploration_model_last_updated)
+        self.model_instance_0.exploration_model_last_updated = (
+            datetime.datetime.utcnow() + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration model last '
+                'updated check of ExpSummaryModel\', '
+                '[u\'Entity id %s: The exploration_model_last_updated '
+                'field: %s does not match the last time a commit was '
+                'made by a human contributor: %s\']]'
+            ) % (
+                self.model_instance_0.id,
+                self.model_instance_0.exploration_model_last_updated,
+                last_human_update_time),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3804,7 +3814,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for ratings schema check of '
                 'ExpSummaryModel\', '
-                '[u"Model id 0: Property does not match the schema with '
+                '[u"Entity id 0: Property does not match the schema with '
                 'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
                 'Extra keys: [u\'10\']"]]'
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -3815,7 +3825,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for language code check of '
                 'ExpSummaryModel\', '
-                '[u\'Model id %s: Language code %s for model is unsupported'
+                '[u\'Entity id %s: Language code %s for entity is unsupported'
                 '\']]'
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated ExpSummaryModel\', 2]']
@@ -3831,7 +3841,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for contributors summary check '
                 'of ExpSummaryModel\', '
-                '[u\'Model id %s: Contributor ids: %s do not match the '
+                '[u\'Entity id %s: Contributor ids: %s do not match the '
                 'contributor ids obtained using contributors summary: %s'
                 '\']]'
             ) % (
@@ -3878,7 +3888,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 (
                     u'[u\'failed validation check for %s field check of '
                     'ExpSummaryModel\', '
-                    '[u\'Model id %s: %s field in model: %s does not match '
+                    '[u\'Entity id %s: %s field in entity: %s does not match '
                     'corresponding exploration %s field: %s\']]'
                 ) % (
                     property_name, self.model_instance_0.id, property_name,
@@ -3933,7 +3943,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 (
                     u'[u\'failed validation check for %s field check of '
                     'ExpSummaryModel\', '
-                    '[u\'Model id %s: %s field in model: %s does not match '
+                    '[u\'Entity id %s: %s field in entity: %s does not match '
                     'corresponding exploration rights %s field: %s\']]'
                 ) % (
                     property_name, self.model_instance_0.id, property_name,
@@ -3988,7 +3998,7 @@ class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for time field relation check '
                 'of FileMetadataModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance_0.id,
@@ -4003,7 +4013,7 @@ class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'FileMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -4018,10 +4028,10 @@ class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model field '
+                u'[u\'failed validation check for exploration_ids field '
                 'check of FileMetadataModel\', '
-                '[u"Model id %s: based on field exploration_model having value '
-                'exp1, expect model ExplorationModel with id exp1 but it '
+                '[u"Entity id %s: based on field exploration_ids having '
+                'value exp1, expect model ExplorationModel with id exp1 but it '
                 'doesn\'t exist"]]') % self.model_instance_1.id,
             u'[u\'fully-validated FileMetadataModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -4031,10 +4041,11 @@ class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
             '%s-1' % self.model_instance_0.id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of FileMetadataModel\', '
-                '[u"Model id %s: based on field snapshot_metadata_model having '
-                'value %s-1, expect model FileMetadataSnapshotMetadataModel '
+                '[u"Entity id %s: based on field snapshot_metadata_ids '
+                'having value %s-1, expect model '
+                'FileMetadataSnapshotMetadataModel '
                 'with id %s-1 but it doesn\'t exist"]]') % (
                     self.model_instance_0.id, self.model_instance_0.id,
                     self.model_instance_0.id),
@@ -4046,9 +4057,9 @@ class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
             '%s-1' % self.model_instance_0.id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of FileMetadataModel\', '
-                '[u"Model id %s: based on field snapshot_content_model having '
+                '[u"Entity id %s: based on field snapshot_content_ids having '
                 'value %s-1, expect model FileMetadataSnapshotContentModel '
                 'with id %s-1 but it doesn\'t exist"]]') % (
                     self.model_instance_0.id, self.model_instance_0.id,
@@ -4110,7 +4121,7 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of FileMetadataSnapshotMetadataModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -4126,7 +4137,7 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'FileMetadataSnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -4140,12 +4151,12 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
             self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for file_metadata_model '
+                u'[u\'failed validation check for file_metadata_ids '
                 'field check of FileMetadataSnapshotMetadataModel\', '
-                '[u"Model id %s-1: based on field file_metadata_model '
+                '[u"Entity id %s-1: based on field file_metadata_ids '
                 'having value %s, expect model FileMetadataModel with '
-                'id %s but it doesn\'t exist", u"Model id %s-2: based on field '
-                'file_metadata_model having value %s, expect model '
+                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
+                'field file_metadata_ids having value %s, expect model '
                 'FileMetadataModel with id %s but it doesn\'t exist"]]'
             ) % (
                 self.id_0, self.id_0, self.id_0, self.id_0,
@@ -4159,9 +4170,9 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of FileMetadataSnapshotMetadataModel\', '
-                '[u"Model id %s-1: based on field committer_model having '
+                '[u"Entity id %s-1: based on field committer_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.id_1, self.user_id, self.user_id), (
@@ -4179,7 +4190,7 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for file_metadata model '
                 'version check of FileMetadataSnapshotMetadataModel\', '
-                '[u\'Model id %s-3: FileMetadata model corresponding to '
+                '[u\'Entity id %s-3: FileMetadata model corresponding to '
                 'id %s has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ) % (self.id_0, self.id_0), (
@@ -4239,7 +4250,7 @@ class FileMetadataSnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of FileMetadataSnapshotContentModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -4255,7 +4266,7 @@ class FileMetadataSnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'FileMetadataSnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -4269,12 +4280,12 @@ class FileMetadataSnapshotContentModelValidatorTests(
             self.id_0).delete(self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for file_metadata_model '
+                u'[u\'failed validation check for file_metadata_ids '
                 'field check of FileMetadataSnapshotContentModel\', '
-                '[u"Model id %s-1: based on field file_metadata_model '
+                '[u"Entity id %s-1: based on field file_metadata_ids '
                 'having value %s, expect model FileMetadataModel with '
-                'id %s but it doesn\'t exist", u"Model id %s-2: based on field '
-                'file_metadata_model having value %s, expect model '
+                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
+                'field file_metadata_ids having value %s, expect model '
                 'FileMetadataModel with id %s but it doesn\'t exist"]]'
             ) % (
                 self.id_0, self.id_0, self.id_0, self.id_0, self.id_0,
@@ -4292,7 +4303,7 @@ class FileMetadataSnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for file_metadata model '
                 'version check of FileMetadataSnapshotContentModel\', '
-                '[u\'Model id %s-3: FileMetadata model corresponding to '
+                '[u\'Entity id %s-3: FileMetadata model corresponding to '
                 'id %s has a version 1 which is less than '
                 'the version 3 in snapshot content model id\']]'
             ) % (self.id_0, self.id_0), (
@@ -4343,7 +4354,7 @@ class FileModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for time field relation check '
                 'of FileModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance_0.id,
@@ -4358,7 +4369,7 @@ class FileModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'FileModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -4373,11 +4384,11 @@ class FileModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model field '
+                u'[u\'failed validation check for exploration_ids field '
                 'check of FileModel\', '
-                '[u"Model id %s: based on field exploration_model having value '
-                'exp1, expect model ExplorationModel with id exp1 but it '
-                'doesn\'t exist"]]') % self.model_instance_1.id,
+                '[u"Entity id %s: based on field exploration_ids having '
+                'value exp1, expect model ExplorationModel with id exp1 '
+                'but it doesn\'t exist"]]') % self.model_instance_1.id,
             u'[u\'fully-validated FileModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -4386,10 +4397,10 @@ class FileModelValidatorTests(test_utils.GenericTestBase):
             '%s-1' % self.model_instance_0.id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of FileModel\', '
-                '[u"Model id %s: based on field snapshot_metadata_model having '
-                'value %s-1, expect model FileSnapshotMetadataModel '
+                '[u"Entity id %s: based on field snapshot_metadata_ids '
+                'having value %s-1, expect model FileSnapshotMetadataModel '
                 'with id %s-1 but it doesn\'t exist"]]') % (
                     self.model_instance_0.id, self.model_instance_0.id,
                     self.model_instance_0.id),
@@ -4401,9 +4412,9 @@ class FileModelValidatorTests(test_utils.GenericTestBase):
             '%s-1' % self.model_instance_0.id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of FileModel\', '
-                '[u"Model id %s: based on field snapshot_content_model having '
+                '[u"Entity id %s: based on field snapshot_content_ids having '
                 'value %s-1, expect model FileSnapshotContentModel '
                 'with id %s-1 but it doesn\'t exist"]]') % (
                     self.model_instance_0.id, self.model_instance_0.id,
@@ -4465,7 +4476,7 @@ class FileSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of FileSnapshotMetadataModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -4481,7 +4492,7 @@ class FileSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'FileSnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -4495,12 +4506,12 @@ class FileSnapshotMetadataModelValidatorTests(
             self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for file_model '
+                u'[u\'failed validation check for file_ids '
                 'field check of FileSnapshotMetadataModel\', '
-                '[u"Model id %s-1: based on field file_model '
+                '[u"Entity id %s-1: based on field file_ids '
                 'having value %s, expect model FileModel with '
-                'id %s but it doesn\'t exist", u"Model id %s-2: based on field '
-                'file_model having value %s, expect model '
+                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
+                'field file_ids having value %s, expect model '
                 'FileModel with id %s but it doesn\'t exist"]]'
             ) % (
                 self.id_0, self.id_0, self.id_0, self.id_0,
@@ -4513,9 +4524,9 @@ class FileSnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of FileSnapshotMetadataModel\', '
-                '[u"Model id %s-1: based on field committer_model having '
+                '[u"Entity id %s-1: based on field committer_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.id_1, self.user_id, self.user_id), (
@@ -4533,7 +4544,7 @@ class FileSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for file model '
                 'version check of FileSnapshotMetadataModel\', '
-                '[u\'Model id %s-3: File model corresponding to '
+                '[u\'Entity id %s-3: File model corresponding to '
                 'id %s has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ) % (self.id_0, self.id_0), (
@@ -4592,7 +4603,7 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of FileSnapshotContentModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -4608,7 +4619,7 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'FileSnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -4622,12 +4633,12 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             self.id_0).delete(self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for file_model '
+                u'[u\'failed validation check for file_ids '
                 'field check of FileSnapshotContentModel\', '
-                '[u"Model id %s-1: based on field file_model '
+                '[u"Entity id %s-1: based on field file_ids '
                 'having value %s, expect model FileModel with '
-                'id %s but it doesn\'t exist", u"Model id %s-2: based on field '
-                'file_model having value %s, expect model '
+                'id %s but it doesn\'t exist", u"Entity id %s-2: based on '
+                'field file_ids having value %s, expect model '
                 'FileModel with id %s but it doesn\'t exist"]]'
             ) % (
                 self.id_0, self.id_0, self.id_0, self.id_0, self.id_0,
@@ -4645,7 +4656,7 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for file model '
                 'version check of FileSnapshotContentModel\', '
-                '[u\'Model id %s-3: File model corresponding to '
+                '[u\'Entity id %s-3: File model corresponding to '
                 'id %s has a version 1 which is less than '
                 'the version 3 in snapshot content model id\']]'
             ) % (self.id_0, self.id_0), (
@@ -4696,7 +4707,7 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for time field relation check '
                 'of ExplorationRecommendationsModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance_0.id, self.model_instance_0.created_on,
@@ -4709,7 +4720,7 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationRecommendationsModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -4723,9 +4734,9 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
             self.user_id, '', [{}])
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model field '
+                u'[u\'failed validation check for exploration_ids field '
                 'check of ExplorationRecommendationsModel\', '
-                '[u"Model id 0: based on field exploration_model having value '
+                '[u"Entity id 0: based on field exploration_ids having value '
                 '3, expect model ExplorationModel with '
                 'id 3 but it doesn\'t exist"]]'
             ),
@@ -4740,9 +4751,9 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for item exploration id check '
                 'of ExplorationRecommendationsModel\', '
-                '[u\'Model id 0: The exploration id: 0 for which the '
-                'model is created is also present in the recommended '
-                'exploration ids for model\']]'
+                '[u\'Entity id 0: The exploration id: 0 for which the '
+                'entity is created is also present in the recommended '
+                'exploration ids for entity\']]'
             ),
             u'[u\'fully-validated ExplorationRecommendationsModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -4781,7 +4792,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for time field relation check '
                 'of TopicSimilaritiesModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance.id, self.model_instance.created_on,
@@ -4792,7 +4803,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'TopicSimilaritiesModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance.id, self.model_instance.last_updated)]
 
@@ -4810,7 +4821,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for model id check of '
                 'TopicSimilaritiesModel\', '
-                '[u\'Model id random: Model id does not match regex pattern\']]'
+                '[u\'Entity id random: Entity id does not match regex '
+                'pattern\']]'
             ),
             u'[u\'fully-validated TopicSimilaritiesModel\', 1]']
 
@@ -4827,8 +4839,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for topic similarities column '
             'check of TopicSimilaritiesModel\', '
-            '[u\'Model id %s: Length of topic similarities columns '
-            'does not match length of topic list\']]') % (
+            '[u\'Entity id %s: Length of topic similarities columns: 1 '
+            'does not match length of topic list: 2\']]') % (
                 self.model_instance.id)]
 
         run_job_and_check_output(self, expected_output, sort=True)
@@ -4844,7 +4856,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for topic check of '
             'TopicSimilaritiesModel\', '
-            '[u\'Model id %s: Topic Random not in list of known topics\']]'
+            '[u\'Entity id %s: Topic Random not in list of known topics\']]'
         ) % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output)
@@ -4859,8 +4871,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for topic similarities row 0 '
             'check of TopicSimilaritiesModel\', '
-            '[u\'Model id %s: Length of topic similarities rows '
-            'does not match length of topic list\']]') % (
+            '[u\'Entity id %s: Length of topic similarities rows: 2 '
+            'does not match length of topic list: 1\']]') % (
                 self.model_instance.id)]
 
         run_job_and_check_output(self, expected_output)
@@ -4877,12 +4889,12 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for similarity type check of '
                 'TopicSimilaritiesModel\', '
-                '[u\'Model id %s: Expected similarity to be a float, '
+                '[u\'Entity id %s: Expected similarity to be a float, '
                 'received one\']]'
             ) % self.model_instance.id, (
                 u'[u\'failed validation check for similarity value check of '
                 'TopicSimilaritiesModel\', '
-                '[u\'Model id %s: Expected similarity to be between 0.0 '
+                '[u\'Entity id %s: Expected similarity to be between 0.0 '
                 'and 1.0, received one\']]') % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output, sort=True)
@@ -4898,7 +4910,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for similarity value check '
             'of TopicSimilaritiesModel\', '
-            '[u\'Model id %s: Expected similarity to be between '
+            '[u\'Entity id %s: Expected similarity to be between '
             '0.0 and 1.0, received 10.0\']]') % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output)
@@ -4914,7 +4926,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for symmetry check of '
             'TopicSimilaritiesModel\', '
-            '[u\'Model id %s: Expected topic similarities '
+            '[u\'Entity id %s: Expected topic similarities '
             'to be symmetric\']]') % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output)
@@ -4984,7 +4996,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for time field relation check '
                 'of StoryModel\', '
-                '[u\'Model id %s: The created_on field has a value '
+                '[u\'Entity id %s: The created_on field has a value '
                 '%s which is greater than the value '
                 '%s of last_updated field\']]') % (
                     self.model_instance_0.id,
@@ -5000,7 +5012,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'StoryModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -5014,8 +5026,8 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for domain object check of '
                 'StoryModel\', '
-                '[u\'Model id %s: Model fails domain validation with the error '
-                'Invalid language code: %s\']]'
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error Invalid language code: %s\']]'
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated StoryModel\', 2]']
         with self.swap(
@@ -5029,9 +5041,9 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for exploration_model field '
+                u'[u\'failed validation check for exploration_ids field '
                 'check of StoryModel\', '
-                '[u"Model id 0: based on field exploration_model having value '
+                '[u"Entity id 0: based on field exploration_ids having value '
                 '1, expect model ExplorationModel with id 1 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
@@ -5051,10 +5063,10 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for '
-                'story_commit_log_entry_model field check of '
+                'story_commit_log_entry_ids field check of '
                 'StoryModel\', '
-                '[u"Model id 0: based on field '
-                'story_commit_log_entry_model having value '
+                '[u"Entity id 0: based on field '
+                'story_commit_log_entry_ids having value '
                 'story-0-1, expect model StoryCommitLogEntryModel '
                 'with id story-0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
@@ -5065,9 +5077,9 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for story_summary_model '
+                u'[u\'failed validation check for story_summary_ids '
                 'field check of StoryModel\', '
-                '[u"Model id 0: based on field story_summary_model having '
+                '[u"Entity id 0: based on field story_summary_ids having '
                 'value 0, expect model StorySummaryModel with id 0 '
                 'but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
@@ -5079,9 +5091,9 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for story_rights_model '
+                u'[u\'failed validation check for story_rights_ids '
                 'field check of StoryModel\', '
-                '[u"Model id 0: based on field story_rights_model having '
+                '[u"Entity id 0: based on field story_rights_ids having '
                 'value 0, expect model StoryRightsModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
@@ -5092,9 +5104,9 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of StoryModel\', '
-                '[u"Model id 0: based on field snapshot_metadata_model having '
+                '[u"Entity id 0: based on field snapshot_metadata_ids having '
                 'value 0-1, expect model StorySnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
@@ -5105,9 +5117,9 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of StoryModel\', '
-                '[u"Model id 0: based on field snapshot_content_model having '
+                '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model StorySnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryModel\', 2]']
@@ -5167,7 +5179,7 @@ class StorySnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of StorySnapshotMetadataModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -5184,7 +5196,7 @@ class StorySnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'StorySnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -5198,12 +5210,12 @@ class StorySnapshotMetadataModelValidatorTests(
             self.user_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for story_model '
+                u'[u\'failed validation check for story_ids '
                 'field check of StorySnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field story_model '
+                '[u"Entity id 0-1: based on field story_ids '
                 'having value 0, expect model StoryModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'story_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'story_ids having value 0, expect model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -5215,9 +5227,9 @@ class StorySnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of StorySnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field committer_model having '
+                '[u"Entity id 0-1: based on field committer_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
@@ -5235,7 +5247,7 @@ class StorySnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for story model '
                 'version check of StorySnapshotMetadataModel\', '
-                '[u\'Model id 0-3: Story model corresponding to '
+                '[u\'Entity id 0-3: Story model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -5255,14 +5267,14 @@ class StorySnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for commit cmd delete_story_node '
                 'check of StorySnapshotMetadataModel\', '
-                '[u\'Model id 0-1: Commit command domain validation failed '
-                'with error: Following required keys are missing: node_id, '
-                'Following extra keys are present: random_key\']]'
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required keys are missing: node_id, '
+                'The following extra keys are present: random_key\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_story_node '
                 'check of StorySnapshotMetadataModel\', '
-                '[u\'Model id 0-1: Commit command domain validation failed '
-                'with error: Following required keys are missing: '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required keys are missing: '
                 'node_id\']]'
             ),
             u'[u\'fully-validated StorySnapshotMetadataModel\', 2]']
@@ -5316,7 +5328,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of StorySnapshotContentModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -5333,7 +5345,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'StorySnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -5346,12 +5358,12 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         story_models.StoryModel.get_by_id('0').delete(self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for story_model '
+                u'[u\'failed validation check for story_ids '
                 'field check of StorySnapshotContentModel\', '
-                '[u"Model id 0-1: based on field story_model '
+                '[u"Entity id 0-1: based on field story_ids '
                 'having value 0, expect model StoryModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'story_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'story_ids having value 0, expect model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -5368,7 +5380,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for story model '
                 'version check of StorySnapshotContentModel\', '
-                '[u\'Model id 0-3: Story model corresponding to '
+                '[u\'Entity id 0-3: Story model corresponding to '
                 'id 0 has a version 1 which is less than '
                 'the version 3 in snapshot content model id\']]'
             ), (
@@ -5440,7 +5452,7 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of StoryRightsModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -5455,7 +5467,7 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'StoryRightsModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -5469,9 +5481,9 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for story_model '
+                u'[u\'failed validation check for story_ids '
                 'field check of StoryRightsModel\', '
-                '[u"Model id 0: based on field story_model having '
+                '[u"Entity id 0: based on field story_ids having '
                 'value 0, expect model StoryModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryRightsModel\', 2]']
@@ -5481,9 +5493,9 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
         user_models.UserSettingsModel.get_by_id(self.manager1_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for manager_user_model '
+                u'[u\'failed validation check for manager_user_ids '
                 'field check of StoryRightsModel\', '
-                '[u"Model id 0: based on field manager_user_model having '
+                '[u"Entity id 0: based on field manager_user_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]') % (
                     self.manager1_id, self.manager1_id),
@@ -5495,9 +5507,9 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_metadata_model '
+                u'[u\'failed validation check for snapshot_metadata_ids '
                 'field check of StoryRightsModel\', '
-                '[u"Model id 0: based on field snapshot_metadata_model having '
+                '[u"Entity id 0: based on field snapshot_metadata_ids having '
                 'value 0-1, expect model '
                 'StoryRightsSnapshotMetadataModel '
                 'with id 0-1 but it doesn\'t exist"]]'
@@ -5510,9 +5522,9 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
             '0-1').delete()
         expected_output = [
             (
-                u'[u\'failed validation check for snapshot_content_model '
+                u'[u\'failed validation check for snapshot_content_ids '
                 'field check of StoryRightsModel\', '
-                '[u"Model id 0: based on field snapshot_content_model having '
+                '[u"Entity id 0: based on field snapshot_content_ids having '
                 'value 0-1, expect model StoryRightsSnapshotContentModel '
                 'with id 0-1 but it doesn\'t exist"]]'),
             u'[u\'fully-validated StoryRightsModel\', 2]']
@@ -5566,7 +5578,7 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of StoryRightsSnapshotMetadataModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -5583,7 +5595,7 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'StoryRightsSnapshotMetadataModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -5597,12 +5609,12 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
             self.user_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for story_rights_model '
+                u'[u\'failed validation check for story_rights_ids '
                 'field check of StoryRightsSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field story_rights_model '
+                '[u"Entity id 0-1: based on field story_rights_ids '
                 'having value 0, expect model StoryRightsModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'story_rights_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'story_rights_ids having value 0, expect model '
                 'StoryRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -5613,9 +5625,9 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
         user_models.UserSettingsModel.get_by_id(self.user_id).delete()
         expected_output = [
             (
-                u'[u\'failed validation check for committer_model field '
+                u'[u\'failed validation check for committer_ids field '
                 'check of StoryRightsSnapshotMetadataModel\', '
-                '[u"Model id 0-1: based on field committer_model having '
+                '[u"Entity id 0-1: based on field committer_ids having '
                 'value %s, expect model UserSettingsModel with id %s '
                 'but it doesn\'t exist"]]'
             ) % (self.user_id, self.user_id), (
@@ -5633,7 +5645,7 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for story rights model '
                 'version check of StoryRightsSnapshotMetadataModel\', '
-                '[u\'Model id 0-3: Story Rights model corresponding to '
+                '[u\'Entity id 0-3: Story Rights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -5655,13 +5667,14 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for commit cmd publish_story '
                 'check of StoryRightsSnapshotMetadataModel\', '
-                '[u\'Model id 0-1: Commit command domain validation failed '
-                'with error: Following extra keys are present: random_key\']]'
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following extra keys are present: '
+                'random_key\']]'
             ), (
                 u'[u\'failed validation check for commit cmd change_role '
                 'check of StoryRightsSnapshotMetadataModel\', '
-                '[u\'Model id 0-1: Commit command domain validation failed '
-                'with error: Following required keys are missing: '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required keys are missing: '
                 'old_role\']]'
             ),
             u'[u\'fully-validated StoryRightsSnapshotMetadataModel\', 2]']
@@ -5710,7 +5723,7 @@ class StoryRightsSnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of StoryRightsSnapshotContentModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -5727,7 +5740,7 @@ class StoryRightsSnapshotContentModelValidatorTests(
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'StoryRightsSnapshotContentModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -5741,12 +5754,12 @@ class StoryRightsSnapshotContentModelValidatorTests(
             self.owner_id, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for story_rights_model '
+                u'[u\'failed validation check for story_rights_ids '
                 'field check of StoryRightsSnapshotContentModel\', '
-                '[u"Model id 0-1: based on field story_rights_model '
+                '[u"Entity id 0-1: based on field story_rights_ids '
                 'having value 0, expect model StoryRightsModel with '
-                'id 0 but it doesn\'t exist", u"Model id 0-2: based on field '
-                'story_rights_model having value 0, expect model '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'story_rights_ids having value 0, expect model '
                 'StoryRightsModel with id 0 but it doesn\'t exist"]]'
             ), (
                 u'[u\'fully-validated '
@@ -5763,7 +5776,7 @@ class StoryRightsSnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for story rights model '
                 'version check of StoryRightsSnapshotContentModel\', '
-                '[u\'Model id 0-3: Story Rights model corresponding to '
+                '[u\'Entity id 0-3: Story Rights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot content model id\']]'
             ), (
@@ -5819,7 +5832,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of StoryCommitLogEntryModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -5834,7 +5847,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'StoryCommitLogEntryModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -5848,12 +5861,12 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for story_model '
+                u'[u\'failed validation check for story_ids '
                 'field check of StoryCommitLogEntryModel\', '
-                '[u"Model id story-0-1: based on field story_model '
+                '[u"Entity id story-0-1: based on field story_ids '
                 'having value 0, expect model StoryModel with id 0 '
-                'but it doesn\'t exist", u"Model id story-0-2: based '
-                'on field story_model having value 0, expect model '
+                'but it doesn\'t exist", u"Entity id story-0-2: based '
+                'on field story_ids having value 0, expect model '
                 'StoryModel with id 0 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, literal_eval=True)
@@ -5870,7 +5883,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for story model '
                 'version check of StoryCommitLogEntryModel\', '
-                '[u\'Model id %s: Story model corresponding '
+                '[u\'Entity id %s: Story model corresponding '
                 'to story id 0 has a version 1 which is less than '
                 'the version 3 in commit log model id\']]'
             ) % (model_with_invalid_version_in_id.id),
@@ -5891,7 +5904,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for model id check of '
                 'StoryCommitLogEntryModel\', '
-                '[u\'Model id %s: Model id does not match regex pattern\']]'
+                '[u\'Entity id %s: Entity id does not match regex pattern\']]'
             ) % (model_with_invalid_id.id),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -5903,7 +5916,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for commit type check of '
                 'StoryCommitLogEntryModel\', '
-                '[u\'Model id story-0-1: Commit type random is '
+                '[u\'Entity id story-0-1: Commit type random is '
                 'not allowed\']]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -5915,7 +5928,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit status check '
                 'of StoryCommitLogEntryModel\', '
-                '[u\'Model id story-0-1: Post commit status random '
+                '[u\'Entity id story-0-1: Post commit status random '
                 'is invalid\']]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -5929,7 +5942,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit is private '
                 'check of StoryCommitLogEntryModel\', '
-                '[u\'Model id %s: Post commit status is '
+                '[u\'Entity id %s: Post commit status is '
                 'public but post_commit_is_private is True\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
@@ -5944,7 +5957,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for post commit is private '
                 'check of StoryCommitLogEntryModel\', '
-                '[u\'Model id %s: Post commit status is '
+                '[u\'Entity id %s: Post commit status is '
                 'private but post_commit_is_private is False\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
@@ -5962,14 +5975,14 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for commit cmd delete_story_node '
                 'check of StoryCommitLogEntryModel\', '
-                '[u\'Model id story-0-1: Commit command domain validation '
-                'failed with error: Following required keys are missing: '
-                'node_id, Following extra keys are present: random_key\']]'
+                '[u\'Entity id story-0-1: Commit command domain validation '
+                'failed with error: The following required keys are missing: '
+                'node_id, The following extra keys are present: random_key\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_story_node '
                 'check of StoryCommitLogEntryModel\', '
-                '[u\'Model id story-0-1: Commit command domain validation '
-                'failed with error: Following required keys are missing: '
+                '[u\'Entity id story-0-1: Commit command domain validation '
+                'failed with error: The following required keys are missing: '
                 'node_id\']]'
             ),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
@@ -6021,7 +6034,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for time field relation check '
             'of StorySummaryModel\', '
-            '[u\'Model id %s: The created_on field has a value '
+            '[u\'Entity id %s: The created_on field has a value '
             '%s which is greater than the value '
             '%s of last_updated field\']]') % (
                 self.model_instance_0.id,
@@ -6036,7 +6049,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'StorySummaryModel\', '
-            '[u\'Model id %s: The last_updated field has a '
+            '[u\'Entity id %s: The last_updated field has a '
             'value %s which is greater than the time when the job was run\']]'
         ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
 
@@ -6050,9 +6063,9 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
-                u'[u\'failed validation check for story_model '
+                u'[u\'failed validation check for story_ids '
                 'field check of StorySummaryModel\', '
-                '[u"Model id 0: based on field story_model having '
+                '[u"Entity id 0: based on field story_ids having '
                 'value 0, expect model StoryModel with id 0 but '
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated StorySummaryModel\', 2]']
@@ -6063,7 +6076,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for language code check of '
                 'StorySummaryModel\', '
-                '[u\'Model id %s: Language code %s for model is unsupported'
+                '[u\'Entity id %s: Language code %s for entity is unsupported'
                 '\']]'
             ) % (self.model_instance_0.id, self.model_instance_0.language_code),
             u'[u\'fully-validated StorySummaryModel\', 2]']
@@ -6079,7 +6092,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for node count check '
                 'of StorySummaryModel\', '
-                '[u\'Model id 0: Node count: 10 does not match the '
+                '[u\'Entity id 0: Node count: 10 does not match the '
                 'number of nodes in story_contents dict: 0'
                 '\']]'
             ),
@@ -6118,7 +6131,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
                 (
                     u'[u\'failed validation check for %s field check of '
                     'StorySummaryModel\', '
-                    '[u\'Model id %s: %s field in model: %s does not match '
+                    '[u\'Entity id %s: %s field in entity: %s does not match '
                     'corresponding story %s field: %s\']]'
                 ) % (
                     property_name, self.model_instance_0.id, property_name,
@@ -6193,7 +6206,7 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for general_feedback_thread_ids '
                 'field check of UserSubscriptionsModel\', '
-                '[u"Model id 110211048197157141232: based on '
+                '[u"Entity id 110211048197157141232: based on '
                 'field general_feedback_thread_ids having value '
                 'nonexist_thread_id, expect model GeneralFeedbackThreadModel '
                 'with id nonexist_thread_id but it doesn\'t exist"]]'),

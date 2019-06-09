@@ -41,6 +41,8 @@ COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids'
 COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILLS = 'prerequisite_skills'
 COLLECTION_NODE_PROPERTY_ACQUIRED_SKILLS = 'acquired_skills'
 
+# This takes additional 'title' and 'category' parameters.
+CMD_CREATE_NEW = 'create_new'
 # This takes an additional 'exploration_id' parameter.
 CMD_ADD_COLLECTION_NODE = 'add_collection_node'
 # This takes an additional 'exploration_id' parameter.

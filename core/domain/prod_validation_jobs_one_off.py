@@ -16,6 +16,8 @@
 
 """One-off jobs for validating prod models."""
 
+import collections
+import copy
 import csv
 import datetime
 import re
@@ -31,15 +33,18 @@ from core.domain import story_services
 from core.platform import models
 import feconf
 import schema_utils
+import utils
 
 (
-    activity_models, audit_models, collection_models, config_models,
-    email_models, exp_models, feedback_models, file_models,
-    recommendations_models, story_models, user_models,) = (
+    activity_models, audit_models, base_models,
+    collection_models, config_models, email_models,
+    exp_models, feedback_models, file_models,
+    recommendations_models, story_models,
+    user_models,) = (
         models.Registry.import_models([
-            models.NAMES.activity, models.NAMES.audit, models.NAMES.collection,
-            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.file,
+            models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
+            models.NAMES.collection, models.NAMES.config, models.NAMES.email,
+            models.NAMES.exploration, models.NAMES.feedback, models.NAMES.file,
             models.NAMES.recommendations, models.NAMES.story,
             models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
@@ -48,7 +53,7 @@ datastore_services = models.Registry.import_datastore_services()
 class BaseModelValidator(object):
     """Base class for validating models."""
 
-    errors = {}
+    errors = collections.defaultdict(list)
     # external_models is keyed by field name. Each value consists
     # of the model class and a list of (external_key, external_model_instance)
     # tuples.
@@ -59,6 +64,11 @@ class BaseModelValidator(object):
     @classmethod
     def _get_model_id_regex(cls, item):
         """Defines a regex for model id.
+
+        This should be implemented by subclasses.
+
+        Args:
+            item: ndb.Model. Entity to validate.
 
         Returns:
             str. A regex pattern to be followed by the model id.
@@ -75,19 +85,26 @@ class BaseModelValidator(object):
         """
         regex_string = cls._get_model_id_regex(item)
         if not re.compile(regex_string).match(str(item.id)):
-            cls.errors['model id check'] = (
-                'Model id %s: Model id does not match regex pattern') % item.id
+            cls.errors['model id check'].append((
+                'Entity id %s: Entity id does not match regex pattern') % (
+                    item.id))
 
     @classmethod
     def _get_json_properties_schema(cls, item):
         """Defines a schema for model properties.
+
+        This should be implemented by subclasses.
 
         Args:
             item: ndb.Model. Entity to validate.
 
         Returns:
             dict(str, dict). A dictionary whose keys are names of model
-            properties and values are schema for these properties.
+            properties and values are schemas for these properties.
+            A schema defines a type for a custom object. The validation
+            for the schema is done using schema_utils.py. The schmea defined
+            here follow the same pattern as those defined in
+            extensions/objects/models/objects.py.
         """
         raise NotImplementedError
 
@@ -107,16 +124,31 @@ class BaseModelValidator(object):
                 schema_utils.normalize_against_schema(
                     getattr(item, property_name), property_schema)
             except Exception as e:
-                cls.errors['%s schema check' % property_name] = (
-                    'Model id %s: Property does not match the schema '
-                    'with the error %s' % (item.id, e))
+                cls.errors['%s schema check' % property_name].append((
+                    'Entity id %s: Property does not match the schema '
+                    'with the error %s' % (item.id, e)))
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         """Defines a domain object instance created from the model.
 
+        This should be implemented by subclasses.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+
         Returns:
-            A domain object instance.
+            *: list. A list of domain object instances of the model.
+              The list contains domain object instances formed by using
+              model properties which follow a domain object. For instance,
+              each item in ActivityReferencesModel.activity_references
+              follows a ActivityReferences domain object. The list can also
+              contain a single instance if the model itself follows a
+              domain object. For instance, ExplorationModel follows a
+              Exploration domain object. If any model instance cannot be
+              converted to domain object instance, an error is added to
+              cls.errors which contains the exception which was raised during
+              the creating the domain object instance for the model.
         """
         raise NotImplementedError
 
@@ -124,6 +156,9 @@ class BaseModelValidator(object):
     def _validate_model_domain_object_instances(cls, item):
         """Checks that model instance passes the validation of the domain
         object for model.
+
+        Args:
+            item: ndb.Model. Entity to validate.
         """
         model_domain_object_instances = cls._get_model_domain_object_instances(
             item)
@@ -131,13 +166,15 @@ class BaseModelValidator(object):
             try:
                 model_domain_object_instance.validate()
             except Exception as e:
-                cls.errors['domain object check'] = (
-                    'Model id %s: Model fails domain validation with the '
-                    'error %s' % (item.id, e))
+                cls.errors['domain object check'].append((
+                    'Entity id %s: Entity fails domain validation with the '
+                    'error %s' % (item.id, e)))
 
     @classmethod
     def _get_external_id_relationships(cls, item):
         """Defines a mapping of external id to model class.
+
+        This should be implemented by subclasses.
 
         Args:
             item: ndb.Model. Entity to validate.
@@ -161,12 +198,12 @@ class BaseModelValidator(object):
                 cls.external_models.iteritems()):
             for model_id, model in model_id_model_tuples:
                 if model is None or model.deleted:
-                    cls.errors['%s field check' % field_name] = (
-                        'Model id %s: based on field %s having'
+                    cls.errors['%s field check' % field_name].append((
+                        'Entity id %s: based on field %s having'
                         ' value %s, expect model %s with id %s but it doesn\'t'
                         ' exist' % (
                             item.id, field_name, model_id,
-                            str(model_class.__name__), model_id))
+                            str(model_class.__name__), model_id)))
 
     @classmethod
     def _fetch_external_models(cls, item):
@@ -195,82 +232,107 @@ class BaseModelValidator(object):
     def _validate_model_time_fields(cls, item):
         """Checks the following relation for the model:
         model.created_on <= model.last_updated <= current time.
+
+        Args:
+            item: ndb.Model. Entity to validate.
         """
         if item.created_on > item.last_updated:
-            cls.errors['time field relation check'] = (
-                'Model id %s: The created_on field has a value %s which is '
+            cls.errors['time field relation check'].append((
+                'Entity id %s: The created_on field has a value %s which is '
                 'greater than the value %s of last_updated field'
-                ) % (item.id, item.created_on, item.last_updated)
+                ) % (item.id, item.created_on, item.last_updated))
 
         current_datetime = datetime.datetime.utcnow()
         if item.last_updated > current_datetime:
-            cls.errors['current time check'] = (
-                'Model id %s: The last_updated field has a value %s which is '
+            cls.errors['current time check'].append((
+                'Entity id %s: The last_updated field has a value %s which is '
                 'greater than the time when the job was run'
-                ) % (item.id, item.last_updated)
+                ) % (item.id, item.last_updated))
 
     @classmethod
     def _validate_commit_type(cls, item):
-        """Validates that commit type is valid."""
-        if item.commit_type not in ['create', 'edit', 'revert', 'delete']:
-            cls.errors['commit type check'] = (
-                'Model id %s: Commit type %s is not allowed') % (
-                    item.id, item.commit_type)
+        """Validates that commit type is valid.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        if item.commit_type not in (
+                base_models.VersionedModel.COMMIT_TYPE_CHOICES):
+            cls.errors['commit type check'].append((
+                'Entity id %s: Commit type %s is not allowed') % (
+                    item.id, item.commit_type))
 
     @classmethod
     def _get_commit_cmd_domain_class(cls):
         """Defines a Commit command domain class.
 
+        This should be implemented by subclasses.
+
         Returns:
-            A domain object instance.
+            *: A domain object class for the commit commands used in the model.
         """
         raise NotImplementedError
 
     @classmethod
     def _validate_commit_cmds_schema(cls, item):
-        """Validates schema of commit commands in commit_cmds dict."""
+        """Validates schema of commit commands in commit_cmds dict.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
         for commit_cmd_dict in item.commit_cmds:
             if len(commit_cmd_dict.keys()):
                 name = commit_cmd_dict['cmd']
-                parameters = commit_cmd_dict
+                parameters = copy.deepcopy(commit_cmd_dict)
                 parameters.pop('cmd', None)
                 commit_cmd_domain_object = cls._get_commit_cmd_domain_class()(
-                    name=name, parameters=parameters)
+                    name, parameters)
                 try:
                     commit_cmd_domain_object.validate()
                 except Exception as e:
-                    cls.errors['commit cmd %s check' % name] = (
-                        'Model id %s: Commit command domain validation failed '
-                        'with error: %s') % (item.id, e)
+                    cls.errors['commit cmd %s check' % name].append((
+                        'Entity id %s: Commit command domain validation failed '
+                        'with error: %s') % (item.id, e))
 
     @classmethod
     def _validate_post_commit_status(cls, item):
-        """Validates that post_commit_status is either public or private."""
-        if item.post_commit_status not in ['public', 'private']:
-            cls.errors['post commit status check'] = (
-                'Model id %s: Post commit status %s is invalid') % (
-                    item.id, item.post_commit_status)
+        """Validates that post_commit_status is either public or private.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        if item.post_commit_status not in [
+                feconf.POST_COMMIT_STATUS_PUBLIC,
+                feconf.POST_COMMIT_STATUS_PRIVATE]:
+            cls.errors['post commit status check'].append((
+                'Entity id %s: Post commit status %s is invalid') % (
+                    item.id, item.post_commit_status))
 
     @classmethod
     def _validate_post_commit_is_private(cls, item):
         """Validates that post_commit_is_private is true iff
         post_commit_status is private.
-        """
-        if item.post_commit_status == 'private' and not (
-                item.post_commit_is_private):
-            cls.errors['post commit is private check'] = (
-                'Model id %s: Post commit status is private but '
-                'post_commit_is_private is False') % item.id
 
-        if item.post_commit_status == 'public' and (
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        if item.post_commit_status == feconf.POST_COMMIT_STATUS_PRIVATE and (
+                not item.post_commit_is_private):
+            cls.errors['post commit is private check'].append((
+                'Entity id %s: Post commit status is private but '
+                'post_commit_is_private is False') % item.id)
+
+        if item.post_commit_status == feconf.POST_COMMIT_STATUS_PUBLIC and (
                 item.post_commit_is_private):
-            cls.errors['post commit is private check'] = (
-                'Model id %s: Post commit status is public but '
-                'post_commit_is_private is True') % item.id
+            cls.errors['post commit is private check'].append((
+                'Entity id %s: Post commit status is public but '
+                'post_commit_is_private is True') % item.id)
 
     @classmethod
-    def _get_validation_functions(cls):
-        """Returns the list of validation function to run.
+    def _get_custom_validation_functions(cls):
+        """Returns the list of custom validation functions to run.
+
+        This should be implemented by subclasses.
 
         Each validation function should accept only a single arg, which is the
         model instance to validate.
@@ -304,7 +366,7 @@ class BaseModelValidator(object):
             cls._validate_commit_type(item)
             cls._validate_commit_cmds_schema(item)
 
-        for func in cls._get_validation_functions():
+        for func in cls._get_custom_validation_functions():
             func(item)
 
 
@@ -313,30 +375,30 @@ class ActivityReferencesModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
+        # Valid id: featured.
         regex_list = [
-            item + '$' for item in feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES]
+            '%s$' % item for item in feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES]
         regex_string = '|'.join(regex_list)
         return regex_string
 
     @classmethod
     def _get_json_properties_schema(cls, item):
-        activity_references_dict_schema = {
-            'type': 'dict',
-            'properties': [{
-                'name': 'type',
-                'schema': {
-                    'type': 'unicode',
-                },
-            }, {
-                'name': 'id',
-                'schema': {
-                    'type': 'unicode'
-                }
-            }]
-        }
         activity_references_schema = {
             'type': 'list',
-            'items': activity_references_dict_schema
+            'items': {
+                'type': 'dict',
+                'properties': [{
+                    'name': 'type',
+                    'schema': {
+                        'type': 'unicode',
+                    },
+                }, {
+                    'name': 'id',
+                    'schema': {
+                        'type': 'unicode'
+                    }
+                }]
+            }
         }
 
         return {
@@ -348,13 +410,14 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         model_domain_object_instances = []
 
         try:
-            for obj in item.activity_references:
+            for reference in item.activity_references:
                 model_domain_object_instances.append(
-                    activity_domain.ActivityReference(obj['type'], obj['id']))
+                    activity_domain.ActivityReference(
+                        reference['type'], reference['id']))
         except Exception as e:
-            cls.errors['fetch properties'] = (
-                'Model id %s: Model properties cannot be fetched completely '
-                'with the error %s') % (item.id, e)
+            cls.errors['fetch properties'].append((
+                'Entity id %s: Entity properties cannot be fetched completely '
+                'with the error %s') % (item.id, e))
             return []
 
         return model_domain_object_instances
@@ -369,15 +432,15 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         collection_ids = []
 
         try:
-            for obj in item.activity_references:
-                if obj['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
-                    exploration_ids.append(obj['id'])
-                elif obj['type'] == constants.ACTIVITY_TYPE_COLLECTION:
-                    collection_ids.append(obj['id'])
+            for reference in item.activity_references:
+                if reference['type'] == constants.ACTIVITY_TYPE_EXPLORATION:
+                    exploration_ids.append(reference['id'])
+                elif reference['type'] == constants.ACTIVITY_TYPE_COLLECTION:
+                    collection_ids.append(reference['id'])
         except Exception as e:
-            cls.errors['fetch properties'] = (
-                'Model id %s: Model properties cannot be fetched completely '
-                'with the error %s') % (item.id, e)
+            cls.errors['fetch properties'].append((
+                'Entity id %s: Entity properties cannot be fetched completely '
+                'with the error %s') % (item.id, e))
             return {}
 
         return {
@@ -387,7 +450,7 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -396,6 +459,7 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
+        # Valid id: [user_id].[timestamp_in_sec].[intent].[random_number]
         regex_string = '%s\\.\\d*\\.%s\\.\\d*$' % (item.user_id, item.intent)
         return regex_string
 
@@ -413,26 +477,11 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {'user_id': (user_models.UserSettingsModel, [item.user_id])}
+        return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
 
     @classmethod
-    def _validate_user_id_belongs_to_admin(cls, item):
-        """Validate that user id of model belongs to an admin.
-
-        Args:
-            item: RoleQueryAuditModel to validate.
-        """
-        _, user_id_models = (cls.external_models['user_id'])
-        user_id_model = user_id_models[0][1]
-        if user_id_model and not user_id_model.deleted:
-            if user_id_model.role != feconf.ROLE_ID_ADMIN:
-                cls.errors['admin check'] = (
-                    'Model id %s: User id %s in model does not belong '
-                    'to an admin') % (item.id, item.user_id)
-
-    @classmethod
-    def _get_validation_functions(cls):
-        return [cls._validate_user_id_belongs_to_admin]
+    def _get_custom_validation_functions(cls):
+        return []
 
 
 class CollectionModelValidator(BaseModelValidator):
@@ -470,27 +519,27 @@ class CollectionModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel, exploration_model_ids),
-            'collection_commit_log_entry_model': (
+            'collection_commit_log_entry_ids': (
                 collection_models.CollectionCommitLogEntryModel,
                 collection_commit_log_entry_model_ids),
-            'collection_summary_model': (
+            'collection_summary_ids': (
                 collection_models.CollectionSummaryModel,
                 collection_summary_model_ids),
-            'collection_rights_model': (
+            'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
                 collection_rights_model_ids),
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 collection_models.CollectionSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 collection_models.CollectionSnapshotContentModel,
                 snapshot_model_ids),
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -518,10 +567,10 @@ class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'collection_model': (
+            'collection_ids': (
                 collection_models.CollectionModel,
                 [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -533,20 +582,20 @@ class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: CollectionSnapshotMetadataModel to validate.
         """
-        _, collection_model_tuples = cls.external_models['collection_model']
+        _, collection_model_tuples_list = cls.external_models['collection_ids']
 
-        collection_model = collection_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(collection_model.version) < int(version):
-            cls.errors['collection model version check'] = (
-                'Model id %s: Collection model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot metadata model id' % (
-                    item.id, collection_model.id, collection_model.version,
-                    version))
+        for (_, collection_model) in collection_model_tuples_list:
+            if int(collection_model.version) < int(version):
+                cls.errors['collection model version check'].append((
+                    'Entity id %s: Collection model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot metadata model id' % (
+                        item.id, collection_model.id, collection_model.version,
+                        version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_collection_model_version_from_item_id]
 
 
@@ -572,7 +621,7 @@ class CollectionSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'collection_model': (
+            'collection_ids': (
                 collection_models.CollectionModel,
                 [item.id[:item.id.find('-')]]),
         }
@@ -580,25 +629,26 @@ class CollectionSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _validate_collection_model_version_from_item_id(cls, item):
         """Validate that collection model corresponding to snapshot
-        content model has a version greater than or equal to the in item.id.
+        content model has a version greater than or equal to the version
+        in item.id.
 
         Args:
             item: CollectionSnapshotContentModel to validate.
         """
-        _, collection_model_tuples = cls.external_models['collection_model']
+        _, collection_model_tuples_list = cls.external_models['collection_ids']
 
-        collection_model = collection_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(collection_model.version) < int(version):
-            cls.errors['collection model version check'] = (
-                'Model id %s: Collection model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot content model id' % (
-                    item.id, collection_model.id, collection_model.version,
-                    version))
+        for (_, collection_model) in collection_model_tuples_list:
+            if int(collection_model.version) < int(version):
+                cls.errors['collection model version check'].append((
+                    'Entity id %s: Collection model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot content model id' % (
+                        item.id, collection_model.id, collection_model.version,
+                        version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_collection_model_version_from_item_id]
 
 
@@ -627,18 +677,18 @@ class CollectionRightsModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
-            'collection_model': (
+            'collection_ids': (
                 collection_models.CollectionModel, [item.id]),
-            'owner_user_model': (
+            'owner_user_ids': (
                 user_models.UserSettingsModel, item.owner_ids),
-            'editor_user_model': (
+            'editor_user_ids': (
                 user_models.UserSettingsModel, item.editor_ids),
-            'viewer_user_model': (
+            'viewer_user_ids': (
                 user_models.UserSettingsModel, item.viewer_ids),
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 collection_models.CollectionRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 collection_models.CollectionRightsSnapshotContentModel,
                 snapshot_model_ids),
         }
@@ -658,13 +708,13 @@ class CollectionRightsModelValidator(BaseModelValidator):
         current_msec = (
             datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
         if item.first_published_msec > current_msec:
-            cls.errors['first published msec check'] = (
-                'Model id %s: The first_published_msec field has a value %s '
+            cls.errors['first published msec check'].append((
+                'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run'
-                ) % (item.id, item.first_published_msec)
+                ) % (item.id, item.first_published_msec))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_first_published_msec]
 
 
@@ -692,10 +742,10 @@ class CollectionRightsSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'collection_rights_model': (
+            'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -708,21 +758,21 @@ class CollectionRightsSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: CollectionRightsSnapshotMetadataModel to validate.
         """
-        _, collection_rights_model_tuples = cls.external_models[
-            'collection_rights_model']
+        _, collection_rights_model_tuples_list = cls.external_models[
+            'collection_rights_ids']
 
-        collection_rights_model = collection_rights_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(collection_rights_model.version) < int(version):
-            cls.errors['collection rights model version check'] = (
-                'Model id %s: Collection Rights model corresponding to '
-                'id %s has a version %s which is less '
-                'than the version %s in snapshot metadata model id' % (
-                    item.id, collection_rights_model.id,
-                    collection_rights_model.version, version))
+        for (_, collection_rights_model) in collection_rights_model_tuples_list:
+            if int(collection_rights_model.version) < int(version):
+                cls.errors['collection rights model version check'].append((
+                    'Entity id %s: Collection Rights model corresponding to '
+                    'id %s has a version %s which is less '
+                    'than the version %s in snapshot metadata model id' % (
+                        item.id, collection_rights_model.id,
+                        collection_rights_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_collection_model_version_from_item_id]
 
 
@@ -748,7 +798,7 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'collection_rights_model': (
+            'collection_rights_ids': (
                 collection_models.CollectionRightsModel,
                 [item.id[:item.id.find('-')]]),
         }
@@ -762,21 +812,21 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: CollectionRightsSnapshotContentModel to validate.
         """
-        _, collection_rights_model_tuples = cls.external_models[
-            'collection_rights_model']
+        _, collection_rights_model_tuples_list = cls.external_models[
+            'collection_rights_ids']
 
-        collection_rights_model = collection_rights_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(collection_rights_model.version) < int(version):
-            cls.errors['collection rights model version check'] = (
-                'Model id %s: Collection Rights model corresponding to '
-                'id %s has a version %s which is less '
-                'than the version %s in snapshot content model id' % (
-                    item.id, collection_rights_model.id,
-                    collection_rights_model.version, version))
+        for (_, collection_rights_model) in collection_rights_model_tuples_list:
+            if int(collection_rights_model.version) < int(version):
+                cls.errors['collection rights model version check'].append((
+                    'Entity id %s: Collection Rights model corresponding to '
+                    'id %s has a version %s which is less '
+                    'than the version %s in snapshot content model id' % (
+                        item.id, collection_rights_model.id,
+                        collection_rights_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_collection_model_version_from_item_id]
 
 
@@ -787,6 +837,7 @@ class CollectionCommitLogEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
+        # Valid id: [collection/rights]-[collection_id]-[collection_version].
         regex_string = '(collection|rights)-%s-\\d*$' % (
             item.collection_id)
 
@@ -807,7 +858,7 @@ class CollectionCommitLogEntryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'collection_model': (
+            'collection_ids': (
                 collection_models.CollectionModel, [item.collection_id]),
         }
 
@@ -819,20 +870,20 @@ class CollectionCommitLogEntryModelValidator(BaseModelValidator):
         Args:
             item: CollectionCommitLogEntryModel to validate.
         """
-        _, collection_model_tuples = cls.external_models['collection_model']
+        _, collection_model_tuples_list = cls.external_models['collection_ids']
 
-        collection_model = collection_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(collection_model.version) < int(version):
-            cls.errors['collection model version check'] = (
-                'Model id %s: Collection model corresponding to collection '
-                'id %s has a version %s which is less than the version %s in '
-                'commit log model id' % (
-                    item.id, item.collection_id, collection_model.version,
-                    version))
+        for (_, collection_model) in collection_model_tuples_list:
+            if int(collection_model.version) < int(version):
+                cls.errors['collection model version check'].append((
+                    'Entity id %s: Collection model corresponding to '
+                    'collection id %s has a version %s which is less than '
+                    'the version %s in commit log model id' % (
+                        item.id, item.collection_id, collection_model.version,
+                        version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_collection_model_version_from_item_id]
 
 
@@ -876,17 +927,17 @@ class CollectionSummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'collection_model': (
+            'collection_ids': (
                 collection_models.CollectionModel, [item.id]),
-            'collection_rights_model': (
+            'collection_rights_ids': (
                 collection_models.CollectionRightsModel, [item.id]),
-            'owner_user_model': (
+            'owner_user_ids': (
                 user_models.UserSettingsModel, item.owner_ids),
-            'editor_user_model': (
+            'editor_user_ids': (
                 user_models.UserSettingsModel, item.editor_ids),
-            'viewer_user_model': (
+            'viewer_user_ids': (
                 user_models.UserSettingsModel, item.viewer_ids),
-            'contributor_user_model': (
+            'contributor_user_ids': (
                 user_models.UserSettingsModel, item.contributor_ids)
         }
 
@@ -902,12 +953,12 @@ class CollectionSummaryModelValidator(BaseModelValidator):
             item.contributors_summary.keys())
         if sorted(item.contributor_ids) != sorted(
                 contributor_ids_from_contributors_summary):
-            cls.errors['contributors summary check'] = (
-                'Model id %s: Contributor ids: %s do not match the contributor '
-                'ids obtained using contributors summary: %s') % (
+            cls.errors['contributors summary check'].append((
+                'Entity id %s: Contributor ids: %s do not match the '
+                'contributor ids obtained using contributors summary: %s') % (
                     item.id, (',').join(sorted(item.contributor_ids)),
                     (',').join(
-                        sorted(contributor_ids_from_contributors_summary)))
+                        sorted(contributor_ids_from_contributors_summary))))
 
     @classmethod
     def _validate_language_code(cls, item):
@@ -916,14 +967,10 @@ class CollectionSummaryModelValidator(BaseModelValidator):
         Args:
             item: CollectionSummaryModel to validate.
         """
-        allowed_language_codes = [
-            language_item['code'] for language_item in (
-                constants.ALL_LANGUAGE_CODES)]
-
-        if item.language_code not in allowed_language_codes:
-            cls.errors['language code check'] = (
-                'Model id %s: Language code %s for model is unsupported' % (
-                    item.id, item.language_code))
+        if not utils.is_valid_language_code(item.language_code):
+            cls.errors['language code check'].append((
+                'Entity id %s: Language code %s for model is unsupported' % (
+                    item.id, item.language_code)))
 
     @classmethod
     def _validate_node_count(cls, item):
@@ -933,15 +980,16 @@ class CollectionSummaryModelValidator(BaseModelValidator):
         Args:
             item: CollectionSummaryModel to validate.
         """
-        _, collection_model_tuples = cls.external_models[
-            'collection_model']
-        collection_model = collection_model_tuples[0][1]
-        nodes = collection_model.collection_contents['nodes']
-        if item.node_count != len(nodes):
-            cls.errors['node count check'] = (
-                'Model id %s: Node count: %s does not match the number of '
-                'nodes in collection_contents dict: %s') % (
-                    item.id, item.node_count, len(nodes))
+        _, collection_model_tuples_list = cls.external_models[
+            'collection_ids']
+
+        for (_, collection_model) in collection_model_tuples_list:
+            nodes = collection_model.collection_contents['nodes']
+            if item.node_count != len(nodes):
+                cls.errors['node count check'].append((
+                    'Entity id %s: Node count: %s does not match the number of '
+                    'nodes in collection_contents dict: %s') % (
+                        item.id, item.node_count, len(nodes)))
 
     @classmethod
     def _validate_related_model_properties(cls, item):
@@ -951,90 +999,83 @@ class CollectionSummaryModelValidator(BaseModelValidator):
         Args:
             item: CollectionSummaryModel to validate.
         """
-        _, collection_model_tuples = cls.external_models[
-            'collection_model']
-        _, collection_rights_model_tuples = cls.external_models[
-            'collection_rights_model']
-        collection_model = collection_model_tuples[0][1]
-        collection_rights_model = collection_rights_model_tuples[0][1]
+        _, collection_model_tuples_list = cls.external_models[
+            'collection_ids']
+        _, collection_rights_model_tuples_list = cls.external_models[
+            'collection_rights_ids']
 
-        if item.title != collection_model.title:
-            cls.errors['title field check'] = (
-                'Model id %s: title field in model: %s does not match '
-                'corresponding collection title field: %s') % (
-                    item.id, item.title, collection_model.title)
+        collection_model_properties_dict = {
+            'title': 'title',
+            'category': 'category',
+            'objective': 'objective',
+            'language_code': 'language_code',
+            'tags': 'tags',
+            'collection_model_created_on': 'created_on',
+        }
 
-        if item.category != collection_model.category:
-            cls.errors['category field check'] = (
-                'Model id %s: category field in model: %s does not match '
-                'corresponding collection category field: %s') % (
-                    item.id, item.category, collection_model.category)
+        for (_, collection_model) in collection_model_tuples_list:
+            for (property_name, collection_model_property_name) in (
+                    collection_model_properties_dict.iteritems()):
+                value_in_summary_model = getattr(item, property_name)
+                value_in_collection_model = getattr(
+                    collection_model, collection_model_property_name)
 
-        if item.objective != collection_model.objective:
-            cls.errors['objective field check'] = (
-                'Model id %s: objective field in model: %s does not match '
-                'corresponding collection objective field: %s') % (
-                    item.id, item.objective, collection_model.objective)
+                summary_model_output_value = value_in_summary_model
+                if isinstance(summary_model_output_value, list):
+                    summary_model_output_value = (',').join(
+                        summary_model_output_value)
 
-        if item.language_code != collection_model.language_code:
-            cls.errors['language_code field check'] = (
-                'Model id %s: language_code field in model: %s does not match '
-                'corresponding collection language_code field: %s') % (
-                    item.id, item.language_code,
-                    collection_model.language_code)
+                collection_model_output_value = (
+                    value_in_collection_model)
+                if isinstance(collection_model_output_value, list):
+                    collection_model_output_value = (',').join(
+                        collection_model_output_value)
 
-        if item.tags != collection_model.tags:
-            cls.errors['tags field check'] = (
-                'Model id %s: tags field in model: %s does not match '
-                'corresponding collection tags field: %s') % (
-                    item.id, (',').join(item.tags),
-                    (',').join(collection_model.tags))
+                if value_in_summary_model != value_in_collection_model:
+                    cls.errors['%s field check' % property_name].append((
+                        'Entity id %s: %s field in entity: %s does not match '
+                        'corresponding collection %s field: %s') % (
+                            item.id, property_name, summary_model_output_value,
+                            collection_model_property_name,
+                            collection_model_output_value))
 
-        if item.collection_model_created_on != collection_model.created_on:
-            cls.errors['collection_model_created_on field check'] = (
-                'Model id %s: collection_model_created_on field in model: %s '
-                'does not match corresponding collection created_on '
-                'field: %s') % (
-                    item.id, item.collection_model_created_on,
-                    collection_model.created_on)
+        collection_rights_model_properties_dict = {
+            'status': 'status',
+            'community_owned': 'community_owned',
+            'owner_ids': 'owner_ids',
+            'editor_ids': 'editor_ids',
+            'viewer_ids': 'viewer_ids',
+        }
 
-        if item.status != collection_rights_model.status:
-            cls.errors['status field check'] = (
-                'Model id %s: status field in model: %s does not match '
-                'corresponding collection rights status field: %s') % (
-                    item.id, item.status, collection_rights_model.status)
+        for (_, collection_rights_model) in collection_rights_model_tuples_list:
+            for (property_name, collection_rights_model_property_name) in (
+                    collection_rights_model_properties_dict.iteritems()):
+                value_in_summary_model = getattr(item, property_name)
+                value_in_collection_rights_model = getattr(
+                    collection_rights_model,
+                    collection_rights_model_property_name)
 
-        if item.community_owned != collection_rights_model.community_owned:
-            cls.errors['community_owned field check'] = (
-                'Model id %s: community_owned field in model: %s does not '
-                'match corresponding collection rights community_owned '
-                'field: %s') % (
-                    item.id, item.community_owned,
-                    collection_rights_model.community_owned)
+                summary_model_output_value = value_in_summary_model
+                if isinstance(summary_model_output_value, list):
+                    summary_model_output_value = (',').join(
+                        summary_model_output_value)
 
-        if item.owner_ids != collection_rights_model.owner_ids:
-            cls.errors['owner_ids field check'] = (
-                'Model id %s: owner_ids field in model: %s does not match '
-                'corresponding collection rights owner_ids field: %s') % (
-                    item.id, (',').join(item.owner_ids),
-                    (',').join(collection_rights_model.owner_ids))
+                collection_rights_model_output_value = (
+                    value_in_collection_rights_model)
+                if isinstance(collection_rights_model_output_value, list):
+                    collection_rights_model_output_value = (',').join(
+                        collection_rights_model_output_value)
 
-        if item.editor_ids != collection_rights_model.editor_ids:
-            cls.errors['editor_ids field check'] = (
-                'Model id %s: editor_ids field in model: %s does not match '
-                'corresponding collection rights editor_ids field: %s') % (
-                    item.id, (',').join(item.editor_ids),
-                    (',').join(collection_rights_model.editor_ids))
-
-        if item.viewer_ids != collection_rights_model.viewer_ids:
-            cls.errors['viewer_ids field check'] = (
-                'Model id %s: viewer_ids field in model: %s does not match '
-                'corresponding collection rights viewer_ids field: %s') % (
-                    item.id, (',').join(item.viewer_ids),
-                    (',').join(collection_rights_model.viewer_ids))
+                if value_in_summary_model != value_in_collection_rights_model:
+                    cls.errors['%s field check' % property_name].append((
+                        'Entity id %s: %s field in entity: %s does not match '
+                        'corresponding collection rights %s field: %s') % (
+                            item.id, property_name, summary_model_output_value,
+                            collection_rights_model_property_name,
+                            collection_rights_model_output_value))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [
             cls._validate_language_code, cls._validate_node_count,
             cls._validate_contributors_summary,
@@ -1066,16 +1107,16 @@ class ConfigPropertyModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 config_models.ConfigPropertySnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 config_models.ConfigPropertySnapshotContentModel,
                 snapshot_model_ids),
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -1103,10 +1144,10 @@ class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'config_property_model': (
+            'config_property_ids': (
                 config_models.ConfigPropertyModel,
                 [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -1118,21 +1159,21 @@ class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: ConfigPropertySnapshotMetadataModel to validate.
         """
-        _, config_property_model_tuples = cls.external_models[
-            'config_property_model']
+        _, config_property_model_tuples_list = cls.external_models[
+            'config_property_ids']
 
-        config_property_model = config_property_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(config_property_model.version) < int(version):
-            cls.errors['config property model version check'] = (
-                'Model id %s: ConfigProperty model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot metadata model id' % (
-                    item.id, config_property_model.id,
-                    config_property_model.version, version))
+        for (_, config_property_model) in config_property_model_tuples_list:
+            if int(config_property_model.version) < int(version):
+                cls.errors['config property model version check'].append((
+                    'Entity id %s: ConfigProperty model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot metadata model id' % (
+                        item.id, config_property_model.id,
+                        config_property_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_config_property_model_version_from_item_id]
 
 
@@ -1158,7 +1199,7 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'config_property_model': (
+            'config_property_ids': (
                 config_models.ConfigPropertyModel,
                 [item.id[:item.id.find('-')]]),
         }
@@ -1171,21 +1212,21 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: ConfigPropertySnapshotContentModel to validate.
         """
-        _, config_property_model_tuples = cls.external_models[
-            'config_property_model']
+        _, config_property_model_tuples_list = cls.external_models[
+            'config_property_ids']
 
-        config_property_model = config_property_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(config_property_model.version) < int(version):
-            cls.errors['config property model version check'] = (
-                'Model id %s: ConfigProperty model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot content model id' % (
-                    item.id, config_property_model.id,
-                    config_property_model.version, version))
+        for (_, config_property_model) in config_property_model_tuples_list:
+            if int(config_property_model.version) < int(version):
+                cls.errors['config property model version check'].append((
+                    'Entity id %s: ConfigProperty model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot content model id' % (
+                        item.id, config_property_model.id,
+                        config_property_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_config_property_model_version_from_item_id]
 
 
@@ -1194,6 +1235,7 @@ class SentEmailModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
+        # Valid id: [intent].[random hash]
         regex_string = '%s\\.\\..*$' % item.intent
         return regex_string
 
@@ -1226,10 +1268,10 @@ class SentEmailModelValidator(BaseModelValidator):
         """
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
-            cls.errors['sent datetime check'] = (
-                'Model id %s: The sent_datetime field has a value %s which is '
+            cls.errors['sent datetime check'].append((
+                'Entity id %s: The sent_datetime field has a value %s which is '
                 'greater than the time when the job was run'
-                ) % (item.id, item.sent_datetime)
+                ) % (item.id, item.sent_datetime))
 
     @classmethod
     def _validate_sender_email(cls, item):
@@ -1239,14 +1281,16 @@ class SentEmailModelValidator(BaseModelValidator):
         Args:
             item: SentEmailModel to validate.
         """
-        _, sender_models = (cls.external_models['sender_id'])
-        sender_model = sender_models[0][1]
-        if sender_model and not sender_model.deleted:
-            if sender_model.email != item.sender_email:
-                cls.errors['sender email check'] = (
-                    'Model id %s: Sender email %s in model does not match '
-                    'with email %s of user obtained through sender id') % (
-                        item.id, item.sender_email, sender_model.email)
+        _, sender_model_tuples_list = cls.external_models['sender_id']
+
+        for (_, sender_model) in sender_model_tuples_list:
+            if sender_model and not sender_model.deleted:
+                if sender_model.email != item.sender_email:
+                    cls.errors['sender email check'].append((
+                        'Entity id %s: Sender email %s in entity does not '
+                        'match with email %s of user obtained through '
+                        'sender id') % (
+                            item.id, item.sender_email, sender_model.email))
 
     @classmethod
     def _validate_recipient_email(cls, item):
@@ -1256,17 +1300,20 @@ class SentEmailModelValidator(BaseModelValidator):
         Args:
             item: SentEmailModel to validate.
         """
-        _, recipient_models = (cls.external_models['recipient_id'])
-        recipient_model = recipient_models[0][1]
-        if recipient_model and not recipient_model.deleted:
-            if recipient_model.email != item.recipient_email:
-                cls.errors['recipient email check'] = (
-                    'Model id %s: Recipient email %s in model does not match '
-                    'with email %s of user obtained through recipient id') % (
-                        item.id, item.recipient_email, recipient_model.email)
+        _, recipient_model_tuples_list = cls.external_models['recipient_id']
+
+        for (_, recipient_model) in recipient_model_tuples_list:
+            if recipient_model and not recipient_model.deleted:
+                if recipient_model.email != item.recipient_email:
+                    cls.errors['recipient email check'].append((
+                        'Entity id %s: Recipient email %s in entity does '
+                        'not match with email %s of user obtained through '
+                        'recipient id') % (
+                            item.id, item.recipient_email,
+                            recipient_model.email))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [
             cls._validate_sent_datetime, cls._validate_sender_email,
             cls._validate_recipient_email]
@@ -1306,10 +1353,12 @@ class BulkEmailModelValidator(BaseModelValidator):
         Args:
             item: BulkEmailModel to validate.
         """
-        if len(item.id) != 12:
-            cls.errors['model id length check'] = (
-                'Model id %s: Model id should be of length 12 but instead has '
-                'length %s' % (item.id, len(item.id)))
+        # The bulk email model has ids as randomly generated strings of
+        # length 12.
+        if len(item.id) != email_models.BulkEmailModel.MODEL_ID_LENGTH:
+            cls.errors['model id length check'].append((
+                'Entity id %s: Entity id should be of length 12 but instead '
+                'has length %s' % (item.id, len(item.id))))
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -1320,10 +1369,10 @@ class BulkEmailModelValidator(BaseModelValidator):
         """
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
-            cls.errors['sent datetime check'] = (
-                'Model id %s: The sent_datetime field has a value %s which is '
+            cls.errors['sent datetime check'].append((
+                'Entity id %s: The sent_datetime field has a value %s which is '
                 'greater than the time when the job was run'
-                ) % (item.id, item.sent_datetime)
+                ) % (item.id, item.sent_datetime))
 
     @classmethod
     def _validate_sender_email(cls, item):
@@ -1333,17 +1382,19 @@ class BulkEmailModelValidator(BaseModelValidator):
         Args:
             item: BulkEmailModel to validate.
         """
-        _, sender_models = (cls.external_models['sender_id'])
-        sender_model = sender_models[0][1]
-        if sender_model and not sender_model.deleted:
-            if sender_model.email != item.sender_email:
-                cls.errors['sender email check'] = (
-                    'Model id %s: Sender email %s in model does not match '
-                    'with email %s of user obtained through sender id') % (
-                        item.id, item.sender_email, sender_model.email)
+        _, sender_model_tuples_list = (cls.external_models['sender_id'])
+
+        for (_, sender_model) in sender_model_tuples_list:
+            if sender_model and not sender_model.deleted:
+                if sender_model.email != item.sender_email:
+                    cls.errors['sender email check'].append((
+                        'Entity id %s: Sender email %s in entity does not '
+                        'match with email %s of user obtained through '
+                        'sender id') % (
+                            item.id, item.sender_email, sender_model.email))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [
             cls._validate_id_length, cls._validate_sent_datetime,
             cls._validate_sender_email]
@@ -1387,15 +1438,19 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
         Args:
             item: GeneralFeedbackEmailReplyToIdModel to validate.
         """
+        # The reply_to_id of model is created using utils.get_random_int
+        # method by using a upper bound as email_models.REPLY_TO_ID_LENGTH.
+        # So, the reply_to_id length should be less than or equal to
+        # email_models.REPLY_TO_ID_LENGTH.
         if len(item.reply_to_id) > email_models.REPLY_TO_ID_LENGTH:
-            cls.errors['reply_to_id length check'] = (
-                'Model id %s: reply_to_id %s should have length less than or '
+            cls.errors['reply_to_id length check'].append((
+                'Entity id %s: reply_to_id %s should have length less than or '
                 'equal to %s but instead has length %s' % (
                     item.id, item.reply_to_id, email_models.REPLY_TO_ID_LENGTH,
-                    len(item.reply_to_id)))
+                    len(item.reply_to_id))))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_reply_to_id_length]
 
 
@@ -1432,24 +1487,24 @@ class ExplorationModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
-            'exploration_commit_log_entry_model': (
+            'exploration_commit_log_entry_ids': (
                 exp_models.ExplorationCommitLogEntryModel,
                 exploration_commit_log_entry_model_ids),
-            'exp_summary_model': (
+            'exp_summary_ids': (
                 exp_models.ExpSummaryModel, exp_summary_model_ids),
-            'exploration_rights_model': (
+            'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
                 exploration_rights_model_ids),
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 exp_models.ExplorationSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 exp_models.ExplorationSnapshotContentModel,
                 snapshot_model_ids),
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -1477,9 +1532,9 @@ class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel, [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -1491,20 +1546,22 @@ class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: ExplorationSnapshotMetadataModel to validate.
         """
-        _, exploration_model_tuples = cls.external_models['exploration_model']
+        _, exploration_model_tuples_list = cls.external_models[
+            'exploration_ids']
 
-        exploration_model = exploration_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(exploration_model.version) < int(version):
-            cls.errors['exploration model version check'] = (
-                'Model id %s: Exploration model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot metadata model id' % (
-                    item.id, exploration_model.id, exploration_model.version,
-                    version))
+
+        for (_, exploration_model) in exploration_model_tuples_list:
+            if int(exploration_model.version) < int(version):
+                cls.errors['exploration model version check'].append((
+                    'Entity id %s: Exploration model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot metadata model id' % (
+                        item.id, exploration_model.id,
+                        exploration_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_exploration_model_version_from_item_id]
 
 
@@ -1530,7 +1587,7 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel, [item.id[:item.id.find('-')]]),
         }
 
@@ -1542,20 +1599,22 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: ExplorationSnapshotContentModel to validate.
         """
-        _, exploration_model_tuples = cls.external_models['exploration_model']
+        _, exploration_model_tuples_list = cls.external_models[
+            'exploration_ids']
 
-        exploration_model = exploration_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(exploration_model.version) < int(version):
-            cls.errors['exploration model version check'] = (
-                'Model id %s: Exploration model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot content model id' % (
-                    item.id, exploration_model.id, exploration_model.version,
-                    version))
+
+        for (_, exploration_model) in exploration_model_tuples_list:
+            if int(exploration_model.version) < int(version):
+                cls.errors['exploration model version check'].append((
+                    'Entity id %s: Exploration model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot content model id' % (
+                        item.id, exploration_model.id,
+                        exploration_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_exploration_model_version_from_item_id]
 
 
@@ -1587,21 +1646,21 @@ class ExplorationRightsModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel, [item.id]),
-            'cloned_from_exploration_model': (
+            'cloned_from_exploration_ids': (
                 exp_models.ExplorationModel,
                 cloned_from_exploration_id),
-            'owner_user_model': (
+            'owner_user_ids': (
                 user_models.UserSettingsModel, item.owner_ids),
-            'editor_user_model': (
+            'editor_user_ids': (
                 user_models.UserSettingsModel, item.editor_ids),
-            'viewer_user_model': (
+            'viewer_user_ids': (
                 user_models.UserSettingsModel, item.viewer_ids),
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 exp_models.ExplorationRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 exp_models.ExplorationRightsSnapshotContentModel,
                 snapshot_model_ids),
         }
@@ -1621,13 +1680,13 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         current_msec = (
             datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
         if item.first_published_msec > current_msec:
-            cls.errors['first published msec check'] = (
-                'Model id %s: The first_published_msec field has a value %s '
+            cls.errors['first published msec check'].append((
+                'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run'
-                ) % (item.id, item.first_published_msec)
+                ) % (item.id, item.first_published_msec))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_first_published_msec]
 
 
@@ -1655,10 +1714,10 @@ class ExplorationRightsSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'exploration_rights_model': (
+            'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -1671,21 +1730,22 @@ class ExplorationRightsSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: ExplorationRightsSnapshotMetadataModel to validate.
         """
-        _, exploration_rights_model_tuples = cls.external_models[
-            'exploration_rights_model']
+        _, exploration_rights_model_tuples_list = cls.external_models[
+            'exploration_rights_ids']
 
-        exploration_rights_model = exploration_rights_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(exploration_rights_model.version) < int(version):
-            cls.errors['exploration rights model version check'] = (
-                'Model id %s: Exploration Rights model corresponding to '
-                'id %s has a version %s which is less '
-                'than the version %s in snapshot metadata model id' % (
-                    item.id, exploration_rights_model.id,
-                    exploration_rights_model.version, version))
+        for (_, exploration_rights_model) in (
+                exploration_rights_model_tuples_list):
+            if int(exploration_rights_model.version) < int(version):
+                cls.errors['exploration rights model version check'].append((
+                    'Entity id %s: Exploration Rights model corresponding to '
+                    'id %s has a version %s which is less '
+                    'than the version %s in snapshot metadata model id' % (
+                        item.id, exploration_rights_model.id,
+                        exploration_rights_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_exploration_model_version_from_item_id]
 
 
@@ -1711,7 +1771,7 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'exploration_rights_model': (
+            'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel,
                 [item.id[:item.id.find('-')]]),
         }
@@ -1725,21 +1785,22 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: ExplorationRightsSnapshotContentModel to validate.
         """
-        _, exploration_rights_model_tuples = cls.external_models[
-            'exploration_rights_model']
+        _, exploration_rights_model_tuples_list = cls.external_models[
+            'exploration_rights_ids']
 
-        exploration_rights_model = exploration_rights_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(exploration_rights_model.version) < int(version):
-            cls.errors['exploration rights model version check'] = (
-                'Model id %s: Exploration Rights model corresponding to '
-                'id %s has a version %s which is less '
-                'than the version %s in snapshot content model id' % (
-                    item.id, exploration_rights_model.id,
-                    exploration_rights_model.version, version))
+        for (_, exploration_rights_model) in (
+                exploration_rights_model_tuples_list):
+            if int(exploration_rights_model.version) < int(version):
+                cls.errors['exploration rights model version check'].append((
+                    'Entity id %s: Exploration Rights model corresponding to '
+                    'id %s has a version %s which is less '
+                    'than the version %s in snapshot content model id' % (
+                        item.id, exploration_rights_model.id,
+                        exploration_rights_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_exploration_model_version_from_item_id]
 
 
@@ -1750,6 +1811,7 @@ class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
+        # Valid id: [exploration/rights]-[exploration_id]-[exploration-version].
         regex_string = '(exploration|rights)-%s-\\d*$' % (
             item.exploration_id)
 
@@ -1770,7 +1832,7 @@ class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel, [item.exploration_id]),
         }
 
@@ -1782,20 +1844,21 @@ class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
         Args:
             item: ExplorationCommitLogEntryModel to validate.
         """
-        _, exploration_model_tuples = cls.external_models['exploration_model']
+        _, exploration_model_tuples_list = cls.external_models[
+            'exploration_ids']
 
-        exploration_model = exploration_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(exploration_model.version) < int(version):
-            cls.errors['exploration model version check'] = (
-                'Model id %s: Exploration model corresponding to exploration '
-                'id %s has a version %s which is less than the version %s in '
-                'commit log model id' % (
-                    item.id, item.exploration_id, exploration_model.version,
-                    version))
+        for (_, exploration_model) in exploration_model_tuples_list:
+            if int(exploration_model.version) < int(version):
+                cls.errors['exploration model version check'].append((
+                    'Entity id %s: Exploration model corresponding to '
+                    'exploration id %s has a version %s which is less '
+                    'than the version %s in commit log model id' % (
+                        item.id, item.exploration_id, exploration_model.version,
+                        version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_exploration_model_version_from_item_id]
 
 
@@ -1839,17 +1902,17 @@ class ExpSummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel, [item.id]),
-            'exploration_rights_model': (
+            'exploration_rights_ids': (
                 exp_models.ExplorationRightsModel, [item.id]),
-            'owner_user_model': (
+            'owner_user_ids': (
                 user_models.UserSettingsModel, item.owner_ids),
-            'editor_user_model': (
+            'editor_user_ids': (
                 user_models.UserSettingsModel, item.editor_ids),
-            'viewer_user_model': (
+            'viewer_user_ids': (
                 user_models.UserSettingsModel, item.viewer_ids),
-            'contributor_user_model': (
+            'contributor_user_ids': (
                 user_models.UserSettingsModel, item.contributor_ids)
         }
 
@@ -1865,12 +1928,12 @@ class ExpSummaryModelValidator(BaseModelValidator):
             item.contributors_summary.keys())
         if sorted(item.contributor_ids) != sorted(
                 contributor_ids_from_contributors_summary):
-            cls.errors['contributors summary check'] = (
-                'Model id %s: Contributor ids: %s do not match the contributor '
-                'ids obtained using contributors summary: %s') % (
+            cls.errors['contributors summary check'].append((
+                'Entity id %s: Contributor ids: %s do not match the '
+                'contributor ids obtained using contributors summary: %s') % (
                     item.id, (',').join(sorted(item.contributor_ids)),
                     (',').join(
-                        sorted(contributor_ids_from_contributors_summary)))
+                        sorted(contributor_ids_from_contributors_summary))))
 
     @classmethod
     def _validate_language_code(cls, item):
@@ -1879,14 +1942,10 @@ class ExpSummaryModelValidator(BaseModelValidator):
         Args:
             item: ExpSummaryModel to validate.
         """
-        allowed_language_codes = [
-            language_item['code'] for language_item in (
-                constants.ALL_LANGUAGE_CODES)]
-
-        if item.language_code not in allowed_language_codes:
-            cls.errors['language code check'] = (
-                'Model id %s: Language code %s for model is unsupported' % (
-                    item.id, item.language_code))
+        if not utils.is_valid_language_code(item.language_code):
+            cls.errors['language code check'].append((
+                'Entity id %s: Language code %s for entity is unsupported' % (
+                    item.id, item.language_code)))
 
     @classmethod
     def _validate_first_published_msec(cls, item):
@@ -1903,10 +1962,42 @@ class ExpSummaryModelValidator(BaseModelValidator):
         current_msec = (
             datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
         if item.first_published_msec > current_msec:
-            cls.errors['first published msec check'] = (
-                'Model id %s: The first_published_msec field has a value %s '
+            cls.errors['first published msec check'].append((
+                'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run'
-                ) % (item.id, item.first_published_msec)
+                ) % (item.id, item.first_published_msec))
+
+    @classmethod
+    def _validate_exploration_model_last_updated(cls, item):
+        """Validate that item.exploration_model_last_updated matches the
+        time when a last commit was made by a human contributor.
+
+        Args:
+            item: ExpSummaryModel to validate.
+        """
+        _, exploration_model_tuples_list = cls.external_models[
+            'exploration_ids']
+        for (_, exploration_model) in exploration_model_tuples_list:
+            if not exploration_model or exploration_model.deleted:
+                continue
+            last_human_update_ms = 0
+            snapshots_metadata = (
+                exp_services.get_exploration_snapshots_metadata(
+                    exploration_model.id))
+            for snapshot_metadata in reversed(snapshots_metadata):
+                if snapshot_metadata['committer_id'] != (
+                        feconf.MIGRATION_BOT_USER_ID):
+                    last_human_update_ms = snapshot_metadata['created_on_ms']
+                    break
+            last_human_update_time = datetime.datetime.fromtimestamp(
+                last_human_update_ms / 1000.0)
+            if item.exploration_model_last_updated != last_human_update_time:
+                cls.errors['exploration model last updated check'].append((
+                    'Entity id %s: The exploration_model_last_updated '
+                    'field: %s does not match the last time a commit was '
+                    'made by a human contributor: %s') % (
+                        item.id, item.exploration_model_last_updated,
+                        last_human_update_time))
 
     @classmethod
     def _validate_related_model_properties(cls, item):
@@ -1916,102 +2007,90 @@ class ExpSummaryModelValidator(BaseModelValidator):
         Args:
             item: ExpSummaryModel to validate.
         """
-        _, exploration_model_tuples = cls.external_models[
-            'exploration_model']
-        _, exploration_rights_model_tuples = cls.external_models[
-            'exploration_rights_model']
-        exploration_model = exploration_model_tuples[0][1]
-        exploration_rights_model = exploration_rights_model_tuples[0][1]
+        _, exploration_model_tuples_list = cls.external_models[
+            'exploration_ids']
+        _, exploration_rights_model_tuples_list = cls.external_models[
+            'exploration_rights_ids']
 
-        if item.title != exploration_model.title:
-            cls.errors['title field check'] = (
-                'Model id %s: title field in model: %s does not match '
-                'corresponding exploration title field: %s') % (
-                    item.id, item.title, exploration_model.title)
+        exploration_model_properties_dict = {
+            'title': 'title',
+            'category': 'category',
+            'objective': 'objective',
+            'language_code': 'language_code',
+            'tags': 'tags',
+            'exploration_model_created_on': 'created_on',
+        }
 
-        if item.category != exploration_model.category:
-            cls.errors['category field check'] = (
-                'Model id %s: category field in model: %s does not match '
-                'corresponding exploration category field: %s') % (
-                    item.id, item.category, exploration_model.category)
+        for (_, exploration_model) in exploration_model_tuples_list:
+            for (property_name, exploration_model_property_name) in (
+                    exploration_model_properties_dict.iteritems()):
+                value_in_summary_model = getattr(item, property_name)
+                value_in_exploration_model = getattr(
+                    exploration_model, exploration_model_property_name)
 
-        if item.objective != exploration_model.objective:
-            cls.errors['objective field check'] = (
-                'Model id %s: objective field in model: %s does not match '
-                'corresponding exploration objective field: %s') % (
-                    item.id, item.objective, exploration_model.objective)
+                summary_model_output_value = value_in_summary_model
+                if isinstance(summary_model_output_value, list):
+                    summary_model_output_value = (',').join(
+                        summary_model_output_value)
 
-        if item.language_code != exploration_model.language_code:
-            cls.errors['language_code field check'] = (
-                'Model id %s: language_code field in model: %s does not match '
-                'corresponding exploration language_code field: %s') % (
-                    item.id, item.language_code,
-                    exploration_model.language_code)
+                exploration_model_output_value = (
+                    value_in_exploration_model)
+                if isinstance(exploration_model_output_value, list):
+                    exploration_model_output_value = (',').join(
+                        exploration_model_output_value)
 
-        if item.tags != exploration_model.tags:
-            cls.errors['tags field check'] = (
-                'Model id %s: tags field in model: %s does not match '
-                'corresponding exploration tags field: %s') % (
-                    item.id, (',').join(item.tags),
-                    (',').join(exploration_model.tags))
+                if value_in_summary_model != value_in_exploration_model:
+                    cls.errors['%s field check' % property_name].append((
+                        'Entity id %s: %s field in entity: %s does not match '
+                        'corresponding exploration %s field: %s') % (
+                            item.id, property_name, summary_model_output_value,
+                            exploration_model_property_name,
+                            exploration_model_output_value))
 
-        if item.exploration_model_created_on != exploration_model.created_on:
-            cls.errors['exploration_model_created_on field check'] = (
-                'Model id %s: exploration_model_created_on field in model: %s '
-                'does not match corresponding exploration created_on '
-                'field: %s') % (
-                    item.id, item.exploration_model_created_on,
-                    exploration_model.created_on)
 
-        if item.first_published_msec != (
-                exploration_rights_model.first_published_msec):
-            cls.errors['first_published_msec field check'] = (
-                'Model id %s: first_published_msec field in model: %s does '
-                'not match corresponding exploration rights '
-                'first_published_msec field: %s') % (
-                    item.id, item.first_published_msec,
-                    exploration_rights_model.first_published_msec)
+        exploration_rights_model_properties_dict = {
+            'first_published_msec': 'first_published_msec',
+            'status': 'status',
+            'community_owned': 'community_owned',
+            'owner_ids': 'owner_ids',
+            'editor_ids': 'editor_ids',
+            'viewer_ids': 'viewer_ids',
+        }
 
-        if item.status != exploration_rights_model.status:
-            cls.errors['status field check'] = (
-                'Model id %s: status field in model: %s does not match '
-                'corresponding exploration rights status field: %s') % (
-                    item.id, item.status, exploration_rights_model.status)
+        for (_, exploration_rights_model) in (
+                exploration_rights_model_tuples_list):
+            for (property_name, exploration_rights_model_property_name) in (
+                    exploration_rights_model_properties_dict.iteritems()):
+                value_in_summary_model = getattr(item, property_name)
+                value_in_exploration_rights_model = getattr(
+                    exploration_rights_model,
+                    exploration_rights_model_property_name)
 
-        if item.community_owned != exploration_rights_model.community_owned:
-            cls.errors['community_owned field check'] = (
-                'Model id %s: community_owned field in model: %s does not '
-                'match corresponding exploration rights community_owned '
-                'field: %s') % (
-                    item.id, item.community_owned,
-                    exploration_rights_model.community_owned)
+                summary_model_output_value = value_in_summary_model
+                if isinstance(summary_model_output_value, list):
+                    summary_model_output_value = (',').join(
+                        summary_model_output_value)
 
-        if item.owner_ids != exploration_rights_model.owner_ids:
-            cls.errors['owner_ids field check'] = (
-                'Model id %s: owner_ids field in model: %s does not match '
-                'corresponding exploration rights owner_ids field: %s') % (
-                    item.id, (',').join(item.owner_ids),
-                    (',').join(exploration_rights_model.owner_ids))
+                exploration_rights_model_output_value = (
+                    value_in_exploration_rights_model)
+                if isinstance(exploration_rights_model_output_value, list):
+                    exploration_rights_model_output_value = (',').join(
+                        exploration_rights_model_output_value)
 
-        if item.editor_ids != exploration_rights_model.editor_ids:
-            cls.errors['editor_ids field check'] = (
-                'Model id %s: editor_ids field in model: %s does not match '
-                'corresponding exploration rights editor_ids field: %s') % (
-                    item.id, (',').join(item.editor_ids),
-                    (',').join(exploration_rights_model.editor_ids))
-
-        if item.viewer_ids != exploration_rights_model.viewer_ids:
-            cls.errors['viewer_ids field check'] = (
-                'Model id %s: viewer_ids field in model: %s does not match '
-                'corresponding exploration rights viewer_ids field: %s') % (
-                    item.id, (',').join(item.viewer_ids),
-                    (',').join(exploration_rights_model.viewer_ids))
+                if value_in_summary_model != value_in_exploration_rights_model:
+                    cls.errors['%s field check' % property_name].append((
+                        'Entity id %s: %s field in entity: %s does not match '
+                        'corresponding exploration rights %s field: %s') % (
+                            item.id, property_name, summary_model_output_value,
+                            exploration_rights_model_property_name,
+                            exploration_rights_model_output_value))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [
             cls._validate_language_code, cls._validate_first_published_msec,
             cls._validate_contributors_summary,
+            cls._validate_exploration_model_last_updated,
             cls._validate_related_model_properties]
 
 
@@ -2050,19 +2129,19 @@ class FileMetadataModelValidator(BaseModelValidator):
         else:
             exploration_model_ids = [item.id[:item.id.find('/')]]
         return {
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 file_models.FileMetadataSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 file_models.FileMetadataSnapshotContentModel,
                 snapshot_model_ids),
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel,
                 exploration_model_ids)
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -2090,10 +2169,10 @@ class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'file_metadata_model': (
+            'file_metadata_ids': (
                 file_models.FileMetadataModel,
                 [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -2105,21 +2184,21 @@ class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: FileMetadataSnapshotMetadataModel to validate.
         """
-        _, file_metadata_model_tuples = cls.external_models[
-            'file_metadata_model']
+        _, file_metadata_model_tuples_list = cls.external_models[
+            'file_metadata_ids']
 
-        file_metadata_model = file_metadata_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(file_metadata_model.version) < int(version):
-            cls.errors['file_metadata model version check'] = (
-                'Model id %s: FileMetadata model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot metadata model id' % (
-                    item.id, file_metadata_model.id,
-                    file_metadata_model.version, version))
+        for (_, file_metadata_model) in file_metadata_model_tuples_list:
+            if int(file_metadata_model.version) < int(version):
+                cls.errors['file_metadata model version check'].append((
+                    'Entity id %s: FileMetadata model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot metadata model id' % (
+                        item.id, file_metadata_model.id,
+                        file_metadata_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_file_metadata_model_version_from_item_id]
 
 
@@ -2145,7 +2224,7 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'file_metadata_model': (
+            'file_metadata_ids': (
                 file_models.FileMetadataModel,
                 [item.id[:item.id.find('-')]]),
         }
@@ -2158,21 +2237,21 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: FileMetadataSnapshotContentModel to validate.
         """
-        _, file_metadata_model_tuples = cls.external_models[
-            'file_metadata_model']
+        _, file_metadata_model_tuples_list = cls.external_models[
+            'file_metadata_ids']
 
-        file_metadata_model = file_metadata_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(file_metadata_model.version) < int(version):
-            cls.errors['file_metadata model version check'] = (
-                'Model id %s: FileMetadata model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot content model id' % (
-                    item.id, file_metadata_model.id,
-                    file_metadata_model.version, version))
+        for (_, file_metadata_model) in file_metadata_model_tuples_list:
+            if int(file_metadata_model.version) < int(version):
+                cls.errors['file_metadata model version check'].append((
+                    'Entity id %s: FileMetadata model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot content model id' % (
+                        item.id, file_metadata_model.id,
+                        file_metadata_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_file_metadata_model_version_from_item_id]
 
 
@@ -2211,19 +2290,19 @@ class FileModelValidator(BaseModelValidator):
         else:
             exploration_model_ids = [item.id[:item.id.find('/')]]
         return {
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 file_models.FileSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 file_models.FileSnapshotContentModel,
                 snapshot_model_ids),
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel,
                 exploration_model_ids)
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -2251,10 +2330,10 @@ class FileSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'file_model': (
+            'file_ids': (
                 file_models.FileModel,
                 [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -2266,21 +2345,21 @@ class FileSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: FileSnapshotMetadataModel to validate.
         """
-        _, file_model_tuples = cls.external_models[
-            'file_model']
+        _, file_model_tuples_list = cls.external_models[
+            'file_ids']
 
-        file_model = file_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(file_model.version) < int(version):
-            cls.errors['file model version check'] = (
-                'Model id %s: File model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot metadata model id' % (
-                    item.id, file_model.id,
-                    file_model.version, version))
+        for (_, file_model) in file_model_tuples_list:
+            if int(file_model.version) < int(version):
+                cls.errors['file model version check'].append((
+                    'Entity id %s: File model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot metadata model id' % (
+                        item.id, file_model.id,
+                        file_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_file_model_version_from_item_id]
 
 
@@ -2306,7 +2385,7 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'file_model': (
+            'file_ids': (
                 file_models.FileModel,
                 [item.id[:item.id.find('-')]]),
         }
@@ -2319,21 +2398,21 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: FileSnapshotContentModel to validate.
         """
-        _, file_model_tuples = cls.external_models[
-            'file_model']
+        _, file_model_tuples_list = cls.external_models[
+            'file_ids']
 
-        file_model = file_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(file_model.version) < int(version):
-            cls.errors['file model version check'] = (
-                'Model id %s: File model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot content model id' % (
-                    item.id, file_model.id,
-                    file_model.version, version))
+        for (_, file_model) in file_model_tuples_list:
+            if int(file_model.version) < int(version):
+                cls.errors['file model version check'].append((
+                    'Entity id %s: File model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot content model id' % (
+                        item.id, file_model.id,
+                        file_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_file_model_version_from_item_id]
 
 
@@ -2361,7 +2440,7 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
         exploration_ids = [item.id]
         exploration_ids = exploration_ids + item.recommended_exploration_ids
         return {
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel, exploration_ids),
         }
 
@@ -2373,13 +2452,13 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
             item: ExplorationRecommendationsModel to validate.
         """
         if item.id in item.recommended_exploration_ids:
-            cls.errors['item exploration id check'] = (
-                'Model id %s: The exploration id: %s for which the model is '
+            cls.errors['item exploration id check'].append((
+                'Entity id %s: The exploration id: %s for which the entity is '
                 'created is also present in the recommended exploration ids '
-                'for model') % (item.id, item.id)
+                'for entity') % (item.id, item.id))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_item_id_not_in_recommended_exploration_ids]
 
 
@@ -2388,6 +2467,7 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
+        # Valid id: topics.
         return '%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
 
     @classmethod
@@ -2435,15 +2515,16 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
 
         if len(topic_similarities_values) != topics_length:
             invalid_model = True
-            cls.errors['topic similarities column check'] = (
-                'Model id %s: Length of topic similarities columns does '
-                'not match length of topic list') % item.id
+            cls.errors['topic similarities column check'].append((
+                'Entity id %s: Length of topic similarities columns: %s does '
+                'not match length of topic list: %s') % (
+                    item.id, len(topic_similarities_values), topics_length))
 
         for topic in topics_list:
             if topic not in recommendations_services.RECOMMENDATION_CATEGORIES:
-                cls.errors['topic check'] = (
-                    'Model id %s: Topic %s not in list of known topics') % (
-                        item.id, topic)
+                cls.errors['topic check'].append((
+                    'Entity id %s: Topic %s not in list of known topics') % (
+                        item.id, topic))
 
         if invalid_model:
             return
@@ -2451,9 +2532,11 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
         for index, topic in enumerate(topics_list):
             if len(topic_similarities_values[index]) != topics_length:
                 invalid_model = topic_similarities_values
-                cls.errors['topic similarities row %s check' % index] = (
-                    'Model id %s: Length of topic similarities rows does '
-                    'not match length of topic list') % item.id
+                cls.errors['topic similarities row %s check' % index].append((
+                    'Entity id %s: Length of topic similarities rows: %s does '
+                    'not match length of topic list: %s') % (
+                        item.id, len(topic_similarities_values[index]),
+                        topics_length))
 
         if invalid_model:
             return
@@ -2464,25 +2547,25 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
                 try:
                     similarity = float(similarity)
                 except Exception:
-                    cls.errors['similarity type check'] = (
-                        'Model id %s: Expected similarity to be a float, '
-                        'received %s') % (item.id, similarity)
+                    cls.errors['similarity type check'].append((
+                        'Entity id %s: Expected similarity to be a float, '
+                        'received %s') % (item.id, similarity))
 
                 if similarity < 0.0 or similarity > 1.0:
-                    cls.errors['similarity value check'] = (
-                        'Model id %s: Expected similarity to be between 0.0 '
-                        'and 1.0, received %s') % (item.id, similarity)
+                    cls.errors['similarity value check'].append((
+                        'Entity id %s: Expected similarity to be between 0.0 '
+                        'and 1.0, received %s') % (item.id, similarity))
 
         for row_ind in range(topics_length):
             for col_ind in range(topics_length):
                 if (topic_similarities_values[row_ind][col_ind] !=
                         topic_similarities_values[col_ind][row_ind]):
-                    cls.errors['symmetry check'] = (
-                        'Model id %s: Expected topic similarities to be '
-                        'symmetric') % item.id
+                    cls.errors['symmetry check'].append((
+                        'Entity id %s: Expected topic similarities to be '
+                        'symmetric') % item.id)
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_topic_similarities]
 
 
@@ -2521,27 +2604,27 @@ class StoryModelValidator(BaseModelValidator):
         exploration_model_ids = [
             node['exploration_id'] for node in item.story_contents['nodes']]
         return {
-            'story_commit_log_entry_model': (
+            'story_commit_log_entry_ids': (
                 story_models.StoryCommitLogEntryModel,
                 story_commit_log_entry_model_ids),
-            'story_summary_model': (
+            'story_summary_ids': (
                 story_models.StorySummaryModel, story_summary_model_ids),
-            'story_rights_model': (
+            'story_rights_ids': (
                 story_models.StoryRightsModel,
                 story_rights_model_ids),
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 story_models.StorySnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 story_models.StorySnapshotContentModel,
                 snapshot_model_ids),
-            'exploration_model': (
+            'exploration_ids': (
                 exp_models.ExplorationModel,
                 exploration_model_ids)
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -2569,9 +2652,9 @@ class StorySnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'story_model': (
+            'story_ids': (
                 story_models.StoryModel, [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -2583,20 +2666,20 @@ class StorySnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: StorySnapshotMetadataModel to validate.
         """
-        _, story_model_tuples = cls.external_models['story_model']
+        _, story_model_tuples_list = cls.external_models['story_ids']
 
-        story_model = story_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(story_model.version) < int(version):
-            cls.errors['story model version check'] = (
-                'Model id %s: Story model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot metadata model id' % (
-                    item.id, story_model.id, story_model.version,
-                    version))
+        for (_, story_model) in story_model_tuples_list:
+            if int(story_model.version) < int(version):
+                cls.errors['story model version check'].append((
+                    'Entity id %s: Story model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot metadata model id' % (
+                        item.id, story_model.id, story_model.version,
+                        version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_story_model_version_from_item_id]
 
 
@@ -2622,7 +2705,7 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'story_model': (
+            'story_ids': (
                 story_models.StoryModel, [item.id[:item.id.find('-')]]),
         }
 
@@ -2634,20 +2717,20 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: StorySnapshotContentModel to validate.
         """
-        _, story_model_tuples = cls.external_models['story_model']
+        _, story_model_tuples_list = cls.external_models['story_ids']
 
-        story_model = story_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(story_model.version) < int(version):
-            cls.errors['story model version check'] = (
-                'Model id %s: Story model corresponding to '
-                'id %s has a version %s which is less than the version %s in '
-                'snapshot content model id' % (
-                    item.id, story_model.id, story_model.version,
-                    version))
+        for (_, story_model) in story_model_tuples_list:
+            if int(story_model.version) < int(version):
+                cls.errors['story model version check'].append((
+                    'Entity id %s: Story model corresponding to '
+                    'id %s has a version %s which is less than the version %s '
+                    'in snapshot content model id' % (
+                        item.id, story_model.id, story_model.version,
+                        version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_story_model_version_from_item_id]
 
 
@@ -2676,20 +2759,20 @@ class StoryRightsModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
-            'story_model': (
+            'story_ids': (
                 story_models.StoryModel, [item.id]),
-            'manager_user_model': (
+            'manager_user_ids': (
                 user_models.UserSettingsModel, item.manager_ids),
-            'snapshot_metadata_model': (
+            'snapshot_metadata_ids': (
                 story_models.StoryRightsSnapshotMetadataModel,
                 snapshot_model_ids),
-            'snapshot_content_model': (
+            'snapshot_content_ids': (
                 story_models.StoryRightsSnapshotContentModel,
                 snapshot_model_ids),
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -2717,10 +2800,10 @@ class StoryRightsSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'story_rights_model': (
+            'story_rights_ids': (
                 story_models.StoryRightsModel,
                 [item.id[:item.id.find('-')]]),
-            'committer_model': (
+            'committer_ids': (
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
@@ -2733,21 +2816,21 @@ class StoryRightsSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: StoryRightsSnapshotMetadataModel to validate.
         """
-        _, story_rights_model_tuples = cls.external_models[
-            'story_rights_model']
+        _, story_rights_model_tuples_list = cls.external_models[
+            'story_rights_ids']
 
-        story_rights_model = story_rights_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(story_rights_model.version) < int(version):
-            cls.errors['story rights model version check'] = (
-                'Model id %s: Story Rights model corresponding to '
-                'id %s has a version %s which is less '
-                'than the version %s in snapshot metadata model id' % (
-                    item.id, story_rights_model.id,
-                    story_rights_model.version, version))
+        for (_, story_rights_model) in story_rights_model_tuples_list:
+            if int(story_rights_model.version) < int(version):
+                cls.errors['story rights model version check'].append((
+                    'Entity id %s: Story Rights model corresponding to '
+                    'id %s has a version %s which is less '
+                    'than the version %s in snapshot metadata model id' % (
+                        item.id, story_rights_model.id,
+                        story_rights_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_story_model_version_from_item_id]
 
 
@@ -2773,7 +2856,7 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'story_rights_model': (
+            'story_rights_ids': (
                 story_models.StoryRightsModel,
                 [item.id[:item.id.find('-')]]),
         }
@@ -2787,21 +2870,21 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: StoryRightsSnapshotContentModel to validate.
         """
-        _, story_rights_model_tuples = cls.external_models[
-            'story_rights_model']
+        _, story_rights_model_tuples_list = cls.external_models[
+            'story_rights_ids']
 
-        story_rights_model = story_rights_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(story_rights_model.version) < int(version):
-            cls.errors['story rights model version check'] = (
-                'Model id %s: Story Rights model corresponding to '
-                'id %s has a version %s which is less '
-                'than the version %s in snapshot content model id' % (
-                    item.id, story_rights_model.id,
-                    story_rights_model.version, version))
+        for (_, story_rights_model) in story_rights_model_tuples_list:
+            if int(story_rights_model.version) < int(version):
+                cls.errors['story rights model version check'].append((
+                    'Entity id %s: Story Rights model corresponding to '
+                    'id %s has a version %s which is less '
+                    'than the version %s in snapshot content model id' % (
+                        item.id, story_rights_model.id,
+                        story_rights_model.version, version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_story_model_version_from_item_id]
 
 
@@ -2812,6 +2895,7 @@ class StoryCommitLogEntryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
+        # Valid id: [story/rights]-[story_id]-[story_version].
         regex_string = '(story|rights)-%s-\\d*$' % (
             item.story_id)
 
@@ -2832,7 +2916,7 @@ class StoryCommitLogEntryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'story_model': (
+            'story_ids': (
                 story_models.StoryModel, [item.story_id]),
         }
 
@@ -2844,20 +2928,20 @@ class StoryCommitLogEntryModelValidator(BaseModelValidator):
         Args:
             item: StoryCommitLogEntryModel to validate.
         """
-        _, story_model_tuples = cls.external_models['story_model']
+        _, story_model_tuples_list = cls.external_models['story_ids']
 
-        story_model = story_model_tuples[0][1]
         version = item.id[item.id.rfind('-') + 1:]
-        if int(story_model.version) < int(version):
-            cls.errors['story model version check'] = (
-                'Model id %s: Story model corresponding to story '
-                'id %s has a version %s which is less than the version %s in '
-                'commit log model id' % (
-                    item.id, item.story_id, story_model.version,
-                    version))
+        for (_, story_model) in story_model_tuples_list:
+            if int(story_model.version) < int(version):
+                cls.errors['story model version check'].append((
+                    'Entity id %s: Story model corresponding to story '
+                    'id %s has a version %s which is less than the version %s '
+                    'in commit log model id' % (
+                        item.id, item.story_id, story_model.version,
+                        version)))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [cls._validate_story_model_version_from_item_id]
 
 
@@ -2883,9 +2967,9 @@ class StorySummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'story_model': (
+            'story_ids': (
                 story_models.StoryModel, [item.id]),
-            'story_rights_model': (
+            'story_rights_ids': (
                 story_models.StoryRightsModel, [item.id]),
         }
 
@@ -2896,14 +2980,10 @@ class StorySummaryModelValidator(BaseModelValidator):
         Args:
             item: StorySummaryModel to validate.
         """
-        allowed_language_codes = [
-            language_item['code'] for language_item in (
-                constants.ALL_LANGUAGE_CODES)]
-
-        if item.language_code not in allowed_language_codes:
-            cls.errors['language code check'] = (
-                'Model id %s: Language code %s for model is unsupported' % (
-                    item.id, item.language_code))
+        if not utils.is_valid_language_code(item.language_code):
+            cls.errors['language code check'].append((
+                'Entity id %s: Language code %s for entity is unsupported' % (
+                    item.id, item.language_code)))
 
     @classmethod
     def _validate_node_count(cls, item):
@@ -2913,15 +2993,16 @@ class StorySummaryModelValidator(BaseModelValidator):
         Args:
             item: StorySummaryModel to validate.
         """
-        _, story_model_tuples = cls.external_models[
-            'story_model']
-        story_model = story_model_tuples[0][1]
-        nodes = story_model.story_contents['nodes']
-        if item.node_count != len(nodes):
-            cls.errors['node count check'] = (
-                'Model id %s: Node count: %s does not match the number of '
-                'nodes in story_contents dict: %s') % (
-                    item.id, item.node_count, len(nodes))
+        _, story_model_tuples_list = cls.external_models[
+            'story_ids']
+
+        for (_, story_model) in story_model_tuples_list:
+            nodes = story_model.story_contents['nodes']
+            if item.node_count != len(nodes):
+                cls.errors['node count check'].append((
+                    'Entity id %s: Node count: %s does not match the '
+                    'number of nodes in story_contents dict: %s') % (
+                        item.id, item.node_count, len(nodes)))
 
     @classmethod
     def _validate_related_model_properties(cls, item):
@@ -2931,39 +3012,32 @@ class StorySummaryModelValidator(BaseModelValidator):
         Args:
             item: StorySummaryModel to validate.
         """
-        _, story_model_tuples = cls.external_models[
-            'story_model']
-        story_model = story_model_tuples[0][1]
+        _, story_model_tuples_list = cls.external_models[
+            'story_ids']
 
-        if item.title != story_model.title:
-            cls.errors['title field check'] = (
-                'Model id %s: title field in model: %s does not match '
-                'corresponding story title field: %s') % (
-                    item.id, item.title, story_model.title)
+        story_model_properties_dict = {
+            'title': 'title',
+            'language_code': 'language_code',
+            'description': 'description',
+            'story_model_created_on': 'created_on',
+        }
 
-        if item.language_code != story_model.language_code:
-            cls.errors['language_code field check'] = (
-                'Model id %s: language_code field in model: %s does not match '
-                'corresponding story language_code field: %s') % (
-                    item.id, item.language_code,
-                    story_model.language_code)
-
-        if item.description != story_model.description:
-            cls.errors['description field check'] = (
-                'Model id %s: description field in model: %s does not match '
-                'corresponding story description field: %s') % (
-                    item.id, item.description, story_model.description)
-
-        if item.story_model_created_on != story_model.created_on:
-            cls.errors['story_model_created_on field check'] = (
-                'Model id %s: story_model_created_on field in model: %s '
-                'does not match corresponding story created_on '
-                'field: %s') % (
-                    item.id, item.story_model_created_on,
-                    story_model.created_on)
+        for (_, story_model) in story_model_tuples_list:
+            for (property_name, story_model_property_name) in (
+                    story_model_properties_dict.iteritems()):
+                value_in_summary_model = getattr(item, property_name)
+                value_in_story_model = getattr(
+                    story_model, story_model_property_name)
+                if value_in_summary_model != value_in_story_model:
+                    cls.errors['%s field check' % property_name].append((
+                        'Entity id %s: %s field in entity: %s does not match '
+                        'corresponding story %s field: %s') % (
+                            item.id, property_name, value_in_summary_model,
+                            story_model_property_name,
+                            value_in_story_model))
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return [
             cls._validate_language_code, cls._validate_node_count,
             cls._validate_related_model_properties]
@@ -3003,7 +3077,7 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
         }
 
     @classmethod
-    def _get_validation_functions(cls):
+    def _get_custom_validation_functions(cls):
         return []
 
 
@@ -3094,7 +3168,7 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     yield (
                         'failed validation check for %s of %s' % (
                             error_key, model_name),
-                        error_val)
+                        (',').join(set(error_val)))
             else:
                 yield (
                     'fully-validated %s' % model_name, 1)
