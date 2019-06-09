@@ -94,10 +94,12 @@ require('directives/MathjaxBindDirective.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('pages/skill_editor/SkillEditorNavbarDirective.ts');
-require('pages/skill_editor/SkillEditorNavbarBreadcrumbDirective.ts');
-require('pages/skill_editor/editor_tab/SkillEditorMainTabDirective.ts');
-require('pages/skill_editor/questions_tab/QuestionsTabDirective.ts');
+require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
+require(
+  'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
+require(
+  'pages/skill-editor-page/editor-tab/skill-editor-main-tab.directive.ts');
+require('pages/skill-editor-page/questions-tab/questions-tab.directive.ts');
 
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/AudioLanguageObjectFactory.ts');

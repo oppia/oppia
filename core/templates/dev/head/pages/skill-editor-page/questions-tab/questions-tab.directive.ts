@@ -27,7 +27,7 @@ require('domain/question/EditableQuestionBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/skill/EditableSkillBackendApiService.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -40,7 +40,7 @@ oppia.directive('questionsTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/questions_tab/questions_tab_directive.html'),
+        '/pages/skill-editor-page/questions-tab/questions-tab.directive.html'),
       controller: [
         '$scope', '$http', '$q', '$uibModal', '$window', 'AlertsService',
         'SkillEditorStateService', 'QuestionCreationService', 'UrlService',

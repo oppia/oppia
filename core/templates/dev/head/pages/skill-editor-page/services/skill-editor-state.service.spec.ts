@@ -19,7 +19,7 @@
 require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('domain/skill/SkillUpdateService.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 describe('Skill editor state service', function() {
   var SkillEditorStateService, $q, $rootScope,

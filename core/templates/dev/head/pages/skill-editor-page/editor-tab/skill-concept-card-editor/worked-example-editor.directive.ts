@@ -19,7 +19,7 @@
 
 require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 oppia.directive('workedExampleEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -32,7 +32,8 @@ oppia.directive('workedExampleEditor', [
         getOnSaveFn: '&onSave',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/worked_example_editor_directive.html'),
+        '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
+        'worked-example-editor.directive.html'),
       controller: [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
         function($scope, SkillUpdateService, SkillEditorStateService) {

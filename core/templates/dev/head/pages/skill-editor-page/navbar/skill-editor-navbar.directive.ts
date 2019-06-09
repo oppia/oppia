@@ -22,8 +22,8 @@ require(
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/skill_editor/SkillEditorRoutingService.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/AlertsService.ts');
 
 oppia.directive('skillEditorNavbar', [
@@ -66,8 +66,8 @@ oppia.directive('skillEditorNavbar', [
             if (UndoRedoService.getChangeCount() > 0) {
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/skill_editor/editor_tab/' +
-                  'save_pending_changes_modal_directive.html'),
+                  '/pages/skill-editor-page/modal-templates/' +
+                  'save-pending-changes-modal.directive.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
@@ -128,8 +128,8 @@ oppia.directive('skillEditorNavbar', [
           $scope.saveChanges = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/' +
-                'skill_editor_save_modal_directive.html'),
+                '/pages/skill-editor-page/modal-templates/' +
+                'skill-editor-save-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -153,8 +153,8 @@ oppia.directive('skillEditorNavbar', [
           $scope.publishSkill = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/' +
-                'skill_editor_pre_publish_modal_directive.html'),
+                '/pages/skill-editor-page/modal-templates/' +
+                'skill-editor-pre-publish-modal.directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

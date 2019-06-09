@@ -22,13 +22,15 @@ require(
 require(
   'components/forms/schema-based-editors/schema-based-editor.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
-require('pages/skill_editor/editor_tab/WorkedExampleEditorDirective.ts');
+require(
+  'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
+  'worked-example-editor.directive.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/format-rte-preview.filter.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/GenerateContentIdService.ts');
 
 oppia.directive('skillConceptCardEditor', [
@@ -43,8 +45,8 @@ oppia.directive('skillConceptCardEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/' +
-        'skill_concept_card_editor_directive.html'),
+        '/pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
+        'skill-concept-card-editor.directive.html'),
       controller: [
         '$scope', '$filter', '$uibModal', 'EVENT_SKILL_REINITIALIZED',
         function($scope, $filter, $uibModal, EVENT_SKILL_REINITIALIZED) {
@@ -136,8 +138,8 @@ oppia.directive('skillConceptCardEditor', [
           $scope.deleteWorkedExample = function(index, evt) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/' +
-                'delete_worked_example_modal_directive.html'),
+                '/pages/skill-editor-page/modal-templates/' +
+                'delete-worked-example-modal.directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
@@ -165,8 +167,8 @@ oppia.directive('skillConceptCardEditor', [
           $scope.openAddWorkedExampleModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/' +
-                'add_worked_example_modal_directive.html'),
+                '/pages/skill-editor-page/modal-templates/' +
+                'add-worked-example-modal.directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',

@@ -19,7 +19,7 @@
 require('domain/skill/SkillObjectFactory.ts');
 require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 oppia.directive('skillDescriptionEditor', [
   'SkillEditorStateService', 'SkillObjectFactory', 'SkillUpdateService',
@@ -31,8 +31,8 @@ oppia.directive('skillDescriptionEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/' +
-        'skill_description_editor_directive.html'),
+        '/pages/skill-editor-page/editor-tab/skill-description-editor/' +
+        'skill-description-editor.directive.html'),
       controller: [
         '$scope', 'EVENT_SKILL_REINITIALIZED',
         function($scope, EVENT_SKILL_REINITIALIZED) {

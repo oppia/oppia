@@ -18,7 +18,7 @@
 
 require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 oppia.directive('misconceptionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -30,7 +30,8 @@ oppia.directive('misconceptionEditor', [
         isEditable: '&isEditable'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/misconception_editor_directive.html'),
+        'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
+        'misconception-editor.directive.html'),
       controller: [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
         function($scope, SkillUpdateService, SkillEditorStateService) {

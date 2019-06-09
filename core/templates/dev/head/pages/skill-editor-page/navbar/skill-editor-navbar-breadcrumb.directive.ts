@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 oppia.directive('skillEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -25,7 +25,8 @@ oppia.directive('skillEditorNavbarBreadcrumb', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/skill_editor_navbar_breadcrumb_directive.html'),
+        '/pages/skill-editor-page/navbar/' +
+        'skill-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService',
         function($scope, SkillEditorStateService) {

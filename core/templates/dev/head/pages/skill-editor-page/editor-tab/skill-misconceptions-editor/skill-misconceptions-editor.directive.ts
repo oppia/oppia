@@ -19,12 +19,14 @@
 require(
   'components/state-directives/answer-group-editor/' +
   'summary-list-header.directive.ts');
-require('pages/skill_editor/editor_tab/MisconceptionEditorDirective.ts');
+require(
+  'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
+  'misconception-editor.directive.ts');
 
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('domain/skill/SkillUpdateService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 oppia.directive('skillMisconceptionsEditor', [
   'SkillEditorStateService', 'SkillUpdateService', 'UrlInterpolationService',
@@ -34,8 +36,8 @@ oppia.directive('skillMisconceptionsEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/' +
-        'skill_misconceptions_editor_directive.html'),
+        '/pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
+        'skill-misconceptions-editor.directive.html'),
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope',
         'MisconceptionObjectFactory', 'EVENT_SKILL_REINITIALIZED',
@@ -68,8 +70,8 @@ oppia.directive('skillMisconceptionsEditor', [
           $scope.openDeleteMisconceptionModal = function(index, evt) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/' +
-                'delete_misconception_modal_directive.html'),
+                '/pages/skill-editor-page/modal-templates/' +
+                'delete-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
@@ -95,8 +97,8 @@ oppia.directive('skillMisconceptionsEditor', [
           $scope.openAddMisconceptionModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/' +
-                'add_misconception_modal_directive.html'),
+                '/pages/skill-editor-page/modal-templates/' +
+                'add-misconception-modal.directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',

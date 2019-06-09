@@ -66,7 +66,8 @@ module.exports = {
     preferences: commonPrefix + '/pages/preferences/Preferences.ts',
     profile: commonPrefix + '/pages/profile/Profile.ts',
     signup: commonPrefix + '/pages/signup/Signup.ts',
-    skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
+    skill_editor:
+      commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
     splash: commonPrefix + '/pages/splash/Splash.ts',
     stewards: commonPrefix + '/pages/landing/stewards/Stewards.ts',
     story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
@@ -275,8 +276,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['skill_editor'],
-      filename: 'skill_editor.html',
-      template: commonPrefix + '/pages/skill_editor/skill_editor.html',
+      filename: 'skill-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/skill-editor-page/' +
+        'skill-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

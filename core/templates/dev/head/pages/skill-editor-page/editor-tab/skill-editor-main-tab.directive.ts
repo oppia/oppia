@@ -16,12 +16,18 @@
  * @fileoverview Controller for the main tab of the skill editor.
  */
 
-require('pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.ts');
-require('pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.ts');
-require('pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.ts');
+require(
+  'pages/skill-editor-page/editor-tab/skill-description-editor/' +
+  'skill-description-editor.directive.ts');
+require(
+  'pages/skill-editor-page/editor-tab/skill-concept-card-editor/' +
+  'skill-concept-card-editor.directive.ts');
+require(
+  'pages/skill-editor-page/editor-tab/skill-misconceptions-editor/' +
+  'skill-misconceptions-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/skill_editor/SkillEditorStateService.ts');
+require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 oppia.directive('skillEditorMainTab', [
   'SkillEditorStateService', 'UrlInterpolationService',
@@ -30,8 +36,8 @@ oppia.directive('skillEditorMainTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/' +
-        'skill_editor_main_tab_directive.html'),
+        '/pages/skill-editor-page/editor-tab/' +
+        'skill-editor-main-tab.directive.html'),
       controller: [
         '$scope', 'SkillEditorStateService',
         function($scope, SkillEditorStateService) {
