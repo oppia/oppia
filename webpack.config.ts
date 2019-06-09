@@ -41,7 +41,8 @@ module.exports = {
       'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
-      commonPrefix + '/pages/creator_dashboard/CreatorDashboard.ts',
+      commonPrefix + '/pages/creator-dashboard-page/' +
+      'creator-dashboard-page.controller.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
     email_dashboard:
       commonPrefix +
@@ -78,8 +79,10 @@ module.exports = {
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
-    splash: commonPrefix + '/pages/splash/Splash.ts',
-    stewards: commonPrefix + '/pages/landing/stewards/Stewards.ts',
+    splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
+    stewards:
+      commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
+      'stewards-landing-page.controller.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
