@@ -16,9 +16,11 @@
  * @fileoverview Data and directive for the Oppia contributors' library page.
  */
 
-require('components/loading/LoadingDotsDirective.ts');
-require('components/summary_tile/ExplorationSummaryTileDirective.ts');
-require('components/summary_tile/CollectionSummaryTileDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
+require('components/summary-tile/exploration-summary-tile.directive.ts');
+require('components/summary-tile/collection-summary-tile.directive.ts');
 require('pages/library/SearchResultsDirective.ts');
 
 require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');

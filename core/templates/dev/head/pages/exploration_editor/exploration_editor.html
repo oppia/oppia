@@ -119,7 +119,7 @@
   <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
-  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script>
     {{ value_generators_js }}
   </script>
@@ -164,7 +164,7 @@
       <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
-  {% include 'components/rich_text_components.html' %}
+  {% include 'components/ck-editor-helpers/rich-text-components.template.html' %}
   {{ interaction_templates }}
   {{ visualizations_html }}
   {{ dependencies_html }}

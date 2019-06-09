@@ -20,13 +20,15 @@
 
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('pages/exploration_editor/AngularNameService.ts');
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationInitStateNameService.ts');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
 require('pages/exploration_player/AnswerClassificationService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ValidatorsService.ts');

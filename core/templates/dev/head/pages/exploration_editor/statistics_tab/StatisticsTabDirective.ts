@@ -20,7 +20,7 @@
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/CamelCaseToHyphensFilter.ts');
+require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/RouterService.ts');

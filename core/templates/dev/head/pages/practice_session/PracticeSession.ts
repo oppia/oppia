@@ -21,8 +21,12 @@ oppia.constant(
   'PRACTICE_SESSIONS_DATA_URL',
   '/practice_session/data/<topic_name>');
 
-require('components/background/BackgroundBannerDirective.ts');
-require('pages/question_player/QuestionPlayerDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+require(
+  'components/question-directives/question-player/' +
+  'question-player.directive.ts');
 
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');

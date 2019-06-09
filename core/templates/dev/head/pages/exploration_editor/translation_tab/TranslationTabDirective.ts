@@ -16,7 +16,9 @@
  * @fileoverview Directive for the translation tab.
  */
 
-require('components/attribution_guide/AttributionGuideDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'attribution-guide.directive.ts');
 require(
   'pages/exploration_editor/translation_tab/StateTranslationDirective.ts');
 require(
@@ -30,10 +32,15 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StatePropertyService.ts');
 require(
-  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 
