@@ -16,6 +16,8 @@
  * @fileoverview Page object for the exploration editor's translation tab, for
  * use in Protractor tests.
  */
+var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var ExplorationEditorTranslationTab = function() {
@@ -165,6 +167,10 @@ var ExplorationEditorTranslationTab = function() {
       element(by.cssContainingText('option', language)).click();
   };
 
+  var selectedLanguageElement = element(
+    by.css('.protractor-test-translation-language-selector')).element(
+    by.css('option:checked'));
+
   var languageSelectorLabelElement = element(
     by.css('.protractor-test-language-selector-label'));
   var progressBarLabelElement = element(
@@ -179,6 +185,14 @@ var ExplorationEditorTranslationTab = function() {
     by.css('.protractor-test-edit-translation'));
   var translationDisplay = element(
     by.css('.protractor-test-translation-display'));
+
+  var stateGraph = element(by.css('.protractor-test-translation-graph'));
+  var stateBackgroundNodes = stateGraph.all(by.css(
+    '.protractor-test-node-background'));
+  var stateNodes = stateGraph.all(by.css('.protractor-test-node'));
+  var stateNodeLabel = function(nodeElement) {
+    return nodeElement.element(by.css('.protractor-test-node-label'));
+  };
 
   this.setTranslation = function(richTextInstructions) {
     waitFor.elementToBeClickable(
@@ -224,7 +238,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectToBeInTranslationMode = function() {
     expect(languageSelectorLabelElement.getText()).toBe(
-      'Translate in language:');
+      'Translations for language:');
     expect(progressBarLabelElement.getText()).toBe(
       'Exploration translation progress:');
     expect(translationModeButton.getAttribute('class')).toMatch(
@@ -235,7 +249,7 @@ var ExplorationEditorTranslationTab = function() {
 
   this.expectToBeInVoiceoverMode = function() {
     expect(languageSelectorLabelElement.getText()).toBe(
-      'Voiceover in language:');
+      'Voiceovers for language:');
     expect(progressBarLabelElement.getText()).toBe(
       'Exploration voiceover progress:');
     expect(translationModeButton.getAttribute('class')).not.toMatch(
@@ -322,9 +336,13 @@ var ExplorationEditorTranslationTab = function() {
       'aria-label')).toMatch(content);
   };
 
-  this.changeTranslationLanguage = function(language) {
+  this.changeLanguage = function(language) {
     _selectLanguage(language);
     waitFor.pageToFullyLoad();
+  };
+
+  this.expectSelectedLanguageToBe = function(language) {
+    expect(selectedLanguageElement.getText()).toMatch(language);
   };
 
   this.navigateToFeedbackTab = function() {
@@ -338,6 +356,46 @@ var ExplorationEditorTranslationTab = function() {
   this.expectFeedbackTabToBeActive = function() {
     expect(element(by.css('.protractor-test-translation-feedback-tab'))[0]
     ).toEqual(element(by.css('.oppia-active-translation-tab'))[0]);
+  };
+
+  this.moveToState = function(targetName) {
+    general.scrollToTop();
+    stateNodes.map(function(stateElement) {
+      return stateNodeLabel(stateElement).getText();
+    }).then(function(listOfNames) {
+      var matched = false;
+      for (var i = 0; i < listOfNames.length; i++) {
+        if (listOfNames[i] === targetName) {
+          stateNodes.get(i).click();
+          matched = true;
+        }
+      }
+      if (!matched) {
+        throw Error(
+          'State ' + targetName + ' not found by editorTranslationTab.' +
+          'moveToState.');
+      }
+    });
+  };
+
+  this.expectCorrectStatusColor = function(stateName, expectedColor) {
+    stateNodes.map(function(stateElement) {
+      return stateNodeLabel(stateElement).getText();
+    }).then(function(listOfNames) {
+      var matched = false;
+      for (var i = 0; i < listOfNames.length; i++) {
+        if (listOfNames[i] === stateName) {
+          expect(stateBackgroundNodes.get(i).getCssValue('fill')).toBe(
+            expectedColor);
+          matched = true;
+        }
+      }
+      if (!matched) {
+        throw Error(
+          'State ' + targetName +
+          ' not found by editorTranslationTab.expectCorrectStatusColor.');
+      }
+    });
   };
 };
 exports.ExplorationEditorTranslationTab = ExplorationEditorTranslationTab;
