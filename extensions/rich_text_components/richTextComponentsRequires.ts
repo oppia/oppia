@@ -12,9 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('rich_text_components/Collapsible/directives/OppiaNoninteractiveCollapsibleDirective.ts');
-require('rich_text_components/Image/directives/OppiaNoninteractiveImageDirective.ts');
-require('rich_text_components/Link/directives/OppiaNoninteractiveLinkDirective.ts');
-require('rich_text_components/Math/directives/OppiaNoninteractiveMathDirective.ts');
-require('rich_text_components/Tabs/directives/OppiaNoninteractiveTabsDirective.ts');
-require('rich_text_components/Video/directives/OppiaNoninteractiveVideoDirective.ts');
+/**
+ * @fileoverview Requires for all the RTC directives.
+ */
+
+require(
+  'rich_text_components/Collapsible/directives/' +
+  'OppiaNoninteractiveCollapsibleDirective.ts');
+require(
+  'rich_text_components/Image/directives/' +
+  'OppiaNoninteractiveImageDirective.ts');
+require(
+  'rich_text_components/Link/directives/OppiaNoninteractiveLinkDirective.ts');
+require(
+  'rich_text_components/Math/directives/OppiaNoninteractiveMathDirective.ts');
+require(
+  'rich_text_components/Tabs/directives/OppiaNoninteractiveTabsDirective.ts');
+require(
+  'rich_text_components/Video/directives/' +
+  'OppiaNoninteractiveVideoDirective.ts');
