@@ -137,7 +137,7 @@ oppia.directive('questionPlayer', [
             if (className) {
               return className + 'outer';
             }
-            return "";
+            return '';
           };
 
           ctrl.getActionButtonInnerClass = function(actionButtonType) {
@@ -145,19 +145,20 @@ oppia.directive('questionPlayer', [
             if (className) {
               return className + 'inner';
             }
-            return "";
+            return '';
           };
 
           ctrl.getActionButtonIconHtml = function(actionButtonType) {
-            var iconHtml = "";
+            var iconHtml = '';
             if (actionButtonType === 'BOOST_SCORE') {
               iconHtml = '<img class="action-button-icon" src="' +
               getStaticImageUrl('/icons/rocket@2x.png') + '"/>';
             } else if (actionButtonType === 'RETRY_SESSION') {
-              iconHtml = '<i class="material-icons md-36 action-button-icon">&#xE5D5</i>';
-
+              iconHtml = '<i class="material-icons md-36 ' +
+              'action-button-icon">&#xE5D5</i>';
             } else if (actionButtonType === 'DASHBOARD') {
-              iconHtml = '<i class="material-icons md-36 action-button-icon">&#xE88A</i>';
+              iconHtml = '<i class="material-icons md-36 ' +
+              'action-button-icon">&#xE88A</i>';
             }
             return $sce.trustAsHtml($sanitize(iconHtml));
           };
@@ -168,13 +169,13 @@ oppia.directive('questionPlayer', [
             } else if (actionButton.url) {
               $window.location.href = actionButton.url;
             }
-          }
+          };
 
 
           var boostScoreModal = function() {
             // Will open a boost score modal that explains the worst skill
             // and redirects to the concept card of that skill.
-          }
+          };
 
           var getClassNameForType = function(actionButtonType) {
             if (actionButtonType === 'BOOST_SCORE') {
@@ -234,12 +235,13 @@ oppia.directive('questionPlayer', [
                 ctrl.worstSkill = {
                   skill_id: skill,
                   skill_description: description
-                }
+                };
               }
               $scope.scorePerSkill.push([description, totalScorePerSkill]);
               totalScore += totalScorePerSkill;
             }
-            $scope.totalScore = totalScore * 100/ Object.keys(questionScores).length;
+            $scope.totalScore = (totalScore * 100) /
+            Object.keys(questionScores).length;
           };
 
 
@@ -284,17 +286,18 @@ oppia.directive('questionPlayer', [
           });
 
           $rootScope.$on('questionSessionCompleted', function(event, result) {
-            $location.hash(HASH_PARAM 
-              + encodeURIComponent(JSON.stringify(result)));
+            $location.hash(HASH_PARAM +
+              encodeURIComponent(JSON.stringify(result)));
           });
 
           $scope.$on('$locationChangeSuccess', function(event) {
             var hashContent = $location.hash();
-            if (!hashContent || hashContent.indexOf(HASH_PARAM) == -1) {
+            if (!hashContent || hashContent.indexOf(HASH_PARAM) === -1) {
               return;
             }
             var resultHashString = decodeURIComponent(
-              hashContent.substring(hashContent.indexOf(HASH_PARAM) + HASH_PARAM.length));
+              hashContent.substring(hashContent.indexOf(
+                HASH_PARAM) + HASH_PARAM.length));
             if (resultHashString) {
               var questionStateData = JSON.parse(resultHashString);
               calculateScores(questionStateData);

@@ -18,10 +18,10 @@
   <div class="oppia-question-player-results" ng-if="resultsLoaded">
     <div class="oppia-question-player-card question-player-results-header">
       <h3 class="oppia-question-player-header"> Test Complete. Well Done! </h3>
-        <score-ring score="totalScore"></score-ring>
-        <h4 class="learn-more"> Learn more about your score </h4>
+      <score-ring score="totalScore"></score-ring>
+      <h4 class="learn-more"> Learn more about your score </h4>
     </div>
-     <div class="oppia-question-player-card question-player-results-footer">
+    <div class="oppia-question-player-card question-player-results-footer">
       <span data-ng-repeat="actionButton in questionPlayerConfig.resultActionButtons"
             ng-click="$ctrl.performAction(actionButton)">
         <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
@@ -154,7 +154,6 @@
 
   .question-player-results-footer {
     height: 130px;
-    text-align: center;
     margin-top: 16px;
     padding: 0px 10px;
     padding-top: 2px;

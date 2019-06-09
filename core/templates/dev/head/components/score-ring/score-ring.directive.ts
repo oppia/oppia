@@ -40,10 +40,10 @@ oppia.directive('scoreRing', [
           const circumference = radius * 2 * Math.PI;
           circle.style.strokeDasharray = `${circumference} ${circumference}`;
           circle.style.strokeDashoffset = circumference;
-           $scope.$watch(function() {
+          $scope.$watch(function() {
             return ctrl.getScore();
           }, function(newScore) {
-            if(newScore && newScore > 0) {
+            if (newScore && newScore > 0) {
               setScore(newScore);
             }
           });

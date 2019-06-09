@@ -20,7 +20,7 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant(
   'PRACTICE_SESSIONS_URL',
   '/practice_session/<topic_name>'
-  );
+);
 oppia.constant(
   'PRACTICE_SESSIONS_DATA_URL',
   '/practice_session/data/<topic_name>');
@@ -71,7 +71,7 @@ oppia.controller('PracticeSession', [
             {
               type: 'BOOST_SCORE',
               text: 'Boost My Score'
-            }, 
+            },
             {
               type: 'RETRY_SESSION',
               text: 'New Session',
