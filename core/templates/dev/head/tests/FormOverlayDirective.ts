@@ -29,7 +29,7 @@ oppia.directive('formOverlay', [
         savedValue: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/tests/form_entry_point_modal_directive.html'),
+        '/tests/form_entry_point_modal_directive.html'),
       restrict: 'E',
       compile: NestedDirectivesRecursionTimeoutPreventionService.compile,
       controller: ['$scope', function($scope) {
