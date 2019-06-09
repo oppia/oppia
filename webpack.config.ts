@@ -37,7 +37,8 @@ module.exports = {
     collection_editor:
       commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
     collection_player:
-      commonPrefix + '/pages/collection_player/CollectionPlayer.ts',
+      commonPrefix + '/pages/collection-player-page/' +
+      'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact/Contact.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
@@ -115,9 +116,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['collection_player'],
-      filename: 'collection_player.html',
+      filename: 'collection-player-page.mainpage.html',
       template:
-        commonPrefix + '/pages/collection_player/collection_player.html',
+        commonPrefix + '/pages/collection-player-page/' +
+        'collection-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

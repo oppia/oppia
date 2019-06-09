@@ -16,6 +16,10 @@
  * @fileoverview Directives required in collection player.
  */
 
-require('pages/collection_player/CollectionFooterDirective.ts');
-require('pages/collection_player/CollectionLocalNavDirective.ts');
-require('pages/collection_player/CollectionPlayerPageDirective.ts');
+require(
+  'pages/collection-player-page/collection-footer/' +
+  'collection-footer.directive.ts');
+require(
+  'pages/collection-player-page/collection-local-nav/' +
+  'collection-local-nav.directive.ts');
+require('pages/collection-player-page/collection-player-page.scripts.ts');

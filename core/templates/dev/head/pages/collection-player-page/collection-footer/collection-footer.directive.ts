@@ -32,8 +32,8 @@ oppia.directive('collectionFooter', [
         twitterText: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/' +
-        'collection_footer_directive.html'),
+        '/pages/collection-player-page/collection-footer/' +
+        'collection-footer.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         function() {

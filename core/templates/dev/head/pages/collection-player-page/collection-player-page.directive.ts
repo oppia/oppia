@@ -18,7 +18,9 @@
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
-require('pages/collection_player/CollectionNodeListDirective.ts');
+require(
+  'pages/collection-player-page/collection-node-list/' +
+  'collection-node-list.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
@@ -58,7 +60,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/collection_player_page_directive.html'),
+        '/pages/collection-player-page/collection-player-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$anchorScroll', '$http', '$location', '$scope',

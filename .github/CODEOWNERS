@@ -41,7 +41,7 @@
 /core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @kevinlee12
 /core/templates/dev/head/domain/collection/ @kevinlee12
 /core/templates/dev/head/pages/collection_editor/ @kevinlee12
-/core/templates/dev/head/pages/collection_player/ @kevinlee12
+/core/templates/dev/head/pages/collection-player-page/ @kevinlee12
 
 
 # Core documentation

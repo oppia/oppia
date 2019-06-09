@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,25 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for creating a list of collection nodes which link to
- * playing the exploration in each node.
+ * @fileoverview Directive for the local navigation in the collection view.
  */
 
-require('domain/utilities/UrlInterpolationService.ts');
-
-oppia.directive('collectionNodeList', [
+oppia.directive('collectionLocalNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
-      bindToController: {
-        getCollectionId: '&collectionId',
-        getCollectionNodes: '&collectionNodes'
-      },
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/collection_player/' +
-        'collection_node_list_directive.html'),
+        '/pages/collection-player-page/collection-local-nav/' +
+        'collection-local-nav.directive.html'),
       controllerAs: '$ctrl',
-      controller: [function() {}]
+      controller: [function() {
+        var ctrl = this;
+        ctrl.canEdit = GLOBALS.canEdit;
+        ctrl.collectionId = GLOBALS.collectionId;
+      }]
     };
-  }]);
+  }
+]);
