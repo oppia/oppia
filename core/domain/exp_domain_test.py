@@ -4293,7 +4293,7 @@ auto_tts_enabled: true
 blurb: ''
 category: category
 correctness_feedback_enabled: false
-image_counter: 0
+image_counter: 2
 init_state_name: Introduction
 language_code: en
 objective: ''
@@ -4422,8 +4422,8 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - <p>This is value2 for <br>MultipleChoice</p>
+          - <p>This is </p><p>value1 <br/>for MultipleChoice</p>
+          - <p>This is value2 for <br/>MultipleChoice</p>
       default_outcome:
         dest: state2
         feedback:
@@ -4467,7 +4467,17 @@ states:
       content_id: content
       html: <p>Hello, this is state3</p>
     image_assets:
-      image_mapping: {}
+      image_mapping:
+        1:
+          author_id: ''
+          instructions: ''
+          placeholder: false
+          src: \'&quot;startBlue_height_490_width_120.png&quot;\'
+        2:
+          author_id: ''
+          instructions: ''
+          placeholder: false
+          src: \'&quot;startBlue_height_490_width_120.png&quot;\'
     interaction:
       answer_groups:
       - outcome:
@@ -4475,10 +4485,9 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Here is the image1 </p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-              filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
-              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image>
+              image_id-with-value="1"> </oppia-noninteractive-image><p>Here is the
+              image2 </p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+              image_id-with-value="2"> </oppia-noninteractive-image>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4662,14 +4671,14 @@ states:
       content_id: content
       html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
         image_id-with-value="1"></oppia-noninteractive-image><p>Hello this is test
-         case to check image tag inside p tag</p>
+        case to check image tag inside p tag</p>
     image_assets:
       image_mapping:
         1:
-          src: "&amp;quot;random_height_490_width_120.png&amp;quot;"
-          placeholder: False
           author_id: ''
           instructions: ''
+          placeholder: false
+          src: \'&quot;random_height_490_width_120.png&quot;\'
     interaction:
       answer_groups:
       - outcome:

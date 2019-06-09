@@ -157,7 +157,6 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
         'states_schema_version': exploration_model.states_schema_version,
         'states': copy.deepcopy(exploration_model.states)
     }
-
     # If the exploration uses the latest states schema version, no conversion
     # is necessary.
     if (run_conversion and exploration_model.states_schema_version !=
@@ -586,7 +585,7 @@ def get_images_ids_of_exploration(exploration):
 
     for image in soup.findAll(name='oppia-noninteractive-image'):
         image_id = image['image_id-with-value']
-        image_ids.append(int(image_id))
+        image_ids.append(image_id)
 
     return image_ids
 
@@ -819,9 +818,9 @@ def apply_change_list(exploration_id, change_list):
                         image_ids = get_images_ids_of_exploration(exploration)
 
                         # Adds a new image.
-                        if not isinstance(change.image_id, int):
+                        if not isinstance(change.image_id, unicode):
                             raise Exception(
-                                'Expected image_id to be int, '
+                                'Expected image_id to be unicode, '
                                 'received %s' % change.image_id)
                         if not isinstance(change.image_info, dict):
                             raise Exception(
@@ -831,7 +830,7 @@ def apply_change_list(exploration_id, change_list):
                             raise Exception(
                                 'Image Id does not exist in exploration, '
                                 'received image_id is %s' % change.image_id)
-                        if change.image_id > image_counter:
+                        if int(change.image_id) > image_counter:
                             raise Exception(
                                 'Image Id is greater then image_id counter'
                                 'not possible, received image_id is %s' %

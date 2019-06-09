@@ -314,14 +314,13 @@ class ImageAssets(object):
         if image_id in self.image_mapping:
             raise utils.ValidationError('Image Id already exist. %s' %
                                         image_id)
-        else:
-            src = image_info['src']
-            placeholder = image_info['placeholder']
-            author_id = image_info['author_id']
-            instructions = image_info['instructions']
+        src = image_info['src']
+        placeholder = image_info['placeholder']
+        author_id = image_info['author_id']
+        instructions = image_info['instructions']
 
-            image = Image(src, placeholder, author_id, instructions)
-            self.image_mapping[unicode(image_id)] = image
+        image = Image(src, placeholder, author_id, instructions)
+        self.image_mapping[image_id] = image
 
     def delete_image(self, image_id):
         """Deletes an image from the state.
@@ -329,7 +328,8 @@ class ImageAssets(object):
         Args:
             image_id: str. ID of an image.
         """
-        del self.image_mapping[unicode(image_id)]
+        image_id = unicode(image_id)
+        del self.image_mapping[image_id]
 
     def get_all_image_ids(self):
         """Returns all image ids of images in the state.
@@ -670,9 +670,12 @@ class InteractionInstance(object):
         if self.id in (
                 'ItemSelectionInput', 'MultipleChoiceInput',
                 'DragAndDropSortInput'):
-            customization_args_html_list = (
-                self.customization_args['choices']['value'])
-            html_list = html_list + customization_args_html_list
+            try:
+                customization_args_html_list = (
+                    self.customization_args['choices']['value'])
+                html_list = html_list + customization_args_html_list
+            except KeyError:
+                return html_list
 
         return html_list
 
@@ -1646,7 +1649,7 @@ class State(object):
             if not isinstance(image_id, unicode):
                 raise utils.ValidationError(
                     'Expected image_id to be unicode, received %s' %
-                    image_id)
+                    type(image_id))
             if image_id > image_counter:
                 utils.ValidationError(
                     'Found image id to be greater then image counter %s' %

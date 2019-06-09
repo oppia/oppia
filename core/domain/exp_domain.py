@@ -93,7 +93,8 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 # Represents answers which led to the 'default outcome' of an interaction,
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
-
+# Created so that there should no need to pass 
+GLOBAL_IMAGE_COUNTER = 0
 
 class ExplorationChange(object):
     """Domain object class for an exploration change.
@@ -600,6 +601,11 @@ class Exploration(object):
             state.written_translations = (
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
+
+            state.image_assets = (
+                state_domain.ImageAssets.from_dict(
+                    sdict['image_assets'])
+                )
 
             exploration.states[state_name] = state
 
@@ -2221,8 +2227,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v28_dict_to_v29_dict(
-            cls, states_dict, image_counter):
+    def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
         """Converts from version 28 to 29. Version 29 added image assets field
         in state model.
 
@@ -2235,10 +2240,10 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        image_assets = {}
-        image_mapping = {}
-
         for state_dict in states_dict.itervalues():
+            image_assets = {}
+            image_counter = 0
+            image_mapping = {}
 
             content_html = state_dict['content']['html']
             (new_content_html, image_counter, image_mapping) = (
@@ -2312,12 +2317,12 @@ class Exploration(object):
                             value, image_counter, image_mapping))
                     state_dict['interaction']['customization_args'][
                         'choices']['value'][value_index] = new_value
-            print(image_mapping)
+
             image_assets['image_mapping'] = image_mapping
             state_dict['image_assets'] = image_assets
-            print(state_dict)
+            GLOBAL_IMAGE_COUNTER = image_counter
 
-        return (states_dict, image_counter)
+        return states_dict
 
     @classmethod
     def update_states_from_model(
@@ -2952,10 +2957,11 @@ class Exploration(object):
         exploration_dict['schema_version'] = 34
         exploration_dict['image_counter'] = 0
 
-        (exploration_dict['states'], exploration_dict['image_counter']) = (
+        exploration_dict['states'] = (
             cls._convert_states_v28_dict_to_v29_dict(
-                exploration_dict['states'],
-                exploration_dict['image_counter']))
+                exploration_dict['states']))
+
+        exploration_dict['image_counter'] = GLOBAL_IMAGE_COUNTER
         exploration_dict['states_schema_version'] = 29
         return exploration_dict
 

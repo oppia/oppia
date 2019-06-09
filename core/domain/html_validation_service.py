@@ -23,6 +23,7 @@ import bs4
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
+from core.domain import state_domain
 from core.platform import models
 import feconf
 
@@ -858,7 +859,9 @@ def get_html_with_image_id_in_image_tag(
             'author_id': '',
             'instructions': ''
         }
-        image_mapping[image_counter] = image_info
+
+        image_id = unicode(image_counter)
+        image_mapping[image_id] = image_info
 
         # Removes filepath from image tag.
         del image['filepath-with-value']
