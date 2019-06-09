@@ -19,11 +19,11 @@
 // TODO(vojtechjelinek): this block of requires should be removed after we
 // introduce webpack for /extensions
 require('directives/FocusOnDirective.ts');
-require('components/forms/validators/IsAtLeastFilter.ts');
-require('components/forms/validators/IsAtMostFilter.ts');
-require('components/forms/validators/IsFloatFilter.ts');
-require('components/forms/validators/IsIntegerFilter.ts');
-require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require('components/forms/custom-forms-directives/object-editor.directive.ts');

@@ -16,7 +16,7 @@
  * @fileoverview Directive for a schema-based editor for floats.
  */
 
-require('components/forms/validators/IsFloatFilter.ts');
+require('components/forms/validators/is-float.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/stateful/FocusManagerService.ts');
 
