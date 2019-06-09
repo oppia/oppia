@@ -20,17 +20,10 @@ rendering.-->
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  (function() {
-    fetch('/google_analytics').then(function(response) {
-      return response.text()
-    }).then(function(response) {
-      response = JSON.parse(response.substring(4));
-      ga('create', response.analytics_id, 'auto', {allowLinker: true});
-      ga('set', 'anonymizeIp', true);
-      ga('set', 'forceSSL', true);
-      ga('require', 'linker');
-      ga('linker:autoLink', [response.site_name_for_analytics]);
-      ga('send', 'pageview');
-    })
-  })();
+  ga('create', constants.ANALYTICS_ID, 'auto', {allowLinker: true});
+  ga('set', 'anonymizeIp', true);
+  ga('set', 'forceSSL', true);
+  ga('require', 'linker');
+  ga('linker:autoLink', [constants.SITE_NAME_FOR_ANALYTICS]);
+  ga('send', 'pageview');
 </script>
