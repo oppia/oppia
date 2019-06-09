@@ -31,7 +31,7 @@ def filter_a(tag, name, value):
     whitelisted.
 
     Args:
-        tag: str. The value of the tag passed.
+        tag: str. The name of the tag passed.
         name: str. The name of the attribute.
         value: str. The value of the attribute.
 
