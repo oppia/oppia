@@ -25,81 +25,99 @@ from core.tests import test_utils
 import utils
 
 
-def assert_validation_error(self, domain_object, expected_error_substring):
-    """Checks that validation of commit command domain object raises
-    the given error.
-
-    Args:
-        domain_object: CommitCmdDomainObject. The domain object to validate.
-        expected_error_substring: str. The error message.
-
-    Raises:
-        Exception: If the error message is not produced on validation.
-    """
-    with self.assertRaisesRegexp(
-        utils.ValidationError, expected_error_substring):
-        domain_object.validate()
-
-
-def validate_with_valid_command(commit_cmd_class, name, parameters):
-    """Validates a valid commit command.
-
-    Args:
-        commit_cmd_class: CommitCmdDomainClass. The domain class of the command
-            to validate.
-        name: str. The command name.
-        parameters: dict. Dict containing command parameters.
-    """
-    commit_cmd_domain_object = commit_cmd_class(
-        name=name, parameters=parameters)
-    commit_cmd_domain_object.validate()
-
-
-def validate_with_missing_keys_in_command(
-        self, commit_cmd_class, name, parameters):
-    """Validates a commit command with missing keys in parameters.
-
-    Args:
-        commit_cmd_class: CommitCmdDomainClass. The domain class of the command
-            to validate.
-        name: str. The command name.
-        parameters: dict. Dict containing command parameters.
+class BaseCommitCmdUnitTests(test_utils.GenericTestBase):
+    """Tests the validation of commit commands in three cases:
+        1. All valid keys are present.
+        2. Required key is missing.
+        3. Extra key is present.
     """
 
-    if not len(parameters.keys()):
-        return
-    parameter_key = sorted(parameters.keys())[0]
-    parameters.pop(parameter_key, None)
-    commit_cmd_domain_object = commit_cmd_class(
-        name=name, parameters=parameters)
-    assert_validation_error(
-        self, commit_cmd_domain_object,
-        'Following required keys are missing: %s' % parameter_key)
+    COMMIT_CMD_CLASS = commit_commands_domain.BaseCommitCmd
+    COMMAND_LIST = []
+
+    def validate_commit_cmds(self):
+        """Validates a list of commit cmds for three cases:
+            1. All valid keys are present.
+            2. Required key is missing.
+            3. Extra key is present.
+        """
+        for cmd in self.COMMAND_LIST:
+            self.validate_with_valid_command(cmd['name'], cmd['parameters'])
+            self.validate_with_missing_keys_in_command(
+                cmd['name'], cmd['parameters'])
+            self.validate_with_extra_keys_in_command(
+                cmd['name'], cmd['parameters'])
+
+    def assert_validation_error(
+            self, domain_object, expected_error_message):
+        """Checks that validation of commit command domain object raises
+        the given error.
+
+        Args:
+            domain_object: CommitCmdDomainObject. The domain object to validate.
+            expected_error_message: str. The error message.
+
+        Raises:
+            Exception: If the error message is not produced on validation.
+        """
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_message):
+            domain_object.validate()
 
 
-def validate_with_extra_keys_in_command(
-        self, commit_cmd_class, name, parameters):
-    """Validates a commit command with extra keys in parameters.
+    def validate_with_valid_command(self, name, parameters):
+        """Validates a valid commit command.
 
-    Args:
-        commit_cmd_class: CommitCmdDomainClass. The domain class of the command
-            to validate.
-        name: str. The command name.
-        parameters: dict. Dict containing command parameters.
-    """
-    parameters['random'] = 'random'
-    commit_cmd_domain_object = commit_cmd_class(
-        name=name, parameters=parameters)
-    assert_validation_error(
-        self, commit_cmd_domain_object,
-        'Following extra keys are present: random')
+        Args:
+            name: str. The command name.
+            parameters: dict. Dict containing command parameters.
+        """
+        commit_cmd_domain_object = self.COMMIT_CMD_CLASS(name, parameters)
+        commit_cmd_domain_object.validate()
 
 
-class ExplorationCommitCmdUnitTests(test_utils.GenericTestBase):
+    def validate_with_missing_keys_in_command(self, name, parameters):
+        """Validates a commit command with missing keys in parameters.
+
+        Args:
+            name: str. The command name.
+            parameters: dict. Dict containing command parameters.
+        """
+
+        if not parameters.keys():
+            return
+        parameter_key = sorted(parameters.keys())[0]
+        parameters.pop(parameter_key, None)
+        commit_cmd_domain_object = self.COMMIT_CMD_CLASS(name, parameters)
+        self.assert_validation_error(
+            commit_cmd_domain_object,
+            'The following required keys are missing: %s' % parameter_key)
+
+
+    def validate_with_extra_keys_in_command(self, name, parameters):
+        """Validates a commit command with extra keys in parameters.
+
+        Args:
+            name: str. The command name.
+            parameters: dict. Dict containing command parameters.
+        """
+        parameters['random'] = 'random'
+        commit_cmd_domain_object = self.COMMIT_CMD_CLASS(name, parameters)
+        self.assert_validation_error(
+            commit_cmd_domain_object,
+            'The following extra keys are present: random')
+
+
+class ExplorationCommitCmdUnitTests(BaseCommitCmdUnitTests):
     """Test the exploration commit cmd domain object."""
 
-    def test_commands(self):
-        command_list = [{
+    def setUp(self):
+        super(ExplorationCommitCmdUnitTests, self).setUp()
+        self.COMMIT_CMD_CLASS = commit_commands_domain.ExplorationCommitCmd
+        self.COMMAND_LIST = [{
+            'name': exp_domain.CMD_CREATE_NEW,
+            'parameters': {'category': 'category', 'title': 'title'}
+        }, {
             'name': exp_domain.CMD_ADD_STATE,
             'parameters': {'state_name': 'state'}
         }, {
@@ -127,21 +145,20 @@ class ExplorationCommitCmdUnitTests(test_utils.GenericTestBase):
             'parameters': {'from_version': 1, 'to_version': 3}
         }]
 
-        commit_cmd_class = commit_commands_domain.ExplorationCommitCmd
-        for cmd in command_list:
-            validate_with_valid_command(
-                commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_missing_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_extra_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+    def test_commands(self):
+        self.validate_commit_cmds()
 
 
-class CollectionCommitCmdUnitTests(test_utils.GenericTestBase):
+class CollectionCommitCmdUnitTests(BaseCommitCmdUnitTests):
     """Test the collection commit cmd domain object."""
 
-    def test_commands(self):
-        command_list = [{
+    def setUp(self):
+        super(CollectionCommitCmdUnitTests, self).setUp()
+        self.COMMIT_CMD_CLASS = commit_commands_domain.CollectionCommitCmd
+        self.COMMAND_LIST = [{
+            'name': collection_domain.CMD_CREATE_NEW,
+            'parameters': {'category': 'category', 'title': 'title'}
+        }, {
             'name': collection_domain.CMD_ADD_COLLECTION_NODE,
             'parameters': {'exploration_id': '0'}
         }, {
@@ -175,40 +192,32 @@ class CollectionCommitCmdUnitTests(test_utils.GenericTestBase):
             'parameters': {'question_id': '0', 'skill_id': '0'}
         }]
 
-        commit_cmd_class = commit_commands_domain.CollectionCommitCmd
-        for cmd in command_list:
-            validate_with_valid_command(
-                commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_missing_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_extra_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+    def test_commands(self):
+        self.validate_commit_cmds()
 
 
-class ConfigPropertyCommitCmdUnitTests(test_utils.GenericTestBase):
+class ConfigPropertyCommitCmdUnitTests(BaseCommitCmdUnitTests):
     """Test the config property commit cmd domain object."""
 
-    def test_commands(self):
-        command_list = [{
+    def setUp(self):
+        super(ConfigPropertyCommitCmdUnitTests, self).setUp()
+        self.COMMIT_CMD_CLASS = commit_commands_domain.ConfigPropertyCommitCmd
+        self.COMMAND_LIST = [{
             'name': config_domain.CMD_CHANGE_PROPERTY_VALUE,
             'parameters': {'new_value': 'new value'}
         }]
 
-        commit_cmd_class = commit_commands_domain.ConfigPropertyCommitCmd
-        for cmd in command_list:
-            validate_with_valid_command(
-                commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_missing_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_extra_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+    def test_commands(self):
+        self.validate_commit_cmds()
 
 
-class StoryCommitCmdUnitTests(test_utils.GenericTestBase):
+class StoryCommitCmdUnitTests(BaseCommitCmdUnitTests):
     """Test the story commit cmd domain object."""
 
-    def test_commands(self):
-        command_list = [{
+    def setUp(self):
+        super(StoryCommitCmdUnitTests, self).setUp()
+        self.COMMIT_CMD_CLASS = commit_commands_domain.StoryCommitCmd
+        self.COMMAND_LIST = [{
             'name': story_domain.CMD_UPDATE_STORY_PROPERTY,
             'parameters': {
                 'property_name': 'name', 'new_value': 'new value',
@@ -240,21 +249,17 @@ class StoryCommitCmdUnitTests(test_utils.GenericTestBase):
             'parameters': {'from_version': 0, 'to_version': 1}
         }]
 
-        commit_cmd_class = commit_commands_domain.StoryCommitCmd
-        for cmd in command_list:
-            validate_with_valid_command(
-                commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_missing_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_extra_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+    def test_commands(self):
+        self.validate_commit_cmds()
 
 
-class StoryRightsCommitCmdUnitTests(test_utils.GenericTestBase):
+class StoryRightsCommitCmdUnitTests(BaseCommitCmdUnitTests):
     """Test the story rights commit cmd domain object."""
 
-    def test_commands(self):
-        command_list = [{
+    def setUp(self):
+        super(StoryRightsCommitCmdUnitTests, self).setUp()
+        self.COMMIT_CMD_CLASS = commit_commands_domain.StoryRightsCommitCmd
+        self.COMMAND_LIST = [{
             'name': story_domain.CMD_CREATE_NEW,
             'parameters': {}
         }, {
@@ -269,11 +274,5 @@ class StoryRightsCommitCmdUnitTests(test_utils.GenericTestBase):
             'parameters': {}
         }]
 
-        commit_cmd_class = commit_commands_domain.StoryRightsCommitCmd
-        for cmd in command_list:
-            validate_with_valid_command(
-                commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_missing_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
-            validate_with_extra_keys_in_command(
-                self, commit_cmd_class, cmd['name'], cmd['parameters'])
+    def test_commands(self):
+        self.validate_commit_cmds()
