@@ -16,7 +16,9 @@
  * @fileoverview Controller for landing page.
  */
 
-require('components/background/BackgroundBannerDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/landing/TopicLandingPage.ts');
