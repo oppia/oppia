@@ -104,7 +104,7 @@ oppia.directive('storyEditor', [
             }
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                'pages/story-editor-page/modal-templates/' +
+                '/pages/story-editor-page/modal-templates/' +
                 'delete-chapter-modal.template.html'),
               backdrop: true,
               controller: [

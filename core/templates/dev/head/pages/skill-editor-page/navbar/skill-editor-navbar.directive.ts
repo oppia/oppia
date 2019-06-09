@@ -31,7 +31,7 @@ oppia.directive('skillEditorNavbar', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/skill_editor_navbar_directive.html'),
+        '/pages/skill-editor-page/navbar/skill-editor-navbar.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
