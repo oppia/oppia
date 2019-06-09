@@ -18,7 +18,7 @@
 
 require('domain/story/StoryObjectFactory.ts');
 require('domain/story/StoryUpdateService.ts');
-require('pages/story_editor/StoryEditorStateService.ts');
+require('pages/story-editor-page/services/story-editor-state.service.ts');
 
 describe('Story editor state service', function() {
   var StoryEditorStateService = null;

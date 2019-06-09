@@ -18,7 +18,7 @@
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/story/StoryUpdateService.ts');
-require('pages/story_editor/StoryEditorStateService.ts');
+require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/AlertsService.ts');
 
 oppia.directive('storyNodeEditor', [
@@ -35,7 +35,7 @@ oppia.directive('storyNodeEditor', [
         getAcquiredSkillIds: '&acquiredSkillIds'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story_editor/main_editor/story_node_editor_directive.html'),
+        '/pages/story-editor-page/editor-tab/story-node-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
@@ -172,8 +172,8 @@ oppia.directive('storyNodeEditor', [
               });
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/story_editor/main_editor/' +
-                'new_chapter_title_modal_directive.html'),
+                '/pages/story-editor-page/modal-templates/' +
+                'new-chapter-title-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

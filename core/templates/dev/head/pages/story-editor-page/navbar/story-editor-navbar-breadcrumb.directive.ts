@@ -18,8 +18,8 @@
 
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/story_editor/StoryEditorStateService.ts');
-require('pages/story_editor/main_editor/StoryEditorDirective.ts');
+require('pages/story-editor-page/services/story-editor-state.service.ts');
+require('pages/story-editor-page/editor-tab/story-editor.directive.ts');
 require('services/contextual/UrlService.ts');
 
 oppia.directive('storyEditorNavbarBreadcrumb', [
@@ -28,7 +28,8 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/story_editor/story_editor_navbar_breadcrumb_directive.html'),
+        '/pages/story-editor-page/navbar/' +
+        'story-editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', '$uibModal', '$window', 'UrlService',
         'UrlInterpolationService', 'UndoRedoService', 'StoryEditorStateService',
@@ -48,8 +49,8 @@ oppia.directive('storyEditorNavbarBreadcrumb', [
             if (UndoRedoService.getChangeCount() > 0) {
               var modalInstance = $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/story_editor/' +
-                  'save_pending_changes_modal_directive.html'),
+                  '/pages/story-editor-page/modal-templates/' +
+                  'save-pending-changes-modal.template.html'),
                 backdrop: true,
                 controller: [
                   '$scope', '$uibModalInstance',
