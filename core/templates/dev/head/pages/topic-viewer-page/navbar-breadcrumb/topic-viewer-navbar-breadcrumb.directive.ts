@@ -25,7 +25,8 @@ oppia.directive('topicViewerNavbarBreadcrumb', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topic_viewer/topic_viewer_navbar_breadcrumb_directive.html'),
+        '/pages/topic-viewer-page/navbar-breadcrumb/' +
+        'topic-viewer-navbar-breadcrumb.directive.html'),
       controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
         function($scope, TopicViewerBackendApiService, UrlService) {
           TopicViewerBackendApiService.fetchTopicData(
