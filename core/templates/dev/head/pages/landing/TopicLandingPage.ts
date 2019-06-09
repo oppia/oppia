@@ -20,6 +20,7 @@ require('components/background/BackgroundBannerDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/CapitalizeFilter.ts');
+require('filters/HyphensToSpacesFilter.ts');
 require('pages/landing/TopicLandingPage.ts');
 require('services/PageTitleService.ts');
 require('services/SiteAnalyticsService.ts');
@@ -62,8 +63,8 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
         video: 'negative-numbers_video.mp4',
         lessons: [
           'The number line',
-          'What is a negative number?',
-          'Adding and subtracting negative numbers'
+          'What is a Negative Number?',
+          'Adding and subtracting Negative Numbers'
         ]
       }
     },
@@ -81,7 +82,7 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
         },
         video: 'ratios_video.mp4',
         lessons: [
-          'What is Ratio?',
+          'What is a Ratio?',
           'Equivalent Ratios',
           'Ratios & Proportional Reasoning',
           'Writing Ratios in Simplest Form'
