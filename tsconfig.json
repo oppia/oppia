@@ -26,8 +26,8 @@
     "extensions/classifiers",
     "extensions/interactions",
     "extensions/objects",
-    "rich_text_components",
     "extensions/value_generators",
+    "extensions/visualizations",
     "typings"
   ]
 }
