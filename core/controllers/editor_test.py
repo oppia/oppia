@@ -32,8 +32,8 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(user_models, stats_models) = models.Registry.import_models(
-    [models.NAMES.user, models.NAMES.statistics])
+(exp_models, user_models, stats_models) = models.Registry.import_models(
+    [models.NAMES.exploration, models.NAMES.user, models.NAMES.statistics])
 
 
 class BaseEditorControllerTests(test_utils.GenericTestBase):
@@ -850,14 +850,13 @@ class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
                 '/createhandler/state_rules_stats/%s/invalid_state_name'
                 % (exp_id), expected_status_int=404)
 
-        self.assertEqual(len(observed_log_messages), 2)
         self.assertEqual(
-            observed_log_messages[0],
-            'Could not find state: invalid_state_name')
-
-        self.assertEqual(
-            observed_log_messages[1],
-            'Available states: [u\'Introduction\']')
+            observed_log_messages,
+            [
+                'Could not find state: invalid_state_name',
+                'Available states: [u\'Introduction\']'
+            ]
+        )
 
         self.logout()
 
@@ -1466,6 +1465,40 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.assert_can_edit(response.body)
 
         self.logout()
+
+    def test_cannot_transfer_ownership_to_the_community_with_invalid_lang_code(
+            self):
+        self.login(self.OWNER_EMAIL)
+        exp_id = 'exp_id'
+
+        rights_manager.create_new_exploration_rights(exp_id, self.owner_id)
+        model = exp_models.ExplorationModel(
+            id=exp_id,
+            category='category',
+            title='title',
+            language_code='invalid_language_code',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME
+        )
+        commit_cmd = exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_CREATE_NEW,
+            'title': 'title',
+            'category': 'category',
+        })
+        commit_cmds_dict = [commit_cmd.to_dict()]
+        model.commit(self.owner_id, 'commit_message', commit_cmds_dict)
+
+        response = self.get_html_response('/create/%s' % exp_id)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        response = self.put_json(
+            rights_url, {
+                'version': 1,
+                'make_community_owned': True
+            }, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'Invalid language_code: invalid_language_code')
 
     def test_get_with_invalid_version_raises_error(self):
         self.login(self.OWNER_EMAIL)

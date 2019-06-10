@@ -262,7 +262,11 @@ class ExplorationRightsHandler(EditorHandler):
 
         elif make_community_owned:
             exploration = exp_services.get_exploration_by_id(exploration_id)
-            exploration.validate(strict=True)
+            try:
+                exploration.validate(strict=True)
+            except utils.ValidationError as e:
+                raise self.InvalidInputException(e)
+
             rights_manager.release_ownership_of_exploration(
                 self.user, exploration_id)
 
