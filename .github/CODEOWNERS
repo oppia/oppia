@@ -41,7 +41,7 @@
 /core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @kevinlee12
 /core/templates/dev/head/domain/collection/ @kevinlee12
 /core/templates/dev/head/pages/collection_editor/ @kevinlee12
-/core/templates/dev/head/pages/collection_player/ @kevinlee12
+/core/templates/dev/head/pages/collection-player-page/ @kevinlee12
 
 
 # Core documentation
@@ -50,9 +50,9 @@
 /CONTRIBUTORS @seanlip
 /LICENSE @seanlip
 /NOTICE @seanlip
-/core/templates/dev/head/pages/about/ @seanlip
-/core/templates/dev/head/pages/privacy/ @seanlip
-/core/templates/dev/head/pages/terms/ @seanlip
+/core/templates/dev/head/pages/about-page/ @seanlip
+/core/templates/dev/head/pages/privacy-page/ @seanlip
+/core/templates/dev/head/pages/terms-page/ @seanlip
 
 
 # Dashboard pages.
@@ -67,10 +67,10 @@
 /core/domain/subscription_services*.py @nithusha21
 /core/templates/dev/head/domain/creator_dashboard/ @nithusha21
 /core/templates/dev/head/domain/learner_dashboard/ @nithusha21
-/core/templates/dev/head/pages/creator_dashboard/ @nithusha21
-/core/templates/dev/head/pages/email_dashboard/ @nithusha21
+/core/templates/dev/head/pages/creator-dashboard-page/ @nithusha21
+/core/templates/dev/head/pages/email-dashboard-pages/ @nithusha21
 /core/templates/dev/head/pages/learner_dashboard/ @nithusha21
-/core/templates/dev/head/pages/notifications_dashboard/ @nithusha21
+/core/templates/dev/head/pages/notifications-dashboard-page/ @nithusha21
 
 
 # Dev workflow team.
@@ -234,7 +234,7 @@
 /core/controllers/library*.py @kevinlee12
 /core/domain/recommendations*.py @seanlip
 /core/domain/search_services*.py @kevinlee12
-/core/templates/dev/head/pages/library/ @kevinlee12
+/core/templates/dev/head/pages/library-page/ @kevinlee12
 /core/templates/dev/head/services/ConstructTranslationIdsService.ts @kevinlee12
 /core/templates/dev/head/services/SearchService*.ts @kevinlee12
 
@@ -256,7 +256,7 @@
 /core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681
-/core/templates/dev/head/pages/practice_session/ @vinitamurthi
+/core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-editor/ @aks681
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681
 /core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
@@ -268,7 +268,7 @@
 /core/storage/skill/ @aks681
 /core/templates/dev/head/components/entity-creation-services/skill-creation.service.ts @aks681
 /core/templates/dev/head/domain/skill/ @aks681
-/core/templates/dev/head/pages/skill_editor/ @aks681
+/core/templates/dev/head/pages/skill-editor-page/ @aks681
 
 # Story project.
 /core/controllers/story*.py @aks681
@@ -276,7 +276,7 @@
 /core/storage/story/ @aks681
 /core/templates/dev/head/components/entity-creation-services/story-creation.service.ts @aks681
 /core/templates/dev/head/domain/story/ @aks681
-/core/templates/dev/head/pages/story_editor/ @aks681
+/core/templates/dev/head/pages/story-editor-page/ @aks681
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
@@ -289,13 +289,13 @@
 /core/templates/dev/head/domain/topic/ @aks681
 /core/templates/dev/head/domain/topic_viewer @aks681
 /core/templates/dev/head/pages/topic_editor/ @aks681
-/core/templates/dev/head/pages/topic_viewer/ @aks681
+/core/templates/dev/head/pages/topic-viewer-page/ @aks681
 
 # Topics and skills dashboard project.
 /core/controllers/subtopic_viewer*.py @aks681
 /core/controllers/topics_and_skills_dashboard*.py @aks681
 /core/templates/dev/head/domain/topics_and_skills_dashboard/ @aks681
-/core/templates/dev/head/pages/topics_and_skills_dashboard/ @aks681
+/core/templates/dev/head/pages/topics-and-skills-dashboard-page/ @aks681
 
 
 # Infrastructure.
@@ -323,7 +323,7 @@
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
-/core/templates/dev/head/pages/tests/ @seanlip
+/core/templates/dev/head/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
 /schema_utils*.py @seanlip
 /utils*.py @aks681
@@ -335,7 +335,7 @@
 /core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
 /core/templates/dev/head/pages/admin/ @seanlip
-/core/templates/dev/head/pages/moderator/ @seanlip
+/core/templates/dev/head/pages/moderator-page/ @seanlip
 
 
 # QA team.
@@ -351,7 +351,6 @@
 /core/templates/dev/head/mathjaxConfig.ts @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/ck-editor-helpers/rich-text-components.template.html @AllanYangZhou @bansalnitish
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @AllanYangZhou @bansalnitish
 /core/templates/dev/head/services/RteHelperService*.ts @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish
@@ -380,17 +379,17 @@
 # Simple pages.
 /core/controllers/pages*.py @vojtechjelinek
 /core/controllers/custom_landing_pages*.py @vojtechjelinek
-/core/templates/dev/head/pages/contact/ @vojtechjelinek
-/core/templates/dev/head/pages/donate/ @vojtechjelinek
-/core/templates/dev/head/pages/error/ @vojtechjelinek
-/core/templates/dev/head/pages/get_started/ @vojtechjelinek
-/core/templates/dev/head/pages/landing/ @vojtechjelinek
-/core/templates/dev/head/pages/maintenance/ @vojtechjelinek
-/core/templates/dev/head/pages/preferences/ @vojtechjelinek
-/core/templates/dev/head/pages/signup/ @vojtechjelinek
-/core/templates/dev/head/pages/splash/ @vojtechjelinek
-/core/templates/dev/head/pages/teach/ @vojtechjelinek
-/core/templates/dev/head/pages/thanks/ @vojtechjelinek
+/core/templates/dev/head/pages/contact-page/ @vojtechjelinek
+/core/templates/dev/head/pages/donate-page/ @vojtechjelinek
+/core/templates/dev/head/pages/error-pages/ @vojtechjelinek
+/core/templates/dev/head/pages/get-started-page/ @vojtechjelinek
+/core/templates/dev/head/pages/landing-pages/ @vojtechjelinek
+/core/templates/dev/head/pages/maintenance-page/ @vojtechjelinek
+/core/templates/dev/head/pages/preferences-page/ @vojtechjelinek
+/core/templates/dev/head/pages/signup-page/ @vojtechjelinek
+/core/templates/dev/head/pages/splash-page/ @vojtechjelinek
+/core/templates/dev/head/pages/teach-page/ @vojtechjelinek
+/core/templates/dev/head/pages/thanks-page/ @vojtechjelinek
 
 
 # Speed Improvement team.
@@ -415,7 +414,7 @@
 # User’s profile page.
 /core/controllers/profile*.py @kevinlee12
 /core/templates/dev/head/domain/user/ @kevinlee12
-/core/templates/dev/head/pages/profile/ @kevinlee12
+/core/templates/dev/head/pages/profile-page/ @kevinlee12
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
 
