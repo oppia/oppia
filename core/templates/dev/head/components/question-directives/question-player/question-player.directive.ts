@@ -90,13 +90,17 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require(
-  'pages/exploration-player-page/learner-experience/conversation-skin.directive.ts');
+  'pages/exploration-player-page/learner-experience/' +
+  'conversation-skin.directive.ts');
 require(
-  'pages/exploration-player-page/layout-directives/exploration-footer.directive.ts');
+  'pages/exploration-player-page/layout-directives/' +
+  'exploration-footer.directive.ts');
 require(
-  'pages/exploration-player-page/layout-directives/learner-local-nav.directive.ts');
+  'pages/exploration-player-page/layout-directives/' +
+  'learner-local-nav.directive.ts');
 require(
-  'pages/exploration-player-page/layout-directives/learner-view-info.directive.ts');
+  'pages/exploration-player-page/layout-directives/' +
+  'learner-view-info.directive.ts');
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',

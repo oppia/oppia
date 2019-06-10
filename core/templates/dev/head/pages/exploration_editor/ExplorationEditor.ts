@@ -168,9 +168,11 @@ require(
 require('pages/exploration_editor/statistics_tab/StatisticsTabDirective.ts');
 require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
 require(
-  'pages/exploration-player-page/learner-experience/conversation-skin.directive.ts');
+  'pages/exploration-player-page/learner-experience/' +
+  'conversation-skin.directive.ts');
 require(
-  'pages/exploration-player-page/layout-directives/exploration-footer.directive.ts');
+  'pages/exploration-player-page/layout-directives/' +
+  'exploration-footer.directive.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
