@@ -20,7 +20,6 @@ import ast
 import datetime
 import re
 
-from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
@@ -154,9 +153,7 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             self):
         model1 = exp_models.ExplorationSnapshotMetadataModel(
             id='exp_id-1', committer_id=self.user_a_id, commit_type='create')
-
         model1.put()
-
         user_models.UserContributionsModel(
             id=self.user_a_id,
             created_exploration_ids=['exp_id']
@@ -164,7 +161,6 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
         user_contributions_model = user_models.UserContributionsModel.get(
             self.user_a_id)
-
         self.assertEqual(
             user_contributions_model.created_exploration_ids,
             ['exp_id'])
@@ -173,7 +169,6 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
 
         user_contributions_model = user_models.UserContributionsModel.get(
             self.user_a_id)
-
         self.assertEqual(
             user_contributions_model.created_exploration_ids,
             ['exp_id'])
@@ -181,73 +176,19 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
     def test_user_contributions_get_created_after_running_the_job(self):
         model1 = exp_models.ExplorationSnapshotMetadataModel(
             id='exp_id-1', committer_id='new_user', commit_type='create')
-
         model1.put()
 
         user_contributions_model = user_models.UserContributionsModel.get(
             'new_user', strict=False)
-
         self.assertIsNone(user_contributions_model)
 
         self._run_one_off_job()
 
         user_contributions_model = user_models.UserContributionsModel.get(
             'new_user', strict=False)
-
         self.assertEqual(
             user_contributions_model.created_exploration_ids,
             ['exp_id'])
-
-
-class UserDefaultDashboardOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for the one-off username length distribution job."""
-
-    CREATOR_USER_EMAIL = 'creator@example.com'
-    CREATOR_USER_USERNAME = 'creator'
-    LEARNER_USER_EMAIL = 'learner@example.com'
-    LEARNER_USER_USERNAME = 'learner'
-
-    EXP_ID_1 = 'exp_id_1'
-    EXP_ID_2 = 'exp_id_2'
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            user_jobs_one_off.UserDefaultDashboardOneOffJob.create_new())
-        user_jobs_one_off.UserDefaultDashboardOneOffJob.enqueue(job_id)
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        # Test reduce function does nothing.
-        self.assertIsNone(
-            user_jobs_one_off.UserDefaultDashboardOneOffJob.reduce('item'))
-
-    def test_default_dashboard(self):
-        """Tests whether the one off jobs assigns the correct dashboard
-        to the user.
-        """
-        self.signup(self.CREATOR_USER_EMAIL, self.CREATOR_USER_USERNAME)
-        creator_user_id = self.get_user_id_from_email(
-            self.CREATOR_USER_EMAIL)
-        self.signup(self.LEARNER_USER_EMAIL, self.LEARNER_USER_USERNAME)
-        learner_user_id = self.get_user_id_from_email(
-            self.LEARNER_USER_EMAIL)
-
-        self.save_new_valid_exploration(
-            self.EXP_ID_1, creator_user_id, end_state_name='End')
-
-        self._run_one_off_job()
-
-        creator_settings = user_services.get_user_settings(creator_user_id)
-        learner_settings = user_services.get_user_settings(learner_user_id)
-
-        self.assertEqual(
-            creator_settings.default_dashboard,
-            constants.DASHBOARD_TYPE_CREATOR)
-        self.assertEqual(
-            learner_settings.default_dashboard,
-            constants.DASHBOARD_TYPE_LEARNER)
 
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
@@ -772,7 +713,6 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ), self.swap(
                 subscription_services, 'subscribe_to_collection', self._null_fn
             ):
-
             rights_manager.publish_exploration(self.user_a, self.EXP_ID_1)
 
             # User A creates and saves a new valid collection.
@@ -860,9 +800,6 @@ class DashboardStatsOneOffJobTests(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
-        # Test reduce function does nothing.
-        self.assertIsNone(
-            user_jobs_one_off.DashboardStatsOneOffJob.reduce('item'))
 
     def setUp(self):
         super(DashboardStatsOneOffJobTests, self).setUp()
@@ -1174,7 +1111,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
 
-    def test_contribution_msec_does_not_generate_on_explorations_not_created(
+    def test_contribution_msec_is_not_generated_if_exploration_not_created(
             self):
         model1 = exp_models.ExplorationRightsSnapshotMetadataModel(
             id='exp_id-1', committer_id=self.owner_id, commit_type='create')
@@ -1186,8 +1123,8 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
-
         self.process_and_flush_pending_tasks()
+
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
 
@@ -1201,12 +1138,9 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        # Test reduce function does nothing.
-        self.assertIsNone(
-            user_jobs_one_off.UserProfilePictureOneOffJob.reduce(
-                'key', 'values'))
 
-    def mock_fetch_gravatar(self, unused_email):
+    def _mock_fetch_gravatar(self, unused_email):
+        """Mocks user_services.fetch_gravatar()."""
         return self.FETCHED_GRAVATAR
 
     def test_new_profile_picture_is_generated_if_it_does_not_exist(self):
@@ -1221,7 +1155,7 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
         with self.swap(
-            user_services, 'fetch_gravatar', self.mock_fetch_gravatar):
+            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL has been updated.
@@ -1243,7 +1177,7 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
         with self.swap(
-            user_services, 'fetch_gravatar', self.mock_fetch_gravatar):
+            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL is still the manually-added one.
@@ -1272,10 +1206,6 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
-        # Test reduce function does nothing.
-        self.assertIsNone(
-            user_jobs_one_off.UserLastExplorationActivityOneOffJob.reduce(
-                'key', 'values'))
 
     def test_that_last_created_time_is_updated(self):
         self.login(self.OWNER_EMAIL)
