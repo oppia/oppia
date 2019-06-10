@@ -18,7 +18,9 @@
 
 require('pages/exploration_editor/ExplorationInitStateNameService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/ExplorationFeaturesService.ts');
 
 oppia.factory('RouterService', [
