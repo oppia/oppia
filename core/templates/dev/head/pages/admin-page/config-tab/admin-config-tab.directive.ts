@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/admin/AdminTaskManagerService.ts');
+require('pages/admin-page/services/admin-task-manager.service.ts');
 
 oppia.directive('adminConfigTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
@@ -30,8 +30,7 @@ oppia.directive('adminConfigTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/config_tab/' +
-        'admin_config_tab_directive.html'),
+        '/pages/admin-page/config-tab/admin-config-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

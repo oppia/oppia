@@ -62,17 +62,20 @@ require(
   'schema-based-unicode-editor.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('pages/admin/AdminNavbarDirective.ts');
-require('pages/admin/activities_tab/AdminDevModeActivitiesTabDirective.ts');
-require('pages/admin/activities_tab/AdminProdModeActivitiesTabDirective.ts');
-require('pages/admin/config_tab/AdminConfigTabDirective.ts');
-require('pages/admin/jobs_tab/AdminJobsTabDirective.ts');
-require('pages/admin/misc_tab/AdminMiscTabDirective.ts');
-require('pages/admin/roles_tab/AdminRolesTabDirective.ts');
+require('pages/admin-page/navbar/admin-navbar.directive.ts');
+require(
+  'pages/admin-page/activities-tab/admin-dev-mode-activities-tab.directive.ts');
+require(
+  'pages/admin-page/activities-tab/' +
+  'admin-prod-mode-activities-tab.directive.ts');
+require('pages/admin-page/config-tab/admin-config-tab.directive.ts');
+require('pages/admin-page/jobs-tab/admin-jobs-tab.directive.ts');
+require('pages/admin-page/misc-tab/admin-misc-tab.directive.ts');
+require('pages/admin-page/roles-tab/admin-roles-tab.directive.ts');
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/admin/AdminRouterService.ts');
+require('pages/admin-page/services/admin-router.service.ts');
 require('services/UtilsService.ts');
 
 oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
@@ -90,7 +93,7 @@ oppia.directive('adminPage', ['UrlInterpolationService',
       scope: {},
       bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/admin_page_directive.html'),
+        '/pages/admin-page/admin-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
         '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',

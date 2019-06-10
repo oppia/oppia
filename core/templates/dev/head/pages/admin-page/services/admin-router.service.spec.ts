@@ -16,7 +16,7 @@
  * @fileoverview Tests for AdminRouterService.
  */
 
-require('pages/admin/AdminRouterService.ts');
+require('pages/admin-page/services/admin-router.service.ts');
 
 describe('Admin router service', function() {
   var AdminRouterService = null;

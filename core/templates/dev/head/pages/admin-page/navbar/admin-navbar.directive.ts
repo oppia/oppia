@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/admin/AdminRouterService.ts');
+require('pages/admin-page/services/admin-router.service.ts');
 require('services/UserService.ts');
 
 oppia.directive('adminNavbar', [
@@ -33,8 +33,7 @@ oppia.directive('adminNavbar', [
         getUserEmail: '&userEmail'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/' +
-        'admin_navbar_directive.html'),
+        '/pages/admin-page/navbar/admin-navbar.directive.html'),
       controllerAs: '$ctrl',
       controller: ['UserService', function(UserService) {
         var ctrl = this;

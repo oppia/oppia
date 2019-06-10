@@ -31,8 +31,7 @@ oppia.directive('adminJobsTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/jobs_tab/' +
-        'admin_jobs_tab_directive.html'),
+        '/pages/admin-page/jobs-tab/admin-jobs-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;

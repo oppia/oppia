@@ -19,7 +19,7 @@
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/admin/AdminTaskManagerService.ts');
+require('pages/admin-page/services/admin-task-manager.service.ts');
 
 oppia.directive('adminDevModeActivitiesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
@@ -33,8 +33,8 @@ oppia.directive('adminDevModeActivitiesTab', [
         setStatusMessage: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/admin/activities_tab/' +
-        'admin_dev_mode_activities_tab_directive.html'),
+        '/pages/admin-page/activities-tab/' +
+        'admin-dev-mode-activities-tab.directive.html'),
       controllerAs: '$ctrl',
       controller: [function() {
         var ctrl = this;
