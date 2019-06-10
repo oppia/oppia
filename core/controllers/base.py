@@ -320,8 +320,6 @@ class BaseHandler(webapp2.RequestHandler):
                 app_identity_services.get_gcs_resource_bucket_name()),
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
-            'user_is_logged_in': user_services.has_fully_registered(
-                self.user_id)
         })
 
         if 'status_code' not in values:
@@ -379,9 +377,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
-                    'pages/error/error_iframed.html', iframe_restriction=None)
+                    'pages/error-pages/error-iframed.mainpage.html',
+                    iframe_restriction=None)
             else:
-                self.render_template('dist/error.html')
+                self.render_template('dist/error-page.mainpage.html')
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
