@@ -32,8 +32,8 @@ oppia.directive('explorationSaveAndPublishButtons', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/' +
-        'exploration_save_and_publish_buttons_directive.html'),
+        '/pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
+        'exploration-save-and-publish-buttons.directive.html'),
       controller: [
         '$scope', 'ChangeListService', 'EditabilityService',
         'ExplorationRightsService', 'ExplorationWarningsService',

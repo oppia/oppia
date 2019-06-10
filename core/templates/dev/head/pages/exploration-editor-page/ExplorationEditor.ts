@@ -157,7 +157,8 @@ require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.directive.ts');
 require(
-  'pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.ts');
+  'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
+  'exploration-save-and-publish-buttons.directive.ts');
 require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
 require('pages/exploration_editor/ParamChangesEditorDirective.ts');
 require(
