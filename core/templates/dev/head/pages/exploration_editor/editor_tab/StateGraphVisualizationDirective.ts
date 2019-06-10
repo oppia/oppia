@@ -16,9 +16,9 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
-require('components/StateGraphLayoutService.ts');
+require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 require('pages/exploration_editor/ExplorationWarningsService.ts');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
 

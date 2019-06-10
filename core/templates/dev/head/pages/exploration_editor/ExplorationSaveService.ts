@@ -16,7 +16,9 @@
  * @fileoverview Service for exploration saving & publication functionality.
  */
 
-require('components/share/SharingLinksDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
 
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');

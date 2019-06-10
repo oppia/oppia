@@ -32,8 +32,12 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
+      'core/templates/dev/head/**/*.directive.html',
+      'core/templates/dev/head/**/*.template.html',
       'core/templates/dev/head/**/*Spec.ts',
       'core/templates/dev/head/*Spec.ts',
+      'core/templates/dev/head/**/*.spec.ts',
+      'core/templates/dev/head/*.spec.ts',
       'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
       {
@@ -64,10 +68,10 @@ module.exports = function(config) {
        'SolutionVerificationServiceSpec.ts'),
       ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
        'StateNameEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state_editor/' +
-       'StateContentEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state_editor/' +
-       'StateInteractionEditorDirectiveSpec.ts'),
+      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
+       'state-content-editor.directive.spec.ts'),
+      ('core/templates/dev/head/components/state-editor/' +
+       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -81,12 +85,16 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.ts': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/!(*.spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*.spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
@@ -146,7 +154,10 @@ module.exports = function(config) {
     webpack: {
       mode: 'development',
       resolve: {
-        modules: ['core/templates/dev/head'],
+        modules: [
+          'core/templates/dev/head',
+          'extensions'
+        ],
       },
       module: {
         rules: [{

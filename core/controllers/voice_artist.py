@@ -63,7 +63,6 @@ class AudioUploadHandler(base.BaseHandler):
     @acl_decorators.can_voiceover_exploration
     def post(self, exploration_id):
         """Saves an audio file uploaded by a content creator."""
-
         raw_audio_file = self.request.get('raw_audio_file')
         filename = self.payload.get('filename')
         allowed_formats = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
@@ -131,7 +130,7 @@ class AudioUploadHandler(base.BaseHandler):
         # in production.
         file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            'exploration/%s' % exploration_id))
+            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(
             self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
             raw_audio_file, mimetype=mimetype)
@@ -211,11 +210,8 @@ class ExplorationVoiceoverHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        try:
-            exploration_data = exp_services.get_user_exploration_data(
-                self.user_id, exploration_id)
-        except:
-            raise self.PageNotFoundException
+        exploration_data = exp_services.get_user_exploration_data(
+            self.user_id, exploration_id)
 
         self.values.update(exploration_data)
         self.render_json(self.values)

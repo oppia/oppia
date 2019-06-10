@@ -613,6 +613,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+            self.process_and_flush_pending_tasks()
 
         self._run_one_off_job()
 
@@ -712,6 +713,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration from earlier.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+            self.process_and_flush_pending_tasks()
 
         self._run_one_off_job()
 

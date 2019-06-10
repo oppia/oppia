@@ -20,13 +20,15 @@
 
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/NormalizeWhitespaceFilter.ts');
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('pages/exploration_editor/AngularNameService.ts');
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationInitStateNameService.ts');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
 require('pages/exploration_player/AnswerClassificationService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ValidatorsService.ts');
@@ -48,7 +50,7 @@ oppia.factory('ExplorationStatesService', [
     var stateAddedCallbacks = [];
     var stateDeletedCallbacks = [];
     var stateRenamedCallbacks = [];
-    var stateAnswerGroupsSavedCallbacks = [];
+    var stateInteractionSavedCallbacks = [];
 
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -300,6 +302,9 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionId: function(stateName, newInteractionId) {
         saveStateProperty(stateName, 'widget_id', newInteractionId);
+        stateInteractionSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getInteractionCustomizationArgsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');
@@ -308,13 +313,16 @@ oppia.factory('ExplorationStatesService', [
           stateName, newCustomizationArgs) {
         saveStateProperty(
           stateName, 'widget_customization_args', newCustomizationArgs);
+        stateInteractionSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getInteractionAnswerGroupsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'answer_groups');
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+        stateInteractionSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
       },
@@ -325,6 +333,9 @@ oppia.factory('ExplorationStatesService', [
       saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
         saveStateProperty(
           stateName, 'confirmed_unclassified_answers', newAnswers);
+        stateInteractionSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getInteractionDefaultOutcomeMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'default_outcome');
@@ -388,12 +399,12 @@ oppia.factory('ExplorationStatesService', [
 
         var initStateName = ExplorationInitStateNameService.displayed;
         if (deleteStateName === initStateName) {
-          return;
+          return $q.reject('The initial state can not be deleted.');
         }
         if (!_states.hasState(deleteStateName)) {
-          AlertsService.addWarning(
-            'No state with name ' + deleteStateName + ' exists.');
-          return;
+          var message = 'No state with name ' + deleteStateName + ' exists.';
+          AlertsService.addWarning(message);
+          return $q.reject(message);
         }
 
         return $uibModal.open({
@@ -401,29 +412,23 @@ oppia.factory('ExplorationStatesService', [
             '/pages/exploration_editor/editor_tab/' +
             'confirm_delete_state_modal_directive.html'),
           backdrop: true,
-          resolve: {
-            deleteStateName: function() {
-              return deleteStateName;
-            }
-          },
           controller: [
-            '$scope', '$uibModalInstance', 'deleteStateName',
-            function($scope, $uibModalInstance, deleteStateName) {
+            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
               $scope.deleteStateWarningText = (
                 'Are you sure you want to delete the card "' +
                 deleteStateName + '"?');
 
               $scope.reallyDelete = function() {
-                $uibModalInstance.close(deleteStateName);
+                $uibModalInstance.close();
               };
 
               $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
+                $uibModalInstance.dismiss();
                 AlertsService.clearWarnings();
               };
             }
           ]
-        }).result.then(function(deleteStateName) {
+        }).result.then(function() {
           _states.deleteState(deleteStateName);
 
           ChangeListService.deleteState(deleteStateName);
@@ -433,10 +438,10 @@ oppia.factory('ExplorationStatesService', [
               ExplorationInitStateNameService.savedMemento);
           }
 
-          $location.path('/gui/' + StateEditorService.getActiveStateName());
           stateDeletedCallbacks.forEach(function(callback) {
             callback(deleteStateName);
           });
+          $location.path('/gui/' + StateEditorService.getActiveStateName());
           $rootScope.$broadcast('refreshGraph');
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
@@ -484,8 +489,8 @@ oppia.factory('ExplorationStatesService', [
       registerOnStateRenamedCallback: function(callback) {
         stateRenamedCallbacks.push(callback);
       },
-      registerOnStateAnswerGroupsSavedCallback: function(callback) {
-        stateAnswerGroupsSavedCallbacks.push(callback);
+      registerOnStateInteractionSavedCallback: function(callback) {
+        stateInteractionSavedCallbacks.push(callback);
       }
     };
   }
