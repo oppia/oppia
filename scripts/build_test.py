@@ -677,10 +677,12 @@ class BuildTests(test_utils.GenericTestBase):
         """
         def mock_check_call(unused_cmd):
             pass
-        def mock_call(unused_cmd, unused_shell, unused_stdout):
+        # pylint: disable=unused-argument
+        def mock_call(unused_cmd, shell, stdout):
             pass
-        def mock_popen(unused_cmd, unused_stdout):
+        def mock_popen(unused_cmd, stdout):
             pass
+        # pylint: enable=unused-argument
         def mock_test_compiled_js_dir_is_valid():
             pass
 
