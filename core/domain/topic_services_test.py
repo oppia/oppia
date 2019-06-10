@@ -865,8 +865,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_b, topic_rights))
 
 
-# TODO: Remove this mock class and tests for the mock subtopic migrations
-# once the actual functions are implemented.
+# TODO: Remove this mock class and the SubtopicMigrationTests class
+# once the actual functions for subtopic migrations are implemented.
 class MockTopicObject(topic_domain.Topic):
     """Mocks Topic domain object."""
 
@@ -892,7 +892,7 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
         model = topic_models.TopicModel(
             id='topic_id',
             name='name',
-            canonical_name='canonical_name',
+            canonical_name='Name',
             next_subtopic_id=1,
             language_code='en',
             subtopics=[subtopic_dict],
@@ -910,3 +910,9 @@ class SubtopicMigrationTests(test_utils.GenericTestBase):
             topic = topic_services.get_topic_from_model(model)
 
         self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(topic.name, 'name')
+        self.assertEqual(topic.canonical_name, 'name')
+        self.assertEqual(topic.next_subtopic_id, 1)
+        self.assertEqual(topic.language_code, 'en')
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_dict)
