@@ -20,23 +20,34 @@
 // introduce webpack for /extensions
 require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
-require('components/state/AnswerGroupEditorDirective.ts');
-require('components/state/OutcomeEditorDirective.ts');
-require('components/state/OutcomeDestinationEditorDirective.ts');
-require('components/state/OutcomeFeedbackEditorDirective.ts');
-require('components/state/RuleEditorDirective.ts');
-require('components/state/RuleTypeSelectorDirective.ts');
-require('components/state/SolutionEditorDirective.ts');
-require('components/state/SolutionExplanationEditorDirective.ts');
+require(
+  'components/state-directives/answer-group-editor/' +
+  'answer-group-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.directive.ts');
+require(
+  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'components/state-directives/solution-editor/' +
+  'solution-explanation-editor.directive.ts');
 require('components/forms/custom-forms-directives/html-select.directive.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
-require('components/forms/validators/IsAtLeastFilter.ts');
-require('components/forms/validators/IsAtMostFilter.ts');
-require('components/forms/validators/IsFloatFilter.ts');
-require('components/forms/validators/IsIntegerFilter.ts');
-require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
