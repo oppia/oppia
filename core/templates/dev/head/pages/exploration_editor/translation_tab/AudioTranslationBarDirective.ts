@@ -40,12 +40,14 @@ require('services/AudioPlayerService.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/IdGenerationService.ts');
+require('services/UserService.ts');
 
 // Constant for audio recording time limit.
 oppia.constant('RECORDING_TIME_LIMIT', 300);
 
 oppia.directive('audioTranslationBar', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'UserService',
+  function(UrlInterpolationService, UserService) {
     return {
       restrict: 'E',
       scope: {
@@ -54,10 +56,14 @@ oppia.directive('audioTranslationBar', [
       link: function(scope: ICustomScope, elm) {
         scope.getVoiceoverRecorder();
 
+        var userIsLoggedIn;
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          userIsLoggedIn = userInfo.isLoggedIn();
+        });
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
           scope.dropAreaIsAccessible = GLOBALS.can_voiceover;
-          scope.userIsGuest = !GLOBALS.userIsLoggedIn;
+          scope.userIsGuest = !userIsLoggedIn;
           scope.$digest();
           return false;
         });
