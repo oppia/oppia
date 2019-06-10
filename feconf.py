@@ -951,5 +951,5 @@ RTE_CONTENT_SPEC = {
 # oppia constant defined in
 # core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
-    'maths': ['fractions', 'ratios']
+    'maths': ['fractions', 'negative-numbers', 'ratios']
 }
