@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for warning_loader
+ * @fileoverview Directive for warning_loader.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
