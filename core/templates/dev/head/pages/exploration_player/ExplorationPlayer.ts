@@ -95,9 +95,9 @@ require('pages/exploration_player/LearnerViewInfoDirective.ts');
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 
-require('objects/templates/MathLatexStringEditorDirective.ts')
-require('objects/templates/SanitizedUrlEditorDirective.ts')
-require('objects/templates/ListOfTabsEditorDirective.ts')
+require('objects/templates/MathLatexStringEditorDirective.ts');
+require('objects/templates/SanitizedUrlEditorDirective.ts');
+require('objects/templates/ListOfTabsEditorDirective.ts');
 
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
