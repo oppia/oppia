@@ -162,7 +162,9 @@ require(
 require(
   'pages/exploration-editor-page/exploration-title-editor/' +
   'exploration-title-editor.directive.ts');
-require('pages/exploration_editor/ParamChangesEditorDirective.ts');
+require(
+  'pages/exploration-editor-page/param-changes-editor/' +
+  'param-changes-editor.directive.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.directive.ts');

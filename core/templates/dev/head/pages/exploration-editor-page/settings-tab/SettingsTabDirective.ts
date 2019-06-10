@@ -24,7 +24,9 @@ require(
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.directive.ts');
-require('pages/exploration_editor/ParamChangesEditorDirective.ts');
+require(
+  'pages/exploration-editor-page/param-changes-editor/' +
+  'param-changes-editor.directive.ts');
 
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');

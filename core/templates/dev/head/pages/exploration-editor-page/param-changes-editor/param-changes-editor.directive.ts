@@ -19,7 +19,9 @@
 
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require('pages/exploration_editor/ValueGeneratorEditorDirective.ts');
+require(
+  'pages/exploration-editor-page/param-changes-editor/' +
+  'value-generator-editor.directive.ts');
 
 require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
@@ -41,8 +43,8 @@ oppia.directive('paramChangesEditor', [
         isCurrentlyInSettingsTab: '&currentlyInSettingsTab'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/' +
-        'param_changes_editor_directive.html'),
+        '/pages/exploration-editor-page/param-changes-editor/' +
+        'param-changes-editor.directive.html'),
       controller: [
         '$scope', '$rootScope', 'EditabilityService', 'StateEditorService',
         'ExplorationParamSpecsService', 'AlertsService',
