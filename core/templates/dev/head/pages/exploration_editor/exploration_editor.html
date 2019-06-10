@@ -1,19 +1,11 @@
 {% extends 'dist/base.html' %}
 
-{% block maintitle %}
-  {% if title %}
-    {{ title }} - Oppia Editor
-  {% else %}
-    Untitled Exploration - Oppia Editor
-  {% endif %}
-{% endblock maintitle %}
-
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
     GLOBALS.can_publish = JSON.parse('{{can_publish|js_string}}');
-    GLOBALS.can_translate = JSON.parse('{{can_translate|js_string}}');
+    GLOBALS.can_voiceover = JSON.parse('{{can_voiceover|js_string}}');
     GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
       '{{DEFAULT_OBJECT_VALUES|js_string}}');
     GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
@@ -72,36 +64,29 @@
         </div>
       </div>
 
-      <div ng-show="getActiveTabName() === 'main'">
-        {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
-      </div>
+      <exploration-editor-tab ng-show="getActiveTabName() === 'main'">
+      </exploration-editor-tab>
 
-      <div ng-if="getActiveTabName() === 'translation'">
-        <translation-tab></translation-tab>
-      </div>
+      <translation-tab ng-if="getActiveTabName() === 'translation'">
+      </translation-tab>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
-      <div ng-if="getActiveTabName() === 'preview'">
-        {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
-      </div>
+      <preview-tab ng-if="getActiveTabName() === 'preview'">
+      </preview-tab>
 
-      <div ng-show="getActiveTabName() === 'stats'">
-        {% include 'pages/exploration_editor/statistics_tab/statistics_tab.html' %}
-      </div>
+      <statistics-tab ng-show="getActiveTabName() === 'stats'">
+      </statistics-tab>
 
       <improvements-tab ng-if="getActiveTabName() === 'improvements'">
       </improvements-tab>
 
-      <div ng-show="getActiveTabName() === 'settings'">
-        {% include 'pages/exploration_editor/settings_tab/settings_tab.html' %}
-      </div>
+      <settings-tab ng-show="getActiveTabName() === 'settings'" current-user-is-admin="currentUserIsAdmin" current-user-is-moderator="currentUserIsModerator">
+      </settings-tab>
 
-      <div ng-show="getActiveTabName() === 'history'">
-        {% include 'pages/exploration_editor/history_tab/history_tab.html' %}
-      </div>
+      <history-tab ng-show="getActiveTabName() === 'history'">
+      </history-tab>
 
-      <div ng-show="getActiveTabName() === 'feedback'">
-        {% include 'pages/exploration_editor/feedback_tab/feedback_tab.html' %}
-      </div>
+      <feedback-tab ng-show="getActiveTabName() === 'feedback'">
+      </feedback-tab>
     </div>
   </div>
 
@@ -134,7 +119,7 @@
   <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
-  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script>
     {{ value_generators_js }}
   </script>
@@ -179,7 +164,7 @@
       <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
-  {% include 'components/rich_text_components.html' %}
+  {% include 'components/ck-editor-helpers/rich-text-components.template.html' %}
   {{ interaction_templates }}
   {{ visualizations_html }}
   {{ dependencies_html }}

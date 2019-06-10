@@ -16,17 +16,24 @@
  * @fileoverview Directive for the audio translation bar.
  */
 
-require('filters/FormatTimerFilter.ts');
+require('filters/format-timer.filter.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require(
   'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
 require(
   'pages/exploration_editor/translation_tab/' +
   'TranslationTabActiveContentIdService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
-require('pages/state_editor/state_properties/StatePropertyService.ts');
 require(
-  'pages/state_editor/state_properties/StateRecordedVoiceoversService.ts');
+  'pages/exploration_editor/translation_tab/VoiceoverRecordingService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-recorded-voiceovers.service.ts');
 require('services/AlertsService.ts');
 require('services/AssetsBackendApiService.ts');
 require('services/AudioPlayerService.ts');
@@ -45,11 +52,11 @@ oppia.directive('audioTranslationBar', [
         isTranslationTabBusy: '='
       },
       link: function(scope: ICustomScope, elm) {
-        scope.getRecorderController();
+        scope.getVoiceoverRecorder();
 
         $('.oppia-translation-tab').on('dragover', function(evt) {
           evt.preventDefault();
-          scope.dropAreaIsAccessible = GLOBALS.can_translate;
+          scope.dropAreaIsAccessible = GLOBALS.can_voiceover;
           scope.userIsGuest = !GLOBALS.userIsLoggedIn;
           scope.$digest();
           return false;
@@ -81,25 +88,24 @@ oppia.directive('audioTranslationBar', [
         '/pages/exploration_editor/translation_tab/' +
         'audio_translation_bar_directive.html'),
       controller: [
-        '$filter', '$rootScope', '$scope', '$timeout', '$uibModal',
+        '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
         'IdGenerationService', 'SiteAnalyticsService',
         'StateEditorService', 'StateRecordedVoiceoversService',
-        'TranslationLanguageService', 'recorderService',
-        'TranslationTabActiveContentIdService', 'RECORDING_TIME_LIMIT',
+        'TranslationLanguageService', 'TranslationTabActiveContentIdService',
+        'RECORDING_TIME_LIMIT', 'VoiceoverRecordingService',
         function(
-            $filter, $rootScope, $scope, $timeout, $uibModal,
+            $filter, $interval, $rootScope, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
             IdGenerationService, SiteAnalyticsService,
             StateEditorService, StateRecordedVoiceoversService,
-            TranslationLanguageService, recorderService,
-            TranslationTabActiveContentIdService, RECORDING_TIME_LIMIT) {
-          $scope.RECORDER_ID = 'recorderId';
+            TranslationLanguageService, TranslationTabActiveContentIdService,
+            RECORDING_TIME_LIMIT, VoiceoverRecordingService) {
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
-          $scope.recorder = null;
+          $scope.voiceoverRecorder = null;
           $scope.unsupportedBrowser = false;
           $scope.selectedRecording = false;
           $scope.isAudioAvailable = false;
@@ -107,12 +113,16 @@ oppia.directive('audioTranslationBar', [
           $scope.languageCode = null;
           $scope.cannotRecord = false;
           $scope.audioNeedsUpdate = false;
-          $scope.canTranslate = false;
+          $scope.canVoiceover = false;
           $scope.showRecorderWarning = false;
           $scope.audioLoadingIndicatorIsShown = false;
           $scope.checkingMicrophonePermission = false;
           $scope.audioTimerIsShown = true;
           $scope.audioIsCurrentlyBeingSaved = false;
+          $scope.elapsedTime = 0;
+          $scope.timerInterval = null;
+          $scope.unsavedAudioIsPlaying = false;
+          $scope.waveSurfer = null;
           document.body.onkeyup = function(e) {
             if (e.keyCode === 82 && !$scope.isAudioAvailable) {
               // 82 belongs to the keycode for 'R'
@@ -136,30 +146,23 @@ oppia.directive('audioTranslationBar', [
             }
           };
 
+          var cancelTimer = function() {
+            if ($scope.timerInterval) {
+              $interval.cancel($scope.timerInterval);
+            }
+          };
+
           var generateNewFilename = function() {
             return $scope.contentId + '-' +
               $scope.languageCode + '-' +
               IdGenerationService.generateNewId() + '.mp3';
           };
 
-          $scope.onRecordStart = function() {
-            $scope.showRecorderWarning = true;
-            $scope.isTranslationTabBusy = true;
-          };
-
-          $scope.onConversionComplete = function() {
-            $rootScope.loadingMessage = '';
-          };
-
           var getTranslationTabBusyMessage = function() {
             var message = '';
-            if ($scope.recorder.status.isRecording) {
+            if ($scope.isRecording) {
               message = 'You haven\'t finished recording. Please stop ' +
                 'recording and either save or cancel the recording.';
-            } else if ($scope.recorder.status.isConverting) {
-              message = 'It seems like recorded audio is still getting ' +
-                'converted into mp3. Please wait until the audio has finished' +
-                ' processing.';
             } else if ($scope.showRecorderWarning) {
               message = 'You haven\'t saved your recording. Please save or ' +
                 'cancel the recording.';
@@ -168,29 +171,38 @@ oppia.directive('audioTranslationBar', [
           };
           var showPermissionAndStartRecording = function() {
             $scope.checkingMicrophonePermission = true;
-            recorderService.showPermission({
-              onDenied: function() {
-                $scope.recordingPermissionDenied = true;
-                $scope.cannotRecord = true;
-                $scope.checkingMicrophonePermission = false;
-              },
-              onAllowed: function() {
-                $scope.recordingPermissionDenied = false;
-                $scope.cannotRecord = false;
-                $scope.recorder.startRecord();
-                $scope.selectedRecording = true;
-                $scope.checkingMicrophonePermission = false;
-              },
-              onClosed: function() {
-                $scope.recordingPermissionDenied = true;
-                $scope.cannotRecord = true;
-                $scope.checkingMicrophonePermission = false;
-              },
+            $scope.voiceoverRecorder.startRecording().then(function() {
+              // When the user accepts the microphone access.
+              $scope.showRecorderWarning = true;
+              $scope.isTranslationTabBusy = true;
+
+              $scope.recordingPermissionDenied = false;
+              $scope.cannotRecord = false;
+              $scope.selectedRecording = true;
+              $scope.checkingMicrophonePermission = false;
+
+              $scope.elapsedTime = 0;
+              $scope.timerInterval = $interval(function() {
+                $scope.elapsedTime++;
+                // $scope.recordingTimeLimit is decremented to
+                // compensate for the audio recording timing inconsistency,
+                // so it allows the server to accept the recording.
+                if ($scope.elapsedTime === $scope.recordingTimeLimit - 1) {
+                  $scope.stopRecording();
+                }
+              }, 1000);
+            }, function() {
+              // When the user denies microphone access.
+              $scope.recordingPermissionDenied = true;
+              $scope.cannotRecord = true;
+              $scope.checkingMicrophonePermission = false;
+              $scope.$apply();
             });
           };
 
           $scope.checkAndStartRecording = function() {
-            if (!$scope.recorder.isAvailable) {
+            $scope.voiceoverRecorder.initRecorder();
+            if (!$scope.voiceoverRecorder.status().isAvailable) {
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
             } else {
@@ -207,14 +219,15 @@ oppia.directive('audioTranslationBar', [
             $scope.audioNeedsUpdate = !$scope.audioNeedsUpdate;
           };
 
-          $scope.getRecorderController = function() {
-            $scope.recorder = recorderService.controller($scope.RECORDER_ID);
+
+          $scope.getVoiceoverRecorder = function() {
+            $scope.voiceoverRecorder = VoiceoverRecordingService;
           };
 
           $scope.reRecord = function() {
             $scope.initAudioBar();
             $scope.selectedRecording = false;
-            showPermissionAndStartRecording();
+            $scope.checkAndStartRecording();
           };
 
           $scope.cancelRecording = function() {
@@ -225,13 +238,49 @@ oppia.directive('audioTranslationBar', [
             $scope.showRecorderWarning = false;
           };
 
+          $scope.stopRecording = function() {
+            $scope.voiceoverRecorder.stopRecord();
+            $scope.recordingComplete = true;
+            cancelTimer();
+            $scope.voiceoverRecorder.getMp3Data().then(function(audio) {
+              var fileType = 'audio/mp3';
+              $scope.audioBlob = new Blob(audio, {type: fileType});
+              // Free the browser from web worker.
+              $scope.voiceoverRecorder.closeRecorder();
+              // Create audio play and pause for unsaved recording.
+              var url = $window.URL.createObjectURL($scope.audioBlob);
+              // Create visualizer for playing unsaved audio.
+              $scope.waveSurfer = $window.WaveSurfer.create({
+                container: '#visualized',
+                waveColor: '#009688',
+                progressColor: '#cccccc',
+                height: 38
+              });
+              $scope.waveSurfer.load(url);
+            });
+          };
+
+          // Play and pause for unsaved recording.
+          $scope.playAndPauseUnsavedAudio = function() {
+            $scope.unsavedAudioIsPlaying = !$scope.unsavedAudioIsPlaying;
+            if ($scope.unsavedAudioIsPlaying) {
+              $scope.waveSurfer.play();
+              $scope.waveSurfer.on('finish', function() {
+                $scope.unsavedAudioIsPlaying = false;
+                $scope.$apply();
+              });
+            } else {
+              $scope.waveSurfer.pause();
+            }
+          };
+
           $scope.updateAudio = function() {
             AudioPlayerService.stop();
             AudioPlayerService.clear();
             $scope.audioBlob = null;
             $scope.audioIsUpdating = true;
             $scope.selectedRecording = false;
-            showPermissionAndStartRecording();
+            $scope.checkAndStartRecording();
           };
 
           $scope.saveRecordedAudio = function() {
@@ -270,19 +319,17 @@ oppia.directive('audioTranslationBar', [
               return;
             }
 
-            if (!$scope.recorder.status.isRecording && !$scope.audioBlob) {
+            if (!$scope.isRecording && !$scope.audioBlob) {
               $scope.checkAndStartRecording();
             } else {
-              $scope.recorder.stopRecord();
+              $scope.stopRecording();
             }
           };
 
           $scope.$on('externalSave', function() {
-            if ($scope.recorder && $scope.recorder.status.isPlaying) {
-              $scope.recorder.playbackPause();
-            }
-            if (recorderService.getHandler()) {
-              recorderService.getHandler().clear();
+            if ($scope.voiceoverRecorder.status().isRecording) {
+              $scope.voiceoverRecorder.stopRecord();
+              $scope.voiceoverRecorder.closeRecorder();
             }
             AudioPlayerService.stop();
             AudioPlayerService.clear();
@@ -375,31 +422,26 @@ oppia.directive('audioTranslationBar', [
           };
 
           $scope.initAudioBar = function() {
-            // This stops angular-recorder when user navigate while recording.
-            if ($scope.recorder) {
-              if ($scope.recorder.status.isPlaying) {
-                $scope.recorder.playbackPause();
-              }
-              if ($scope.recorder.status.isRecording &&
+            // This stops the voiceoverRecorder when user navigates
+            // while recording.
+            if ($scope.voiceoverRecorder) {
+              if ($scope.voiceoverRecorder.status().isRecording &&
                 $scope.showRecorderWarning) {
-                $scope.recorder.stopRecord();
-                $rootScope.loadingMessage = 'loading';
-              }
-              if ($scope.recorder.status.isConverting) {
-                $rootScope.loadingMessage = 'loading';
-              }
-              if (recorderService && recorderService.getHandler()) {
-                recorderService.getHandler().stop();
-                recorderService.getHandler().clear();
+                $scope.voiceoverRecorder.stopRecord();
+                cancelTimer();
+                $scope.voiceoverRecorder.closeRecorder();
               }
             }
             $scope.isTranslationTabBusy = false;
             AudioPlayerService.stop();
             AudioPlayerService.clear();
             $scope.showRecorderWarning = false;
+            // re-initialize for unsaved recording
+            $scope.unsavedAudioIsPlaying = false;
+            $scope.waveSurfer = null;
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();
-            $scope.canTranslate = EditabilityService.isTranslatable();
+            $scope.canVoiceover = EditabilityService.isTranslatable();
             $scope.contentId = (
               TranslationTabActiveContentIdService.getActiveContentId());
             var audioTranslationObject = getAvailableAudio(

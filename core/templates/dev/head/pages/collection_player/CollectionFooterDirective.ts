@@ -17,7 +17,9 @@
  * in collection player.
  */
 
-require('components/share/SharingLinksDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'sharing-links.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 
@@ -25,21 +27,23 @@ oppia.directive('collectionFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         twitterText: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/collection_player/' +
         'collection_footer_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope',
-        function($scope) {
-          $scope.collectionId = GLOBALS.collectionId;
+        function() {
+          var ctrl = this;
+          ctrl.collectionId = GLOBALS.collectionId;
 
-          $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+          ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
 
-          $scope.getTwitterText = function() {
-            return $scope.twitterText;
+          ctrl.getTwitterText = function() {
+            return ctrl.twitterText;
           };
         }
       ]
