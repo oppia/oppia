@@ -35,8 +35,8 @@ oppia.factory('SuggestionModalForExplorationEditorService', [
       StateObjectFactory, SuggestionModalService,
       ThreadDataService, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/suggestion_editor/' +
-      'exploration_editor_suggestion_modal_directive.html'
+      '/pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
+      'exploration-editor-suggestion-modal.template.html'
     );
 
     var _showEditStateContentSuggestionModal = function(

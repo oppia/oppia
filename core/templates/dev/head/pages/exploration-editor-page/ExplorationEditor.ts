@@ -134,7 +134,8 @@ require(
 require(
   'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
 require(
-  'pages/suggestion_editor/SuggestionModalForExplorationEditorService.ts');
+  'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
+  'suggestion-modal-for-exploration-editor.service.ts');
 require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
