@@ -27,8 +27,8 @@ oppia.directive('editorNavbarBreadcrumb', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/' +
-        'editor_navbar_breadcrumb_directive.html'),
+        '/pages/exploration-editor-page/editor-navigation/' +
+        'editor-navbar-breadcrumb.directive.html'),
       controller: [
         '$scope', 'ExplorationTitleService', 'RouterService',
         'FocusManagerService', 'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',

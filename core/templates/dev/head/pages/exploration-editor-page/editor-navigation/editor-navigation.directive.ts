@@ -34,7 +34,8 @@ oppia.directive('editorNavigation', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_navigation_directive.html'),
+        '/pages/exploration-editor-page/editor-navigation/' +
+        'editor-navigation.directive.html'),
       controller: [
         '$rootScope', '$scope', '$timeout', '$uibModal', 'ContextService',
         'ExplorationFeaturesService', 'ExplorationRightsService',
