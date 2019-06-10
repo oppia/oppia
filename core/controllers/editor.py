@@ -98,7 +98,7 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests."""
         if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'pages/error/disabled_exploration.html',
+                'pages/error-pages/disabled-exploration.mainpage.html',
                 iframe_restriction=None)
             return
 
@@ -139,8 +139,8 @@ class ExplorationPage(EditorHandler):
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
                     self.user, exploration_rights)),
-            'can_translate': (
-                rights_manager.check_can_translate_activity(
+            'can_voiceover': (
+                rights_manager.check_can_voiceover_activity(
                     self.user, exploration_rights)),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
@@ -421,9 +421,13 @@ class ExplorationFileDownloader(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        version = self.request.get('v', default_value=exploration.version)
+        version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
-        width = int(self.request.get('width', default_value=80))
+
+        try:
+            version = int(version_str)
+        except ValueError:
+            version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s.zip' % (
@@ -436,7 +440,7 @@ class ExplorationFileDownloader(EditorHandler):
                 filename, 'text/plain')
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
-                exploration_id, version=version, width=width))
+                exploration_id, version=version))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
@@ -462,21 +466,6 @@ class StateYamlHandler(EditorHandler):
             'yaml': state_domain.State.convert_state_dict_to_yaml(
                 state_dict, width),
         })
-
-
-class ExplorationResourcesHandler(EditorHandler):
-    """Manages assets associated with an exploration."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        dir_list = fs.listdir('')
-
-        self.render_json({'filepaths': dir_list})
 
 
 class ExplorationSnapshotsHandler(EditorHandler):
@@ -720,7 +709,7 @@ class ImageUploadHandler(EditorHandler):
 
         file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            'exploration/%s' % exploration_id))
+            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
@@ -796,9 +785,15 @@ class StateAnswerStatisticsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
+        top_state_answers = stats_services.get_top_state_answer_stats_multi(
+            exploration_id, current_exploration.states)
+        top_state_interaction_ids = {
+            state_name: current_exploration.states[state_name].interaction.id
+            for state_name in top_state_answers
+        }
         self.render_json({
-            'answers': stats_services.get_top_state_answer_stats_multi(
-                exploration_id, current_exploration.states)
+            'answers': top_state_answers,
+            'interaction_ids': top_state_interaction_ids,
         })
 
 

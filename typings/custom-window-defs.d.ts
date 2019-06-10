@@ -11,6 +11,7 @@ interface Window {
     MathJax?: any;
     MozBlobBuilder?: any;
     WebKitBlobBuilder?: any;
+    WaveSurfer?: any;
     __fixtures__?: any;
     decodeURIComponent?: any;
     encodeURIComponent?: any;

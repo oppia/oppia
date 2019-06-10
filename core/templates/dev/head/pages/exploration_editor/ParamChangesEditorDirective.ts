@@ -17,14 +17,17 @@
  * both the exploration settings tab and the state editor page).
  */
 
-require('components/forms/Select2DropdownDirective.ts');
+require(
+  'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
 require('pages/exploration_editor/ValueGeneratorEditorDirective.ts');
 
 require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationParamSpecsService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
