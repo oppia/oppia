@@ -1476,7 +1476,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'check of CollectionCommitLogEntryModel\', '
                 '[u\'Entity id %s: Post commit status is '
                 '%s but post_commit_is_private is False\']]'
-            ) % (self.model_instance_0.id, feconf.POST_COMMIT_STATUS_PUBLIC),
+            ) % (self.model_instance_0.id, feconf.POST_COMMIT_STATUS_PRIVATE),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
