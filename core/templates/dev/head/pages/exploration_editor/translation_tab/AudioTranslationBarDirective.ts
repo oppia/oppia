@@ -18,6 +18,7 @@
 
 require('filters/format-timer.filter.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration_editor/RouterService.ts');
 require(
   'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
 require(
@@ -97,7 +98,7 @@ oppia.directive('audioTranslationBar', [
         '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
-        'IdGenerationService', 'SiteAnalyticsService',
+        'IdGenerationService', 'RouterService', 'SiteAnalyticsService',
         'StateEditorService', 'StateRecordedVoiceoversService',
         'TranslationLanguageService', 'TranslationTabActiveContentIdService',
         'RECORDING_TIME_LIMIT', 'VoiceoverRecordingService',
@@ -105,7 +106,7 @@ oppia.directive('audioTranslationBar', [
             $filter, $interval, $rootScope, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
-            IdGenerationService, SiteAnalyticsService,
+            IdGenerationService, RouterService, SiteAnalyticsService,
             StateEditorService, StateRecordedVoiceoversService,
             TranslationLanguageService, TranslationTabActiveContentIdService,
             RECORDING_TIME_LIMIT, VoiceoverRecordingService) {
@@ -130,10 +131,12 @@ oppia.directive('audioTranslationBar', [
           $scope.unsavedAudioIsPlaying = false;
           $scope.waveSurfer = null;
           document.body.onkeyup = function(e) {
-            if (e.keyCode === 82 && !$scope.isAudioAvailable) {
-              // 82 belongs to the keycode for 'R'
-              // Used as shortcut key for recording
-              toggleStartAndStopRecording();
+            if (RouterService.getActiveTabName() === 'translation') {
+              if (e.keyCode === 82 && !$scope.isAudioAvailable) {
+                // 82 belongs to the keycode for 'R'
+                // Used as shortcut key for recording
+                toggleStartAndStopRecording();
+              }
             }
           };
 
