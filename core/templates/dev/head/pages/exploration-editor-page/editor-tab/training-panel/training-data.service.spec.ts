@@ -18,8 +18,8 @@
 
 require('App.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
-require('pages/exploration_editor/ChangeListService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require('pages/exploration_editor/editor_tab/TrainingDataService.ts');

@@ -19,8 +19,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

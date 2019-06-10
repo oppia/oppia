@@ -18,8 +18,10 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ChangesInHumanReadableFormService.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'changes-in-human-readable-form.service.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/LocalStorageService.ts');
 
 oppia.factory('AutosaveInfoModalsService', [

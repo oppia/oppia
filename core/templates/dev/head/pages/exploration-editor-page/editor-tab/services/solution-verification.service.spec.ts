@@ -18,7 +18,7 @@
 
 require('App.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'interaction-details-cache.service.ts');

@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
-require('pages/exploration_editor/ChangeListService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'interaction-details-cache.service.ts');

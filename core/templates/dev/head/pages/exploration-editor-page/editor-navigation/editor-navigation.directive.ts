@@ -18,10 +18,13 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationRightsService.ts');
-require('pages/exploration_editor/ExplorationWarningsService.ts');
-require('pages/exploration_editor/RouterService.ts');
-require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'state-tutorial-first-time.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require('services/ContextService.ts');

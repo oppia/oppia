@@ -20,14 +20,20 @@
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ParamChangeObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationCategoryService.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
-require('pages/exploration_editor/ExplorationInitStateNameService.ts');
-require('pages/exploration_editor/ExplorationParamChangesService.ts');
-require('pages/exploration_editor/ExplorationParamSpecsService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/ExplorationTitleService.ts');
-require('pages/exploration_editor/ParameterMetadataService.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-category.service.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-param-changes.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/exploration-title.service.ts');
+require('pages/exploration-editor-page/services/parameter-metadata.service.ts');
 require('pages/exploration_player/ExplorationEngineService.ts');
 require('pages/exploration_player/LearnerParamsService.ts');
 require('pages/exploration_player/NumberAttemptsService.ts');

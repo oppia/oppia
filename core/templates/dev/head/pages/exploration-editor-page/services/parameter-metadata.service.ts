@@ -18,9 +18,11 @@
 
 require('domain/exploration/ParamMetadataObjectFactory.ts');
 require('expressions/ExpressionInterpolationService.ts');
-require('pages/exploration_editor/ExplorationParamChangesService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/GraphDataService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-param-changes.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/graph-data.service.ts');
 
 oppia.constant('PARAM_ACTION_GET', 'get');
 

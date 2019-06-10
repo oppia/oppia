@@ -30,10 +30,14 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/parameterize-rule-description.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
-require('pages/exploration_editor/ExplorationInitStateNameService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/RouterService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-init-state-name.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
 require(
   'pages/exploration_editor/translation_tab/' +

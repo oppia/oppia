@@ -21,8 +21,8 @@ require(
   'state-graph-visualization.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/GraphDataService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +

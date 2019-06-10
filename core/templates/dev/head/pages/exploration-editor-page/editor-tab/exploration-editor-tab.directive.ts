@@ -31,12 +31,17 @@ require(
 require('components/state-editor/state-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
-require('pages/exploration_editor/ExplorationInitStateNameService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/ExplorationWarningsService.ts');
-require('pages/exploration_editor/GraphDataService.ts');
-require('pages/exploration_editor/RouterService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-correctness-feedback.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-init-state-name.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
+require('pages/exploration-editor-page/services/graph-data.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

@@ -18,7 +18,7 @@
  * with base class as ExplorationPropertyService.
  */
 
-require('pages/exploration_editor/ChangeListService.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
 require('services/AlertsService.ts');
 
 oppia.factory('ExplorationPropertyService', [

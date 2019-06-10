@@ -13,31 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the exploration language code.
+ * @fileoverview Service for checking the correctness feedback for an
+ * exploration.
  */
 
+require(
+  'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-require('pages/exploration_editor/ExplorationPropertyService.ts');
-
-oppia.factory('ExplorationLanguageCodeService', [
+oppia.factory('ExplorationCorrectnessFeedbackService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'language_code';
-    child.getAllLanguageCodes = function() {
-      return constants.ALL_LANGUAGE_CODES;
-    };
-    child.getCurrentLanguageDescription = function() {
-      for (var i = 0; i < constants.ALL_LANGUAGE_CODES.length; i++) {
-        if (constants.ALL_LANGUAGE_CODES[i].code === child.displayed) {
-          return constants.ALL_LANGUAGE_CODES[i].description;
-        }
-      }
-    };
+    child.propertyName = 'correctness_feedback_enabled';
+
     child._isValid = function(value) {
-      return constants.ALL_LANGUAGE_CODES.some(function(elt) {
-        return elt.code === value;
-      });
+      return (typeof value === 'boolean');
     };
+
+    child.isEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.toggleCorrectnessFeedback = function() {
+      child.displayed = !child.displayed;
+      child.saveDisplayedValue();
+    };
+
     return child;
   }
 ]);

@@ -32,7 +32,8 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/parameterize-rule-description.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require(
+  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'interaction-details-cache.service.ts');

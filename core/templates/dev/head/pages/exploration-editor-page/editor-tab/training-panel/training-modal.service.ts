@@ -23,10 +23,11 @@ require(
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/AngularNameService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/ExplorationWarningsService.ts');
-require('pages/exploration_editor/GraphDataService.ts');
+require('pages/exploration-editor-page/services/angular-name.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
+require('pages/exploration-editor-page/services/graph-data.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(

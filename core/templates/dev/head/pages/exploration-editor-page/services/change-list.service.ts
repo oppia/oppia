@@ -17,8 +17,9 @@
  * committed to the server.
  */
 
-require('pages/exploration_editor/AutosaveInfoModalsService.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
+require(
+  'pages/exploration-editor-page/services/autosave-info-modals.service.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
 oppia.factory('ChangeListService', [

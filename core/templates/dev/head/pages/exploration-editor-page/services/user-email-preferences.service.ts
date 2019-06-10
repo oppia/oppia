@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
 oppia.factory('UserEmailPreferencesService', [

@@ -17,7 +17,7 @@
  * about the rights for this exploration.
  */
 
-require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
 oppia.factory('ExplorationRightsService', [

@@ -13,18 +13,31 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the name of the exploration's
- * initial state. NOTE: This service does not perform validation. Users of this
- * service should ensure that new initial state names passed to the service are
- * valid.
+ * @fileoverview Services for storing exploration properties for
+ * text to speech data.
  */
 
-require('pages/exploration_editor/ExplorationPropertyService.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-oppia.factory('ExplorationInitStateNameService', [
+oppia.factory('ExplorationAutomaticTextToSpeechService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'init_state_name';
+    child.propertyName = 'auto_tts_enabled';
+
+    child._isValid = function(value) {
+      return (typeof value === 'boolean');
+    };
+
+    child.isAutomaticTextToSpeechEnabled = function() {
+      return child.savedMemento;
+    };
+
+    child.toggleAutomaticTextToSpeech = function() {
+      child.displayed = !child.displayed;
+      child.saveDisplayedValue();
+    };
+
     return child;
   }
 ]);

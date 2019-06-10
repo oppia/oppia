@@ -18,8 +18,8 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationTitleService.ts');
-require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration-editor-page/services/exploration-title.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
 oppia.directive('editorNavbarBreadcrumb', [

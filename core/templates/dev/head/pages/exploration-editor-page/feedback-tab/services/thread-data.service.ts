@@ -20,7 +20,7 @@
 require('domain/feedback_thread/FeedbackThreadObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
 oppia.factory('ThreadDataService', [

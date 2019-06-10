@@ -13,23 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current exploration category so
+ * @fileoverview A data service that stores the current exploration title so
  * that it can be displayed and edited in multiple places in the UI.
  */
 
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('pages/exploration_editor/ExplorationPropertyService.ts');
-require('pages/exploration_editor/ExplorationRightsService.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-property.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('services/ValidatorsService.ts');
 
-oppia.factory('ExplorationCategoryService', [
+oppia.factory('ExplorationTitleService', [
   '$filter', 'ExplorationPropertyService', 'ExplorationRightsService',
   'ValidatorsService',
   function(
       $filter, ExplorationPropertyService, ExplorationRightsService,
       ValidatorsService) {
     var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'category';
+    child.propertyName = 'title';
     child._normalize = $filter('normalizeWhitespace');
     child._isValid = function(value) {
       return ValidatorsService.isValidEntityName(

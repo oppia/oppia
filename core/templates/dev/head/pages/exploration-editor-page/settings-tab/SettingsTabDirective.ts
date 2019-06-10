@@ -30,23 +30,38 @@ require(
 
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ChangeListService.ts');
-require('pages/exploration_editor/ExplorationAutomaticTextToSpeechService.ts');
-require('pages/exploration_editor/ExplorationCategoryService.ts');
-require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-automatic-text-to-speech.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-category.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-correctness-feedback.service.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration_editor/ExplorationEditor.ts');
-require('pages/exploration_editor/ExplorationInitStateNameService.ts');
-require('pages/exploration_editor/ExplorationLanguageCodeService.ts');
-require('pages/exploration_editor/ExplorationObjectiveService.ts');
-require('pages/exploration_editor/ExplorationParamChangesService.ts');
-require('pages/exploration_editor/ExplorationParamSpecsService.ts');
-require('pages/exploration_editor/ExplorationRightsService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/ExplorationTagsService.ts');
-require('pages/exploration_editor/ExplorationTitleService.ts');
-require('pages/exploration_editor/ExplorationWarningsService.ts');
-require('pages/exploration_editor/UserEmailPreferencesService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-init-state-name.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-language-code.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-objective.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-param-changes.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
+require('pages/exploration-editor-page/services/exploration-rights.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/exploration-tags.service.ts');
+require('pages/exploration-editor-page/services/exploration-title.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-warnings.service.ts');
+require(
+  'pages/exploration-editor-page/services/user-email-preferences.service.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesService.ts');

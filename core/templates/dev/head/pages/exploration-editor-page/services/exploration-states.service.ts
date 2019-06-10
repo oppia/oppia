@@ -21,9 +21,11 @@
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('pages/exploration_editor/AngularNameService.ts');
-require('pages/exploration_editor/ChangeListService.ts');
-require('pages/exploration_editor/ExplorationInitStateNameService.ts');
+require('pages/exploration-editor-page/services/angular-name.service.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-init-state-name.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-validity.service.ts');

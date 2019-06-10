@@ -17,7 +17,8 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationObjectiveService.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-objective.service.ts');
 
 oppia.directive('explorationObjectiveEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

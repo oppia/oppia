@@ -21,7 +21,8 @@ require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require(
+  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'interaction-details-cache.service.ts');

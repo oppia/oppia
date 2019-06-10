@@ -19,8 +19,8 @@
  */
 
 require('domain/exploration/RuleObjectFactory.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/GraphDataService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/graph-data.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(

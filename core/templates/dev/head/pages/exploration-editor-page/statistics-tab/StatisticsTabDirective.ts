@@ -21,9 +21,9 @@ require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration_editor/statistics_tab/' +
   'StateImprovementSuggestionService.ts'

@@ -16,7 +16,7 @@
  * @fileoverview Unit test for the Angular names service.
  */
 
-require('pages/exploration_editor/AngularNameService.ts');
+require('pages/exploration-editor-page/services/angular-name.service.ts');
 
 describe('Angular names service', function() {
   beforeEach(angular.mock.module('oppia'));

@@ -13,30 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for checking the correctness feedback for an
- * exploration.
+ * @fileoverview Services for storing exploration properties for
+ * changes to parameters.
  */
 
-require('pages/exploration_editor/ExplorationPropertyService.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-oppia.factory('ExplorationCorrectnessFeedbackService', [
+oppia.factory('ExplorationParamChangesService', [
   'ExplorationPropertyService', function(ExplorationPropertyService) {
     var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'correctness_feedback_enabled';
-
-    child._isValid = function(value) {
-      return (typeof value === 'boolean');
-    };
-
-    child.isEnabled = function() {
-      return child.savedMemento;
-    };
-
-    child.toggleCorrectnessFeedback = function() {
-      child.displayed = !child.displayed;
-      child.saveDisplayedValue();
-    };
-
+    child.propertyName = 'param_changes';
     return child;
   }
 ]);

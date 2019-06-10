@@ -16,7 +16,7 @@
  * @fileoverview Service for solution verification.
  */
 
-require('pages/exploration_editor/AngularNameService.ts');
+require('pages/exploration-editor-page/services/angular-name.service.ts');
 require('pages/exploration_player/AnswerClassificationService.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +

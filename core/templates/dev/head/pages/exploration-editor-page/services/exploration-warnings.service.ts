@@ -17,10 +17,12 @@
  */
 
 require('expressions/ExpressionInterpolationService.ts');
-require('pages/exploration_editor/ExplorationParamChangesService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/GraphDataService.ts');
-require('pages/exploration_editor/ParameterMetadataService.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'exploration-param-changes.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-editor-page/services/graph-data.service.ts');
+require('pages/exploration-editor-page/services/parameter-metadata.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-validity.service.ts');

@@ -19,8 +19,8 @@
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/state/StateObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
-require('pages/exploration_editor/ExplorationDiffService.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('pages/exploration-editor-page/services/exploration-diff.service.ts');
 require(
   'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 

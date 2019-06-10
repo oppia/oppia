@@ -29,9 +29,11 @@ require(
   'pages/exploration_editor/translation_tab/TranslatorOverviewDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
+  'state-tutorial-first-time.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

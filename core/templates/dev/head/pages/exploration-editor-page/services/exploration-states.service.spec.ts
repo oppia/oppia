@@ -16,7 +16,7 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
 describe('ExplorationStatesService', function() {
   var $q = null;

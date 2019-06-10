@@ -18,9 +18,9 @@
 
 require('domain/state/StateObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/ChangeListService.ts');
-require('pages/exploration_editor/ExplorationDataService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
+require('pages/exploration-editor-page/services/exploration-data.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(

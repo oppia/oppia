@@ -16,7 +16,7 @@
  * @fileoverview Unit test for the Translation status service.
  */
 
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
 require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
