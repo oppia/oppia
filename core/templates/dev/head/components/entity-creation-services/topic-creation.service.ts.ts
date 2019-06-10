@@ -35,8 +35,8 @@ oppia.factory('TopicCreationService', [
         }
         var modalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/topics_and_skills_dashboard/' +
-            'new_topic_name_editor_directive.html'),
+            '/pages/topics-and-skills-dashboard-page/templates/' +
+            'new-topic-name-editor.template.html'),
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance',

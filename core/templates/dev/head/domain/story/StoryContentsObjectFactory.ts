@@ -18,7 +18,7 @@
  */
 
 require('domain/story/StoryNodeObjectFactory.ts');
-require('pages/story_editor/StoryEditor.ts');
+require('pages/story-editor-page/story-editor-page.controller.ts');
 
 oppia.factory('StoryContentsObjectFactory', [
   'StoryNodeObjectFactory', 'NODE_ID_PREFIX',
