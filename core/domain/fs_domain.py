@@ -392,7 +392,7 @@ class GcsFileSystem(GeneralFileSystem):
             '/%s/%s/%s' % (
                 bucket_name, self._assets_path, filepath))
         try:
-            return cloudstorage.stat(gcs_file_url, retry_params=None)
+            return bool(cloudstorage.stat(gcs_file_url, retry_params=None))
         except cloudstorage.NotFoundError:
             return False
 
