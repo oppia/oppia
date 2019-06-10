@@ -153,7 +153,9 @@ require(
 require(
   'pages/exploration-editor-page/editor-navigation/' +
   'editor-navigation.directive.ts');
-require('pages/exploration_editor/ExplorationObjectiveEditorDirective.ts');
+require(
+  'pages/exploration-editor-page/exploration-objective-editor/' +
+  'exploration-objective-editor.directive.ts');
 require(
   'pages/exploration_editor/ExplorationSaveAndPublishButtonsDirective.ts');
 require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');

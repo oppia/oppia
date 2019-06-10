@@ -32,8 +32,8 @@ oppia.directive('explorationObjectiveEditor', [
         onInputFieldBlur: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/' +
-        'exploration_objective_editor_directive.html'),
+        '/pages/exploration-editor-page/exploration-objective-editor/' +
+        'exploration-objective-editor.directive.html'),
       controller: [
         '$scope', 'ExplorationObjectiveService',
         function($scope, ExplorationObjectiveService) {
