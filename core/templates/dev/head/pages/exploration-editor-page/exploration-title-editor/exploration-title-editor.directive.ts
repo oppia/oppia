@@ -33,8 +33,8 @@ oppia.directive('explorationTitleEditor', [
         onInputFieldBlur: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/' +
-        'exploration_title_editor_directive.html'),
+        '/pages/exploration-editor-page/exploration-title-editor/' +
+        'exploration-title-editor.directive.html'),
       controller: [
         '$scope', 'ExplorationTitleService',
         function($scope, ExplorationTitleService) {

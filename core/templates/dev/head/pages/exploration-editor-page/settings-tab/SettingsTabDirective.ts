@@ -18,7 +18,9 @@
 
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
+require(
+  'pages/exploration-editor-page/exploration-title-editor/' +
+  'exploration-title-editor.directive.ts');
 require(
   'pages/exploration-editor-page/exploration-objective-editor/' +
   'exploration-objective-editor.directive.ts');
