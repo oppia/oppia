@@ -16,11 +16,15 @@
  * @fileoverview Directive for visualizing issues.
  */
 
-require('pages/exploration_editor/statistics_tab/EarlyQuitIssueDirective.ts');
 require(
-  'pages/exploration_editor/statistics_tab/MultipleIncorrectIssueDirective.ts');
+  'pages/exploration-editor-page/statistics-tab/issues/' +
+  'early-quit-issue.directive.ts');
 require(
-  'pages/exploration_editor/statistics_tab/CyclicTransitionsIssueDirective.ts');
+  'pages/exploration-editor-page/statistics-tab/issues/' +
+  'multiple-incorrect-issue.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/issues/' +
+  'cyclic-transitions-issue.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
@@ -31,8 +35,8 @@ oppia.directive('playthroughIssues', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/statistics_tab/' +
-        'playthrough_issues_directive.html'),
+        '/pages/exploration-editor-page/statistics-tab/issues/' +
+        'playthrough-issues.directive.html'),
       controller: [
         '$scope', 'PlaythroughIssuesService',
         function($scope, PlaythroughIssuesService) {

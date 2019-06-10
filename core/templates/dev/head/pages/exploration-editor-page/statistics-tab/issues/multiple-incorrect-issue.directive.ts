@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-oppia.directive('cyclicTransitionsIssue', [
+oppia.directive('multipleIncorrectIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -31,8 +31,8 @@ oppia.directive('cyclicTransitionsIssue', [
         issue: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/statistics_tab/' +
-        'cyclic_transitions_issue_directive.html'),
+        '/pages/exploration-editor-page/statistics-tab/issues/' +
+        'multiple-incorrect-issue.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'PlaythroughIssuesService',
         function($scope, $uibModal, AlertsService, PlaythroughIssuesService) {

@@ -131,7 +131,8 @@ require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
 require(
   'components/forms/forms-templates/' +
   'mark-all-audio-and-translations-as-needing-update.controller.ts');
-require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/charts/bar-chart.directive.ts');
 require(
   'pages/suggestion_editor/SuggestionModalForExplorationEditorService.ts');
 require('services/AutoplayedVideosService.ts');
@@ -178,10 +179,13 @@ require(
   'improvements-tab.directive.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
 require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
-require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');
 require(
-  'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
-require('pages/exploration_editor/statistics_tab/StatisticsTabDirective.ts');
+  'pages/exploration-editor-page/statistics-tab/charts/pie-chart.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/issues/' +
+  'playthrough-issues.directive.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
 require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');

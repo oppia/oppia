@@ -21,7 +21,8 @@
 
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require(
-  'pages/exploration_editor/statistics_tab/LearnerActionRenderService.ts');
+  'pages/exploration-editor-page/statistics-tab/services/' +
+  'learner-action-render.service.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/PlaythroughService.ts');
 

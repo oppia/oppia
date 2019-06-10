@@ -18,10 +18,11 @@
 
 require('domain/exploration/StatesObjectFactory.ts');
 require(
-  'pages/exploration_editor/statistics_tab/' +
-  'StateImprovementSuggestionService.ts'
+  'pages/exploration-editor-page/statistics-tab/services/' +
+  'state-improvement-suggestion.service.ts'
 );
-require('pages/exploration_editor/statistics_tab/StatisticsTabDirective.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
 
 describe('StateImprovementSuggestionService', function() {
   beforeEach(angular.mock.module('oppia'));

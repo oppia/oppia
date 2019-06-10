@@ -25,8 +25,8 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
 require(
-  'pages/exploration_editor/statistics_tab/' +
-  'StateImprovementSuggestionService.ts'
+  'pages/exploration-editor-page/statistics-tab/services/' +
+  'state-improvement-suggestion.service.ts'
 );
 require('services/AlertsService.ts');
 require('services/ComputeGraphService.ts');
@@ -43,7 +43,8 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/statistics_tab/statistics_tab_directive.html'),
+      '/pages/exploration-editor-page/statistics-tab/' +
+      'statistics-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$http', '$scope', '$uibModal', 'AlertsService', 'ComputeGraphService',
@@ -165,8 +166,8 @@ oppia.directive('statisticsTab', ['UrlInterpolationService', function(
           ).then(function(stateRulesStats) {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/statistics_tab/' +
-                'state_stats_modal_directive.html'),
+                '/pages/exploration-editor-page/statistics-tab/templates/' +
+                'state-stats-modal.template.html'),
               backdrop: true,
               resolve: {
                 stateName: function() {

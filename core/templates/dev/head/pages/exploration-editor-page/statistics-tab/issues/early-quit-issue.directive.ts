@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for visualizing multiple incorrect issue.
+ * @fileoverview Directive for visualizing early quit issue.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-oppia.directive('multipleIncorrectIssue', [
+oppia.directive('earlyQuitIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -31,8 +31,8 @@ oppia.directive('multipleIncorrectIssue', [
         issue: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/statistics_tab/' +
-        'multiple_incorrect_issue_directive.html'),
+        '/pages/exploration-editor-page/statistics-tab/issues/' +
+        'early-quit-issue.directive.html'),
       controller: [
         '$scope', '$uibModal', 'AlertsService', 'PlaythroughIssuesService',
         function($scope, $uibModal, AlertsService, PlaythroughIssuesService) {
