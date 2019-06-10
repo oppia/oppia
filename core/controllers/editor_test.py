@@ -555,6 +555,23 @@ written_translations:
         # Check downloaded dict.
         self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
 
+        # Check downloading a specific version.
+        download_url = (
+            '/createhandler/download/%s?output_format=%s&v=1' %
+            (exp_id, feconf.OUTPUT_FORMAT_JSON))
+        response = self.get_json(download_url)
+        self.assertEqual(['Introduction'], response.keys())
+
+        # Check downloading an invalid version results in downloading the
+        # latest version.
+        download_url = (
+            '/createhandler/download/%s?output_format=%s&v=xxx' %
+            (exp_id, feconf.OUTPUT_FORMAT_JSON))
+        response = self.get_json(download_url)
+        self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
+        self.assertEqual(
+            ['Introduction', 'State A', 'State B'], response.keys())
+
         self.logout()
 
     def test_state_yaml_handler(self):
@@ -656,7 +673,7 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
         for snapshot in snapshots:
             snapshot.update({
                 'committer_id': 'owner'
-                })
+            })
 
         response = self.get_json('/createhandler/snapshots/%s' % (exp_id))
 
@@ -675,7 +692,7 @@ class ExplorationSnapshotsHandlerTests(test_utils.GenericTestBase):
         for snapshot in snapshots:
             snapshot.update({
                 'committer_id': 'owner'
-                })
+            })
 
         response = self.get_json('/createhandler/snapshots/%s' % (exp_id))
 
@@ -762,39 +779,6 @@ class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
         self.logout()
 
 
-class StateAnswerStatisticsHandlerTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(StateAnswerStatisticsHandlerTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-
-    def test_get_with_invalid_exploration_id_raises_error(self):
-        self.login(self.OWNER_EMAIL)
-
-        self.get_json(
-            '/createhandler/state_answer_stats/invalid_exp_id',
-            expected_status_int=404)
-
-        self.logout()
-
-    def test_get_basic_learner_answer_statistics_for_a_state(self):
-        self.login(self.OWNER_EMAIL)
-        exp_id = 'eid'
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-        exploration = self.save_new_valid_exploration(exp_id, owner_id)
-
-        answers = stats_services.get_top_state_answer_stats_multi(
-            exp_id, exploration.states)
-
-        response = self.get_json(
-            '/createhandler/state_answer_stats/%s' % exp_id)
-
-        self.assertEqual(response['answers'], answers)
-
-        self.logout()
-
-
 class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -808,7 +792,6 @@ class TopUnresolvedAnswersHandlerTests(test_utils.GenericTestBase):
 
     def test_cannot_get_unresolved_answers_with_no_state_name(self):
         self.login(self.OWNER_EMAIL)
-
 
         self.get_json(
             '/createhandler/get_top_unresolved_answers/%s' % self.exp_id,
@@ -871,6 +854,10 @@ class StateRulesStatsHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(
             observed_log_messages[0],
             'Could not find state: invalid_state_name')
+
+        self.assertEqual(
+            observed_log_messages[1],
+            'Available states: [u\'Introduction\']')
 
         self.logout()
 
@@ -1496,14 +1483,17 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         response = self.get_html_response('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
         exploration = exp_services.get_exploration_by_id(exp_id)
-        with self.assertRaisesRegexp(
-            Exception, 'Sorry, we could not find the specified user.'):
-            self.put_json(
-                '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-                payload={
-                    'version': exploration.version,
-                    'new_member_username': 'invalid_new_member_username'},
-                csrf_token=csrf_token)
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
+            payload={
+                'version': exploration.version,
+                'new_member_username': 'invalid_new_member_username'},
+            csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Sorry, we could not find the specified user.')
 
     def test_make_private_exploration_viewable(self):
         self.login(self.OWNER_EMAIL)
@@ -1530,11 +1520,14 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         response = self.get_html_response('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
         exploration = exp_services.get_exploration_by_id(exp_id)
-        with self.assertRaisesRegexp(
-            Exception, 'No change was made to this exploration.'):
-            self.put_json(
-                '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
-                payload={'version': exploration.version}, csrf_token=csrf_token)
+
+        response = self.put_json(
+            '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id),
+            payload={'version': exploration.version}, csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'], 'No change was made to this exploration.')
 
 
 class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
@@ -1605,11 +1598,14 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         response = self.get_html_response(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exp_id))
         csrf_token = self.get_csrf_token_from_response(response)
-        with self.assertRaisesRegexp(Exception, 'Invalid message type.'):
-            self.put_json(
-                '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id),
-                payload={'message_type': 'invalid_message_type'},
-                csrf_token=csrf_token)
+
+        response = self.put_json(
+            '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id),
+            payload={'message_type': 'invalid_message_type'},
+            csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(response['error'], 'Invalid message type.')
+
         self.logout()
 
 
@@ -1874,7 +1870,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
 
     def test_cannot_fetch_issues_with_invalid_version(self):
         self.get_json(
-            '/issuesdatahandler/%s' % (self.EXP_ID),
+            '/issuesdatahandler/%s' % self.EXP_ID,
             params={'exp_version': 2}, expected_status_int=404)
 
     def test_cannot_fetch_playthrough_with_invalid_playthrough_id(self):
@@ -1885,7 +1881,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
     def test_fetch_issues_handler(self):
         """Test that all issues get fetched correctly."""
         response = self.get_json(
-            '/issuesdatahandler/%s' % (self.EXP_ID),
+            '/issuesdatahandler/%s' % self.EXP_ID,
             params={'exp_version': 1})
         self.assertEqual(len(response), 2)
         self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
@@ -1900,7 +1896,7 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         exp_issues_model.put()
 
         response = self.get_json(
-            '/issuesdatahandler/%s' % (self.EXP_ID),
+            '/issuesdatahandler/%s' % self.EXP_ID,
             params={'exp_version': 1})
         self.assertEqual(len(response), 1)
         self.assertEqual(response[0]['issue_type'], 'EarlyQuit')

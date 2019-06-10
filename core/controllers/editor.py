@@ -251,7 +251,7 @@ class ExplorationRightsHandler(EditorHandler):
             new_member_id = user_services.get_user_id_from_username(
                 new_member_username)
             if new_member_id is None:
-                raise Exception(
+                raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
 
             rights_manager.assign_role_for_exploration(
@@ -562,7 +562,8 @@ class FetchIssuesHandler(EditorHandler):
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
         if exp_issues is None:
             raise self.PageNotFoundException(
-                'Invalid exploration version %s' % (exp_version))
+                'Invalid version %s for exploration ID %s'
+                % (exp_version, exp_id))
         unresolved_issues = []
         for issue in exp_issues.unresolved_issues:
             if issue.is_valid:
