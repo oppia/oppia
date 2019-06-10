@@ -172,7 +172,8 @@ require(
   'thread-table.directive.ts');
 require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
-  'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
+  'pages/exploration-editor-page/improvements-tab/' +
+  'improvements-tab.directive.ts');
 require('pages/exploration_editor/preview_tab/PreviewTabDirective.ts');
 require('pages/exploration_editor/settings_tab/SettingsTabDirective.ts');
 require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');

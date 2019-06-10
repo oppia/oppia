@@ -27,8 +27,9 @@ oppia.directive('playthroughImprovementCard', [
         getData: '&data',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/improvements_tab/' +
-        'playthrough_improvement_card_directive.html'),
+        '/pages/exploration-editor-page/improvements-tab/' +
+        'playthrough-improvement-card/' +
+        'playthrough-improvement-card.directive.html'),
       controller: [
         '$scope', 'PlaythroughIssuesService',
         function($scope, PlaythroughIssuesService) {

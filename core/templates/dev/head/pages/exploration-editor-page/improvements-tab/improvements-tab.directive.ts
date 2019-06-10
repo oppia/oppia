@@ -18,8 +18,8 @@
  */
 
 require(
-  'pages/exploration_editor/improvements_tab/' +
-  'PlaythroughImprovementCardDirective.ts'
+  'pages/exploration-editor-page/improvements-tab/' +
+  'playthrough-improvement-card/playthrough-improvement-card.directive.ts'
 );
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -31,8 +31,8 @@ oppia.directive('improvementsTab', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/improvements_tab/' +
-        'improvements_tab_directive.html'),
+        '/pages/exploration-editor-page/improvements-tab/' +
+        'improvements-tab.directive.html'),
       controller: [
         '$scope', 'ImprovementCardService',
         function($scope, ImprovementCardService) {
