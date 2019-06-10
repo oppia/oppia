@@ -20,10 +20,14 @@ rendering.-->
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
-  ga('create', constants.ANALYTICS_ID, 'auto', {allowLinker: true});
-  ga('set', 'anonymizeIp', true);
-  ga('set', 'forceSSL', true);
-  ga('require', 'linker');
-  ga('linker:autoLink', [constants.SITE_NAME_FOR_ANALYTICS]);
-  ga('send', 'pageview');
+  (function() {
+    if (constants.ANALYTICS_ID && constants.SITE_NAME_FOR_ANALYTICS) {
+      ga('create', constants.ANALYTICS_ID, 'auto', {allowLinker: true});
+      ga('set', 'anonymizeIp', true);
+      ga('set', 'forceSSL', true);
+      ga('require', 'linker');
+      ga('linker:autoLink', [constants.SITE_NAME_FOR_ANALYTICS]);
+      ga('send', 'pageview');
+    }
+  })()
 </script>
