@@ -132,7 +132,7 @@ oppia.constant('SITE_NAME', 'Oppia.org');
 oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
 oppia.constant('FEEDBACK_POPOVER_PATH',
   '/pages/exploration-player-page/templates/' +
-  'feedback-popup-container.template.html.html');
+  'feedback-popup-container.template.html');
 
 oppia.constant('LOGOUT_URL', '/logout');
 
