@@ -22,7 +22,9 @@ require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
-require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-data.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

@@ -18,7 +18,7 @@
  */
 
 require(
-  '/pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
+  'pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
   'test-interaction-panel.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');

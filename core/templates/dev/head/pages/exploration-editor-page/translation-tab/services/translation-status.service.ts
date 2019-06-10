@@ -23,7 +23,7 @@ require(
   'translation-language.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
-  'TranslationTabActiveModeServiceSpec.ts');
+  'translation-tab-active-mode.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
