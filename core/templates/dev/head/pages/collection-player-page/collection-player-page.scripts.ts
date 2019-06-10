@@ -22,4 +22,4 @@ require(
 require(
   'pages/collection-player-page/collection-local-nav/' +
   'collection-local-nav.directive.ts');
-require('pages/collection-player-page/collection-player-page.scripts.ts');
+require('pages/collection-player-page/collection-player-page.directive.ts');
