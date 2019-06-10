@@ -23,8 +23,11 @@ require(
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
-require('pages/exploration_editor/history_tab/CompareVersionsService.ts');
-require('pages/exploration_editor/history_tab/VersionTreeService.ts');
+require(
+  'pages/exploration-editor-page/history-tab/services/' +
+  'compare-versions.service.ts');
+require(
+  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 require('services/DateTimeFormatService.ts');
 require('services/EditabilityService.ts');
 
@@ -35,7 +38,7 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/history_tab/history_tab_directive.html'),
+      '/pages/exploration-editor-page/history-tab/history-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$http', '$log', '$rootScope', '$scope',
@@ -256,8 +259,8 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
         ctrl.showRevertExplorationModal = function(version) {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/history_tab/' +
-              'revert_exploration_modal_directive.html'),
+              '/pages/exploration-editor-page/history-tab/modal-templates/' +
+              'revert-exploration-modal.template.html'),
             backdrop: true,
             resolve: {
               version: function() {

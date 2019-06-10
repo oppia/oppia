@@ -21,7 +21,8 @@ require('domain/state/StateObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationDiffService.ts');
-require('pages/exploration_editor/history_tab/VersionTreeService.ts');
+require(
+  'pages/exploration-editor-page/history-tab/services/version-tree.service.ts');
 
 oppia.factory('CompareVersionsService', [
   '$http', '$q', 'ExplorationDataService', 'ExplorationDiffService',

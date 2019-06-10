@@ -170,7 +170,7 @@ require('pages/exploration-editor-page/feedback-tab/feedback-tab.directive.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.directive.ts');
-require('pages/exploration_editor/history_tab/HistoryTabDirective.ts');
+require('pages/exploration-editor-page/history-tab/history-tab.directive.ts');
 require(
   'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
 require('pages/exploration_editor/preview_tab/PreviewTabDirective.ts');
