@@ -40,7 +40,7 @@ require(
   'pages/exploration-editor-page/services/' +
   'exploration-correctness-feedback.service.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
-require('pages/exploration_editor/ExplorationEditor.ts');
+require('pages/exploration-editor-page/exploration-editor-page.controller.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');

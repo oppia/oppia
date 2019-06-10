@@ -20,13 +20,15 @@ require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
-  'pages/exploration_editor/translation_tab/StateTranslationDirective.ts');
+  'pages/exploration-editor-page/translation-tab/state-translation/' +
+  'state-translation.directive.ts');
 require(
-  'pages/exploration_editor/translation_tab/' +
-  'StateTranslationStatusGraphDirective.ts'
+  'pages/exploration-editor-page/translation-tab/' +
+  'state-translation-status-graph/state-translation-status-graph.directive.ts'
 );
 require(
-  'pages/exploration_editor/translation_tab/TranslatorOverviewDirective.ts');
+  'pages/exploration-editor-page/translation-tab/translator-overview/' +
+  'translator-overview.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
@@ -52,8 +54,8 @@ oppia.directive('translationTab', ['UrlInterpolationService',
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/translation_tab/' +
-        'translation_tab_directive.html'),
+        '/pages/exploration-editor-page/translation-tab/' +
+        'translation-tab.directive.html'),
 
       controller: ['$scope', '$rootScope', '$templateCache', '$uibModal',
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
@@ -280,8 +282,8 @@ oppia.directive('translationTab', ['UrlInterpolationService',
           $scope.showWelcomeTranslationModal = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/translation_tab/' +
-                'welcome_translation_modal_directive.html'),
+                '/pages/exploration-editor-page/translation-tab/' +
+                'modal-templates/welcome-translation-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', 'ContextService',

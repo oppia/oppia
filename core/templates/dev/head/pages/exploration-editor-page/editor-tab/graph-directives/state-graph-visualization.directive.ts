@@ -21,7 +21,9 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
-require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-status.service.ts');
 
 /* eslint-disable angular/directive-restrict */
 oppia.directive('stateGraphVisualization', [

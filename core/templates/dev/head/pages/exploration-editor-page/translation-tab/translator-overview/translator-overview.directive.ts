@@ -20,8 +20,11 @@
 require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
-require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-language.service.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-status.service.ts');
 
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
@@ -33,8 +36,8 @@ oppia.directive('translatorOverview', [
         isTranslationTabBusy: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/translation_tab/' +
-        'translator_overview_directive.html'),
+        '/pages/exploration-editor-page/translation-tab/translator-overview/' +
+        'translator-overview.directive.html'),
       controller: [
         '$rootScope', '$scope', '$timeout', '$window',
         'ExplorationLanguageCodeService', 'LanguageUtilService',

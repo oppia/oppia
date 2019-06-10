@@ -19,12 +19,14 @@
 require('filters/format-timer.filter.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
-  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-language.service.ts');
 require(
-  'pages/exploration_editor/translation_tab/' +
-  'TranslationTabActiveContentIdService.ts');
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-tab-active-content-id.service.ts');
 require(
-  'pages/exploration_editor/translation_tab/VoiceoverRecordingService.ts');
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'voiceover-recording.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -85,8 +87,8 @@ oppia.directive('audioTranslationBar', [
         });
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/translation_tab/' +
-        'audio_translation_bar_directive.html'),
+        '/pages/exploration-editor-page/translation-tab/' +
+        'audio-translation-bar/audio-translation-bar.directive.html'),
       controller: [
         '$filter', '$interval', '$rootScope', '$scope', '$uibModal', '$window',
         'AlertsService', 'AssetsBackendApiService', 'AudioPlayerService',
@@ -350,8 +352,8 @@ oppia.directive('audioTranslationBar', [
           $scope.openTranslationTabBusyModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/translation_tab/' +
-                'translation_tab_busy_modal_directive.html'),
+                '/pages/exploration-editor-page/translation-tab/' +
+                'modal-templates/translation-tab-busy-modal.template.html'),
               backdrop: true,
               resolve: {
                 message: function() {
@@ -470,8 +472,8 @@ oppia.directive('audioTranslationBar', [
           $scope.openDeleteAudioTranslationModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/translation_tab/' +
-                'delete_audio_translation_modal_directive.html'),
+                '/pages/exploration-editor-page/translation-tab/' +
+                'modal-templates/delete-audio-translation-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -497,8 +499,8 @@ oppia.directive('audioTranslationBar', [
             SiteAnalyticsService.registerUploadAudioEvent();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/translation_tab/' +
-                'add_audio_translation_modal_directive.html'),
+                '/pages/exploration-editor-page/translation-tab/' +
+                'modal-templates/add-audio-translation-modal.template.html'),
               backdrop: 'static',
               resolve: {
                 audioFile: function() {

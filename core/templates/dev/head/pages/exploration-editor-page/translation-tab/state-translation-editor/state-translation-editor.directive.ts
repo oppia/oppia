@@ -22,8 +22,8 @@ oppia.directive('stateTranslationEditor', [
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/translation_tab/' +
-        'state_translation_editor_directive.html'),
+        '/pages/exploration-editor-page/translation-tab/' +
+        'state-translation-editor/state-translation-editor.directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditabilityService', 'ExplorationStatesService',
         'StateEditorService', 'StateWrittenTranslationsService',

@@ -17,9 +17,8 @@
  */
 
 require(
-  'pages/exploration_editor/translation_tab/' +
-  'TranslationTabActiveContentIdService.ts'
-);
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-tab-active-content-id.service.ts');
 
 describe('Translation tab active content id service', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {

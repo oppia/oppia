@@ -19,10 +19,11 @@
 require(
   'components/state-directives/response-header/response-header.directive.ts');
 require(
-  'pages/exploration_editor/translation_tab/AudioTranslationBarDirective.ts');
+  'pages/exploration-editor-page/translation-tab/audio-translation-bar/' +
+  'audio-translation-bar.directive.ts');
 require(
-  'pages/exploration_editor/translation_tab/' +
-  'StateTranslationEditorDirective.ts'
+  'pages/exploration-editor-page/translation-tab/state-translation-editor/' +
+  'state-translation-editor.directive.ts'
 );
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -38,12 +39,13 @@ require(
   'exploration-init-state-name.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
 require(
-  'pages/exploration_editor/translation_tab/' +
-  'TranslationTabActiveContentIdService.ts'
-);
-require(
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-status.service.ts');
+  require(
+    'pages/exploration-editor-page/translation-tab/services/' +
+    'translation-tab-active-content-id.service.ts');
+  require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
@@ -55,8 +57,8 @@ oppia.directive('stateTranslation', [
         isTranslationTabBusy: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/translation_tab/' +
-        'state_translation_directive.html'),
+        '/pages/exploration-editor-page/translation-tab/' +
+        'state-translation/state-translation.directive.html'),
       controller: [
         '$filter', '$rootScope', '$scope',
         'ExplorationCorrectnessFeedbackService',

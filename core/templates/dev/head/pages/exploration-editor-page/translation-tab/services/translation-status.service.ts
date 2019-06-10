@@ -19,11 +19,11 @@
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
-  'pages/exploration_editor/translation_tab/TranslationLanguageService.ts');
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-language.service.ts');
 require(
-  'pages/exploration_editor/translation_tab/' +
-  'TranslationTabActiveModeService.ts'
-);
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'TranslationTabActiveModeServiceSpec.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');

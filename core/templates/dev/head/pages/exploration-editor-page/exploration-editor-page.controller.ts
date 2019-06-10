@@ -187,7 +187,8 @@ require(
   'playthrough-issues.directive.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
-require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');
 require('pages/exploration_player/PlayerConstants.ts');

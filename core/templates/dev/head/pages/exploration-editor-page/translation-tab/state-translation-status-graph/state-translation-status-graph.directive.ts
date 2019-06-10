@@ -23,7 +23,9 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
-require('pages/exploration_editor/translation_tab/TranslationStatusService.ts');
+require(
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-status.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
@@ -45,8 +47,9 @@ oppia.directive('stateTranslationStatusGraph', [
         isTranslationTabBusy: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/translation_tab/' +
-        'state_translation_status_graph_directive.html'),
+        '/pages/exploration-editor-page/translation-tab/' +
+        'state-translation-status-graph/' +
+        'state-translation-status-graph.directive.html'),
       controller: [
         '$scope', '$rootScope', 'ExplorationStatesService', 'GraphDataService',
         'StateEditorService', 'StateRecordedVoiceoversService',
