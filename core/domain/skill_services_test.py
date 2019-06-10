@@ -827,11 +827,13 @@ class SkillMigrationTests(test_utils.GenericTestBase):
                     explanation_content_id: {}
                 }
             }))
+        misconception = skill_domain.Misconception(
+            1, 'name', 'description', 'default_feedback')
         model = skill_models.SkillModel(
             id='skill_id',
             description='description',
             language_code='en',
-            misconceptions=[],
+            misconceptions=[misconception.to_dict()],
             skill_contents=skill_contents.to_dict(),
             next_misconception_id=1,
             misconceptions_schema_version=1,
