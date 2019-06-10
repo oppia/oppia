@@ -130,7 +130,8 @@ class BaseModelValidator(object):
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
-        """Defines a domain object instance created from the model.
+        """Defines a list of domain object instances created from
+        the model properties/model.
 
         This should be implemented by subclasses.
 
