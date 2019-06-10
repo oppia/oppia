@@ -18,7 +18,7 @@ module.exports = function(config) {
       'local_compiled_js/assets/rich_text_components_definitions.js',
       // Since jquery,jquery-ui,angular,angular-mocks and math-expressions
       // are not bundled, they will be treated separately.
-      'third_party/static/jquery-3.2.1/jquery.min.js',
+      'third_party/static/jquery-3.4.1/jquery.min.js',
       'third_party/static/jqueryui-1.12.1/jquery-ui.min.js',
       'third_party/static/angularjs-1.5.8/angular.js',
       'third_party/static/angularjs-1.5.8/angular-mocks.js',
@@ -26,16 +26,18 @@ module.exports = function(config) {
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.9.2/ckeditor.js',
-      'third_party/static/angular-recorder-1.4.1/dist' +
-      '/angular-audio-recorder.min.js',
       generatedJs,
       'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
+      'core/templates/dev/head/**/*.directive.html',
+      'core/templates/dev/head/**/*.template.html',
       'core/templates/dev/head/**/*Spec.ts',
       'core/templates/dev/head/*Spec.ts',
+      'core/templates/dev/head/**/*.spec.ts',
+      'core/templates/dev/head/*.spec.ts',
       'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
       {
@@ -66,10 +68,10 @@ module.exports = function(config) {
        'SolutionVerificationServiceSpec.ts'),
       ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
        'StateNameEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state_editor/' +
-       'StateContentEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state_editor/' +
-       'StateInteractionEditorDirectiveSpec.ts'),
+      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
+       'state-content-editor.directive.spec.ts'),
+      ('core/templates/dev/head/components/state-editor/' +
+       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -83,12 +85,16 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.ts': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/!(*.spec).js': ['coverage'],
+      'core/templates/dev/head/**/!(*.spec).js': ['coverage'],
       'extensions/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       // Note that these files should contain only directive templates, and no
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
@@ -148,7 +154,10 @@ module.exports = function(config) {
     webpack: {
       mode: 'development',
       resolve: {
-        modules: ['core/templates/dev/head'],
+        modules: [
+          'core/templates/dev/head',
+          'extensions'
+        ],
       },
       module: {
         rules: [{

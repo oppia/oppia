@@ -430,26 +430,6 @@ def _remove_activity_ids_from_playlist(
         learner_playlist_services.save_learner_playlist(learner_playlist)
 
 
-def remove_exp_from_completed_list(user_id, exploration_id):
-    """Removes the exploration from the completed list of the user
-    (if present).
-
-    Args:
-        user_id: str. The id of the user.
-        exploration_id: str. The id of the exploration to be removed.
-    """
-    completed_activities_model = (
-        user_models.CompletedActivitiesModel.get(
-            user_id, strict=False))
-
-    if completed_activities_model:
-        activities_completed = _get_completed_activities_from_model(
-            completed_activities_model)
-        if exploration_id in activities_completed.exploration_ids:
-            activities_completed.remove_exploration_id(exploration_id)
-            _save_completed_activities(activities_completed)
-
-
 def remove_collection_from_completed_list(user_id, collection_id):
     """Removes the collection id from the list of completed collections
     (if present).

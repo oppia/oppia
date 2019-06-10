@@ -1,9 +1,5 @@
 {% extends 'dist/base.html' %}
 
-{% block maintitle %}
-  {{ exploration_title }} - Oppia
-{% endblock maintitle %}
-
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
@@ -33,24 +29,15 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="LearnerViewInfo">
-    <li>
-      <span class="oppia-navbar-breadcrumb-separator"></span>
-      <h1 class="oppia-exploration-h1"><span class="protractor-test-exploration-header oppia-exploration-header" itemprop="description">{{exploration_title}}</span></h1>
-    </li>
-    <li ng-click="showInformationCard()" uib-tooltip="<['I18N_PLAYER_INFO_TOOLTIP' | translate]>" tooltip-placement="bottom" style="cursor: pointer;" class="oppia-exploration-info-icon protractor-test-exploration-info-icon" tabindex="0">
-      <i class="material-icons oppia-navbar-breadcrumb-icon" style="font-size: 20px;">&#xE88E;</i>
-      <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_INFO_TOOLTIP' | translate]></span>
-    </li>
-  </ul>
+  <learner-view-info exploration-title="{{exploration_title}}"></learner-view-info>
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  {% include 'pages/exploration_player/learner_local_nav.html' %}
+  <learner-local-nav></learner-local-nav>
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <div>
+  <div ng-controller="ExplorationPlayer">
     <background-banner></background-banner>
     <conversation-skin></conversation-skin>
     <attribution-guide></attribution-guide>
@@ -81,7 +68,7 @@
   <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
 
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
-  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
   <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
   <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
@@ -95,7 +82,6 @@
       <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
-  {% include 'components/rich_text_components.html' %}
   {{ interaction_templates }}
   {{ dependencies_html }}
 {% endblock footer_js %}

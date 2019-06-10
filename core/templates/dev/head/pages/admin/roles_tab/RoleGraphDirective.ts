@@ -16,15 +16,16 @@
  * @fileoverview Directive for displaying Role graph.
  */
 
-require('components/StateGraphLayoutService.ts');
+require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 
 oppia.directive('roleGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         // An object with these keys:
         //  - 'nodes': An object whose keys are node ids and whose values are
         //             node labels
@@ -39,12 +40,14 @@ oppia.directive('roleGraph', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/roles_tab/role_graph_directive.html'),
+      controllerAs: '$ctrl',
       controller: [
-        '$scope', '$element', '$timeout', '$filter', 'StateGraphLayoutService',
+        '$element', '$timeout', '$filter', 'StateGraphLayoutService',
         'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
         function(
-            $scope, $element, $timeout, $filter, StateGraphLayoutService,
+            $element, $timeout, $filter, StateGraphLayoutService,
             MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
+          var ctrl = this;
           var getElementDimensions = function() {
             return {
               h: $element.height(),
@@ -52,48 +55,48 @@ oppia.directive('roleGraph', [
             };
           };
 
-          $scope.getGraphHeightInPixels = function() {
-            return Math.max($scope.GRAPH_HEIGHT, 300);
+          ctrl.getGraphHeightInPixels = function() {
+            return Math.max(ctrl.GRAPH_HEIGHT, 300);
           };
 
-          $scope.drawGraph = function(
+          ctrl.drawGraph = function(
               nodes, originalLinks, initStateId, finalStateIds) {
-            $scope.finalStateIds = finalStateIds;
+            ctrl.finalStateIds = finalStateIds;
             var links = angular.copy(originalLinks);
 
             var nodeData = StateGraphLayoutService.computeLayout(
               nodes, links, initStateId, angular.copy(finalStateIds));
 
-            $scope.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
+            ctrl.GRAPH_WIDTH = StateGraphLayoutService.getGraphWidth(
               MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH);
-            $scope.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
+            ctrl.GRAPH_HEIGHT = StateGraphLayoutService.getGraphHeight(
               nodeData);
 
             nodeData = StateGraphLayoutService.modifyPositionValues(
-              nodeData, $scope.GRAPH_WIDTH, $scope.GRAPH_HEIGHT);
+              nodeData, ctrl.GRAPH_WIDTH, ctrl.GRAPH_HEIGHT);
 
-            $scope.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
+            ctrl.augmentedLinks = StateGraphLayoutService.getAugmentedLinks(
               nodeData, links);
 
-            $scope.getNodeTitle = function(node) {
+            ctrl.getNodeTitle = function(node) {
               return node.label;
             };
 
-            $scope.getTruncatedLabel = function(nodeLabel) {
+            ctrl.getTruncatedLabel = function(nodeLabel) {
               return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
             };
 
             // creating list of nodes to display.
-            $scope.nodeList = [];
+            ctrl.nodeList = [];
             for (var nodeId in nodeData) {
-              $scope.nodeList.push(nodeData[nodeId]);
+              ctrl.nodeList.push(nodeData[nodeId]);
             }
           };
 
-          if ($scope.graphDataLoaded) {
-            $scope.drawGraph(
-              $scope.graphData.nodes, $scope.graphData.links,
-              $scope.graphData.initStateId, $scope.graphData.finalStateIds
+          if (ctrl.graphDataLoaded) {
+            ctrl.drawGraph(
+              ctrl.graphData.nodes, ctrl.graphData.links,
+              ctrl.graphData.initStateId, ctrl.graphData.finalStateIds
             );
           }
         }
