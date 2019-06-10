@@ -27,7 +27,8 @@ require('pages/exploration_editor/ExplorationWarningsService.ts');
 require('pages/exploration_editor/GraphDataService.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
-require('pages/exploration_player/AnswerClassificationService.ts');
+require(
+  'pages/exploration-player-page/services/answer-classification.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

@@ -28,10 +28,12 @@ require('pages/exploration_editor/ExplorationParamSpecsService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/ExplorationTitleService.ts');
 require('pages/exploration_editor/ParameterMetadataService.ts');
-require('pages/exploration_player/ExplorationEngineService.ts');
-require('pages/exploration_player/LearnerParamsService.ts');
-require('pages/exploration_player/NumberAttemptsService.ts');
-require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.ts');
+require('pages/exploration-player-page/services/exploration-engine.service.ts');
+require('pages/exploration-player-page/services/learner-params.service.ts');
+require('pages/exploration-player-page/services/number-attempts.service.ts');
+require(
+  'pages/exploration-player-page/services/' +
+  'player-correctness-feedback-enabled.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

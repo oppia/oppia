@@ -18,7 +18,8 @@
 
 require('domain/classifier/AnswerClassificationResultObjectFactory.ts');
 require('domain/exploration/OutcomeObjectFactory.ts');
-require('pages/exploration_player/AnswerClassificationService.ts');
+require(
+  'pages/exploration-player-page/services/answer-classification.service.ts');
 
 describe('Answer classification result object factory', function() {
   var oof, acrof;

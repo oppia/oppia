@@ -25,8 +25,10 @@ require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
 require('pages/exploration_editor/editor_tab/TrainingModalService.ts');
-require('pages/exploration_player/AnswerClassificationService.ts');
-require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/exploration-player-page/services/answer-classification.service.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

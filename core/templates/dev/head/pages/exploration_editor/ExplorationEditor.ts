@@ -167,9 +167,11 @@ require(
   'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
 require('pages/exploration_editor/statistics_tab/StatisticsTabDirective.ts');
 require('pages/exploration_editor/translation_tab/TranslationTabDirective.ts');
-require('pages/exploration_player/ConversationSkinDirective.ts');
-require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/PlayerConstants.ts');
+require(
+  'pages/exploration-player-page/learner-experience/conversation-skin.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/exploration-footer.directive.ts');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
@@ -192,7 +194,8 @@ require('pages/exploration_editor/ExplorationTitleService.ts');
 require('pages/exploration_editor/ExplorationWarningsService.ts');
 require('pages/exploration_editor/GraphDataService.ts');
 require('pages/exploration_editor/RouterService.ts');
-require('pages/exploration_player/StateClassifierMappingService.ts');
+require(
+  'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
 require('pages/exploration_editor/UserEmailPreferencesService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');

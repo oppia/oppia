@@ -28,7 +28,8 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
 require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
-require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-customization-args.service.ts');

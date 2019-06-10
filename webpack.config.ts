@@ -52,7 +52,8 @@ module.exports = {
     exploration_editor:
       commonPrefix + '/pages/exploration_editor/ExplorationEditor.ts',
     exploration_player:
-      commonPrefix + '/pages/exploration_player/ExplorationPlayer.ts',
+      commonPrefix + '/pages/exploration-player-page/' +
+      'exploration-player-page.controller.ts',
     get_started:
       commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
@@ -192,9 +193,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_player'],
-      filename: 'exploration_player.html',
+      filename: 'exploration-player-page.mainpage.html',
       template:
-        commonPrefix + '/pages/exploration_player/exploration_player.html',
+        commonPrefix + '/pages/exploration-player-page/' +
+        'exploration-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

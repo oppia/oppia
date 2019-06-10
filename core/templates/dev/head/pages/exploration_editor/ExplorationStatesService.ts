@@ -25,7 +25,8 @@ require('pages/exploration_editor/AngularNameService.ts');
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationInitStateNameService.ts');
 require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
-require('pages/exploration_player/AnswerClassificationService.ts');
+require(
+  'pages/exploration-player-page/services/answer-classification.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
