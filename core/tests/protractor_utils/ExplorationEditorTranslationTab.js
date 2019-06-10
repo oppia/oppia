@@ -180,7 +180,7 @@ var ExplorationEditorTranslationTab = function() {
   var voiceoverModeButton = element(by.css('.protractor-test-voiceover-mode'));
 
   var saveTranslationButton = element(
-    by.css('protractor-test-save-translation'));
+    by.css('.protractor-test-save-translation'));
   var editTranslation = element(
     by.css('.protractor-test-edit-translation'));
   var translationDisplay = element(
