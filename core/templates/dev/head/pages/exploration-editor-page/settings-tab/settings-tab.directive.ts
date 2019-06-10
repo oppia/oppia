@@ -76,7 +76,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
       currentUserIsModerator: '='
     },
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/settings_tab/settings_tab_directive.html'),
+      '/pages/exploration-editor-page/settings-tab/' +
+      'settings-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$http', '$rootScope', '$scope', '$uibModal', '$window', 'AlertsService',
@@ -305,8 +306,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           AlertsService.clearWarnings();
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/settings_tab/' +
-              'preview_summary_tile_modal_directive.html'),
+              '/pages/exploration-editor-page/settings-tab/templates/' +
+              'preview-summary-tile-modal.template.html'),
             backdrop: true,
             controller: [
               '$scope', '$uibModalInstance', function(
@@ -352,8 +353,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
           AlertsService.clearWarnings();
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/settings_tab/' +
-              'transfer_exploration_ownership_modal_directive.html'),
+              '/pages/exploration-editor-page/settings-tab/templates/' +
+              'transfer-exploration-ownership-modal.template.html'),
             backdrop: true,
             controller: [
               '$scope', '$uibModalInstance', function(
@@ -376,8 +377,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
 
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/settings_tab/' +
-              'delete_exploration_modal_directive.html'),
+              '/pages/exploration-editor-page/settings-tab/templates/' +
+              'delete-exploration-modal.template.html'),
             backdrop: true,
             controller: [
               '$scope', '$uibModalInstance', function(
@@ -410,8 +411,8 @@ oppia.directive('settingsTab', ['UrlInterpolationService', function(
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/settings_tab/' +
-                'moderator_unpublish_exploration_modal_directive.html'),
+                '/pages/exploration-editor-page/settings-tab/templates/' +
+                'moderator-unpublish-exploration-modal.template.html'),
               backdrop: true,
               resolve: {
                 draftEmailBody: function() {

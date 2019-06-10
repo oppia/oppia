@@ -177,7 +177,7 @@ require(
   'pages/exploration-editor-page/improvements-tab/' +
   'improvements-tab.directive.ts');
 require('pages/exploration-editor-page/preview-tab/preview-tab.directive.ts');
-require('pages/exploration_editor/settings_tab/SettingsTabDirective.ts');
+require('pages/exploration-editor-page/settings-tab/settings-tab.directive.ts');
 require('pages/exploration_editor/statistics_tab/PieChartDirective.ts');
 require(
   'pages/exploration_editor/statistics_tab/PlaythroughIssuesDirective.ts');
