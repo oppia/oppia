@@ -2302,18 +2302,18 @@ class LintChecksManager(object):
                 filepath for filepath in self.all_filepaths if (
                     filepath.endswith('.js'))]
 
-            for filename in js_files_to_check:
-                if filename.startswith(('core/templates', 'extensions')) and (
-                        filename not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
-                            not filename.endswith('protractor.js')):
-                    print '%s  --> Found extra .js file\n' % filename
+            for filepath in js_files_to_check:
+                if filepath.startswith(('core/templates', 'extensions')) and (
+                        filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
+                            not filepath.endswith('protractor.js')):
+                    print '%s  --> Found extra .js file\n' % filepath
                     failed = True
 
             if failed:
                 err_msg = (
                     'If you want the above files to be present as js files, '
                     'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
-                    'build.py else rename them to .ts\n')
+                    'build.py. Otherwise, rename them to .ts\n')
                 print err_msg
 
             if failed:

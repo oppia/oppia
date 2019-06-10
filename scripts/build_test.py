@@ -22,7 +22,6 @@ import collections
 import json
 import os
 import random
-import shutil
 import subprocess
 import threading
 
@@ -48,7 +47,8 @@ MOCK_TEMPLATES_COMPILED_JS_DIR = os.path.join(
 
 MOCK_COMPILED_JS_DIR = os.path.join(TEST_SOURCE_DIR, 'compiled_js_dir', '')
 
-MOCK_TSC_OUTPUT_LOG_FILE = os.path.join(TEST_SOURCE_DIR, 'tsc_output_log.txt')
+MOCK_TSC_OUTPUT_LOG_FILEPATH = os.path.join(
+    TEST_SOURCE_DIR, 'tsc_output_log.txt')
 
 INVALID_INPUT_FILEPATH = os.path.join(
     TEST_DIR, 'invalid', 'path', 'to', 'input.js')
@@ -655,54 +655,68 @@ class BuildTests(test_utils.GenericTestBase):
 
     def test_compiled_js_dir_validation(self):
         """Test that build.COMPILED_JS_DIR is validated correctly with
-        outDir in tsconfig.json.
+        outDir in build.TSCONFIG_FILEPATH.
         """
-        build.test_compiled_js_dir_is_valid()
+        build.require_compiled_js_dir_to_be_valid()
 
         out_dir = ''
-        with open('tsconfig.json') as f:
+        with open(build.TSCONFIG_FILEPATH) as f:
             config_data = json.load(f)
             out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
         with self.assertRaisesRegexp(
             Exception,
-            'COMPILED_JS_DIR: %s is does not match the output directory '
-            'in tsconfig.json: %s' % (
-                MOCK_COMPILED_JS_DIR, out_dir)), self.swap(
+            'COMPILED_JS_DIR: %s does not match the output directory '
+            'in %s: %s' % (
+                MOCK_COMPILED_JS_DIR, build.TSCONFIG_FILEPATH,
+                out_dir)), self.swap(
                     build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR):
-            build.test_compiled_js_dir_is_valid()
+            build.require_compiled_js_dir_to_be_valid()
 
     def test_compiled_js_dir_is_deleted_before_compilation(self):
-        """Test that compiled_js_dir is deleted before a fresh
-        compilation.
-        """
+        """Test that compiled_js_dir is deleted before a fresh compilation."""
         def mock_check_call(unused_cmd):
             pass
+        def mock_require_compiled_js_dir_to_be_valid():
+            pass
+
+        with self.swap(
+            build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR), self.swap(
+                build, 'require_compiled_js_dir_to_be_valid',
+                mock_require_compiled_js_dir_to_be_valid):
+
+            if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
+                os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
+
+            with self.swap(subprocess, 'check_call', mock_check_call):
+                build.compile_typescript_files('.')
+                self.assertFalse(
+                    os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
+
+    def test_compiled_js_dir_is_deleted_before_watch_mode_compilation(self):
+        """Test that compiled_js_dir is deleted before a fresh watch mode
+        compilation.
+        """
         # pylint: disable=unused-argument
         def mock_call(unused_cmd, shell, stdout):
             pass
         def mock_popen(unused_cmd, stdout):
             pass
         # pylint: enable=unused-argument
-        def mock_test_compiled_js_dir_is_valid():
+        def mock_require_compiled_js_dir_to_be_valid():
             pass
 
         with self.swap(
             build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR), self.swap(
-                build, 'test_compiled_js_dir_is_valid',
-                mock_test_compiled_js_dir_is_valid):
-            if os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
-                shutil.rmtree(MOCK_COMPILED_JS_DIR)
+                build, 'require_compiled_js_dir_to_be_valid',
+                mock_require_compiled_js_dir_to_be_valid):
 
-            with self.swap(subprocess, 'check_call', mock_check_call):
+            if not os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
                 os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
-                build.compile_typescript_files('.')
-                self.assertFalse(
-                    os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
             with self.swap(subprocess, 'Popen', mock_popen), self.swap(
                 subprocess, 'call', mock_call), self.swap(
-                    build, 'TSC_OUTPUT_LOG_FILE', MOCK_TSC_OUTPUT_LOG_FILE):
-                os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
+                    build, 'TSC_OUTPUT_LOG_FILEPATH',
+                    MOCK_TSC_OUTPUT_LOG_FILEPATH):
                 build.compile_typescript_files_continuously('.')
                 self.assertFalse(
                     os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
