@@ -76,22 +76,35 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-require('components/forms/validators/IsAtLeastFilter.ts');
-require('components/forms/validators/IsAtMostFilter.ts');
-require('components/forms/validators/IsFloatFilter.ts');
-require('components/forms/validators/IsIntegerFilter.ts');
-require('components/forms/validators/IsNonemptyFilter.ts');
-require('components/state/AnswerGroupEditorDirective.ts');
-require('components/state/HintEditorDirective.ts');
-require('components/state/OutcomeEditorDirective.ts');
-require('components/state/OutcomeDestinationEditorDirective.ts');
-require('components/state/OutcomeFeedbackEditorDirective.ts');
-require('components/state/ResponseHeaderDirective.ts');
-require('components/state/RuleEditorDirective.ts');
-require('components/state/RuleTypeSelectorDirective.ts');
-require('components/state/SolutionEditorDirective.ts');
-require('components/state/SolutionExplanationEditorDirective.ts');
-require('components/CodemirrorMergeviewDirective.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
+require(
+  'components/state-directives/answer-group-editor/' +
+  'answer-group-editor.directive.ts');
+require('components/state-directives/hint-editor/hint-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/outcome-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-destination-editor.directive.ts');
+require(
+  'components/state-directives/outcome-editor/' +
+  'outcome-feedback-editor.directive.ts');
+require(
+  'components/state-directives/response-header/response-header.directive.ts');
+require('components/state-directives/rule-editor/rule-editor.directive.ts');
+require(
+  'components/state-directives/rule-editor/rule-type-selector.directive.ts');
+require(
+  'components/state-directives/solution-editor/solution-editor.directive.ts');
+require(
+  'components/state-directives/solution-editor/' +
+  'solution-explanation-editor.directive.ts');
+require(
+  'components/version-diff-visualization/codemirror-mergeview.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
@@ -119,18 +132,21 @@ require(
   'components/forms/forms-templates/' +
   'mark-all-audio-and-translations-as-needing-update.controller.ts');
 require('pages/exploration_editor/statistics_tab/BarChartDirective.ts');
-require('pages/suggestion_editor/ShowSuggestionModalForEditorView.ts');
+require(
+  'pages/suggestion_editor/SuggestionModalForExplorationEditorService.ts');
 require('services/AutoplayedVideosService.ts');
 require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
 
-require('components/VersionDiffVisualizationDirective.ts');
+require(
+  'components/version-diff-visualization/' +
+  'version-diff-visualization.directive.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
 require(
   'components/forms/custom-forms-directives/select2-dropdown.directive.ts');
-require('components/profile_link/ProfileLinkTextDirective.ts');
+require('components/profile-link-directives/profile-link-text.directive.ts');
 require('pages/exploration_editor/EditorNavbarBreadcrumbDirective.ts');
 require('pages/exploration_editor/EditorNavigationDirective.ts');
 require('pages/exploration_editor/ExplorationObjectiveEditorDirective.ts');
@@ -180,7 +196,9 @@ require('pages/exploration_player/StateClassifierMappingService.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
 require('pages/exploration_editor/UserEmailPreferencesService.ts');
 require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
