@@ -32,7 +32,9 @@ require('pages/exploration_player/ExplorationEngineService.ts');
 require('pages/exploration_player/LearnerParamsService.ts');
 require('pages/exploration_player/NumberAttemptsService.ts');
 require('pages/exploration_player/PlayerCorrectnessFeedbackEnabledService.ts');
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 
