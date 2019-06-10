@@ -19,7 +19,9 @@
 require('App.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/state-name-editor/' +
+  'state-name-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

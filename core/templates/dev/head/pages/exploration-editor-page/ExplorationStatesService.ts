@@ -24,7 +24,9 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('pages/exploration_editor/AngularNameService.ts');
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationInitStateNameService.ts');
-require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-validity.service.ts');
 require('pages/exploration_player/AnswerClassificationService.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -409,8 +411,8 @@ oppia.factory('ExplorationStatesService', [
 
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/editor_tab/' +
-            'confirm_delete_state_modal_directive.html'),
+            '/pages/exploration-editor-page/editor-tab/templates/' +
+            'modal-templates/confirm-delete-state-modal.template.html'),
           backdrop: true,
           controller: [
             '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {

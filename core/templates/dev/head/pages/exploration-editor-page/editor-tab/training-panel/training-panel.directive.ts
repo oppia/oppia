@@ -38,8 +38,8 @@ oppia.directive('trainingPanel', [
         addingNewResponse: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'training_answer_modal_directive.html'),
+        '/pages/exploration-editor-page/editor-tab/training-panel/' +
+        'training-panel.directive.html'),
       controller: [
         '$scope', 'ExplorationHtmlFormatterService',
         'StateEditorService', 'ExplorationStatesService',

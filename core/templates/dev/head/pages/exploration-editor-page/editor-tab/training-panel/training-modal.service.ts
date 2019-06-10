@@ -17,7 +17,9 @@
  * the training modal used for unresolved answers.
  */
 
-require('pages/exploration_editor/editor_tab/TrainingPanelDirective.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-panel.directive.ts');
 
 require('domain/exploration/AnswerGroupObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
@@ -25,8 +27,11 @@ require('pages/exploration_editor/AngularNameService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/ExplorationWarningsService.ts');
 require('pages/exploration_editor/GraphDataService.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
-require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-data.service.ts');
 require('pages/exploration_player/AnswerClassificationService.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
@@ -52,8 +57,8 @@ oppia.factory('TrainingModalService', [
         AlertsService.clearWarnings();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/editor_tab/' +
-            'training_unresolved_answer_modal_directive.html'),
+            '/pages/exploration-editor-page/editor-tab/templates/' +
+            'modal-templates/training-unresolved-answer-modal.template.html'),
           backdrop: true,
           controller: [
             '$scope', '$injector', '$uibModalInstance',

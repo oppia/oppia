@@ -19,7 +19,8 @@
 require('filters/string-utility-filters/truncate.filter.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

@@ -17,7 +17,8 @@
  */
 
 require(
-  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'interaction-details-cache.service.ts');
 
 describe('Interaction Details Cache Service', function() {
   describe('InteractionDetailsCache', function() {

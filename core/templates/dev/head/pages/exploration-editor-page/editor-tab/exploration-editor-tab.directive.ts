@@ -16,12 +16,18 @@
  * @fileoverview Controller for the Editor tab in the exploration editor page.
  */
 
-require('pages/exploration_editor/editor_tab/ExplorationGraphDirective.ts');
-require('pages/exploration_editor/editor_tab/StateNameEditorDirective.ts');
 require(
-  'pages/exploration_editor/editor_tab/StateParamChangesEditorDirective.ts');
+  'pages/exploration-editor-page/editor-tab/graph-directives/' +
+  'exploration-graph.directive.ts');
 require(
-  'pages/exploration_editor/editor_tab/UnresolvedAnswersOverviewDirective.ts');
+  'pages/exploration-editor-page/editor-tab/state-name-editor/' +
+  'state-name-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/state-param-changes-editor/' +
+  'state-param-changes-editor.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/unresolved-answers-overview/' +
+  'unresolved-answers-overview.directive.ts');
 require('components/state-editor/state-editor.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
@@ -45,8 +51,8 @@ oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/editor_tab/' +
-      'exploration_editor_tab_directive.html'),
+      '/pages/exploration-editor-page/editor-tab/' +
+      'exploration-editor-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$rootScope', '$scope', '$uibModal', 'AlertsService', 'ContextService',

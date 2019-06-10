@@ -18,9 +18,15 @@
  */
 
 require('domain/exploration/OutcomeObjectFactory.ts');
-require('pages/exploration_editor/editor_tab/AnswerGroupsCacheService.ts');
-require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
-require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'answer-groups-cache.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-validity.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-verification.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

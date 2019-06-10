@@ -21,7 +21,8 @@
 require('domain/exploration/RuleObjectFactory.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/GraphDataService.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

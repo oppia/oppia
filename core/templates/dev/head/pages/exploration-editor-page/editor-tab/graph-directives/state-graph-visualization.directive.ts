@@ -76,8 +76,8 @@ oppia.directive('stateGraphVisualization', [
         showTranslationWarnings: '@'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/' +
-        'state_graph_visualization_directive.html'),
+        '/pages/exploration-editor-page/editor-tab/graph-directives/' +
+        'state-graph-visualization.directive.html'),
       controller: [
         '$element', '$filter', '$scope', '$timeout',
         'ExplorationWarningsService', 'StateGraphLayoutService',

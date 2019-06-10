@@ -21,7 +21,9 @@ require('pages/exploration_editor/ExplorationParamChangesService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require('pages/exploration_editor/GraphDataService.ts');
 require('pages/exploration_editor/ParameterMetadataService.ts');
-require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-validity.service.ts');
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 

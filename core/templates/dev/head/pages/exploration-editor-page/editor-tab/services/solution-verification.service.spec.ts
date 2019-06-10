@@ -20,8 +20,11 @@ require('App.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
 require(
-  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
-require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'interaction-details-cache.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-verification.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-customization-args.service.ts');

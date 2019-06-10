@@ -17,14 +17,21 @@
  * the training data editor of an answer group.
  */
 
-require('pages/exploration_editor/editor_tab/TestInteractionPanelDirective.ts');
+require(
+  '/pages/exploration-editor-page/editor-tab/test-interaction-panel/' +
+  'test-interaction-panel.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/AngularNameService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
-require('pages/exploration_editor/editor_tab/TrainingDataService.ts');
-require('pages/exploration_editor/editor_tab/TrainingModalService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-data.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-modal.service.ts');
 require('pages/exploration_player/AnswerClassificationService.ts');
 require('pages/exploration_player/CurrentInteractionService.ts');
 require(
@@ -49,8 +56,8 @@ oppia.factory('TrainingDataEditorPanelService', [
         AlertsService.clearWarnings();
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/editor_tab/' +
-            'training_data_editor_directive.html'),
+            '/pages/exploration-editor-page/editor-tab/templates/' +
+            'training-data-editor.template.html'),
           backdrop: true,
           controller: [
             '$scope', '$injector', '$uibModalInstance', '$filter',
