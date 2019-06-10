@@ -18,6 +18,8 @@ import os
 
 from constants import constants
 from core.domain import exp_services
+from core.domain import fs_domain
+from core.domain import fs_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
@@ -325,6 +327,15 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             self.system_user, '0')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
+        mock_accepted_audio_extensions = {
+            'mp3': ['audio/mp3'],
+            'flac': ['audio/flac']
+        }
+
+        self.accepted_audio_extensions_swap = self.swap(
+            feconf, 'ACCEPTED_AUDIO_EXTENSIONS',
+            mock_accepted_audio_extensions)
+
     def test_audio_upload(self):
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/create/0')
@@ -340,6 +351,88 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
         )
         self.logout()
+
+    def test_audio_upload_with_non_mp3_file(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        file_system_class = fs_services.get_exploration_file_system_class()
+        fs = fs_domain.AbstractFileSystem(file_system_class(
+            fs_domain.ENTITY_TYPE_EXPLORATION, '0'))
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR,
+                               self.TEST_AUDIO_FILE_FLAC),
+                  mode='rb') as f:
+            raw_audio = f.read()
+
+        self.assertFalse(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
+
+        with self.accepted_audio_extensions_swap:
+            self.post_json(
+                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+                {'filename': self.TEST_AUDIO_FILE_FLAC},
+                csrf_token=csrf_token,
+                upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+            )
+
+        self.assertTrue(fs.isfile('audio/%s' % self.TEST_AUDIO_FILE_FLAC))
+
+        self.logout()
+
+    def test_detect_non_matching_extensions(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Use an accepted audio extension in mismatched_filename
+        # that differs from the uploaded file's audio type.
+        mismatched_filename = 'test.flac'
+        with open(os.path.join(feconf.TESTS_DATA_DIR,
+                               self.TEST_AUDIO_FILE_MP3),
+                  mode='rb') as f:
+            raw_audio = f.read()
+
+        with self.accepted_audio_extensions_swap:
+            response_dict = self.post_json(
+                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+                {'filename': mismatched_filename},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+                upload_files=[('raw_audio_file', 'unused_filename', raw_audio)]
+            )
+
+        self.logout()
+        self.assertIn(
+            'Although the filename extension indicates the file is a flac '
+            'file, it was not recognized as one. Found mime types:',
+            response_dict['error'])
+
+    def test_detect_non_audio_file(self):
+        """Test that filenames with extensions that don't match the audio are
+        detected.
+        """
+
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR,
+                               'img.png'),
+                  mode='rb') as f:
+            raw_audio = f.read()
+
+        with self.accepted_audio_extensions_swap:
+            response_dict = self.post_json(
+                '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
+                {'filename': self.TEST_AUDIO_FILE_FLAC},
+                csrf_token=csrf_token,
+                expected_status_int=400,
+                upload_files=(('raw_audio_file', 'unused_filename', raw_audio),)
+            )
+        self.logout()
+        self.assertEqual(response_dict['error'], 'Audio not recognized as '
+                         'a flac file')
 
     def test_audio_upload_mpeg_container(self):
         self.login(self.EDITOR_EMAIL)

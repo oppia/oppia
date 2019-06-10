@@ -15,7 +15,9 @@
 /**
  * @fileoverview Directive containing the exploration material to be translated.
  */
-require('components/state/ResponseHeaderDirective.ts');
+
+require(
+  'components/state-directives/response-header/response-header.directive.ts');
 require(
   'pages/exploration_editor/translation_tab/AudioTranslationBarDirective.ts');
 require(
@@ -24,10 +26,10 @@ require(
 );
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/ConvertToPlainTextFilter.ts');
-require('filters/ParameterizeRuleDescriptionFilter.ts');
-require('filters/TruncateFilter.ts');
-require('filters/WrapTextWithEllipsisFilter.ts');
+require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
+require('filters/parameterize-rule-description.filter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
+require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
 require('pages/exploration_editor/ExplorationCorrectnessFeedbackService.ts');
 require('pages/exploration_editor/ExplorationInitStateNameService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
@@ -37,7 +39,9 @@ require(
   'pages/exploration_editor/translation_tab/' +
   'TranslationTabActiveContentIdService.ts'
 );
-require('pages/state_editor/state_properties/StateEditorService.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-editor.service.ts');
 
 oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

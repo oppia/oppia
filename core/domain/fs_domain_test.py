@@ -23,25 +23,43 @@ from core.domain import fs_domain
 from core.platform import models
 from core.tests import test_utils
 import feconf
+import utils
 
 app_identity_services = models.Registry.import_app_identity_services()
 (file_models,) = models.Registry.import_models(
     [models.NAMES.file])
 
 
-class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
+class DatastoreBackedFileSystemUnitTests(test_utils.GenericTestBase):
     """Tests for the datastore-backed exploration file system."""
 
     def setUp(self):
-        super(ExplorationFileSystemUnitTests, self).setUp()
+        super(DatastoreBackedFileSystemUnitTests, self).setUp()
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/eid'))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
+
+    def test_validate_entity_parameters(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid entity_id received: 1'):
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 1)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Entity id cannot be empty'):
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, '')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid entity_name received: '
+            'invalid_name.'):
+            fs_domain.DatastoreBackedFileSystem('invalid_name', 'exp_id')
 
     def test_get_raises_error_when_file_size_is_more_than_1_mb(self):
         self.fs.commit(self.user_id, 'abc.png', 'file_contents')
@@ -111,7 +129,8 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.listdir('fake_dir'), [])
 
         new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/eid2'))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
         self.assertEqual(new_fs.listdir('assets'), [])
 
     def test_versioning(self):
@@ -139,41 +158,10 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.fs.get('abc.png'), 'file_contents')
 
         fs2 = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('eid2'))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
         with self.assertRaisesRegexp(IOError, r'File abc\.png .* not found'):
             fs2.get('abc.png')
-
-
-class DiskBackedFileSystemUnitTests(test_utils.GenericTestBase):
-    """Tests for the disk-backed file system."""
-
-    def setUp(self):
-        super(DiskBackedFileSystemUnitTests, self).setUp()
-        self.user_email = 'abc@example.com'
-        self.user_id = self.get_user_id_from_email(self.user_email)
-        self.fs = fs_domain.AbstractFileSystem(fs_domain.DiskBackedFileSystem(
-            feconf.TESTS_DATA_DIR))
-
-    def test_get(self):
-        self.assertTrue(self.fs.get('img.png'))
-        with self.assertRaisesRegexp(IOError, 'No such file or directory'):
-            self.fs.get('non_existent_file.png')
-
-    def test_commit(self):
-        with self.assertRaises(NotImplementedError):
-            self.fs.commit(self.user_id, 'abc.png', 'file_contents')
-
-    def test_isfile(self):
-        self.assertTrue(self.fs.isfile('img.png'))
-        self.assertFalse(self.fs.isfile('fake.png'))
-
-    def test_delete(self):
-        with self.assertRaises(NotImplementedError):
-            self.fs.delete(self.user_id, 'img.png')
-
-    def test_listdir(self):
-        with self.assertRaises(NotImplementedError):
-            self.fs.listdir('')
 
 
 class GcsFileSystemUnitTests(test_utils.GenericTestBase):
@@ -184,12 +172,26 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
         self.user_email = 'abc@example.com'
         self.user_id = self.get_user_id_from_email(self.user_email)
         self.fs = fs_domain.AbstractFileSystem(
-            fs_domain.GcsFileSystem('exploration/eid'))
+            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
 
     def test_get_and_save(self):
         with self.swap(constants, 'DEV_MODE', False):
             self.fs.commit(self.user_id, 'abc.png', 'file_contents')
             self.assertEqual(self.fs.get('abc.png'), 'file_contents')
+
+    def test_validate_entity_parameters(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid entity_id received: 1'):
+            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, 1)
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Entity id cannot be empty'):
+            fs_domain.GcsFileSystem(fs_domain.ENTITY_TYPE_EXPLORATION, '')
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid entity_name received: '
+            'invalid_name.'):
+            fs_domain.GcsFileSystem('invalid_name', 'exp_id')
 
     def test_delete(self):
         with self.swap(constants, 'DEV_MODE', False):
@@ -246,7 +248,8 @@ class GcsFileSystemUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.fs.listdir('fake_dir'), [])
 
             new_fs = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/eid2'))
+                fs_domain.GcsFileSystem(
+                    fs_domain.ENTITY_TYPE_EXPLORATION, 'eid2'))
             self.assertEqual(new_fs.listdir('assets'), [])
 
 
@@ -260,7 +263,8 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
 
     def test_invalid_filepaths_are_caught(self):
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/eid'))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, 'eid'))
 
         invalid_filepaths = [
             '..', '../another_exploration', '../', '/..', '/abc']

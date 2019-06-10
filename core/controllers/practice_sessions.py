@@ -61,7 +61,7 @@ class PracticeSessionsPage(base.BaseHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'topic_name': topic.name,
         })
-        self.render_template('dist/practice_session.html')
+        self.render_template('dist/practice-session-page.mainpage.html')
 
 
 class PracticeSessionsPageDataHandler(base.BaseHandler):

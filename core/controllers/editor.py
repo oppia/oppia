@@ -95,7 +95,6 @@ class ExplorationPage(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
 
@@ -685,7 +684,7 @@ class ImageUploadHandler(EditorHandler):
 
         file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            'exploration/%s' % exploration_id))
+            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
@@ -757,9 +756,15 @@ class StateAnswerStatisticsHandler(EditorHandler):
         """Handles GET requests."""
         current_exploration = exp_services.get_exploration_by_id(exploration_id)
 
+        top_state_answers = stats_services.get_top_state_answer_stats_multi(
+            exploration_id, current_exploration.states)
+        top_state_interaction_ids = {
+            state_name: current_exploration.states[state_name].interaction.id
+            for state_name in top_state_answers
+        }
         self.render_json({
-            'answers': stats_services.get_top_state_answer_stats_multi(
-                exploration_id, current_exploration.states)
+            'answers': top_state_answers,
+            'interaction_ids': top_state_interaction_ids,
         })
 
 
