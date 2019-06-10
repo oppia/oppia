@@ -32,6 +32,9 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
         self.assertGreater(
             len(visualization_registry.Registry.get_all_visualization_ids()),
             0)
+        self.assertGreater(
+            len(visualization_registry.Registry.get_all_visualization_ids()),
+            0)
 
     def test_get_visualization_class_with_invalid_id_raises_error(self):
         with self.assertRaisesRegexp(
