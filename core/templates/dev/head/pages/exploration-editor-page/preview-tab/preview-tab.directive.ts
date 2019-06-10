@@ -45,7 +45,7 @@ oppia.directive('previewTab', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/preview_tab/preview_tab_directive.html'),
+      '/pages/exploration-editor-page/preview-tab/preview-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$q', '$scope', '$timeout', '$uibModal', 'ContextService',
@@ -129,8 +129,8 @@ oppia.directive('previewTab', ['UrlInterpolationService', function(
         ctrl.showSetParamsModal = function(manualParamChanges, callback) {
           var modalInstance = $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/preview_tab/' +
-              'preview_set_parameters_modal_directive.html'),
+              '/pages/exploration-editor-page/preview-tab/templates/' +
+              'preview-set-parameters-modal.template.html'),
             backdrop: 'static',
             windowClass: 'oppia-preview-set-params-modal',
             controller: [
