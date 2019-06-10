@@ -18,7 +18,9 @@
  * feedback tab of the exploration editor.
  */
 
-require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-status-display.service.ts');
 
 describe('Thread Status Display Service', function() {
   beforeEach(

@@ -22,7 +22,8 @@ require('pages/exploration_editor/ExplorationRightsService.ts');
 require('pages/exploration_editor/ExplorationWarningsService.ts');
 require('pages/exploration_editor/RouterService.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
-require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/SiteAnalyticsService.ts');

@@ -20,7 +20,9 @@
 require('filters/string-utility-filters/truncate.filter.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-status-display.service.ts');
 require('services/DateTimeFormatService.ts');
 
 oppia.directive('threadTable', [
@@ -32,8 +34,8 @@ oppia.directive('threadTable', [
         getThreads: '&threads'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/' +
-        'feedback_tab/thread_table_directive.html'),
+        '/pages/exploration-editor-page/feedback-tab/thread-table/' +
+        'thread-table.directive.html'),
       controller: [
         '$scope', 'ThreadStatusDisplayService', 'DateTimeFormatService',
         function($scope, ThreadStatusDisplayService, DateTimeFormatService) {

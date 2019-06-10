@@ -20,7 +20,8 @@ require('domain/state/StateObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require('pages/suggestion_editor/SuggestionModalService.ts');
 require('services/EditabilityService.ts');
 

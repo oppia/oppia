@@ -159,13 +159,17 @@ require(
 require(
   'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
   'exploration-save-and-publish-buttons.directive.ts');
-require('pages/exploration_editor/ExplorationTitleEditorDirective.ts');
+require(
+  'pages/exploration-editor-page/exploration-title-editor/' +
+  'exploration-title-editor.directive.ts');
 require('pages/exploration_editor/ParamChangesEditorDirective.ts');
 require(
   'pages/exploration-editor-page/editor-tab/' +
   'exploration-editor-tab.directive.ts');
-require('pages/exploration_editor/feedback_tab/FeedbackTabDirective.ts');
-require('pages/exploration_editor/feedback_tab/ThreadTableDirective.ts');
+require('pages/exploration-editor-page/feedback-tab/feedback-tab.directive.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/thread-table/' +
+  'thread-table.directive.ts');
 require('pages/exploration_editor/history_tab/HistoryTabDirective.ts');
 require(
   'pages/exploration_editor/improvements_tab/ImprovementsTabDirective.ts');
@@ -204,7 +208,8 @@ require('pages/exploration_editor/RouterService.ts');
 require('pages/exploration_player/StateClassifierMappingService.ts');
 require('pages/exploration_editor/StateTutorialFirstTimeService.ts');
 require('pages/exploration_editor/UserEmailPreferencesService.ts');
-require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

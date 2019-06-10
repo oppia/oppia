@@ -21,8 +21,11 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration_editor/ChangeListService.ts');
 require('pages/exploration_editor/ExplorationDataService.ts');
 require('pages/exploration_editor/ExplorationStatesService.ts');
-require('pages/exploration_editor/feedback_tab/ThreadDataService.ts');
-require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-status-display.service.ts');
 require(
   'pages/suggestion_editor/SuggestionModalForExplorationEditorService.ts');
 require('services/AlertsService.ts');
@@ -36,7 +39,8 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/exploration_editor/feedback_tab/feedback_tab_directive.html'),
+      '/pages/exploration-editor-page/feedback-tab/' +
+      'feedback-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$log', '$q', '$rootScope', '$uibModal',
@@ -110,8 +114,8 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
         ctrl.showCreateThreadModal = function() {
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/feedback_tab/' +
-              'editor_create_feedback_thread_modal_directive.html'),
+              '/pages/exploration-editor-page/feedback-tab/templates/' +
+              'create-feedback-thread-modal.template.html'),
             backdrop: true,
             resolve: {},
             controller: ['$scope', '$uibModalInstance', function(
