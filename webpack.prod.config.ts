@@ -24,7 +24,7 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
-      path.resolve(__dirname, 'extensions'),
+      path.resolve(__dirname, 'extensions')
     ],
   },
   entry: commonWebpackConfig.entries,

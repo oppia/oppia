@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Dev environment config file for Webpack.
+ * @fileoverview Development environment config file for Webpack.
  */
 
 var commonWebpackConfig = require('./webpack.config.ts');
@@ -24,7 +24,7 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
-      path.resolve(__dirname, 'extensions'),
+      path.resolve(__dirname, 'extensions')
     ],
   },
   entry: commonWebpackConfig.entries,
