@@ -55,6 +55,23 @@ class BaseRteComponent(object):
         arg_names_to_obj_classes = {}
         customization_arg_specs = cls.rich_text_component_specs[
             cls.__name__]['customization_arg_specs']
+
+        # RTC of image has changed. filepath-with-value is removed from
+        # <oppia-noninteractive-image> tag and image_id-with-value is added.
+        # Schema form stills contain filepath. So to validate image the below
+        # if condition is added for image, since validation of image is different
+        # from other rtc.
+        if cls.rich_text_component_specs[
+            cls.__name__]['backend_id'] == 'Image':
+            customization_arg_specs.pop(0)
+            image_id_arg_spec = {
+                u'default_value': u'',
+                u'schema' : {u'type': u'int'},
+                u'name': u'image_id',
+                u'description': u'The id of an image'
+            }
+            customization_arg_specs.append(image_id_arg_spec)
+
         for customization_arg_spec in customization_arg_specs:
             arg_name = '%s-with-value' % customization_arg_spec['name']
             schema = customization_arg_spec['schema']
@@ -106,10 +123,10 @@ class Image(BaseRteComponent):
     def validate(cls, value_dict):
         """Validates Image component."""
         super(Image, cls).validate(value_dict)
-        filename_re = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$'
-        filepath = value_dict['filepath-with-value']
-        if not re.match(filename_re, filepath):
-            raise Exception('Invalid filepath')
+        image_id = value_dict['image_id-with-value']
+        if not isinstance(image_id, unicode):
+            raise exception('Invalid image_id,  received %' %
+                image_id)
 
 
 class Link(BaseRteComponent):

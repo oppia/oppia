@@ -25,6 +25,7 @@ import copy
 import functools
 import re
 import string
+import bs4
 
 from constants import constants
 from core.domain import html_validation_service
@@ -93,8 +94,7 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 # Represents answers which led to the 'default outcome' of an interaction,
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
-# Created so that there should no need to pass 
-GLOBAL_IMAGE_COUNTER = 0
+# Created so that there should no need to pass  = 0
 
 class ExplorationChange(object):
     """Domain object class for an exploration change.
@@ -2235,14 +2235,13 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-            image_counter: int. Counter for an image id.
 
         Returns:
             dict. The converted states_dict.
         """
+        image_counter = 0
         for state_dict in states_dict.itervalues():
             image_assets = {}
-            image_counter = 0
             image_mapping = {}
 
             content_html = state_dict['content']['html']
@@ -2320,7 +2319,6 @@ class Exploration(object):
 
             image_assets['image_mapping'] = image_mapping
             state_dict['image_assets'] = image_assets
-            GLOBAL_IMAGE_COUNTER = image_counter
 
         return states_dict
 
@@ -2955,14 +2953,14 @@ class Exploration(object):
     def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
         """Converts a v33 exploration dict into a v34 exploration dict."""
         exploration_dict['schema_version'] = 34
-        exploration_dict['image_counter'] = 0
 
         exploration_dict['states'] = (
             cls._convert_states_v28_dict_to_v29_dict(
                 exploration_dict['states']))
 
-        exploration_dict['image_counter'] = GLOBAL_IMAGE_COUNTER
+        exploration_dict['image_counter'] = cls.get_image_counter(exploration_dict['states'])
         exploration_dict['states_schema_version'] = 29
+
         return exploration_dict
 
     @classmethod
@@ -3332,6 +3330,57 @@ class Exploration(object):
             html_list = html_list + [content_html] + interaction_html_list
 
         return html_list
+
+    @classmethod
+    def get_image_counter(cls, states_dict):
+        """Gets an image counter of the exploration.
+
+        Returns:
+            image_counter: int. The image counter.
+        """
+        # exploration_html = (self.get_all_html_content_strings())[0]
+        exploration_html = ''
+        for state_dict in states_dict.itervalues():
+
+            content_html = state_dict['content']['html']
+            exploration_html = exploration_html + content_html
+
+            if state_dict['interaction']['default_outcome']:
+                interaction_feedback_html = state_dict[
+                    'interaction']['default_outcome']['feedback']['html']
+                exploration_html = exploration_html + interaction_feedback_html
+
+            for answer_group_index, answer_group in enumerate(
+                    state_dict['interaction']['answer_groups']):
+                answer_group_html = answer_group['outcome']['feedback']['html']
+                exploration_html = exploration_html + answer_group_html
+                if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                    for rule_spec_index, rule_spec in enumerate(
+                            answer_group['rule_specs']):
+                        for x_index, x in enumerate(rule_spec['inputs']['x']):
+                            exploration_html = exploration_html + x
+
+            for hint_index, hint in enumerate(
+                    state_dict['interaction']['hints']):
+                hint_html = hint['hint_content']['html']
+                exploration_html = exploration_html + hint_html
+
+            if state_dict['interaction']['solution']:
+                solution_html = state_dict[
+                    'interaction']['solution']['explanation']['html']
+                exploration_html = exploration_html + solution_html
+
+            if state_dict['interaction']['id'] in (
+                    'ItemSelectionInput', 'MultipleChoiceInput'):
+                for value_index, value in enumerate(
+                        state_dict['interaction']['customization_args'][
+                            'choices']['value']):
+                    exploration_html = exploration_html + value
+                    
+        soup = bs4.BeautifulSoup(exploration_html, 'html.parser')
+        image_counter = len(soup.findAll(name='oppia-noninteractive-image'))
+
+        return image_counter
 
 
 class ExplorationSummary(object):

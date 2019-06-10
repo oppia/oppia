@@ -79,21 +79,20 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
     def test_image_validation(self):
         """Tests collapsible component validation."""
         valid_items = [{
-            'filepath-with-value': 'random.png',
             'alt-with-value': '1234',
-            'caption-with-value': 'hello'
+            'caption-with-value': 'hello',
+            'image_id-with-value': u'1'
         }, {
-            'filepath-with-value': 'xyz.png',
             'alt-with-value': 'hello',
-            'caption-with-value': 'abc'
+            'image_id-with-value': u'2'
         }]
         invalid_items = [{
-            'filepath-with-value': 'random.png',
-            'caption-with-value': 'abc'
+            'caption-with-value': 'abc',
+            'image_id-with-value': 'invalid_1'
         }, {
-            'filepath-with-value': 'xyz.jpeg.png',
             'alt-with-value': 'hello',
-            'caption-with-value': 'abc'
+            'caption-with-value': 'abc',
+            'image_id-with-value': 'invalid_2'
         }]
 
         self.check_validation(

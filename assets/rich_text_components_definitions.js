@@ -80,11 +80,7 @@ var richTextComponents = {
         }
       },
       "default_value": ""
-    }, {
-       "name": "image_id",
-       "description": "Image Id of an exploration.",
-       "default_value": ""
-     }]
+    }]
   },
   "Link": {
     "backend_id": "Link",

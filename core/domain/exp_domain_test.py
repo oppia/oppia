@@ -4468,12 +4468,12 @@ states:
       html: <p>Hello, this is state3</p>
     image_assets:
       image_mapping:
-        1:
+        \'1\':
           author_id: ''
           instructions: ''
           placeholder: false
           src: \'&quot;startBlue_height_490_width_120.png&quot;\'
-        2:
+        \'2\':
           author_id: ''
           instructions: ''
           placeholder: false
@@ -4674,7 +4674,7 @@ states:
         case to check image tag inside p tag</p>
     image_assets:
       image_mapping:
-        1:
+        \'1\':
           author_id: ''
           instructions: ''
           placeholder: false

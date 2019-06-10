@@ -587,13 +587,13 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_image(self):
         image_assets_dict = {
             'image_mapping': {
-                1: {
+                u'1': {
                     'src': '',
                     'placeholder': True,
                     'author_id': 'random_1',
                     'instructions': 'no instructions'
                 },
-                2: {
+                u'2': {
                     'src': '',
                     'placeholder': False,
                     'author_id': 'random_2',
@@ -604,7 +604,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
 
         expected_image_assets_dict = {
             'image_mapping': {
-                1: {
+                u'1': {
                     'src': '',
                     'placeholder': True,
                     'author_id': 'random_1',
