@@ -179,28 +179,29 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             self._validate_customization_arg_specs(
                 component_specs['customization_arg_specs'])  # pylint: disable=protected-access
 
-    def test_html_contains_all_imports(self):
+    def test_require_file_contains_all_imports(self):
         """Test that the rich_text_components.html file contains script-imports
         for all directives of all RTE components.
         """
 
-        ts_files = []
+        rtc_ts_filenames = []
         for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
             component_dir = os.path.join(
                 feconf.RTE_EXTENSIONS_DIR, component_id)
             directives_dir = os.path.join(component_dir, 'directives')
             directive_filenames = os.listdir(directives_dir)
-            ts_files.extend(
+            rtc_ts_filenames.extend(
                 filename for filename
                 in directive_filenames if filename.endswith('.ts'))
 
         rtc_ts_file = os.path.join(
             feconf.RTE_EXTENSIONS_DIR, 'richTextComponentsRequires.ts')
         with open(rtc_ts_file, 'r') as f:
-            rtc_html_file_contents = f.read()
+            rtc_require_file_contents = f.read()
 
-        for i in range(len(ts_files)):
-            self.assertTrue((rtc_html_file_contents.find(ts_files[i]) > 0))
+        for rtc_ts_filename in rtc_ts_filenames:
+            self.assertIn(rtc_ts_filename, rtc_require_file_contents)
+
 
 class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
     """Tests the methods in RteComponentRegistry."""
