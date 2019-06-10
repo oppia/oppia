@@ -48,7 +48,7 @@ oppia.factory('HintAndSolutionModalService', [
         return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration-player-page/templates/' +
-            'hint-and-solution-modal.template.htmll'),
+            'hint-and-solution-modal.template.html'),
           backdrop: 'static',
           controller: [
             '$scope', '$rootScope', '$uibModalInstance',
