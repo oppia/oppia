@@ -19,6 +19,7 @@
 # pylint: disable=invalid-name
 import StringIO
 import collections
+import json
 import os
 import random
 import shutil
@@ -44,6 +45,10 @@ MOCK_EXTENSIONS_COMPILED_JS_DIR = os.path.join(
 MOCK_TEMPLATES_DEV_DIR = os.path.join(TEST_SOURCE_DIR, 'templates', '')
 MOCK_TEMPLATES_COMPILED_JS_DIR = os.path.join(
     TEST_SOURCE_DIR, 'local_compiled_js', 'templates', '')
+
+MOCK_COMPILED_JS_DIR = os.path.join(TEST_SOURCE_DIR, 'compiled_js_dir', '')
+
+MOCK_TSC_OUTPUT_LOG_FILE = os.path.join(TEST_SOURCE_DIR, 'tsc_output_log.txt')
 
 INVALID_INPUT_FILEPATH = os.path.join(
     TEST_DIR, 'invalid', 'path', 'to', 'input.js')
@@ -648,35 +653,56 @@ class BuildTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(delete_tasks), build.get_file_count(MOCK_TEMPLATES_DEV_DIR))
 
+    def test_compiled_js_dir_validation(self):
+        """Test that build.COMPILED_JS_DIR is validated correctly with
+        outDir in tsconfig.json.
+        """
+        build.test_compiled_js_dir_is_valid()
+
+        out_dir = ''
+        with open('tsconfig.json') as f:
+            config_data = json.load(f)
+            out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
+        with self.assertRaisesRegexp(
+            Exception,
+            'COMPILED_JS_DIR: %s is does not match the output directory '
+            'in tsconfig.json: %s' % (
+                MOCK_COMPILED_JS_DIR, out_dir)), self.swap(
+                    build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR):
+            build.test_compiled_js_dir_is_valid()
+
     def test_compiled_js_dir_is_deleted_before_compilation(self):
         """Test that compiled_js_dir is deleted before a fresh
         compilation.
         """
-        # pylint: disable=unused-argument
-        def mock_check_call(cmd):
+        def mock_check_call(unused_cmd):
             pass
-        def mock_call(cmd, shell, stdout):
+        def mock_call(unused_cmd, unused_shell, unused_stdout):
             pass
-        def mock_popen(cmd, stdout):
+        def mock_popen(unused_cmd, unused_stdout):
             pass
-        # pylint: enable=unused-argument
+        def mock_test_compiled_js_dir_is_valid():
+            pass
 
-        compiled_js_dir = os.path.join(
-            'core', 'tests', 'build_sources', 'compiled_js_dir', '')
+        with self.swap(
+            build, 'COMPILED_JS_DIR', MOCK_COMPILED_JS_DIR), self.swap(
+                build, 'test_compiled_js_dir_is_valid',
+                mock_test_compiled_js_dir_is_valid):
+            if os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)):
+                shutil.rmtree(MOCK_COMPILED_JS_DIR)
 
-        if os.path.exists(os.path.dirname(compiled_js_dir)):
-            shutil.rmtree(compiled_js_dir)
+            with self.swap(subprocess, 'check_call', mock_check_call):
+                os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
+                build.compile_typescript_files('.')
+                self.assertFalse(
+                    os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
-        with self.swap(subprocess, 'check_call', mock_check_call):
-            os.mkdir(os.path.dirname(compiled_js_dir))
-            build.compile_typescript_files('.', compiled_js_dir)
-            self.assertFalse(os.path.exists(os.path.dirname(compiled_js_dir)))
-
-        with self.swap(subprocess, 'Popen', mock_popen), self.swap(
-            subprocess, 'call', mock_call):
-            os.mkdir(os.path.dirname(compiled_js_dir))
-            build.compile_typescript_files_continuously(
-                '.', compiled_js_dir, condition=False)
-            self.assertFalse(os.path.exists(os.path.dirname(compiled_js_dir)))
+            with self.swap(subprocess, 'Popen', mock_popen), self.swap(
+                subprocess, 'call', mock_call), self.swap(
+                    build, 'TSC_OUTPUT_LOG_FILE', MOCK_TSC_OUTPUT_LOG_FILE):
+                os.mkdir(os.path.dirname(MOCK_COMPILED_JS_DIR))
+                build.compile_typescript_files_continuously('.')
+                self.assertFalse(
+                    os.path.exists(os.path.dirname(MOCK_COMPILED_JS_DIR)))
 
 # pylint: enable=protected-access

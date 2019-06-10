@@ -29,6 +29,9 @@ import threading
 ASSETS_DEV_DIR = os.path.join('assets', '')
 ASSETS_OUT_DIR = os.path.join('build', 'assets', '')
 
+COMPILED_JS_DIR = os.path.join('local_compiled_js', '')
+TSC_OUTPUT_LOG_FILE = 'tsc_output_log.txt'
+
 THIRD_PARTY_STATIC_DIR = os.path.join('third_party', 'static')
 THIRD_PARTY_GENERATED_DEV_DIR = os.path.join('third_party', 'generated', '')
 THIRD_PARTY_GENERATED_OUT_DIR = os.path.join(
@@ -110,6 +113,19 @@ FILEPATHS_PROVIDED_TO_FRONTEND = (
     '*.template.html', '*.png', '*.json')
 
 HASH_BLOCK_SIZE = 2**20
+
+
+def test_compiled_js_dir_is_valid():
+    """Checks if COMPILED_JS_DIR matches the directory used in tsconfig.json."""
+
+    out_dir = ''
+    with open('tsconfig.json') as f:
+        config_data = json.load(f)
+        out_dir = os.path.join(config_data['compilerOptions']['outDir'], '')
+    if out_dir != COMPILED_JS_DIR:
+        raise Exception(
+            'COMPILED_JS_DIR: %s is does not match the output directory '
+            'in tsconfig.json: %s' % (COMPILED_JS_DIR, out_dir))
 
 
 def _minify(source_path, target_path):
@@ -1182,42 +1198,36 @@ def generate_build_directory():
     print 'Build completed.'
 
 
-def compile_typescript_files(project_dir, compiled_js_dir):
+def compile_typescript_files(project_dir):
     """Compiles typescript files to produce javascript files in
     local_compiled_js folder.
 
     Args:
         project_dir: str. The project directory which contains the ts files
             to be compiled.
-        compiled_js_dir: str. The directory which contains the compiled js
-            files.
     """
-    safe_delete_directory_tree(compiled_js_dir)
+    test_compiled_js_dir_is_valid()
+    safe_delete_directory_tree(COMPILED_JS_DIR)
     print 'Compiling ts files...'
     cmd = ['./node_modules/typescript/bin/tsc', '--project', project_dir]
     subprocess.check_call(cmd)
 
 
-def compile_typescript_files_continuously(
-        project_dir, compiled_js_dir, condition=True):
+def compile_typescript_files_continuously(project_dir):
     """Compiles typescript files continuously i.e enable a watcher which
     monitors any changes in js files and recompiles them to ts files.
 
     Args:
         project_dir: str. The project directory which contains the ts files
             to be compiled.
-        compiled_js_dir: str. The directory which contains the compiled js
-            files.
-        condition: bool. The variable which decides whether we need to
-            monitor tsc_output_log.txt continuously. It will be false only
-            while running the tests for build script.
     """
     kill_cmd = (
         'kill `ps aux | grep "node_modules/typescript/bin/tsc --project . '
         '--watch" | awk \'{print $2}\'`'
     )
     subprocess.call(kill_cmd, shell=True, stdout=subprocess.PIPE)
-    safe_delete_directory_tree(compiled_js_dir)
+    test_compiled_js_dir_is_valid()
+    safe_delete_directory_tree(COMPILED_JS_DIR)
     print 'Compiling ts files in watch mode...'
     cmd = [
         './node_modules/typescript/bin/tsc', '--project', project_dir,
@@ -1226,18 +1236,17 @@ def compile_typescript_files_continuously(
     with open('tsc_output_log.txt', 'w') as out:
         subprocess.Popen(cmd, stdout=out)
 
-    while condition:
-        if os.path.isfile('tsc_output_log.txt'):
-            with open('tsc_output_log.txt', 'r') as f:
-                lines = f.readlines()
-                if len(lines):
-                    # We are checking only the last line here since
-                    # whenever typescript is done with compilation with or
-                    # without errors, the last line will always read
-                    # 'Found x errors. Watching for file changes'.
-                    last_output = lines[len(lines) - 1]
-                    if 'Watching for file changes' in last_output:
-                        return
+    while True:
+        with open(TSC_OUTPUT_LOG_FILE, 'r') as f:
+            lines = f.readlines()
+            if len(lines):
+                # We are checking only the last line here since
+                # whenever typescript is done with compilation with or
+                # without errors, the last line will always read
+                # 'Found x errors. Watching for file changes'.
+                last_output = lines[len(lines) - 1]
+                if 'Watching for file changes' in last_output:
+                    return
 
 
 def build():
@@ -1260,11 +1269,10 @@ def build():
     safe_delete_directory_tree(THIRD_PARTY_GENERATED_DEV_DIR)
     build_third_party_libs(THIRD_PARTY_GENERATED_DEV_DIR)
 
-    compiled_js_dir = os.path.join('local_compiled_js', '')
     if not options.enable_watcher:
-        compile_typescript_files('.', compiled_js_dir)
+        compile_typescript_files('.')
     else:
-        compile_typescript_files_continuously('.', compiled_js_dir)
+        compile_typescript_files_continuously('.')
 
     # If minify_third_party_libs_only is set to True, skips the rest of the
     # build process once third party libs are minified.
