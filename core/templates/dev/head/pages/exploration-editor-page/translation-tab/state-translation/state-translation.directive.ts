@@ -42,10 +42,10 @@ require('pages/exploration-editor-page/services/router.service.ts');
 require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-status.service.ts');
-  require(
-    'pages/exploration-editor-page/translation-tab/services/' +
-    'translation-tab-active-content-id.service.ts');
-  require(
+require(
+  'pages/exploration-editor-page/translation-tab/services/' +
+  'translation-tab-active-content-id.service.ts');
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
