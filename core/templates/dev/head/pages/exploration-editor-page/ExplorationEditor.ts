@@ -665,8 +665,8 @@ oppia.controller('ExplorationEditor', [
     $scope.showWelcomeExplorationModal = function() {
       var modalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/' +
-          'welcome_modal_directive.html'),
+          '/pages/exploration-editor-page/modal-templates/' +
+          'welcome-modal.template.html'),
         backdrop: true,
         controller: [
           '$scope', '$uibModalInstance', 'SiteAnalyticsService',

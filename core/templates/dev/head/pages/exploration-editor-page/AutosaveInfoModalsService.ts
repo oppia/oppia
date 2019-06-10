@@ -41,8 +41,8 @@ oppia.factory('AutosaveInfoModalsService', [
       showNonStrictValidationFailModal: function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'save_validation_fail_modal_directive.html'),
+            '/pages/exploration-editor-page/modal-templates/' +
+            'save-validation-fail-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: [
@@ -67,8 +67,8 @@ oppia.factory('AutosaveInfoModalsService', [
       showVersionMismatchModal: function(lostChanges) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'save_version_mismatch_modal_directive.html'),
+            '/pages/exploration-editor-page/modal-templates/' +
+            'save-version-mismatch-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', function($scope) {
@@ -102,7 +102,8 @@ oppia.factory('AutosaveInfoModalsService', [
       showLostChangesModal: function(lostChanges, explorationId) {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/lost_changes_modal_directive.html'),
+            '/pages/exploration-editor-page/modal-templates/' +
+            'lost-changes-modal.template.html'),
           // Prevent modal from closing when the user clicks outside it.
           backdrop: 'static',
           controller: ['$scope', '$uibModalInstance', function(

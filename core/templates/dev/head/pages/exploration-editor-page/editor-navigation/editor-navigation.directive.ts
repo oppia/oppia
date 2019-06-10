@@ -81,8 +81,8 @@ oppia.directive('editorNavigation', [
             var TRANSLATION_TUTORIAL_MODE = 'translation';
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/' +
-                'help_modal_directive.html'),
+                '/pages/exploration-editor-page/modal-templates/' +
+                'help-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',

@@ -104,8 +104,8 @@ oppia.factory('ExplorationSaveService', [
     var showCongratulatorySharingModal = function() {
       return $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/' +
-          'post_publish_modal_directive.html'),
+          '/pages/exploration-editor-page/modal-templates/' +
+          'post-publish-modal.template.html'),
         backdrop: true,
         controller: [
           '$scope', '$window', '$uibModalInstance',
@@ -146,8 +146,8 @@ oppia.factory('ExplorationSaveService', [
 
       var publishModalInstance = $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/' +
-          'exploration_publish_modal_directive.html'),
+          '/pages/exploration-editor-page/modal-templates/' +
+          'exploration-publish-modal.template.html'),
         backdrop: 'static',
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
@@ -247,8 +247,8 @@ oppia.factory('ExplorationSaveService', [
       discardChanges: function() {
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/exploration_editor/' +
-            'confirm_discard_changes_modal_directive.html'),
+            '/pages/exploration-editor-page/modal-templates/' +
+            'confirm-discard-changes-modal.template.html'),
           backdrop: 'static',
           keyboard: false,
           controller: [
@@ -267,8 +267,8 @@ oppia.factory('ExplorationSaveService', [
 
           $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/' +
-              'editor_reloading_modal_directive.html'),
+              '/pages/exploration-editor-page/modal-templates/' +
+              'editor-reloading-modal.template.html'),
             backdrop: 'static',
             keyboard: false,
             controller: [
@@ -308,8 +308,8 @@ oppia.factory('ExplorationSaveService', [
         if (isAdditionalMetadataNeeded()) {
           var modalInstance = $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/' +
-              'exploration_metadata_modal_directive.html'),
+              '/pages/exploration-editor-page/modal-templates/' +
+              'exploration-metadata-modal.template.html'),
             backdrop: 'static',
             controller: [
               '$scope', '$uibModalInstance', 'ExplorationObjectiveService',
@@ -533,8 +533,8 @@ oppia.factory('ExplorationSaveService', [
 
           var modalInstance = $uibModal.open({
             templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-              '/pages/exploration_editor/' +
-              'exploration_save_modal_directive.html'),
+              '/pages/exploration-editor-page/modal-templates/' +
+              'exploration-save-modal.template.html'),
             backdrop: true,
             resolve: {
               isExplorationPrivate: function() {
