@@ -17,6 +17,7 @@
  * text components.
  */
 
+require('rich_text_components/richTextComponentsRequires.ts');
 require('services/HtmlEscaperService.ts');
 require('services/RteHelperService.ts');
 

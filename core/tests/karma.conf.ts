@@ -154,7 +154,10 @@ module.exports = function(config) {
     webpack: {
       mode: 'development',
       resolve: {
-        modules: ['core/templates/dev/head'],
+        modules: [
+          'core/templates/dev/head',
+          'extensions'
+        ],
       },
       module: {
         rules: [{

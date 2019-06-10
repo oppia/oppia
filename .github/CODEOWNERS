@@ -351,7 +351,6 @@
 /core/templates/dev/head/mathjaxConfig.ts @AllanYangZhou @bansalnitish
 /extensions/rich_text_components/ @AllanYangZhou @bansalnitish
 /core/templates/dev/head/components/ck-editor-helpers/ck-editor-widgets.initializer.ts @AllanYangZhou @bansalnitish
-/core/templates/dev/head/components/ck-editor-helpers/rich-text-components.template.html @AllanYangZhou @bansalnitish
 /core/templates/dev/head/services/AutoplayedVideosService*.ts @AllanYangZhou @bansalnitish
 /core/templates/dev/head/services/RteHelperService*.ts @AllanYangZhou @bansalnitish
 /extensions/ckeditor_plugins/ @AllanYangZhou @bansalnitish

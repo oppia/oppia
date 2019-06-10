@@ -19,6 +19,11 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ContextService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('oppiaNoninteractiveLink', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
