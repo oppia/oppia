@@ -56,6 +56,12 @@ def _migrate_subtopics_to_latest_schema(versioned_subtopics):
             'Sorry, we can only process v1-v%d subtopic schemas at '
             'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
 
+    while (subtopic_schema_version <
+           feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+        topic_domain.Topic.update_subtopics_from_model(
+            versioned_subtopics, subtopic_schema_version)
+        subtopic_schema_version += 1
+
 
 # Repository GET methods.
 def _get_topic_memcache_key(topic_id, version=None):
