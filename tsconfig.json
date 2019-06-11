@@ -7,7 +7,7 @@
     "rootDir": ".",
     "skipLibCheck": true,
     "target": "es5",
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": ["./node_modules/@types"]
   },
   "files": [
     "assets/constants.js", 
@@ -18,8 +18,16 @@
     "core/templates/dev/head/mathjaxConfig.ts",
     "core/templates/dev/head/domain/classifier/PredictionResultObjectFactory.ts",
     "core/templates/dev/head/expressions/ExpressionParserService.js",
-    "core/templates/dev/head/filters/ConvertToPlainTextFilter.ts",
-    "core/templates/dev/head/filters/TruncateAtFirstLineFilter.ts"
+    "core/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.ts",
+    "core/templates/dev/head/filters/string-utility-filters/truncate-at-first-line.filter.ts"
   ],
-  "include": ["extensions", "typings"]
+  "include": [
+    "extensions/ckeditor_plugins", 
+    "extensions/classifiers",
+    "extensions/interactions",
+    "extensions/objects",
+    "extensions/value_generators",
+    "extensions/visualizations",
+    "typings"
+  ]
 }
