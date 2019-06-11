@@ -471,8 +471,7 @@ class Exploration(object):
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            image_counter=feconf.DEFAULT_IMAGE_COUNTER):
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Returns a Exploration domain object with default values.
 
         'title', 'init_state_name', 'category', 'objective' if not provided are
@@ -489,12 +488,13 @@ class Exploration(object):
             category: str. The category of the exploration.
             objective: str. The objective of the exploration.
             language_code: str. The language code of the exploration.
-            image_counter: int. Counter for an image id.
 
         Returns:
             Exploration. The Exploration domain object with default
             values.
         """
+        image_counter = feconf.DEFAULT_IMAGE_COUNTER
+
         init_state_dict = state_domain.State.create_default_state(
             init_state_name, is_initial_state=True).to_dict()
 
@@ -535,14 +535,14 @@ class Exploration(object):
             title=exploration_dict['title'],
             category=exploration_dict['category'],
             objective=exploration_dict['objective'],
-            language_code=exploration_dict['language_code'],
-            image_counter=exploration_dict['image_counter'])
+            language_code=exploration_dict['language_code'])
         exploration.tags = exploration_dict['tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
         exploration.auto_tts_enabled = exploration_dict['auto_tts_enabled']
         exploration.correctness_feedback_enabled = exploration_dict[
             'correctness_feedback_enabled']
+        exploration.image_counter = exploration_dict['image_counter']
 
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
@@ -2957,7 +2957,8 @@ class Exploration(object):
             cls._convert_states_v28_dict_to_v29_dict(
                 exploration_dict['states']))
 
-        exploration_dict['image_counter'] = cls.get_image_counter(exploration_dict['states'])
+        states_dict = copy.deepcopy(exploration_dict['states'])
+        exploration_dict['image_counter'] = cls.get_image_counter(states_dict)
         exploration_dict['states_schema_version'] = 29
 
         return exploration_dict

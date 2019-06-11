@@ -285,7 +285,7 @@ class Question(object):
             raise utils.ValidationError(
                 'Expected the question to have a solution'
             )
-        self.question_state_data.validate({}, False)
+        self.question_state_data.validate({}, 0, False)
 
     def validate(self):
         """Validates the Question domain object before it is saved."""
