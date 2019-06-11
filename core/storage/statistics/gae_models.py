@@ -1139,68 +1139,62 @@ class PlaythroughModel(base_models.BaseModel):
 class LearnerAnswerDetailsModel(base_models.BaseModel):
     """Model for storing the answer details that a learner enters when they
     are asked for it.
-
-    The id of instances of this class has the form
-        [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING]
     """
-    # ID of the entity.
-    entity_id = ndb.StringProperty(required=True, indexed=True)
+
+    # The reference to the state for which model instance is created.
+    state_reference = ndb.StringProperty(required=True, indexed=True)
     # The type of entity, that whether it is exploration, question, or any
     # other object if it is added in future.
     entity_type = ndb.StringProperty(
         required=True, indexed=True, choices=ENTITY_TYPE_CHOICES)
+    # The id of the interaction for which the answer details were received.
+    interaction_id = ndb.StringProperty(required=True, indexed=False)
     # The answer submitted by the learner.
     learner_answer = ndb.JsonProperty(required=True, indexed=False)
     # The answer details submitted by the learner.
     learner_answer_details = ndb.TextProperty(required=True, indexed=False)
-    # The version of the submitted_answer_list currently supported by Oppia. If
-    # the internal JSON structure of submitted_answer_list changes,
-    # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
-    schema_version = ndb.IntegerProperty(
-        indexed=True, default=feconf.CURRENT_STATE_ANSWERS_SCHEMA_VERSION)
     # The time at which the response was created.
     created_on = ndb.DateTimeProperty(required=True, indexed=True)
     # Whether the response received has been resolved.
     is_resolved = ndb.BooleanProperty(default=False, required=True)
 
     @classmethod
-    def get_entity_id(cls, id_parameters, entity_type):
-        """Gets entity_id for a batch model based on given entity_type.
+    def get_state_reference_for_exploration(cls, exp_id, state_name):
+        """Generate the state_reference for the state in an exploration.
 
         Args:
-            id_parameters: dict. The parameters which will be
-                responsible to generate the entity_id.
-            entity_type: str. The type of the entity.
+            exp_id: str. The id of the exploration.
+            state_name: str. The name of the state.
 
         Returns:
-            str. Returns entity_id for a new instance of this class.
-
-        Raises:
-           Exception: If entity type is not valid.
+            str. The state_reference for a new instance of this class.
         """
-        # NOTE: In future if this model is used for any other entity type,
-        # then make the id_parameters dict for it, for eg. id_parameters
-        # dict for entity type exploration is {'exp_id': '', 'state_name': ''}
-        #  and add an elif condition in this function with the method to
-        #  generate the entity_id for that entity.
-        if entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            return '%s.%s' % (
-                id_parameters['exp_id'], id_parameters['state_name'])
-        else:
-            raise Exception('Invalid entity type.')
+        return '%s.%s' % (exp_id, state_name)
 
     @classmethod
-    def create(
-            cls, entity_id, entity_type, learner_answer,
-            learner_answer_details):
-        """Creates a new LearnerAnswerDetailsModel and
-        then writes it to the datastore.
+    def get_state_reference_for_question(cls, question_id):
+        """Generate the state_reference for the state in the question.
 
         Args:
-            entity_id: str. ID of the entity.
-            entity_type: str.  The type of entity, that whether it is state,
-                question, or any other object if it is added in future.
-            learner_answer: str. The answer entered by the user.
+            question_id: str. The id of the question.
+
+        Returns:
+            str. The state_reference for a new instance of this class.
+        """
+        return question_id
+
+    @classmethod
+    def create_model_instance_for_exploration(
+            cls, exp_id, state_name, interaction_id, learner_answer,
+            learner_answer_details):
+        """Creates a new LearnerAnswerDetailsModel for the entity type
+        exploration and then writes it to the datastore.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            state_name: str. The name of the state.
+            interaction_id: str. The id of the interaction.
+            learner_answer: dict. The answer submitted by the user.
             learner_answer_details: str. The details of the answer entered by
                 the learner.
 
@@ -1208,12 +1202,41 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             LearnerAnswerDetailsModel. The instance of the
                 LearnerAnswerDetailsModel.
         """
-        answer_details_id = cls.generate_new_answer_details_id(
-            entity_type, entity_id)
+
+        state_reference = get_state_reference_for_exploration(
+            exp_id, state_name)
         answer_details_instance = cls(
-            id=answer_details_id,
-            entity_id=entity_id,
-            entity_type=entity_type,
+            state_reference=state_reference,
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            learner_answer=learner_answer,
+            learner_answer_details=learner_answer_details,
+            created_on=datetime.datetime.utcnow())
+        answer_details_instance.put()
+        return answer_details_instance
+
+    @classmethod
+    def create_model_instance_for_question(
+            cls, question_id, interaction_id, learner_answer,
+            learner_answer_details):
+        """Creates a new LearnerAnswerDetailsModel for the entity type
+        question and then writes it to the datastore.
+
+        Args:
+            question_id: str. ID of the question.
+            interaction_id: str. The id of the interaction.
+            learner_answer: dict. The answer submitted by the user.
+            learner_answer_details: str. The details of the answer entered by
+                the learner.
+
+        Returns:
+            LearnerAnswerDetailsModel. The instance of the
+                LearnerAnswerDetailsModel.
+        """
+
+        state_reference = get_state_reference_for_question(question_id)
+        answer_details_instance = cls(
+            state_reference=state_reference,
+            entity_type=feconf.ENTITY_TYPE_QUESTION,
             learner_answer=learner_answer,
             learner_answer_details=learner_answer_details,
             created_on=datetime.datetime.utcnow())
@@ -1222,15 +1245,15 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
 
     @classmethod
     def get_answer_details(
-            cls, entity_type, entity_id, limit=feconf.DEFAULT_QUERY_LIMIT):
+            cls, entity_type, state_reference, limit=feconf.DEFAULT_QUERY_LIMIT):
         """Returns a list of answer details associated with the entity, ordered
-        by their "created_on" field. The number of entities fetched is
+        by their "created_on" field. The number of instances fetched is
         limited by the `limit` argument to this method, whose default
         value is equal to the default query limit.
 
         Args:
             entity_type: str. The type of the entity.
-            entity_id: str. The ID of the entity.
+            state_reference: str. The .
             limit: int. The maximum possible number of items in the returned
                 list.
 
@@ -1239,7 +1262,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 with the entity. Doesn't include deleted entries.
         """
         return cls.get_all().filter(cls.entity_type == entity_type).filter(
-            cls.entity_id == entity_id).order(-cls.created_on).fetch(limit)
+            cls.state_reference == state_reference).order(-cls.created_on).fetch(limit)
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
