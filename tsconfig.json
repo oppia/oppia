@@ -25,7 +25,6 @@
     "extensions/ckeditor_plugins",
     "extensions/classifiers",
     "extensions/interactions",
-    "extensions/value_generators",
     "extensions/visualizations",
     "typings"
   ]

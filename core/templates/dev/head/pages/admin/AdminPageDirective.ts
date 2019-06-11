@@ -69,6 +69,7 @@ require('pages/admin/config_tab/AdminConfigTabDirective.ts');
 require('pages/admin/jobs_tab/AdminJobsTabDirective.ts');
 require('pages/admin/misc_tab/AdminMiscTabDirective.ts');
 require('pages/admin/roles_tab/AdminRolesTabDirective.ts');
+require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
