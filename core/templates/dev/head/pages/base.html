@@ -72,7 +72,8 @@
     {% endblock base_url %}
 
     {% block header_css %}
-      {% include 'pages/header_css_libs.html' %}
+      <!-- Require head styles file using webpack -->
+      @require('header_css_libs.html')
     {% endblock header_css %}
 
     <script>
@@ -86,7 +87,8 @@
     </script>
 
     {% block header_js %}
-      {% include 'pages/header_js_libs.html' %}
+      <!-- Require head javascript file using webpack -->
+      @require('header_js_libs.html')
     {% endblock header_js %}
 
     {{BEFORE_END_HEAD_TAG_HOOK}}
@@ -161,18 +163,7 @@
       </a>
     </div>
 
-    {% include 'pages/footer_js_libs.html' %}
-    <script src="/templates/dev/head/AppInit.js"></script>
-    <!-- This code is used for inserting webpack bundles
-       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-      <% if (webpackConfig.mode == 'production') { %>
-        <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } else { %>
-        <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } %>
-    <% } %>
-
+    @require('footer_js_libs.html')
     {% block footer_js %}
     {% endblock footer_js %}
   </body>

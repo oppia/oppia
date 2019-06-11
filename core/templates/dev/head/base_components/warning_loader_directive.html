@@ -1,0 +1,26 @@
+<div class="oppia-toast-container toast-top-center">
+  <div ng-repeat="warning in (AlertsService.warnings | limitTo:5) track by $index"
+       class="toast toast-warning oppia-toast">
+    <button type="button" class="toast-close-button" ng-click="AlertsService.deleteWarning(warning)"
+            role="button">&times;
+    </button>
+    <div class="toast-message">
+      <[warning.content]>
+    </div>
+  </div>
+</div>
+
+<div>
+  <div ng-repeat="message in AlertsService.messages track by $index">
+    <alert-message message-object="message" message-index="$index"></alert-message>
+  </div>
+</div>
+
+<div ng-show="loadingMessage" class="oppia-loading-fullpage">
+  <div class="oppia-align-center">
+    <span translate="<[loadingMessage]>"></span>
+    <span class="oppia-loading-dot-one">.</span>
+    <span class="oppia-loading-dot-two">.</span>
+    <span class="oppia-loading-dot-three">.</span>
+  </div>
+</div>
