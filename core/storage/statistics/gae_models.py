@@ -63,7 +63,7 @@ ISSUE_TYPE_KEYNAME_MAPPING = {
     'CyclicStateTransitions': 'state_names'
 }
 # The choices of entity type valid for LearnerAnswerDetailsModel
-ENTITY_TYPE_CHOICES = [feconf.ENTITY_TYPE_TOPIC]
+ENTITY_TYPE_CHOICES = [feconf.ENTITY_TYPE_EXPLORATION]
 
 
 class StateCounterModel(base_models.BaseModel):
@@ -1151,8 +1151,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         required=True, indexed=True, choices=ENTITY_TYPE_CHOICES)
     # The answer submitted by the learner.
     learner_answer = ndb.JsonProperty(required=True, indexed=False)
-    # The response submitted by the learner.
-    learner_answer_details = ndb.StringProperty(required=True, indexed=False)
+    # The answer details submitted by the learner.
+    learner_answer_details = ndb.TextProperty(required=True, indexed=False)
     # The version of the submitted_answer_list currently supported by Oppia. If
     # the internal JSON structure of submitted_answer_list changes,
     # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
@@ -1188,32 +1188,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 id_parameters['exp_id'], id_parameters['state_name'])
         else:
             raise Exception('Invalid entity type.')
-
-    @classmethod
-    def generate_new_answer_details_id(cls, entity_type, entity_id):
-        """Generates a new answer detail ID which is unique.
-
-        Args:
-            entity_type: str. The type of the entity.
-            entity_id: str. The ID of the entity.
-
-        Returns:
-            str. An answer detail ID that is different from the IDs of all
-                the existing answer details within the given entity.
-
-        Raises:
-           Exception: There were too many collisions with existing answer
-               detail IDs when attempting to generate a new answer detail ID.
-        """
-        for _ in range(base_models.MAX_RETRIES):
-            answer_details_id = (
-                entity_type + '.' + entity_id + '.' +
-                utils.base64_from_int(utils.get_current_time_in_millisecs()) +
-                utils.base64_from_int(utils.get_random_int(base_models.RAND_RANGE)))
-            if not cls.get_by_id(answer_details_id):
-                return answer_details_id
-        raise Exception(
-            'New answer details id generator is producing too many collisions.')
 
     @classmethod
     def create(
