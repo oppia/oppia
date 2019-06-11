@@ -26,7 +26,6 @@
     "extensions/classifiers",
     "extensions/interactions",
     "extensions/objects",
-    "extensions/value_generators",
     "typings"
   ]
 }
