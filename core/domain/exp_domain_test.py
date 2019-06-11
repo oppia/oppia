@@ -4670,8 +4670,8 @@ states:
     content:
       content_id: content
       html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-        image_id-with-value="&amp;quot;1&amp;quot;"></oppia-noninteractive-image><p>Hello
-        this is test case to check image tag inside p tag</p>
+        image_id-with-value="1"></oppia-noninteractive-image><p>Hello this is test
+        case to check image tag inside p tag</p>
     image_assets:
       image_mapping:
         \'1\':
@@ -4790,7 +4790,7 @@ tags: []
 title: Title
 """)
 
-pylint: enable=line-too-long
+# pylint: enable=line-too-long
 
 
     def test_load_from_v26_textangular(self):
