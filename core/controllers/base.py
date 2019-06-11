@@ -333,15 +333,6 @@ class BaseHandler(webapp2.RequestHandler):
                 'Oppia is a free, open-source learning platform. Join the '
                 'community to create or try an exploration today!')
 
-        # Create a new csrf token for inclusion in HTML responses. This assumes
-        # that tokens generated in one handler will be sent back to a handler
-        # with the same page name.
-        values['csrf_token'] = ''
-
-        if self.REQUIRE_PAYLOAD_CSRF_CHECK:
-            values['csrf_token'] = CsrfTokenManager.create_csrf_token(
-                self.user_id)
-
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
         self.response.headers['Strict-Transport-Security'] = (
