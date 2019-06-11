@@ -1247,8 +1247,8 @@ def compile_typescript_files_continuously(project_dir):
         with open(TSC_OUTPUT_LOG_FILEPATH, 'r') as f:
             lines = f.readlines()
             if len(lines):
-                # We are checking only the last line here since
-                # whenever typescript is done with compilation with or
+                # We are checking only the last line here since whenever
+                # typescript is done with initial compilation with or
                 # without errors, the last line will always read
                 # 'Found x errors. Watching for file changes'.
                 last_output = lines[len(lines) - 1]
