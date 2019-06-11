@@ -45,7 +45,9 @@ oppia.controller('Base', [
     $rootScope.loadingMessage = '';
 
     if (UrlService.getPathname() !== '/signup') {
-      CsrfService.setToken();
+      CsrfService.getToken().then(function(token) {
+        constants.CSRF_TOKEN = token;
+      });
     }
 
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;

@@ -102,7 +102,9 @@ oppia.directive('adminPage', ['UrlInterpolationService',
           var ctrl = this;
           ctrl.userEmail = GLOBALS.USER_EMAIL;
           ctrl.inDevMode = DEV_MODE;
-          CsrfService.setToken();
+          CsrfService.getToken().then(function(token) {
+            constants.CSRF_TOKEN = token;
+          })
           ctrl.statusMessage = '';
           ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
           ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;

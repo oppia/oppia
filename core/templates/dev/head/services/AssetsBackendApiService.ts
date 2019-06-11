@@ -152,7 +152,7 @@ oppia.factory('AssetsBackendApiService', [
       form.append('payload', JSON.stringify({
         filename: filename
       }));
-      form.append('csrf_token', constants.csrf_token);
+      form.append('csrf_token', constants.CSRF_TOKEN);
 
       $.ajax({
         url: _getAudioUploadUrl(explorationId),

@@ -16,11 +16,11 @@
  * @fileoverview Service for managing csrf tokens
  */
 
-oppia.factory('CsrfService', ['$http', function($http) {
+oppia.factory('CsrfService', ['$http' '$q', function($http, $q) {
   return {
-    setToken: function() {
-      $http.post('/csrf').then(function(response) {
-        constants.csrf_token = response.data.token;
+    getToken: function() {
+      return $http.post('/csrf').then(function(response) {
+        return response.data.token;
       });
     },
   };
