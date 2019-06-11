@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html ng-app="oppia" ng-controller="Admin">
+<html ng-app="oppia">
   <head>
     <title>Oppia Admin Panel</title>
 
-    {% include 'pages/header_css_libs.html' %}
+    <!-- Require head styles file using webpack -->
+    @require('../header_css_libs.html')
 
     <script>
       var GLOBALS = {
@@ -23,65 +24,18 @@
         VIEWABLE_ROLES: JSON.parse('{{viewable_roles|js_string}}'),
         TOPIC_SUMMARIES: JSON.parse('{{topic_summaries|js_string}}'),
         ROLE_GRAPH_DATA: JSON.parse('{{role_graph_data|js_string}}'),
-        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
       }
     </script>
 
-    {% include 'pages/header_js_libs.html' %}
+    <!-- Require head javascript file using webpack -->
+      @require('../header_js_libs.html')
   </head>
 
   <body>
-    <admin-navbar user-email="userEmail" logout-url="logoutUrl"></admin-navbar>
 
-    <div align="center"
-         ng-if="statusMessage"
-         style="background-color: #ffffff; position: fixed; max-width: 30%; z-index: 3000; border: 1px solid #00376d; right: 30px; bottom: 30px">
-      <[statusMessage]>
-    </div>
-    <br>
+    <admin-page></admin-page>
 
-    <div style="padding-top: 16px;">
-      <admin-dev-mode-activities-tab ng-if="isActivitiesTabOpen() && inDevMode"
-                                     set-status-message="setStatusMessage">
-      </admin-dev-mode-activities-tab>
-      <admin-prod-mode-activities-tab ng-if="isActivitiesTabOpen() && !inDevMode">
-      </admin-prod-mode-activities-tab>
-
-      <admin-jobs-tab ng-if="isJobsTabOpen()"
-                      set-status-message="setStatusMessage">
-      </admin-jobs-tab>
-
-      <admin-config-tab ng-if="isConfigTabOpen()"
-                        set-status-message="setStatusMessage">
-      </admin-config-tab>
-
-      <admin-roles-tab ng-if="isRolesTabOpen()"
-                       set-status-message="setStatusMessage">
-      </admin-roles-tab>
-
-      <admin-misc-tab ng-if="isMiscTabOpen()"
-                      set-status-message="setStatusMessage">
-      </admin-misc-tab>
-    </div>
-
-    <div ng-if="inDevMode" class="oppia-dev-mode">
-      Dev Mode
-    </div>
-
-    {% include 'pages/footer_js_libs.html' %}
-
-    <script src="/templates/dev/head/AppInit.js"></script>
-    <!-- This code is used for inserting webpack bundles
-       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-      <% if (webpackConfig.mode == 'production') { %>
-        <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } else { %>
-        <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } %>
-    <% } %>
-    {% include 'components/rich_text_components.html' %}
-
+    @require('../footer_js_libs.html')
     <script>
       {{ value_generators_js }}
     </script>

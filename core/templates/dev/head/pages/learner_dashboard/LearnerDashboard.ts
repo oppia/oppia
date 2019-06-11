@@ -16,17 +16,23 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
-require('components/background/BackgroundBannerDirective.ts');
-require('components/loading/LoadingDotsDirective.ts');
-require('components/summary_tile/CollectionSummaryTileDirective.ts');
-require('components/summary_tile/ExplorationSummaryTileDirective.ts');
-require('filters/TruncateFilter.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'loading-dots.directive.ts');
+require('components/summary-tile/collection-summary-tile.directive.ts');
+require('components/summary-tile/exploration-summary-tile.directive.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
-require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
-require('pages/suggestion_editor/ShowSuggestionModalForLearnerViewService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-status-display.service.ts');
+require('pages/suggestion_editor/SuggestionModalForLearnerDashboardService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
@@ -91,7 +97,7 @@ oppia.controller('LearnerDashboard', [
   'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
   'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
   'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
-  'ShowSuggestionModalForLearnerViewService', 'UserService',
+  'SuggestionModalForLearnerDashboardService', 'UserService',
   function(
       $scope, $rootScope, $q, $window, $http, $uibModal,
       AlertsService, EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS,
@@ -101,7 +107,7 @@ oppia.controller('LearnerDashboard', [
       LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
       DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
       FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory,
-      ShowSuggestionModalForLearnerViewService, UserService) {
+      SuggestionModalForLearnerDashboardService, UserService) {
     $scope.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
       EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS);
     $scope.SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -484,7 +490,7 @@ oppia.controller('LearnerDashboard', [
     };
 
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
-      ShowSuggestionModalForLearnerViewService.showSuggestionModal(
+      SuggestionModalForLearnerDashboardService.showSuggestionModal(
         'edit_exploration_state_content',
         {
           newContent: newContent,
