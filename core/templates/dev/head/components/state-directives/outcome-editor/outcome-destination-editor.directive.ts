@@ -18,7 +18,8 @@
 
 require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
+require(
+  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

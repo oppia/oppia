@@ -140,8 +140,8 @@ oppia.directive('stateHintsEditor', [
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'add_hint_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/add-hint-modal.template.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
@@ -208,8 +208,8 @@ oppia.directive('stateHintsEditor', [
 
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_last_hint_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/delete-last-hint-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -247,8 +247,8 @@ oppia.directive('stateHintsEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_hint_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/delete-hint-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', function(

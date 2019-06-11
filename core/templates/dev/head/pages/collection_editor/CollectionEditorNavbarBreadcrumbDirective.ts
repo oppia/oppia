@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/collection_editor/CollectionEditorStateService.ts');
-require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
 // TODO(bhenning): After the navbar is moved to a directive, this directive

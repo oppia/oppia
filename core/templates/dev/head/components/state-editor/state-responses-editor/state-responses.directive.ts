@@ -32,10 +32,13 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('filters/parameterize-rule-description.filter.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 require('filters/string-utility-filters/wrap-text-with-ellipsis.filter.ts');
-require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 require(
-  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
+  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'interaction-details-cache.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-content.service.ts');
@@ -329,8 +332,8 @@ oppia.directive('stateResponses', [
             var currentInteractionId = $scope.getCurrentInteractionId();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'add_answer_group_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/add-answer-group-modal.template.html'),
               // Clicking outside this modal should not dismiss it.
               backdrop: 'static',
               controller: [
@@ -450,8 +453,8 @@ oppia.directive('stateResponses', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_answer_group_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/delete-answer-group-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', function(

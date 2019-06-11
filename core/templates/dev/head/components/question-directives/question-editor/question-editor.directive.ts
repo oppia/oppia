@@ -22,8 +22,11 @@ require('components/entity-creation-services/question-creation.service.ts');
 require('domain/question/EditableQuestionBackendApiService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 require('domain/question/QuestionUpdateService.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
-require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-validity.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
