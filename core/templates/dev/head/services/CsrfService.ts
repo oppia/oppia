@@ -23,5 +23,5 @@ oppia.factory('CsrfService', ['$http', function($http) {
         constants.csrf_token = response.data.token;
       });
     },
-  }
+  };
 }]);

@@ -16,7 +16,7 @@
  * @fileoverview Tests that the csrf service is working as expected.
  */
 
-require('services/CsrfService.ts')
+require('services/CsrfService.ts');
 
 describe('CSRF service factory', function() {
   var $httpBackend = null;

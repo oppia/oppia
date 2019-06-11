@@ -25,11 +25,11 @@ require('services/stateful/BackgroundMaskService.ts');
 
 oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'CsrfService', 'SidebarStatusService', 'UrlInterpolationService', 'UrlService',
-  'DEV_MODE', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
+  'CsrfService', 'SidebarStatusService', 'UrlInterpolationService',
+  'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      CsrfService, SidebarStatusService, UrlInterpolationService, UrlService,
-      DEV_MODE, SITE_FEEDBACK_FORM_URL, SITE_NAME) {
+      CsrfService, SidebarStatusService, UrlInterpolationService,
+      UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
