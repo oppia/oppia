@@ -210,8 +210,12 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['get_started'],
+      chunks: ['app', 'get_started'],
       filename: 'get-started-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Learn how to get started using Oppia.'
+      },
       template:
         commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
       minify: htmlMinifyConfig,
