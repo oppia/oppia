@@ -3237,7 +3237,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
     def test_get_exploration_summary_by_id_with_invalid_exploration_id(self):
         exploration_summary = exp_services.get_exploration_summary_by_id(
-            'invalid_exploration_id')
+            'invalid_exploration_id', strict=False)
 
         self.assertIsNone(exploration_summary)
 
@@ -3699,7 +3699,7 @@ title: Old Title
             category='category',
             title='title',
             objective='Old objective',
-            states_schema_version=-1,
+            states_schema_version=(feconf.CURRENT_STATE_SCHEMA_VERSION + 1),
             init_state_name=feconf.DEFAULT_INIT_STATE_NAME
         )
 
@@ -3785,6 +3785,248 @@ title: Old Title
                     'property_name': 'title',
                     'new_value': 'new title'
                 })], feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
+
+    def test_update_language_code(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.language_code, 'en')
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'language_code',
+                'new_value': 'bn'
+            })], 'Changed language code.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.language_code, 'bn')
+
+    def test_update_exploration_tags(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.tags, [])
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'tags',
+                'new_value': ['test']
+            })], 'Changed tags.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.tags, ['test'])
+
+    def test_update_exploration_author_notes(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.author_notes, '')
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'author_notes',
+                'new_value': 'author_notes'
+            })], 'Changed author_notes.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.author_notes, 'author_notes')
+
+    def test_update_exploration_blurb(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.blurb, '')
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'blurb',
+                'new_value': 'blurb'
+            })], 'Changed blurb.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.blurb, 'blurb')
+
+    def test_update_exploration_param_changes(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.param_changes, [])
+
+        exploration.param_specs = {
+            'myParam': param_domain.ParamSpec('UnicodeString')}
+        exp_services._save_exploration(self.albert_id, exploration, '', [])
+
+        param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        }]
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'param_changes',
+                'new_value': param_changes
+            })], 'Changed param_changes.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        self.assertEqual(len(exploration.param_changes), 1)
+        self.assertEqual(
+            exploration.param_changes[0].to_dict(), param_changes[0])
+
+    def test_update_exploration_init_state_name(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'State'
+            })], 'Added new state.')
+
+        self.assertEqual(
+            exploration.init_state_name, feconf.DEFAULT_INIT_STATE_NAME)
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'init_state_name',
+                'new_value': 'State'
+            })], 'Changed init_state_name.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.init_state_name, 'State')
+
+    def test_update_exploration_auto_tts_enabled(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.auto_tts_enabled, True)
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'auto_tts_enabled',
+                'new_value': False
+            })], 'Changed auto_tts_enabled.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.auto_tts_enabled, False)
+
+    def test_update_exploration_correctness_feedback_enabled(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.correctness_feedback_enabled, False)
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'correctness_feedback_enabled',
+                'new_value': True
+            })], 'Changed correctness_feedback_enabled.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(exploration.correctness_feedback_enabled, True)
+
+    def test_update_unclassified_answers(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.confirmed_unclassified_answers,
+            [])
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
+                'state_name': exploration.init_state_name,
+                'new_value': ['test']
+            })], 'Changed confirmed_unclassified_answers.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.confirmed_unclassified_answers,
+            ['test'])
+
+    def test_update_interaction_hints(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.hints, [])
+
+        hint_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>')
+            }
+        }]
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': hint_list
+            })], 'Changed hints.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        self.assertEqual(len(exploration.init_state.interaction.hints), 1)
+        self.assertEqual(
+            exploration.init_state.interaction.hints[0].hint_content.content_id,
+            'hint_1')
+
+    def test_update_interaction_solutions(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertIsNone(exploration.init_state.interaction.solution)
+
+        solution = {
+            'answer_is_exclusive': False,
+            'correct_answer': 'helloworld!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': 'hello_world is a string'
+            },
+        }
+
+        hint_list = [{
+            'hint_content': {
+                'content_id': u'hint_1',
+                'html': (
+                    u'<p>Hello, this is html1 for state2'
+                    u'<oppia-noninteractive-image filepath-with-value="'
+                    u'&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    u'"&amp;quot;&amp;quot;" alt-with-value='
+                    u'"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    u'</p>')
+            }
+        }]
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_HINTS,
+                'state_name': exploration.init_state_name,
+                'new_value': hint_list
+            })], 'Changed hints.')
+
+        exp_services.update_exploration(
+            self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION,
+                'state_name': exploration.init_state_name,
+                'new_value': solution
+            })], 'Changed interaction_solutions.')
+
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+        self.assertEqual(
+            exploration.init_state.interaction.solution.to_dict(),
+            solution)
+
+    def test_cannot_update_recorded_voiceovers_with_invalid_type(self):
+        exploration = exp_services.get_exploration_by_id(self.NEW_EXP_ID)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected recorded_voiceovers to be a dict'):
+            exp_services.update_exploration(
+                self.albert_id, self.NEW_EXP_ID, [exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS),
+                    'state_name': exploration.init_state_name,
+                    'new_value': 'invalid_recorded_voiceovers'
+                })], 'Changed recorded_voiceovers.')
 
     def test_revert_exploration_with_mismatch_of_versions_raises_error(self):
         self.save_new_valid_exploration('exp_id', 'user_id')

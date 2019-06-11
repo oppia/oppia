@@ -89,6 +89,8 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     """
     states_schema_version = versioned_exploration_states[
         'states_schema_version']
+    if states_schema_version is None or states_schema_version < 1:
+        states_schema_version = 0
 
     if not (0 <= states_schema_version
             <= feconf.CURRENT_STATE_SCHEMA_VERSION):
@@ -237,11 +239,13 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             return None
 
 
-def get_exploration_summary_by_id(exploration_id):
+def get_exploration_summary_by_id(exploration_id, strict=True):
     """Returns a domain object representing an exploration summary.
 
     Args:
         exploration_id: str. The id of the ExplorationSummary to be returned.
+        strict: bool. If True, an EntityNotFoundError is raised when any
+            exploration id is invalid.
 
     Returns:
         ExplorationSummary. The summary domain object corresponding to the
@@ -249,7 +253,7 @@ def get_exploration_summary_by_id(exploration_id):
     """
     # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
     exp_summary_model = exp_models.ExpSummaryModel.get(
-        exploration_id, strict=False)
+        exploration_id, strict=strict)
     if exp_summary_model:
         exp_summary = get_exploration_summary_from_model(exp_summary_model)
         return exp_summary
