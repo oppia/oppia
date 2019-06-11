@@ -28,9 +28,7 @@ require(
   'components/question-directives/question-player/' +
   'question-player.directive.ts');
 
-require('objects/templates/MathLatexStringEditorDirective.ts');
-require('objects/templates/SanitizedUrlEditorDirective.ts');
-require('objects/templates/ListOfTabsEditorDirective.ts');
+require('objects/objectComponentsRequiresForPlayers.ts');
 
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');

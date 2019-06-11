@@ -73,9 +73,7 @@ require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 
-require('objects/templates/MathLatexStringEditorDirective.ts');
-require('objects/templates/SanitizedUrlEditorDirective.ts');
-require('objects/templates/ListOfTabsEditorDirective.ts');
+require('objects/objectComponentsRequiresForPlayers.ts');
 
 require('services/HtmlEscaperService.ts');
 require('services/IdGenerationService.ts');
