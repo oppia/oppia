@@ -10,7 +10,7 @@
          ng-class="{'oppia-activity-playlist-tile': $ctrl.isPlaylistTile()}"
          style="position: relative; z-index: 5;">
   <a ng-href="<[$ctrl.getCollectionLink()]>" style="text-decoration: none;">
-    <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
+    <div class="title-section" style="background-color: <[$ctrl.getThumbnailBgColor()]>;">
       <img class="collection-corner-image" ng-src="<[$ctrl.getStaticImageUrl('/general/collection_corner.svg')]>" alt="">
       <img class="thumbnail-image" ng-src="<[$ctrl.getCompleteThumbnailIconUrl()]>" alt="<[$ctrl.getCategory()]>" ng-style="$ctrl.isPlaylistTile() && {'top': '6px', 'width': '60px'}">
       <h3 class="activity-title protractor-test-collection-summary-tile-title" ng-style="$ctrl.isPlaylistTile() && {'width': '93%', 'text-align': 'center'}"><[$ctrl.getCollectionTitle() || $ctrl.DEFAULT_EMPTY_TITLE]></h3>
