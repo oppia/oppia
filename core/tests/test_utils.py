@@ -821,7 +821,8 @@ tags: []
 
     def get_csrf_token(self):
         """Retrieve CSRF token."""
-        return self.get_json('/csrf')['token']
+        response = self.post_json('/csrf')
+        return response['token']
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
