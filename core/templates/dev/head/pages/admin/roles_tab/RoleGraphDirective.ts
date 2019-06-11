@@ -16,9 +16,9 @@
  * @fileoverview Directive for displaying Role graph.
  */
 
-require('components/StateGraphLayoutService.ts');
+require('components/graph-services/graph-layout.service.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/TruncateFilter.ts');
+require('filters/string-utility-filters/truncate.filter.ts');
 
 oppia.directive('roleGraph', [
   'UrlInterpolationService', function(UrlInterpolationService) {
