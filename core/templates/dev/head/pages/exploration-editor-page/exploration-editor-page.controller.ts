@@ -192,6 +192,7 @@ require(
 require('pages/exploration_player/ConversationSkinDirective.ts');
 require('pages/exploration_player/ExplorationFooterDirective.ts');
 require('pages/exploration_player/PlayerConstants.ts');
+require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
