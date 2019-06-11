@@ -30,7 +30,7 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
-require('pages/exploration_editor/RouterService.ts');
+require('pages/exploration-editor-page/services/router.service.ts');
 require('services/AlertsService.ts');
 
 oppia.directive('collectionEditorNavbar', [

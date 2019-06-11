@@ -21,9 +21,11 @@ require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_editor/EditorFirstTimeEventsService.ts');
 require(
-  'pages/exploration_editor/editor_tab/InteractionDetailsCacheService.ts');
+  'pages/exploration-editor-page/services/editor-first-time-events.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'interaction-details-cache.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-content.service.ts');
@@ -215,8 +217,8 @@ oppia.directive('stateInteractionEditor', [
 
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/pages/exploration_editor/editor_tab/' +
-                  'customize_interaction_modal_directive.html'),
+                  '/pages/exploration-editor-page/editor-tab/templates/' +
+                  'modal-templates/customize-interaction-modal.template.html'),
                 backdrop: true,
                 resolve: {},
                 controller: [
@@ -413,8 +415,8 @@ oppia.directive('stateInteractionEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_interaction_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/delete-interaction-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance', function(

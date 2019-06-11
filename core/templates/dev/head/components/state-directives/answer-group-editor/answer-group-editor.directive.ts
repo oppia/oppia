@@ -23,9 +23,11 @@ require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/RuleObjectFactory.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
 require(
-  'pages/exploration_editor/editor_tab/TrainingDataEditorPanelService.ts');
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/training-panel/' +
+  'training-data-editor-panel.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
