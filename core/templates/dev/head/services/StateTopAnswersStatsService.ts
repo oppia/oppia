@@ -18,8 +18,8 @@
  */
 
 require('domain/exploration/AnswerStatsObjectFactory.ts');
-require('pages/exploration_editor/AngularNameService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/angular-name.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/ContextService.ts');

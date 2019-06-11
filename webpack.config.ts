@@ -52,7 +52,8 @@ module.exports = {
       '/pages/email-dashboard-pages/email-dashboard-result.controller.ts',
     error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
     exploration_editor:
-      commonPrefix + '/pages/exploration_editor/ExplorationEditor.ts',
+      commonPrefix + '/pages/exploration-editor-page/' +
+      'exploration-editor-page.controller.ts',
     exploration_player:
       commonPrefix + '/pages/exploration-player-page/' +
       'exploration-player-page.controller.ts',
@@ -192,9 +193,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],
-      filename: 'exploration_editor.html',
+      filename: 'exploration-editor-page.mainpage.html',
       template:
-        commonPrefix + '/pages/exploration_editor/exploration_editor.html',
+        commonPrefix + '/pages/exploration-editor-page/' +
+        'exploration-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

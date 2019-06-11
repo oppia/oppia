@@ -25,9 +25,14 @@ require(
 require('domain/exploration/SolutionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
-require('pages/exploration_editor/editor_tab/ResponsesService.ts');
-require('pages/exploration_editor/editor_tab/SolutionValidityService.ts');
-require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/responses.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-validity.service.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-verification.service.ts');
 require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
@@ -146,8 +151,8 @@ oppia.directive('stateSolutionEditor', [
             $scope.inlineSolutionEditorIsActive = false;
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'add_or_update_solution_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/add-or-update-solution-modal.template.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance', 'StateSolutionService',
@@ -260,8 +265,8 @@ oppia.directive('stateSolutionEditor', [
             AlertsService.clearWarnings();
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/exploration_editor/editor_tab/' +
-                'delete_solution_modal_directive.html'),
+                '/pages/exploration-editor-page/editor-tab/templates/' +
+                'modal-templates/delete-solution-modal.template.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
