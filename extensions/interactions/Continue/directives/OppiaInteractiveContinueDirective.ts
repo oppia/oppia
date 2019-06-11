@@ -19,6 +19,14 @@
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/Continue/directives/ContinueRulesService.ts');
+require('pages/exploration_player/CurrentInteractionService.ts');
+require('services/ContextService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 oppia.directive('oppiaInteractiveContinue', [
   'ContinueRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
   function(ContinueRulesService, HtmlEscaperService, UrlInterpolationService) {
