@@ -579,8 +579,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(init_state, 'solicit_answer_details', 'abc'):
                 exploration.validate()
         self.assertEqual(init_state.solicit_answer_details, False)
-        init_state.update_interaction_id('GraphInput')
-        self.assertEqual(init_state.interaction.id, 'GraphInput')
+        init_state.update_interaction_id('Continue')
+        self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'This state cannont have true instance of' +

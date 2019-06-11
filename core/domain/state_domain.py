@@ -1471,7 +1471,7 @@ class State(object):
                 'Expected solicit_answer_details to be a boolean, ' +
                 'received %s' % self.solicit_answer_details)
         if self.solicit_answer_details:
-            if self.interaction.id != 'TextInput':
+            if self.interaction.id in feconf.CANNOT_SOLICIT_ANSWER_DETAILS:
                 raise utils.ValidationError(
                     'This state cannont have true instance of ' +
                     'solicit_answer_details, because the interaction is ' +
