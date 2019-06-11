@@ -19,8 +19,8 @@
 require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
-require('pages/exploration_editor/ChangeListService.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/change-list.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-content.service.ts');
