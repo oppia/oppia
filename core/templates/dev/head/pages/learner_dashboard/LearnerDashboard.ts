@@ -29,7 +29,9 @@ require('filters/string-utility-filters/truncate.filter.ts');
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
-require('pages/exploration_editor/feedback_tab/ThreadStatusDisplayService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-status-display.service.ts');
 require('pages/suggestion_editor/SuggestionModalForLearnerDashboardService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
