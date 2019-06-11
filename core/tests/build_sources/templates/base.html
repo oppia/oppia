@@ -73,7 +73,7 @@
 
     {% block header_css %}
       <!-- Require head styles file using webpack -->
-      @require('../pages/header_css_libs.html')
+      @require('pages/header_css_libs.html')
     {% endblock header_css %}
 
     <script>
@@ -94,7 +94,7 @@
 
     {% block header_js %}
       <!-- Require head javascript file using webpack -->
-      @require('../pages/header_js_libs.html')
+      @require('pages/header_js_libs.html')
     {% endblock header_js %}
 
     {{BEFORE_END_HEAD_TAG_HOOK}}
@@ -169,7 +169,7 @@
       </a>
     </div>
 
-    @require('../pages/footer_js_libs.html')
+    @require('pages/footer_js_libs.html')
 
     <script src="/templates/dev/head/App.js"></script>
     <script src="/templates/dev/head/I18nFooter.js"></script>
