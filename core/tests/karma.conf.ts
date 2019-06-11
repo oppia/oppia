@@ -173,6 +173,10 @@ module.exports = function(config) {
               }
             }
           ]
+        },
+        {
+          test: /\.html$/,
+          loader: 'underscore-template-loader'
         }]
       },
       plugins: [

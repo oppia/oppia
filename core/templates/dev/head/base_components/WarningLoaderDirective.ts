@@ -13,10 +13,24 @@
 // limitations under the License.
 
 /**
- * @fileoverview File to import necessary scripts for get_started page.
+ * @fileoverview Directive for warning_loader.
  */
 
-require('base_components/BaseContentDirective.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
+oppia.directive('warningLoader', [
+  'UrlInterpolationService',
+  function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/base_components/warning_loader_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        function() {}
+      ]
+    };
+  }
+]);
