@@ -18,7 +18,7 @@
  */
 
 require('App.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/StateTopAnswersStatsService.ts');
 
 var joC = jasmine.objectContaining;
