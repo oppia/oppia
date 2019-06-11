@@ -22,6 +22,7 @@ describe('CSRF service factory', function() {
   var $httpBackend = null;
   var CsrfService = null;
 
+  beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfService');
