@@ -74,6 +74,7 @@ require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin/AdminRouterService.ts');
 require('services/UtilsService.ts');
+require('services/CsrfService.ts');
 
 oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
 oppia.constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
@@ -93,12 +94,15 @@ oppia.directive('adminPage', ['UrlInterpolationService',
         '/pages/admin/admin_page_directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$http', '$location', '$scope', 'AdminRouterService', 'DEV_MODE',
-        function($http, $location, $scope, AdminRouterService, DEV_MODE) {
+        '$http', '$location', '$scope', 'AdminRouterService', 'CsrfService',
+        'DEV_MODE',
+        function(
+            $http, $location, $scope, AdminRouterService, CsrfService,
+            DEV_MODE) {
           var ctrl = this;
           ctrl.userEmail = GLOBALS.USER_EMAIL;
           ctrl.inDevMode = DEV_MODE;
-
+          CsrfService.setToken();
           ctrl.statusMessage = '';
           ctrl.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
           ctrl.isJobsTabOpen = AdminRouterService.isJobsTabOpen;

@@ -671,7 +671,8 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             # Following handler are present in base.py where acl_decorators
             # cannot be imported.
             if (handler.__name__ == 'LogoutPage' or
-                    handler.__name__ == 'Error404Handler'):
+                    handler.__name__ == 'Error404Handler' or
+                    handler.__name__ == 'CsrfTokenHandler'):
                 continue
 
             if handler.get != base.BaseHandler.get:
@@ -857,7 +858,7 @@ class SignUpTests(test_utils.GenericTestBase):
         """
         self.login('abc@example.com')
         response = self.get_html_response(feconf.SIGNUP_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
         self.assertIn('Logout', response.location)
@@ -877,8 +878,7 @@ class SignUpTests(test_utils.GenericTestBase):
         after signup.
         """
         self.login('abc@example.com')
-        response = self.get_html_response(feconf.SIGNUP_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         self.post_json(
             feconf.SIGNUP_DATA_URL, {

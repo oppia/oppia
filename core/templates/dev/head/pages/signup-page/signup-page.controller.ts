@@ -49,6 +49,7 @@ oppia.controller('Signup', [
       $scope.showEmailPreferencesForm = data.can_send_emails;
       $scope.hasUsername = Boolean($scope.username);
       FocusManagerService.setFocus('usernameInputField');
+      constants.csrf_token = data.csrf_token;
     });
 
     $scope.blurredAtLeastOnce = false;

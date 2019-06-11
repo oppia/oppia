@@ -98,7 +98,7 @@ oppia.factory('ExplorationCreationService', [
           var form = new FormData();
           form.append('yaml_file', yamlFile);
           form.append('payload', JSON.stringify({}));
-          form.append('csrf_token', GLOBALS.csrf_token);
+          form.append('csrf_token', constants.csrf_token);
 
           $.ajax({
             contentType: false,

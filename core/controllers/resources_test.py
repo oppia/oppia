@@ -54,7 +54,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
                   mode='rb') as f:
@@ -75,8 +75,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_non_matching_extensions_are_detected(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         filename_without_extension = 'test'
         supplied_filename = ('%s.jpg' % filename_without_extension)
@@ -114,8 +113,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         """Test upload of an empty image."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         # Upload an empty image.
         response_dict = self.post_json(
@@ -134,8 +132,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         """Test upload of a malformed image."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         # Upload an invalid image.
         response_dict = self.post_json(
@@ -161,8 +158,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
         # TODO(sll): Add more tests here.
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
                   mode='rb') as f:
@@ -181,8 +177,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_missing_extensions_are_detected(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
                   mode='rb') as f:
@@ -202,8 +197,7 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
 
     def test_bad_extensions_are_detected(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
                   mode='rb') as f:
@@ -269,8 +263,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_audio_upload(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
                   mode='rb') as f:
@@ -285,8 +278,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_audio_upload_with_non_mp3_file(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
@@ -313,8 +305,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_detect_non_matching_extensions(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         # Use an accepted audio extension in mismatched_filename
         # that differs from the uploaded file's audio type.
@@ -345,8 +336,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         with open(os.path.join(feconf.TESTS_DATA_DIR,
                                'img.png'),
@@ -367,8 +357,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
 
     def test_audio_upload_mpeg_container(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         with open(os.path.join(
             feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MPEG_CONTAINER),
@@ -386,8 +375,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """Test that invalid extensions are caught."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         filename_without_extension = 'test'
         invalid_extension = 'wav'
@@ -416,8 +404,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """Test upload of empty audio."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         # Upload empty audio.
         response_dict = self.post_json(
@@ -435,8 +422,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """Test upload of malformed audio."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
         response_dict = self.post_json(
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
             {'filename': 'test.mp3'},
@@ -454,8 +440,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """Test upload of filenames with no extensions are caught."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         missing_extension_filename = 'test'
         with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
@@ -480,8 +465,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """Test that audio file is less than max playback length."""
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         with open(os.path.join(feconf.TESTS_DATA_DIR,
                                self.TEST_AUDIO_FILE_OVER_MAX_LENGTH),
@@ -506,8 +490,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
         """
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_html_response('/create/0')
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         # Use an accepted audio extension in mismatched_filename
         # that differs from the uploaded file's audio type.

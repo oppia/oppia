@@ -401,6 +401,8 @@
 /core/templates/dev/head/pages/footer_js_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_css_libs.html @vojtechjelinek
 /core/templates/dev/head/pages/header_js_libs.html @vojtechjelinek
+/core/templates/dev/head/services/CsrfService.ts @jamesjay4199 @vojtechjelinek
+/core/templates/dev/head/services/CsrfServiceSpec.ts @jamesjay4199 @vojtechjelinek
 /gulpfile.js @vojtechjelinek
 /jinja_utils*.py @vojtechjelinek
 /webpack.config.ts @vojtechjelinek

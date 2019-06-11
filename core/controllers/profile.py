@@ -275,6 +275,7 @@ class SignupHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
+        csrf_token = base.CsrfTokenManager.create_csrf_token(self.user_id)
         self.render_json({
             'can_send_emails': feconf.CAN_SEND_EMAILS,
             'has_agreed_to_latest_terms': bool(
@@ -284,6 +285,7 @@ class SignupHandler(base.BaseHandler):
             'has_ever_registered': bool(
                 user_settings.username and user_settings.last_agreed_to_terms),
             'username': user_settings.username,
+            'csrf_token': csrf_token,
         })
 
     @acl_decorators.require_user_id_else_redirect_to_homepage

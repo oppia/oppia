@@ -16,13 +16,15 @@
  * @fileoverview Oppia's base controller.
  */
 
+require('services/CsrfService.ts');
+
 oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService', 'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL',
-  'SITE_NAME',
+  'CsrfService', 'SidebarStatusService', 'UrlService', 'DEV_MODE',
+  'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      SidebarStatusService, UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL,
-      SITE_NAME) {
+      CsrfService, SidebarStatusService, UrlService, DEV_MODE,
+      SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
@@ -32,6 +34,10 @@ oppia.controller('Base', [
     $rootScope.DEV_MODE = DEV_MODE;
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
+
+    if (UrlService.getPathname() !== '/signup') {
+      CsrfService.setToken();
+    }
 
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;

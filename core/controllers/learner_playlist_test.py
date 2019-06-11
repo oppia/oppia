@@ -72,7 +72,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
     def test_add_exploration_to_learner_playlist(self):
         self.login(self.VIEWER_EMAIL)
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         # Add one exploration to the playlist.
         self.post_json(
@@ -170,7 +170,7 @@ class LearnerPlaylistHandlerTests(test_utils.GenericTestBase):
     def test_add_collection_to_learner_playlist(self):
         self.login(self.VIEWER_EMAIL)
         response = self.get_html_response(feconf.LEARNER_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
 
         # Add one collection to the playlist.
         self.post_json(

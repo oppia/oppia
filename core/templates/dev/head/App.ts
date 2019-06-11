@@ -194,7 +194,7 @@ oppia.config([
           request: function(config) {
             if (config.data) {
               config.data = $.param({
-                csrf_token: GLOBALS.csrf_token,
+                csrf_token: constants.csrf_token,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -291,7 +291,7 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
           type: 'POST',
           url: '/frontend_errors',
           data: $.param({
-            csrf_token: GLOBALS.csrf_token,
+            csrf_token: constants.csrf_token,
             payload: JSON.stringify({
               error: messageAndSourceAndStackTrace
             }),

@@ -585,3 +585,17 @@ class CsrfTokenManager(object):
             return False
         except Exception:
             return False
+
+
+class CsrfTokenHandler(BaseHandler):
+    """Handles sending CSRF tokens to the frontend."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def post(self):
+        csrf_token = CsrfTokenManager.create_csrf_token(
+            self.user_id)
+        self.render_json({
+            'token': csrf_token,
+        })
