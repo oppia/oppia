@@ -18,6 +18,7 @@
 
 import copy
 import logging
+import re
 
 from constants import constants
 from core.domain import customization_args_util
@@ -230,7 +231,7 @@ class Image(object):
             valid.
         """
         src_re = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$'
-        if not re.match(filename_re, filepath):
+        if not re.match(src_re, self.src):
             raise utils.ValidationError(
                 'Invalid image_src, received %s' % self.src)
         if not isinstance(self.author_id, basestring):
@@ -314,6 +315,11 @@ class ImageAssets(object):
         if image_id in self.image_mapping:
             raise utils.ValidationError('Image Id already exist. %s' %
                                         image_id)
+        try:
+            image_id = int(image_id)
+        except ValueError:
+            raise utils.ValidationError('Invalid image Id')
+
         src = image_info['src']
         placeholder = image_info['placeholder']
         author_id = image_info['author_id']

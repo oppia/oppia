@@ -580,7 +580,7 @@ def get_images_ids_of_exploration(exploration):
     """
     image_ids = []
 
-    exploration_content = (exploration.get_all_html_content_strings())[0]
+    exploration_content = exploration.get_all_html_content_strings()[0]
     soup = bs4.BeautifulSoup(exploration_content.encode('utf-8'), 'html.parser')
 
     for image in soup.findAll(name='oppia-noninteractive-image'):

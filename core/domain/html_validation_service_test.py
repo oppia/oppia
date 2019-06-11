@@ -650,8 +650,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-collapsible>'
         ), (
             '<oppia-noninteractive-image caption-with-value="&amp;quot;'
-            'abc&amp;quot;" filepath-with-value="&amp;quot;'
-            'random.png&amp;quot;"></oppia-noninteractive-image>'
+            'abc&amp;quot;" image_id-with-value="&amp;quot;1&amp;quot;"'
+            '></oppia-noninteractive-image>'
         ), (
             '<p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
             'abc&amp;quot;"></oppia-noninteractive-math></p>'
@@ -760,31 +760,31 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="&amp;quot;&amp;quot;" '
-            'filepath-with-value="&amp;quot;xyz.png&amp;quot;">'
+            'image_id-with-value="&amp;quot;2&amp;quot;" >'
             '</oppia-noninteractive-image>'
         ), (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="&amp;quot;Hello&amp;quot;" '
-            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+            'image_id-with-value="&amp;quot;3&amp;quot;" >'
             '</oppia-noninteractive-image>'
         ), (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="34454" '
-            'filepath-with-value="&amp;quot;xyz.png&amp;quot;">'
+            'image_id-with-value="&amp;quot;4&amp;quot;" >'
             '</oppia-noninteractive-image>'
         ), (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="&amp;quot;5454&amp;quot;" '
-            'filepath-with-value="&amp;quot;xyz.jpg&amp;quot;">'
+            'image_id-with-value="&amp;quot;5&amp;quot;">'
             '</oppia-noninteractive-image>'
         ), (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="&amp;quot;Hello&amp;quot;" '
-            'filepath-with-value="&amp;quot;46503*.jpg&amp;quot;">'
+            'image_id-with-value="&amp;quot;random&amp;quot;" >'
             '</oppia-noninteractive-image>'
         )]
 
@@ -792,18 +792,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             test_cases)
 
         expected_output = {
-            'Invalid filepath': [(
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;'
-                'A circle divided into equal fifths.&amp;quot;" caption-'
-                'with-value="&amp;quot;Hello&amp;quot;" filepath-with-value'
-                '="&amp;quot;46503*.jpg&amp;quot;">'
-                '</oppia-noninteractive-image>'
-            ), (
+            "invalid literal for int() with base 10: \'random\'": [(
                 '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-                'circle divided into equal fifths.&amp;quot;" caption-'
-                'with-value="&amp;quot;Hello&amp;quot;" filepath-with-value'
-                '="&amp;quot;xy.z.png&amp;quot;"></oppia-noninteractive-image>'
-            )],
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'image_id-with-value="&amp;quot;random&amp;quot;" >'
+                '</oppia-noninteractive-image>'
+                )
+            ],
             'Expected dict, received [1, 2, 3]': [(
                 '<oppia-noninteractive-tabs tab_contents-with-value='
                 '"[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
@@ -885,10 +881,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-video>'
             )],
             'Expected unicode string, received 34454': [(
-                '<oppia-noninteractive-image alt-with-value="&amp;quot;'
-                'A circle divided into equal fifths.&amp;quot;" '
-                'caption-with-value="34454" filepath-with-value="&amp;quot;'
-                'xyz.png&amp;quot;"></oppia-noninteractive-image>'
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="34454" '
+                'image_id-with-value="&amp;quot;4&amp;quot;" >'
+                '</oppia-noninteractive-image>'
             )],
             'Expected unicode string, received 3456': [(
                 '<p><oppia-noninteractive-link text-with-value="3456" '
@@ -921,8 +918,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'Missing attributes: [u\'alt-with-value\'], Extra attributes: []':
             [(
                 '<oppia-noninteractive-image caption-with-value="&amp;quot;abc'
-                '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
-                'quot;"></oppia-noninteractive-image>'
+                '&amp;quot;" image_id-with-value="&amp;quot;1&amp;quot;"'
+                '></oppia-noninteractive-image>'
             )],
             'Video id length is not 11': [(
                 '<oppia-noninteractive-video autoplay-with-value="false" '
@@ -930,6 +927,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;quot;lorem&amp;quot;"></oppia-noninteractive-video>'
             )]}
 
+        # self.assertEqual(set(actual_output.keys()), "keshav")
         self.assertEqual(set(actual_output.keys()), set(expected_output.keys()))
         for key in expected_output:
             self.assertEqual(set(actual_output[key]), set(expected_output[key]))
@@ -951,7 +949,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'tag_name': 'oppia-noninteractive-link'
         }, {
             'html_string': (
-                '<oppia-noninteractive-image image_id-with-value="1" caption-with-value="&amp;quot;'
+                '<oppia-noninteractive-image image_id-with-value="&amp;quot;1&amp;quot;" caption-with-value="&amp;quot;'
                 'abc&amp;quot;" filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image>'
             ),
@@ -965,7 +963,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'Invalid URL: Sanitized URL should start with \'http://\' '
                 'or \'https://\'; received htt://link.com'
             )],
-            ['Missing attributes: [u\'alt-with-value\'], Extra attributes: []']
+            ['Missing attributes: [u\'alt-with-value\'], Extra attributes: [u\'filepath-with-value\']']
         ]
         for test_case in test_cases:
             html_string = test_case['html_string']
@@ -1149,11 +1147,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         expected_image_counter = 3
 
         image_mapping = {}
-        expected_image_mapping = {
-            1: {'src': u'', 'author_id': '', 'placeholder': False, 'instructions': ''},
-            2: {'src': u'&quot;img.png&quot;', 'author_id': '', 'placeholder': False, 'instructions': ''},
-            3: {'src': u'&quot;abc3.png&quot;', 'author_id': '', 'placeholder': False, 'instructions': ''}
-        }
+        expected_image_mapping = {u'1': {'src': u'', 'author_id': '', 'placeholder': False, 'instructions': ''}, u'3': {'src': u'&quot;abc3.png&quot;', 'author_id': '', 'placeholder': False, 'instructions': ''}, u'2': {'src': u'&quot;img.png&quot;', 'author_id': '', 'placeholder': False, 'instructions': ''}}
 
         (received_content_html, received_image_counter, received_image_mapping) = (
             html_validation_service.get_html_with_image_id_in_image_tag(

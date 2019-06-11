@@ -94,7 +94,6 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 # Represents answers which led to the 'default outcome' of an interaction,
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
-# Created so that there should no need to pass  = 0
 
 class ExplorationChange(object):
     """Domain object class for an exploration change.
@@ -112,6 +111,7 @@ class ExplorationChange(object):
     """
 
     STATE_PROPERTIES = (
+        STATE_PROPERTY_ADD_NEW_IMAGE,
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
@@ -124,8 +124,7 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
         STATE_PROPERTY_INTERACTION_HINTS,
         STATE_PROPERTY_INTERACTION_SOLUTION,
-        STATE_PROPERTY_UNCLASSIFIED_ANSWERS,
-        STATE_PROPERTY_ADD_NEW_IMAGE)
+        STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
 
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
@@ -176,7 +175,7 @@ class ExplorationChange(object):
         elif self.cmd == CMD_EDIT_STATE_PROPERTY:
             if change_dict['property_name'] not in self.STATE_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
-            if change_dict['property_name'] == 'add_new_image':
+            if change_dict['property_name'] == STATE_PROPERTY_ADD_NEW_IMAGE:
                 self.state_name = change_dict['state_name']
                 self.property_name = change_dict['property_name']
                 self.image_id = change_dict['image_id']

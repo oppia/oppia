@@ -124,10 +124,11 @@ class Image(BaseRteComponent):
         """Validates Image component."""
         super(Image, cls).validate(value_dict)
         image_id = value_dict['image_id-with-value']
-        if not isinstance(image_id, unicode):
-            raise exception('Invalid image_id,  received %' %
+        try:
+            image_id = int(image_id)
+        except:
+            raise Exception('Invalid image_id,  received %s' %
                 image_id)
-
 
 class Link(BaseRteComponent):
     """Class for Link component."""
