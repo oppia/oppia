@@ -1466,8 +1466,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
 
         self.logout()
 
-    def test_cannot_transfer_ownership_to_the_community_with_invalid_lang_code(
-            self):
+    def test_cannot_transfer_ownership_of_invalid_exp_to_the_community(self):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
 
@@ -1487,6 +1486,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         commit_cmds_dict = [commit_cmd.to_dict()]
         model.commit(self.owner_id, 'commit_message', commit_cmds_dict)
 
+        # The exploration is now invalid due to invalid language code.
+        # Therefore, the following PUT request will raise an exception after
+        # creating a domain object from the exploration model and validating it.
         response = self.get_html_response('/create/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
 
