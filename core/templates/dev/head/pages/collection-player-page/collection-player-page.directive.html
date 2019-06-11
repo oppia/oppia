@@ -224,13 +224,12 @@
           </div>
         </div>
       </div>
-
     </div>
 
     <div ng-if="$ctrl.collection && $ctrl.collectionSummary" class="oppia-card-preview-panel hidden-sm hidden-xs">
       <md-card class="oppia-activity-summary-tile md-default-theme">
         <div class="title-section" style="background-color: <[$ctrl.collectionSummary.thumbnail_bg_color]>; z-index: 1;">
-          <img ng-src="<[$ctrl.etStaticImageUrl($ctrl.collectionSummary.thumbnail_icon_url)]>" class="thumbnail-image">
+          <img ng-src="<[$ctrl.getStaticImageUrl($ctrl.collectionSummary.thumbnail_icon_url)]>" class="thumbnail-image">
         </div>
         <div class="title-section-mask objective oppia-activity-summary-tile-pre-hover-preview">
           <span>Hover over an icon to preview an exploration.</span>
