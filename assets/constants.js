@@ -572,7 +572,7 @@ var constants = {
   },
 
   "ALLOW_YAML_FILE_UPLOAD": false,
-  "CSRF_TOKEN": null,
+  "CSRF_TOKEN": "",
   
   "DEV_MODE": true
 };

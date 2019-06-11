@@ -19,7 +19,7 @@
 oppia.factory('CsrfService', ['$http' '$q', function($http, $q) {
   return {
     getToken: function() {
-      return $http.post('/csrf').then(function(response) {
+      return $http.get('/csrf').then(function(response) {
         return response.data.token;
       });
     },

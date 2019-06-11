@@ -584,7 +584,7 @@ class CsrfTokenHandler(BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    def post(self):
+    def get(self):
         csrf_token = CsrfTokenManager.create_csrf_token(
             self.user_id)
         self.render_json({

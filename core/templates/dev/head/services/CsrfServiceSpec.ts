@@ -30,10 +30,10 @@ describe('CSRF service factory', function() {
 
   it('should return the csrf token', function() {
     var response = {token: 'sample-csrf-token'};
-    $httpBackend.expectPOST('/csrf').respond(response);
+    $httpBackend.expectGET('/csrf').respond(response);
 
     CsrfService.getToken().then(function(token) {
-      expect(token).toBe('saple-csrf-token');
+      expect(token).toBe('sample-csrf-token');
     });
   });
 });
