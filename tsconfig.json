@@ -9,6 +9,7 @@
     "target": "es5",
     "typeRoots": ["./node_modules/@types"]
   },
+  "files_explanation": "These files are included separately since we still do not have webpack in extensions folder and these files are still included through scripts tags, so they need to be compiled separately.",
   "files": [
     "assets/constants.js", 
     "assets/rich_text_components_definitions.js", 
@@ -26,8 +27,6 @@
     "extensions/classifiers",
     "extensions/interactions",
     "extensions/objects",
-    "extensions/value_generators",
-    "extensions/visualizations",
     "typings"
   ]
 }

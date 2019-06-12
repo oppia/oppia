@@ -38,8 +38,6 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
-from core.domain import value_generators_domain
-from core.domain import visualization_registry
 from core.platform import models
 import feconf
 import utils
@@ -58,16 +56,6 @@ DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
     default_value=(
         'Check out this interactive lesson I created on Oppia - a free '
         'platform for teaching and learning!'))
-
-
-def get_value_generators_js():
-    """Return a string that concatenates the JS for all value generators."""
-    all_value_generators = (
-        value_generators_domain.Registry.get_all_generator_classes())
-    value_generators_js = ''
-    for _, generator_cls in all_value_generators.iteritems():
-        value_generators_js += generator_cls.get_js_template()
-    return value_generators_js
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -104,8 +92,6 @@ class ExplorationPage(EditorHandler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
-
-        visualizations_html = visualization_registry.Registry.get_full_html()
 
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -148,16 +134,13 @@ class ExplorationPage(EditorHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-            'value_generators_js': jinja2.utils.Markup(
-                get_value_generators_js()),
-            'visualizations_html': jinja2.utils.Markup(visualizations_html),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('dist/exploration_editor.html')
+        self.render_template('dist/exploration-editor-page.mainpage.html')
 
 
 class ExplorationHandler(EditorHandler):
