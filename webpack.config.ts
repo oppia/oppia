@@ -32,7 +32,7 @@ var commonPrefix = './core/templates/dev/head';
 module.exports = {
   entries: {
     about: commonPrefix + '/pages/about-page/about-page.controller.ts',
-    admin: commonPrefix + '/pages/admin/Admin.ts',
+    admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
       commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
@@ -55,14 +55,16 @@ module.exports = {
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.controller.ts',
     exploration_player:
-      commonPrefix + '/pages/exploration_player/ExplorationPlayer.ts',
+      commonPrefix + '/pages/exploration-player-page/' +
+      'exploration-player-page.controller.ts',
     get_started:
       commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
       commonPrefix + '/pages/landing-pages/topic-landing-page/' +
       'topic-landing-page.controller.ts',
     learner_dashboard:
-      commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
+      commonPrefix + '/pages/learner-dashboard-page/' +
+      'learner-dashboard-page.controller.ts',
     library: commonPrefix + '/pages/library-page/library-page.scripts.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
@@ -104,8 +106,8 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['app', 'admin'],
-      filename: 'admin.html',
-      template: commonPrefix + '/pages/admin/admin.html',
+      filename: 'admin-page.mainpage.html',
+      template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -211,9 +213,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_player'],
-      filename: 'exploration_player.html',
+      filename: 'exploration-player-page.mainpage.html',
       template:
-        commonPrefix + '/pages/exploration_player/exploration_player.html',
+        commonPrefix + '/pages/exploration-player-page/' +
+        'exploration-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -240,9 +243,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['learner_dashboard'],
-      filename: 'learner_dashboard.html',
+      filename: 'learner-dashboard-page.mainpage.html',
       template:
-        commonPrefix + '/pages/learner_dashboard/learner_dashboard.html',
+        commonPrefix + '/pages/learner-dashboard-page/' +
+        'learner-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
