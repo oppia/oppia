@@ -116,6 +116,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 3)
         for question in questions:
             self.assertTrue(question.to_dict() in question_dicts)
+        self.assertNotEquals(
+            self.question.to_dict(), self.question_1.to_dict(),
+            self.question_2.to_dict()
+        )
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
@@ -462,6 +466,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.assertEqual(
                 question_summary.question_content,
                 feconf.DEFAULT_INIT_STATE_CONTENT_STR)
+        self.assertNotEquals(
+            question_summaries[0].id, question_summaries[1].id,
+            question_summaries[2].id
+        )
 
     def test_created_question_rights(self):
         question_rights = question_services.get_question_rights(
