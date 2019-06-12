@@ -318,8 +318,12 @@ class ImageAssets(object):
         if image_id in self.image_mapping:
             raise utils.ValidationError('Image Id already exist. %s' %
                                         image_id)
+
+        # Reason for converting image_id to int, is to check that
+        # image_id is numeric or not.
         try:
             image_id = int(image_id)
+            image_id = unicode(image_id)
         except ValueError:
             raise utils.ValidationError('Invalid image Id')
 
