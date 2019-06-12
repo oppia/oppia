@@ -16,6 +16,8 @@
  * @fileoverview Controller for the stewards landing page.
  */
 
+require('base_components/BaseContentDirective.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/contextual/UrlService.ts');
