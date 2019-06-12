@@ -2221,41 +2221,38 @@ class LintChecksManager(object):
         """
 
         failed = False
-        # The following condition checks for extra rules in the critical
-        # files section in the .github/CODEOWNERS file.
-        if len(important_patterns) > len(
-                CODEOWNER_IMPORTANT_PATHS):
-            important_path_match_bool_list = ([
-                important_path in CODEOWNER_IMPORTANT_PATHS
-                for important_path in important_patterns])
-            for index, bool_value in enumerate(
-                    important_path_match_bool_list):
-                if not bool_value:
-                    print ('%s --> The rule \'%s\' is not an important '
-                           'rule. Please place it before the critical '
-                           'files section.' % (
-                               CODEOWNER_FILEPATH,
-                               important_patterns[index]))
-                    failed = True
-        else:
-            important_path_match_bool_list = ([
-                important_path in important_patterns
-                for important_path in CODEOWNER_IMPORTANT_PATHS])
-            # This condition checks that all the values in the boolean list
-            # are True. This ensures that the critical files of the
-            # CODEOWNERS file matches with the CODEOWNER_IMPORTANT_PATHS.
-            for index, bool_value in enumerate(
-                    important_path_match_bool_list):
-                if not bool_value:
-                    print ('%s --> Please ensure that the rule \'%s\' lies '
-                           'towards the bottom of the CODEOWNERS file under'
-                           ' the critical files section since it is an '
-                           'important rule.' % (
-                               CODEOWNER_FILEPATH,
-                               CODEOWNER_IMPORTANT_PATHS[index]))
-                    failed = True
+        # Check that there are no duplicate elements in the lists.
+        important_patterns_set = set(important_patterns)
+        codeowner_important_paths_set = set(CODEOWNER_IMPORTANT_PATHS)
+        if len(important_patterns_set) != len(important_patterns):
+            print('%s --> Duplicate patterns found in critical rules'
+                  ' section.' % CODEOWNER_FILEPATH)
+            failed = True
+        if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
+            print('scripts/pre_commit_linter.py --> Duplicate pattern found in '
+                  'CODEOWNER_IMPORTANT_PATHS list.')
+            failed = True
+        # Check missing rules by set difference operation.
+        critical_rule_section_minus_list_set = (
+            important_patterns_set.difference(codeowner_important_paths_set))
+        list_minus_critical_rule_section_set = (
+            codeowner_important_paths_set.difference(important_patterns_set))
+        for rule in critical_rule_section_minus_list_set:
+            print('%s --> Rule %s is not present in the '
+                  'CODEOWNER_IMPORTANT_PATHS list in '
+                  'scripts/pre_commit_linter.py. Please add this rule in the '
+                  'mentioned list or remove this rule from the \'Critical files'
+                  '\' section.' % (CODEOWNER_FILEPATH, rule))
+            failed = True
+        for rule in list_minus_critical_rule_section_set:
+            print('%s --> Rule \'%s\' is not present in the \'Critical files\' '
+                  'section. Please place it under the \'Critical files\' since '
+                  'it is an important rule. Alternatively please remove it '
+                  'from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
+                  'scripts/pre_commit_linter.py if it is no longer an '
+                  'important rule.' % (CODEOWNER_FILEPATH, rule))
+            failed = True        
         return failed
-
 
     def _check_codeowner_file(self):
         """Checks the CODEOWNERS file for any uncovered dirs/files and also
