@@ -198,6 +198,8 @@ require(
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
+require('objects/objectComponentsRequires.ts');
+
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
