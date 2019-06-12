@@ -236,8 +236,8 @@ module.exports = {
       filename: 'learner-dashboard-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
-        description: 'Oppia is a free, open-source learning platform. Join the ' +
-          'community to create or try an exploration today!'
+        description: 'Oppia is a free, open-source learning platform. ' +
+          'Join the community to create or try an exploration today!'
       },
       template:
         commonPrefix + '/pages/learner-dashboard-page/' +
@@ -295,8 +295,12 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['preferences'],
+      chunks: ['app', 'preferences'],
       filename: 'preferences-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Change your Oppia profile settings and preferences'
+      },
       template:
         commonPrefix + '/pages/preferences-page/preferences-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -355,8 +359,8 @@ module.exports = {
       filename: 'stewards-landing-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
-        description: 'Oppia is a free, open-source learning platform. Join the ' +
-          'community to create or try an exploration today!'
+        description: 'Oppia is a free, open-source learning platform. ' +
+          'Join the community to create or try an exploration today!'
       },
       template:
         commonPrefix +
