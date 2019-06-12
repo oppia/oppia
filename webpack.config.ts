@@ -31,7 +31,7 @@ var commonPrefix = './core/templates/dev/head';
 
 module.exports = {
   entries: {
-    about: commonPrefix + '/pages/about-page/about-page.controller.ts',
+    about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin/Admin.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:

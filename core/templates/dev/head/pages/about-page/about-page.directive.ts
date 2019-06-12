@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('pages/OppiaFooterDirective.ts');
-
 require('domain/utilities/UrlInterpolationService.ts');
 
 /**
@@ -65,7 +63,8 @@ oppia.directive('about', ['UrlInterpolationService',
 
           window.onhashchange = function() {
             var hashChange = window.location.hash.slice(1);
-            if (hashChange === ctrl.TAB_ID_FOUNDATION || hashChange === 'license') {
+            if (hashChange === ctrl.TAB_ID_FOUNDATION || (
+              hashChange === 'license')) {
               activateTab(ctrl.TAB_ID_FOUNDATION);
               // Ensure page goes to the license section
               if (hashChange === 'license') {
@@ -103,8 +102,8 @@ oppia.directive('about', ['UrlInterpolationService',
             .slice(0, listOfNamesToThank.length - 1).join(', ') +
             ' & ' + listOfNamesToThank[listOfNamesToThank.length - 1];
           ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-          ctrl.aboutPageMascotImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/about_page_mascot.png');
+          ctrl.aboutPageMascotImgUrl = UrlInterpolationService
+            .getStaticImageUrl('/general/about_page_mascot.png');
         }
       ]
     };
