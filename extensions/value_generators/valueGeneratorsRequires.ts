@@ -13,10 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview File to import necessary scripts for get_started page.
+ * @fileoverview Requires for all the value generators directives.
  */
 
-require('base_components/BaseContentDirective.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+require('value_generators/templates/CopierDirective.ts');
+require('value_generators/templates/RandomSelectorDirective.ts');

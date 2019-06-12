@@ -63,7 +63,8 @@ module.exports = {
       commonPrefix + '/pages/landing-pages/topic-landing-page/' +
       'topic-landing-page.controller.ts',
     learner_dashboard:
-      commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
+      commonPrefix + '/pages/learner-dashboard-page/' +
+      'learner-dashboard-page.controller.ts',
     library: commonPrefix + '/pages/library-page/library-page.scripts.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
@@ -211,8 +212,12 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['get_started'],
+      chunks: ['app', 'get_started'],
       filename: 'get-started-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Learn how to get started using Oppia.'
+      },
       template:
         commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -229,9 +234,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['learner_dashboard'],
-      filename: 'learner_dashboard.html',
+      filename: 'learner-dashboard-page.mainpage.html',
       template:
-        commonPrefix + '/pages/learner_dashboard/learner_dashboard.html',
+        commonPrefix + '/pages/learner-dashboard-page/' +
+        'learner-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

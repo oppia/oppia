@@ -571,6 +571,10 @@ var constants = {
       }
   },
 
+  // Data required for Google Analytics. 
+  "ANALYTICS_ID": "",
+  "SITE_NAME_FOR_ANALYTICS": "",
+
   "ALLOW_YAML_FILE_UPLOAD": false,
 
   "DEV_MODE": true

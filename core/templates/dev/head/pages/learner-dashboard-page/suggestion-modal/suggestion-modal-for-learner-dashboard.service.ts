@@ -23,8 +23,8 @@ oppia.factory('SuggestionModalForLearnerDashboardService', [
   '$rootScope', '$uibModal', 'UrlInterpolationService',
   function($rootScope, $uibModal, UrlInterpolationService) {
     var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/suggestion_editor/' +
-      'learner_dashboard_suggestion_modal_directive.html'
+      '/pages/learner-dashboard-page/suggestion-modal/' +
+      'learner-dashboard-suggestion-modal.directive.html'
     );
 
     var _showEditStateContentSuggestionModal = function(

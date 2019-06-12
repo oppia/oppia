@@ -13,10 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview File to import necessary scripts for get_started page.
+ * @fileoverview Requires for all the visualization directives.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('visualizations/OppiaVisualizationBarChartDirective.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'visualizations/OppiaVisualizationEnumeratedFrequencyTableDirective.ts');
+require('visualizations/OppiaVisualizationFrequencyTableDirective.ts');

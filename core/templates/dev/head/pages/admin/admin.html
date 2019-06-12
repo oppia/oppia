@@ -3,7 +3,8 @@
   <head>
     <title>Oppia Admin Panel</title>
 
-    {% include 'pages/header_css_libs.html' %}
+    <!-- Require head styles file using webpack -->
+    @require('../header_css_libs.html')
 
     <script>
       var GLOBALS = {
@@ -26,27 +27,13 @@
       }
     </script>
 
-    {% include 'pages/header_js_libs.html' %}
+    <!-- Require head javascript file using webpack -->
+      @require('../header_js_libs.html')
   </head>
 
   <body>
-
     <admin-page></admin-page>
 
-    {% include 'pages/footer_js_libs.html' %}
-    <script src="/templates/dev/head/AppInit.js"></script>
-    <!-- This code is used for inserting webpack bundles
-       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-      <% if (webpackConfig.mode == 'production') { %>
-        <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } else { %>
-        <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } %>
-    <% } %>
-
-    <script>
-      {{ value_generators_js }}
-    </script>
+    @require('../footer_js_libs.html')
   </body>
 </html>
