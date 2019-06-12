@@ -26,17 +26,20 @@ import bs4
 from core.domain import rte_component_registry
 
 
-def filter_a(name, value):
-    """Returns whether the described attribute of an anchor ('a') tag should be
+def filter_a(tag, name, value):
+    """Returns whether the described attribute of a tag should be
     whitelisted.
 
     Args:
+        tag: str. The name of the tag passed.
         name: str. The name of the attribute.
         value: str. The value of the attribute.
 
     Returns:
         bool. Whether the given attribute should be whitelisted.
     """
+    if tag != 'a':
+        raise Exception('The filter_a method should only be used for a tags.')
     if name in ('title', 'target'):
         return True
     if name == 'href':
