@@ -2251,7 +2251,7 @@ class LintChecksManager(object):
                   'from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
                   'scripts/pre_commit_linter.py if it is no longer an '
                   'important rule.' % (CODEOWNER_FILEPATH, rule))
-            failed = True        
+            failed = True
         return failed
 
     def _check_codeowner_file(self):
