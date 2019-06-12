@@ -69,6 +69,7 @@ import tempfile
 import threading
 import time
 
+import build # pylint: disable=relative-import
 import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
@@ -188,7 +189,7 @@ BAD_PATTERNS_JS_REGEXP = [
         'regexp': r'templateUrl: \'',
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
+            'core/templates/dev/head/pages/exploration-player-page/'
             'FeedbackPopupDirective.js'
         ),
         'excluded_dirs': (
@@ -942,7 +943,7 @@ def _lint_js_and_ts_files(
     num_js_and_ts_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
-        print 'There are no JavaScript files to lint.'
+        print 'There are no JavaScript or Typescript files to lint.'
         return
 
     print 'Total js and ts files: ', num_js_and_ts_files
@@ -2287,6 +2288,49 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_extra_js_files(self):
+        """Checks if the changes made include extra js files in core
+        or extensions folder which are not specified in
+        build.JS_FILEPATHS_NOT_TO_BUILD.
+        """
+
+        if self.verbose_mode_enabled:
+            print 'Starting extra js files check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+        with _redirect_stdout(_TARGET_STDOUT):
+            js_files_to_check = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.js'))]
+
+            for filepath in js_files_to_check:
+                if filepath.startswith(('core/templates', 'extensions')) and (
+                        filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
+                            not filepath.endswith('protractor.js')):
+                    print '%s  --> Found extra .js file\n' % filepath
+                    failed = True
+
+            if failed:
+                err_msg = (
+                    'If you want the above files to be present as js files, '
+                    'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                    'build.py. Otherwise, rename them to .ts\n')
+                print err_msg
+
+            if failed:
+                summary_message = '%s  Extra JS files check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Extra JS files check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+            print ''
+
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2296,6 +2340,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
+        extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
@@ -2315,9 +2360,9 @@ class LintChecksManager(object):
         pattern_messages = self._check_bad_patterns()
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
-            js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages +
-            import_order_messages +
+            extra_js_files_messages + js_and_ts_component_messages +
+            directive_scope_messages + sorted_dependencies_messages +
+            controller_dependency_messages + import_order_messages +
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
