@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
-    <!-- Insert head content using webpack -->
     @require('../../base_components/header.html', {"title": "Terms of Use - Oppia"})
-    {{BEFORE_END_HEAD_TAG_HOOK}}
+    <script>
+      var GLOBALS = {
+        csrf_token: JSON.parse('{{csrf_token|js_string}}')
+      }
+    </script>
   </head>
   <body>
     <base-content>
+      <navbar-breadcrumb>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            Terms of Use
+          </li>
+        </ul>
+      </navbar-breadcrumb>
+
       <content>
         <div class="oppia-page-cards-container">
           <md-card class="oppia-page-card oppia-long-text">
@@ -275,15 +287,6 @@
           <p><a href="#modifications-to-these-terms">Modifications to these Terms</a></p>
         </div>
       </content>
-
-      <navbar-breadcrumb>
-        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
-          <li>
-            <span class="oppia-navbar-breadcrumb-separator"></span>
-            Terms of Use
-          </li>
-        </ul>
-      </navbar-breadcrumb>
     </base-content>
 
     <script>

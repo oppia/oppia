@@ -13,6 +13,7 @@
 // limitations under the License.
 
 require('base_components/BaseContentDirective.ts');
+
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
