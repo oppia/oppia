@@ -21,9 +21,9 @@ oppia.constant('REVIEW_TEST_DATA_URL', '/review_test_handler/data/<story_id>');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-  require(
-    'components/question-directives/question-player/' +
-    'question-player.directive.ts');
+require(
+  'components/question-directives/question-player/' +
+  'question-player.directive.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
