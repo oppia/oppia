@@ -229,8 +229,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['learner_dashboard'],
+      chunks: ['app', 'learner_dashboard'],
       filename: 'learner_dashboard.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. Join the ' +
+          'community to create or try an exploration today!'
+      },
       template:
         commonPrefix + '/pages/learner_dashboard/learner_dashboard.html',
       minify: htmlMinifyConfig,
