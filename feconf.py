@@ -112,9 +112,8 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
-# The trivial interaction ids which don't need the true instance of
-# solicit_answer_details.
-CANNOT_SOLICIT_ANSWER_DETAILS = ['EndExploration', 'Continue']
+# Interaction IDs for which answer details cannot be solicited.
+TRIVIAL_INTERACTION_IDS = ['EndExploration', 'Continue']
 
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'

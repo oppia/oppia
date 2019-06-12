@@ -1471,11 +1471,10 @@ class State(object):
                 'Expected solicit_answer_details to be a boolean, ' +
                 'received %s' % self.solicit_answer_details)
         if self.solicit_answer_details:
-            if self.interaction.id in feconf.CANNOT_SOLICIT_ANSWER_DETAILS:
+            if self.interaction.id in feconf.TRIVIAL_INTERACTION_IDS:
                 raise utils.ValidationError(
-                    'This state cannont have true instance of ' +
-                    'solicit_answer_details, because the interaction is ' +
-                    'of type %s.' % self.interaction.id)
+                    'The %s interaction does not ' % (self.interaction.id) +
+                    'support soliciting answer details from learners.')
 
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)

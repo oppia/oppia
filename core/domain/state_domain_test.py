@@ -583,12 +583,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(init_state.interaction.id, 'Continue')
         exploration.validate()
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'This state cannont have true instance of' +
-            ' solicit_answer_details, because the interaction is '):
+            utils.ValidationError, 'The Continue interaction does not ' +
+            'support soliciting answer details from learners.'):
             with self.swap(init_state, 'solicit_answer_details', True):
                 exploration.validate()
-        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        self.assertEqual(init_state.interaction.id, 'TextInput')
         self.assertEqual(init_state.solicit_answer_details, False)
+        exploration.validate()
+        init_state.solicit_answer_details = True
+        self.assertEqual(init_state.solicit_answer_details, True)
+        exploration.validate()
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, True)
 
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
