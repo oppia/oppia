@@ -46,10 +46,10 @@ module.exports = {
     donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
     email_dashboard:
       commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-page.controller.ts',
+      '/pages/email-dashboard-pages/email-dashboard-page.scripts.ts',
     email_dashboard_result:
       commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-result.controller.ts',
+      '/pages/email-dashboard-pages/email-dashboard-result.scripts.ts',
     error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
