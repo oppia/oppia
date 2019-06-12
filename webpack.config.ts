@@ -50,7 +50,7 @@ module.exports = {
     email_dashboard_result:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-result.controller.ts',
-    error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
+    error: commonPrefix + '/pages/error-pages/error-page.scripts.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.controller.ts',

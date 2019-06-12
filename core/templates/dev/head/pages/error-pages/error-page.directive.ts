@@ -16,13 +16,11 @@
  * @fileoverview Controllers for the error page.
  */
 
-require('pages/OppiaFooterDirective.ts');
-
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PageTitleService.ts');
 
 oppia.directive('errorPage', ['UrlInterpolationService', function(
-    UrlInterpolationService){
+    UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},
@@ -42,4 +40,5 @@ oppia.directive('errorPage', ['UrlInterpolationService', function(
 
         PageTitleService.setPageTitle('Error ' + ctrl.statusCode + ' - Oppia');
       }
-    ]};}]);
+    ]};
+}]);
