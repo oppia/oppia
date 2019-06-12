@@ -23,7 +23,6 @@ import bs4
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import rte_component_registry
-from core.domain import state_domain
 from core.platform import models
 import feconf
 

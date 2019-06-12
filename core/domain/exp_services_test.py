@@ -125,19 +125,14 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                 },
             'property_name': 'content',
             }
-        change_dict_2 = {
-            'new_value': u'5',
-            'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-            'old_value': 0,
-            'property_name': 'image_counter'
-        }
 
         # Invalid image_id (image_id > image_counter)
-        change_dict_3 = {
+        change_dict_2 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
-            'image_id': u'10',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
+            'image_id': u'50',
             'image_info': {
                 'src': '',
                 'placeholder': True,
@@ -147,9 +142,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             }
         change_object_1 = exp_domain.ExplorationChange(change_dict_1)
         change_object_2 = exp_domain.ExplorationChange(change_dict_2)
-        change_object_3 = exp_domain.ExplorationChange(change_dict_3)
 
-        change_list = [change_object_1, change_object_2, change_object_3]
+        change_list = [change_object_1, change_object_2]
         with self.assertRaises(Exception):
             exp_services.update_exploration(
                 self.editor_id, self.EXP_ID, change_list, 'one commit')
@@ -158,7 +152,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_dict_3 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
             'image_id': u'22',
             'image_info': {
                 'src': '',
@@ -178,7 +173,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_dict_3 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
             'image_id': 'invalid',
             'image_info': {
                 'src': '',
@@ -198,7 +194,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_dict_3 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
             'image_id': 'invalid',
             'image_info': 'invalid'
             }
@@ -232,7 +229,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_dict_2 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
             'image_id': u'1',
             'image_info': {
                 'src': '',
@@ -356,7 +354,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_dict_2 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
             'image_id': u'1',
             'image_info': {
                 'src': '',
@@ -369,7 +368,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_dict_3 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
             'image_id': u'2',
             'image_info': {
                 'src': '',
@@ -382,7 +382,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_dict_4 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
             'image_id': u'3',
             'image_info': {
                 'src': '',
@@ -526,7 +527,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_dict_2 = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
-            'property_name': 'add_new_image',
+            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
+            'action': 'add_image',
             'image_id': u'1',
             'image_info': {
                 'src': '',

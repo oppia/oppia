@@ -29,7 +29,6 @@ import logging
 import math
 import os
 import pprint
-import re
 import traceback
 import zipfile
 import bs4
@@ -809,37 +808,39 @@ def apply_change_list(exploration_id, change_list):
                     state.update_written_translations(written_translations)
                 elif (
                         change.property_name ==
-                        exp_domain.STATE_PROPERTY_ADD_NEW_IMAGE):
+                        exp_domain.STATE_PROPERTY_IMAGE_ASSETS):
 
-                    # Increment image_counter
-                    image_counter = exploration.image_counter
-                    image_counter += 1
-                    if (exploration.get_all_html_content_strings())[0] != '':
-                        # Find image_ids of newly added images.
-                        image_ids = get_images_ids_of_exploration(exploration)
+                    if change.action == exp_domain.IMAGE_ASSETS_ADD_IMAGE:
+                        # Increment image_counter
+                        image_counter = exploration.image_counter
+                        image_counter += 1
+                        if exploration.get_all_html_content_strings()[0] != '':
+                            # Find image_ids of newly added images.
+                            image_ids = (
+                                get_images_ids_of_exploration(exploration))
 
-                        # Adds a new image.
-                        if not isinstance(change.image_id, unicode):
-                            raise Exception(
-                                'Expected image_id to be unicode, '
-                                'received %s' % change.image_id)
-                        if not isinstance(change.image_info, dict):
-                            raise Exception(
-                                'Expected image_info to be dict, '
-                                'received %s' % change.image_info)
-                        if change.image_id not in image_ids:
-                            raise Exception(
-                                'Image Id does not exist in exploration, '
-                                'received image_id is %s' % change.image_id)
-                        if int(change.image_id) > image_counter:
-                            raise Exception(
-                                'Image Id is greater then image_id counter'
-                                'not possible, received image_id is %s' %
-                                change.image_id)
+                            # Adds a new image.
+                            if not isinstance(change.image_id, unicode):
+                                raise Exception(
+                                    'Expected image_id to be unicode, '
+                                    'received %s' % change.image_id)
+                            if not isinstance(change.image_info, dict):
+                                raise Exception(
+                                    'Expected image_info to be dict, '
+                                    'received %s' % change.image_info)
+                            if change.image_id not in image_ids:
+                                raise Exception(
+                                    'Image Id does not exist in exploration, '
+                                    'received image_id is %s' % change.image_id)
+                            if int(change.image_id) > image_counter:
+                                raise Exception(
+                                    'Image Id is greater then image_id counter'
+                                    'not possible, received image_id is %s' %
+                                    change.image_id)
 
-                    state.image_assets.add_image(
-                        change.image_id, change.image_info)
-                    exploration.update_image_counter(image_counter)
+                        state.image_assets.add_image(
+                            change.image_id, change.image_info)
+                        exploration.update_image_counter(image_counter)
 
                 # Deletes the image_ids of deleted images from the
                 # ImageAssets.

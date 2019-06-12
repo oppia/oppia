@@ -329,7 +329,6 @@ class ImageAssets(object):
         except ValueError:
             raise utils.ValidationError('Invalid image Id')
 
-        print(image_id)
         src = image_info['src']
         placeholder = image_info['placeholder']
         author_id = image_info['author_id']

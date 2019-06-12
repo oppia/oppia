@@ -48,7 +48,7 @@ STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
-STATE_PROPERTY_ADD_NEW_IMAGE = 'add_new_image'
+STATE_PROPERTY_IMAGE_ASSETS = 'image_assets'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
@@ -78,6 +78,9 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
+
+# ImageAssets Actions.
+IMAGE_ASSETS_ADD_IMAGE = 'add_image'
 
 # These are categories to which answers may be classified. These values should
 # not be changed because they are persisted in the data store within answer
@@ -111,11 +114,11 @@ class ExplorationChange(object):
     """
 
     STATE_PROPERTIES = (
-        STATE_PROPERTY_ADD_NEW_IMAGE,
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
+        STATE_PROPERTY_IMAGE_ASSETS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
@@ -175,9 +178,10 @@ class ExplorationChange(object):
         elif self.cmd == CMD_EDIT_STATE_PROPERTY:
             if change_dict['property_name'] not in self.STATE_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
-            if change_dict['property_name'] == STATE_PROPERTY_ADD_NEW_IMAGE:
+            if change_dict['property_name'] == STATE_PROPERTY_IMAGE_ASSETS:
                 self.state_name = change_dict['state_name']
                 self.property_name = change_dict['property_name']
+                self.action = change_dict['action']
                 self.image_id = change_dict['image_id']
                 self.image_info = change_dict['image_info']
             else:
@@ -3350,17 +3354,17 @@ class Exploration(object):
                     'interaction']['default_outcome']['feedback']['html']
                 exploration_html = exploration_html + interaction_feedback_html
 
-            for answer_group_index, answer_group in enumerate(
+            for answer_group in (
                     state_dict['interaction']['answer_groups']):
                 answer_group_html = answer_group['outcome']['feedback']['html']
                 exploration_html = exploration_html + answer_group_html
                 if state_dict['interaction']['id'] == 'ItemSelectionInput':
-                    for rule_spec_index, rule_spec in enumerate(
+                    for rule_spec in (
                             answer_group['rule_specs']):
-                        for x_index, x in enumerate(rule_spec['inputs']['x']):
+                        for x in rule_spec['inputs']['x']:
                             exploration_html = exploration_html + x
 
-            for hint_index, hint in enumerate(
+            for hint in (
                     state_dict['interaction']['hints']):
                 hint_html = hint['hint_content']['html']
                 exploration_html = exploration_html + hint_html
@@ -3372,11 +3376,11 @@ class Exploration(object):
 
             if state_dict['interaction']['id'] in (
                     'ItemSelectionInput', 'MultipleChoiceInput'):
-                for value_index, value in enumerate(
+                for value in (
                         state_dict['interaction']['customization_args'][
                             'choices']['value']):
                     exploration_html = exploration_html + value
-                    
+
         soup = bs4.BeautifulSoup(exploration_html, 'html.parser')
         image_counter = len(soup.findAll(name='oppia-noninteractive-image'))
 

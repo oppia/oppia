@@ -16,8 +16,6 @@
 
 """Classes for Rich Text Components in Oppia."""
 
-import re
-
 import bs4
 import constants
 from extensions.objects.models import objects
@@ -59,10 +57,10 @@ class BaseRteComponent(object):
         # RTC of image has changed. filepath-with-value is removed from
         # <oppia-noninteractive-image> tag and image_id-with-value is added.
         # Schema form stills contain filepath. So to validate image the below
-        # if condition is added for image, since validation of image is different
-        # from other rtc.
+        # if condition is added for image, since validation of image is
+        # different from other rtc.
         if cls.rich_text_component_specs[
-            cls.__name__]['backend_id'] == 'Image':
+                cls.__name__]['backend_id'] == 'Image':
             customization_arg_specs.pop(0)
             image_id_arg_spec = {
                 u'default_value': u'',
@@ -128,7 +126,7 @@ class Image(BaseRteComponent):
             image_id = int(image_id)
         except:
             raise Exception('Invalid image_id,  received %s' %
-                image_id)
+                            image_id)
 
 class Link(BaseRteComponent):
     """Class for Link component."""
