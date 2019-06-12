@@ -69,6 +69,7 @@ import tempfile
 import threading
 import time
 
+import build # pylint: disable=relative-import
 import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
@@ -188,7 +189,7 @@ BAD_PATTERNS_JS_REGEXP = [
         'regexp': r'templateUrl: \'',
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
+            'core/templates/dev/head/pages/exploration-player-page/'
             'FeedbackPopupDirective.js'
         ),
         'excluded_dirs': (
@@ -353,16 +354,19 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.5'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
-    os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
-    os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
-    os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
-    os.path.join('third_party', 'mutagen-1.38'),
-    os.path.join('third_party', 'soupsieve-1.8'),
+    os.path.join('third_party', 'bleach-3.1.0'),
+    os.path.join('third_party', 'callbacks-0.3.0'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
+    os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
+    os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
+    os.path.join('third_party', 'mutagen-1.38'),
+    os.path.join('third_party', 'soupsieve-1.9.1'),
+    os.path.join('third_party', 'six-1.12.0'),
+    os.path.join('third_party', 'webencodings-0.5.1'),
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
@@ -939,7 +943,7 @@ def _lint_js_and_ts_files(
     num_js_and_ts_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
-        print 'There are no JavaScript files to lint.'
+        print 'There are no JavaScript or Typescript files to lint.'
         return
 
     print 'Total js and ts files: ', num_js_and_ts_files
@@ -1397,12 +1401,10 @@ class LintChecksManager(object):
                 not filepath.endswith('App.ts'))]
         failed = False
         summary_messages = []
-        component_name = ''
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         for filepath in files_to_check:
             component_num = 0
             # Filename without its path and extension.
-            exact_filename = filepath.split('/')[-1][:-3]
             parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
@@ -1421,35 +1423,6 @@ class LintChecksManager(object):
                             'component in the file.' % (filepath))
                         failed = True
                         break
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    # The first argument of the expression is the
-                    # name of the component.
-                    component_name = arguments[0].value
-                    component = expression.callee.property.name
-
-                    # If the component is directive or filter and its name is
-                    # xxx then the filename containing it should be
-                    # XxxDirective.js or XxxFilter.js respectively.
-                    if component == 'directive' or component == 'filter':
-                        if (component_name[0].swapcase() + component_name[1:] +
-                                component.capitalize() != (exact_filename)):
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
-                    # If the component is controller or factory, then the
-                    # component name should exactly match the filename
-                    # containing it. If the component's name is xxx then the
-                    # filename should be xxx.js.
-                    else:
-                        if component_name != exact_filename:
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -2315,6 +2288,49 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_extra_js_files(self):
+        """Checks if the changes made include extra js files in core
+        or extensions folder which are not specified in
+        build.JS_FILEPATHS_NOT_TO_BUILD.
+        """
+
+        if self.verbose_mode_enabled:
+            print 'Starting extra js files check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+        with _redirect_stdout(_TARGET_STDOUT):
+            js_files_to_check = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.js'))]
+
+            for filepath in js_files_to_check:
+                if filepath.startswith(('core/templates', 'extensions')) and (
+                        filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
+                            not filepath.endswith('protractor.js')):
+                    print '%s  --> Found extra .js file\n' % filepath
+                    failed = True
+
+            if failed:
+                err_msg = (
+                    'If you want the above files to be present as js files, '
+                    'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                    'build.py. Otherwise, rename them to .ts\n')
+                print err_msg
+
+            if failed:
+                summary_message = '%s  Extra JS files check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Extra JS files check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+            print ''
+
+        return summary_messages
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2324,6 +2340,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
+        extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
@@ -2332,8 +2349,6 @@ class LintChecksManager(object):
             self._check_sorted_dependencies())
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
-        html_directive_name_messages = (
-            self._check_html_directive_name())
         import_order_messages = self._check_import_order()
         docstring_messages = self._check_docstrings()
         comment_messages = self._check_comments()
@@ -2345,9 +2360,9 @@ class LintChecksManager(object):
         pattern_messages = self._check_bad_patterns()
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
-            js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages +
-            html_directive_name_messages + import_order_messages +
+            extra_js_files_messages + js_and_ts_component_messages +
+            directive_scope_messages + sorted_dependencies_messages +
+            controller_dependency_messages + import_order_messages +
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
