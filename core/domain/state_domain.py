@@ -1367,7 +1367,7 @@ class State(object):
 
     def __init__(
             self, content, param_changes, interaction, recorded_voiceovers,
-            written_translations, solicit_answer_details=False,
+            written_translations, solicit_answer_details,
             classifier_model_id=None):
         """Initializes a State domain object.
 
@@ -1471,7 +1471,8 @@ class State(object):
                 'Expected solicit_answer_details to be a boolean, ' +
                 'received %s' % self.solicit_answer_details)
         if self.solicit_answer_details:
-            if self.interaction.id in feconf.TRIVIAL_INTERACTION_IDS:
+            if self.interaction.id in (
+                    feconf.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
                 raise utils.ValidationError(
                     'The %s interaction does not ' % (self.interaction.id) +
                     'support soliciting answer details from learners.')
@@ -1888,7 +1889,8 @@ class State(object):
             RecordedVoiceovers.from_dict(copy.deepcopy(
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
-                copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)))
+                copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
+            False)
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):

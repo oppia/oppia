@@ -113,7 +113,7 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
 }
 
 # Interaction IDs for which answer details cannot be solicited.
-TRIVIAL_INTERACTION_IDS = ['EndExploration', 'Continue']
+INTERACTION_IDS_WITHOUT_ANSWER_DETAILS = ['EndExploration', 'Continue']
 
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
