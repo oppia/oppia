@@ -26,7 +26,6 @@ from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import fs_domain
 from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.platform import models
@@ -391,115 +390,6 @@ class ExplorationConversionErrorIdentificationJob(
         yield (key, values)
 
 
-class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job produces state id mapping model for all explorations currently
-    present in datastore.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        if item.deleted:
-            return
-        try:
-            exploration = exp_services.get_exploration_from_model(item)
-        except Exception as e:
-            yield ('ERROR get_exp_from_model: exp_id %s' % item.id, str(e))
-            return
-
-        # Commit commands which are required to generate state id mapping for
-        # given version of exploration from previous version of exploration.
-        relevant_commit_cmds = [
-            exp_domain.CMD_ADD_STATE,
-            exp_domain.CMD_RENAME_STATE,
-            exp_domain.CMD_DELETE_STATE,
-            exp_models.ExplorationModel.CMD_REVERT_COMMIT
-        ]
-
-        explorations = []
-
-        # Fetch all versions of the exploration, if they exist.
-        if exploration.version > 1:
-            # Ignore latest version since we already have corresponding
-            # exploration.
-            versions = range(1, exploration.version)
-
-            # Get all exploration versions for current exploration id.
-            try:
-                explorations = (
-                    exp_services.get_multiple_explorations_by_version(
-                        exploration.id, versions))
-            except Exception as e:
-                yield (
-                    'ERROR get_multiple_exp_by_version exp_id %s' % item.id,
-                    str(e))
-                return
-
-        # Append latest exploration to the list of explorations.
-        explorations.append(exploration)
-
-        # Retrieve list of snapshot models representing each version of the
-        # exploration.
-        versions = range(1, exploration.version + 1)
-        snapshots_by_version = (
-            exp_models.ExplorationModel.get_snapshots_metadata(
-                exploration.id, versions))
-
-        # Create and save state id mapping model for all exploration versions.
-        for exploration, snapshot in zip(explorations, snapshots_by_version):
-            if snapshot is None:
-                yield (
-                    'ERROR with exp_id %s' % item.id,
-                    'Error: No exploration snapshot metadata model instance '
-                    'found for exploration %s, version %d' % (
-                        exploration.id, exploration.version))
-                return
-
-            change_list = [
-                exp_domain.ExplorationChange(change_cmd)
-                for change_cmd in snapshot['commit_cmds']
-                if change_cmd['cmd'] in relevant_commit_cmds
-            ]
-
-            try:
-                # Check if commit is to revert the exploration.
-                if change_list and change_list[0].cmd == (
-                        exp_models.ExplorationModel.CMD_REVERT_COMMIT):
-                    reverted_version = change_list[0].version_number
-                    # pylint: disable=line-too-long
-                    state_id_mapping = exp_services.generate_state_id_mapping_model_for_reverted_exploration(
-                        exploration.id, exploration.version - 1,
-                        reverted_version)
-                    # pylint: enable=line-too-long
-                else:
-                    state_id_mapping = (
-                        exp_services.generate_state_id_mapping_model(
-                            exploration, change_list))
-
-                state_id_mapping_model = exp_models.StateIdMappingModel.create(
-                    state_id_mapping.exploration_id,
-                    state_id_mapping.exploration_version,
-                    state_id_mapping.state_names_to_ids,
-                    state_id_mapping.largest_state_id_used, overwrite=True)
-                state_id_mapping_model.put()
-
-            except Exception as e:
-                yield (
-                    'ERROR with exp_id %s version %s' % (
-                        item.id, exploration.version),
-                    traceback.format_exc())
-                return
-
-        yield (exploration.id, exploration.version)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
 class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that tabulates the number of hints used by each state of an
     exploration.
@@ -559,194 +449,6 @@ class ExplorationContentValidationJobForCKEditor(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
-
-
-class VerifyAllUrlsMatchGcsIdRegexJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for verifying the image and audio urls."""
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exp_model):
-        if not constants.DEV_MODE:
-            exp_id = exp_model.id
-            fs_old = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
-            # We have to make sure we pass the dir name without starting or
-            # ending with '/'.
-            image_urls = fs_old.listdir('image')
-            audio_urls = fs_old.listdir('audio')
-            for url in image_urls:
-                catched_groups = GCS_IMAGE_ID_REGEX.match(url)
-                if not catched_groups:
-                    yield (INVALID_GCS_URL, url.encode('utf-8'))
-                else:
-                    try:
-                        filename = GCS_IMAGE_ID_REGEX.match(url).group(3)
-                        if fs_old.isfile('image/%s' % filename.encode('utf-8')):
-                            yield (FILE_FOUND_IN_GCS, filename.encode('utf-8'))
-                    except Exception:
-                        yield (ERROR_IN_FILENAME, url.encode('utf-8'))
-            for url in audio_urls:
-                catched_groups = GCS_AUDIO_ID_REGEX.match(url)
-                if not catched_groups:
-                    yield (INVALID_GCS_URL, url)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == FILE_FOUND_IN_GCS:
-            yield (status, len(values))
-        else:
-            yield (status, values)
-
-
-class ImagesAuditJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for checking whether all images in {{exp_id}}/assets/image/
-    are also present in exploration/{{exp_id}}/assets/image/.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exp_model):
-        if exp_model.deleted:
-            return
-
-        if not constants.DEV_MODE:
-            exp_id = exp_model.id
-            fs_internal = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
-            fs_external = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem('exploration/' + exp_id))
-            # We have to make sure we pass the dir name without starting or
-            # ending with '/'.
-            image_urls_internal = fs_internal.listdir('image')
-            image_urls_external = fs_external.listdir('image')
-
-            image_filenames_internal = set([
-                GCS_IMAGE_ID_REGEX.match(url).group(3)
-                for url in image_urls_internal])
-
-            image_filenames_external = set([
-                GCS_EXTERNAL_IMAGE_ID_REGEX.match(url).group(3)
-                for url in image_urls_external])
-
-            image_filenames_internal_with_dimensions = set([])
-
-            for image_name in image_filenames_internal:
-                raw_image = fs_internal.get(
-                    'image/%s' % image_name.encode('utf-8'))
-                height, width = gae_image_services.get_image_dimensions(
-                    raw_image)
-                image_filenames_internal_with_dimensions.add(
-                    html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
-                        image_name, height, width))
-
-            # Currently in editor.py and exp_services.py, all images are stored
-            # in exploration/{{exp_id}}/ external folder. So, we only need to
-            # check if all images in the internal folder are there in the
-            # external folder.
-            non_existent_images = (
-                image_filenames_internal_with_dimensions.difference(
-                    image_filenames_external))
-
-            if len(non_existent_images) > 0:
-                yield (
-                    exp_id,
-                    'Missing Images: %s' % list(non_existent_images))
-            else:
-                yield (
-                    ALL_IMAGES_VERIFIED, len(image_filenames_external))
-
-    @staticmethod
-    def reduce(status, values):
-        if status == ALL_IMAGES_VERIFIED:
-            yield (status, sum([int(elem) for elem in values]))
-        else:
-            yield (status, values)
-
-
-class CopyToNewDirectoryJob(jobs.BaseMapReduceOneOffJobManager):
-    """One-off job for copying the image/audio such that the url instead of
-    {{exp_id}}/assets/image/image.png is
-    exploration/{{exp_id}}/assets/image/image.png. It also involves compressing
-    the images as well as renaming the filenames so that they have dimensions
-    as a part of their name.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(exp_model):
-        if not constants.DEV_MODE:
-            exp_id = exp_model.id
-            fs_old = fs_domain.AbstractFileSystem(
-                fs_domain.GcsFileSystem(exp_id))
-            # We have to make sure we pass the dir name without starting or
-            # ending with '/'.
-            image_urls = fs_old.listdir('image')
-            audio_urls = fs_old.listdir('audio')
-
-            image_filenames = [
-                GCS_IMAGE_ID_REGEX.match(url).group(3) for url in image_urls]
-            audio_filenames = [
-                GCS_AUDIO_ID_REGEX.match(url).group(3) for url in audio_urls]
-
-            references_unicode_files = False
-            for image_filename in image_filenames:
-                try:
-                    fs_old.get('image/%s' % image_filename)
-                except Exception:
-                    references_unicode_files = True
-                    break
-
-            if references_unicode_files:
-                image_filenames_str = '%s' % image_filenames
-                yield (
-                    EXP_REFERENCES_UNICODE_FILES,
-                    'Exp: %s, image filenames: %s' % (
-                        exp_id, image_filenames_str.encode('utf-8')))
-
-            for image_filename in image_filenames:
-                try:
-                    raw_image = fs_old.get(
-                        'image/%s' % image_filename.encode('utf-8'))
-                    height, width = gae_image_services.get_image_dimensions(
-                        raw_image)
-                    filename_with_dimensions = (
-                        html_validation_service.regenerate_image_filename_using_dimensions( # pylint: disable=line-too-long
-                            image_filename, height, width))
-                    exp_services.save_original_and_compressed_versions_of_image( # pylint: disable=line-too-long
-                        'ADMIN', filename_with_dimensions, exp_id, raw_image)
-                    yield ('Copied file', 1)
-                except Exception:
-                    error = traceback.format_exc()
-                    logging.error(
-                        'File %s in %s failed migration: %s' %
-                        (image_filename.encode('utf-8'), exp_id, error))
-                    yield (
-                        ERROR_IN_FILENAME, 'Error when copying %s in %s: %s' % (
-                            image_filename.encode('utf-8'), exp_id, error))
-
-            for audio_filename in audio_filenames:
-                filetype = audio_filename[audio_filename.rfind('.') + 1:]
-                raw_data = fs_old.get('audio/%s' % audio_filename)
-                fs = fs_domain.AbstractFileSystem(
-                    fs_domain.GcsFileSystem('exploration/%s' % exp_id))
-                fs.commit(
-                    'Admin', 'audio/%s' % audio_filename,
-                    raw_data, mimetype='audio/%s' % filetype)
-            yield (ADDED_COMPRESSED_VERSIONS_OF_IMAGES, exp_id)
-
-    @staticmethod
-    def reduce(status, values):
-        if status == 'Copied file':
-            yield (status, len(values))
-        else:
-            yield (status, values)
 
 
 class InteractionCustomizationArgsValidationJob(
@@ -838,3 +540,18 @@ class TranslatorToVoiceArtistOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (key, len(values))
         else:
             yield (key, values)
+
+
+class DeleteStateIdMappingModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for wiping out state ID mapping models."""
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.StateIdMappingModel]
+
+    @staticmethod
+    def map(item):
+        item.delete()
+
+    @staticmethod
+    def reduce(key, values):
+        pass

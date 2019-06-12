@@ -621,7 +621,8 @@ def export_to_zip_file(exploration_id, version=None):
         zfile.writestr('%s.yaml' % exploration.title, yaml_repr)
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         dir_list = fs.listdir('')
         for filepath in dir_list:
             # Currently, the version number of all files is 1, since they are
@@ -899,9 +900,6 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         exploration, exp_versions_diff=exp_versions_diff,
         revert_to_version=None)
 
-    # Save state id mapping model for exploration.
-    create_and_save_state_id_mapping_model(exploration, change_list)
-
 
 def _create_exploration(
         committer_id, exploration, commit_message, commit_cmds):
@@ -966,8 +964,6 @@ def _create_exploration(
     stats_services.create_exp_issues_for_new_exploration(
         exploration.id, exploration.version)
 
-    # Save state id mapping model for new exploration.
-    create_and_save_state_id_mapping_model(exploration, commit_cmds)
     create_exploration_summary(exploration.id, committer_id)
 
 
@@ -1019,7 +1015,6 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         committer_id, '', force_deletion=force_deletion)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration_version = exploration_model.version
     exploration_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         force_deletion=force_deletion)
@@ -1041,9 +1036,25 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     activity_services.remove_featured_activity(
         constants.ACTIVITY_TYPE_EXPLORATION, exploration_id)
 
-    # Remove associated state id mapping models.
-    delete_state_id_mapping_model_for_exploration(
-        exploration_id, exploration_version)
+    # Remove from subscribers.
+    taskqueue_services.defer(
+        delete_exploration_from_subscribed_users,
+        taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS,
+        exploration_id)
+
+
+def delete_exploration_from_subscribed_users(exploration_id):
+    """Remove exploration from all subscribers' activity_ids.
+
+    Args:
+        exploration_id: The id of the exploration to delete.
+    """
+    subscription_models = user_models.UserSubscriptionsModel.query(
+        user_models.UserSubscriptionsModel.activity_ids ==
+        exploration_id).fetch()
+    for model in subscription_models:
+        model.activity_ids.remove(exploration_id)
+    user_models.UserSubscriptionsModel.put_multi(subscription_models)
 
 
 # Operations on exploration snapshots.
@@ -1436,10 +1447,6 @@ def revert_exploration(
         classifier_services.create_classifier_training_job_for_reverted_exploration( # pylint: disable=line-too-long
             current_exploration, exploration_to_revert_to)
 
-    # Save state id mapping model for the new exploration version.
-    create_and_save_state_id_mapping_model_for_reverted_exploration(
-        exploration_id, current_version, revert_to_version)
-
 
 # Creation and deletion methods.
 def get_demo_exploration_components(demo_path):
@@ -1504,7 +1511,8 @@ def save_new_exploration_from_yaml_and_assets(
     # perform the migration.
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exploration_id))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         fs.commit(committer_id, asset_filename, asset_content)
 
     if (exp_schema_version <=
@@ -1691,7 +1699,7 @@ def save_original_and_compressed_versions_of_image(
 
     file_system_class = fs_services.get_exploration_file_system_class()
     fs = fs_domain.AbstractFileSystem(file_system_class(
-        'exploration/%s' % exp_id))
+        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
 
     compressed_image_content = gae_image_services.compress_image(
         original_image_content, 0.8)
@@ -2004,148 +2012,3 @@ def discard_draft(exp_id, user_id):
         exp_user_data.draft_change_list_last_updated = None
         exp_user_data.draft_change_list_exp_version = None
         exp_user_data.put()
-
-
-def get_state_id_mapping(exp_id, exp_version):
-    """Retrieve state id mapping model instance from the datastore.
-
-    Args:
-        exp_id: str. The exploration id.
-        exp_version: int. The exploration version.
-
-    Returns:
-        StateIdMapping. Domain object for state id mapping model instance.
-    """
-    model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
-        exp_id, exp_version)
-    state_id_mapping = exp_domain.StateIdMapping(
-        model.exploration_id, model.exploration_version,
-        copy.deepcopy(model.state_names_to_ids), model.largest_state_id_used)
-    return state_id_mapping
-
-
-def _save_state_id_mapping(state_id_mapping):
-    """Stores state id mapping instance in datastore.
-
-    Args:
-        state_id_mapping: StateIdMapping. State ID mapping which is to be
-            stored in database.
-    """
-    exp_models.StateIdMappingModel.create(
-        state_id_mapping.exploration_id,
-        state_id_mapping.exploration_version,
-        state_id_mapping.state_names_to_ids,
-        state_id_mapping.largest_state_id_used)
-
-
-def generate_state_id_mapping_model(exploration, change_list):
-    """Create and store state id mapping for new exploration.
-
-    Args:
-        exploration: Exploration. Exploration for which state id mapping is
-            to be stored.
-        change_list: list(ExplorationChange). A list of changes made in the
-            exploration.
-
-    Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
-    """
-    if exploration.version > 1:
-        # Get state id mapping for new exploration from old exploration with
-        # the help of change list.
-        old_exploration = get_exploration_by_id(
-            exploration.id, version=exploration.version - 1)
-        old_state_id_mapping = get_state_id_mapping(
-            old_exploration.id, old_exploration.version)
-        new_state_id_mapping = (
-            old_state_id_mapping.create_mapping_for_new_version(
-                old_exploration, exploration, change_list))
-    else:
-        # Get state id mapping for first version of exploration.
-        new_state_id_mapping = (
-            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
-                exploration))
-
-    new_state_id_mapping.validate()
-    return new_state_id_mapping
-
-
-def create_and_save_state_id_mapping_model(exploration, change_list):
-    """Create and store state id mapping for new exploration.
-
-    Args:
-        exploration: Exploration. Exploration for which state id mapping is
-            to be stored.
-        change_list: list(ExplorationChange). A list of changes made in the
-            exploration.
-
-    Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
-    """
-    new_state_id_mapping = generate_state_id_mapping_model(
-        exploration, change_list)
-    _save_state_id_mapping(new_state_id_mapping)
-    return new_state_id_mapping
-
-
-def generate_state_id_mapping_model_for_reverted_exploration(
-        exploration_id, current_version, revert_to_version):
-    """Generates state id mapping model for when exploration is reverted.
-
-    Args:
-        exploration_id: str. The ID of the exploration.
-        current_version: str. The current version of the exploration.
-        revert_to_version: int. The version to which the given exploration
-            is to be reverted.
-
-    Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
-    """
-    old_state_id_mapping = get_state_id_mapping(
-        exploration_id, revert_to_version)
-    previous_state_id_mapping = get_state_id_mapping(
-        exploration_id, current_version)
-
-    # Note: when an exploration is reverted state id mapping should
-    # be same as reverted version of the exploration but largest
-    # state id used should be kept as it is as in old exploration.
-    new_version = current_version + 1
-    new_state_id_mapping = exp_domain.StateIdMapping(
-        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
-        previous_state_id_mapping.largest_state_id_used)
-    new_state_id_mapping.validate()
-
-    return new_state_id_mapping
-
-
-def create_and_save_state_id_mapping_model_for_reverted_exploration(
-        exploration_id, current_version, revert_to_version):
-    """Create and save state id mapping model for when exploration is reverted.
-
-    Args:
-        exploration_id: str. The ID of the exploration.
-        current_version: str. The current version of the exploration.
-        revert_to_version: int. The version to which the given exploration
-            is to be reverted.
-
-    Returns:
-        StateIdMapping. Domain object of StateIdMappingModel instance.
-    """
-    new_state_id_mapping = (
-        generate_state_id_mapping_model_for_reverted_exploration(
-            exploration_id, current_version, revert_to_version))
-    _save_state_id_mapping(new_state_id_mapping)
-    return new_state_id_mapping
-
-
-def delete_state_id_mapping_model_for_exploration(
-        exploration_id, exploration_version):
-    """Removes state id mapping model for the exploration.
-
-    Args:
-        exploration_id: str. Id of the exploration.
-        exploration_version: int. Latest version of the exploration.
-    """
-    exp_versions = range(1, exploration_version + 1)
-    exp_models.StateIdMappingModel.delete_state_id_mapping_models(
-        exploration_id, exp_versions)
