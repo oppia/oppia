@@ -16,11 +16,15 @@
  * @fileoverview Controllers for the review tests.
  */
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant('REVIEW_TEST_DATA_URL', '/review_test/data/<story_id>');
+oppia.constant('REVIEW_TEST_DATA_URL', '/review_test_handler/data/<story_id>');
 
-require('components/background/BackgroundBannerDirective.ts');
-require('pages/question_player/QuestionPlayerDirective.ts');
-require('pages/review_test/ReviewTestEngineService.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+  require(
+    'components/question-directives/question-player/' +
+    'question-player.directive.ts');
+require('pages/review-test-page/review-test-engine.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 

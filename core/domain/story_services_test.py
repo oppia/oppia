@@ -529,6 +529,19 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
+    def test_get_latest_completed_node_ids_with_special_cases(self):
+        # If record completion in different orders and record multiple times.
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+
+        self.assertEqual(
+            story_services.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID),
+            [self.NODE_ID_4, self.NODE_ID_3, self.NODE_ID_2])
+
     def test_get_completed_nodes_in_story(self):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)

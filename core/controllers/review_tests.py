@@ -63,7 +63,7 @@ class ReviewTestsPage(base.BaseHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'story_name': story.title
         })
-        self.render_template('dist/review_test.html')
+        self.render_template('dist/review-test-page.mainpage.html')
 
 
 class ReviewTestsPageDataHandler(base.BaseHandler):

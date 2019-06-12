@@ -228,6 +228,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_links[0].skill_id, 'skill_id1')
         self.assertEqual(question_skill_links[1].skill_id, 'skill_id2')
 
+        # Testing for queries that retrieve more questions than available.
         question_skill_links_2 = (
             question_models.QuestionSkillLinkModel.
             get_question_skill_links_with_constant_number_per_skill(
