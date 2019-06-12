@@ -42,7 +42,7 @@ module.exports = {
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
-      'creator-dashboard-page.controller.ts',
+      'creator-dashboard-page.scripts.ts',
     donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
     email_dashboard:
       commonPrefix +

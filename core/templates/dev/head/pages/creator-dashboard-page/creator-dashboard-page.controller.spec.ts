@@ -17,11 +17,11 @@
  * user's explorations.
  */
 
-require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
+require('pages/creator-dashboard-page/creator-dashboard-page.directive.ts');
 
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
-    var scope, ctrl, $httpBackend;
+    var ctrl, $httpBackend, componentController;
     var CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data';
     var dashboardData = {
       explorations_list: [{
@@ -61,17 +61,20 @@ describe('Creator dashboard controller', function() {
       angular.mock.module('oppia');
     });
 
+    beforeEach(inject(['$componentController', function(
+        $componentController) {
+      componentController = $componentController;
+    }]));
+
     beforeEach(angular.mock.inject(function($injector) {
       $httpBackend = $injector.get('$httpBackend');
     }));
 
     beforeEach(angular.mock.inject(
-      function($controller, $rootScope, CreatorDashboardBackendApiService) {
+      function(CreatorDashboardBackendApiService) {
         $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
           dashboardData);
-        scope = $rootScope.$new();
-        ctrl = $controller('CreatorDashboard', {
-          $scope: scope,
+        ctrl = componentController('creatorDashboard', null, {
           AlertsService: null,
           CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
         });
@@ -80,10 +83,10 @@ describe('Creator dashboard controller', function() {
 
     it('should have the correct data for creator dashboard', function() {
       $httpBackend.flush();
-      expect(scope.explorationsList).toEqual(dashboardData.explorations_list);
-      expect(scope.collectionsList).toEqual(dashboardData.collections_list);
-      expect(scope.dashboardStats).toEqual(dashboardData.dashboard_stats);
-      expect(scope.lastWeekStats).toEqual(dashboardData.last_week_stats);
+      expect(ctrl.explorationsList).toEqual(dashboardData.explorations_list);
+      expect(ctrl.collectionsList).toEqual(dashboardData.collections_list);
+      expect(ctrl.dashboardStats).toEqual(dashboardData.dashboard_stats);
+      expect(ctrl.lastWeekStats).toEqual(dashboardData.last_week_stats);
     });
   });
 });
