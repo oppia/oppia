@@ -425,9 +425,9 @@ def _save_story(committer_id, story, commit_message, change_list):
 
     if story.id not in topic.canonical_story_ids + topic.additional_story_ids:
         raise Exception(
-            'Expected story to belongs to the topic %s, but it is '
-            'neither a part of canonical story or the addition story of '
-            'the topic.' % story.belongs_to_topic)
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the additional stories '
+            'of the topic.' % story.belongs_to_topic)
 
     story_model.description = story.description
     story_model.title = story.title

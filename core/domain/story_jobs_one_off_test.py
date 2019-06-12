@@ -41,6 +41,9 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         # Setup user who will own the test stories.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.story_id_1 = 'story_id_1'
+        self.story_id_2 = 'story_id_2'
+        self.story_id_3 = 'story_id_3'
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, 'Name', 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
