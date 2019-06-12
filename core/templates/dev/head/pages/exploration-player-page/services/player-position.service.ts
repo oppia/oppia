@@ -16,6 +16,7 @@
  * @fileoverview Service for keeping track of the learner's position.
  */
 
+require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/ContextService.ts');
 
 oppia.factory('PlayerPositionService', [
