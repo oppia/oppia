@@ -98,7 +98,7 @@ oppia.constant('TOPIC_LANDING_PAGE_DATA', {
 });
 
 oppia.directive('topicLandingPage', ['UrlInterpolationService', function(
-    UrlInterpolationService){
+    UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},
@@ -188,5 +188,4 @@ oppia.directive('topicLandingPage', ['UrlInterpolationService', function(
         };
       }
     ]};
-  }
-]);
+}]);
