@@ -175,6 +175,62 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_versions_diff.old_to_new_state_names, {})
         self.exploration.version += 1
 
+    def test_cannot_create_exploration_change_with_invalid_change_dict(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            exp_domain.ExplorationChange({
+                'invalid_cmd': 'invalid'
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            exp_domain.ExplorationChange({
+                'cmd': 'invalid_cmd'
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_state_property(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': 'invalid_property'
+            })
+
+    def test_cannot_create_exploration_change_with_invalid_exploration_property(
+            self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
+                'property_name': 'invalid_property'
+            })
+
+    def test_revert_exploration_commit(self):
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+            'version_number': 1
+        })
+
+        self.assertEqual(exp_change.version_number, 1)
+
+
+class ExpVersionReferenceTests(test_utils.GenericTestBase):
+
+    def test_create_exp_version_reference_object(self):
+        exp_version_reference = exp_domain.ExpVersionReference('exp_id', 1)
+
+        self.assertEqual(
+            exp_version_reference.to_dict(), {
+                'exp_id': 'exp_id',
+                'version': 1
+            })
+
+    def test_validate_exp_version(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected version to be an int'):
+            exp_domain.ExpVersionReference('exp_id', 'invalid_version')
+
+    def test_validate_exp_id(self):
+        with self.assertRaisesRegexp(Exception, 'Expected exp_id to be a str'):
+            exp_domain.ExpVersionReference(0, 1)
+
 
 class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration domain object."""
@@ -727,6 +783,292 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         demo = exp_domain.Exploration.create_default_exploration('0')
         init_state = demo.states[feconf.DEFAULT_INIT_STATE_NAME]
         self.assertFalse(init_state.interaction.is_terminal)
+
+    def test_cannot_create_exploration_with_invalid_param_changes(self):
+        demo = exp_domain.Exploration.create_default_exploration('0')
+        demo_dict = demo.to_dict()
+        new_state = state_domain.State.create_default_state(
+            'new_state_name')
+        new_state.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'myParam',
+            'generator_id': 'RandomSelector'
+        })]
+
+        demo_dict['states']['new_state_name'] = new_state.to_dict()
+        demo_dict['param_specs'] = {
+            'ParamSpec': {'obj_type': 'UnicodeString'}
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'Parameter myParam was used in a state but not '
+            'declared in the exploration param_specs.'):
+            exp_domain.Exploration.from_dict(demo_dict)
+
+    def test_validate_exploration_category(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.category = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected category to be a string'):
+            exploration.validate()
+
+    def test_validate_exploration_objective(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.objective = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected objective to be a string'):
+            exploration.validate()
+
+    def test_validate_exploration_blurb(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.blurb = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected blurb to be a string'):
+            exploration.validate()
+
+    def test_validate_exploration_language_code(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.language_code = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected language_code to be a string'):
+            exploration.validate()
+
+    def test_validate_exploration_author_notes(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.author_notes = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected author_notes to be a string'):
+            exploration.validate()
+
+    def test_validate_exploration_states(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.states = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected states to be a dict'):
+            exploration.validate()
+
+    def test_validate_exploration_outcome_dest(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.init_state.interaction.default_outcome.dest = None
+        with self.assertRaisesRegexp(
+            Exception, 'Every outcome should have a destination.'):
+            exploration.validate()
+
+    def test_validate_exploration_outcome_dest_type(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.init_state.interaction.default_outcome.dest = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected outcome dest to be a string'):
+            exploration.validate()
+
+    def test_validate_exploration_states_schema_version(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.states_schema_version = None
+        with self.assertRaisesRegexp(
+            Exception, 'This exploration has no states schema version.'):
+            exploration.validate()
+
+    def test_validate_exploration_auto_tts_enabled(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.auto_tts_enabled = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected auto_tts_enabled to be a bool'):
+            exploration.validate()
+
+    def test_validate_exploration_correctness_feedback_enabled(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.correctness_feedback_enabled = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected correctness_feedback_enabled to be a bool'):
+            exploration.validate()
+
+    def test_validate_exploration_param_specs(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.param_specs = {
+            1: param_domain.ParamSpec.from_dict(
+                {'obj_type': 'UnicodeString'})
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'Expected parameter name to be a string'):
+            exploration.validate()
+
+    def test_validate_exploration_param_changes_type(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.param_changes = 1
+        with self.assertRaisesRegexp(
+            Exception, 'Expected param_changes to be a list'):
+            exploration.validate()
+
+    def test_validate_exploration_param_name(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'invalid',
+            'generator_id': 'RandomSelector'
+        })]
+        with self.assertRaisesRegexp(
+            Exception,
+            'No parameter named \'invalid\' exists in this '
+            'exploration'):
+            exploration.validate()
+
+    def test_validate_exploration_reserved_param_name(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.param_changes = [param_domain.ParamChange.from_dict({
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'all',
+            'generator_id': 'RandomSelector'
+        })]
+        with self.assertRaisesRegexp(
+            Exception,
+            'The exploration-level parameter with name \'all\' is '
+            'reserved. Please choose a different name.'):
+            exploration.validate()
+
+    def test_validate_exploration_is_non_self_loop(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        exploration.add_states(['DEF'])
+        (
+            exploration.init_state.interaction.default_outcome
+            .refresher_exploration_id) = 'refresher_exploration_id'
+        exploration.init_state.interaction.default_outcome.dest = 'DEF'
+        with self.assertRaisesRegexp(
+            Exception,
+            'The default outcome for state Introduction has a refresher '
+            'exploration ID, but is not a self-loop.'):
+            exploration.validate()
+
+    def test_validate_exploration_answer_group_parameter(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='', category='',
+            objective='', end_state_name='End')
+        param_changes = [{
+            'customization_args': {
+                'list_of_values': ['1', '2'], 'parse_with_jinja': False
+            },
+            'name': 'ParamChange',
+            'generator_id': 'RandomSelector'
+        }]
+
+        answer_groups = [{
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Feedback'
+                },
+                'labelled_as_correct': False,
+                'param_changes': param_changes,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+
+        exploration.init_state.update_interaction_answer_groups(answer_groups)
+        with self.assertRaisesRegexp(
+            Exception,
+            'The parameter ParamChange was used in an answer group, '
+            'but it does not exist in this exploration'):
+            exploration.validate()
+
+    def test_verify_all_states_reachable(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'owner_id')
+
+        exploration.add_states(['End'])
+        end_state = exploration.states['End']
+        end_state.update_interaction_id('EndExploration')
+        end_state.update_interaction_default_outcome(None)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Please fix the following issues before saving this exploration: '
+            '1. The following states are not reachable from the initial state: '
+            'End 2. It is impossible to complete the exploration from the '
+            'following states: Introduction'):
+            exploration.validate(strict=True)
+
+    def test_update_init_state_name_with_invalid_state(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Invalid new initial state name: invalid_state;'):
+            exploration.update_init_state_name('invalid_state')
+
+    def test_rename_state_with_invalid_state(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+
+        with self.assertRaisesRegexp(
+            Exception, 'State invalid_state does not exist'):
+            exploration.rename_state('invalid_state', 'new_state_name')
+
+    def test_default_outcome_is_labelled_incorrect_for_self_loop(self):
+        exploration = self.save_new_valid_exploration(
+            'exp_id', 'user@example.com', title='title', category='category',
+            objective='objective', end_state_name='End')
+
+        (exploration.init_state.interaction.default_outcome
+         .labelled_as_correct) = True
+
+        (exploration.init_state.interaction.default_outcome
+         .dest) = exploration.init_state_name
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The default outcome for state Introduction is labelled '
+            'correct but is a self-loop'):
+            exploration.validate(strict=True)
 
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):

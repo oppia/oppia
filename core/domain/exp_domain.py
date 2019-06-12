@@ -747,7 +747,7 @@ class Exploration(object):
             if not isinstance(param_name, basestring):
                 raise utils.ValidationError(
                     'Expected parameter name to be a string, received %s (%s).'
-                    % param_name, type(param_name))
+                    % (param_name, type(param_name)))
             if not re.match(feconf.ALPHANUMERIC_REGEX, param_name):
                 raise utils.ValidationError(
                     'Only parameter names with characters in [a-zA-Z0-9] are '
@@ -760,14 +760,14 @@ class Exploration(object):
                 % self.param_changes)
         for param_change in self.param_changes:
             param_change.validate()
-            if param_change.name not in self.param_specs:
-                raise utils.ValidationError(
-                    'No parameter named \'%s\' exists in this exploration'
-                    % param_change.name)
             if param_change.name in feconf.INVALID_PARAMETER_NAMES:
                 raise utils.ValidationError(
                     'The exploration-level parameter with name \'%s\' is '
                     'reserved. Please choose a different name.'
+                    % param_change.name)
+            if param_change.name not in self.param_specs:
+                raise utils.ValidationError(
+                    'No parameter named \'%s\' exists in this exploration'
                     % param_change.name)
 
         # TODO(sll): Find a way to verify the param change customization args
@@ -780,17 +780,17 @@ class Exploration(object):
         for state_name, state in self.states.iteritems():
             for param_change in state.param_changes:
                 param_change.validate()
+                if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+                    raise utils.ValidationError(
+                        'The parameter name \'%s\' is reserved. Please choose '
+                        'a different name for the parameter being set in '
+                        'state \'%s\'.' % (param_change.name, state_name))
                 if param_change.name not in self.param_specs:
                     raise utils.ValidationError(
                         'The parameter with name \'%s\' was set in state '
                         '\'%s\', but it does not exist in the list of '
                         'parameter specifications for this exploration.'
                         % (param_change.name, state_name))
-                if param_change.name in feconf.INVALID_PARAMETER_NAMES:
-                    raise utils.ValidationError(
-                        'The parameter name \'%s\' is reserved. Please choose '
-                        'a different name for the parameter being set in '
-                        'state \'%s\'.' % (param_change.name, state_name))
 
         # Check that all answer groups, outcomes, and param_changes are valid.
         all_state_names = self.states.keys()
@@ -862,10 +862,6 @@ class Exploration(object):
                     'An objective must be specified (in the \'Settings\' tab).'
                 )
 
-            if not self.language_code:
-                warnings_list.append(
-                    'A language must be specified (in the \'Settings\' tab).')
-
             # Check that self-loop outcomes are not labelled as correct.
             all_state_names = self.states.keys()
             for state_name, state in self.states.iteritems():
@@ -913,20 +909,18 @@ class Exploration(object):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if curr_state_name in processed_queue:
-                continue
+            if not curr_state_name in processed_queue:
+                processed_queue.append(curr_state_name)
 
-            processed_queue.append(curr_state_name)
+                curr_state = self.states[curr_state_name]
 
-            curr_state = self.states[curr_state_name]
-
-            if not curr_state.interaction.is_terminal:
-                all_outcomes = curr_state.interaction.get_all_outcomes()
-                for outcome in all_outcomes:
-                    dest_state = outcome.dest
-                    if (dest_state not in curr_queue and
-                            dest_state not in processed_queue):
-                        curr_queue.append(dest_state)
+                if not curr_state.interaction.is_terminal:
+                    all_outcomes = curr_state.interaction.get_all_outcomes()
+                    for outcome in all_outcomes:
+                        dest_state = outcome.dest
+                        if (dest_state not in curr_queue and
+                                dest_state not in processed_queue):
+                            curr_queue.append(dest_state)
 
         if len(self.states) != len(processed_queue):
             unseen_states = list(
@@ -954,20 +948,18 @@ class Exploration(object):
             curr_state_name = curr_queue[0]
             curr_queue = curr_queue[1:]
 
-            if curr_state_name in processed_queue:
-                continue
+            if not curr_state_name in processed_queue:
+                processed_queue.append(curr_state_name)
 
-            processed_queue.append(curr_state_name)
-
-            for (state_name, state) in self.states.iteritems():
-                if (state_name not in curr_queue
-                        and state_name not in processed_queue):
-                    all_outcomes = (
-                        state.interaction.get_all_outcomes())
-                    for outcome in all_outcomes:
-                        if outcome.dest == curr_state_name:
-                            curr_queue.append(state_name)
-                            break
+                for (state_name, state) in self.states.iteritems():
+                    if (state_name not in curr_queue
+                            and state_name not in processed_queue):
+                        all_outcomes = (
+                            state.interaction.get_all_outcomes())
+                        for outcome in all_outcomes:
+                            if outcome.dest == curr_state_name:
+                                curr_queue.append(state_name)
+                                break
 
         if len(self.states) != len(processed_queue):
             dead_end_states = list(
