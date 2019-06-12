@@ -50,11 +50,11 @@ oppia.factory('ExplorationSummaryBackendApiService', [
       }).then(function(response) {
         var summaries = angular.copy(response.data.summaries);
         if (successCallback) {
-          if (!summaries) {
+          if (summaries === null) {
             var summariesError = (
               'Summaries fetched are null for explorationIds: ' + explorationIds
             );
-            throw summariesError;
+            throw new Error(summariesError);
           }
           successCallback(summaries);
         }
