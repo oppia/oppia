@@ -183,41 +183,6 @@ describe('Topic update service', function() {
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
-  it('should add/remove a canonical story id to/from a topic',
-    function() {
-      expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);
-      TopicUpdateService.addCanonicalStoryId(_sampleTopic, 'story_3');
-      expect(_sampleTopic.getCanonicalStoryIds()).toEqual([
-        'story_1', 'story_3'
-      ]);
-
-      UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);
-    }
-  );
-
-  it('should create a proper backend change dict for adding a canonical ' +
-    'story id',
-  function() {
-    TopicUpdateService.addCanonicalStoryId(_sampleTopic, 'story_3');
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-      cmd: 'update_topic_property',
-      property_name: 'canonical_story_ids',
-      new_value: ['story_1', 'story_3'],
-      old_value: ['story_1'],
-      change_affects_subtopic_page: false
-    }]);
-  });
-
-  it('should not create a backend change dict for adding a canonical ' +
-    'story id when an error is encountered',
-  function() {
-    expect(function() {
-      TopicUpdateService.addCanonicalStoryId(_sampleTopic, 'story_1');
-    }).toThrow();
-    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
-  });
-
   it('should remove/add a canonical story id from/to a topic',
     function() {
       expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_1']);

@@ -236,7 +236,6 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
             given story.
     """
     story.validate()
-    create_new_story_rights(story.id, committer_id)
     model = story_models.StoryModel(
         id=story.id,
         description=story.description,
@@ -644,24 +643,6 @@ def record_completed_node_in_story_context(user_id, story_id, node_id):
         progress_model.put()
 
 
-def get_story_rights_from_model(story_rights_model):
-    """Constructs a StoryRights object from the given story rights model.
-
-    Args:
-        story_rights_model: StoryRightsModel. Story rights from the
-            datastore.
-
-    Returns:
-        StoryRights. The rights object created from the model.
-    """
-
-    return story_domain.StoryRights(
-        story_rights_model.id,
-        story_rights_model.manager_ids,
-        story_rights_model.story_is_published
-    )
-
-
 def publish_story(story_id, committer_id):
     """Marks the given story as published.
 
@@ -705,9 +686,6 @@ def publish_story(story_id, committer_id):
                     'Exploration with id %s isn\'t published.'
                     % exploration_rights.id)
 
-    story_rights = get_story_rights(story_id, strict=False)
-    if story_rights is None:
-        raise Exception('The given story does not exist')
     user = user_services.UserActionsInfo(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
@@ -722,11 +700,6 @@ def publish_story(story_id, committer_id):
             _are_nodes_valid_for_publishing([node])
 
     story_rights.story_is_published = True
-    commit_cmds = [story_domain.StoryRightsChange({
-        'cmd': story_domain.CMD_PUBLISH_STORY
-    })]
-    save_story_rights(
-        story_rights, committer_id, 'Published the story', commit_cmds)
 
 
 def unpublish_story(story_id, committer_id):
@@ -741,9 +714,6 @@ def unpublish_story(story_id, committer_id):
         Exception. The story is already unpublished.
         Exception. The user does not have enough rights to unpublish the story.
     """
-    story_rights = get_story_rights(story_id, strict=False)
-    if story_rights is None:
-        raise Exception('The given story does not exist')
     user = user_services.UserActionsInfo(committer_id)
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
@@ -752,154 +722,3 @@ def unpublish_story(story_id, committer_id):
     if not story_rights.story_is_published:
         raise Exception('The story is already unpublished.')
     story_rights.story_is_published = False
-    commit_cmds = [story_domain.StoryRightsChange({
-        'cmd': story_domain.CMD_UNPUBLISH_STORY
-    })]
-    save_story_rights(
-        story_rights, committer_id, 'Unpublished the story', commit_cmds)
-
-
-def save_story_rights(story_rights, committer_id, commit_message, commit_cmds):
-    """Saves a StoryRights domain object to the datastore.
-
-    Args:
-        story_rights: StoryRights. The rights object for the given
-            story.
-        committer_id: str. ID of the committer.
-        commit_message: str. Descriptive message for the commit.
-        commit_cmds: list(StoryRightsChange). A list of commands describing
-            what kind of commit was done.
-    """
-
-    model = story_models.StoryRightsModel.get(story_rights.id, strict=False)
-
-    model.manager_ids = story_rights.manager_ids
-    model.story_is_published = story_rights.story_is_published
-    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmd_dicts)
-
-
-def create_new_story_rights(story_id, committer_id):
-    """Creates a new story rights object and saves it to the datastore.
-
-    Args:
-        story_id: str. ID of the story.
-        committer_id: str. ID of the committer.
-    """
-    story_rights = story_domain.StoryRights(story_id, [], False)
-    commit_cmds = [{'cmd': story_domain.CMD_CREATE_NEW}]
-
-    story_models.StoryRightsModel(
-        id=story_rights.id,
-        manager_ids=story_rights.manager_ids,
-        story_is_published=story_rights.story_is_published
-    ).commit(committer_id, 'Created new story rights', commit_cmds)
-
-
-def get_story_rights(story_id, strict=True):
-    """Retrieves the rights object for the given story.
-
-    Args:
-        story_id: str. ID of the story.
-        strict: bool. Whether to fail noisily if no story with a given id
-            exists in the datastore.
-
-    Returns:
-        StoryRights. The rights object associated with the given story.
-
-    Raises:
-        EntityNotFoundError. The story with ID story_id was not
-            found in the datastore.
-    """
-
-    model = story_models.StoryRightsModel.get(story_id, strict=strict)
-
-    if model is None:
-        return None
-
-    return get_story_rights_from_model(model)
-
-
-def check_can_edit_story(user, story_rights):
-    """Checks whether the user can edit the given story.
-
-    Args:
-        user: UserActionsInfo. Object having user_id, role and actions for
-            given user.
-        story_rights: StoryRights or None. Rights object for the given story.
-
-    Returns:
-        bool. Whether the given user can edit the given story.
-    """
-    if story_rights is None:
-        return False
-    if role_services.ACTION_EDIT_ANY_STORY in user.actions:
-        return True
-    if role_services.ACTION_EDIT_OWNED_STORY not in user.actions:
-        return False
-    if story_rights.is_manager(user.user_id):
-        return True
-
-    return False
-
-
-def assign_role(committer, assignee, new_role, story_id):
-    """Assigns a new role to the user.
-
-    Args:
-        committer: UserActionsInfo. UserActionsInfo object for the user
-            who is performing the action.
-        assignee: UserActionsInfo. UserActionsInfo object for the user
-            whose role is being changed.
-        new_role: str. The name of the new role. Possible values are:
-            ROLE_MANAGER
-        story_id: str. ID of the story.
-
-    Raises:
-        Exception. The committer does not have rights to modify a role.
-        Exception. The assignee is already a manager for the story.
-        Exception. The assignee doesn't have enough rights to become a manager.
-        Exception. The role is invalid.
-    """
-    committer_id = committer.user_id
-    story_rights = get_story_rights(story_id)
-    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
-            committer.actions):
-        logging.error(
-            'User %s tried to allow user %s to be a %s of story %s '
-            'but was refused permission.' % (
-                committer_id, assignee.user_id, new_role, story_id))
-        raise Exception(
-            'UnauthorizedUserException: Could not assign new role.')
-
-    assignee_username = user_services.get_username(assignee.user_id)
-    if role_services.ACTION_EDIT_OWNED_STORY not in assignee.actions:
-        raise Exception(
-            'The assignee doesn\'t have enough rights to become a manager.')
-
-    old_role = story_domain.ROLE_NONE
-    if story_rights.is_manager(assignee.user_id):
-        old_role = story_domain.ROLE_MANAGER
-
-    if new_role == story_domain.ROLE_MANAGER:
-        if story_rights.is_manager(assignee.user_id):
-            raise Exception('This user already is a manager for this story')
-        story_rights.manager_ids.append(assignee.user_id)
-    elif new_role == story_domain.ROLE_NONE:
-        if story_rights.is_manager(assignee.user_id):
-            story_rights.manager_ids.remove(assignee.user_id)
-        else:
-            raise Exception('This user already has no role for this story')
-    else:
-        raise Exception('Invalid role: %s' % new_role)
-
-    commit_message = 'Changed role of %s from %s to %s' % (
-        assignee_username, old_role, new_role)
-    commit_cmds = [story_domain.StoryRightsChange({
-        'cmd': story_domain.CMD_CHANGE_ROLE,
-        'assignee_id': assignee.user_id,
-        'old_role': old_role,
-        'new_role': new_role
-    })]
-
-    save_story_rights(story_rights, committer_id, commit_message, commit_cmds)

@@ -433,11 +433,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_commit_log_entry.commit_message,
             'Removed %s from uncategorized skill ids' % self.skill_id_1)
 
-    def test_delete_story(self):
-        topic_services.delete_story(
+    def test_delete_canonical_story(self):
+        topic_services.delete_canonical_story(
             self.user_id_admin, self.TOPIC_ID, self.story_id_1)
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.canonical_story_ids, [self.story_id_2])
+        self.assertEqual(len(topic.canonical_story_references), 1)
+        self.assertEqual(
+            topic.canonical_story_references[0].story_id, self.story_id_2)
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 3)
         )
@@ -453,8 +455,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, 'story_id')
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
-            topic.canonical_story_ids,
-            [self.story_id_1, self.story_id_2, 'story_id'])
+            len(topic.canonical_story_references), 3)
+        self.assertEqual(
+            topic.canonical_story_references[2].story_id, 'story_id')
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 3)
         )

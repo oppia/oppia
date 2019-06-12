@@ -494,27 +494,6 @@ oppia.factory('TopicUpdateService', [
       },
 
       /**
-       * Adds a canonical story id to a topic and records the change
-       * in the undo/redo service.
-       */
-      addCanonicalStoryId: function(topic, storyId) {
-        var oldCanonicalStoryIdsList = angular.copy(
-          topic.getCanonicalStoryIds());
-        var newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
-        newCanonicalStoryIdsList.push(storyId);
-        _applyTopicPropertyChange(
-          topic, TOPIC_PROPERTY_CANONICAL_STORY_IDS, newCanonicalStoryIdsList,
-          oldCanonicalStoryIdsList,
-          function(changeDict, topic) {
-            // Apply.
-            topic.addCanonicalStoryId(storyId);
-          }, function(changeDict, topic) {
-            // Undo.
-            topic.removeCanonicalStoryId(storyId);
-          });
-      },
-
-      /**
        * Removes an canonical story id from a topic and records the change
        * in the undo/redo service.
        */

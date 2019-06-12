@@ -53,13 +53,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'id': self.topic_id,
             'name': 'Name',
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
-            'canonical_story_ids': [],
-            'additional_story_ids': [],
+            'canonical_story_references': [],
+            'additional_story_references': [],
             'uncategorized_skill_ids': [],
             'subtopics': [],
             'next_subtopic_id': 1,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            'story_reference_schema_version': (
+                feconf.CURRENT_STORY_REFERENCE_SCHEMA_VERSION),
             'version': 0
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
@@ -87,26 +89,38 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
                 'title': 'Title'}])
 
     def test_delete_story(self):
-        self.topic.canonical_story_ids = [
-            'story_id', 'story_id_1', 'story_id_2']
-        self.topic.delete_story('story_id_1')
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
+        self.topic.delete_canonical_story('story_id_1')
+        canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
-            self.topic.canonical_story_ids, ['story_id', 'story_id_2'])
+            canonical_story_ids, ['story_id', 'story_id_2'])
         with self.assertRaisesRegexp(
             Exception, 'The story_id story_id_5 is not present in the canonical'
-            ' story ids list of the topic.'):
-            self.topic.delete_story('story_id_5')
+            ' story references list of the topic.'):
+            self.topic.delete_canonical_story('story_id_5')
 
     def test_add_canonical_story(self):
-        self.topic.canonical_story_ids = [
-            'story_id', 'story_id_1']
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self.topic.add_canonical_story('story_id_2')
+        canonical_story_ids = self.topic.get_canonical_story_ids()
         self.assertEqual(
-            self.topic.canonical_story_ids,
+            canonical_story_ids,
             ['story_id', 'story_id_1', 'story_id_2'])
         with self.assertRaisesRegexp(
             Exception, 'The story_id story_id_2 is already present in the '
-            'canonical story ids list of the topic.'):
+            'canonical story references list of the topic.'):
             self.topic.add_canonical_story('story_id_2')
 
     def _assert_validation_error(self, expected_error_substring):
@@ -165,25 +179,49 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.language_code = 'xz'
         self._assert_validation_error('Invalid language code')
 
-    def test_canonical_story_ids_validation(self):
-        self.topic.canonical_story_ids = ['story_id', 'story_id', 'story_id_1']
+    def test_canonical_story_references_validation(self):
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self._assert_validation_error(
             'Expected all canonical story ids to be distinct.')
-        self.topic.canonical_story_ids = 'story_id'
+        self.topic.canonical_story_references = 'story_id'
         self._assert_validation_error(
-            'Expected canonical story ids to be a list')
+            'Expected canonical story references to be a list')
 
-    def test_additional_story_ids_validation(self):
-        self.topic.additional_story_ids = ['story_id', 'story_id', 'story_id_1']
+    def test_additional_story_references_validation(self):
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1')
+        ]
         self._assert_validation_error(
             'Expected all additional story ids to be distinct.')
-        self.topic.additional_story_ids = 'story_id'
+        self.topic.additional_story_references = 'story_id'
         self._assert_validation_error(
-            'Expected additional story ids to be a list')
+            'Expected additional story references to be a list')
 
     def test_additional_canonical_story_intersection_validation(self):
-        self.topic.additional_story_ids = ['story_id', 'story_id_1']
-        self.topic.canonical_story_ids = ['story_id', 'story_id_2']
+        self.topic.additional_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_1'),
+        ]
+        self.topic.canonical_story_references = [
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id'),
+            topic_domain.StoryReference.create_default_story_reference(
+                'story_id_2')
+        ]
         self._assert_validation_error(
             'Expected additional story ids list and canonical story '
             'ids list to be mutually exclusive.')

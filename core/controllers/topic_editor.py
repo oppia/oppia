@@ -50,9 +50,9 @@ class TopicEditorStoryHandler(base.BaseHandler):
         """Handles GET requests."""
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_story_summaries = story_services.get_story_summaries_by_ids(
-            topic.canonical_story_ids)
+            topic.get_canonical_story_ids())
         additional_story_summaries = story_services.get_story_summaries_by_ids(
-            topic.additional_story_ids)
+            topic.get_additional_story_ids())
 
         canonical_story_summary_dicts = [
             summary.to_dict() for summary in canonical_story_summaries]
@@ -85,6 +85,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
         story = story_domain.Story.create_default_story(
             new_story_id, title=title)
         story_services.save_new_story(self.user_id, story)
+        topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
         self.render_json({
             'storyId': new_story_id
         })
