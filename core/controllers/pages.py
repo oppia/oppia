@@ -62,9 +62,6 @@ class GetStartedPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.GET_STARTED_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/get-started-page.mainpage.html')
 
 
