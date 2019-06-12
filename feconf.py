@@ -222,8 +222,6 @@ DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
 DEFAULT_IMAGE_ASSETS = {
     'image_mapping': {}
 }
-# Default image_id counter.
-DEFAULT_IMAGE_COUNTER = 0
 # Default recorded_voiceovers dict for a default state template.
 DEFAULT_RECORDED_VOICEOVERS = {
     'voiceovers_mapping': {

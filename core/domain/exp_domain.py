@@ -21,11 +21,11 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
+import bs4
 import copy
 import functools
 import re
 import string
-import bs4
 
 from constants import constants
 from core.domain import html_validation_service
@@ -80,7 +80,7 @@ CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
 # ImageAssets Actions.
-IMAGE_ASSETS_ADD_IMAGE = 'add_image'
+ACTION_ADD_IMAGE = 'add_image'
 
 # These are categories to which answers may be classified. These values should
 # not be changed because they are persisted in the data store within answer
@@ -132,8 +132,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        'image_counter')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'state_name', 'old_state_name', 'new_state_name',
@@ -178,15 +177,13 @@ class ExplorationChange(object):
         elif self.cmd == CMD_EDIT_STATE_PROPERTY:
             if change_dict['property_name'] not in self.STATE_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
+            self.state_name = change_dict['state_name']
+            self.property_name = change_dict['property_name']
             if change_dict['property_name'] == STATE_PROPERTY_IMAGE_ASSETS:
-                self.state_name = change_dict['state_name']
-                self.property_name = change_dict['property_name']
                 self.action = change_dict['action']
                 self.image_id = change_dict['image_id']
                 self.image_info = change_dict['image_info']
             else:
-                self.state_name = change_dict['state_name']
-                self.property_name = change_dict['property_name']
                 self.new_value = change_dict['new_value']
                 self.old_value = change_dict.get('old_value')
         elif self.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
@@ -497,7 +494,7 @@ class Exploration(object):
             Exploration. The Exploration domain object with default
             values.
         """
-        image_counter = feconf.DEFAULT_IMAGE_COUNTER
+        image_counter = 0
 
         init_state_dict = state_domain.State.create_default_state(
             init_state_name, is_initial_state=True).to_dict()
@@ -2953,7 +2950,7 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
+    def _convert_v33_dict_to_v34_dict(cls, exp_id, exploration_dict):
         """Converts a v33 exploration dict into a v34 exploration dict."""
         exploration_dict['schema_version'] = 34
 
@@ -2961,8 +2958,8 @@ class Exploration(object):
             cls._convert_states_v28_dict_to_v29_dict(
                 exploration_dict['states']))
 
-        states_dict = copy.deepcopy(exploration_dict['states'])
-        exploration_dict['image_counter'] = cls.get_image_counter(states_dict)
+        exploration_dict = copy.deepcopy(exploration_dict)
+        exploration_dict['image_counter'] = cls.calculate_image_counter(exp_id, exploration_dict)
         exploration_dict['states_schema_version'] = 29
 
         return exploration_dict
@@ -3167,7 +3164,7 @@ class Exploration(object):
 
         if exploration_schema_version == 33:
             exploration_dict = cls._convert_v33_dict_to_v34_dict(
-                exploration_dict)
+                exp_id, exploration_dict)
             exploration_schema_version = 34
 
         return (exploration_dict, initial_schema_version)
@@ -3336,53 +3333,23 @@ class Exploration(object):
         return html_list
 
     @classmethod
-    def get_image_counter(cls, states_dict):
-        """Gets an image counter of the exploration.
+    def calculate_image_counter(cls, exp_id, exploration_dict):
+        """Calculates an image counter of the exploration.
 
         Returns:
             image_counter: int. The image counter.
         """
-        # exploration_html = (self.get_all_html_content_strings())[0]
-        exploration_html = ''
-        for state_dict in states_dict.itervalues():
+        # Creates an exploration from exploration dict.
+        image_counter = 0
+        exploration_dict['id'] = exp_id
+        exploration_dict['image_counter'] = image_counter
+        exploration = Exploration.from_dict(exploration_dict)
+        exploration_html = exploration.get_all_html_content_strings()
 
-            content_html = state_dict['content']['html']
-            exploration_html = exploration_html + content_html
-
-            if state_dict['interaction']['default_outcome']:
-                interaction_feedback_html = state_dict[
-                    'interaction']['default_outcome']['feedback']['html']
-                exploration_html = exploration_html + interaction_feedback_html
-
-            for answer_group in (
-                    state_dict['interaction']['answer_groups']):
-                answer_group_html = answer_group['outcome']['feedback']['html']
-                exploration_html = exploration_html + answer_group_html
-                if state_dict['interaction']['id'] == 'ItemSelectionInput':
-                    for rule_spec in (
-                            answer_group['rule_specs']):
-                        for x in rule_spec['inputs']['x']:
-                            exploration_html = exploration_html + x
-
-            for hint in (
-                    state_dict['interaction']['hints']):
-                hint_html = hint['hint_content']['html']
-                exploration_html = exploration_html + hint_html
-
-            if state_dict['interaction']['solution']:
-                solution_html = state_dict[
-                    'interaction']['solution']['explanation']['html']
-                exploration_html = exploration_html + solution_html
-
-            if state_dict['interaction']['id'] in (
-                    'ItemSelectionInput', 'MultipleChoiceInput'):
-                for value in (
-                        state_dict['interaction']['customization_args'][
-                            'choices']['value']):
-                    exploration_html = exploration_html + value
-
-        soup = bs4.BeautifulSoup(exploration_html, 'html.parser')
-        image_counter = len(soup.findAll(name='oppia-noninteractive-image'))
+        for html in exploration_html:
+            soup = bs4.BeautifulSoup(html, 'html.parser')
+            no_of_images = len(soup.findAll(name='oppia-noninteractive-image'))
+            image_counter += no_of_images
 
         return image_counter
 

@@ -810,7 +810,7 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_IMAGE_ASSETS):
 
-                    if change.action == exp_domain.IMAGE_ASSETS_ADD_IMAGE:
+                    if change.action == exp_domain.ACTION_ADD_IMAGE:
                         # Increment image_counter
                         image_counter = exploration.image_counter
                         image_counter += 1

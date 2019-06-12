@@ -1817,7 +1817,7 @@ auto_tts_enabled: true
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
-image_counter: %s
+image_counter: 0
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -1901,7 +1901,6 @@ states_schema_version: %d
 tags: []
 title: A title
 """ % (
-    feconf.DEFAULT_IMAGE_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
@@ -1913,7 +1912,7 @@ auto_tts_enabled: true
 blurb: ''
 category: A category
 correctness_feedback_enabled: false
-image_counter: %s
+image_counter: 0
 init_state_name: %s
 language_code: en
 objective: The objective
@@ -1997,7 +1996,6 @@ states_schema_version: %d
 tags: []
 title: A title
 """ % (
-    feconf.DEFAULT_IMAGE_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
@@ -3686,7 +3684,7 @@ auto_tts_enabled: true
 blurb: ''
 category: category
 correctness_feedback_enabled: false
-image_counter: %s
+image_counter: 0
 init_state_name: %s
 language_code: en
 objective: Old objective
@@ -3756,7 +3754,6 @@ states_schema_version: %d
 tags: []
 title: Old Title
 """) % (
-    feconf.DEFAULT_IMAGE_COUNTER,
     feconf.DEFAULT_INIT_STATE_NAME,
     exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION,
     feconf.DEFAULT_INIT_STATE_NAME,
