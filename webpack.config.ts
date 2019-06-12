@@ -301,8 +301,12 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['signup'],
+      chunks: ['app', 'signup'],
       filename: 'signup-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Sign up for Oppia and begin exploring a new subject.'
+      },
       template: commonPrefix + '/pages/signup-page/signup-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
