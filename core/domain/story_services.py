@@ -691,15 +691,10 @@ def publish_story(story_id, committer_id):
         raise Exception(
             'The user does not have enough rights to publish the story.')
 
-    if story_rights.story_is_published:
-        raise Exception('The story is already published.')
-
     story = get_story_by_id(story_id, strict=False)
     for node in story.story_contents.nodes:
         if node.id == story.story_contents.initial_node_id:
             _are_nodes_valid_for_publishing([node])
-
-    story_rights.story_is_published = True
 
 
 def unpublish_story(story_id, committer_id):
@@ -718,7 +713,3 @@ def unpublish_story(story_id, committer_id):
     if role_services.ACTION_CHANGE_STORY_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the story.')
-
-    if not story_rights.story_is_published:
-        raise Exception('The story is already unpublished.')
-    story_rights.story_is_published = False

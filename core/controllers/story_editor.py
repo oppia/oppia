@@ -38,7 +38,8 @@ class StoryEditorPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
+        canonical_story_ids = topic.get_canonical_story_ids()
+        if topic is None or story_id not in canonical_story_ids:
             raise self.PageNotFoundException
 
         self.values.update({
@@ -78,7 +79,8 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
+        canonical_story_ids = topic.get_canonical_story_ids()
+        if topic is None or story_id not in canonical_story_ids:
             raise self.PageNotFoundException
 
         self.values.update({
@@ -98,7 +100,8 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
+        canonical_story_ids = topic.get_canonical_story_ids()
+        if topic is None or story_id not in canonical_story_ids:
             raise self.PageNotFoundException
 
         version = self.payload.get('version')
