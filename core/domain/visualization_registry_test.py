@@ -33,18 +33,6 @@ class VisualizationRegistryUnitTests(test_utils.GenericTestBase):
             len(visualization_registry.Registry.get_all_visualization_ids()),
             0)
 
-    def test_get_full_html(self):
-        """Check that the visualization HTML contains templates and directives
-        for all visualizations.
-        """
-
-        full_html = visualization_registry.Registry.get_full_html()
-        all_visualization_ids = (
-            visualization_registry.Registry.get_all_visualization_ids())
-
-        for visualization_id in all_visualization_ids:
-            self.assertIn('oppiaVisualization%s' % visualization_id, full_html)
-
     def test_get_visualization_class_with_invalid_id_raises_error(self):
         with self.assertRaisesRegexp(
             TypeError, 'is not a valid visualization id.'):

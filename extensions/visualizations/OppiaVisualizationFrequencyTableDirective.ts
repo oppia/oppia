@@ -16,10 +16,12 @@
  * @fileoverview Directive for the "frequency table" visualization.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 // Each visualization receives three variables: 'data', 'options', and
 // 'isAddressed'. The exact format for each of these is specific to the
 // particular visualization.
-
 oppia.directive('oppiaVisualizationFrequencyTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
