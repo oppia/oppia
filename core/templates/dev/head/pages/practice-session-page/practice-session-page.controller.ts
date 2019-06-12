@@ -15,11 +15,6 @@
 /**
  * @fileoverview Controllers for the practice session.
  */
-oppia.constant('TOTAL_QUESTIONS', 20);
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant(
-  'PRACTICE_SESSIONS_DATA_URL',
-  '/practice-session-page/data/<topic_name>');
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -30,6 +25,8 @@ require(
 
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
+
+require('pages/practice-session-page/practice-session-page.constants.ts');
 
 oppia.controller('PracticeSession', [
   '$http', '$rootScope', '$scope', 'AlertsService',
