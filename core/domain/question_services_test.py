@@ -116,7 +116,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 3)
         for question in questions:
             self.assertTrue(question.to_dict() in question_dicts)
-        self.assertNotEquals(
+        self.assertNotEqual(
             self.question.to_dict(), self.question_1.to_dict(),
             self.question_2.to_dict()
         )
@@ -466,7 +466,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.assertEqual(
                 question_summary.question_content,
                 feconf.DEFAULT_INIT_STATE_CONTENT_STR)
-        self.assertNotEquals(
+        self.assertNotEqual(
             question_summaries[0].id, question_summaries[1].id,
             question_summaries[2].id
         )
