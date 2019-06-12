@@ -555,7 +555,8 @@ class Story(object):
     def __init__(
             self, story_id, title, description, notes,
             story_contents, story_contents_schema_version, language_code,
-            belongs_to_topic, version, created_on=None, last_updated=None):
+            corresponding_topic_id, version, created_on=None,
+            last_updated=None):
         """Constructs a Story domain object.
 
         Args:
@@ -571,7 +572,7 @@ class Story(object):
                 story contents object.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
-            belongs_to_topic: str. The id of the topic to which the story
+            corresponding_topic_id: str. The id of the topic to which the story
                 belongs to.
             version: int. The version of the story.
             created_on: datetime.datetime. Date and time when the story is
@@ -586,7 +587,7 @@ class Story(object):
         self.story_contents = story_contents
         self.story_contents_schema_version = story_contents_schema_version
         self.language_code = language_code
-        self.belongs_to_topic = belongs_to_topic
+        self.corresponding_topic_id = corresponding_topic_id
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
@@ -702,13 +703,13 @@ class Story(object):
             'notes': self.notes,
             'language_code': self.language_code,
             'story_contents_schema_version': self.story_contents_schema_version,
-            'belongs_to_topic': self.belongs_to_topic,
+            'corresponding_topic_id': self.corresponding_topic_id,
             'version': self.version,
             'story_contents': self.story_contents.to_dict()
         }
 
     @classmethod
-    def create_default_story(cls, story_id, title, belongs_to_topic):
+    def create_default_story(cls, story_id, title, corresponding_topic_id):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
@@ -716,7 +717,7 @@ class Story(object):
         Args:
             story_id: str. The unique id of the story.
             title: str. The title for the newly created story.
-            belongs_to_topic: str. The id of the topic to which the story
+            corresponding_topic_id: str. The id of the topic to which the story
                 belongs.
 
         Returns:
@@ -729,7 +730,7 @@ class Story(object):
             story_id, title,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, belongs_to_topic, 0)
+            constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
 
     @classmethod
     def update_story_contents_from_model(

@@ -59,7 +59,7 @@ class StoryModel(base_models.VersionedModel):
     story_contents_schema_version = (
         ndb.IntegerProperty(required=True, indexed=True))
     # The topic id to which the story belongs.
-    belongs_to_topic = ndb.StringProperty(indexed=True, required=True)
+    corresponding_topic_id = ndb.StringProperty(indexed=True, required=True)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

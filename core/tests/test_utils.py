@@ -1270,7 +1270,8 @@ tags: []
 
     def save_new_story(
             self, story_id, owner_id, title, description, notes,
-            belongs_to_topic, language_code=constants.DEFAULT_LANGUAGE_CODE):
+            corresponding_topic_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
         Args:
@@ -1280,7 +1281,8 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            belongs_to_topic: str. The topic id to which the story belongs to.
+            corresponding_topic_id: str. The topic id to which the story belongs
+                to.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
 
@@ -1288,7 +1290,7 @@ tags: []
             Story. A newly-created story.
         """
         story = story_domain.Story.create_default_story(
-            story_id, title, belongs_to_topic)
+            story_id, title, corresponding_topic_id)
         story.title = title
         story.description = description
         story.notes = notes
@@ -1298,7 +1300,8 @@ tags: []
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, owner_id, title, description, notes,
-            belongs_to_topic, language_code=constants.DEFAULT_LANGUAGE_CODE):
+            corresponding_topic_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new skill with a default version 1 story contents
         data dictionary.
 
@@ -1318,7 +1321,8 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            belongs_to_topic: str. The topic id to which the story belongs to.
+            corresponding_topic_id: str. The topic id to which the story belongs
+                to.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
         """
@@ -1329,7 +1333,7 @@ tags: []
             language_code=language_code,
             story_contents_schema_version=1,
             notes=notes,
-            belongs_to_topic=belongs_to_topic,
+            corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT
         )
         commit_message = (

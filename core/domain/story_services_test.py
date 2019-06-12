@@ -226,7 +226,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
 
-    def test_update_story_with_invalid_belongs_to_topic_value(self):
+    def test_update_story_with_invalid_corresponding_topic_id_value(self):
         topic_id = topic_services.get_new_topic_id()
         story_id = story_services.get_new_story_id()
         self.save_new_story(
@@ -246,7 +246,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_services.update_story(
                 self.USER_ID, story_id, changelist, 'Added node.')
 
-    def test_update_story_which_not_belongs_to_topic(self):
+    def test_update_story_which_not_corresponding_topic_id(self):
         topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             topic_id, self.USER_ID, 'A New Topic', 'A new topic description.',

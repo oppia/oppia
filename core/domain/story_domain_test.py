@@ -92,7 +92,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'story_contents_schema_version': (
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'belongs_to_topic': topic_id,
+            'corresponding_topic_id': topic_id,
             'version': 0
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
@@ -147,30 +147,30 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 self.story.story_contents_schema_version)
         )
 
-    def test_belongs_to_topic_validation(self):
+    def test_corresponding_topic_id_validation(self):
         # Generating valid topic id of length 12.
         valid_topic_id = utils.generate_random_string(12)
-        self.story.belongs_to_topic = valid_topic_id
+        self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 
         # Generating invalid topic id of length 5 (not equal to 12).
         invalid_topic_id = utils.generate_random_string(5)
-        self.story.belongs_to_topic = invalid_topic_id
+        self.story.corresponding_topic_id = invalid_topic_id
         self._assert_validation_error(
-            'Invalid belongs_to_topic value: %s' % invalid_topic_id)
+            'Invalid corresponding_topic_id value: %s' % invalid_topic_id)
 
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
         self.assertTrue(isinstance(valid_topic_id, basestring))
-        self.story.belongs_to_topic = valid_topic_id
+        self.story.corresponding_topic_id = valid_topic_id
         self.story.validate()
 
         # Setting invalid topic id type.
         invalid_topic_id = 123
-        self.story.belongs_to_topic = invalid_topic_id
+        self.story.corresponding_topic_id = invalid_topic_id
         self._assert_validation_error(
-            'Expected belongs_to_topic should be a string, received: %s' % (
-                invalid_topic_id))
+            'Expected corresponding_topic_id should be a string, received: %s' %
+            (invalid_topic_id))
 
     def test_add_node_validation(self):
         with self.assertRaisesRegexp(
