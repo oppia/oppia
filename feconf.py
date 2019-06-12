@@ -601,6 +601,7 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
+EXPLORATION_STATE_ANSWER_STATS_PREFIX = '/createhandler/state_answer_stats'
 EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
@@ -612,7 +613,6 @@ FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
-GOOGLE_ANALYTICS_DATA_URL = '/google_analytics'
 TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
@@ -951,11 +951,7 @@ RTE_CONTENT_SPEC = {
 # of topics as the value.
 # Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
 # oppia constant defined in
-# core/templates/dev/head/pages/landing/TopicLandingPage.js file.
+# core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
-    'maths': ['fractions', 'ratios']
+    'maths': ['fractions', 'negative-numbers', 'ratios']
 }
-
-# Data required for Google Analytics.
-ANALYTICS_ID = ''
-SITE_NAME_FOR_ANALYTICS = ''

@@ -14,6 +14,8 @@
 
 """Tests for core.domain.question_services."""
 
+import logging
+
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import skill_domain
@@ -174,6 +176,55 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.create_new_question_skill_link(
                 self.question_id, 'skill_1', 0.3)
 
+    def test_get_question_summaries_and_skill_descriptions_with_no_skill_ids(
+            self):
+        question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id, self.editor_id,
+            self._create_valid_question_data('ABC'))
+
+        question_services.create_new_question_skill_link(
+            question_id, 'skill_1', 0.5)
+
+        question_summaries, skill_descriptions, _ = (
+            question_services.get_question_summaries_and_skill_descriptions(
+                2, [], ''))
+
+        self.assertEqual(question_summaries, [])
+        self.assertEqual(skill_descriptions, [])
+
+    def test_cannot_get_question_from_model_with_invalid_schema_version(self):
+        # Delete all question models.
+        all_question_models = question_models.QuestionModel.get_all()
+        question_models.QuestionModel.delete_multi(all_question_models)
+
+        all_question_models = question_models.QuestionModel.get_all()
+        self.assertEqual(all_question_models.count(), 0)
+
+        question_id = question_services.get_new_question_id()
+
+        question_model = question_models.QuestionModel(
+            id=question_id,
+            question_state_data=(
+                self._create_valid_question_data('ABC').to_dict()),
+            language_code='en',
+            version=0,
+            question_state_data_schema_version=0)
+
+        question_model.commit(
+            self.editor_id, 'question model created',
+            [{'cmd': question_domain.CMD_CREATE_NEW}])
+
+        all_question_models = question_models.QuestionModel.get_all()
+        self.assertEqual(all_question_models.count(), 1)
+        question_model = all_question_models.get()
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v25-v%d state schemas at present.' %
+            feconf.CURRENT_STATE_SCHEMA_VERSION):
+            question_services.get_question_from_model(question_model)
+
     def test_get_question_skill_links_of_skill(self):
         # If the skill id doesnt exist at all, it returns an empty list.
         question_skill_links = (
@@ -274,6 +325,69 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             question.question_state_data.to_dict(), new_question_data.to_dict())
         self.assertEqual(question.version, 2)
+
+    def test_cannot_update_question_with_no_commit_message(self):
+        new_question_data = self._create_valid_question_data('DEF')
+        change_dict = {
+            'cmd': 'update_question_property',
+            'property_name': 'question_state_data',
+            'new_value': new_question_data.to_dict(),
+            'old_value': self.question.question_state_data.to_dict()
+        }
+        change_list = [question_domain.QuestionChange(change_dict)]
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected a commit message, received none.'):
+            question_services.update_question(
+                self.editor_id, self.question_id, change_list, None)
+
+    def test_cannot_update_question_with_no_change_list(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unexpected error: received an invalid change list when trying to '
+            'save question'):
+            question_services.update_question(
+                self.editor_id, self.question_id, [],
+                'updated question data')
+
+    def test_update_question_language_code(self):
+        self.assertEqual(self.question.language_code, 'en')
+        change_dict = {
+            'cmd': 'update_question_property',
+            'property_name': 'language_code',
+            'new_value': 'bn',
+            'old_value': 'en'
+        }
+        change_list = [question_domain.QuestionChange(change_dict)]
+
+        question_services.update_question(
+            self.editor_id, self.question_id, change_list,
+            'updated question language code')
+
+        question = question_services.get_question_by_id(self.question_id)
+        self.assertEqual(question.language_code, 'bn')
+        self.assertEqual(question.version, 2)
+
+    def test_cannot_update_question_with_invalid_change_list(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        assert_raises_context_manager = self.assertRaises(Exception)
+
+        with logging_swap, assert_raises_context_manager:
+            question_services.update_question(
+                self.editor_id, self.question_id, 'invalid_change_list',
+                'updated question language code')
+
+        self.assertEqual(len(observed_log_messages), 1)
+        self.assertEqual(
+            observed_log_messages[0],
+            'AttributeError \'str\' object has no attribute \'cmd\' %s '
+            'invalid_change_list' % self.question_id)
 
     def test_update_skill_ids_of_questions(self):
         question_id_2 = question_services.get_new_question_id()

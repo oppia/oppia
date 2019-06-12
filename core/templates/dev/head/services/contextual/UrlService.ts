@@ -112,6 +112,9 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getHash: function() {
       return this.getCurrentLocation().hash;
+    },
+    getOrigin: function() {
+      return this.getCurrentLocation().origin;
     }
   };
 }]);

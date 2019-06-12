@@ -606,21 +606,6 @@ def get_question_summaries_by_creator_id(creator_id):
     return question_summaries
 
 
-def get_question_summary_by_question_id(question_id, strict=False):
-    """Gets question summary of question by ID of the question.
-
-    Args:
-        question_id: str. The ID of the question.
-        strict: bool. Whether to fail noisily if no question summary for the
-            given question id exists in the datastore.
-
-    Returns:
-        QuestionSummaryModel. The QuestionSummaryModel for the given question.
-    """
-    return get_question_summary_from_model(
-        question_models.QuestionSummaryModel.get(question_id, strict=strict))
-
-
 def get_question_rights_from_model(question_rights_model):
     """Constructs a QuestionRights object from the given question rights model.
 

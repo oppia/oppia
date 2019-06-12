@@ -353,7 +353,7 @@ class EscapingTests(test_utils.GenericTestBase):
 
         def get(self):
             """Handles GET requests."""
-            self.render_template('pages/tests/jinja_escaping.html')
+            self.render_template('tests/jinja_escaping.html')
 
         def post(self):
             """Handles POST requests."""
@@ -671,8 +671,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             # Following handler are present in base.py where acl_decorators
             # cannot be imported.
             if (handler.__name__ == 'LogoutPage' or
-                    handler.__name__ == 'Error404Handler' or
-                    handler.__name__ == 'GoogleAnalyticsHandler'):
+                    handler.__name__ == 'Error404Handler'):
                 continue
 
             if handler.get != base.BaseHandler.get:
@@ -812,7 +811,7 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
             iframe_restriction = self.request.get(
                 'iframe_restriction', default_value=None)
             self.render_template(
-                'pages/about/about.html',
+                'pages/about-page/about-page.mainpage.html',
                 iframe_restriction=iframe_restriction)
 
     def setUp(self):
@@ -889,19 +888,3 @@ class SignUpTests(test_utils.GenericTestBase):
         )
 
         self.get_html_response('/about')
-
-
-class GoogleAnalyticsHandlerTests(test_utils.GenericTestBase):
-
-    def test_analytics_handler_returns_required_values(self):
-
-        with self.swap(feconf, 'ANALYTICS_ID', 'test123'):
-            with self.swap(
-                feconf, 'SITE_NAME_FOR_ANALYTICS', 'Oppia foundation'):
-                response = self.get_json(feconf.GOOGLE_ANALYTICS_DATA_URL)
-                self.assertEqual(
-                    response, {
-                        'analytics_id': 'test123',
-                        'site_name_for_analytics': 'Oppia foundation'
-                    }
-                )

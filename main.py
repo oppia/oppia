@@ -463,9 +463,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
     get_redirect_route(
-        r'/createhandler/resource_list/<exploration_id>',
-        editor.ExplorationResourcesHandler),
-    get_redirect_route(
         r'/createhandler/revert/<exploration_id>',
         editor.ExplorationRevertHandler),
     get_redirect_route(
@@ -490,7 +487,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateRulesStatsHandler),
     get_redirect_route(
-        r'/createhandler/state_answer_stats/<exploration_id>',
+        r'%s/<exploration_id>' % feconf.EXPLORATION_STATE_ANSWER_STATS_PREFIX,
         editor.StateAnswerStatisticsHandler),
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
@@ -671,10 +668,6 @@ URLS = MAPREDUCE_HANDLERS + [
 
     get_redirect_route(
         r'/resolveissuehandler/<exploration_id>', editor.ResolveIssueHandler),
-
-    get_redirect_route(
-        r'%s' % feconf.GOOGLE_ANALYTICS_DATA_URL,
-        base.GoogleAnalyticsHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
