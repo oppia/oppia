@@ -105,4 +105,4 @@ oppia.directive('emailDashboardPage', ['UrlInterpolationService', function(
         });
       }
     ]};
-}])
+}]);
