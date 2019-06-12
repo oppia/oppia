@@ -196,6 +196,9 @@ class TestBase(unittest.TestCase):
                 u'solution': {}
             }
         },
+        'image_assets': {
+            'image_mapping': {}
+        },
         'interaction': {
             'solution': {
                 'correct_answer': u'Solution',
