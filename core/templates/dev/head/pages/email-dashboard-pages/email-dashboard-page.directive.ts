@@ -20,7 +20,7 @@ require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
 require('services/UserService.ts');
 
 oppia.directive('emailDashboardPage', ['UrlInterpolationService', function(
-    UrlInterpolationService){
+    UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},
