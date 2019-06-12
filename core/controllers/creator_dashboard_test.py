@@ -895,6 +895,20 @@ class CreationButtonsTests(test_utils.GenericTestBase):
 
         self.logout()
 
+    def test_can_non_admins_can_not_upload_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        response = self.post_json(
+            feconf.UPLOAD_EXPLORATION_URL, {}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to upload exploration.')
+
+        self.logout()
+
     def test_can_upload_exploration(self):
         with self.swap(constants, 'ALLOW_YAML_FILE_UPLOAD', True):
             self.set_admins([self.ADMIN_USERNAME])

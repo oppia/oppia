@@ -46,6 +46,14 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
 
+    def test_cannot_access_story_editor_page_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_URL_PREFIX, 'invalid_topic_id',
+                self.story_id), expected_status_int=404)
+        self.logout()
+
     def test_access_story_editor_page(self):
         """Test access to editor pages for the sample story."""
         # Check that non-admins cannot access the editor page.
@@ -120,6 +128,23 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
                 self.story_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=401)
+
+    def test_can_not_delete_story_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, 'invalid_topic_id',
+                self.story_id), expected_status_int=404)
+        self.logout()
+
+    def test_guest_can_not_delete_story(self):
+        response = self.delete_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                self.story_id), expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_editable_story_handler_delete(self):
         # Check that admins can delete a story.

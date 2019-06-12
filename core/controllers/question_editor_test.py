@@ -307,6 +307,34 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
         question_services.create_new_question_skill_link(
             self.question_id, self.skill_id, 0.7)
 
+    def test_get_can_not_access_handler_with_invalid_question_id(self):
+        self.login(self.ADMIN_EMAIL)
+        self.get_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, 'invalid_question_id'),
+            expected_status_int=404)
+        self.logout()
+
+    def test_delete_with_guest_does_not_allow_question_deletion(self):
+        response = self.delete_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+            expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_delete_with_new_user_does_not_allow_question_deletion(self):
+        self.login(self.NEW_USER_EMAIL)
+        response = self.delete_json(
+            '%s/%s' % (
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
+            expected_status_int=401)
+        self.assertIn(
+            'does not have enough rights to delete the question.',
+            response['error'])
+        self.logout()
+
     def test_get_with_non_admin_or_topic_manager_email_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)
         self.get_json(
