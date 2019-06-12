@@ -384,8 +384,12 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['thanks'],
+      chunks: ['app', 'thanks'],
       filename: 'thanks-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Thank you for donating to The Oppia Foundation.'
+      },
       template: commonPrefix + '/pages/thanks-page/thanks-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
