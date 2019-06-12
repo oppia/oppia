@@ -33,7 +33,7 @@ oppia.constant('ADMIN_TAB_URLS', {
   CONFIG: '#config',
   ROLES: '#roles',
   MISC: '#misc'
-});  
+});
 
 oppia.constant(
   'PROFILE_URL_TEMPLATE', '/profile/<username>');

@@ -19,7 +19,7 @@
 oppia.constant(
   'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
   '/topic_editor_handler/data/<topic_id>');
-  
+
 oppia.constant(
   'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
   '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
@@ -33,5 +33,3 @@ oppia.constant(
 oppia.constant(
   'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
   'topicsAndSkillsDashboardReinitialized');
-  
-  

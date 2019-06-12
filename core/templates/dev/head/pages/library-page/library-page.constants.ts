@@ -32,4 +32,3 @@ oppia.constant('LIBRARY_PATHS_TO_MODES', {
   '/library/recently_published': 'group',
   '/search/find': 'search'
 });
-  
