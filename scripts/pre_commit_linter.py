@@ -189,7 +189,7 @@ BAD_PATTERNS_JS_REGEXP = [
         'regexp': r'templateUrl: \'',
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
+            'core/templates/dev/head/pages/exploration-player-page/'
             'FeedbackPopupDirective.js'
         ),
         'excluded_dirs': (
