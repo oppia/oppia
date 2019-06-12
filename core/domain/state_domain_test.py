@@ -515,7 +515,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
-                'html': {}
+                'html': ''
             },
         })
         init_state.update_interaction_hints(hints_list)
