@@ -129,6 +129,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.subtopics[0].title = 1
         self._assert_validation_error('Expected subtopic title to be a string')
 
+    def test_subtopic_id_validation(self):
+        self.topic.subtopics[0].id = 'invalid_id'
+        self._assert_validation_error('Expected subtopic id to be an int')
+
     def test_subtopic_skill_ids_validation(self):
         self.topic.subtopics[0].skill_ids = 'abc'
         self._assert_validation_error('Expected skill ids to be a list')
@@ -145,6 +149,24 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_name_validation(self):
         self.topic.name = 1
         self._assert_validation_error('Name should be a string')
+        self.topic.name = ''
+        self._assert_validation_error('Name field should not be empty')
+
+    def test_subtopic_schema_version_type_validation(self):
+        self.topic.subtopic_schema_version = 'invalid_version'
+        self._assert_validation_error(
+            'Expected schema version to be an integer')
+
+    def test_subtopic_schema_version_validation(self):
+        self.topic.subtopic_schema_version = 0
+        self._assert_validation_error(
+            'Expected subtopic schema version to be %s'
+            % (feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION))
+
+    def test_subtopic_type_validation(self):
+        self.topic.subtopics = ['subtopic']
+        self._assert_validation_error(
+            'Expected each subtopic to be a Subtopic object')
 
     def test_description_validation(self):
         self.topic.description = 1
@@ -264,3 +286,79 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(topic_rights.is_manager(self.user_id_a))
         self.assertTrue(topic_rights.is_manager(self.user_id_b))
         self.assertFalse(topic_rights.is_manager('fakeuser'))
+
+    def test_cannot_create_topic_rights_change_class_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicRightsChange({
+                'cmd': 'invalid cmd'
+            })
+
+    def test_cannot_create_topic_rights_change_class_with_invalid_changelist(
+            self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicRightsChange({})
+
+    def test_create_new_topic_rights_change_class(self):
+        topic_rights = topic_domain.TopicRightsChange({
+            'cmd': 'create_new'
+        })
+
+        self.assertEqual(topic_rights.to_dict(), {'cmd': 'create_new'})
+
+    def test_update_language_code(self):
+        self.assertEqual(self.topic.language_code, 'en')
+        self.topic.update_language_code('bn')
+        self.assertEqual(self.topic.language_code, 'bn')
+
+    def test_update_additional_story_ids(self):
+        self.assertEqual(self.topic.additional_story_ids, [])
+        self.topic.update_additional_story_ids(['story_id_1', 'story_id_2'])
+        self.assertEqual(
+            self.topic.additional_story_ids, ['story_id_1', 'story_id_2'])
+
+    def test_cannot_add_uncategorized_skill_with_existing_uncategorized_skill(
+            self):
+        self.assertEqual(self.topic.uncategorized_skill_ids, [])
+        self.topic.uncategorized_skill_ids = ['skill_id1']
+        with self.assertRaisesRegexp(
+            Exception,
+            'The skill id skill_id1 is already an uncategorized skill.'):
+            self.topic.add_uncategorized_skill_id('skill_id1')
+
+    def test_cannot_delete_subtopic_with_invalid_subtopic_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'A subtopic with id invalid_id doesn\'t exist.'):
+            self.topic.delete_subtopic('invalid_id')
+
+    def test_cannot_update_subtopic_title_with_invalid_subtopic_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.update_subtopic_title('invalid_id', 'new title')
+
+    def test_update_subtopic_title(self):
+        self.assertEqual(len(self.topic.subtopics), 1)
+        self.assertEqual(self.topic.subtopics[0].title, 'Title')
+
+        self.topic.update_subtopic_title(1, 'new title')
+        self.assertEqual(self.topic.subtopics[0].title, 'new title')
+
+    def test_cannot_remove_skill_id_from_subtopic_with_invalid_subtopic_id(
+            self):
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id invalid_id does not exist.'):
+            self.topic.remove_skill_id_from_subtopic('invalid_id', 'skill_id1')
+
+    def test_cannot_move_skill_id_to_subtopic_with_invalid_subtopic_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id old_subtopic_id does not exist.'):
+            self.topic.move_skill_id_to_subtopic(
+                'old_subtopic_id', 'new_subtopic_id', 'skill_id1')
+
+    def test_cannot_move_existing_skill_to_subtopic(self):
+        self.topic.subtopics = [
+            topic_domain.Subtopic(1, 'Title', ['skill_id_1']),
+            topic_domain.Subtopic(2, 'Another title', ['skill_id_1'])]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Skill id skill_id_1 is already present in the target subtopic'):
+            self.topic.move_skill_id_to_subtopic(1, 2, 'skill_id_1')

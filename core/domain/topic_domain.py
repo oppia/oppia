@@ -555,13 +555,11 @@ class Topic(object):
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     @classmethod
-    def update_subtopics_from_model(
-            cls, versioned_subtopics, current_version):
+    def update_subtopics_from_model(cls, versioned_subtopics, current_version):
         """Converts the subtopics blob contained in the given
         versioned_subtopics dict from current_version to
         current_version + 1. Note that the versioned_subtopics being
         passed in is modified in-place.
-
         Args:
             versioned_subtopics: dict. A dict with two keys:
                 - schema_version: str. The schema version for the
