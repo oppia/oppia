@@ -18,7 +18,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration_player/PlayerConstants.ts');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.factory('ReadOnlyExplorationBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

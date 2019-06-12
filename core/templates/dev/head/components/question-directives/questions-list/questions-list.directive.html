@@ -1,0 +1,140 @@
+<button class="btn btn-default protractor-test-create-question-button"
+        ng-click="$ctrl.createQuestion()"
+        style="float: right;">
+  Create Question
+</button>
+<table class="dashboard-table" ng-if="$ctrl.questionSummaries.length > 0">
+  <colgroup>
+    <col style="width: 5%;">
+    <col style="width: 60%;">
+    <col style="width: 35%;">
+  </colgroup>
+  <tr>
+    <th class="dashboard-table-headings">
+      <p> No. </p>
+    </th>
+    <th class="dashboard-table-headings">
+      <p> Question Content </p>
+    </th>
+    <th class="dashboard-table-headings" ng-if="!$ctrl.getSkill()">
+      <p> Skill Description </p>
+    </th>
+  </tr>
+  <tr ng-repeat="question in $ctrl.questionSummaries"
+      class="list-item protractor-test-question-list-item"
+      style="height: 4em;"
+      ng-click="$ctrl.editQuestion(question.summary)">
+    <td> <[$ctrl.getQuestionIndex($index)]> </td>
+    <td> <[$ctrl.truncatedQuestionSummaries[$index]]> </td>
+    <td ng-if="!$ctrl.getSkill()">{{question.skill_description}}</td>
+  </tr>
+</table>
+<h4 ng-if="$ctrl.questionSummaries.length === 0" style="color: gray;">
+  Click on Create Question to create a new question.
+</h4>
+
+<h3 class="form-heading" ng-if="$ctrl.getQuestionSuggestionThreads().length > 0"> Questions suggested </h3>
+<table class="dashboard-table" ng-if="$ctrl.getQuestionSuggestionThreads().length > 0">
+  <colgroup>
+    <col style="width: 10%;">
+    <col style="width: 80%;">
+    <col style="width: 10%">
+  </colgroup>
+  <tr>
+    <th class="dashboard-table-headings">
+      <p> No. </p>
+    </th>
+    <th class="dashboard-table-headings">
+      <p> Question Content </p>
+    </th>
+    <th class="dashboard-table-headings">
+      <p> Status </p>
+    </th>
+  </tr>
+  <tr ng-repeat="questionSuggestionThread in $ctrl.getQuestionSuggestionThreads()" ng-click="$ctrl.setActiveQuestion(questionSuggestionThread)" class="list-item">
+    <td> <[$index + 1]> </td>
+    <td>
+      <a class="list-summary">
+        <angular-html-bind html-data="questionSuggestionThread.suggestion.question.getStateData().content.getHtml()"></angular-html-bind>
+      </a>
+    </td>
+    <td>
+      <p><[questionSuggestionThread.suggestion.status]></p>
+    </td>
+  </tr>
+</table>
+
+<div class="page-navigation-arrows" ng-if="$ctrl.questionSummaries.length > 0">
+  <i class="material-icons md-18"
+     ng-if="$ctrl.currentPage !== 0"
+     ng-click="$ctrl.goToPreviousPage()">&#xE5C4;
+  </i> Page <[$ctrl.currentPage + 1]>
+  <i class="material-icons md-18" ng-if="!$ctrl.isLastPage($ctrl.currentPage)" ng-click="$ctrl.goToNextPage()">&#xE5C8;</i>
+</div>
+
+<div ng-if="$ctrl.activeQuestion">
+  <question-editor question-id="$ctrl.activeQuestion.getId()"
+                   misconceptions="$ctrl.emptyMisconceptionsList"
+                   question="$ctrl.activeQuestion"
+                   can-edit-question="false">
+  </question-editor>
+
+  <textarea ng-model="$ctrl.suggestionReviewMessage"></textarea><br>
+  <button class="btn btn-default" ng-click="$ctrl.showSelectSkillModal()">Select skill</button>
+  <button class="btn btn-success" ng-click="$ctrl.acceptQuestion($ctrl.idOfActiveSuggestion, $ctrl.suggestionReviewMessage)">Approve</button>
+  <button class="btn btn-danger" ng-click="$ctrl.rejectQuestion($ctrl.idOfActiveSuggestion, $ctrl.suggestionReviewMessage)">Reject</button>
+</div>
+<style>
+questions-list .oppia-editor-publish-button {
+  margin-top: 2%;
+}
+
+questions-list .dashboard-table {
+  font-size: 15px;
+  text-align: center;
+  width: 100%;
+}
+
+questions-list .page-navigation-arrows {
+  float: right;
+}
+
+questions-list .list-summary,
+questions-list .list-summary:active,
+questions-list .list-summary:visited {
+  color: inherit;
+  display: block;
+  height: 2em;
+  text-decoration: none;
+}
+
+questions-list .dashboard-table .dashboard-table-headings {
+  border-bottom: 2px solid #bbb;
+  padding-bottom: 0.7em;
+  text-align: center;
+}
+
+questions-list .dashboard-table .dashboard-table-headings p {
+  display: inline;
+}
+
+questions-list .list-item:not(:last-child) {
+  border-bottom: 1px solid #bbb;
+}
+
+questions-list .list-item:hover {
+  background-color: #ededed;
+}
+
+questions-list .list-summary span {
+  display: inline-block;
+  line-height: normal;
+  vertical-align: middle;
+}
+
+@media(max-width: 815px) {
+  questions-list .list-summary .additional-text {
+    display: none;
+  }
+}
+</style>

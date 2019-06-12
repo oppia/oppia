@@ -22,6 +22,7 @@ import datetime
 import os
 import zipfile
 
+from constants import constants
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -32,6 +33,7 @@ from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -78,17 +80,19 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         user_services.create_new_user(self.editor_id, self.EDITOR_EMAIL)
-        user_services.create_new_user(self.translator_id, self.TRANSLATOR_EMAIL)
+        user_services.create_new_user(
+            self.voice_artist_id, self.VOICE_ARTIST_EMAIL)
         user_services.create_new_user(self.viewer_id, self.VIEWER_EMAIL)
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
-        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
 
@@ -333,6 +337,22 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_ids_matching_query(''),
             ([], None))
+
+    def test_get_subscribed_users_activity_ids_with_deleted_explorations(self):
+        # Ensure a deleted exploration does not show up in subscribed users
+        # activity ids.
+        subscription_services.subscribe_to_exploration(
+            self.owner_id, self.EXP_ID_0)
+        self.assertIn(
+            self.EXP_ID_0,
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.owner_id))
+        exp_services.delete_exploration(self.owner_id, self.EXP_ID_0)
+        self.process_and_flush_pending_tasks()
+        self.assertNotIn(
+            self.EXP_ID_0,
+            subscription_services.get_exploration_ids_subscribed_to(
+                self.owner_id))
 
     def test_search_exploration_summaries(self):
         # Search within the 'Architecture' category.
@@ -899,7 +919,8 @@ title: Title
             self.owner_id, self.SAMPLE_YAML_CONTENT, self.EXP_ID, [test_asset])
 
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         self.assertEqual(
             fs.get(self.TEST_ASSET_PATH), self.TEST_ASSET_CONTENT)
 
@@ -1204,8 +1225,8 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             original_image_content = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(
-                'exploration/%s' % self.EXPLORATION_ID))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
         self.assertEqual(fs.isfile('image/%s' % self.FILENAME), False)
         self.assertEqual(
             fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), False)
@@ -1219,6 +1240,99 @@ class SaveOriginalAndCompressedVersionsOfImageTests(
             fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME), True)
         self.assertEqual(
             fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME), True)
+
+    def test_compress_image_on_prod_mode_with_big_image_size(self):
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        # This swap is done to make the image's dimensions greater than
+        # MAX_RESIZE_DIMENSION_PX so that it can be treated as a big image.
+        max_resize_dimension_px_swap = self.swap(
+            gae_image_services, 'MAX_RESIZE_DIMENSION_PX', 20)
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            original_image_content = f.read()
+
+        # The scaling factor changes if the dimensions of the image is
+        # greater than MAX_RESIZE_DIMENSION_PX.
+        with prod_mode_swap, max_resize_dimension_px_swap:
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
+
+            self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
+            self.assertFalse(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+            self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+            exp_services.save_original_and_compressed_versions_of_image(
+                self.USER, self.FILENAME, self.EXPLORATION_ID,
+                original_image_content)
+
+            self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
+            self.assertTrue(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+            self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+            original_image_content = fs.get(
+                'image/%s' % self.FILENAME)
+            compressed_image_content = fs.get(
+                'image/%s' % self.COMPRESSED_IMAGE_FILENAME)
+            micro_image_content = fs.get(
+                'image/%s' % self.MICRO_IMAGE_FILENAME)
+
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                    original_image_content),
+                (32, 32))
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                    compressed_image_content),
+                (20, 20))
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                    micro_image_content),
+                (20, 20))
+
+    def test_compress_image_on_prod_mode_with_small_image_size(self):
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            original_image_content = f.read()
+
+        with self.swap(constants, 'DEV_MODE', False):
+            fs = fs_domain.AbstractFileSystem(
+                fs_domain.GcsFileSystem(
+                    fs_domain.ENTITY_TYPE_EXPLORATION, self.EXPLORATION_ID))
+
+            self.assertFalse(fs.isfile('image/%s' % self.FILENAME))
+            self.assertFalse(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+            self.assertFalse(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+            exp_services.save_original_and_compressed_versions_of_image(
+                self.USER, self.FILENAME, self.EXPLORATION_ID,
+                original_image_content)
+
+            self.assertTrue(fs.isfile('image/%s' % self.FILENAME))
+            self.assertTrue(
+                fs.isfile('image/%s' % self.COMPRESSED_IMAGE_FILENAME))
+            self.assertTrue(fs.isfile('image/%s' % self.MICRO_IMAGE_FILENAME))
+
+            original_image_content = fs.get(
+                'image/%s' % self.FILENAME)
+            compressed_image_content = fs.get(
+                'image/%s' % self.COMPRESSED_IMAGE_FILENAME)
+            micro_image_content = fs.get(
+                'image/%s' % self.MICRO_IMAGE_FILENAME)
+
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                    original_image_content),
+                (32, 32))
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                    compressed_image_content),
+                (25, 25))
+            self.assertEqual(
+                gae_image_services.get_image_dimensions(
+                    micro_image_content),
+                (22, 22))
 
 
 # pylint: disable=protected-access
@@ -1469,7 +1583,8 @@ title: A title
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
@@ -1507,7 +1622,8 @@ title: A title
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
@@ -1714,7 +1830,8 @@ written_translations:
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % self.EXP_ID))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, self.EXP_ID))
         fs.commit(self.owner_id, 'abc.png', raw_image)
         exp_services.update_exploration(
             self.owner_id, exploration.id, change_list, '')
@@ -3015,7 +3132,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                         'language_code', 'tags', 'ratings',
                         'scaled_average_rating', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'translator_ids', 'viewer_ids',
+                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
@@ -3058,7 +3175,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         simple_props = ['id', 'title', 'category', 'objective',
                         'language_code', 'tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
-                        'editor_ids', 'translator_ids', 'viewer_ids',
+                        'editor_ids', 'voice_artist_ids', 'viewer_ids',
                         'contributor_ids', 'version',
                         'exploration_model_created_on',
                         'exploration_model_last_updated']
@@ -3225,7 +3342,6 @@ title: Old Title
 
         # Store state id mapping model for new exploration.
         exploration = exp_services.get_exploration_from_model(exploration_model)
-        exp_services.create_and_save_state_id_mapping_model(exploration, [])
 
         # In version 3, a new state is added.
         new_state = copy.deepcopy(
@@ -3247,19 +3363,6 @@ title: Old Title
 
         # Store state id mapping model for new exploration.
         exploration = exp_services.get_exploration_from_model(exploration_model)
-
-        # Change list for version 3.
-        change_list = [exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'New state'
-        }), exp_domain.ExplorationChange({
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': 'New state',
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': 'TextInput'
-        })]
-        exp_services.create_and_save_state_id_mapping_model(
-            exploration, change_list)
 
         # Version 4 is an upgrade based on the migration job.
 
@@ -3559,111 +3662,3 @@ class GetExplorationAndExplorationRightsTests(ExplorationServicesUnitTests):
                 'fake_id'))
         self.assertIsNone(exp)
         self.assertIsNone(exp_rights)
-
-
-class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
-    """Tests for functions associated with creating and updating state id
-    mapping.
-    """
-
-    EXP_ID = 'eid'
-
-    def setUp(self):
-        """Initialize owner before each test case."""
-        super(ExplorationStateIdMappingTests, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-
-    def test_that_correct_state_id_mapping_model_is_stored(self):
-        """Test that correct mapping model is stored for new and edited
-        exploration.
-        """
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, exploration.version)
-        expected_mapping = {
-            exploration.init_state_name: 0
-        }
-
-        self.assertEqual(mapping.exploration_id, self.EXP_ID)
-        self.assertEqual(mapping.exploration_version, 1)
-        self.assertEqual(
-            mapping.largest_state_id_used, 0)
-        self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            })], 'Add state name')
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        expected_mapping = {
-            new_exploration.init_state_name: 0,
-            'new state': 1
-        }
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 1)
-
-    def test_that_state_id_mapping_model_is_deleted(self):
-        """Test that state id mapping model is correctly deleted."""
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            })], 'Add state name')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        exp_services.delete_state_id_mapping_model_for_exploration(
-            exploration.id, exploration.version)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Entity for class StateIdMappingModel with id eid.2 not found'):
-            exp_services.get_state_id_mapping(
-                exploration.id, exploration.version)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'Entity for class StateIdMappingModel with id eid.1 not found'):
-            exp_services.get_state_id_mapping(
-                exploration.id, exploration.version - 1)
-
-    def test_that_mapping_is_correct_when_exploration_is_reverted(self):
-        """Test that state id mapping is correct when exploration is reverted
-        to old version.
-        """
-        exploration = self.save_new_valid_exploration(
-            self.EXP_ID, self.owner_id)
-
-        exp_services.update_exploration(
-            self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'new state',
-            })], 'Add state name')
-
-        # Revert exploration to version 1.
-        exp_services.revert_exploration(self.owner_id, self.EXP_ID, 2, 1)
-
-        new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        new_mapping = exp_services.get_state_id_mapping(
-            self.EXP_ID, new_exploration.version)
-
-        # Expected mapping is same as initial version's mapping.
-        expected_mapping = {
-            exploration.init_state_name: 0
-        }
-        self.assertEqual(
-            new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
-        self.assertEqual(new_mapping.largest_state_id_used, 1)

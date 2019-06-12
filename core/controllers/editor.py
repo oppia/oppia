@@ -38,8 +38,6 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
-from core.domain import value_generators_domain
-from core.domain import visualization_registry
 from core.platform import models
 import feconf
 import utils
@@ -58,16 +56,6 @@ DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
     default_value=(
         'Check out this interactive lesson I created on Oppia - a free '
         'platform for teaching and learning!'))
-
-
-def get_value_generators_js():
-    """Return a string that concatenates the JS for all value generators."""
-    all_value_generators = (
-        value_generators_domain.Registry.get_all_generator_classes())
-    value_generators_js = ''
-    for _, generator_cls in all_value_generators.iteritems():
-        value_generators_js += generator_cls.get_js_template()
-    return value_generators_js
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -98,15 +86,12 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests."""
         if exploration_id in constants.DISABLED_EXPLORATION_IDS:
             self.render_template(
-                'pages/error/disabled_exploration.html',
+                'pages/error-pages/disabled-exploration.mainpage.html',
                 iframe_restriction=None)
             return
 
-        (exploration, exploration_rights) = (
-            exp_services.get_exploration_and_exploration_rights_by_id(
-                exploration_id))
-
-        visualizations_html = visualization_registry.Registry.get_full_html()
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
 
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -140,8 +125,8 @@ class ExplorationPage(EditorHandler):
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
                     self.user, exploration_rights)),
-            'can_translate': (
-                rights_manager.check_can_translate_activity(
+            'can_voiceover': (
+                rights_manager.check_can_voiceover_activity(
                     self.user, exploration_rights)),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
@@ -149,17 +134,13 @@ class ExplorationPage(EditorHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-            'value_generators_js': jinja2.utils.Markup(
-                get_value_generators_js()),
-            'title': exploration.title,
-            'visualizations_html': jinja2.utils.Markup(visualizations_html),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('dist/exploration_editor.html')
+        self.render_template('dist/exploration-editor-page.mainpage.html')
 
 
 class ExplorationHandler(EditorHandler):
@@ -423,9 +404,13 @@ class ExplorationFileDownloader(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        version = self.request.get('v', default_value=exploration.version)
+        version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
-        width = int(self.request.get('width', default_value=80))
+
+        try:
+            version = int(version_str)
+        except ValueError:
+            version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s.zip' % (
@@ -438,7 +423,7 @@ class ExplorationFileDownloader(EditorHandler):
                 filename, 'text/plain')
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
-                exploration_id, version=version, width=width))
+                exploration_id, version=version))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
@@ -464,21 +449,6 @@ class StateYamlHandler(EditorHandler):
             'yaml': state_domain.State.convert_state_dict_to_yaml(
                 state_dict, width),
         })
-
-
-class ExplorationResourcesHandler(EditorHandler):
-    """Manages assets associated with an exploration."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        dir_list = fs.listdir('')
-
-        self.render_json({'filepaths': dir_list})
 
 
 class ExplorationSnapshotsHandler(EditorHandler):
@@ -722,7 +692,7 @@ class ImageUploadHandler(EditorHandler):
 
         file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            'exploration/%s' % exploration_id))
+            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
@@ -798,9 +768,15 @@ class StateAnswerStatisticsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
+        top_state_answers = stats_services.get_top_state_answer_stats_multi(
+            exploration_id, current_exploration.states)
+        top_state_interaction_ids = {
+            state_name: current_exploration.states[state_name].interaction.id
+            for state_name in top_state_answers
+        }
         self.render_json({
-            'answers': stats_services.get_top_state_answer_stats_multi(
-                exploration_id, current_exploration.states)
+            'answers': top_state_answers,
+            'interaction_ids': top_state_interaction_ids,
         })
 
 

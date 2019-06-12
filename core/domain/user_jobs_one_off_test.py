@@ -20,7 +20,6 @@ import ast
 import datetime
 import re
 
-from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
@@ -150,53 +149,46 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             user_d_contributions_model.created_exploration_ids,
             [self.EXP_ID_2])
 
+    def test_no_new_user_contributions_model_get_created_with_existing_model(
+            self):
+        model1 = exp_models.ExplorationSnapshotMetadataModel(
+            id='exp_id-1', committer_id=self.user_a_id, commit_type='create')
+        model1.put()
+        user_models.UserContributionsModel(
+            id=self.user_a_id,
+            created_exploration_ids=['exp_id']
+        ).put()
 
-class UserDefaultDashboardOneOffJobTests(test_utils.GenericTestBase):
-    """Tests for the one-off username length distribution job."""
-
-    CREATOR_USER_EMAIL = 'creator@example.com'
-    CREATOR_USER_USERNAME = 'creator'
-    LEARNER_USER_EMAIL = 'learner@example.com'
-    LEARNER_USER_USERNAME = 'learner'
-
-    EXP_ID_1 = 'exp_id_1'
-    EXP_ID_2 = 'exp_id_2'
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            user_jobs_one_off.UserDefaultDashboardOneOffJob.create_new())
-        user_jobs_one_off.UserDefaultDashboardOneOffJob.enqueue(job_id)
+        user_contributions_model = user_models.UserContributionsModel.get(
+            self.user_a_id)
         self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-
-    def test_default_dashboard(self):
-        """Tests whether the one off jobs assigns the correct dashboard
-        to the user.
-        """
-        self.signup(self.CREATOR_USER_EMAIL, self.CREATOR_USER_USERNAME)
-        creator_user_id = self.get_user_id_from_email(
-            self.CREATOR_USER_EMAIL)
-        self.signup(self.LEARNER_USER_EMAIL, self.LEARNER_USER_USERNAME)
-        learner_user_id = self.get_user_id_from_email(
-            self.LEARNER_USER_EMAIL)
-
-        self.save_new_valid_exploration(
-            self.EXP_ID_1, creator_user_id, end_state_name='End')
+            user_contributions_model.created_exploration_ids,
+            ['exp_id'])
 
         self._run_one_off_job()
 
-        creator_settings = user_services.get_user_settings(creator_user_id)
-        learner_settings = user_services.get_user_settings(learner_user_id)
+        user_contributions_model = user_models.UserContributionsModel.get(
+            self.user_a_id)
+        self.assertEqual(
+            user_contributions_model.created_exploration_ids,
+            ['exp_id'])
 
+    def test_user_contributions_get_created_after_running_the_job(self):
+        model1 = exp_models.ExplorationSnapshotMetadataModel(
+            id='exp_id-1', committer_id='new_user', commit_type='create')
+        model1.put()
+
+        user_contributions_model = user_models.UserContributionsModel.get(
+            'new_user', strict=False)
+        self.assertIsNone(user_contributions_model)
+
+        self._run_one_off_job()
+
+        user_contributions_model = user_models.UserContributionsModel.get(
+            'new_user', strict=False)
         self.assertEqual(
-            creator_settings.default_dashboard,
-            constants.DASHBOARD_TYPE_CREATOR)
-        self.assertEqual(
-            learner_settings.default_dashboard,
-            constants.DASHBOARD_TYPE_LEARNER)
+            user_contributions_model.created_exploration_ids,
+            ['exp_id'])
 
 
 class UsernameLengthDistributionOneOffJobTests(test_utils.GenericTestBase):
@@ -356,6 +348,16 @@ class LongUserBiosOneOffJobTests(test_utils.GenericTestBase):
         result = self._run_one_off_job()
         expected_result = [[800, ['c']], [2400, ['d']]]
         self.assertEqual(result, expected_result)
+
+    def test_bio_length_for_users_with_no_bio(self):
+        user_id_a = self.get_user_id_from_email(self.USER_A_EMAIL)
+        model1 = user_models.UserSettingsModel(
+            id=user_id_a, email=self.USER_A_EMAIL)
+        model1.put()
+
+        result = self._run_one_off_job()
+
+        self.assertEqual(result, [])
 
 
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
@@ -552,6 +554,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+            self.process_and_flush_pending_tasks()
 
         self._run_one_off_job()
 
@@ -651,6 +654,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
 
             # User A deletes the exploration from earlier.
             exp_services.delete_exploration(self.user_a_id, self.EXP_ID_1)
+            self.process_and_flush_pending_tasks()
 
         self._run_one_off_job()
 
@@ -702,6 +706,54 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             user_b_subscriptions_model.activity_ids, [])
         self.assertEqual(
             user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
+
+    def test_community_owned_collection(self):
+        with self.swap(
+            subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_collection', self._null_fn
+            ):
+            rights_manager.publish_exploration(self.user_a, self.EXP_ID_1)
+
+            # User A creates and saves a new valid collection.
+            self.save_new_valid_collection(
+                self.COLLECTION_ID_1, self.user_a_id,
+                exploration_id=self.EXP_ID_1)
+
+            # User A adds user B as an editor to the collection.
+            rights_manager.assign_role_for_collection(
+                self.user_a, self.COLLECTION_ID_1, self.user_b_id,
+                rights_manager.ROLE_EDITOR)
+
+            # The collection becomes community-owned.
+            rights_manager.publish_collection(self.user_a, self.COLLECTION_ID_1)
+            rights_manager.release_ownership_of_collection(
+                self.user_a, self.COLLECTION_ID_1)
+
+            # User C edits the collection.
+            collection_services.update_collection(
+                self.user_c_id, self.COLLECTION_ID_1, [{
+                    'cmd': collection_domain.CMD_EDIT_COLLECTION_PROPERTY,
+                    'property_name': (
+                        collection_domain.COLLECTION_PROPERTY_TITLE),
+                    'new_value': 'New title'
+                }], 'Changed title.')
+
+        self._run_one_off_job()
+
+        # User A and user B are subscribed to the collection; user C is not.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
+
+        self.assertEqual(
+            user_a_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
+        self.assertEqual(
+            user_b_subscriptions_model.collection_ids, [self.COLLECTION_ID_1])
+        self.assertEqual(user_c_subscriptions_model, None)
 
 
 class MockUserStatsAggregator(
@@ -1059,6 +1111,23 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         self.assertIsNone(user_services.get_user_settings(
             self.owner_id).first_contribution_msec)
 
+    def test_contribution_msec_is_not_generated_if_exploration_not_created(
+            self):
+        model1 = exp_models.ExplorationRightsSnapshotMetadataModel(
+            id='exp_id-1', committer_id=self.owner_id, commit_type='create')
+        model1.put()
+
+        self.assertIsNone(user_services.get_user_settings(
+            self.owner_id).first_contribution_msec)
+
+        job_id = (
+            user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
+        user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        self.assertIsNone(user_services.get_user_settings(
+            self.owner_id).first_contribution_msec)
+
 
 class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
 
@@ -1069,6 +1138,10 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
 
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+    def _mock_fetch_gravatar(self, unused_email):
+        """Mocks user_services.fetch_gravatar()."""
+        return self.FETCHED_GRAVATAR
 
     def test_new_profile_picture_is_generated_if_it_does_not_exist(self):
         user_services.update_profile_picture_data_url(self.owner_id, None)
@@ -1081,10 +1154,8 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
-        def mock_fetch_gravatar(unused_email):
-            return self.FETCHED_GRAVATAR
-
-        with self.swap(user_services, 'fetch_gravatar', mock_fetch_gravatar):
+        with self.swap(
+            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL has been updated.
@@ -1105,10 +1176,8 @@ class UserProfilePictureOneOffJobTests(test_utils.GenericTestBase):
             user_jobs_one_off.UserProfilePictureOneOffJob.create_new())
         user_jobs_one_off.UserProfilePictureOneOffJob.enqueue(job_id)
 
-        def mock_fetch_gravatar(unused_email):
-            return self.FETCHED_GRAVATAR
-
-        with self.swap(user_services, 'fetch_gravatar', mock_fetch_gravatar):
+        with self.swap(
+            user_services, 'fetch_gravatar', self._mock_fetch_gravatar):
             self.process_and_flush_pending_tasks()
 
         # After the job runs, the data URL is still the manually-added one.

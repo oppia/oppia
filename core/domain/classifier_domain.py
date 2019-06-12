@@ -260,17 +260,6 @@ class ClassifierTrainingJob(object):
                     initial_status, status))
         self._status = status
 
-    def update_next_scheduled_check_time(self, next_scheduled_check_time):
-        """Updates the next_scheduled_check_time attribute of the
-        ClassifierTrainingJob domain object.
-
-        Args:
-            next_scheduled_check_time: datetime.datetime. The next scheduled
-            time to check the job.
-        """
-
-        self._next_scheduled_check_time = next_scheduled_check_time
-
     def update_classifier_data(self, classifier_data):
         """Updates the classifier_data attribute of the ClassifierTrainingJob
         domain object.
@@ -331,9 +320,8 @@ class ClassifierTrainingJob(object):
 
         if self.status not in feconf.ALLOWED_TRAINING_JOB_STATUSES:
             raise utils.ValidationError(
-                'Expected status to be in %s, received %s' %
-                feconf.ALLOWED_TRAINING_JOB_STATUSES,
-                self.exp_version)
+                'Expected status to be in %s, received %s'
+                % (feconf.ALLOWED_TRAINING_JOB_STATUSES, self.status))
 
         if not isinstance(self.interaction_id, basestring):
             raise utils.ValidationError(
@@ -364,7 +352,7 @@ class ClassifierTrainingJob(object):
         for grouped_answers in self.training_data:
             if 'answer_group_index' not in grouped_answers:
                 raise utils.ValidationError(
-                    'Expected answer_group_index to be a key in training_data',
+                    'Expected answer_group_index to be a key in training_data'
                     'list item')
             if 'answers' not in grouped_answers:
                 raise utils.ValidationError(
