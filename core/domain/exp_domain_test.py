@@ -333,7 +333,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.dest = destination
 
-        outcome.feedback = state_domain.SubtitledHtml('feedback_1', {})
+        outcome.feedback = state_domain.SubtitledHtml('feedback_1', '')
         exploration.validate()
 
         outcome.labelled_as_correct = 'hello'
