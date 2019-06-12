@@ -32,8 +32,10 @@ require(
 require(
   'pages/exploration-editor-page/editor-tab/training-panel/' +
   'training-modal.service.ts');
-require('pages/exploration_player/AnswerClassificationService.ts');
-require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/exploration-player-page/services/answer-classification.service.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');

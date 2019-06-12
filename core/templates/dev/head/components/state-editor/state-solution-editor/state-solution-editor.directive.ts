@@ -33,7 +33,8 @@ require(
 require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-verification.service.ts');
-require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-customization-args.service.ts');
