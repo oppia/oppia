@@ -164,6 +164,7 @@ require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',
