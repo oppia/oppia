@@ -2259,7 +2259,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.solicit_answer_details, False)
 
-
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
         with self.assertRaisesRegexp(KeyError, 'content_id'):
