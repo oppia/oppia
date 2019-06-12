@@ -196,6 +196,7 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.directive.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');

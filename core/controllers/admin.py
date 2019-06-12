@@ -22,7 +22,6 @@ from core import jobs
 from core import jobs_registry
 from core.controllers import acl_decorators
 from core.controllers import base
-from core.controllers import editor
 from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import config_services
@@ -39,8 +38,6 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
-
-import jinja2
 
 current_user_services = models.Registry.import_current_user_services()
 
@@ -97,8 +94,6 @@ class AdminPage(base.BaseHandler):
             'one_off_job_specs': one_off_job_specs,
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
-            'value_generators_js': jinja2.utils.Markup(
-                editor.get_value_generators_js()),
             'updatable_roles': {
                 role: role_services.HUMAN_READABLE_ROLES[role]
                 for role in role_services.UPDATABLE_ROLES
