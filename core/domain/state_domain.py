@@ -190,6 +190,7 @@ class Image(object):
         self.placeholder = placeholder
         self.author_id = author_id
         self.instructions = instructions
+        self.validate()
 
     def to_dict(self):
         """Returns a dict representing this Image domain object.
@@ -261,6 +262,7 @@ class ImageAssets(object):
                 ImageAssets mapping.
         """
         self.image_mapping = image_mapping
+        self.validate()
 
     def validate(self):
         """Validates all properties of ImageAssets.
@@ -327,6 +329,7 @@ class ImageAssets(object):
         except ValueError:
             raise utils.ValidationError('Invalid image Id')
 
+        print(image_id)
         src = image_info['src']
         placeholder = image_info['placeholder']
         author_id = image_info['author_id']
