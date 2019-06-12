@@ -18,7 +18,7 @@ require('domain/utilities/UrlInterpolationService.ts');
  * @fileoverview Controllers for the about page.
  */
 
-oppia.directive('about', ['UrlInterpolationService',
+oppia.directive('aboutPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',

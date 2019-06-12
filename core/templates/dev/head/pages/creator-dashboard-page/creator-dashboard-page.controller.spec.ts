@@ -74,7 +74,7 @@ describe('Creator dashboard controller', function() {
       function(CreatorDashboardBackendApiService) {
         $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
           dashboardData);
-        ctrl = componentController('creatorDashboard', null, {
+        ctrl = componentController('creatorDashboardPage', null, {
           AlertsService: null,
           CreatorDashboardBackendApiService: CreatorDashboardBackendApiService
         });

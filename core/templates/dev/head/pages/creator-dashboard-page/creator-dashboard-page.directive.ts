@@ -193,7 +193,7 @@ oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
   IMPACT: 'Impact'
 });
 
-oppia.directive('creatorDashboard', ['UrlInterpolationService', function(
+oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',
