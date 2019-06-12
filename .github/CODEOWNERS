@@ -69,7 +69,7 @@
 /core/templates/dev/head/domain/learner_dashboard/ @nithusha21
 /core/templates/dev/head/pages/creator-dashboard-page/ @nithusha21
 /core/templates/dev/head/pages/email-dashboard-pages/ @nithusha21
-/core/templates/dev/head/pages/learner_dashboard/ @nithusha21
+/core/templates/dev/head/pages/learner-dashboard-page/ @nithusha21
 /core/templates/dev/head/pages/notifications-dashboard-page/ @nithusha21
 
 
@@ -115,7 +115,7 @@
 /core/templates/dev/head/domain/summary/ @aks681
 /core/templates/dev/head/domain/state_card/ @aks681
 /core/templates/dev/head/pages/exploration-editor-page/ @DubeySandeep
-/core/templates/dev/head/pages/exploration_player/ @aks681
+/core/templates/dev/head/pages/exploration-player-page/ @aks681
 /core/templates/dev/head/components/state-editor/ @aks681
 /core/templates/dev/head/services/ComputeGraphService.ts @DubeySandeep
 /core/templates/dev/head/services/ContextService*.ts @aks681
@@ -334,7 +334,7 @@
 /core/controllers/moderator*.py @seanlip
 /core/controllers/recent_commits*.py @seanlip
 /core/domain/moderator_services*.py @seanlip
-/core/templates/dev/head/pages/admin/ @seanlip
+/core/templates/dev/head/pages/admin-page/ @seanlip
 /core/templates/dev/head/pages/moderator-page/ @seanlip
 
 
