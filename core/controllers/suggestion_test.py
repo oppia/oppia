@@ -245,28 +245,31 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STATE_SCHEMA_VERSION)
         }
 
-        thread_id = feedback_services.create_thread(
-            suggestion_models.TARGET_TYPE_QUESTION, self.EXP_ID,
-            self.author_id, 'description', '', has_suggestion=True)
+        exp_id = 'new_exp_id'
+        self.save_new_default_exploration(exp_id, self.editor_id)
 
-        suggestion_models.GeneralSuggestionModel.create(
+        suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_QUESTION, self.EXP_ID,
-            1, suggestion_models.STATUS_IN_REVIEW, self.author_id,
-            None, {
+            suggestion_models.TARGET_TYPE_TOPIC, exp_id, 1,
+            self.author_id, {
                 'cmd': (
                     question_domain
                     .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
                 'question_dict': question_dict,
                 'skill_id': None
-            }, 'score_category', thread_id)
+            }, None, None)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        suggestion_id = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), (
+                'target_id', exp_id)])[0].suggestion_id
+
+        response = self.get_html_response('/explore/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response = self.put_json(
             '%s/exploration/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID, thread_id), {
+                feconf.SUGGESTION_ACTION_URL_PREFIX, exp_id,
+                suggestion_id), {
                     'action': u'reject',
                     'review_message': u'Rejected!'
                 }, csrf_token=csrf_token, expected_status_int=400)
@@ -311,27 +314,33 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     def test_owner_of_exploration_cannot_repond_to_own_suggestion(self):
         self.login(self.EDITOR_EMAIL)
 
-        thread_id = feedback_services.create_thread(
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID,
-            self.editor_id, 'description', '', has_suggestion=True)
+        exp_id = 'new_exp_id'
+        self.save_new_default_exploration(exp_id, self.editor_id)
 
-        suggestion_models.GeneralSuggestionModel.create(
+        new_content = state_domain.SubtitledHtml(
+            'content', 'new content html').to_dict()
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State 1',
+            'new_value': new_content
+        }
+        suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID,
-            1, suggestion_models.STATUS_IN_REVIEW, self.editor_id,
-            None, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'state_name': 'Welcome!',
-                'new_value': 'new_content'
-            }, 'score_category', thread_id)
+            suggestion_models.TARGET_TYPE_EXPLORATION, exp_id, 1,
+            self.editor_id, change_cmd, 'sample description', None)
 
-        response = self.get_html_response('/explore/%s' % self.EXP_ID)
+        suggestion_id = suggestion_services.query_suggestions(
+            [('author_id', self.editor_id), (
+                'target_id', exp_id)])[0].suggestion_id
+
+        response = self.get_html_response('/explore/%s' % exp_id)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response = self.put_json(
             '%s/exploration/%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID, thread_id), {
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                exp_id, suggestion_id), {
                     'action': u'reject',
                     'review_message': u'Rejected!'
                 }, csrf_token=csrf_token, expected_status_int=401)
@@ -791,21 +800,25 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
     def test_suggestion_to_topic_handler_with_invalid_target_type(self):
         self.login(self.ADMIN_EMAIL)
 
-        thread_id = feedback_services.create_thread(
-            suggestion_models.TARGET_TYPE_QUESTION, self.topic_id,
-            self.author_id, 'description', '', has_suggestion=True)
+        exp_id = 'new_exp_id'
+        self.save_new_default_exploration(exp_id, self.admin_id)
 
-        suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_ADD_QUESTION,
-            suggestion_models.TARGET_TYPE_QUESTION, self.topic_id,
-            1, suggestion_models.STATUS_IN_REVIEW, self.author_id,
-            None, {
-                'cmd': (
-                    question_domain
-                    .CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION),
-                'question_dict': self.question_dict,
-                'skill_id': None
-            }, 'score_category', thread_id)
+        new_content = state_domain.SubtitledHtml(
+            'content', 'new content html').to_dict()
+        change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State 1',
+            'new_value': new_content
+        }
+        suggestion_services.create_suggestion(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, exp_id, 1,
+            self.author_id, change_cmd, 'sample description', None)
+
+        suggestion_id = suggestion_services.query_suggestions(
+            [('author_id', self.author_id), (
+                'target_id', exp_id)])[0].suggestion_id
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -814,7 +827,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
             response = self.put_json(
                 '%s/topic/%s/%s' % (
                     feconf.SUGGESTION_ACTION_URL_PREFIX,
-                    self.topic_id, thread_id), {
+                    self.topic_id, suggestion_id), {
                         'action': u'reject',
                         'review_message': u'Rejected!'
                     }, csrf_token=csrf_token, expected_status_int=400)
