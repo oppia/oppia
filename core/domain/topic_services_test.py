@@ -24,6 +24,8 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
+import feconf
+
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
@@ -98,8 +100,37 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     def test_get_topic_from_model(self):
         topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
         topic = topic_services.get_topic_from_model(topic_model)
-
         self.assertEqual(topic.to_dict(), self.topic.to_dict())
+
+    def test_cannot_get_topic_from_model_with_invalid_schema_version(self):
+        topic_services.create_new_topic_rights('topic_id', self.user_id_a)
+        commit_cmd = topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_CREATE_NEW,
+            'name': 'name'
+        })
+        subtopic_dict = {
+            'id': 1,
+            'title': 'subtopic_title',
+            'skill_ids': []
+        }
+        model = topic_models.TopicModel(
+            id='topic_id',
+            name='name',
+            canonical_name='canonical_name',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopics=[subtopic_dict],
+            subtopic_schema_version=0
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            self.user_id_a, 'topic model created', commit_cmd_dicts)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d subtopic schemas at '
+            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            topic_services.get_topic_from_model(model)
 
     def test_get_topic_summary_from_model(self):
         topic_summary_model = topic_models.TopicSummaryModel.get(self.TOPIC_ID)
@@ -166,6 +197,64 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_services.get_all_skill_ids_assigned_to_some_topic(),
             set([self.skill_id_1, self.skill_id_2, 'skill_3']))
+
+    def test_cannot_create_topic_change_class_with_invalid_changelist(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicChange({
+                'invalid_cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
+
+    def test_cannot_update_topic_property_with_invalid_changelist(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+                'property_name': 'invalid property',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
+
+    def test_cannot_update_subtopic_property_with_invalid_changelist(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+                'property_name': 'invalid property',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
+
+    def test_update_subtopic_property(self):
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'Title')
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'property_name': 'title',
+            'subtopic_id': 1,
+            'old_value': 'Title',
+            'new_value': 'New Title'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Update title of subtopic.')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].title, 'New Title')
+
+    def test_cannot_create_topic_change_class_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            topic_domain.TopicChange({
+                'cmd': 'invalid cmd',
+                'property_name': 'title',
+                'subtopic_id': 1,
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
 
     def test_update_topic(self):
         topic_services.assign_role(
@@ -777,3 +866,56 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
+
+
+# TODO: Remove this mock class and the SubtopicMigrationTests class
+# once the actual functions for subtopic migrations are implemented.
+class MockTopicObject(topic_domain.Topic):
+    """Mocks Topic domain object."""
+
+    @classmethod
+    def _convert_subtopic_v1_dict_to_v2_dict(cls, subtopic):
+        """Converts v1 subtopic dict to v2."""
+        return subtopic
+
+
+class SubtopicMigrationTests(test_utils.GenericTestBase):
+
+    def test_migrate_subtopic_to_latest_schema(self):
+        topic_services.create_new_topic_rights('topic_id', 'user_id_admin')
+        commit_cmd = topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_CREATE_NEW,
+            'name': 'name'
+        })
+        subtopic_dict = {
+            'id': 1,
+            'title': 'subtopic_title',
+            'skill_ids': []
+        }
+        model = topic_models.TopicModel(
+            id='topic_id',
+            name='name',
+            canonical_name='Name',
+            next_subtopic_id=1,
+            language_code='en',
+            subtopics=[subtopic_dict],
+            subtopic_schema_version=1
+        )
+        commit_cmd_dicts = [commit_cmd.to_dict()]
+        model.commit(
+            'user_id_admin', 'topic model created', commit_cmd_dicts)
+
+        swap_topic_object = self.swap(topic_domain, 'Topic', MockTopicObject)
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_SUBTOPIC_SCHEMA_VERSION', 2)
+
+        with swap_topic_object, current_schema_version_swap:
+            topic = topic_services.get_topic_from_model(model)
+
+        self.assertEqual(topic.subtopic_schema_version, 2)
+        self.assertEqual(topic.name, 'name')
+        self.assertEqual(topic.canonical_name, 'name')
+        self.assertEqual(topic.next_subtopic_id, 1)
+        self.assertEqual(topic.language_code, 'en')
+        self.assertEqual(len(topic.subtopics), 1)
+        self.assertEqual(topic.subtopics[0].to_dict(), subtopic_dict)
