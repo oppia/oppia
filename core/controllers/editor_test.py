@@ -452,6 +452,10 @@ written_translations:
     default_outcome: {}
 """)
 
+    def test_can_not_download_exploration_with_disabled_exp_id(self):
+        download_url = '/createhandler/download/5'
+        self.get_json(download_url, expected_status_int=404)
+
     def test_exploration_download_handler_for_default_exploration(self):
         self.login(self.EDITOR_EMAIL)
         owner_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
@@ -1912,6 +1916,9 @@ class FetchIssuesPlaythroughHandlerTests(test_utils.GenericTestBase):
         self.get_json(
             '/playthroughdatahandler/%s/%s' % (
                 self.EXP_ID, 'invalid_playthrough_id'), expected_status_int=404)
+
+    def test_fetch_issues_handler_with_disabled_exp_id(self):
+        self.get_json('/issuesdatahandler/5', expected_status_int=404)
 
     def test_fetch_issues_handler(self):
         """Test that all issues get fetched correctly."""
