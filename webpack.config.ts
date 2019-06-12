@@ -43,7 +43,7 @@ module.exports = {
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
       'creator-dashboard-page.scripts.ts',
-    donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
+    donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
       '/pages/email-dashboard-pages/email-dashboard-page.controller.ts',
