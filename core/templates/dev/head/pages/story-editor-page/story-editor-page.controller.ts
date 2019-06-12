@@ -104,7 +104,7 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.constant('NODE_ID_PREFIX', 'node_');
+require('pages/story-editor-page/story-editor-page.constants.ts');
 
 oppia.controller('StoryEditor', [
   '$scope', '$uibModal', '$window', 'PageTitleService',
