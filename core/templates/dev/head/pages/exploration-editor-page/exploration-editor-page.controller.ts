@@ -189,9 +189,13 @@ require(
   'pages/exploration-editor-page/statistics-tab/statistics-tab.directive.ts');
 require(
   'pages/exploration-editor-page/translation-tab/translation-tab.directive.ts');
-require('pages/exploration_player/ConversationSkinDirective.ts');
-require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/PlayerConstants.ts');
+require(
+  'pages/exploration-player-page/learner-experience/' +
+  'conversation-skin.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'exploration-footer.directive.ts');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
@@ -230,7 +234,8 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 require('pages/exploration-editor-page/services/router.service.ts');
-require('pages/exploration_player/StateClassifierMappingService.ts');
+require(
+  'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'state-tutorial-first-time.service.ts');
