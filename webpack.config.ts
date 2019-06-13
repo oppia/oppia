@@ -70,7 +70,7 @@ module.exports = {
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
     moderator:
-      commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
+      commonPrefix + '/pages/moderator-page/moderator-page.scripts.ts',
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
       'notifications-dashboard-page.controller.ts',
