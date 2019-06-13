@@ -33,7 +33,8 @@ require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
-require('pages/exploration-player-page/services/question-player-engine.service.ts');
+require(
+  'pages/exploration-player-page/services/question-player-engine.service.ts');
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
