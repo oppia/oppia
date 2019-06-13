@@ -21,6 +21,10 @@ require('components/entity-creation-services/topic-creation.service.ts.ts');
 require('domain/topic/EditableTopicBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ts');
+
 oppia.directive('topicsAndSkillsDashboardNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

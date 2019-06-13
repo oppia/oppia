@@ -102,6 +102,9 @@ require(
   'learner-view-info.directive.ts');
 
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+
+require('objects/objectComponentsRequiresForPlayers.ts');
+
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
 
