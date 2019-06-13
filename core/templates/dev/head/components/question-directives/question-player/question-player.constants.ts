@@ -13,13 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the practice session.
+ * @fileoverview Constants for the questions player directive.
  */
-
-oppia.constant('TOTAL_QUESTIONS', 20);
-
-oppia.constant(
-  'PRACTICE_SESSIONS_DATA_URL',
-  '/practice_session/data/<topic_name>');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);

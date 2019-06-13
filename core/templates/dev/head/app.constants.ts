@@ -42,7 +42,6 @@ oppia.constant(
 oppia.constant(
   'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/voiceover/<exploration_id>');
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 /* New card is available but user hasn't gone to it yet (when oppia
    gives a feedback and waits for user to press 'continue').
    Not called when a card is selected by clicking progress dots */

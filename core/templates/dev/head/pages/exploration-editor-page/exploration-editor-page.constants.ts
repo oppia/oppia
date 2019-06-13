@@ -55,3 +55,5 @@ oppia.constant(
   'IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
+
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);

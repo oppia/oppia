@@ -93,3 +93,5 @@ oppia.constant('STATS_REPORTING_URLS', {
     '/explorehandler/leave_for_refresher_exp_event/<exploration_id>'),
   STATS_EVENTS: '/explorehandler/stats_events/<exploration_id>'
 });
+
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
