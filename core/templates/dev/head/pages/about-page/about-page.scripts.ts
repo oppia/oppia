@@ -16,5 +16,5 @@
  * @fileoverview Directive scripts for the about page.
  */
 
-require('pages/about-page/about-page.directive.ts');
+require('pages/about-page/about-page.controller.ts');
 require('pages/OppiaFooterDirective.ts');
