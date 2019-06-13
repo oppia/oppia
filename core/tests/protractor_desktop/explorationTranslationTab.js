@@ -245,37 +245,37 @@ describe('Exploration translation and voiceover tab', function() {
     explorationEditorTranslationTab.expectContentTabContentToMatch(
       'This is first card.');
     explorationEditorTranslationTab.setTranslation(forms.toRichText(
-      'Yah pehla panna hain.'));
+      'Yeh pehla panna hain.'));
     explorationEditorTranslationTab.navigateToFeedbackTab();
     explorationEditorTranslationTab.setTranslation(forms.toRichText(
-      'Yah hindi main vishleshad hain.'));
+      'Yeh hindi main vishleshad hain.'));
     explorationEditorTranslationTab.moveToState('final card');
     explorationEditorTranslationTab.expectContentTabContentToMatch(
       'This is final card.');
     explorationEditorTranslationTab.setTranslation(forms.toRichText(
-      'Yah aakhri panna hain.'));
+      'Yeh aakhri panna hain.'));
 
     explorationEditorTranslationTab.moveToState('first');
     explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yah pehla panna hain.'));
+      'Yeh pehla panna hain.'));
     explorationEditorTranslationTab.navigateToFeedbackTab();
     explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yah hindi main vishleshad hain.'));
+      'Yeh hindi main vishleshad hain.'));
     explorationEditorTranslationTab.moveToState('final card');
     explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yah aakhri panna hain.'));
+      'Yeh aakhri panna hain.'));
 
     explorationEditorTranslationTab.switchToVoiceoverMode();
     explorationEditorTranslationTab.switchToTranslationMode();
     explorationEditorTranslationTab.moveToState('first');
     explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yah pehla panna hain.'));
+      'Yeh pehla panna hain.'));
     explorationEditorTranslationTab.navigateToFeedbackTab();
     explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yah hindi main vishleshad hain.'));
+      'Yeh hindi main vishleshad hain.'));
     explorationEditorTranslationTab.moveToState('final card');
     explorationEditorTranslationTab.expectTranslationToMatch(forms.toRichText(
-      'Yah aakhri panna hain.'));
+      'Yeh aakhri panna hain.'));
 
     explorationEditorTranslationTab.expectCorrectStatusColor(
       'first', YELLOW_STATE_PROGRESS_COLOR);

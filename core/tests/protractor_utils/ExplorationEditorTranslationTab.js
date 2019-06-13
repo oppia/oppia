@@ -181,7 +181,7 @@ var ExplorationEditorTranslationTab = function() {
 
   var saveTranslationButton = element(
     by.css('.protractor-test-save-translation'));
-  var editTranslation = element(
+  var editTranslationButtton = element(
     by.css('.protractor-test-edit-translation'));
   var translationDisplay = element(
     by.css('.protractor-test-translation-display'));
@@ -196,9 +196,9 @@ var ExplorationEditorTranslationTab = function() {
 
   this.setTranslation = function(richTextInstructions) {
     waitFor.elementToBeClickable(
-      editTranslation,
-      'editTranslation taking too long to appear to set content');
-    editTranslation.click();
+      editTranslationButtton,
+      'editTranslationButtton taking too long to appear to set content');
+    editTranslationButtton.click();
     var stateTranslationEditorTag = element(
       by.tagName('state-translation-editor'));
     var stateTranslationEditor = stateTranslationEditorTag.element(
@@ -223,7 +223,7 @@ var ExplorationEditorTranslationTab = function() {
   this.switchToVoiceoverMode = function() {
     waitFor.elementToBeClickable(
       voiceoverModeButton,
-      'Translation Mode switch is taking too long to appear');
+      'Voiceover Mode switch is taking too long to appear');
     voiceoverModeButton.click();
     waitFor.pageToFullyLoad();
   };
