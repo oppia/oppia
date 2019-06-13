@@ -89,6 +89,7 @@ describe('Sidebar state name controller', function() {
             hints: []
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -120,6 +121,7 @@ describe('Sidebar state name controller', function() {
             hints: []
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -158,6 +160,7 @@ describe('Sidebar state name controller', function() {
               parse_with_jinja: false
             }
           }],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},

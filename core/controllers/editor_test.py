@@ -342,6 +342,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -376,6 +377,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -410,6 +412,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -446,6 +449,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}

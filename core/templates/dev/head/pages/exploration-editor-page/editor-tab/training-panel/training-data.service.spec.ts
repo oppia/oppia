@@ -128,6 +128,7 @@ describe('TrainingDataService', function() {
           confirmed_unclassified_answers: []
         },
         param_changes: [],
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},

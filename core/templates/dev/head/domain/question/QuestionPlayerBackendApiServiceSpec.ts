@@ -70,7 +70,8 @@ describe('Question Player backend Api service', function() {
             },
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          solicit_answer_details: false
         },
         language_code: 'en',
         version: 1

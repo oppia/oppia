@@ -735,7 +735,14 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     state.update_interaction_solution(change.new_value)
-
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS):
+                    if not isinstance(change.new_value, bool):
+                        raise Exception(
+                            'Expected solicit_answer_details to be a ' +
+                            'bool, received %s' % change.new_value)
+                    state.update_solicit_answer_details(change.new_value)
                 elif (
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_RECORDED_VOICEOVERS):
