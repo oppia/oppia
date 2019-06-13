@@ -68,7 +68,8 @@ require(
   'player-correctness-feedback-enabled.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
-require('pages/exploration-player-page/services/question-player-engine.service.ts');
+require(
+  'pages/exploration-player-page/services/question-player-engine.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'refresher-exploration-confirmation-modal.service.ts');
