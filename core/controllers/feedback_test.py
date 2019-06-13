@@ -586,28 +586,9 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         response = self.get_html_response('/create/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        feedback_services.create_thread(
+        thread_id = feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, self.owner_id_1,
-            'a subject', 'some text', has_suggestion=True)
-
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        threadlist = response_dict['suggestion_thread_dicts']
-        thread_id = threadlist[0]['thread_id']
-
-        new_content = state_domain.SubtitledHtml(
-            'content', 'new content html').to_dict()
-        change = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'Welcome!',
-            'new_value': new_content
-        }
-        suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID,
-            1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
-            None, change, 'score category', thread_id)
+            'a subject', 'some text')
 
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
         response = self.post_json(
@@ -628,15 +609,6 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         response = self.get_html_response('/create/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        feedback_services.create_thread(
-            feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, self.owner_id_1,
-            'a subject', 'some text', has_suggestion=True)
-
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        threadlist = response_dict['suggestion_thread_dicts']
-        thread_id = threadlist[0]['thread_id']
-
         new_content = state_domain.SubtitledHtml(
             'content', 'new content html').to_dict()
         change = {
@@ -645,11 +617,14 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'state_name': 'Welcome!',
             'new_value': new_content
         }
-        suggestion_models.GeneralSuggestionModel.create(
+        suggestion_services.create_suggestion(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID,
-            1, suggestion_models.STATUS_IN_REVIEW, self.owner_id_1,
-            None, change, 'score category', thread_id)
+            suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID, 1,
+            self.owner_id_1, change, 'sample description', None)
+
+        thread_id = suggestion_services.query_suggestions(
+            [('author_id', self.owner_id_1),
+             ('target_id', self.EXP_ID)])[0].suggestion_id
 
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
         response = self.post_json(
