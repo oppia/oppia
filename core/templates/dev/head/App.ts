@@ -42,14 +42,22 @@ require('services/stateful/BackgroundMaskService.ts');
 require('services/stateful/FocusManagerService.ts');
 require('services/SiteAnalyticsService.ts');
 
-require('components/alerts/AlertMessageDirective.ts');
-require('components/create_button/CreateActivityButtonDirective.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'alert-message.directive.ts');
+require('components/button-directives/create-activity-button.directive.ts');
 
-require('components/forms/ObjectEditorDirective.ts');
-require('components/promo/PromoBarDirective.ts');
-require('components/side_navigation_bar/SideNavigationBarDirective.ts');
-require('components/social_buttons/SocialButtonsDirective.ts');
-require('components/top_navigation_bar/TopNavigationBarDirective.ts');
+require('components/forms/custom-forms-directives/object-editor.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'promo-bar.directive.ts');
+require(
+  'components/common-layout-directives/navigation-bars/' +
+  'side-navigation-bar.directive.ts');
+require('components/button-directives/social-buttons.directive.ts');
+require(
+  'components/common-layout-directives/navigation-bars/' +
+  'top-navigation-bar.directive.ts');
 
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
@@ -123,7 +131,8 @@ oppia.constant('SITE_NAME', 'Oppia.org');
 
 oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
 oppia.constant('FEEDBACK_POPOVER_PATH',
-  '/pages/exploration_player/feedback_popup_container_directive.html');
+  '/pages/exploration-player-page/templates/' +
+  'feedback-popup-container.template.html');
 
 oppia.constant('LOGOUT_URL', '/logout');
 
