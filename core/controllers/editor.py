@@ -20,7 +20,6 @@ import datetime
 import imghdr
 import logging
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -84,12 +83,6 @@ class ExplorationPage(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in constants.DISABLED_EXPLORATION_IDS:
-            self.render_template(
-                'pages/error-pages/disabled-exploration.mainpage.html',
-                iframe_restriction=None)
-            return
-
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id)
 
@@ -197,11 +190,9 @@ class ExplorationHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        try:
-            exploration_data = exp_services.get_user_exploration_data(
-                self.user_id, exploration_id)
-        except:
-            raise self.PageNotFoundException
+        exploration_data = exp_services.get_user_exploration_data(
+            self.user_id, exploration_id)
+
         self.values.update(exploration_data)
         self.render_json(self.values)
 
@@ -243,7 +234,7 @@ class ExplorationRightsHandler(EditorHandler):
             new_member_id = user_services.get_user_id_from_username(
                 new_member_username)
             if new_member_id is None:
-                raise Exception(
+                raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
 
             rights_manager.assign_role_for_exploration(
@@ -399,10 +390,7 @@ class ExplorationFileDownloader(EditorHandler):
     @acl_decorators.can_download_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
-            raise self.PageNotFoundException
+        exploration = exp_services.get_exploration_by_id(exploration_id)
 
         version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
@@ -439,10 +427,10 @@ class StateYamlHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
         """Handles POST requests."""
-        try:
-            state_dict = self.payload.get('state_dict')
-            width = self.payload.get('width')
-        except Exception:
+        state_dict = self.payload.get('state_dict')
+        width = self.payload.get('width')
+
+        if not width or not state_dict:
             raise self.PageNotFoundException
 
         self.render_json({
@@ -460,11 +448,8 @@ class ExplorationSnapshotsHandler(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
 
-        try:
-            snapshots = exp_services.get_exploration_snapshots_metadata(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        snapshots = exp_services.get_exploration_snapshots_metadata(
+            exploration_id)
 
         # Patch `snapshots` to use the editor's display name.
         snapshots_committer_ids = [
@@ -518,11 +503,8 @@ class ExplorationStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            current_exploration = exp_services.get_exploration_by_id(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(
+            exploration_id)
 
         self.render_json(stats_services.get_exploration_stats(
             exploration_id, current_exploration.version).to_frontend_dict())
@@ -536,11 +518,8 @@ class StateRulesStatsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
-        try:
-            current_exploration = exp_services.get_exploration_by_id(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(
+            exploration_id)
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
@@ -570,7 +549,8 @@ class FetchIssuesHandler(EditorHandler):
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
         if exp_issues is None:
             raise self.PageNotFoundException(
-                'Invalid exploration ID %s' % (exp_id))
+                'Invalid version %s for exploration ID %s'
+                % (exp_version, exp_id))
         unresolved_issues = []
         for issue in exp_issues.unresolved_issues:
             if issue.is_valid:
@@ -762,11 +742,7 @@ class StateAnswerStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            current_exploration = (
-                exp_services.get_exploration_by_id(exploration_id))
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(exploration_id)
 
         top_state_answers = stats_services.get_top_state_answer_stats_multi(
             exploration_id, current_exploration.states)
@@ -788,9 +764,8 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
         """Handles GET requests for unresolved answers."""
-        try:
-            state_name = self.request.get('state_name')
-        except Exception:
+        state_name = self.request.get('state_name')
+        if not state_name:
             raise self.PageNotFoundException
 
         unresolved_answers_with_frequency = (
