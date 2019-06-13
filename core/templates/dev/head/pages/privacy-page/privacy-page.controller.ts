@@ -13,12 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the about page.
+ * @fileoverview Directives required in privacy page.
  */
 
 require('base_components/BaseContentDirective.ts');
-require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
-
-require('pages/about-page/about-page.controller.ts');

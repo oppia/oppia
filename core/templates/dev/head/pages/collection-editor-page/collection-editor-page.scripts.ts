@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the about page.
+ * @fileoverview Directives required in collection editor.
  */
 
-require('base_components/BaseContentDirective.ts');
+require('pages/collection-editor-page/collection-editor-page.directive.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
-
-require('pages/about-page/about-page.controller.ts');
+  'pages/collection-editor-page/navbar/' +
+  'collection-editor-navbar-breadcrumb.directive.ts');
+require(
+  'pages/collection-editor-page/navbar/' +
+  'collection-editor-navbar.directive.ts');
