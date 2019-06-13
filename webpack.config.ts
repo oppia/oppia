@@ -85,7 +85,7 @@ module.exports = {
     splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
     stewards:
       commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
-      'stewards-landing-page.controller.ts',
+      'stewards-landing-page.scripts.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
