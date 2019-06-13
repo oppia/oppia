@@ -34,7 +34,7 @@ require('services/DateTimeFormatService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/StateRulesStatsService.ts');
 
-oppia.constant('IMPROVE_TYPE_INCOMPLETE', 'incomplete');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 oppia.directive('statisticsTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {

@@ -39,8 +39,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+require('pages/collection-player-page/collection-player-page.constants.ts');
 
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {

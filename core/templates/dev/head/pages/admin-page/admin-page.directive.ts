@@ -79,14 +79,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-router.service.ts');
 require('services/UtilsService.ts');
 
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
-oppia.constant('ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
-oppia.constant('PROFILE_URL_TEMPLATE', '/profile/<username>');
-oppia.constant(
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-oppia.constant(
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
-
 oppia.directive('adminPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {

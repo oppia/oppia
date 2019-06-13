@@ -42,6 +42,8 @@ require('services/contextual/DeviceInfoService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
 oppia.animation('.conversation-skin-responses-animate-slide', function() {
   return {
     removeClass: function(element, className, done) {

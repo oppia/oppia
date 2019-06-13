@@ -16,6 +16,8 @@
  * @fileoverview Service for suggestion improvements to a specific state.
  */
 
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
 oppia.factory('StateImprovementSuggestionService', [
   'IMPROVE_TYPE_INCOMPLETE',
   function(IMPROVE_TYPE_INCOMPLETE) {

@@ -24,9 +24,7 @@ require(
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 
-oppia.constant('PARAM_ACTION_GET', 'get');
-
-oppia.constant('PARAM_ACTION_SET', 'set');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 oppia.factory('ParameterMetadataService', [
   'ExplorationParamChangesService', 'ExplorationStatesService',

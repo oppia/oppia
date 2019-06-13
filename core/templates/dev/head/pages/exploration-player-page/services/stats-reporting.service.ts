@@ -20,11 +20,12 @@ require('domain/utilities/StopwatchObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('services/ContextService.ts');
 require('services/MessengerService.ts');
 require('services/PlaythroughService.ts');
 require('services/SiteAnalyticsService.ts');
+
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.constant('STATS_EVENT_TYPES', {
   EVENT_TYPE_START_EXPLORATION: 'start',

@@ -49,6 +49,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
 oppia.directive('stateTranslation', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

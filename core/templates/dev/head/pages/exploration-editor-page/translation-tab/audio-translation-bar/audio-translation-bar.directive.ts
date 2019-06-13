@@ -44,8 +44,7 @@ require('services/EditabilityService.ts');
 require('services/IdGenerationService.ts');
 require('services/UserService.ts');
 
-// Constant for audio recording time limit.
-oppia.constant('RECORDING_TIME_LIMIT', 300);
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 oppia.directive('audioTranslationBar', [
   'UrlInterpolationService', 'UserService',

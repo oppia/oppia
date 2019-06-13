@@ -33,6 +33,8 @@ require('filters/format-rte-preview.filter.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 require('services/GenerateContentIdService.ts');
 
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
+
 oppia.directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',

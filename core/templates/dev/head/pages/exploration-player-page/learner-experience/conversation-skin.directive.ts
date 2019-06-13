@@ -86,6 +86,8 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
 // Note: This file should be assumed to be in an IIFE, and the constants below
 // should only be used within this file.
 var TIME_FADEOUT_MSEC = 100;

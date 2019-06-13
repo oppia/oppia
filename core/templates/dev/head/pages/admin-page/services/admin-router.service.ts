@@ -17,13 +17,7 @@
  * provide routing functionality, and store all available tab states.
  */
 
-oppia.constant('ADMIN_TAB_URLS', {
-  ACTIVITIES: '#activities',
-  JOBS: '#jobs',
-  CONFIG: '#config',
-  ROLES: '#roles',
-  MISC: '#misc'
-});
+require('pages/admin-page/admin-page.constants.ts');
 
 oppia.factory('AdminRouterService', [
   'ADMIN_TAB_URLS',

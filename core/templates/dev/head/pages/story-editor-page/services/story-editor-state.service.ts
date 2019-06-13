@@ -23,8 +23,7 @@ require('domain/story/EditableStoryBackendApiService.ts');
 require('domain/story/StoryObjectFactory.ts');
 require('services/AlertsService.ts');
 
-oppia.constant('EVENT_STORY_INITIALIZED', 'storyInitialized');
-oppia.constant('EVENT_STORY_REINITIALIZED', 'storyReinitialized');
+require('pages/story-editor-page/story-editor-page.constants.ts');
 
 oppia.factory('StoryEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableStoryBackendApiService',
