@@ -1281,7 +1281,8 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job to regenerate stats models which were missing due to
     incorrect handling of exploration reverts. If a model is missing at version
     x, we will regenerate all models from version x-1 till the max version of
-    the exploration."""
+    the exploration.
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -1294,8 +1295,8 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                 [exp_domain.ExpVersionReference(exp.id, version)
                  for version in range(1, exp.version + 1, 1)]))
         first_missing_version = -1
-        for i in range(len(all_models)):
-            if all_models[i] is None:
+        for i, model in enumerate(all_models):
+            if model is None:
                 first_missing_version = i + 1
 
         if first_missing_version == -1:
