@@ -57,30 +57,3 @@ class TopicLandingPageTest(test_utils.GenericTestBase):
     def test_valid_subject_and_topic_loads_correctly(self):
         response = self.get_html_response('/learn/maths/fractions')
         response.mustcontain('<topic-landing-page></topic-landing-page>')
-
-
-class StewardsLandingPageTest(test_utils.GenericTestBase):
-    """Test for showing the landing page for stewards (parents, teachers,
-    volunteers, or NGOs).
-    """
-    def test_nonprofits_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL)
-        response.mustcontain(
-            'Let\'s work together to make compelling educational')
-
-    def test_parents_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_PARENTS_LANDING_PAGE_URL)
-        response.mustcontain(
-            'Help your child learn with our free, engaging lessons')
-
-    def test_teachers_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
-        response.mustcontain('Oppia\'s free, personalized lessons are a great')
-
-    def test_volunteers_landing_page(self):
-        response = self.get_html_response(
-            feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
-        response.mustcontain('Help improve access to high-quality education')
