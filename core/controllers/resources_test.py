@@ -267,6 +267,41 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             feconf, 'ACCEPTED_AUDIO_EXTENSIONS',
             mock_accepted_audio_extensions)
 
+    def test_guest_can_not_upload(self):
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+                  mode='rb') as f:
+            raw_audio = f.read()
+        response = self.post_json(
+            '%s/0' % (self.AUDIO_UPLOAD_URL_PREFIX),
+            {'filename': self.TEST_AUDIO_FILE_MP3},
+            csrf_token=csrf_token,
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),),
+            expected_status_int=401
+        )
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_cannot_upload_audio_with_invalid_exp_id(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
+                  mode='rb') as f:
+            raw_audio = f.read()
+        self.post_json(
+            '%s/invalid_exp_id' % (self.AUDIO_UPLOAD_URL_PREFIX),
+            {'filename': self.TEST_AUDIO_FILE_MP3},
+            csrf_token=csrf_token,
+            upload_files=(('raw_audio_file', 'unused_filename', raw_audio),),
+            expected_status_int=404
+        )
+        self.logout()
+
     def test_audio_upload(self):
         self.login(self.EDITOR_EMAIL)
         response = self.get_html_response('/create/0')
