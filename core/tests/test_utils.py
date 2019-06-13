@@ -1281,8 +1281,8 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            corresponding_topic_id: str. The topic id to which the story belongs
-                to.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
 
@@ -1321,8 +1321,8 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            corresponding_topic_id: str. The topic id to which the story belongs
-                to.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
         """
