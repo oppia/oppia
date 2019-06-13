@@ -101,7 +101,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 [self.NODE_ID_1, self.NODE_ID_2]),
             ['skill_1', 'skill_2']
         )
-    
+
     def test_get_acquired_skill_ids_for_node_ids_special_cases(self):
         # Test cases when there are multiple acquired skill ids linked to
         # one node, and multiple nodes have overlapping skill ids.

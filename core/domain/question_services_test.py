@@ -453,8 +453,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_question_summaries_by_creator_id(
                 self.editor_id))
 
-        questions = [self.question_id, self.question_id_1, self.question_id_2]
-
         self.assertEqual(len(question_summaries), 3)
         question_summaries.sort(key=lambda summary: summary.last_updated)
         question_ids = [summary.id for summary in question_summaries]
