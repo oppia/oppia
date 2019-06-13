@@ -117,9 +117,6 @@ class ThanksPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/thanks-page.mainpage.html')
 
 
