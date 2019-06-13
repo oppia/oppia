@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the donate page.
+ * @fileoverview Directive for the donate page.
  */
 
 require('domain/utilities/UrlInterpolationService.ts');

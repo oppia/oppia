@@ -26,7 +26,7 @@ oppia.directive('errorPage', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/error/error_page_directive.html'),
+      '/pages/error-pages/error-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       'PageTitleService', 'UrlInterpolationService',
