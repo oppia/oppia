@@ -200,7 +200,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(question_skill_links), 0)
 
-    def test_get_question_skill_links_with_constant_number_per_skill(self):
+    def test_get_question_skill_links_equidistributed_by_skill(self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
                 'question_id1', 'skill_id1', 0.1)
@@ -220,7 +220,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_question_skill_links_with_constant_number_per_skill(
+            get_question_skill_links_equidistributed_by_skill(
                 2, ['skill_id1', 'skill_id2']
             )
         )
@@ -228,14 +228,60 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_skill_links[0].skill_id, 'skill_id1')
         self.assertEqual(question_skill_links[1].skill_id, 'skill_id2')
 
+    def test_get_more_question_skill_links_than_available(self):
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1', 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', 'skill_id1', 0.5)
+            )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id3', 'skill_id2', 0.8)
+            )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+
         # Testing for queries that retrieve more questions than available.
-        question_skill_links_2 = (
+        question_skill_links = (
             question_models.QuestionSkillLinkModel.
-            get_question_skill_links_with_constant_number_per_skill(
+            get_question_skill_links_equidistributed_by_skill(
                 4, ['skill_id1', 'skill_id2']
             )
         )
-        self.assertEqual(len(question_skill_links_2), 3)
-        self.assertEqual(question_skill_links_2[0].skill_id, 'skill_id1')
-        self.assertEqual(question_skill_links_2[1].skill_id, 'skill_id1')
-        self.assertEqual(question_skill_links_2[2].skill_id, 'skill_id2')
+        self.assertEqual(len(question_skill_links), 3)
+        self.assertEqual(question_skill_links[0].skill_id, 'skill_id1')
+        self.assertEqual(question_skill_links[1].skill_id, 'skill_id1')
+        self.assertEqual(question_skill_links[2].skill_id, 'skill_id2')
+
+    def test_get_question_skill_links_when_count_not_evenly_divisible(self):
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', 'skill_id1', 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', 'skill_id1', 0.5)
+            )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id3', 'skill_id2', 0.8)
+            )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+
+        # Testing for queries with not evenly divisable total_question_count
+        question_skill_links = (
+            question_models.QuestionSkillLinkModel.
+            get_question_skill_links_equidistributed_by_skill(
+                3, ['skill_id1', 'skill_id2']
+            )
+        )
+        self.assertEqual(len(question_skill_links), 3)
+        self.assertEqual(question_skill_links[0].skill_id, 'skill_id1')
+        self.assertEqual(question_skill_links[1].skill_id, 'skill_id1')
+        self.assertEqual(question_skill_links[2].skill_id, 'skill_id2')

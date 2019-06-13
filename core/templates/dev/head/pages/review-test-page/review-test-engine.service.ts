@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility service for the review tests
+ * @fileoverview Utility service for the review tests.
  */
 
 oppia.factory('ReviewTestEngineService', [
   function() {
     return {
-      getReviewTestTotalQuestions: function(numOfSkills) {
+      getReviewTestQuestionCount: function(numOfSkills) {
         if (numOfSkills < 6) {
           return numOfSkills * 3;
         } else if (numOfSkills < 10) {

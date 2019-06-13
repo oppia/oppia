@@ -131,9 +131,9 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     self.story_id_1))
-            self.assertEqual(len(json_response['skill_list']), 2)
-            self.assertEqual(json_response['skill_list'][0], 'skill_id_1')
-            self.assertEqual(json_response['skill_list'][1], 'skill_id_2')
+            self.assertEqual(len(json_response['skill_ids']), 2)
+            self.assertEqual(json_response['skill_ids'][0], 'skill_id_1')
+            self.assertEqual(json_response['skill_ids'][1], 'skill_id_2')
 
     def test_no_user_can_access_unpublished_story_review_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
@@ -148,4 +148,12 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     'story_id_3'),
+                expected_status_int=404)
+
+    def test_get_fails_when_no_completed_story_node(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_json(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX,
+                    self.story_id_1),
                 expected_status_int=404)

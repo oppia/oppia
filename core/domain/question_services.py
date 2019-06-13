@@ -142,21 +142,26 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     return questions, skill_descriptions, next_cursor
 
 
-def get_questions_by_skill_ids(question_count, skill_ids):
-    """Returns constant number of questions linked to the given skill ids.
+def get_questions_by_skill_ids(total_question_count, skill_ids):
+    """Returns constant number of questions linked to each given skill ids.
 
     Args:
-        question_count: int. The number of questions to return.
-        skill_ids: list(str). The ID of the skills to which the questions are
-            linked.
+        total_question_count: int. The total number of questions to return.
+        skill_ids: list(str). The IDs of the skills to which the questions
+            should be linked.
 
     Returns:
-        list(Question). The list of constant number of questions linked to each
-            given skill id.
+        list(Question). The list containing an expected number of
+        total_question_count questions linked to each given skill id.
+        It will return more if total_question_count is not evenly divisable,
+        or less if not enough questions in datastore.
     """
+    total_question_count = min(
+        total_question_count, feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+
     question_skill_link_models = (
-        question_models.QuestionSkillLinkModel.get_question_skill_links_with_constant_number_per_skill( #pylint: disable=line-too-long
-            question_count, skill_ids))
+        question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
+            total_question_count, skill_ids))
     question_ids = [model.question_id for model in question_skill_link_models]
     questions = get_questions_by_ids(question_ids)
     return questions

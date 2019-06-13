@@ -27,8 +27,8 @@
     <div class="oppia-review-test">
       Review Test
     </div>
-    <question-player ng-if="questionPlayerConfig.skillList &&
-                            questionPlayerConfig.skillList.length > 0"
+    <question-player ng-if="questionPlayerConfig.skillIds &&
+                            questionPlayerConfig.skillIds.length > 0"
                      player-config="questionPlayerConfig">
     </question-player>
   </div>
@@ -59,15 +59,11 @@
 {% endblock %}
 
 {% block footer_js %}
- {{ super() }}
+  {{ super() }}
   <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
 
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
-  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
-  <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
 
   <!-- This code is used for inserting webpack bundles
      https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->

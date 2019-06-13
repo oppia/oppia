@@ -247,22 +247,25 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_models, skill_descriptions, next_cursor_str
 
     @classmethod
-    def get_question_skill_links_with_constant_number_per_skill(
-            cls, question_count, skill_ids):
+    def get_question_skill_links_equidistributed_by_skill(
+            cls, total_question_count, skill_ids):
         """Fetches the list of constant number of QuestionSkillLinkModels
         linked to the skills.
 
         Args:
-            question_count: int. The number of questions to be returned.
+            total_question_count: int. The number of questions expected.
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
 
         Returns:
-            list(QuestionSkillLinkModel). Constant number of
-                QuestionSkillLinkModels corresponding to given skill_ids.
+            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
+                corresponding to given skill_ids, with
+                total_question_count/len(skill_ids) number of questions for
+                each skill. If not enough questions for a skill, just return
+                all questions it links to.
         """
         question_count_per_skill = int(
-            math.ceil(float(question_count) / float(len(skill_ids))))
+            math.ceil(float(total_question_count) / float(len(skill_ids))))
         question_skill_link_models = []
         for skill_id in skill_ids:
             question_skill_link_models.extend(

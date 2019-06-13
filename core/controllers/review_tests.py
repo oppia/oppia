@@ -67,13 +67,15 @@ class ReviewTestsPage(base.BaseHandler):
 
 
 class ReviewTestsPageDataHandler(base.BaseHandler):
-    """Fetches relevant data for the review tests page."""
-
+    """Fetches relevant data for the review tests page. This handler should
+    be called only if the user has completed at least one exploration in
+    the story.
+    """
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
-        """Handles GET request."""
+        """Handles GET requests."""
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
@@ -93,6 +95,6 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
         )
 
         self.values.update({
-            'skill_list': acquired_skill_ids
+            'skill_ids': acquired_skill_ids
         })
         self.render_json(self.values)

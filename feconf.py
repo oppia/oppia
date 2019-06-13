@@ -462,6 +462,9 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
 
+# The maximum number of questions to be fetched at one time.
+MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
+
 # The minimum score required for a user to review suggestions of a particular
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10

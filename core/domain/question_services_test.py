@@ -109,17 +109,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         questions = question_services.get_questions_by_skill_ids(
             4, ['skill_1', 'skill_2'])
-        question_dicts = [
-            self.question.to_dict(), self.question_1.to_dict(),
-            self.question_2.to_dict()
-        ]
+        questions.sort(key=lambda question: question.last_updated)
+
         self.assertEqual(len(questions), 3)
-        for question in questions:
-            self.assertTrue(question.to_dict() in question_dicts)
-        self.assertNotEqual(self.question.to_dict(), self.question_1.to_dict())
-        self.assertNotEqual(self.question.to_dict(), self.question_2.to_dict())
-        self.assertNotEqual(
-            self.question_1.to_dict(), self.question_2.to_dict())
+        self.assertEqual(questions[0].to_dict(), self.question.to_dict())
+        self.assertEqual(questions[1].to_dict(), self.question_1.to_dict())
+        self.assertEqual(questions[2].to_dict(), self.question_2.to_dict())
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
@@ -461,14 +456,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         questions = [self.question_id, self.question_id_1, self.question_id_2]
 
         self.assertEqual(len(question_summaries), 3)
-        for question_summary in question_summaries:
-            self.assertTrue(question_summary.id in questions)
-            self.assertEqual(
-                question_summary.question_content,
-                feconf.DEFAULT_INIT_STATE_CONTENT_STR)
-        self.assertNotEqual(question_summaries[0].id, question_summaries[1].id)
-        self.assertNotEqual(question_summaries[0].id, question_summaries[2].id)
-        self.assertNotEqual(question_summaries[1].id, question_summaries[2].id)
+        question_summaries.sort(key=lambda summary: summary.last_updated)
+        question_ids = [summary.id for summary in question_summaries]
+        self.assertEqual(question_ids[0], self.question_id)
+        self.assertEqual(question_ids[1], self.question_id_1)
+        self.assertEqual(question_ids[2], self.question_id_2)
 
     def test_created_question_rights(self):
         question_rights = question_services.get_question_rights(

@@ -560,16 +560,16 @@ def get_completed_node_ids(user_id, story_id):
 
 
 def get_latest_completed_node_ids(user_id, story_id):
-    """Returns the ids of the completed nodes that are latest in the story.
+    """Returns the ids of the completed nodes that come latest in the story.
 
     Args:
         user_id: str. ID of the given user.
         story_id: str. ID of the story.
 
     Returns:
-        list(str). List of the completed node ids latest in story. If length
-        is larger than 3, return the lastest three of them. If length is smaller
-        or equal to 3, return all of them.
+        list(str). List of the completed node ids that come latest in story.
+        If length is larger than 3, return the lastest three of them. If length
+        is smaller or equal to 3, return all of them.
     """
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)
@@ -578,13 +578,12 @@ def get_latest_completed_node_ids(user_id, story_id):
         return []
 
     num_of_nodes = min(len(progress_model.completed_node_ids), 3)
-    latest_completed_node_ids = []
-    for node_id in progress_model.completed_node_ids:
-        if story_domain.StoryNode.get_number_from_node_id(node_id) > (
-                len(progress_model.completed_node_ids) - num_of_nodes):
-            latest_completed_node_ids.append(node_id)
+    completed_node_ids = [
+        node_id for node_id in progress_model.completed_node_ids]
+    completed_node_ids.sort(
+        key=story_domain.StoryNode.get_number_from_node_id)
 
-    return latest_completed_node_ids
+    return completed_node_ids[-num_of_nodes:]
 
 
 def get_node_ids_completed_in_stories(user_id, story_ids):

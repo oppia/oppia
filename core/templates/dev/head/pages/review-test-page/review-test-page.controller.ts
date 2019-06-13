@@ -24,6 +24,7 @@ require(
 require(
   'components/question-directives/question-player/' +
   'question-player.directive.ts');
+require('objects/objectComponentsRequiresForPlayers.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
@@ -40,6 +41,8 @@ oppia.controller('ReviewTest', [
       FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL
   ) {
     $scope.storyId = UrlService.getStoryIdFromUrl();
+    $scope.questionPlayerConfig = null;
+
     var _fetchSkillDetails = function() {
       var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
         REVIEW_TEST_DATA_URL, {
@@ -47,9 +50,9 @@ oppia.controller('ReviewTest', [
         });
       $http.get(reviewTestsDataUrl).then(function(result) {
         var questionPlayerConfig = {
-          skillList: result.data.skill_list,
-          questionCount: ReviewTestEngineService.getReviewTestTotalQuestions(
-            result.data.skill_list.length)
+          skillIds: result.data.skill_ids,
+          questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
+            result.data.skill_ids.length)
         };
         $scope.questionPlayerConfig = questionPlayerConfig;
       });

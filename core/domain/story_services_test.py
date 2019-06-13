@@ -544,7 +544,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.assertEqual(
             story_services.get_latest_completed_node_ids(
                 self.owner_id, self.STORY_1_ID),
-            [self.NODE_ID_4, self.NODE_ID_3, self.NODE_ID_2])
+            [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
     def test_get_completed_nodes_in_story(self):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
@@ -561,7 +561,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
 
         for index, pending_node in enumerate(
                 story_services.get_pending_nodes_in_story(
-                    self.owner_id, self.STORY_1_ID), 1):
+                    self.owner_id, self.STORY_1_ID), start=1):
             self.assertEqual(
                 pending_node.to_dict(), self.nodes[index].to_dict())
 
