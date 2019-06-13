@@ -49,6 +49,75 @@ class AssetDevHandlerImageTests(test_utils.GenericTestBase):
             self.system_user, '0')
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
 
+    def test_image_upload_with_no_filename_raises_error(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+                  mode='rb') as f:
+            raw_image = f.read()
+        response_dict = self.post_json(
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX, {},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(response_dict['error'], 'No filename supplied')
+
+        self.logout()
+
+    def test_image_upload_with_invalid_filename_raises_error(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+                  mode='rb') as f:
+            raw_image = f.read()
+        response_dict = self.post_json(
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': '.png'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(response_dict['error'], 'Invalid filename')
+
+        self.logout()
+
+    def test_cannot_upload_duplicate_image(self):
+        self.login(self.EDITOR_EMAIL)
+        response = self.get_html_response('/create/0')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+                  mode='rb') as f:
+            raw_image = f.read()
+        response_dict = self.post_json(
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': 'test.png'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),))
+
+        filename = response_dict['filename']
+
+        response = self.get_custom_response(
+            self._get_image_url('0', filename), 'image/png')
+        self.assertEqual(response.body, raw_image)
+
+        response_dict = self.post_json(
+            '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
+            {'filename': 'test.png'},
+            csrf_token=csrf_token,
+            upload_files=(('image', 'unused_filename', raw_image),),
+            expected_status_int=400)
+
+        self.assertEqual(
+            response_dict['error'],
+            'A file with the name test.png already exists. Please choose a '
+            'different name.')
+
     def test_image_upload_and_download(self):
         """Test image uploading and downloading."""
 
