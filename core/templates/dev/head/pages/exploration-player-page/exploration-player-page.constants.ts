@@ -57,3 +57,10 @@ oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit');
 oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match');
 oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
+
+oppia.constant('EXPLORATION_MODE', {
+  EXPLORATION: 'exploration',
+  PRETEST: 'pretest',
+  QUESTION_PLAYER: 'question_player',
+  OTHER: 'other'
+});
