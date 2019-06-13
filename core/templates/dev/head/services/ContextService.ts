@@ -85,7 +85,7 @@ oppia.factory('ContextService', [
               pageContext = PAGE_CONTEXT.QUESTION_EDITOR;
               return PAGE_CONTEXT.QUESTION_EDITOR;
             } else if (
-                pathnameArray[i] === 'practice_session' ||
+              pathnameArray[i] === 'practice_session' ||
                 pathnameArray[i] === 'review_test') {
               pageContext = PAGE_CONTEXT.QUESTION_PLAYER;
               return PAGE_CONTEXT.QUESTION_PLAYER;
