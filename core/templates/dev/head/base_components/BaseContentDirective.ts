@@ -17,6 +17,7 @@
  */
 
 require('pages/OppiaFooterDirective.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('baseContent', [
@@ -27,7 +28,7 @@ oppia.directive('baseContent', [
       scope: {},
       bindToController: {},
       transclude: {
-        breadcrumb: 'navbarBreadcrumb',
+        breadcrumb: '?navbarBreadcrumb',
         content: 'content',
         footer: '?pageFooter',
         navOptions: '?localTopNavOptions',
