@@ -259,6 +259,7 @@
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-editor/ @aks681
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681
+/core/templates/dev/head/components/question-directives/modal-templates/ @aks681
 /core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
 
 # Skill project.
