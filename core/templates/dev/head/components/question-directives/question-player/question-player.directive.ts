@@ -27,11 +27,11 @@ require('directives/MathjaxBindDirective.ts');
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('filters/convert-html-to-unicode.filter.ts');
 require('filters/convert-unicode-to-html.filter.ts');
-require('components/forms/validators/IsAtLeastFilter.ts');
-require('components/forms/validators/IsAtMostFilter.ts');
-require('components/forms/validators/IsFloatFilter.ts');
-require('components/forms/validators/IsIntegerFilter.ts');
-require('components/forms/validators/IsNonemptyFilter.ts');
+require('components/forms/validators/is-at-least.filter.ts');
+require('components/forms/validators/is-at-most.filter.ts');
+require('components/forms/validators/is-float.filter.ts');
+require('components/forms/validators/is-integer.filter.ts');
+require('components/forms/validators/is-nonempty.filter.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
 require(
@@ -89,10 +89,18 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('pages/exploration_player/ConversationSkinDirective.ts');
-require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/LearnerLocalNavDirective.ts');
-require('pages/exploration_player/LearnerViewInfoDirective.ts');
+require(
+  'pages/exploration-player-page/learner-experience/' +
+  'conversation-skin.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'exploration-footer.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'learner-local-nav.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'learner-view-info.directive.ts');
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',
