@@ -17,7 +17,7 @@
  * user's explorations.
  */
 
-require('pages/creator-dashboard-page/creator-dashboard-page.directive.ts');
+require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');
 
 describe('Creator dashboard controller', function() {
   describe('CreatorDashboard', function() {
