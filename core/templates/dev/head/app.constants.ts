@@ -16,6 +16,12 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
+oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT', 30);
+
+oppia.constant(
+  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
+  constants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
+
 /* Called always when learner moves to a new card.
    Also called when card is selected by clicking on progress dots */
 oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
