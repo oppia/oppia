@@ -151,6 +151,9 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardBackendApiService.ts'
 );
+
+require('objects/objectComponentsRequires.ts');
+
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');

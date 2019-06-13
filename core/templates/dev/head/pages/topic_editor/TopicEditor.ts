@@ -107,6 +107,8 @@ require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('objects/objectComponentsRequires.ts');
+
 require('pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.ts');
 require('pages/topic_editor/TopicEditorNavbarDirective.ts');
 require('pages/topic_editor/main_editor/TopicEditorTabDirective.ts');

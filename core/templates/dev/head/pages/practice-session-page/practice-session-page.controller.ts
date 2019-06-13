@@ -23,6 +23,8 @@ require(
   'components/question-directives/question-player/' +
   'question-player.directive.ts');
 
+require('objects/objectComponentsRequiresForPlayers.ts');
+
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 

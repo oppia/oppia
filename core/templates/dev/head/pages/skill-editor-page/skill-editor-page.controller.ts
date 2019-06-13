@@ -94,6 +94,8 @@ require('directives/MathjaxBindDirective.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('objects/objectComponentsRequires.ts');
+
 require('pages/skill-editor-page/navbar/skill-editor-navbar.directive.ts');
 require(
   'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');

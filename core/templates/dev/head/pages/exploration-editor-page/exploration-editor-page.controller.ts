@@ -197,6 +197,8 @@ require(
   'exploration-footer.directive.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
+require('objects/objectComponentsRequires.ts');
+
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/ParamSpecsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
