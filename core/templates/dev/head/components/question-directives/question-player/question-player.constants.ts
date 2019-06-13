@@ -13,15 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview CamelCaseToHyphens filter for Oppia.
+ * @fileoverview Constants for the questions player directive.
  */
 
-oppia.filter('camelCaseToHyphens', [function() {
-  return function(input) {
-    var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
-    if (result[0] === '-') {
-      result = result.substring(1);
-    }
-    return result;
-  };
-}]);
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);

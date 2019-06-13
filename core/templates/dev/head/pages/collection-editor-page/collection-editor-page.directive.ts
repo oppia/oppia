@@ -32,24 +32,7 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/PageTitleService.ts');
 
-// TODO(bhenning): These constants should be provided by the backend.
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
-oppia.constant(
-  'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
-  '/collection_editor_handler/data/<collection_id>');
-oppia.constant(
-  'COLLECTION_RIGHTS_URL_TEMPLATE',
-  '/collection_editor_handler/rights/<collection_id>');
-
-oppia.constant(
-  'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
-
-oppia.constant(
-  'SEARCH_EXPLORATION_URL_TEMPLATE',
-  '/exploration/metadata_search?q=<query>');
-
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+require('pages/collection-editor-page/collection-editor-page.constants.ts');
 
 oppia.directive('collectionEditorPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

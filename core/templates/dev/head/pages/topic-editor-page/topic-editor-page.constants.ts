@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,13 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the practice session.
+ * @fileoverview Constants for the topic editor page.
  */
 
-oppia.constant('TOTAL_QUESTIONS', 20);
-
 oppia.constant(
-  'PRACTICE_SESSIONS_DATA_URL',
-  '/practice_session/data/<topic_name>');
+  'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+
+oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
+oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
+oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
+oppia.constant(
+  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
+oppia.constant(
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');

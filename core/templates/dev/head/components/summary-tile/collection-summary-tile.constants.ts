@@ -13,15 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview CamelCaseToHyphens filter for Oppia.
+ * @fileoverview Constants for summary tile for collections.
  */
 
-oppia.filter('camelCaseToHyphens', [function() {
-  return function(input) {
-    var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
-    if (result[0] === '-') {
-      result = result.substring(1);
-    }
-    return result;
-  };
-}]);
+oppia.constant(
+  'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
+oppia.constant(
+  'COLLECTION_EDITOR_URL', '/collection_editor/create/<collection_id>');
