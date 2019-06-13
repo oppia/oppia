@@ -35,7 +35,8 @@ module.exports = {
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
-      commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
+      commonPrefix + '/pages/collection-editor-page/' +
+      'collection-editor-page.scripts.ts',
     collection_player:
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.scripts.ts',
@@ -90,7 +91,8 @@ module.exports = {
       commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
-    topic_editor: commonPrefix + '/pages/topic_editor/TopicEditor.ts',
+    topic_editor:
+      commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
@@ -123,9 +125,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['collection_editor'],
-      filename: 'collection_editor.html',
+      filename: 'collection-editor-page.mainpage.html',
       template:
-        commonPrefix + '/pages/collection_editor/collection_editor.html',
+        commonPrefix + '/pages/collection-editor-page/' +
+        'collection-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -382,8 +385,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['topic_editor'],
-      filename: 'topic_editor.html',
-      template: commonPrefix + '/pages/topic_editor/topic_editor.html',
+      filename: 'topic-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/topic-editor-page/' +
+        'topic-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
