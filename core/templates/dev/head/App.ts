@@ -63,6 +63,32 @@ require('domain/sidebar/SidebarStatusService.ts');
 require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
+/* Called always when learner moves to a new card.
+   Also called when card is selected by clicking on progress dots */
+oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
+/* Called when the learner moves to a new card that they haven't seen before. */
+oppia.constant('EVENT_NEW_CARD_OPENED', 'newCardOpened');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+oppia.constant(
+  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/data/<exploration_id>');
+oppia.constant(
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>');
+oppia.constant(
+  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>?v=<version>');
+oppia.constant(
+  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/voiceover/<exploration_id>');
+oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+/* New card is available but user hasn't gone to it yet (when oppia
+   gives a feedback and waits for user to press 'continue').
+   Not called when a card is selected by clicking progress dots */
+oppia.constant('EVENT_NEW_CARD_AVAILABLE', 'newCardAvailable');
+
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 

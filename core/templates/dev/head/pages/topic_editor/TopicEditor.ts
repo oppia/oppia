@@ -117,8 +117,6 @@ require('pages/topic_editor/TopicEditorStateService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 

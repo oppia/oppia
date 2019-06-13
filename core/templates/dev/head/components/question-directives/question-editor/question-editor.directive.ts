@@ -35,8 +35,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
 oppia.directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
