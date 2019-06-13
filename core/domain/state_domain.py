@@ -1468,14 +1468,14 @@ class State(object):
 
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
-                'Expected solicit_answer_details to be a boolean, ' +
+                'Expected solicit_answer_details to be a boolean, '
                 'received %s' % self.solicit_answer_details)
         if self.solicit_answer_details:
             if self.interaction.id in (
                     feconf.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
                 raise utils.ValidationError(
-                    'The %s interaction does not ' % (self.interaction.id) +
-                    'support soliciting answer details from learners.')
+                    'The %s interaction does not support soliciting '
+                    'answer details from learners.' % (self.interaction.id))
 
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
