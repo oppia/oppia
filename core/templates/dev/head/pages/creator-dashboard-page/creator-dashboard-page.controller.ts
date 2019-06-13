@@ -137,7 +137,7 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('pages/exploration_player/PlayerConstants.ts');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.directive.ts');
@@ -152,6 +152,9 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardBackendApiService.ts'
 );
+
+require('objects/objectComponentsRequires.ts');
+
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
