@@ -489,6 +489,7 @@ def generate_random_string(length):
     """
     return base64.urlsafe_b64encode(os.urandom(length))[:length]
 
+
 def generate_new_session_id():
     """Generates a new session id.
 

@@ -95,7 +95,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
     def test_can_not_access_story_viewer_page_with_unpublished_story(self):
         new_story_id = 'new_story_id'
-        story = story_domain.Story.create_default_story(new_story_id, 'Title')
+        story = story_domain.Story.create_default_story(
+            new_story_id, 'Title', 'topic_id')
         story_services.save_new_story(self.admin_id, story)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
