@@ -57,3 +57,30 @@ class TopicLandingPageTest(test_utils.GenericTestBase):
     def test_valid_subject_and_topic_loads_correctly(self):
         response = self.get_html_response('/learn/maths/fractions')
         response.mustcontain('<topic-landing-page></topic-landing-page>')
+
+
+class StewardsLandingPageTest(test_utils.GenericTestBase):
+    """Test for showing the landing page for stewards (parents, teachers,
+    volunteers, or NGOs).
+    """
+    def test_nonprofits_landing_page(self):
+        response = self.get_html_response(
+            feconf.CUSTOM_NONPROFITS_LANDING_PAGE_URL)
+        response.mustcontain(
+            '<stewards-landing-page></stewards-landing-page>')
+
+    def test_parents_landing_page(self):
+        response = self.get_html_response(
+            feconf.CUSTOM_PARENTS_LANDING_PAGE_URL)
+        response.mustcontain(
+            '<stewards-landing-page></stewards-landing-page>')
+
+    def test_teachers_landing_page(self):
+        response = self.get_html_response(
+            feconf.CUSTOM_TEACHERS_LANDING_PAGE_URL)
+        response.mustcontain('<stewards-landing-page></stewards-landing-page>')
+
+    def test_volunteers_landing_page(self):
+        response = self.get_html_response(
+            feconf.CUSTOM_VOLUNTEERS_LANDING_PAGE_URL)
+        response.mustcontain('<stewards-landing-page></stewards-landing-page>')
