@@ -73,7 +73,7 @@ module.exports = {
       commonPrefix + '/pages/moderator-page/moderator-page.scripts.ts',
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
-      'notifications-dashboard-page.controller.ts',
+      'notifications-dashboard-page.scripts.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
         'practice-session-page.controller.ts',
