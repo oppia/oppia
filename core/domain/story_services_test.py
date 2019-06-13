@@ -521,6 +521,10 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             self.owner_id, self.STORY_1_ID), [])
 
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+        self.assertEqual(
+            story_services.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID),
+            [self.NODE_ID_1])
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)

@@ -656,7 +656,7 @@ class Story(object):
         if title == '':
             raise utils.ValidationError('Title field should not be empty')
 
-    def get_acquired_skill_ids_for_exp_ids(self, node_ids):
+    def get_acquired_skill_ids_for_node_ids(self, node_ids):
         """Returns the acquired skill ids of the nodes having the given
         node ids.
 

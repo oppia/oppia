@@ -78,18 +78,18 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         story = story_services.get_story_by_id(story_id)
-        latest_completed_exploration_ids = (
+        latest_completed_node_ids = (
             story_services.get_latest_completed_node_ids(self.user_id, story_id)
         )
 
         if story is None:
             raise self.PageNotFoundException(
                 Exception('The story with the given id doesn\'t exist.'))
-        if len(latest_completed_exploration_ids) == 0:
+        if len(latest_completed_node_ids) == 0:
             raise self.PageNotFoundException
 
-        acquired_skill_ids = story.get_acquired_skill_ids_for_exp_ids(
-            latest_completed_exploration_ids
+        acquired_skill_ids = story.get_acquired_skill_ids_for_node_ids(
+            latest_completed_node_ids
         )
 
         self.values.update({
