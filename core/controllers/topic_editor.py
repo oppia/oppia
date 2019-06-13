@@ -158,7 +158,7 @@ class TopicEditorPage(base.BaseHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
-        self.render_template('dist/topic_editor.html')
+        self.render_template('dist/topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):
