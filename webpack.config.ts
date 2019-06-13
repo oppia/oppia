@@ -168,8 +168,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['email_dashboard'],
+      chunks: ['app', 'email_dashboard'],
       filename: 'email-dashboard-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. ' +
+          'Join the community to create or try an exploration today!'
+      },
       template: (
         commonPrefix +
         '/pages/email-dashboard-pages/email-dashboard-page.mainpage.html'),
@@ -177,8 +182,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['email_dashboard_result'],
+      chunks: ['app', 'email_dashboard_result'],
       filename: 'email-dashboard-result.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. ' +
+          'Join the community to create or try an exploration today!'
+      },
       template:
         commonPrefix +
         '/pages/email-dashboard-pages/email-dashboard-result.mainpage.html',
