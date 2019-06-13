@@ -2207,31 +2207,33 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def check_for_important_rules_at_bottom_of_codeowners(
+    def check_for_important_patterns_at_bottom_of_codeowners(
             self, important_patterns):
-        """Checks that the most important rules/patterns are at the bottom
+        """Checks that the most important patterns are at the bottom
         of the CODEOWNERS file.
 
         Arguments:
             important_patterns: list(str). List of the important
-                paths/rules for CODEOWNERS file.
+                patterns for CODEOWNERS file.
 
         Returns:
-            bool. Status of failure.
+            bool. Whether the CODEOWNERS "important pattern" check fails.
         """
 
         failed = False
+
         # Check that there are no duplicate elements in the lists.
         important_patterns_set = set(important_patterns)
         codeowner_important_paths_set = set(CODEOWNER_IMPORTANT_PATHS)
         if len(important_patterns_set) != len(important_patterns):
-            print('%s --> Duplicate patterns found in critical rules'
+            print('%s --> Duplicate pattern(s) found in critical rules'
                   ' section.' % CODEOWNER_FILEPATH)
             failed = True
         if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
-            print('scripts/pre_commit_linter.py --> Duplicate pattern found in '
+            print('scripts/pre_commit_linter.py --> Duplicate pattern(s) found in '
                   'CODEOWNER_IMPORTANT_PATHS list.')
             failed = True
+
         # Check missing rules by set difference operation.
         critical_rule_section_minus_list_set = (
             important_patterns_set.difference(codeowner_important_paths_set))
@@ -2246,12 +2248,13 @@ class LintChecksManager(object):
             failed = True
         for rule in list_minus_critical_rule_section_set:
             print('%s --> Rule \'%s\' is not present in the \'Critical files\' '
-                  'section. Please place it under the \'Critical files\' since '
-                  'it is an important rule. Alternatively please remove it '
-                  'from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
+                  'section. Please place it under the \'Critical files\' '
+                  'section since it is an important rule. Alternatively please '
+                  'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
                   'scripts/pre_commit_linter.py if it is no longer an '
                   'important rule.' % (CODEOWNER_FILEPATH, rule))
             failed = True
+
         return failed
 
     def _check_codeowner_file(self):
@@ -2352,7 +2355,7 @@ class LintChecksManager(object):
                         failed = True
 
             failed = failed or (
-                self.check_for_important_rules_at_bottom_of_codeowners(
+                self.check_for_important_patterns_at_bottom_of_codeowners(
                     important_rules_in_critical_section))
 
             if failed:
