@@ -52,10 +52,10 @@ oppia.factory('ExplorationPlayerStateService', [
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
-  'QuestionPlayerEngineService', 'PretestQuestionBackendApiService',
-  'QuestionPlayerBackendApiService',
-  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
+  'PretestQuestionBackendApiService', 'QuestionPlayerBackendApiService',
+  'QuestionPlayerEngineService', 'ReadOnlyExplorationBackendApiService',
+  'StateClassifierMappingService', 'StatsReportingService',
+  'UrlService', 'EXPLORATION_MODE',
   function(
       $log, $q, $rootScope, ContextService,
       EditableExplorationBackendApiService,
@@ -63,10 +63,10 @@ oppia.factory('ExplorationPlayerStateService', [
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
-      QuestionPlayerEngineService, PretestQuestionBackendApiService,
-      QuestionPlayerBackendApiService,
-      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlService, EXPLORATION_MODE) {
+      PretestQuestionBackendApiService, QuestionPlayerBackendApiService,
+      QuestionPlayerEngineService, ReadOnlyExplorationBackendApiService,
+      StateClassifierMappingService, StatsReportingService,
+      UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
