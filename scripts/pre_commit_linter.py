@@ -2230,8 +2230,8 @@ class LintChecksManager(object):
                   ' section.' % CODEOWNER_FILEPATH)
             failed = True
         if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
-            print('scripts/pre_commit_linter.py --> Duplicate pattern(s) found in '
-                  'CODEOWNER_IMPORTANT_PATHS list.')
+            print('scripts/pre_commit_linter.py --> Duplicate pattern(s) found '
+                  'in CODEOWNER_IMPORTANT_PATHS list.')
             failed = True
 
         # Check missing rules by set difference operation.
