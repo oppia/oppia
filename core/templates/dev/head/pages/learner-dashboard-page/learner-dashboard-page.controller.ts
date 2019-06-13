@@ -59,7 +59,8 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
       'LEARNER_DASHBOARD_SECTION_I18N_IDS',
       'LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', 'ThreadStatusDisplayService',
       'DateTimeFormatService', 'FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS',
-      'FeedbackThreadSummaryObjectFactory', 'FeedbackMessageSummaryObjectFactory',
+      'FeedbackThreadSummaryObjectFactory',
+      'FeedbackMessageSummaryObjectFactory',
       'SuggestionModalForLearnerDashboardService', 'UserService',
       function(
           $scope, $rootScope, $q, $window, $http, $uibModal,
@@ -69,7 +70,8 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
           LEARNER_DASHBOARD_SECTION_I18N_IDS,
           LEARNER_DASHBOARD_SUBSECTION_I18N_IDS, ThreadStatusDisplayService,
           DateTimeFormatService, FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS,
-          FeedbackThreadSummaryObjectFactory, FeedbackMessageSummaryObjectFactory,
+          FeedbackThreadSummaryObjectFactory,
+          FeedbackMessageSummaryObjectFactory,
           SuggestionModalForLearnerDashboardService, UserService) {
         var ctrl = this;
         ctrl.EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS = (
@@ -130,16 +132,20 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
               responseData.subscription_list
             );
             ctrl.numberNonexistentIncompleteExplorations = (
-              responseData.number_of_nonexistent_activities.incomplete_explorations
+              responseData.number_of_nonexistent_activities
+                .incomplete_explorations
             );
             ctrl.numberNonexistentIncompleteCollections = (
-              responseData.number_of_nonexistent_activities.incomplete_collections
+              responseData.number_of_nonexistent_activities
+                .incomplete_collections
             );
             ctrl.numberNonexistentCompletedExplorations = (
-              responseData.number_of_nonexistent_activities.completed_explorations
+              responseData.number_of_nonexistent_activities
+                .completed_explorations
             );
             ctrl.numberNonexistentCompletedCollections = (
-              responseData.number_of_nonexistent_activities.completed_collections
+              responseData.number_of_nonexistent_activities
+                .completed_collections
             );
             ctrl.numberNonexistentExplorationsFromPlaylist = (
               responseData.number_of_nonexistent_activities.exploration_playlist
@@ -245,20 +251,24 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
 
         ctrl.goToPreviousPage = function(section, subsection) {
           if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-            if (subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            if (subsection === (
+              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
               ctrl.startIncompleteExpIndex = Math.max(
                 ctrl.startIncompleteExpIndex - ctrl.PAGE_SIZE, 0);
             } else if (
-              subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+              subsection === (
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
               ctrl.startIncompleteCollectionIndex = Math.max(
                 ctrl.startIncompleteCollectionIndex - ctrl.PAGE_SIZE, 0);
             }
           } else if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
-            if (subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            if (subsection === (
+              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
               ctrl.startCompletedExpIndex = Math.max(
                 ctrl.startCompletedExpIndex - ctrl.PAGE_SIZE, 0);
             } else if (
-              subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+              subsection === (
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
               ctrl.startCompletedCollectionIndex = Math.max(
                 ctrl.startCompletedCollectionIndex - ctrl.PAGE_SIZE, 0);
             }
@@ -267,26 +277,30 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
 
         ctrl.goToNextPage = function(section, subsection) {
           if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-            if (subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            if (subsection === (
+              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
               if (ctrl.startIncompleteExpIndex +
                 ctrl.PAGE_SIZE <= ctrl.incompleteExplorationsList.length) {
                 ctrl.startIncompleteExpIndex += ctrl.PAGE_SIZE;
               }
             } else if (
-              subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+              subsection === (
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
               if (ctrl.startIncompleteCollectionIndex +
                 ctrl.PAGE_SIZE <= ctrl.startIncompleteCollectionIndex.length) {
                 ctrl.startIncompleteCollectionIndex += ctrl.PAGE_SIZE;
               }
             }
           } else if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
-            if (subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
+            if (subsection === (
+              LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)) {
               if (ctrl.startCompletedExpIndex +
                 ctrl.PAGE_SIZE <= ctrl.completedExplorationsList.length) {
                 ctrl.startCompletedExpIndex += ctrl.PAGE_SIZE;
               }
             } else if (
-              subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS) {
+              subsection === (
+                LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)) {
               if (ctrl.startCompletedCollectionIndex +
                 ctrl.PAGE_SIZE <= ctrl.startCompletedCollectionIndex.length) {
                 ctrl.startCompletedCollectionIndex += ctrl.PAGE_SIZE;
@@ -322,8 +336,9 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
         };
 
         ctrl.getValueOfExplorationSortKey = function(exploration) {
-          // This function is passed as a custom comparator function to `orderBy`,
-          // so that special cases can be handled while sorting explorations.
+          // This function is passed as a custom comparator function to
+          // `orderBy`, so that special cases can be handled while sorting
+          // explorations.
           if (ctrl.currentExpSortType ===
               EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS.LAST_PLAYED.key) {
             return null;
@@ -333,8 +348,9 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
         };
 
         ctrl.getValueOfSubscriptionSortKey = function(subscription) {
-          // This function is passed as a custom comparator function to `orderBy`,
-          // so that special cases can be handled while sorting subscriptions.
+          // This function is passed as a custom comparator function to
+          // `orderBy`, so that special cases can be handled while sorting
+          // subscriptions.
           var value = subscription[ctrl.currentSubscribersSortType];
           if (ctrl.currentSubscribersSortType ===
               SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS.IMPACT.key) {
@@ -364,7 +380,8 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
             update: function(e, ui) {
               var insertExpInLearnerPlaylistUrl = (
                 UrlInterpolationService.interpolateUrl(
-                  '/learnerplaylistactivityhandler/<activityType>/<activityId>', {
+                  ('/learnerplaylistactivityhandler/<activityType>/' +
+                  '<activityId>'), {
                     activityType: activityType,
                     activityId: (
                       ctrl.explorationPlaylist[ui.item.sortable.index].id)
@@ -453,7 +470,8 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
           });
         };
 
-        ctrl.showSuggestionModal = function(newContent, oldContent, description) {
+        ctrl.showSuggestionModal = function(
+            newContent, oldContent, description) {
           SuggestionModalForLearnerDashboardService.showSuggestionModal(
             'edit_exploration_state_content',
             {
@@ -506,10 +524,12 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
                   var removeActivityUrlPrefix = '';
                   if (sectionNameI18nId ===
                       LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST) {
-                    removeActivityUrlPrefix = '/learnerplaylistactivityhandler/';
+                    removeActivityUrlPrefix =
+                      '/learnerplaylistactivityhandler/';
                   } else if (sectionNameI18nId ===
                             LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE) {
-                    removeActivityUrlPrefix = '/learnerincompleteactivityhandler/';
+                    removeActivityUrlPrefix =
+                      '/learnerincompleteactivityhandler/';
                   } else {
                     throw new Error('Section name is not valid.');
                   }
@@ -565,18 +585,19 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
           });
         };
       }
-    ]}}]).animation('.menu-sub-section', function() {
-      var NG_HIDE_CLASS = 'ng-hide';
-      return {
-        beforeAddClass: function(element, className, done) {
-          if (className === NG_HIDE_CLASS) {
-            element.slideUp(done);
-          }
-        },
-        removeClass: function(element, className, done) {
-          if (className === NG_HIDE_CLASS) {
-            element.hide().slideDown(done);
-          }
-        }
-      };
-    });
+    ]};
+}]).animation('.menu-sub-section', function() {
+  var NG_HIDE_CLASS = 'ng-hide';
+  return {
+    beforeAddClass: function(element, className, done) {
+      if (className === NG_HIDE_CLASS) {
+        element.slideUp(done);
+      }
+    },
+    removeClass: function(element, className, done) {
+      if (className === NG_HIDE_CLASS) {
+        element.hide().slideDown(done);
+      }
+    }
+  };
+});
