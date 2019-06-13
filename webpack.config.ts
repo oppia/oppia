@@ -223,8 +223,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['landing'],
+      chunks: ['app', 'landing'],
       filename: 'topic-landing-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. ' +
+          'Join the community to create or try an exploration today!'
+      },
       template:
         commonPrefix + '/pages/landing-pages/topic-landing-page/' +
         'topic-landing-page.mainpage.html',
@@ -232,7 +237,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['learner_dashboard'],
+      chunks: ['app', 'learner_dashboard'],
       filename: 'learner-dashboard-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
