@@ -79,7 +79,7 @@ module.exports = {
         'practice-session-page.controller.ts',
     privacy: commonPrefix + '/pages/privacy-page/privacy-page.controller.ts',
     preferences:
-      commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
+      commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor:
