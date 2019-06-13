@@ -121,8 +121,7 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.constant(
-  'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
 
 oppia.controller('TopicEditor', [
   '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',

@@ -18,9 +18,6 @@
  */
 
 oppia.constant(
-  'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
-oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');
 oppia.constant(
