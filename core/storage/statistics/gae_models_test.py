@@ -455,28 +455,3 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         with assert_raises_regexp_context_manager, get_by_id_swap:
             stats_models.PlaythroughModel.create(
                 'exp_id1', 1, 'EarlyQuit', {}, [])
-
-
-class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
-    """Test the LearnerAnswerDetailsModel class."""
-
-    def test_get_entity_id(self):
-        id_parameters = {'exp_id': 'abc', 'state_name': 'init_state'}
-        entity_type = feconf.ENTITY_TYPE_TOPIC
-        with self.assertRaisesRegexp(Exception, 'Invalid entity type'):
-            stats_models.LearnerAnswerDetailsModel.get_entity_id(
-                id_parameters, entity_type)
-
-    def test_create_and_get_answer_details_model(self):
-        id_parameters = {'exp_id': 'abc', 'state_name': 'init_state'}
-        entity_id = stats_models.LearnerAnswerDetailsModel.get_entity_id(
-            id_parameters, feconf.ENTITY_TYPE_EXPLORATION)
-        self.assertEqual(entity_id, 'abc.init_state')
-        stats_models.LearnerAnswerDetailsModel.create(
-            entity_id, feconf.ENTITY_TYPE_EXPLORATION,
-            'This my answer', 'This is my logic')
-        instances = stats_models.LearnerAnswerDetailsModel.get_answer_details(
-            feconf.ENTITY_TYPE_EXPLORATION, entity_id)
-        self.assertEqual(len(instances), 1)
-        self.assertEqual(
-            instances[0].learner_answer_details, 'This is my logic')

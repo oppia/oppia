@@ -184,6 +184,10 @@ CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 
+# This value should be updated in the event of any
+# LearnerAnswerDetailsModel.learner_answer_info_list schema change.
+CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION = 1
+
 # The default number of exploration tiles to load at a time in the search
 # results page.
 SEARCH_RESULTS_PAGE_SIZE = 20

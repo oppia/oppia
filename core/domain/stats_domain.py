@@ -16,6 +16,7 @@
 
 """Domain object for statistics models."""
 
+import datetime
 import numbers
 import sys
 
@@ -1351,3 +1352,115 @@ class StateAnswersCalcOutput(object):
             raise utils.ValidationError(
                 'calculation_output is too big to be stored (size: %d): %s' % (
                     sys.getsizeof(output_data), str(output_data)))
+
+
+class LearnerAnswerDetails(object):
+    """Domain object that represents the answer details submitted by the
+    learner.
+    """
+
+    def __init__(
+            self, state_reference, entity_type, interaction_id,
+            learner_answer_info_list, schema_version=(
+                feconf.CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION)):
+        """Constructs a LearnerAnswerDetail domain object.
+
+            Args:
+                state_reference: str. The reference to the state.
+                entity_type: str. The type of entity, eg. exploration,
+                    question etc.
+                interaction_id: str. The ID of the interaction.
+                learner_answer_info_list: list. The list of LearnerAnswerInfo
+                    objects and version specified in this object.
+                schema_version: str. The schema version of this object.
+        """
+        self.state_reference = state_reference
+        self.entity_type = entity_type
+        self.interaction_id = interaction_id
+        self.learner_answer_info_list = learner_answer_info_list
+        self.schema_version = schema_version
+
+    def get_learner_answer_info_dict_list(self):
+        """Returns the learner_answer_info_list stored within this object as
+        a list of LearnerAnswerInfo dicts.
+        """
+        return [learner_answer_info.to_dict()
+                for learner_answer_info in self.learner_answer_info_list]
+
+    def validate(self):
+        """Validates LearnerAnswerDetails domain object."""
+
+        if not isinstance(self.state_reference, basestring):
+            raise utils.ValidationError(
+                'Expected state_reference to be a string, received %s' % str(
+                    self.state_reference))
+
+        if not isinstance(self.entity_type, basestring):
+            raise utils.ValidationError(
+                'Expected entity_type to be a string, received %s' % str(
+                    self.entity_type))
+
+        if not isinstance(self.interaction_id, basestring):
+            raise utils.ValidationError(
+                'Expected interaction_id to be a string, received %s' % str(
+                    self.interaction_id))
+
+        if not isinstance(self.learner_answer_info_list, list):
+            raise utils.ValidationError(
+                'Expected learner_answer_info_list to be a list, '
+                'received %s' % str(self.learner_answer_info_list))
+
+
+class LearnerAnswerInfo(object):
+    """Domain object containing the answer details submitted by the learner."""
+
+    def __init__(self, answer, answer_details, created_on):
+        """Constructs a LearnerAnswerInfo domain object."""
+
+        self.answer = answer
+        self.answer_details = answer_details
+        self.created_on = created_on
+
+    def to_dict(self):
+        """Returns the dict of learner answer info.
+
+        Returns:
+            dict. The learner_answer_info dict.
+        """
+        learner_answer_info_dict = {
+            'answer': self.answer,
+            'answer_details': self.answer_details,
+            'created_on': self.created_on
+        }
+        return learner_answer_info_dict
+
+    @classmethod
+    def from_dict(cls, learner_answer_info_dict):
+        """Returns the domain object representing an answer info to a
+        state.
+
+        Returns:
+            LearnerAnswerInfo. The LearnerAnswerInfo domin object.
+        """
+        return cls(
+            learner_answer_info_dict['answer'],
+            learner_answer_info_dict['answer_details'],
+            learner_answer_info_dict['created_on']
+        )
+
+    def validate(self):
+        """Validates the LearnerAnswerInfo domain object."""
+        if self.answer is None:
+            raise utils.ValidationError(
+                'The answer submitted by the learner cannot be empty')
+        if self.answer_details is None:
+            raise utils.ValidationError(
+                'LearnerAnswerInfo must have a provided answer details')
+        if not isinstance(self.answer_details, basestring):
+            raise utils.ValidationError(
+                'Expected answer details to be a string, received %s' % str(
+                    self.answer_details))
+        if not isinstance(self.created_on, datetime.datetime):
+            raise utils.ValdationError(
+                'Expected created on to be a datetime, received %s' % str(
+                    self.created_on))
