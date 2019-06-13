@@ -76,7 +76,7 @@ module.exports = {
       'notifications-dashboard-page.scripts.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
-        'practice-session-page.controller.ts',
+        'practice-session-page.scripts.ts',
     privacy: commonPrefix + '/pages/privacy-page/privacy-page.controller.ts',
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
