@@ -108,6 +108,7 @@ describe('Audio preloader service', function() {
             answer_groups: [],
             hints: []
           },
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -146,6 +147,7 @@ describe('Audio preloader service', function() {
             answer_groups: [],
             hints: []
           },
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {}
@@ -191,6 +193,7 @@ describe('Audio preloader service', function() {
             answer_groups: [],
             hints: []
           },
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -277,6 +280,7 @@ describe('Audio preloader service', function() {
             }],
             hints: []
           },
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
