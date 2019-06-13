@@ -939,7 +939,7 @@ class TestRegenerateMissingStatsModels(OneOffJobTestBase):
         model = stats_models.ExplorationStatsModel.get(model_id)
         model.delete()
 
-    def test_dummy(self):
+    def test_job_regenerates_deleted_model(self):
         self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(self.exp.version, 5)
         self.run_one_off_job()
