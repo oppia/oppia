@@ -148,17 +148,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_corresponding_topic_id_validation(self):
-        # Generating valid topic id of length 12.
-        valid_topic_id = utils.generate_random_string(12)
-        self.story.corresponding_topic_id = valid_topic_id
-        self.story.validate()
-
-        # Generating invalid topic id of length 5 (not equal to 12).
-        invalid_topic_id = utils.generate_random_string(5)
-        self.story.corresponding_topic_id = invalid_topic_id
-        self._assert_validation_error(
-            'Invalid corresponding_topic_id value: %s' % invalid_topic_id)
-
         # Generating valid topic id of type str.
         valid_topic_id = utils.generate_random_string(12)
         self.assertTrue(isinstance(valid_topic_id, basestring))

@@ -44,6 +44,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
         self.story_id_3 = 'story_id_3'
+        self.skill_id_1 = 'skill_id_1'
+        self.skill_id_2 = 'skill_id_2'
         self.save_new_topic(
             self.TOPIC_ID, self.albert_id, 'Name', 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
@@ -92,6 +94,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A title', self.TOPIC_ID)
         story_services.save_new_story(self.albert_id, story)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
 
         # Delete the story before migration occurs.
         story_services.delete_story(
@@ -128,6 +132,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_story_with_story_contents_schema_v1(
             self.STORY_ID, self.albert_id, 'A title',
             'A description', 'A note', self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, self.STORY_ID)
         story = (
             story_services.get_story_by_id(self.STORY_ID))
         self.assertEqual(story.story_contents_schema_version, 1)
@@ -159,7 +165,8 @@ class StoryMigrationOneOffJobTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(
             self.STORY_ID, 'A title', self.TOPIC_ID)
         story_services.save_new_story(self.albert_id, story)
-
+        topic_services.add_canonical_story(
+            self.albert_id, self.TOPIC_ID, story.id)
         get_story_by_id_swap = self.swap(
             story_services, 'get_story_by_id', _mock_get_story_by_id)
 

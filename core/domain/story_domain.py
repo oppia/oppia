@@ -631,6 +631,11 @@ class Story(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
+        if not isinstance(self.corresponding_topic_id, basestring):
+            raise utils.ValidationError(
+                'Expected corresponding_topic_id should be a string, received: '
+                '%s' % self.corresponding_topic_id)
+
         self.story_contents.validate()
 
     @classmethod
