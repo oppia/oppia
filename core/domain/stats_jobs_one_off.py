@@ -1275,3 +1275,58 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                     'all: %s sum:%s' % (
                         key, state_name, all_state_hit[state_name],
                         sum_state_hit[state_name]),)
+
+
+class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job to regenerate stats models which were missing due to
+    incorrect handling of exploration reverts. If a model is missing at version
+    x, we will regenerate all models from version x-1 till the max version of
+    the exploration."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exp):
+        all_models = (
+            stats_models.ExplorationStatsModel.get_multi_stats_models(
+                [exp_domain.ExpVersionReference(exp.id, version)
+                 for version in range(1, exp.version + 1, 1)]))
+        first_missing_version = -1
+        for i in range(len(all_models)):
+            if all_models[i] is None:
+                first_missing_version = i + 1
+
+        if first_missing_version == -1:
+            yield ('No change', exp.id)
+
+        for i in range(first_missing_version - 1, exp.version + 1, 1):
+            commit_log = exp_models.ExplorationCommitLogEntryModel.get_commit(
+                exp.id, i)
+            exp_at_version_i = exp_models.ExplorationModel.get_version(
+                exp.id, i)
+            # Delete all old models.
+            if all_models[i - 1] is None:
+                if commit_log.commit_type != 'revert':
+                    yield ('Missing model without revert commit', exp.id)
+
+                # Is a revert commit.
+                revert_to_version = commit_log.commit_cmds[0]['version_number']
+                stats_services.handle_stats_creation_for_new_exp_version(
+                    exp.id, i, exp_at_version_i.states, None, revert_to_version)
+                yield ('Success (revert case)', exp.id)
+            else:
+                all_models[i - 1].delete()
+                change_list = (
+                    [exp_domain.ExplorationChange(commit_cmd)
+                     for commit_cmd in commit_log.commit_cmds])
+                exp_versions_diff = exp_domain.ExplorationVersionsDiff(
+                    change_list)
+                stats_services.handle_stats_creation_for_new_exp_version(
+                    exp.id, i, exp_at_version_i.states, exp_versions_diff, None)
+                yield ('Success (not revert case)', exp.id)
+
+    @staticmethod
+    def reduce(key, items):
+        yield (key, items)

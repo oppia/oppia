@@ -896,3 +896,54 @@ class RecomputeCompleteEventStatisticsTests(OneOffJobTestBase):
             stats_models.ExplorationStatsModel.get_entity_id(self.EXP_ID, 2))
         model = stats_models.ExplorationStatsModel.get(model_id)
         self.assertEqual(model.num_completions_v2, 3)
+
+
+class TestRegenerateMissingStatsModels(OneOffJobTestBase):
+    """Tests the regeneration of missing stats models."""
+    ONE_OFF_JOB_CLASS = stats_jobs_one_off.RegenerateMissingStatsModels
+
+    def setUp(self):
+        super(TestRegenerateMissingStatsModels, self).setUp()
+        self.EXP_ID = 'EXP_ID'
+        self.exp = self.save_new_valid_exploration(self.EXP_ID, 'owner_id')
+        self.state_name = self.exp.init_state_name
+
+        change_list = []
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state_name,
+                'new_state_name': 'b',
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        exp_services.revert_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, 3, 2)
+
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state_name,
+                'new_state_name': 'b',
+            })
+        ]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.EXP_ID, 4)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        model.delete()
+
+    def test_dummy(self):
+        self.exp = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(self.exp.version, 5)
+        self.run_one_off_job()
+        model_id = stats_models.ExplorationStatsModel.get_entity_id(
+            self.EXP_ID, 4)
+        model = stats_models.ExplorationStatsModel.get(model_id)
+        self.assertIsNotNone(model)
