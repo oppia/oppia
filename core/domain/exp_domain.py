@@ -27,6 +27,7 @@ import re
 import string
 
 from constants import constants
+from core.domain import change_domain
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -94,7 +95,7 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
 
-class ExplorationChange(object):
+class ExplorationChange(change_domain.BaseChange):
     """Domain object class for an exploration change.
 
     IMPORTANT: Ensure that all changes to this class (and how these cmds are
@@ -135,6 +136,42 @@ class ExplorationChange(object):
         'to_version', 'title', 'category'
     ]
 
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attributes': ['category', 'title'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_ADD_STATE,
+        'required_attributes': ['state_name'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_DELETE_STATE,
+        'required_attributes': ['state_name'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_RENAME_STATE,
+        'required_attributes': ['new_state_name', 'old_state_name'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_EDIT_STATE_PROPERTY,
+        'required_attributes': ['property_name', 'state_name', 'new_value'],
+        'optional_attributes': ['old_value'],
+        'allowed_values': {'property_name': STATE_PROPERTIES}
+    }, {
+        'name': CMD_EDIT_EXPLORATION_PROPERTY,
+        'required_attributes': ['property_name', 'new_value'],
+        'optional_attributes': ['old_value'],
+        'allowed_values': {'property_name': EXPLORATION_PROPERTIES}
+    }, {
+        'name': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+        'required_attributes': ['from_version', 'to_version'],
+        'optional_attributes': []
+    }, {
+        'name': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+        'required_attributes': ['version_number'],
+        'optional_attributes': []
+    }]
+
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
 
@@ -158,8 +195,7 @@ class ExplorationChange(object):
         Raises:
             Exception: The given change_dict is not valid.
         """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.validate(change_dict)
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_STATE:
@@ -170,16 +206,11 @@ class ExplorationChange(object):
         elif self.cmd == CMD_DELETE_STATE:
             self.state_name = change_dict['state_name']
         elif self.cmd == CMD_EDIT_STATE_PROPERTY:
-            if change_dict['property_name'] not in self.STATE_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
             self.state_name = change_dict['state_name']
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
         elif self.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.EXPLORATION_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
@@ -192,23 +223,6 @@ class ExplorationChange(object):
         elif self.cmd == exp_models.ExplorationModel.CMD_REVERT_COMMIT:
             # If commit is an exploration version revert commit.
             self.version_number = change_dict['version_number']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the ExplorationChange domain object.
-
-        Returns:
-            A dict, mapping all fields of ExplorationChange instance.
-        """
-        exploration_change_dict = {}
-        exploration_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                exploration_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return exploration_change_dict
 
 
 class ExplorationCommitLogEntry(object):

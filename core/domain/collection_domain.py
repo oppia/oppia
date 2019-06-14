@@ -25,6 +25,7 @@ import re
 import string
 
 from constants import constants
+from core.domain import change_domain
 import feconf
 import utils
 
@@ -74,7 +75,7 @@ CMD_REMOVE_QUESTION_ID_FROM_SKILL = 'remove_question_id_from_skill'
 _SKILL_ID_PREFIX = 'skill'
 
 
-class CollectionChange(object):
+class CollectionChange(change_domain.BaseChange):
     """Domain object class for a change to a collection.
 
     IMPORTANT: Ensure that all changes to this class (and how these cmds are
@@ -87,6 +88,65 @@ class CollectionChange(object):
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
         COLLECTION_PROPERTY_OBJECTIVE, COLLECTION_PROPERTY_LANGUAGE_CODE,
         COLLECTION_PROPERTY_TAGS)
+
+    EXPLORATION_PROPERTIES = (
+        'title', 'category', 'objective', 'language_code', 'tags',
+        'blurb', 'author_notes', 'param_specs', 'param_changes',
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'category', 'title', 'exploration_id', 'first_index', 'second_index',
+        'property_name', 'new_value', 'old_value', 'name', 'from_version',
+        'to_version', 'skill_id', 'question_id'
+    ]
+
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attributes': ['category', 'title'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_ADD_COLLECTION_NODE,
+        'required_attributes': ['exploration_id'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_DELETE_COLLECTION_NODE,
+        'required_attributes': ['exploration_id'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_SWAP_COLLECTION_NODES,
+        'required_attributes': ['first_index', 'second_index'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_EDIT_COLLECTION_PROPERTY,
+        'required_attributes': ['property_name', 'new_value'],
+        'optional_attributes': ['old_value'],
+        'allowed_values': {'property_name': COLLECTION_PROPERTIES}
+    }, {
+        'name': CMD_EDIT_COLLECTION_NODE_PROPERTY,
+        'required_attributes': ['exploration_id', 'property_name', 'new_value'],
+        'optional_attributes': ['old_value'],
+        'allowed_values': {'property_name': EXPLORATION_PROPERTIES}
+    }, {
+        'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+        'required_attributes': ['from_version', 'to_version'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_ADD_COLLECTION_SKILL,
+        'required_attributes': ['name'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_DELETE_COLLECTION_SKILL,
+        'required_attributes': ['skill_id'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_ADD_QUESTION_ID_TO_SKILL,
+        'required_attributes': ['question_id', 'skill_id'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_REMOVE_QUESTION_ID_FROM_SKILL,
+        'required_attributes': ['question_id', 'skill_id'],
+        'optional_attributes': []
+    }]
 
     def __init__(self, change_dict):
         """Initializes a CollectionChange object from a dict.
@@ -109,10 +169,12 @@ class CollectionChange(object):
         Raises:
             Exception: The given change_dict is not valid.
         """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.validate(change_dict)
         self.cmd = change_dict['cmd']
 
+        if self.cmd == CMD_CREATE_NEW:
+            self.category = change_dict['category']
+            self.title = change_dict['title']
         if self.cmd == CMD_ADD_COLLECTION_NODE:
             self.exploration_id = change_dict['exploration_id']
         elif self.cmd == CMD_DELETE_COLLECTION_NODE:
@@ -126,9 +188,6 @@ class CollectionChange(object):
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
         elif self.cmd == CMD_EDIT_COLLECTION_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.COLLECTION_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict.get('old_value')
@@ -145,8 +204,6 @@ class CollectionChange(object):
             self.question_id = change_dict['question_id']
         elif self.cmd == CMD_DELETE_COLLECTION_SKILL:
             self.skill_id = change_dict['skill_id']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
 
 
 class CollectionNode(object):

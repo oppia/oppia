@@ -214,7 +214,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for activity_references schema check '
             'of ActivityReferencesModel\', '
             '[u"Entity id featured: Property does not match the schema with '
-            'the error Missing keys: [\'id\'], Extra keys: []"]]'
+            'the error Missing keys: [\'id\'], extra attributes: []"]]'
         ), (
             u'[u\'failed validation check for fetch properties of '
             'ActivityReferencesModel\', '
@@ -225,7 +225,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
 
     def test_model_with_invalid_type_in_activity_references(self):
         self.model_instance.activity_references = [{
-            'type': 'random_type',
+            'type': 'invalid_type',
             'id': '0'
         }]
         self.model_instance.put()
@@ -233,7 +233,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for domain object check of '
             'ActivityReferencesModel\', '
             '[u\'Entity id featured: Entity fails domain validation with the '
-            'error Invalid activity type: random_type\']]')]
+            'error Invalid activity type: invalid_type\']]')]
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_invalid_id_in_activity_references(self):
@@ -252,14 +252,14 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
 
     def test_mock_model_with_invalid_id(self):
         model_instance_with_invalid_id = (
-            activity_models.ActivityReferencesModel(id='random'))
+            activity_models.ActivityReferencesModel(id='invalid'))
         model_instance_with_invalid_id.put()
         expected_output = [(
             u'[u\'fully-validated ActivityReferencesModel\', 1]'
         ), (
             u'[u\'failed validation check for model id check of '
             'ActivityReferencesModel\', '
-            '[u\'Entity id random: Entity id does not match regex pattern\']]'
+            '[u\'Entity id invalid: Entity id does not match regex pattern\']]'
         )]
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -689,7 +689,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
             'cmd': 'add_collection_node',
         }, {
             'cmd': 'delete_collection_node',
-            'random_key': 'random'
+            'invalid_attribute': 'invalid'
         }]
         self.model_instance_0.put()
         expected_output = [
@@ -698,15 +698,16 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 'delete_collection_node '
                 'check of CollectionSnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
-                'with error: The following required keys are missing: '
-                'exploration_id, '
-                'The following extra keys are present: random_key\']]'
+                'with error: The following required attributes are missing: '
+                'exploration_id,'
+                'The following extra attributes are present: '
+                'invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd '
                 'add_collection_node '
                 'check of CollectionSnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
-                'with error: The following required keys are missing: '
+                'with error: The following required attributes are missing: '
                 'exploration_id\']]'
             ),
             u'[u\'fully-validated CollectionSnapshotMetadataModel\', 2]']
@@ -1167,6 +1168,33 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
                 'CollectionRightsSnapshotMetadataModel\', 3]')]
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'change_collection_status',
+            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, {
+            'cmd': 'release_ownership',
+            'invalid_attribute': 'invalid'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd release_ownership '
+                'check of CollectionRightsSnapshotMetadataModel\', '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following extra attributes are present: '
+                'invalid_attribute\']]'
+            ), (
+                u'[u\'failed validation check for commit cmd '
+                'change_collection_status '
+                'check of CollectionRightsSnapshotMetadataModel\', '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required attributes are missing: '
+                'new_status\']]'
+            ),
+            u'[u\'fully-validated CollectionRightsSnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
 
 class CollectionRightsSnapshotContentModelValidatorTests(
         test_utils.GenericTestBase):
@@ -1408,7 +1436,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             collection_models.CollectionCommitLogEntryModel(
-                id='random-0-1', user_id=self.owner_id,
+                id='invalid-0-1', user_id=self.owner_id,
                 username=self.OWNER_USERNAME, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
@@ -1425,25 +1453,25 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_type(self):
-        self.model_instance_0.commit_type = 'random'
+        self.model_instance_0.commit_type = 'invalid'
         self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit type check of '
                 'CollectionCommitLogEntryModel\', '
-                '[u\'Entity id collection-0-1: Commit type random is '
+                '[u\'Entity id collection-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_post_commit_status(self):
-        self.model_instance_0.post_commit_status = 'random'
+        self.model_instance_0.post_commit_status = 'invalid'
         self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
                 'of CollectionCommitLogEntryModel\', '
-                '[u\'Entity id collection-0-1: Post commit status random '
+                '[u\'Entity id collection-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -1485,7 +1513,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'cmd': 'add_collection_node'
         }, {
             'cmd': 'delete_collection_node',
-            'random_key': 'random'
+            'invalid_attribute': 'invalid'
         }]
         self.model_instance_0.put()
         expected_output = [
@@ -1494,16 +1522,16 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'delete_collection_node '
                 'check of CollectionCommitLogEntryModel\', '
                 '[u\'Entity id collection-0-1: Commit command domain '
-                'validation failed with error: The following required keys '
-                'are missing: exploration_id, The following extra keys are '
-                'present: random_key\']]'
+                'validation failed with error: The following required '
+                'attributes are missing: exploration_id,The following '
+                'extra attributes are present: invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd '
                 'add_collection_node '
                 'check of CollectionCommitLogEntryModel\', '
                 '[u\'Entity id collection-0-1: Commit command domain '
                 'validation failed with error: The following required '
-                'keys are missing: exploration_id\']]'
+                'attributes are missing: exploration_id\']]'
             ),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -1700,7 +1728,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'CollectionSummaryModel\', '
                 '[u"Entity id 0: Property does not match the schema with '
                 'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
-                'Extra keys: [u\'10\']"]]'
+                'extra attributes: [u\'10\']"]]'
             ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -1719,7 +1747,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_contributors_summary(self):
-        self.model_instance_0.contributors_summary = {'random': 1}
+        self.model_instance_0.contributors_summary = {'invalid': 1}
         self.model_instance_0.put()
         expected_output = [
             (
@@ -1753,20 +1781,20 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_collection_model_related_properties(self):
         mock_created_on_time = datetime.datetime.utcnow()
         properties_dict = {
-            'title': 'random',
-            'category': 'random',
-            'objective': 'random',
+            'title': 'invalid',
+            'category': 'invalid',
+            'objective': 'invalid',
             'language_code': 'en',
-            'tags': ['random1', 'random2'],
+            'tags': ['invalid1', 'invalid2'],
             'collection_model_created_on': mock_created_on_time
         }
 
         output_dict = {
-            'title': 'random',
-            'category': 'random',
-            'objective': 'random',
+            'title': 'invalid',
+            'category': 'invalid',
+            'objective': 'invalid',
             'language_code': 'en',
-            'tags': 'random1,random2',
+            'tags': 'invalid1,invalid2',
             'collection_model_created_on': mock_created_on_time
         }
 
@@ -1800,23 +1828,23 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_collection_rights_model_related_properties(
             self):
         user_models.UserSettingsModel(
-            id='random1', email='random1@email.com').put()
+            id='invalid1', email='invalid1@email.com').put()
         user_models.UserSettingsModel(
-            id='random2', email='random2@email.com').put()
+            id='invalid2', email='invalid2@email.com').put()
         properties_dict = {
             'status': 'public',
             'community_owned': True,
-            'owner_ids': ['random1', 'random2'],
-            'editor_ids': ['random1', 'random2'],
-            'viewer_ids': ['random1', 'random2']
+            'owner_ids': ['invalid1', 'invalid2'],
+            'editor_ids': ['invalid1', 'invalid2'],
+            'viewer_ids': ['invalid1', 'invalid2']
         }
 
         output_dict = {
             'status': 'public',
             'community_owned': True,
-            'owner_ids': 'random1,random2',
-            'editor_ids': 'random1,random2',
-            'viewer_ids': 'random1,random2'
+            'owner_ids': 'invalid1,invalid2',
+            'editor_ids': 'invalid1,invalid2',
+            'viewer_ids': 'invalid1,invalid2'
         }
 
         for property_name in properties_dict:
@@ -2045,7 +2073,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
     def test_model_with_invalid_commit_cmd_schmea(self):
         self.model_instance.commit_cmds = [{
             'cmd': 'change_property_value',
-            'random_key': 'random'
+            'invalid_attribute': 'invalid'
         }]
         self.model_instance.put()
         expected_output = [
@@ -2054,9 +2082,9 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 'change_property_value '
                 'check of ConfigPropertySnapshotMetadataModel\', '
                 '[u\'Entity id config_model-1: Commit command domain '
-                'validation failed with error: The following required keys '
-                'are missing: new_value, The following extra keys are '
-                'present: random_key\']]'
+                'validation failed with error: The following required '
+                'attributes are missing: new_value,The following extra '
+                'attributes are present: invalid_attribute\']]'
             ),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -2257,7 +2285,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_invalid_sender_email(self):
-        self.sender_model.email = 'random@email.com'
+        self.sender_model.email = 'invalid@email.com'
         self.sender_model.put()
         expected_output = [(
             u'[u\'failed validation check for sender email check of '
@@ -2269,7 +2297,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_invalid_recipient_email(self):
-        self.recipient_model.email = 'random@email.com'
+        self.recipient_model.email = 'invalid@email.com'
         self.recipient_model.put()
         expected_output = [(
             u'[u\'failed validation check for recipient email check of '
@@ -2294,7 +2322,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
 
     def test_model_with_invalid_id(self):
         model_instance_with_invalid_id = email_models.SentEmailModel(
-            id='random', recipient_id=self.recipient_id,
+            id='invalid', recipient_id=self.recipient_id,
             recipient_email=self.recipient_email, sender_id=self.sender_id,
             sender_email=self.sender_email, intent=feconf.EMAIL_INTENT_SIGNUP,
             subject='Email Subject', html_body='Email Body',
@@ -2306,7 +2334,7 @@ class SentEmailModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for model id check of '
             'SentEmailModel\', '
             '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-        ) % 'random']
+        ) % 'invalid']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -2401,7 +2429,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_invalid_sender_email(self):
-        self.sender_model.email = 'random@email.com'
+        self.sender_model.email = 'invalid@email.com'
         self.sender_model.put()
         expected_output = [(
             u'[u\'failed validation check for sender email check of '
@@ -2426,7 +2454,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
 
     def test_model_with_invalid_id(self):
         model_instance_with_invalid_id = email_models.BulkEmailModel(
-            id='random', recipient_ids=self.recipient_ids,
+            id='invalid', recipient_ids=self.recipient_ids,
             sender_id=self.sender_id, sender_email=self.sender_email,
             intent=feconf.BULK_EMAIL_INTENT_MARKETING,
             subject='Email Subject', html_body='Email Body',
@@ -2525,7 +2553,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                 self.model_instance.reply_to_id) < (
                     email_models.REPLY_TO_ID_LENGTH):
             self.model_instance.reply_to_id = (
-                self.model_instance.reply_to_id + 'random')
+                self.model_instance.reply_to_id + 'invalid')
         self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for reply_to_id length check of '
@@ -2834,7 +2862,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             'cmd': 'add_state'
         }, {
             'cmd': 'delete_state',
-            'random_key': 'random'
+            'invalid_attribute': 'invalid'
         }]
         self.model_instance_0.put()
         expected_output = [
@@ -2842,14 +2870,14 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for commit cmd delete_state '
                 'check of ExplorationSnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
-                'with error: The following required keys are missing: '
-                'state_name, The following extra keys are present: '
-                'random_key\']]'
+                'with error: The following required attributes are missing: '
+                'state_name,The following extra attributes are present: '
+                'invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_state '
                 'check of ExplorationSnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
-                'with error: The following required keys are missing: '
+                'with error: The following required attributes are missing: '
                 'state_name\']]'
             ),
             u'[u\'fully-validated ExplorationSnapshotMetadataModel\', 2]']
@@ -3076,7 +3104,7 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_missing_cloned_from_exploration_model_failure(self):
-        self.model_instance_0.cloned_from = 'random'
+        self.model_instance_0.cloned_from = 'invalid'
         self.model_instance_0.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
@@ -3084,8 +3112,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
                 'cloned_from_exploration_ids '
                 'field check of ExplorationRightsModel\', '
                 '[u"Entity id 0: based on field cloned_from_exploration_ids '
-                'having value random, expect model ExplorationModel with id '
-                'random but it doesn\'t exist"]]'),
+                'having value invalid, expect model ExplorationModel with id '
+                'invalid but it doesn\'t exist"]]'),
             u'[u\'fully-validated ExplorationRightsModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3279,6 +3307,33 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             ), (
                 u'[u\'fully-validated '
                 'ExplorationRightsSnapshotMetadataModel\', 3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'change_exploration_status',
+            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+        }, {
+            'cmd': 'release_ownership',
+            'invalid_attribute': 'invalid'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd release_ownership '
+                'check of ExplorationRightsSnapshotMetadataModel\', '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following extra attributes are present: '
+                'invalid_attribute\']]'
+            ), (
+                u'[u\'failed validation check for commit cmd '
+                'change_exploration_status '
+                'check of ExplorationRightsSnapshotMetadataModel\', '
+                '[u\'Entity id 0-1: Commit command domain validation failed '
+                'with error: The following required attributes are missing: '
+                'new_status\']]'
+            ),
+            u'[u\'fully-validated ExplorationRightsSnapshotMetadataModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -3497,7 +3552,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             exp_models.ExplorationCommitLogEntryModel(
-                id='random-0-1', user_id=self.owner_id,
+                id='invalid-0-1', user_id=self.owner_id,
                 username=self.OWNER_USERNAME, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
@@ -3514,25 +3569,25 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_type(self):
-        self.model_instance_0.commit_type = 'random'
+        self.model_instance_0.commit_type = 'invalid'
         self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit type check of '
                 'ExplorationCommitLogEntryModel\', '
-                '[u\'Entity id exploration-0-1: Commit type random is '
+                '[u\'Entity id exploration-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_post_commit_status(self):
-        self.model_instance_0.post_commit_status = 'random'
+        self.model_instance_0.post_commit_status = 'invalid'
         self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
                 'of ExplorationCommitLogEntryModel\', '
-                '[u\'Entity id exploration-0-1: Post commit status random '
+                '[u\'Entity id exploration-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3572,7 +3627,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'cmd': 'add_state'
         }, {
             'cmd': 'delete_state',
-            'random_key': 'random'
+            'invalid_attribute': 'invalid'
         }]
         self.model_instance_0.put()
         expected_output = [
@@ -3580,15 +3635,15 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for commit cmd delete_state '
                 'check of ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id exploration-0-1: Commit command domain '
-                'validation failed with error: The following required keys '
-                'are missing: state_name, The following extra keys are '
-                'present: random_key\']]'
+                'validation failed with error: The following required '
+                'attributes are missing: state_name,The following extra '
+                'attributes are present: invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_state '
                 'check of ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id exploration-0-1: Commit command domain '
                 'validation failed with error: The following required '
-                'keys are missing: state_name\']]'
+                'attributes are missing: state_name\']]'
             ),
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3816,7 +3871,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'ExpSummaryModel\', '
                 '[u"Entity id 0: Property does not match the schema with '
                 'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
-                'Extra keys: [u\'10\']"]]'
+                'extra attributes: [u\'10\']"]]'
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3835,7 +3890,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_contributors_summary(self):
-        self.model_instance_0.contributors_summary = {'random': 1}
+        self.model_instance_0.contributors_summary = {'invalid': 1}
         self.model_instance_0.put()
         expected_output = [
             (
@@ -3855,20 +3910,20 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_exploration_model_related_properties(self):
         mock_created_on_time = datetime.datetime.utcnow()
         properties_dict = {
-            'title': 'random',
-            'category': 'random',
-            'objective': 'random',
+            'title': 'invalid',
+            'category': 'invalid',
+            'objective': 'invalid',
             'language_code': 'en',
-            'tags': ['random1', 'random2'],
+            'tags': ['invalid1', 'invalid2'],
             'exploration_model_created_on': mock_created_on_time
         }
 
         output_dict = {
-            'title': 'random',
-            'category': 'random',
-            'objective': 'random',
+            'title': 'invalid',
+            'category': 'invalid',
+            'objective': 'invalid',
             'language_code': 'en',
-            'tags': 'random1,random2',
+            'tags': 'invalid1,invalid2',
             'exploration_model_created_on': mock_created_on_time
         }
 
@@ -3902,9 +3957,9 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_exploration_rights_model_related_properties(
             self):
         user_models.UserSettingsModel(
-            id='random1', email='random1@email.com').put()
+            id='invalid1', email='invalid1@email.com').put()
         user_models.UserSettingsModel(
-            id='random2', email='random2@email.com').put()
+            id='invalid2', email='invalid2@email.com').put()
         rights_manager.publish_exploration(self.owner, '0')
         rights_manager.publish_exploration(self.owner, '1')
         self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')
@@ -3915,18 +3970,18 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             'status': 'private',
             'community_owned': True,
             'first_published_msec': mock_published_time,
-            'owner_ids': ['random1', 'random2'],
-            'editor_ids': ['random1', 'random2'],
-            'viewer_ids': ['random1', 'random2']
+            'owner_ids': ['invalid1', 'invalid2'],
+            'editor_ids': ['invalid1', 'invalid2'],
+            'viewer_ids': ['invalid1', 'invalid2']
         }
 
         output_dict = {
             'status': 'private',
             'community_owned': True,
             'first_published_msec': mock_published_time,
-            'owner_ids': 'random1,random2',
-            'editor_ids': 'random1,random2',
-            'viewer_ids': 'random1,random2'
+            'owner_ids': 'invalid1,invalid2',
+            'editor_ids': 'invalid1,invalid2',
+            'viewer_ids': 'invalid1,invalid2'
         }
 
         for property_name in properties_dict:
@@ -4814,14 +4869,14 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
 
     def test_model_with_invalid_id(self):
         model_with_invalid_id = recommendations_models.TopicSimilaritiesModel(
-            id='random', content=self.content)
+            id='invalid', content=self.content)
         model_with_invalid_id.put()
 
         expected_output = [
             (
                 u'[u\'failed validation check for model id check of '
                 'TopicSimilaritiesModel\', '
-                '[u\'Entity id random: Entity id does not match regex '
+                '[u\'Entity id invalid: Entity id does not match regex '
                 'pattern\']]'
             ),
             u'[u\'fully-validated TopicSimilaritiesModel\', 1]']
@@ -4847,8 +4902,8 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
 
     def test_model_with_invalid_topic(self):
         content = {
-            'Art': {'Art': '1.0', 'Random': '0.5'},
-            'Random': {'Art': '0.5', 'Random': '1.0'}
+            'Art': {'Art': '1.0', 'invalid': '0.5'},
+            'invalid': {'Art': '0.5', 'invalid': '1.0'}
         }
         self.model_instance.content = content
         self.model_instance.put()
@@ -4856,7 +4911,7 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for topic check of '
             'TopicSimilaritiesModel\', '
-            '[u\'Entity id %s: Topic Random not in list of known topics\']]'
+            '[u\'Entity id %s: Topic invalid not in list of known topics\']]'
         ) % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output)
@@ -5260,7 +5315,7 @@ class StorySnapshotMetadataModelValidatorTests(
             'cmd': 'add_story_node'
         }, {
             'cmd': 'delete_story_node',
-            'random_key': 'random'
+            'invalid_attribute': 'invalid'
         }]
         self.model_instance_0.put()
         expected_output = [
@@ -5268,14 +5323,15 @@ class StorySnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for commit cmd delete_story_node '
                 'check of StorySnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
-                'with error: The following required keys are missing: node_id, '
-                'The following extra keys are present: random_key\']]'
+                'with error: The following required attributes are missing: '
+                'node_id,The following extra attributes are present: '
+                'invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_story_node '
                 'check of StorySnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
-                'with error: The following required keys are missing: '
-                'node_id\']]'
+                'with error: The following required attributes are missing: '
+                'node_id,title\']]'
             ),
             u'[u\'fully-validated StorySnapshotMetadataModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -5660,7 +5716,7 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
             'new_role': 'manager'
         }, {
             'cmd': 'publish_story',
-            'random_key': 'random'
+            'invalid_attribute': 'invalid'
         }]
         self.model_instance_0.put()
         expected_output = [
@@ -5668,13 +5724,13 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
                 u'[u\'failed validation check for commit cmd publish_story '
                 'check of StoryRightsSnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
-                'with error: The following extra keys are present: '
-                'random_key\']]'
+                'with error: The following extra attributes are present: '
+                'invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd change_role '
                 'check of StoryRightsSnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
-                'with error: The following required keys are missing: '
+                'with error: The following required attributes are missing: '
                 'old_role\']]'
             ),
             u'[u\'fully-validated StoryRightsSnapshotMetadataModel\', 2]']
@@ -5893,7 +5949,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_id(self):
         model_with_invalid_id = (
             story_models.StoryCommitLogEntryModel(
-                id='random-0-1', user_id=self.owner_id,
+                id='invalid-0-1', user_id=self.owner_id,
                 username=self.OWNER_USERNAME, commit_type='edit',
                 commit_message='msg', commit_cmds=[{}],
                 post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
@@ -5910,25 +5966,25 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_type(self):
-        self.model_instance_0.commit_type = 'random'
+        self.model_instance_0.commit_type = 'invalid'
         self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for commit type check of '
                 'StoryCommitLogEntryModel\', '
-                '[u\'Entity id story-0-1: Commit type random is '
+                '[u\'Entity id story-0-1: Commit type invalid is '
                 'not allowed\']]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_post_commit_status(self):
-        self.model_instance_0.post_commit_status = 'random'
+        self.model_instance_0.post_commit_status = 'invalid'
         self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for post commit status check '
                 'of StoryCommitLogEntryModel\', '
-                '[u\'Entity id story-0-1: Post commit status random '
+                '[u\'Entity id story-0-1: Post commit status invalid '
                 'is invalid\']]'
             ), u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -5968,7 +6024,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             'cmd': 'add_story_node'
         }, {
             'cmd': 'delete_story_node',
-            'random_key': 'random'
+            'invalid_attribute': 'invalid'
         }]
         self.model_instance_0.put()
         expected_output = [
@@ -5976,14 +6032,15 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for commit cmd delete_story_node '
                 'check of StoryCommitLogEntryModel\', '
                 '[u\'Entity id story-0-1: Commit command domain validation '
-                'failed with error: The following required keys are missing: '
-                'node_id, The following extra keys are present: random_key\']]'
+                'failed with error: The following required attributes are '
+                'missing: node_id,The following extra attributes are present: '
+                'invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_story_node '
                 'check of StoryCommitLogEntryModel\', '
                 '[u\'Entity id story-0-1: Commit command domain validation '
-                'failed with error: The following required keys are missing: '
-                'node_id\']]'
+                'failed with error: The following required attributes are '
+                'missing: node_id\']]'
             ),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -6102,15 +6159,15 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
     def test_model_with_invalid_story_model_related_properties(self):
         mock_created_on_time = datetime.datetime.utcnow()
         properties_dict = {
-            'title': 'random',
-            'description': 'random',
+            'title': 'invalid',
+            'description': 'invalid',
             'language_code': 'en',
             'story_model_created_on': mock_created_on_time
         }
 
         output_dict = {
-            'title': 'random',
-            'description': 'random',
+            'title': 'invalid',
+            'description': 'invalid',
             'language_code': 'en',
             'story_model_created_on': mock_created_on_time
         }

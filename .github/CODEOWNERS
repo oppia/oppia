@@ -323,8 +323,7 @@
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
-/core/domain/commit_commands_domain.py @ankita240796
-/core/domain/commit_commands_domain_test.py @ankita240796
+/core/domain/change_domain.py @seanlip
 /core/templates/dev/head/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
 /schema_utils*.py @seanlip

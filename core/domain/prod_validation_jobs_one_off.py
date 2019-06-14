@@ -17,7 +17,6 @@
 """One-off jobs for validating prod models."""
 
 import collections
-import copy
 import csv
 import datetime
 import re
@@ -25,10 +24,15 @@ import re
 from constants import constants
 from core import jobs
 from core.domain import activity_domain
+from core.domain import collection_domain
 from core.domain import collection_services
-from core.domain import commit_commands_domain
+from core.domain import config_domain
+from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import recommendations_services
+from core.domain import rights_manager
+from core.domain import story_domain
 from core.domain import story_services
 from core.platform import models
 import feconf
@@ -264,13 +268,14 @@ class BaseModelValidator(object):
                     item.id, item.commit_type))
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        """Defines a Commit command domain class.
+    def _get_change_domain_class(cls):
+        """Defines a Change domain class.
 
         This should be implemented by subclasses.
 
         Returns:
-            *: A domain object class for the commit commands used in the model.
+            change_domain.BaseChange: A domain object class for the
+                changes made by commit commands of the model.
         """
         raise NotImplementedError
 
@@ -281,19 +286,17 @@ class BaseModelValidator(object):
         Args:
             item: ndb.Model. Entity to validate.
         """
+        change_domain_object = cls._get_change_domain_class()
         for commit_cmd_dict in item.commit_cmds:
-            if len(commit_cmd_dict.keys()):
-                name = commit_cmd_dict['cmd']
-                parameters = copy.deepcopy(commit_cmd_dict)
-                parameters.pop('cmd', None)
-                commit_cmd_domain_object = cls._get_commit_cmd_domain_class()(
-                    name, parameters)
-                try:
-                    commit_cmd_domain_object.validate()
-                except Exception as e:
-                    cls.errors['commit cmd %s check' % name].append((
-                        'Entity id %s: Commit command domain validation failed '
-                        'with error: %s') % (item.id, e))
+            if not commit_cmd_dict:
+                continue
+            try:
+                change_domain_object(commit_cmd_dict)
+            except Exception as e:
+                cmd_name = commit_cmd_dict.get('cmd')
+                cls.errors['commit cmd %s check' % cmd_name].append((
+                    'Entity id %s: Commit command domain validation failed '
+                    'with error: %s') % (item.id, e))
 
     @classmethod
     def _validate_post_commit_status(cls, item):
@@ -424,7 +427,7 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         return model_domain_object_instances
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -473,7 +476,7 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -504,7 +507,7 @@ class CollectionModelValidator(BaseModelValidator):
         return model_domain_object_instances
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -562,8 +565,8 @@ class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.CollectionCommitCmd
+    def _get_change_domain_class(cls):
+        return collection_domain.CollectionChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -616,7 +619,7 @@ class CollectionSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -669,7 +672,7 @@ class CollectionRightsModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -737,8 +740,8 @@ class CollectionRightsSnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.CollectionRightsCommitCmd
+    def _get_change_domain_class(cls):
+        return rights_manager.CollectionRightsChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -793,7 +796,7 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -853,8 +856,8 @@ class CollectionCommitLogEntryModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.CollectionCommitCmd
+    def _get_change_domain_class(cls):
+        return collection_domain.CollectionChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -922,7 +925,7 @@ class CollectionSummaryModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1099,7 +1102,7 @@ class ConfigPropertyModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1139,8 +1142,8 @@ class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.ConfigPropertyCommitCmd
+    def _get_change_domain_class(cls):
+        return config_domain.ConfigPropertyChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1194,7 +1197,7 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1249,7 +1252,7 @@ class SentEmailModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1323,6 +1326,8 @@ class SentEmailModelValidator(BaseModelValidator):
 class BulkEmailModelValidator(BaseModelValidator):
     """Class for validating BulkEmailModels."""
 
+    MODEL_ID_LENGTH = 12
+
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
@@ -1336,7 +1341,7 @@ class BulkEmailModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1356,7 +1361,7 @@ class BulkEmailModelValidator(BaseModelValidator):
         """
         # The bulk email model has ids as randomly generated strings of
         # length 12.
-        if len(item.id) != email_models.BulkEmailModel.MODEL_ID_LENGTH:
+        if len(item.id) != cls.MODEL_ID_LENGTH:
             cls.errors['model id length check'].append((
                 'Entity id %s: Entity id should be of length 12 but instead '
                 'has length %s' % (item.id, len(item.id))))
@@ -1417,7 +1422,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1474,7 +1479,7 @@ class ExplorationModelValidator(BaseModelValidator):
         return model_domain_object_instances
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1527,8 +1532,8 @@ class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.ExplorationCommitCmd
+    def _get_change_domain_class(cls):
+        return exp_domain.ExplorationChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1582,7 +1587,7 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1635,7 +1640,7 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1709,8 +1714,8 @@ class ExplorationRightsSnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.ExplorationRightsCommitCmd
+    def _get_change_domain_class(cls):
+        return rights_manager.ExplorationRightsChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1766,7 +1771,7 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -1827,8 +1832,8 @@ class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.ExplorationCommitCmd
+    def _get_change_domain_class(cls):
+        return exp_domain.ExplorationChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1897,7 +1902,7 @@ class ExpSummaryModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2111,7 +2116,7 @@ class FileMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2164,8 +2169,8 @@ class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.FileMetadataCommitCmd
+    def _get_change_domain_class(cls):
+        return fs_domain.FileMetadataChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2219,7 +2224,7 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2272,7 +2277,7 @@ class FileModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2325,8 +2330,8 @@ class FileSnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.FileCommitCmd
+    def _get_change_domain_class(cls):
+        return fs_domain.FileChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2380,7 +2385,7 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2433,7 +2438,7 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2480,7 +2485,7 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2589,7 +2594,7 @@ class StoryModelValidator(BaseModelValidator):
         return model_domain_object_instances
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2647,8 +2652,8 @@ class StorySnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.StoryCommitCmd
+    def _get_change_domain_class(cls):
+        return story_domain.StoryChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2700,7 +2705,7 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2751,7 +2756,7 @@ class StoryRightsModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2795,8 +2800,8 @@ class StoryRightsSnapshotMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.StoryRightsCommitCmd
+    def _get_change_domain_class(cls):
+        return story_domain.StoryRightsChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2851,7 +2856,7 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -2911,8 +2916,8 @@ class StoryCommitLogEntryModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
-        return commit_commands_domain.StoryCommitCmd
+    def _get_change_domain_class(cls):
+        return story_domain.StoryChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2962,7 +2967,7 @@ class StorySummaryModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod
@@ -3060,7 +3065,7 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_commit_cmd_domain_class(cls):
+    def _get_change_domain_class(cls):
         return None
 
     @classmethod

@@ -42,23 +42,94 @@ title: A title
 
 class CollectionChangeTests(test_utils.GenericTestBase):
 
-    def test_collection_change_object_with_invalid_change_dict(self):
-        # Raises exception as 'cmd' command is not found in change_dict.
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict:'):
-            collection_domain.CollectionChange({'invalid_cmd': 'data'})
+    def test_collection_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            collection_domain.CollectionChange({'invalid': 'data'})
 
-        # Raises exception due to invalid property name.
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict:'):
+    def test_collection_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            collection_domain.CollectionChange({'cmd': 'invalid'})
+
+    def test_collection_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'exploration_id,new_value')):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_node_property',
+                'property_name': 'category',
+                'old_value': 'old_value'
+            })
+
+    def test_collection_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_node_property',
+                'exploration_id': 'exploration_id',
+                'property_name': 'category',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+                'invalid': 'invalid'
+            })
+
+    def test_collection_change_object_with_invalid_collection_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd edit_collection_property: '
+                'invalid is not allowed')):
             collection_domain.CollectionChange({
                 'cmd': 'edit_collection_property',
-                'property_name': 'invalid_property_name',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
             })
 
-        # Raises exception due to invalid command.
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict:'):
+    def test_collection_change_object_with_invalid_collection_node_property(
+            self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd edit_collection_node_property: '
+                'invalid is not allowed')):
             collection_domain.CollectionChange({
-                'cmd': 'invalid_cmd'
+                'cmd': 'edit_collection_node_property',
+                'exploration_id': 'exploration_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
             })
+
+    def test_collection_change_object_with_create_new(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'create_new',
+            'category': 'category',
+            'title': 'title'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'create_new')
+        self.assertEqual(col_change_object.category, 'category')
+        self.assertEqual(col_change_object.title, 'title')
+
+    def test_collection_change_object_with_add_collection_node(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_collection_node',
+            'exploration_id': 'exploration_id',
+        })
+
+        self.assertEqual(col_change_object.cmd, 'add_collection_node')
+        self.assertEqual(col_change_object.exploration_id, 'exploration_id')
+
+    def test_collection_change_object_with_delete_collection_node(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'delete_collection_node',
+            'exploration_id': 'exploration_id',
+        })
+
+        self.assertEqual(col_change_object.cmd, 'delete_collection_node')
+        self.assertEqual(col_change_object.exploration_id, 'exploration_id')
 
     def test_collection_change_object_with_swap_nodes(self):
         col_change_object = collection_domain.CollectionChange({
@@ -67,22 +138,50 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             'second_index': 'second_index'
         })
 
+        self.assertEqual(col_change_object.cmd, 'swap_nodes')
         self.assertEqual(col_change_object.first_index, 'first_index')
         self.assertEqual(col_change_object.second_index, 'second_index')
+
+    def test_collection_change_object_with_edit_collection_property(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'edit_collection_property',
+            'property_name': 'category',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'edit_collection_property')
+        self.assertEqual(col_change_object.property_name, 'category')
+        self.assertEqual(col_change_object.new_value, 'new_value')
+        self.assertEqual(col_change_object.old_value, 'old_value')
 
     def test_collection_change_object_with_edit_collection_node_property(self):
         col_change_object = collection_domain.CollectionChange({
             'cmd': 'edit_collection_node_property',
             'exploration_id': 'exploration_id',
-            'property_name': 'property_name',
+            'property_name': 'title',
             'new_value': 'new_value',
             'old_value': 'old_value'
         })
 
+        self.assertEqual(col_change_object.cmd, 'edit_collection_node_property')
         self.assertEqual(col_change_object.exploration_id, 'exploration_id')
-        self.assertEqual(col_change_object.property_name, 'property_name')
+        self.assertEqual(col_change_object.property_name, 'title')
         self.assertEqual(col_change_object.new_value, 'new_value')
         self.assertEqual(col_change_object.old_value, 'old_value')
+
+    def test_collection_change_object_with_migrate_schema_to_latest_version(
+            self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'migrate_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
+
+        self.assertEqual(
+            col_change_object.cmd, 'migrate_schema_to_latest_version')
+        self.assertEqual(col_change_object.from_version, 'from_version')
+        self.assertEqual(col_change_object.to_version, 'to_version')
 
     def test_collection_change_object_with_add_collection_skill(self):
         col_change_object = collection_domain.CollectionChange({
@@ -90,7 +189,17 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             'name': 'name'
         })
 
+        self.assertEqual(col_change_object.cmd, 'add_collection_skill')
         self.assertEqual(col_change_object.name, 'name')
+
+    def test_collection_change_object_with_delete_collection_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'delete_collection_skill',
+            'skill_id': 'skill_id'
+        })
+
+        self.assertEqual(col_change_object.cmd, 'delete_collection_skill')
+        self.assertEqual(col_change_object.skill_id, 'skill_id')
 
     def test_collection_change_object_with_add_question_id_to_skill(self):
         col_change_object = collection_domain.CollectionChange({
@@ -99,6 +208,7 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             'question_id': 'question_id'
         })
 
+        self.assertEqual(col_change_object.cmd, 'add_question_id_to_skill')
         self.assertEqual(col_change_object.skill_id, 'skill_id')
         self.assertEqual(col_change_object.question_id, 'question_id')
 
@@ -109,16 +219,18 @@ class CollectionChangeTests(test_utils.GenericTestBase):
             'question_id': 'question_id'
         })
 
+        self.assertEqual(col_change_object.cmd, 'remove_question_id_from_skill')
         self.assertEqual(col_change_object.skill_id, 'skill_id')
         self.assertEqual(col_change_object.question_id, 'question_id')
 
-    def test_collection_change_object_with_delete_collection_skill(self):
-        col_change_object = collection_domain.CollectionChange({
-            'cmd': 'delete_collection_skill',
+    def test_to_dict(self):
+        col_change_dict = {
+            'cmd': 'remove_question_id_from_skill',
             'skill_id': 'skill_id',
-        })
-
-        self.assertEqual(col_change_object.skill_id, 'skill_id')
+            'question_id': 'question_id'
+        }
+        col_change_object = collection_domain.CollectionChange(col_change_dict)
+        self.assertEqual(col_change_object.to_dict(), col_change_dict)
 
 
 class CollectionDomainUnitTests(test_utils.GenericTestBase):

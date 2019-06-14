@@ -20,6 +20,7 @@ import logging
 
 from constants import constants
 from core.domain import activity_services
+from core.domain import change_domain
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import user_services
@@ -54,6 +55,34 @@ ROLE_NONE = 'none'
 
 ROLE_ADMIN = 'admin'
 ROLE_MODERATOR = 'moderator'
+
+ALLOWED_ROLES = [ROLE_OWNER, ROLE_EDITOR, ROLE_VOICE_ARTIST, ROLE_VIEWER]
+ALLOWED_STATUS = [ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC]
+
+COMMON_ALLOWED_COMMANDS = [{
+    'name': CMD_CREATE_NEW,
+    'required_attributes': [],
+    'optional_attributes': []
+}, {
+    'name': CMD_CHANGE_ROLE,
+    'required_attributes': ['assignee_id', 'old_role', 'new_role'],
+    'optional_attributes': [],
+    'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
+}, {
+    'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
+    'required_attributes': [
+        'old_viewable_if_private', 'new_viewable_if_private'],
+    'optional_attributes': []
+}, {
+    'name': CMD_RELEASE_OWNERSHIP,
+    'required_attributes': [],
+    'optional_attributes': [],
+}, {
+    'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
+    'required_attributes': [
+        'old_first_published_msec', 'new_first_published_msec'],
+    'optional_attributes': [],
+}]
 
 
 class ActivityRights(object):
@@ -227,6 +256,92 @@ class ActivityRights(object):
             bool. Whether activity is private.
         """
         return bool(self.status == ACTIVITY_STATUS_PRIVATE)
+
+
+class ActivityRightsChange(change_domain.BaseChange):
+    """Domain object class for an activity rights change."""
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'assignee_id', 'old_role', 'new_role', 'old_viewable_if_private',
+        'new_viewable_if_private', 'old_first_published_msec',
+        'new_first_published_msec', 'old_status', 'new_status']
+
+    ALLOWED_COMMANDS = COMMON_ALLOWED_COMMANDS
+
+    def __init__(self, change_dict):
+        """Initializes an ActivityRightsChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd' key
+                and one or more other keys. The keys depend on what the value
+                for 'cmd' is. The possible values for 'cmd' are listed below,
+                together with the other keys in the dict:
+                    - 'create_new'
+                    - 'change_role' (with assignee_id, old_role, new_role)
+                    - 'change_exploration_status' (with old_status, new_status)
+                    - 'change_collection_status' (with old_status, new_status)
+                    - 'change_private_viewability' (with
+                        old_viewable_if_private, new_viewable_if_private)
+                    - 'release_ownership'
+                    - 'update_first_published_msec' (with
+                        old_first_published_msec, new_first_published_msec)
+                A role must be one of the ALLOWED_ROLES.
+                A status must be one of the ALLOWED_STATUS.
+
+        Raises:
+            Exception: The given change_dict is not valid.
+        """
+        self.validate(change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_CREATE_NEW:
+            pass
+        elif self.cmd == CMD_CHANGE_ROLE:
+            self.assignee_id = change_dict['assignee_id']
+            self.old_role = change_dict['old_role']
+            self.new_role = change_dict['new_role']
+        elif self.cmd == CMD_CHANGE_EXPLORATION_STATUS or (
+                self.cmd == CMD_CHANGE_COLLECTION_STATUS):
+            self.old_status = change_dict['old_status']
+            self.new_status = change_dict['new_status']
+        elif self.cmd == CMD_CHANGE_PRIVATE_VIEWABILITY:
+            self.old_viewable_if_private = change_dict[
+                'old_viewable_if_private']
+            self.new_viewable_if_private = change_dict[
+                'new_viewable_if_private']
+        elif self.cmd == CMD_RELEASE_OWNERSHIP:
+            pass
+        elif self.cmd == CMD_UPDATE_FIRST_PUBLISHED_MSEC:
+            self.old_first_published_msec = change_dict[
+                'old_first_published_msec']
+            self.new_first_published_msec = change_dict[
+                'new_first_published_msec']
+
+
+class ExplorationRightsChange(ActivityRightsChange):
+    """Domain object class for an exploration rights change."""
+
+    ALLOWED_COMMANDS = COMMON_ALLOWED_COMMANDS
+    ALLOWED_COMMANDS.append({
+        'name': CMD_CHANGE_EXPLORATION_STATUS,
+        'required_attributes': ['old_status', 'new_status'],
+        'optional_attributes': [],
+        'allowed_values': {
+            'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
+    })
+
+
+class CollectionRightsChange(ActivityRightsChange):
+    """Domain object class for an collection rights change."""
+
+    ALLOWED_COMMANDS = COMMON_ALLOWED_COMMANDS
+    ALLOWED_COMMANDS.append({
+        'name': CMD_CHANGE_COLLECTION_STATUS,
+        'required_attributes': ['old_status', 'new_status'],
+        'optional_attributes': [],
+        'allowed_values': {
+            'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
+    })
 
 
 def get_activity_rights_from_model(activity_rights_model, activity_type):

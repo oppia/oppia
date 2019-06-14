@@ -18,6 +18,7 @@ import copy
 import re
 
 from constants import constants
+from core.domain import change_domain
 from core.domain import html_cleaner
 import feconf
 import utils
@@ -65,7 +66,7 @@ ROLE_NONE = 'none'
 NODE_ID_PREFIX = 'node_'
 
 
-class StoryChange(object):
+class StoryChange(change_domain.BaseChange):
     """Domain object for changes made to story object."""
     STORY_PROPERTIES = (
         STORY_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
@@ -84,6 +85,45 @@ class StoryChange(object):
         'to_version', 'title', 'finalized'
     ]
 
+    ALLOWED_COMMANDS = [{
+        'name': CMD_UPDATE_STORY_PROPERTY,
+        'required_attributes': ['property_name', 'new_value', 'old_value'],
+        'optional_attributes': [],
+        'allowed_values': {'property_name': STORY_PROPERTIES}
+    }, {
+        'name': CMD_UPDATE_STORY_NODE_PROPERTY,
+        'required_attributes': [
+            'node_id', 'property_name', 'new_value', 'old_value'],
+        'optional_attributes': [],
+        'allowed_values': {'property_name': STORY_NODE_PROPERTIES}
+    }, {
+        'name': CMD_UPDATE_STORY_CONTENTS_PROPERTY,
+        'required_attributes': ['property_name', 'new_value', 'old_value'],
+        'optional_attributes': [],
+        'allowed_values': {'property_name': STORY_CONTENTS_PROPERTIES}
+    }, {
+        'name': CMD_ADD_STORY_NODE,
+        'required_attributes': ['node_id', 'title'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_DELETE_STORY_NODE,
+        'required_attributes': ['node_id'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
+        'required_attributes': ['node_id', 'old_value', 'new_value'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_CREATE_NEW,
+        'required_attributes': ['title'],
+        'optional_attributes': []
+    }, {
+        'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
+        'required_attributes': ['from_version', 'to_version'],
+        'optional_attributes': []
+    }]
+
+
     def __init__(self, change_dict):
         """Initialize a StoryChange object from a dict.
 
@@ -92,7 +132,7 @@ class StoryChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
-                - 'add_story_node' (with node_id)
+                - 'add_story_node' (with node_id, title)
                 - 'delete_story_node' (with node_id)
                 - 'update_story_node_outline_status' (with node_id, old_value
                 and new_value)
@@ -109,8 +149,7 @@ class StoryChange(object):
         Raises:
             Exception: The given change dict is not valid.
         """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.validate(change_dict)
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_STORY_NODE:
@@ -123,23 +162,15 @@ class StoryChange(object):
             self.old_value = change_dict['old_value']
             self.new_value = change_dict['new_value']
         elif self.cmd == CMD_UPDATE_STORY_NODE_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.STORY_NODE_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
             self.node_id = change_dict['node_id']
             self.property_name = change_dict['property_name']
             self.new_value = copy.deepcopy(change_dict['new_value'])
             self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_UPDATE_STORY_PROPERTY:
-            if change_dict['property_name'] not in self.STORY_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = copy.deepcopy(change_dict['new_value'])
             self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_UPDATE_STORY_CONTENTS_PROPERTY:
-            if change_dict['property_name'] not in (
-                    self.STORY_CONTENTS_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = copy.deepcopy(change_dict['new_value'])
             self.old_value = copy.deepcopy(change_dict['old_value'])
@@ -148,23 +179,6 @@ class StoryChange(object):
             self.to_version = change_dict['to_version']
         elif self.cmd == CMD_CREATE_NEW:
             self.title = change_dict['title']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the StoryChange domain object.
-
-        Returns:
-            A dict, mapping all fields of StoryChange instance.
-        """
-        story_change_dict = {}
-        story_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                story_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return story_change_dict
 
 
 class StoryNode(object):
@@ -1108,12 +1122,33 @@ class StoryRights(object):
         return bool(user_id in self.manager_ids)
 
 
-class StoryRightsChange(object):
+class StoryRightsChange(change_domain.BaseChange):
     """Domain object for changes made to a story rights object."""
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'assignee_id', 'new_role', 'old_role'
     ]
+
+    ALLOWED_ROLES = [ROLE_NONE, ROLE_MANAGER]
+
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attributes': [],
+        'optional_attributes': []
+    }, {
+        'name': CMD_CHANGE_ROLE,
+        'required_attributes': ['assignee_id', 'new_role', 'old_role'],
+        'optional_attributes': [],
+        'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
+    }, {
+        'name': CMD_PUBLISH_STORY,
+        'required_attributes': [],
+        'optional_attributes': []
+    }, {
+        'name': CMD_UNPUBLISH_STORY,
+        'required_attributes': [],
+        'optional_attributes': []
+    }]
 
     def __init__(self, change_dict):
         """Initialize a StoryRightsChange object from a dict.
@@ -1131,8 +1166,7 @@ class StoryRightsChange(object):
         Raises:
             Exception: The given change dict is not valid.
         """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.validate(change_dict)
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_CHANGE_ROLE:
@@ -1145,20 +1179,3 @@ class StoryRightsChange(object):
             pass
         elif self.cmd == CMD_UNPUBLISH_STORY:
             pass
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the StoryRightsChange domain object.
-
-        Returns:
-            A dict, mapping all fields of StoryRightsChange instance.
-        """
-        story_rights_change_dict = {}
-        story_rights_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                story_rights_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return story_rights_change_dict

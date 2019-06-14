@@ -16,6 +16,7 @@
 
 """Domain objects for configuration properties."""
 
+from core.domain import change_domain
 from core.platform import models
 import feconf
 import schema_utils
@@ -64,6 +65,39 @@ UNICODE_SCHEMA = {
 FLOAT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_FLOAT
 }
+
+
+class ConfigPropertyChange(change_domain.BaseChange):
+    """Domain object for changes made to a config property object."""
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'new_value'
+    ]
+
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CHANGE_PROPERTY_VALUE,
+        'required_attributes': ['new_value'],
+        'optional_attributes': []
+    }]
+
+    def __init__(self, change_dict):
+        """Initialize a ConfigPropertyChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                - 'change_property_value' (with new_value)
+
+        Raises:
+            Exception: The given change dict is not valid.
+        """
+        self.validate(change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_CHANGE_PROPERTY_VALUE:
+            self.new_value = change_dict['new_value']
 
 
 class ConfigProperty(object):
