@@ -41,13 +41,13 @@ oppia.directive('preferencesPage', ['UrlInterpolationService', function(
       '/pages/preferences-page/preferences-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$http', '$q', '$rootScope', '$timeout', '$translate',
+      '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate',
       '$uibModal', 'AlertsService', 'LanguageUtilService',
       'UrlInterpolationService', 'UserService', 'UtilsService',
       'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
       'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
       function(
-          $http, $q, $rootScope, $timeout, $translate,
+          $http, $q, $rootScope, $scope, $timeout, $translate,
           $uibModal, AlertsService, LanguageUtilService,
           UrlInterpolationService, UserService, UtilsService,
           DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
@@ -70,8 +70,8 @@ oppia.directive('preferencesPage', ['UrlInterpolationService', function(
         preferencesPromise.then(function(response) {
           var data = response.data;
           ctrl.userBio = data.user_bio;
-          ctrl.subjectInterests = data.subject_interests;
-          ctrl.preferredLanguageCodes = data.preferred_language_codes;
+          $scope.subjectInterests = data.subject_interests;
+          $scope.preferredLanguageCodes = data.preferred_language_codes;
           ctrl.profilePictureDataUrl = data.profile_picture_data_url;
           ctrl.defaultDashboard = data.default_dashboard;
           ctrl.canReceiveEmailUpdates = data.can_receive_email_updates;
@@ -80,8 +80,9 @@ oppia.directive('preferencesPage', ['UrlInterpolationService', function(
             data.can_receive_subscription_email;
           ctrl.canReceiveFeedbackMessageEmail = (
             data.can_receive_feedback_message_email);
-          ctrl.preferredSiteLanguageCode = data.preferred_site_language_code;
-          ctrl.preferredAudioLanguageCode = data.preferred_audio_language_code;
+          $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
+          $scope.preferredAudioLanguageCode =
+            data.preferred_audio_language_code;
           ctrl.subscriptionList = data.subscription_list;
           ctrl.hasPageLoaded = true;
           _forceSelect2Refresh();
