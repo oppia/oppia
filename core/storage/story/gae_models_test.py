@@ -39,6 +39,7 @@ class StoryModelTest(test_utils.GenericTestBase):
             notes='notes',
             story_contents_schema_version=(
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
+            corresponding_topic_id='topic_id',
             language_code='language_code')
         story_instance.commit(committer_id, commit_message, commit_cmds)
         story_by_id = story_models.StoryModel.get_by_id('id')
