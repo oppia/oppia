@@ -21,7 +21,6 @@ objects they represent are stored. All methods and properties in this file
 should therefore be independent of the specific storage models used.
 """
 
-import bs4
 import copy
 import functools
 import re
@@ -2241,84 +2240,10 @@ class Exploration(object):
         """
         image_counter = 0
         for state_dict in states_dict.itervalues():
-            image_assets = {}
-            image_mapping = {}
-
-            content_html = state_dict['content']['html']
-            (new_content_html, image_counter, image_mapping) = (
-                html_validation_service.get_html_with_image_id_in_image_tag(
-                    content_html, image_counter, image_mapping))
-            state_dict['content']['html'] = new_content_html
-
-            if state_dict['interaction']['default_outcome']:
-                interaction_feedback_html = state_dict[
-                    'interaction']['default_outcome']['feedback']['html']
-                (
-                    new_interaction_feedback_html, image_counter,
-                    image_mapping) = (
-                        html_validation_service.
-                        get_html_with_image_id_in_image_tag(
-                            interaction_feedback_html, image_counter,
-                            image_mapping))
-                state_dict['interaction']['default_outcome']['feedback'][
-                    'html'] = new_interaction_feedback_html
-
-            for answer_group_index, answer_group in enumerate(
-                    state_dict['interaction']['answer_groups']):
-                answer_group_html = answer_group['outcome']['feedback']['html']
-                (new_answer_group_html, image_counter, image_mapping) = (
-                    html_validation_service.get_html_with_image_id_in_image_tag(
-                        answer_group_html, image_counter, image_mapping))
-                state_dict['interaction']['answer_groups'][
-                    answer_group_index]['outcome']['feedback']['html'] = (
-                        new_answer_group_html)
-                if state_dict['interaction']['id'] == 'ItemSelectionInput':
-                    for rule_spec_index, rule_spec in enumerate(
-                            answer_group['rule_specs']):
-                        for x_index, x in enumerate(rule_spec['inputs']['x']):
-                            (
-                                new_x, image_counter, image_mapping) = (
-                                    html_validation_service.
-                                    get_html_with_image_id_in_image_tag(
-                                        x, image_counter, image_mapping))
-                            state_dict['interaction']['answer_groups'][
-                                answer_group_index]['rule_specs'][
-                                    rule_spec_index]['inputs']['x'][x_index] = (
-                                        new_x)
-
-            for hint_index, hint in enumerate(
-                    state_dict['interaction']['hints']):
-                hint_html = hint['hint_content']['html']
-                (new_hint_html, image_counter, image_mapping) = (
-                    html_validation_service.get_html_with_image_id_in_image_tag(
-                        hint_html, image_counter, image_mapping))
-                state_dict['interaction']['hints'][hint_index][
-                    'hint_content']['html'] = new_hint_html
-
-            if state_dict['interaction']['solution']:
-                solution_html = state_dict[
-                    'interaction']['solution']['explanation']['html']
-                (new_solution_html, image_counter, image_mapping) = (
-                    html_validation_service.
-                    get_html_with_image_id_in_image_tag(
-                        solution_html, image_counter, image_mapping))
-                state_dict['interaction']['solution']['explanation']['html'] = (
-                    new_solution_html)
-
-            if state_dict['interaction']['id'] in (
-                    'ItemSelectionInput', 'MultipleChoiceInput'):
-                for value_index, value in enumerate(
-                        state_dict['interaction']['customization_args'][
-                            'choices']['value']):
-                    (new_value, image_counter, image_mapping) = (
-                        html_validation_service.
-                        get_html_with_image_id_in_image_tag(
-                            value, image_counter, image_mapping))
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value'][value_index] = new_value
-
-            image_assets['image_mapping'] = image_mapping
-            state_dict['image_assets'] = image_assets
+            image_counter = (
+                html_validation_service.
+                add_image_id_and_image_assets_in_state_dict(
+                    state_dict, image_counter))
 
         return states_dict
 
@@ -2950,7 +2875,7 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
-    def _convert_v33_dict_to_v34_dict(cls, exp_id, exploration_dict):
+    def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
         """Converts a v33 exploration dict into a v34 exploration dict."""
         exploration_dict['schema_version'] = 34
 
@@ -2958,8 +2883,12 @@ class Exploration(object):
             cls._convert_states_v28_dict_to_v29_dict(
                 exploration_dict['states']))
 
-        exploration_dict = copy.deepcopy(exploration_dict)
-        exploration_dict['image_counter'] = cls.calculate_image_counter(exp_id, exploration_dict)
+        # Calculating image counter.
+        image_counter = 0
+        for state_dict in exploration_dict['states'].itervalues():
+            image_counter += len(state_dict['image_assets']['image_mapping'])
+        exploration_dict['image_counter'] = image_counter
+
         exploration_dict['states_schema_version'] = 29
 
         return exploration_dict
@@ -3164,7 +3093,7 @@ class Exploration(object):
 
         if exploration_schema_version == 33:
             exploration_dict = cls._convert_v33_dict_to_v34_dict(
-                exp_id, exploration_dict)
+                exploration_dict)
             exploration_schema_version = 34
 
         return (exploration_dict, initial_schema_version)
@@ -3331,27 +3260,6 @@ class Exploration(object):
             html_list = html_list + [content_html] + interaction_html_list
 
         return html_list
-
-    @classmethod
-    def calculate_image_counter(cls, exp_id, exploration_dict):
-        """Calculates an image counter of the exploration.
-
-        Returns:
-            image_counter: int. The image counter.
-        """
-        # Creates an exploration from exploration dict.
-        image_counter = 0
-        exploration_dict['id'] = exp_id
-        exploration_dict['image_counter'] = image_counter
-        exploration = Exploration.from_dict(exploration_dict)
-        exploration_html = exploration.get_all_html_content_strings()
-
-        for html in exploration_html:
-            soup = bs4.BeautifulSoup(html, 'html.parser')
-            no_of_images = len(soup.findAll(name='oppia-noninteractive-image'))
-            image_counter += no_of_images
-
-        return image_counter
 
 
 class ExplorationSummary(object):
