@@ -76,9 +76,9 @@ def _create_new_question(committer_id, question, commit_message):
         question_state_data=question.question_state_data.to_dict(),
         language_code=question.language_code,
         version=question.version,
+        linked_skill_ids=question.linked_skill_ids,
         question_state_data_schema_version=(
-            question.question_state_data_schema_version,),
-        linked_skill_ids=question.linked_skill_ids
+            question.question_state_data_schema_version)
     )
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
@@ -86,32 +86,115 @@ def _create_new_question(committer_id, question, commit_message):
     create_question_summary(question.id, committer_id)
 
 
-def create_new_question_skill_link(question_id, skill_id, skill_difficulty):
-    """Creates a new QuestionSkillLink model.
+def create_multi_question_skill_links_for_question(
+        user_id, question_id, skill_ids, skill_difficulties):
+    """Creates multiple new QuestionSkillLink models. Also adds
+    the skill ids to the linked skill ids of the Question model.
 
     Args:
+        user_id: str. ID of the creator.
+        question_id: str. ID of the question linked to the skill.
+        skill_ids: list(str). ID of the skills to which the question is linked.
+        skill_difficulties: list(float). The difficulty between [0, 1]
+        of the skills.
+
+    Raises:
+        Exception. Skill difficulties and skill ids should match. The lengths of
+        the two lists are different.
+    """
+    if len(skill_ids) != len(skill_difficulties):
+        raise Exception(
+            'Skill difficulties and skill ids should match. The lengths of the '
+            'two lists are different.')
+    question = get_question_by_id(question_id)
+    if not question:
+        raise Exception('Question doesn\'t exist in the backend')
+
+    new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
+    new_linked_skill_ids.extend(skill_ids)
+
+    new_question_skill_link_models = []
+    for index, skill_id in enumerate(skill_ids):
+        question_skill_link_model = question_models.QuestionSkillLinkModel.create( #pylint: disable=line-too-long
+            question_id, skill_id, skill_difficulties[index])
+    _update_linked_skill_ids_of_question(
+        user_id, question_id, new_linked_skill_ids,
+        question.linked_skill_ids)
+    question_skill_link_model.put_multi_question_skill_links(
+        new_question_skill_link_models)
+
+
+def create_new_question_skill_link(
+        user_id, question_id, skill_id, skill_difficulty):
+    """Creates a new QuestionSkillLink model and adds the skill id
+    to the linked skill ids for the Question model.
+
+    Args:
+        user_id: str. ID of the creator.
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
         skill_difficulty: float. The difficulty between [0, 1] of the skill.
     """
+    question = get_question_by_id(question_id)
+    if not question:
+        raise Exception('Question doesn\'t exist in the backend')
+
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
         question_id, skill_id, skill_difficulty)
+    new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
+    new_linked_skill_ids.append(skill_id)
+
+    _update_linked_skill_ids_of_question(
+        user_id, question_id, new_linked_skill_ids,
+        question.linked_skill_ids)
     question_skill_link_model.put()
 
 
-def delete_question_skill_link(question_id, skill_id):
-    """Deleted a QuestionSkillLink model.
+def _update_linked_skill_ids_of_question(
+        user_id, question_id, new_linked_skill_ids, old_linked_skill_ids):
+    """Updates the question linked_skill ids in the Question model.
 
     Args:
+        user_id: str. ID of the creator.
+        question_id: str. ID of the question linked to the skill.
+        new_linked_skill_ids: list(str). New linked skill IDs of the question.
+        old_linked_skill_ids: list(str). Current linked skill IDs of the
+        question.
+    """
+    change_dict = {
+        'cmd': 'update_question_property',
+        'property_name': 'linked_skill_ids',
+        'new_value': new_linked_skill_ids,
+        'old_value': old_linked_skill_ids
+    }
+    change_list = [question_domain.QuestionChange(change_dict)]
+    update_question(
+        user_id, question_id, change_list, 'updated linked skill ids')
+
+
+def delete_question_skill_link(user_id, question_id, skill_id):
+    """Deleted a QuestionSkillLink model and removes the linked skill id
+    from the Question model of question_id.
+
+    Args:
+        user_id: str. ID of the creator.
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
     """
+    question = get_question_by_id(question_id)
+    if not question:
+        raise Exception('Question doesn\'t exist in the backend')
+
+    new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
+    new_linked_skill_ids.remove(skill_id)
     question_skill_link_id = (
         question_models.QuestionSkillLinkModel.get_model_id(
             question_id, skill_id))
     question_skill_link_model = question_models.QuestionSkillLinkModel.get(
         question_skill_link_id)
-    #TODO(vinitamurthi): Add logic here
+    _update_linked_skill_ids_of_question(
+        user_id, question_id,
+        new_linked_skill_ids, question.linked_skill_ids)
     question_skill_link_model.delete()
 
 
@@ -288,16 +371,15 @@ def get_skills_linked_to_question(question_id):
     Returns:
         list(Skill). The list of skills that are linked to the question.
     """
-    questions = get_questions_by_ids(question_id)
-    if not questions:
-        return []
-    skills = skill_services.get_multi_skills(questions[0].linked_skill_ids)
+    question = get_question_by_id(question_id)
+    if not question:
+        raise Exception('Question doesn\'t exist in the backend')
+    skills = skill_services.get_multi_skills(question.linked_skill_ids)
     return skills
 
 
 def update_skill_ids_of_questions(
         curr_skill_id, curr_skill_description, new_skill_id):
-    #TODO(vinitamurthi): Update this
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
     skill ID.
 
@@ -497,7 +579,6 @@ def update_question(
     if not commit_message:
         raise ValueError(
             'Expected a commit message, received none.')
-
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)

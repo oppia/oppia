@@ -1447,7 +1447,8 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            language_code=constants.DEFAULT_LANGUAGE_CODE,
+            linked_skill_ids=[]):
         """Creates an Oppia Question and saves it.
 
         Args:
@@ -1462,7 +1463,8 @@ tags: []
         """
         question = question_domain.Question(
             question_id, question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
+            linked_skill_ids)
         question_services.add_question(owner_id, question)
         return question
 
@@ -1493,7 +1495,8 @@ tags: []
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_data_schema_version=27
+            question_state_data_schema_version=27,
+            linked_skill_ids=[]
         )
         question_model.commit(
             owner_id, 'New question created',

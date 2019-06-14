@@ -30,9 +30,11 @@ import feconf
 class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
-    def validate_skill_ids(skill_ids):
+    def validate_skill_ids(self, skill_ids):
+        """Validates that the passed skill ids are a list of strings."""
         if not(isinstance(skill_ids, list) and all(
-            [isinstance(skill_id, basestring) for skill_id in skill_ids])):
+                [isinstance(
+                    skill_id, basestring) for skill_id in skill_ids])):
             raise self.InvalidInputException
 
     @acl_decorators.can_manage_question_skill_status
@@ -40,16 +42,14 @@ class QuestionCreationHandler(base.BaseHandler):
         """Handles POST requests."""
         try:
             skill_ids = json.loads(skill_ids)
-            validate_skill_ids(skill_ids)
+            self.validate_skill_ids(skill_ids)
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
         except Exception:
             raise self.PageNotFoundException
 
-        
-        
-        skills = skill_services.get_multi_skills(skill_ids, strict=False)
-        if skills is None or len(skills) = 0:
+        skills = skill_services.get_multi_skills(skill_ids)
+        if not skills:
             raise self.PageNotFoundException(
                 'The skills with the given ids don\'t exist.')
 
@@ -64,6 +64,7 @@ class QuestionCreationHandler(base.BaseHandler):
         question_dict['question_state_data_schema_version'] = (
             feconf.CURRENT_STATE_SCHEMA_VERSION)
         question_dict['id'] = question_services.get_new_question_id()
+        question_dict['linked_skill_ids'] = skill_ids
         try:
             question = question_domain.Question.from_dict(question_dict)
         except:
@@ -71,8 +72,11 @@ class QuestionCreationHandler(base.BaseHandler):
         question_services.add_question(self.user_id, question)
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
-        question_services.create_new_question_skill_link(
-            question.id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
+        question_services.create_multi_question_skill_links_for_question(
+            self.user_id,
+            question.id,
+            skill_ids,
+            [constants.DEFAULT_SKILL_DIFFICULTY] * len(skill_ids))
         self.values.update({
             'question_id': question.id
         })
@@ -94,14 +98,15 @@ class QuestionSkillLinkHandler(base.BaseHandler):
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
         question_services.create_new_question_skill_link(
-            question_id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
+            self.user_id, question_id, skill_id,
+            constants.DEFAULT_SKILL_DIFFICULTY)
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status
     def delete(self, question_id, skill_id):
         """Unlinks a question from a skill."""
         question_services.delete_question_skill_link(
-            question_id, skill_id)
+            self.user_id, question_id, skill_id)
         self.render_json(self.values)
 
 
@@ -120,10 +125,8 @@ class EditableQuestionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
 
-        associated_skills = question_services.get_skills_linked_to_question(
-            question_id)
         associated_skill_dicts = [
-            skill.to_dict() for skill in associated_skills]
+            skill.to_dict() for skill in question.linked_skill_ids]
 
         self.values.update({
             'question_dict': question.to_dict(),

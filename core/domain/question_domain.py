@@ -251,11 +251,12 @@ class Question(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
 
-        if not (isinstance(self.linked_skill_ids, list) and all(
-            isinstance(elem, basestring) for elem in self.linked_skill_ids)):
+        if not (isinstance(self.linked_skill_ids, list) and (
+                all(isinstance(
+                    elem, basestring) for elem in self.linked_skill_ids))):
             raise utils.ValidationError(
-                'Expected linked_skill_ids to be a list of strings, received %s' %
-                self.linked_skill_ids)
+                'Expected linked_skill_ids to be a list of strings, '
+                'received %s' % self.linked_skill_ids)
 
         if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(

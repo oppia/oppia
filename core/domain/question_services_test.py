@@ -81,13 +81,38 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_questions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
-            self.question_id, 'skill_1', 0.3)
+            self.editor_id, self.question_id, 'skill_1', 0.3)
         questions, _, _ = (
             question_services.get_questions_and_skill_descriptions_by_skill_ids(
                 2, ['skill_1'], ''))
+        self.question.linked_skill_ids = ['skill_1']
+        self.question.version = 2
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
+
+    def test_create_multi_question_skill_links_for_question(self):
+        self.question = self.save_new_question(
+            self.question_id, self.editor_id,
+            self._create_valid_question_data('ABC'))
+
+        question_id_2 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_2, self.editor_id,
+            self._create_valid_question_data('ABC'))
+
+        question_id_3 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_3, self.editor_id,
+            self._create_valid_question_data('ABC'))
+        question_services.create_multi_question_skill_links_for_question(
+            self.editor_id, self.question_id, ['skill_1', 'skill_2'],
+            [0.5, 0.7])
+        skill_ids = [skill.id for skill in
+                     question_services.get_skills_linked_to_question(
+                         self.question_id)]
+        self.assertItemsEqual(skill_ids, ['skill_1', 'skill_2'])
+
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
@@ -100,11 +125,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            self.question_id, 'skill_1', 0.5)
+            self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
-            question_id_2, 'skill_1', 0.3)
+            self.editor_id, question_id_2, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
-            question_id_3, 'skill_2', 0.2)
+            self.editor_id, question_id_3, 'skill_2', 0.2)
 
         question_summaries, skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
@@ -146,7 +171,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'The given question is already linked to given skill'):
             question_services.create_new_question_skill_link(
-                self.question_id, 'skill_1', 0.3)
+                self.editor_id, self.question_id, 'skill_1', 0.3)
 
     def test_get_question_summaries_and_skill_descriptions_with_no_skill_ids(
             self):
@@ -156,7 +181,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'))
 
         question_services.create_new_question_skill_link(
-            question_id, 'skill_1', 0.5)
+            self.editor_id, question_id, 'skill_1', 0.5)
 
         question_summaries, skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
@@ -221,11 +246,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'))
         # Setting skill difficulty for self.question_id.
         question_services.create_new_question_skill_link(
-            self.question_id, 'skill_1', 0.5)
+            self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
-            question_id_2, 'skill_1', 0.3)
+            self.editor_id, question_id_2, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
-            question_id_3, 'skill_2', 0.1)
+            self.editor_id, question_id_3, 'skill_2', 0.1)
 
         # When question ids exist, it returns a list of questionskilllinks.
         question_skill_links = (
@@ -372,11 +397,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            self.question_id, 'skill_1', 0.5)
+            self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
-            question_id_2, 'skill_1', 0.3)
+            self.editor_id, question_id_2, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
-            question_id_3, 'skill_2', 0.9)
+            self.editor_id, question_id_3, 'skill_2', 0.9)
 
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
@@ -447,13 +472,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'question_id not found'):
             question_services.get_question_rights('question_id')
 
-    def test_get_question_skill_links_of_question(self):
+    def test_get_skills_of_question(self):
         # If the question id doesnt exist at all, it returns an empty list.
-        skills = (
+        with self.assertRaisesRegexp(
+            Exception, 'Entity for class QuestionModel with id '
+            'non_existent_question_id not found'):
             question_services.get_skills_linked_to_question(
-                'non_existent_question_id'))
-        self.assertEqual(len(skills), 0)
-
+                'non_existent_question_id')
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, self.editor_id,
@@ -464,13 +489,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            self.question_id, 'skill_1', 0.5)
+            self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
-            question_id_2, 'skill_1', 0.3)
+            self.editor_id, question_id_2, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
-            question_id_2, 'skill_2', 0.0)
+            self.editor_id, question_id_2, 'skill_2', 0.0)
         question_services.create_new_question_skill_link(
-            question_id_3, 'skill_2', 0.1)
+            self.editor_id, question_id_3, 'skill_2', 0.1)
 
         skills = (
             question_services.get_skills_linked_to_question(
