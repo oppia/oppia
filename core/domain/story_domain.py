@@ -666,8 +666,7 @@ class Story(object):
 
         Returns:
             list(str). The union of the acquired skill IDs corresponding to
-                each of the node IDs. If no acquired skill id is linked to
-                them, the list will be empty.
+                each of the node IDs.
         """
         acquired_skill_ids = []
         for node in self.story_contents.nodes:

@@ -261,9 +261,11 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
                 corresponding to given skill_ids, with
                 total_question_count/len(skill_ids) number of questions for
-                each skill. If not evenly divisable, it will be rounder up.
+                each skill. If not evenly divisible, it will be rounded up.
                 If not enough questions for a skill, just return all questions
-                it links to.
+                it links to. The order of questions will follow the order of
+                given skill ids, but the order of questions for the same skill
+                is random.
         """
         question_count_per_skill = int(
             math.ceil(float(total_question_count) / float(len(skill_ids))))

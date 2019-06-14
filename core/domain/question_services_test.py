@@ -115,6 +115,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[0].to_dict(), self.question.to_dict())
         self.assertEqual(questions[1].to_dict(), self.question_1.to_dict())
         self.assertEqual(questions[2].to_dict(), self.question_2.to_dict())
+    
+    def test_get_questions_by_skill_ids_raise_error(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Question count is too high, please limit the question '
+            'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+            question_services.get_questions_by_skill_ids(
+                25, ['skill_1', 'skill_2'])
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
