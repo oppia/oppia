@@ -17,7 +17,6 @@
 """Services for exploration-related statistics."""
 
 import collections
-import copy
 import itertools
 
 from core.domain import interaction_registry
@@ -47,14 +46,11 @@ def _migrate_to_latest_issue_schema(exp_issue_dict):
         Exception. The issue_schema_version is invalid.
     """
     issue_schema_version = exp_issue_dict['schema_version']
-    if issue_schema_version is None or issue_schema_version < 1:
-        issue_schema_version = 0
-
-    if not (0 <= issue_schema_version
+    if not (1 <= issue_schema_version
             <= stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned issue schemas at'
-            'present.' %
+            ' present.' %
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     while issue_schema_version < stats_models.CURRENT_ISSUE_SCHEMA_VERSION:
@@ -77,10 +73,7 @@ def _migrate_to_latest_action_schema(learner_action_dict):
         Exception. The action_schema_version is invalid.
     """
     action_schema_version = learner_action_dict['schema_version']
-    if action_schema_version is None or action_schema_version < 1:
-        action_schema_version = 0
-
-    if not (0 <= action_schema_version
+    if not (1 <= action_schema_version
             <= stats_models.CURRENT_ACTION_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned action schemas '
@@ -543,7 +536,7 @@ def get_exp_issues_from_model(exp_issues_model):
     """
     unresolved_issues = []
     for unresolved_issue_dict in exp_issues_model.unresolved_issues:
-        _migrate_to_latest_issue_schema(copy.deepcopy(unresolved_issue_dict))
+        _migrate_to_latest_issue_schema(unresolved_issue_dict)
         unresolved_issues.append(
             stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict))
     return stats_domain.ExplorationIssues(
