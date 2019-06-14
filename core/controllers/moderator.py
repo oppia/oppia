@@ -29,7 +29,7 @@ class ModeratorPage(base.BaseHandler):
     @acl_decorators.can_access_moderator_page
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/moderator.html')
+        self.render_template('dist/moderator-page.mainpage.html')
 
 
 class FeaturedActivitiesHandler(base.BaseHandler):

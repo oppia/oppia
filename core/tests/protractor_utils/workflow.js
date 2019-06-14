@@ -158,8 +158,8 @@ var addExplorationCollaborator = function(username) {
   _addExplorationRole('Collaborator', username);
 };
 
-var addExplorationTranslator = function(username) {
-  _addExplorationRole('Translator', username);
+var addExplorationVoiceArtist = function(username) {
+  _addExplorationRole('Voice Artist', username);
 };
 
 var addExplorationPlaytester = function(username) {
@@ -171,7 +171,8 @@ var _getExplorationRoles = function(roleName) {
   var itemName = roleName + 'Name';
   var listName = roleName + 'Names';
   return element.all(by.repeater(
-    itemName + ' in ExplorationRightsService.' + listName + ' track by $index'
+    itemName + ' in $ctrl.ExplorationRightsService.' + listName +
+    ' track by $index'
   )).map(function(elem) {
     return elem.getText();
   });
@@ -185,8 +186,8 @@ var getExplorationCollaborators = function() {
   return _getExplorationRoles('editor');
 };
 
-var getExplorationTranslators = function() {
-  return _getExplorationRoles('translator');
+var getExplorationVoiceArtists = function() {
+  return _getExplorationRoles('voiceArtist');
 };
 
 var getExplorationPlaytesters = function() {
@@ -206,9 +207,9 @@ exports.triggerTitleOnBlurEvent = triggerTitleOnBlurEvent;
 exports.openEditRolesForm = openEditRolesForm;
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
-exports.addExplorationTranslator = addExplorationTranslator;
+exports.addExplorationVoiceArtist = addExplorationVoiceArtist;
 exports.addExplorationPlaytester = addExplorationPlaytester;
 exports.getExplorationManagers = getExplorationManagers;
 exports.getExplorationCollaborators = getExplorationCollaborators;
-exports.getExplorationTranslators = getExplorationTranslators;
+exports.getExplorationVoiceArtists = getExplorationVoiceArtists;
 exports.getExplorationPlaytesters = getExplorationPlaytesters;

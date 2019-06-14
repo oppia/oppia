@@ -1,0 +1,4 @@
+c5:26:51 AM - Starting compilation in watch mode...
+
+
+5:27:08 AM - Found 0 errors. Watching for file changes.

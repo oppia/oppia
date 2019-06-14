@@ -94,7 +94,7 @@ class SkillEditorPage(base.BaseHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
-        self.render_template('dist/skill_editor.html')
+        self.render_template('dist/skill-editor-page.mainpage.html')
 
 
 def check_can_edit_skill_description(user):

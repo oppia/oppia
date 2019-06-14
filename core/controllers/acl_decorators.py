@@ -96,6 +96,9 @@ def can_play_exploration(handler):
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
 
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
@@ -171,6 +174,9 @@ def can_play_collection(handler):
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
 
+        if collection_rights is None:
+            raise self.PageNotFoundException
+
         if rights_manager.check_can_access_activity(
                 self.user, collection_rights):
             return handler(self, collection_id, **kwargs)
@@ -212,6 +218,10 @@ def can_download_exploration(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
@@ -252,6 +262,10 @@ def can_view_exploration_stats(handler):
 
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
+
+        if exploration_rights is None:
+            raise self.PageNotFoundException
+
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
@@ -291,7 +305,8 @@ def can_edit_collection(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        collection_rights = rights_manager.get_collection_rights(collection_id)
+        collection_rights = rights_manager.get_collection_rights(
+            collection_id, strict=False)
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -932,7 +947,7 @@ def can_edit_exploration(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
+            exploration_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -947,19 +962,19 @@ def can_edit_exploration(handler):
     return test_can_edit
 
 
-def can_translate_exploration(handler):
-    """Decorator to check whether the user can translate given exploration.
+def can_voiceover_exploration(handler):
+    """Decorator to check whether the user can voiceover given exploration.
 
     Args:
         handler: function. The function to be decorated.
 
     Returns:
         function. The newly decorated function that now also checks if a
-            user has permission to translate a given exploration.
+            user has permission to voiceover a given exploration.
     """
 
-    def test_can_translate(self, exploration_id, **kwargs):
-        """Checks if the user can translate the exploration.
+    def test_can_voiceover(self, exploration_id, **kwargs):
+        """Checks if the user can voiceover the exploration.
 
         Args:
             exploration_id: str. The exploration id.
@@ -972,25 +987,25 @@ def can_translate_exploration(handler):
             NotLoggedInException: The user is not logged in.
             PageNotFoundException: The page is not found.
             UnauthorizedUserException: The user does not have
-                credentials to translate an exploration.
+                credentials to voiceover an exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
         exploration_rights = rights_manager.get_exploration_rights(
-            exploration_id)
+            exploration_id, strict=False)
         if exploration_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if rights_manager.check_can_translate_activity(
+        if rights_manager.check_can_voiceover_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to translate this exploration.')
-    test_can_translate.__wrapped__ = True
+                'You do not have credentials to voiceover this exploration.')
+    test_can_voiceover.__wrapped__ = True
 
-    return test_can_translate
+    return test_can_voiceover
 
 
 def can_delete_exploration(handler):
@@ -1210,7 +1225,7 @@ def can_publish_collection(handler):
                 credentials to publish a collection.
         """
         collection_rights = rights_manager.get_collection_rights(
-            collection_id)
+            collection_id, strict=False)
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1253,7 +1268,7 @@ def can_unpublish_collection(handler):
                 credentials to unpublish a collection.
         """
         collection_rights = rights_manager.get_collection_rights(
-            collection_id)
+            collection_id, strict=False)
         if collection_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1504,7 +1519,7 @@ def can_edit_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1658,49 +1673,6 @@ def can_delete_question(handler):
     return test_can_delete_question
 
 
-def can_edit_subtopic_page(handler):
-    """Decorator to check whether the user can edit a subtopic page of a
-    topic.
-
-    Args:
-        handler: function. The function to be decorated.
-
-    Returns:
-        function. The newly decorated function that now also checks if
-            the user has permission to edit a subtopic page of a topic.
-    """
-
-    def test_can_edit(self, topic_id, **kwargs):
-        """Checks whether the user can edit the subtopic page
-        of a given topic.
-
-        Args:
-            topic_id: str. The topic id.
-            **kwargs: *. Keyword arguments.
-
-        Returns:
-            *. The return value of the decorated function.
-
-        Raises:
-            NotLoggedInException: The user is not logged in.
-            UnauthorizedUserException: The user does not have
-                credentials to edit the subtopic pages for
-                a given topic.
-        """
-        if not self.user_id:
-            raise base.UserFacingExceptions.NotLoggedInException
-
-        if topic_services.check_can_edit_subtopic_page(self.user):
-            return handler(self, topic_id, **kwargs)
-        else:
-            raise self.UnauthorizedUserException(
-                'You do not have credentials to edit the subtopic pages for '
-                'this topic.')
-    test_can_edit.__wrapped__ = True
-
-    return test_can_edit
-
-
 def can_add_new_story_to_topic(handler):
     """Decorator to check whether the user can add a story to a given topic.
 
@@ -1732,7 +1704,7 @@ def can_add_new_story_to_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1779,7 +1751,7 @@ def can_edit_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -1804,29 +1776,6 @@ def can_edit_skill(handler):
         function. The newly decorated function that now also checks if
             the user has permission to edit a skill.
     """
-    def can_user_edit_skill(user, skill_rights):
-        """Checks whether the user can edit the given skill.
-
-        Args:
-            user: UserActionsInfo. Object having user id, role and actions for
-                given user.
-            skill_rights: SkillRights or None. Rights object for the given
-                skill.
-
-        Returns:
-            bool. Whether the given user can edit the given skill.
-        """
-
-        if skill_rights is None:
-            return False
-        if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
-            if not skill_rights.is_private():
-                return True
-            if skill_rights.is_private() and skill_rights.is_creator(
-                    user.user_id):
-                return True
-        return False
-
     def test_can_edit_skill(self, skill_id, **kwargs):
         """Test to see if user can edit a given skill by checking if
         logged in and using can_user_edit_skill.
@@ -1852,8 +1801,15 @@ def can_edit_skill(handler):
         if skill_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if can_user_edit_skill(self.user, skill_rights):
-            return handler(self, skill_id, **kwargs)
+        if role_services.ACTION_EDIT_PUBLIC_SKILLS in self.user.actions:
+            if not skill_rights.is_private():
+                return handler(self, skill_id, **kwargs)
+            elif skill_rights.is_private() and skill_rights.is_creator(
+                    self.user.user_id):
+                return handler(self, skill_id, **kwargs)
+            else:
+                raise self.UnauthorizedUserException(
+                    'You do not have credentials to edit this skill.')
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
@@ -2028,28 +1984,6 @@ def can_publish_skill(handler):
             checks whether the user has permission to publish
             a skill.
     """
-
-    def can_user_publish_skill(user, skill_rights):
-        """Checks whether the user can publish the given skill.
-
-        Args:
-            user: UserActionsInfo. Object having user id, role and actions
-                for given user.
-            skill_rights: SkillRights or None. Rights object for the given
-                skill.
-
-        Returns:
-            bool. Whether the given user can publish the given skill.
-        """
-
-        if skill_rights is None:
-            return False
-        if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
-            return False
-        if skill_rights.is_creator(user.user_id):
-            return True
-        return False
-
     def test_can_publish_skill(self, skill_id, **kwargs):
         """Tests whether the user can publish a given skill by checking
         if the user is logged in and using can_user_publish_skill.
@@ -2070,15 +2004,19 @@ def can_publish_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        skill_rights = skill_services.get_skill_rights(skill_id)
+        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
         if skill_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if can_user_publish_skill(self.user, skill_rights):
+        if role_services.ACTION_PUBLISH_OWNED_SKILL not in self.user.actions:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this skill.')
+        elif skill_rights.is_creator(self.user.user_id):
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
+
     test_can_publish_skill.__wrapped__ = True
 
     return test_can_publish_skill
@@ -2117,7 +2055,7 @@ def can_delete_story(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 

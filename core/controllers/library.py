@@ -84,7 +84,7 @@ class LibraryPage(base.BaseHandler):
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
         })
-        self.render_template('dist/library.html')
+        self.render_template('dist/library-page.mainpage.html')
 
 
 class LibraryIndexHandler(base.BaseHandler):
@@ -157,7 +157,7 @@ class LibraryGroupPage(base.BaseHandler):
                 self.user_id and
                 user_services.has_fully_registered(self.user_id)),
         })
-        self.render_template('dist/library.html')
+        self.render_template('dist/library-page.mainpage.html')
 
 
 class LibraryGroupIndexHandler(base.BaseHandler):
@@ -191,7 +191,7 @@ class LibraryGroupIndexHandler(base.BaseHandler):
                 header_i18n_id = feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS
 
         else:
-            return self.PageNotFoundException
+            raise self.PageNotFoundException
 
         preferred_language_codes = [constants.DEFAULT_LANGUAGE_CODE]
         if self.user_id:

@@ -9,13 +9,13 @@ interface ICustomScope extends ng.IScope {
     toastr?: any;
     AlertsService?: any;
 
-    // AudioFileUploaderDirective.ts
+    // custom-forms-directives/audio-file-uploader.directive.ts
     inputFieldClassName?: string;
     inputFieldFormId?: string;
     onFileCleared?: (() => void);
     droppedFile?: any;
 
-    // AudioFileUploaderDirective.ts, ImageUploaderDirective.ts
+    // custom-forms-directives/audio-file-uploader.directive.ts, ImageUploaderDirective.ts
     errorMessage?: string;
     onFileChanged?: ((file: any, fileName?: string) => void);
 
@@ -45,7 +45,7 @@ interface ICustomScope extends ng.IScope {
 
     // AudioTranslationBarDirective.ts
     showDropArea?: boolean;
-    getRecorderController?: (() => void);
+    getVoiceoverRecorder?: (() => void);
     openAddAudioTranslationModal?: ((files: any) => void);
     userIsGuest?: boolean;
     dropAreaIsAccessible?: boolean;
