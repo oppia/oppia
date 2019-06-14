@@ -26,10 +26,6 @@ class SplashPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         c_value = self.request.get('c')
-        self.values.update({
-            'meta_description': feconf.SPLASH_PAGE_DESCRIPTION,
-        })
-
         if not c_value:
             self.render_template('dist/splash-page.mainpage.html')
         else:
@@ -57,9 +53,6 @@ class AboutPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/about-page.mainpage.html')
 
 
@@ -69,9 +62,6 @@ class GetStartedPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.GET_STARTED_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/get-started-page.mainpage.html')
 
 
@@ -81,9 +71,6 @@ class TeachPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/teach-page.mainpage.html')
 
 
@@ -131,10 +118,6 @@ class TermsPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
-        })
-
         self.render_template('dist/terms-page.mainpage.html')
 
 
