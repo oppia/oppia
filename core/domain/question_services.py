@@ -413,7 +413,7 @@ def update_skill_ids_of_questions(
         new_linked_skill_ids.remove(curr_skill_id)
         new_linked_skill_ids.append(new_skill_id)
         _update_linked_skill_ids_of_question(
-            user_id, question_id, new_linked_skill_ids, question.linked_skill_ids)
+            user_id, question.id, new_linked_skill_ids, question.linked_skill_ids)
     
 
 
