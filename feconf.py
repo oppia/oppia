@@ -790,9 +790,6 @@ ABOUT_PAGE_DESCRIPTION = (
     'scenarios for others.')
 GET_STARTED_PAGE_DESCRIPTION = (
     'Learn how to get started using Oppia.')
-CONTACT_PAGE_DESCRIPTION = (
-    'Contact the Oppia team, submit feedback, and learn how to get involved '
-    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')

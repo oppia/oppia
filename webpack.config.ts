@@ -145,8 +145,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['contact'],
+      chunks: ['app', 'contact'],
       filename: 'contact-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Contact the Oppia team, submit feedback, and learn ' +
+          'how to get involved with the Oppia project.'
+      },
       template: commonPrefix + '/pages/contact-page/contact-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false

@@ -93,9 +93,6 @@ class ContactPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/contact-page.mainpage.html')
 
 
