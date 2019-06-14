@@ -107,13 +107,6 @@ oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 oppia.constant('COMPONENT_NAME_EXPLANATION', 'explanation');
 oppia.constant('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
 
-// Enables recording playthroughs from learner sessions.
-oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
-oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
-oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
-oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 3);
-oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
-
 oppia.constant('ACTION_TYPE_EXPLORATION_START', 'ExplorationStart');
 oppia.constant('ACTION_TYPE_ANSWER_SUBMIT', 'AnswerSubmit');
 oppia.constant('ACTION_TYPE_EXPLORATION_QUIT', 'ExplorationQuit');
@@ -128,19 +121,8 @@ oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
 
 oppia.constant('LOGOUT_URL', '/logout');
 
-// Whether to enable the promo bar functionality. This does not actually turn on
-// the promo bar, as that is gated by a config value (see config_domain). This
-// merely avoids checking for whether the promo bar is enabled for every Oppia
-// page visited.
-oppia.constant('ENABLE_PROMO_BAR', true);
-
 // TODO(vojtechjelinek): Move these to separate file later, after we establish
 // process to follow for Angular constants (#6731).
-oppia.constant(
-  'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
-  '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
-oppia.constant(
-  'TOPIC_RIGHTS_URL_TEMPLATE', '/rightshandler/get_topic_rights/<topic_id>');
 oppia.constant(
   'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
   '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
