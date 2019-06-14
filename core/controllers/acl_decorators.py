@@ -1827,7 +1827,7 @@ def can_edit_skills(handler):
 
     Returns:
         function. The newly decorated function that now also checks if
-            the user has permission to edit a skill.
+            the user has permission to edit skills.
     """
     def can_user_edit_skill(user, skill_rights):
         """Checks whether the user can edit the given skill.

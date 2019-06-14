@@ -147,7 +147,7 @@ oppia.directive('questionsList', [
               }).then(function() {
                 $timeout(function() {
                   ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-                    0, ctrl.skillIdsList, true, false
+                    0, ctrl.skillIdsList, true, true
                   );
                   ctrl.questionIsBeingSaved = false;
                   ctrl.currentPage = 0;
@@ -164,7 +164,7 @@ oppia.directive('questionsList', [
                     QuestionUndoRedoService.clearChanges();
                     ctrl.questionIsBeingSaved = false;
                     ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
-                      ctrl.currentPage, ctrl.skillIdsList, true, false
+                      ctrl.currentPage, ctrl.skillIdsList, true, true
                     );
                   }, function(error) {
                     AlertsService.addWarning(
@@ -237,12 +237,13 @@ oppia.directive('questionsList', [
                 skillIds).then(
                 function(skillDicts) {
                   skillDicts.forEach(function(skillDict) {
-                    ctrl.misconceptions += skillDict.misconceptions
-                      .map(function(misconceptionsBackendDict) {
+                    ctrl.misconceptions = ctrl.misconceptions.concat(
+                      skillDict.misconceptions.map(
+                          function(misconceptionsBackendDict) {
                         return MisconceptionObjectFactory
                           .createFromBackendDict(misconceptionsBackendDict);
                       });
-                  });
+                  }));
                   ctrl.initializeNewQuestionCreation();
                 }, function(error) {
                   AlertsService.addWarning();

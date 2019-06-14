@@ -17,7 +17,7 @@
  */
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
-require('domain/question/QuestionPlayerBackendApiService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
@@ -117,9 +117,9 @@ oppia.directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', 'QuestionPlayerBackendApiService',
+        '$rootScope', '$scope', 'QuestionBackendApiService',
         function(
-            $rootScope, $scope, QuestionPlayerBackendApiService) {
+            $rootScope, $scope, QuestionBackendApiService) {
           var ctrl = this;
           $scope.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           ctrl.currentQuestion = 0;

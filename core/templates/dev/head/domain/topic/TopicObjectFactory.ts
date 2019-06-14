@@ -148,10 +148,11 @@ oppia.factory('TopicObjectFactory', [
 
       var subtopics = this._subtopics;
       for (var i = 0; i < subtopics.length; i++) {
-        topicSkillIds += subtopics[i].getSkillSummaries().map(
-          function(skillSummary) {
-            return skillSummary.getId();
-          }
+        topicSkillIds = topicSkillIds.concat(
+          subtopics[i].getSkillSummaries().map(
+            function(skillSummary) {
+              return skillSummary.getId();
+            })
         );
       }
       return topicSkillIds;
