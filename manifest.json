@@ -17,25 +17,25 @@
         "targetDirPrefix": "bleach-"
       },
       "gaeCloudStorage": {
-        "version": "1.9.15.0",
+        "version": "1.9.22.1",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/source/G/GoogleAppEngineCloudStorageClient/GoogleAppEngineCloudStorageClient-1.9.15.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/92/cd/4a8aaeb4bf69c67a6fa06c001fd54c229c2bc811e13d3f4d305e1a8201b0/GoogleAppEngineCloudStorageClient-1.9.22.1.tar.gz",
         "tarRootDirPrefix": "GoogleAppEngineCloudStorageClient-",
         "rootDirPrefix": "gae-cloud-storage-",
         "targetDirPrefix": "gae-cloud-storage-"
       },
       "gaeMapReduce": {
-        "version": "1.9.17.0",
+        "version": "1.9.22.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/source/G/GoogleAppEngineMapReduce/GoogleAppEngineMapReduce-1.9.17.0.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/e8/75/aa5286ae205dd6696238c53d7929a5325d26e94016f777c6ad6636e2361c/GoogleAppEngineMapReduce-1.9.22.0.tar.gz",
         "tarRootDirPrefix": "GoogleAppEngineMapReduce-",
         "rootDirPrefix": "gae-mapreduce-",
         "targetDirPrefix": "gae-mapreduce-"
       },
       "gaePipeline": {
-        "version": "1.9.17.0",
+        "version": "1.9.22.1",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/source/G/GoogleAppEnginePipeline/GoogleAppEnginePipeline-1.9.17.0.tar.gz#md5=9fe87b281f4b0a7c110534df4e61b6ec",
+        "url": "https://files.pythonhosted.org/packages/a5/8b/36fb8e247ecb3b7106012125509ef3dec1a385a0b56a737be60f321a483c/GoogleAppEnginePipeline-1.9.22.1.tar.gz",
         "tarRootDirPrefix": "GoogleAppEnginePipeline-",
         "rootDirPrefix": "gae-pipeline-",
         "targetDirPrefix": "gae-pipeline-"
