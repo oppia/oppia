@@ -32,6 +32,8 @@ module.exports = function(config) {
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*_directive.html',
+      'core/templates/dev/head/**/*.directive.html',
+      'core/templates/dev/head/**/*.template.html',
       'core/templates/dev/head/**/*Spec.ts',
       'core/templates/dev/head/*Spec.ts',
       'core/templates/dev/head/**/*.spec.ts',
@@ -62,14 +64,14 @@ module.exports = function(config) {
       // is repaired, the templateCache is broken due to the fact that
       // webpack is not yet implemented for /extensions (#6732)
       'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
-      ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
-       'SolutionVerificationServiceSpec.ts'),
-      ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
-       'StateNameEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state_editor/' +
-       'StateContentEditorDirectiveSpec.ts'),
-      ('core/templates/dev/head/pages/state_editor/' +
-       'StateInteractionEditorDirectiveSpec.ts'),
+      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
+       'services/solution-verification.service.spec.ts'),
+      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
+       'state-name-editor/state-name-editor.directive.spec.ts'),
+      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
+       'state-content-editor.directive.spec.ts'),
+      ('core/templates/dev/head/components/state-editor/' +
+       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -91,6 +93,8 @@ module.exports = function(config) {
       // Jinja expressions. They should also be specified within the 'files'
       // list above.
       'core/templates/dev/head/**/*_directive.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*.directive.html': ['ng-html2js'],
+      'core/templates/dev/head/**/*.template.html': ['ng-html2js'],
       'extensions/interactions/**/*_directive.html': ['ng-html2js'],
       'extensions/interactions/rule_templates.json': ['json_fixtures'],
       'core/tests/data/*.json': ['json_fixtures']
@@ -150,7 +154,10 @@ module.exports = function(config) {
     webpack: {
       mode: 'development',
       resolve: {
-        modules: ['core/templates/dev/head'],
+        modules: [
+          'core/templates/dev/head',
+          'extensions'
+        ],
       },
       module: {
         rules: [{
@@ -166,6 +173,10 @@ module.exports = function(config) {
               }
             }
           ]
+        },
+        {
+          test: /\.html$/,
+          loader: 'underscore-template-loader'
         }]
       },
       plugins: [

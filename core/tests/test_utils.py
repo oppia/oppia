@@ -366,6 +366,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -396,6 +397,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -513,32 +515,6 @@ tags: []
         should override this method.
         """
         raise NotImplementedError
-
-    def _stash_current_user_env(self):
-        """Stashes the current user-specific env variables for later retrieval.
-
-        Developers: please don't use this method outside this class -- it makes
-        the individual tests harder to follow.
-        """
-        self.stashed_user_env = {  # pylint: disable=attribute-defined-outside-init
-            'USER_EMAIL': os.environ['USER_EMAIL'],
-            'USER_ID': os.environ['USER_ID'],
-            'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
-        }
-
-    def _restore_stashed_user_env(self):
-        """Restores a stashed set of user-specific env variables.
-
-        Developers: please don't use this method outside this class -- it makes
-        the individual tests harder to follow.
-        """
-        if not self.stashed_user_env:
-            raise Exception('No stashed user env to restore.')
-
-        for key in self.stashed_user_env:
-            os.environ[key] = self.stashed_user_env[key]
-
-        self.stashed_user_env = None  # pylint: disable=attribute-defined-outside-init
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -884,21 +860,17 @@ tags: []
         """Sets a given configuration object's value to the new value specified
         using a POST request.
         """
-        self._stash_current_user_env()
-
-        self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminhandler', {
-                'action': 'save_config_properties',
-                'new_config_property_values': {
-                    config_obj.name: new_config_value,
-                }
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        self._restore_stashed_user_env()
+        with self.login_context('tmpsuperadmin@example.com',
+                                is_super_admin=True):
+            response = self.get_html_response('/admin')
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'save_config_properties',
+                    'new_config_property_values': {
+                        config_obj.name: new_config_value,
+                    }
+                }, csrf_token=csrf_token)
 
     def set_user_role(self, username, user_role):
         """Sets the given role for this user.
@@ -907,19 +879,15 @@ tags: []
             username: str. Username of the given user.
             user_role: str. Role of the given user.
         """
-        self._stash_current_user_env()
-
-        self.login('tmpsuperadmin@example.com', is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(
-            '/adminrolehandler', {
-                'username': username,
-                'role': user_role
-            }, csrf_token=csrf_token)
-        self.logout()
-
-        self._restore_stashed_user_env()
+        with self.login_context('tmpsuperadmin@example.com',
+                                is_super_admin=True):
+            response = self.get_html_response('/admin')
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '/adminrolehandler', {
+                    'username': username,
+                    'role': user_role
+                }, csrf_token=csrf_token)
 
     def set_admins(self, admin_usernames):
         """Sets role of given users as ADMIN.
@@ -1153,11 +1121,6 @@ tags: []
         )
         exp_summary_model.put()
 
-        # Note: Also save state id mappping model for new exploration. If not
-        # saved, it may cause errors in test cases.
-        exploration = exp_services.get_exploration_from_model(exp_model)
-        exp_services.create_and_save_state_id_mapping_model(exploration, [])
-
     def save_new_exp_with_states_schema_v21(self, exp_id, user_id, title):
         """Saves a new default exploration with a default version 21 states
         dictionary. Version 21 is where training data of exploration is stored
@@ -1218,11 +1181,6 @@ tags: []
             contributors_summary={},
         )
         exp_summary_model.put()
-
-        # Note: Also save state id mappping model for new exploration. If not
-        # saved, it may cause errors in test cases.
-        exploration = exp_services.get_exploration_from_model(exp_model)
-        exp_services.create_and_save_state_id_mapping_model(exploration, [])
 
     def publish_exploration(self, owner_id, exploration_id):
         """Publish the exploration with the given exploration_id.
@@ -1313,8 +1271,8 @@ tags: []
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
-            self, story_id, owner_id, title,
-            description, notes,
+            self, story_id, owner_id, title, description, notes,
+            corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
@@ -1325,13 +1283,16 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
 
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story.create_default_story(story_id, title)
+        story = story_domain.Story.create_default_story(
+            story_id, title, corresponding_topic_id)
         story.title = title
         story.description = description
         story.notes = notes
@@ -1341,6 +1302,7 @@ tags: []
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, owner_id, title, description, notes,
+            corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new skill with a default version 1 story contents
         data dictionary.
@@ -1361,6 +1323,8 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
         """
@@ -1371,6 +1335,7 @@ tags: []
             language_code=language_code,
             story_contents_schema_version=1,
             notes=notes,
+            corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT
         )
         commit_message = (
@@ -1685,6 +1650,30 @@ tags: []
         finally:
             setattr(obj, attr, original)
 
+    @contextlib.contextmanager
+    def login_context(self, email, is_super_admin=False):
+        """Log in with the given email under the context of a 'with' statement.
+
+        Args:
+            email: str. An email associated to a user account.
+            is_super_admin: bool. Whether the user is a super admin.
+
+        Yields:
+            str. The id of the user associated to the given email, who is now
+            'logged in'.
+        """
+        initial_user_env = {
+            'USER_EMAIL': os.environ['USER_EMAIL'],
+            'USER_ID': os.environ['USER_ID'],
+            'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
+        }
+        self.login(email, is_super_admin=is_super_admin)
+        try:
+            yield self.get_user_id_from_email(email)
+        finally:
+            self.logout()
+            os.environ.update(initial_user_env)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
@@ -1717,6 +1706,7 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_files_stub()
         self.testbed.init_blobstore_stub()
         self.testbed.init_search_stub()
+        self.testbed.init_images_stub()
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())

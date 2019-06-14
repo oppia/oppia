@@ -35,8 +35,6 @@ class CollectionPage(base.BaseHandler):
         (collection, collection_rights) = (
             collection_services.get_collection_and_collection_rights_by_id(
                 collection_id))
-        if collection is None:
-            raise self.PageNotFoundException
 
         self.values.update({
             'can_edit': rights_manager.check_can_edit_activity(
@@ -49,7 +47,7 @@ class CollectionPage(base.BaseHandler):
             'meta_description': utils.capitalize_string(collection.objective)
         })
 
-        self.render_template('dist/collection_player.html')
+        self.render_template('dist/collection-player-page.mainpage.html')
 
 
 class CollectionDataHandler(base.BaseHandler):
@@ -60,13 +58,11 @@ class CollectionDataHandler(base.BaseHandler):
     @acl_decorators.can_play_collection
     def get(self, collection_id):
         """Populates the data on the individual collection page."""
-        try:
-            collection_dict = (
-                summary_services.get_learner_collection_dict_by_id(
-                    collection_id, self.user,
-                    allow_invalid_explorations=False))
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        collection_dict = (
+            summary_services.get_learner_collection_dict_by_id(
+                collection_id, self.user,
+                allow_invalid_explorations=False))
+
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
         self.values.update({
