@@ -41,13 +41,13 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
       '/pages/exploration-editor-page/history-tab/history-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$http', '$log', '$rootScope', '$scope', '$window',
-      '$uibModal', 'CompareVersionsService',
+      '$http', '$log', '$rootScope', '$scope',
+      '$uibModal', '$window', 'CompareVersionsService',
       'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
       'UrlInterpolationService', 'VersionTreeService',
       function(
-          $http, $log, $rootScope, $scope, $window,
-          $uibModal, CompareVersionsService,
+          $http, $log, $rootScope, $scope,
+          $uibModal, $window, CompareVersionsService,
           DateTimeFormatService, EditabilityService, ExplorationDataService,
           UrlInterpolationService, VersionTreeService) {
         var ctrl = this;
