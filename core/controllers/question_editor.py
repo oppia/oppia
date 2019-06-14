@@ -15,6 +15,7 @@
 """Controllers for the questions editor, from where questions are edited
 and are created.
 """
+import json
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -29,14 +30,28 @@ import feconf
 class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
+    def validate_skill_ids(skill_ids):
+        if not(isinstance(skill_ids, list) and all(
+            [isinstance(skill_id, basestring) for skill_id in skill_ids])):
+            raise self.InvalidInputException
+
     @acl_decorators.can_manage_question_skill_status
-    def post(self, skill_id):
+    def post(self, skill_ids):
         """Handles POST requests."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
-        if skill is None:
+        try:
+            skill_ids = json.loads(skill_ids)
+            validate_skill_ids(skill_ids)
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.PageNotFoundException
+
+        
+        
+        skills = skill_services.get_multi_skills(skill_ids, strict=False)
+        if skills is None or len(skills) = 0:
             raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+                'The skills with the given ids don\'t exist.')
 
         question_dict = self.payload.get('question_dict')
         if (

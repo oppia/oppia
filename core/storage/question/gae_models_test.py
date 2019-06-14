@@ -27,17 +27,34 @@ from core.tests import test_utils
 class QuestionModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionModel class."""
 
-    def test_create_question(self):
+    def test_create_question_empty_skill_id_list(self):
         state = state_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
         language_code = 'en'
         version = 1
         question_model = question_models.QuestionModel.create(
-            question_state_data, language_code, version)
+            question_state_data, language_code, version, [])
 
         self.assertEqual(
             question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
+        self.assertItemsEqual(question_model.linked_skill_ids, [])
+
+    def test_create_question_with_skill_ids(self):
+        state = state_domain.State.create_default_state('ABC')
+        question_state_data = state.to_dict()
+        linked_skill_ids = ['skill_id1','skill_id2']
+        language_code = 'en'
+        version = 1
+        question_model = question_models.QuestionModel.create(
+            question_state_data, language_code, version,
+            linked_skill_ids)
+
+        self.assertEqual(
+            question_model.question_state_data, question_state_data)
+        self.assertEqual(question_model.language_code, language_code)
+        self.assertItemsEqual(question_model.linked_skill_ids,
+            linked_skill_ids)
 
 
     def test_raise_exception_by_mocking_collision(self):
@@ -57,7 +74,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
                     lambda x, y: True,
                     question_models.QuestionModel)):
                 question_models.QuestionModel.create(
-                    question_state_data, language_code, version)
+                    question_state_data, language_code, version, set([]))
 
 
 class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):

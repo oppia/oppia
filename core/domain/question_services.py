@@ -77,7 +77,8 @@ def _create_new_question(committer_id, question, commit_message):
         language_code=question.language_code,
         version=question.version,
         question_state_data_schema_version=(
-            question.question_state_data_schema_version)
+            question.question_state_data_schema_version,),
+        linked_skill_ids=question.linked_skill_ids
     )
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
@@ -110,6 +111,7 @@ def delete_question_skill_link(question_id, skill_id):
             question_id, skill_id))
     question_skill_link_model = question_models.QuestionSkillLinkModel.get(
         question_skill_link_id)
+    #TODO(vinitamurthi): Add logic here
     question_skill_link_model.delete()
 
 
@@ -210,7 +212,8 @@ def get_question_from_model(question_model):
         state_domain.State.from_dict(versioned_question_state['state']),
         versioned_question_state['state_schema_version'],
         question_model.language_code, question_model.version,
-        question_model.created_on, question_model.last_updated)
+        question_model.linked_skill_ids, question_model.created_on,
+        question_model.last_updated)
 
 
 def get_question_skill_link_from_model(
@@ -285,16 +288,16 @@ def get_skills_linked_to_question(question_id):
     Returns:
         list(Skill). The list of skills that are linked to the question.
     """
-    question_skill_link_models = (
-        question_models.QuestionSkillLinkModel.get_models_by_question_id(
-            question_id))
-    skill_ids = [model.skill_id for model in question_skill_link_models]
-    skills = skill_services.get_multi_skills(skill_ids)
+    questions = get_questions_by_ids(question_id)
+    if not questions:
+        return []
+    skills = skill_services.get_multi_skills(questions[0].linked_skill_ids)
     return skills
 
 
 def update_skill_ids_of_questions(
         curr_skill_id, curr_skill_description, new_skill_id):
+    #TODO(vinitamurthi): Update this
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
     skill ID.
 
@@ -427,6 +430,9 @@ def apply_change_list(question_id, change_list):
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
                     question.update_question_state_data(change.new_value)
+                elif (change.property_name ==
+                      question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
+                    question.update_linked_skill_ids(change.new_value)
 
         return question
 
@@ -465,6 +471,7 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model.language_code = question.language_code
     question_model.question_state_data_schema_version = (
         question.question_state_data_schema_version)
+    question_model.linked_skill_ids = question.linked_skill_ids
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1
