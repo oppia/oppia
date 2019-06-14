@@ -17,11 +17,14 @@
 """Domain object for changes made to domain objects of storage models."""
 
 import copy
+
+from core.platform import models
 import utils
 
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
-def validate_cmd(
-        cmd_name, valid_cmd_specs, actual_cmd_specs):
+
+def validate_cmd(cmd_name, valid_cmd_specs, actual_cmd_specs):
     """Validates that the attributes of a command contain all the required
     attributes and some/all of optional attributes. It also checks that
     the values of attributes belong to a set of allowed values if any.
@@ -51,9 +54,9 @@ def validate_cmd(
 
     error_msg_list = []
     if missing_attributes:
-        error_msg_list.append((
+        error_msg_list.append(
             'The following required attributes are missing: %s' % (
-                (',').join(sorted(missing_attributes)))))
+                (',').join(sorted(missing_attributes))))
 
     if extra_attributes:
         error_msg_list.append(
@@ -80,8 +83,26 @@ class BaseChange(object):
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = []
     ALLOWED_COMMANDS = []
+    COMMON_ALLOWED_COMMANDS = [{
+        'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
+        'required_attributes': [],
+        'optional_attributes': []
+    }]
 
-    def validate(self, change_dict):
+    def __init__(self, change_dict):
+        """Initializes a BaseChange object from a dict.
+
+        Args:
+            change_dict: dict. The dict containing cmd name and attributes.
+
+        Raises:
+            ValidationError: The given change_dict is not valid.
+        """
+        self.validate_dict(change_dict)
+        for key, value in change_dict.iteritems():
+            setattr(self, key, value)
+
+    def validate_dict(self, change_dict):
         """Checks that the command in change dict is valid for the domain
         object.
 
@@ -100,7 +121,10 @@ class BaseChange(object):
         cmd_name = change_dict['cmd']
 
         valid_cmd_specs = None
-        for cmd in self.ALLOWED_COMMANDS:
+
+        all_allowed_commands = (
+            self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS)
+        for cmd in all_allowed_commands:
             if cmd['name'] == cmd_name:
                 valid_cmd_specs = copy.deepcopy(cmd)
                 break

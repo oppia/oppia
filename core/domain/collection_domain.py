@@ -82,6 +82,17 @@ class CollectionChange(change_domain.BaseChange):
     interpreted in general) preserve backward-compatibility with the
     collection snapshots in the datastore. Do not modify the definitions of
     cmd keys that already exist.
+
+    The allowed commands, together with the attributes:
+        - 'add_collection_node' (with exploration_id)
+        - 'delete_collection_node' (with exploration_id)
+        - 'edit_collection_node_property' (with exploration_id,
+            property_name, new_value and, optionally, old_value)
+        - 'edit_collection_property' (with property_name, new_value
+            and, optionally, old_value)
+        - 'migrate_schema' (with from_version and to_version)
+    For a collection, property_name must be one of
+    COLLECTION_PROPERTIES.
     """
 
     COLLECTION_PROPERTIES = (
@@ -147,63 +158,6 @@ class CollectionChange(change_domain.BaseChange):
         'required_attributes': ['question_id', 'skill_id'],
         'optional_attributes': []
     }]
-
-    def __init__(self, change_dict):
-        """Initializes a CollectionChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                    - 'add_collection_node' (with exploration_id)
-                    - 'delete_collection_node' (with exploration_id)
-                    - 'edit_collection_node_property' (with exploration_id,
-                        property_name, new_value and, optionally, old_value)
-                    - 'edit_collection_property' (with property_name, new_value
-                        and, optionally, old_value)
-                    - 'migrate_schema' (with from_version and to_version)
-            For a collection, property_name must be one of
-            COLLECTION_PROPERTIES.
-
-        Raises:
-            Exception: The given change_dict is not valid.
-        """
-        self.validate(change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_CREATE_NEW:
-            self.category = change_dict['category']
-            self.title = change_dict['title']
-        if self.cmd == CMD_ADD_COLLECTION_NODE:
-            self.exploration_id = change_dict['exploration_id']
-        elif self.cmd == CMD_DELETE_COLLECTION_NODE:
-            self.exploration_id = change_dict['exploration_id']
-        elif self.cmd == CMD_SWAP_COLLECTION_NODES:
-            self.first_index = change_dict['first_index']
-            self.second_index = change_dict['second_index']
-        elif self.cmd == CMD_EDIT_COLLECTION_NODE_PROPERTY:
-            self.exploration_id = change_dict['exploration_id']
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_EDIT_COLLECTION_PROPERTY:
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        elif self.cmd == CMD_ADD_COLLECTION_SKILL:
-            self.name = change_dict['name']
-        elif self.cmd == CMD_ADD_QUESTION_ID_TO_SKILL:
-            self.skill_id = change_dict['skill_id']
-            self.question_id = change_dict['question_id']
-        elif self.cmd == CMD_REMOVE_QUESTION_ID_FROM_SKILL:
-            self.skill_id = change_dict['skill_id']
-            self.question_id = change_dict['question_id']
-        elif self.cmd == CMD_DELETE_COLLECTION_SKILL:
-            self.skill_id = change_dict['skill_id']
 
 
 class CollectionNode(object):

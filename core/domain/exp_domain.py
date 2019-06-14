@@ -109,6 +109,19 @@ class ExplorationChange(change_domain.BaseChange):
     accidentally stored the old_value using a ruleSpecs key instead of a
     rule_specs key. So, if you are making use of this data, make sure to
     verify the format of the old_value before doing any processing.
+
+    The allowed commands, together with the attributes:
+        - 'add_state' (with state_name)
+        - 'rename_state' (with old_state_name and new_state_name)
+        - 'delete_state' (with state_name)
+        - 'edit_state_property' (with state_name, property_name,
+            new_value and, optionally, old_value)
+        - 'edit_exploration_property' (with property_name,
+            new_value and, optionally, old_value)
+        - 'migrate_states_schema' (with from_version, to_version)
+    For a state, property_name must be one of STATE_PROPERTIES.
+    For an exploration, property_name must be one of
+    EXPLORATION_PROPERTIES.
     """
 
     STATE_PROPERTIES = (
@@ -173,58 +186,6 @@ class ExplorationChange(change_domain.BaseChange):
         'required_attributes': ['version_number'],
         'optional_attributes': []
     }]
-
-    def __init__(self, change_dict):
-        """Initializes an ExplorationChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd' key
-                and one or more other keys. The keys depend on what the value
-                for 'cmd' is. The possible values for 'cmd' are listed below,
-                together with the other keys in the dict:
-                    - 'add_state' (with state_name)
-                    - 'rename_state' (with old_state_name and new_state_name)
-                    - 'delete_state' (with state_name)
-                    - 'edit_state_property' (with state_name, property_name,
-                        new_value and, optionally, old_value)
-                    - 'edit_exploration_property' (with property_name,
-                        new_value and, optionally, old_value)
-                    - 'migrate_states_schema' (with from_version, to_version)
-                For a state, property_name must be one of STATE_PROPERTIES.
-                For an exploration, property_name must be one of
-                EXPLORATION_PROPERTIES.
-
-        Raises:
-            Exception: The given change_dict is not valid.
-        """
-        self.validate(change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_ADD_STATE:
-            self.state_name = change_dict['state_name']
-        elif self.cmd == CMD_RENAME_STATE:
-            self.old_state_name = change_dict['old_state_name']
-            self.new_state_name = change_dict['new_state_name']
-        elif self.cmd == CMD_DELETE_STATE:
-            self.state_name = change_dict['state_name']
-        elif self.cmd == CMD_EDIT_STATE_PROPERTY:
-            self.state_name = change_dict['state_name']
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        elif self.cmd == CMD_CREATE_NEW:
-            self.title = change_dict['title']
-            self.category = change_dict['category']
-        elif self.cmd == exp_models.ExplorationModel.CMD_REVERT_COMMIT:
-            # If commit is an exploration version revert commit.
-            self.version_number = change_dict['version_number']
 
 
 class ExplorationCommitLogEntry(object):

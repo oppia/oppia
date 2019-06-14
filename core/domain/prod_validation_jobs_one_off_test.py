@@ -37,6 +37,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
 from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -215,7 +216,7 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for activity_references schema check '
             'of ActivityReferencesModel\', '
             '[u"Entity id featured: Property does not match the schema with '
-            'the error Missing keys: [\'id\'], extra attributes: []"]]'
+            'the error Missing keys: [\'id\'], Extra keys: []"]]'
         ), (
             u'[u\'failed validation check for fetch properties of '
             'ActivityReferencesModel\', '
@@ -2467,7 +2468,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for model id length check of '
             'BulkEmailModel\', '
             '[u\'Entity id %s: Entity id should be of length 12 but instead '
-            'has length 6\']]'
+            'has length 7\']]'
         ) % model_instance_with_invalid_id.id]
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -2551,7 +2552,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
 
     def test_model_with_invalid_reply_to_id(self):
         while len(
-                self.model_instance.reply_to_id) < (
+                self.model_instance.reply_to_id) <= (
                     email_models.REPLY_TO_ID_LENGTH):
             self.model_instance.reply_to_id = (
                 self.model_instance.reply_to_id + 'invalid')
@@ -3872,7 +3873,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'ExpSummaryModel\', '
                 '[u"Entity id 0: Property does not match the schema with '
                 'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
-                'extra keys: [u\'10\']"]]'
+                'Extra keys: [u\'10\']"]]'
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -5006,8 +5007,9 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
-        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
-
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
+        topic_services.save_new_topic(self.owner_id, topic)
         language_codes = ['ar', 'en', 'en']
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -5197,7 +5199,8 @@ class StorySnapshotMetadataModelValidatorTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -5210,6 +5213,9 @@ class StorySnapshotMetadataModelValidatorTests(
                 story_services.save_new_story(self.owner_id, story)
             else:
                 story_services.save_new_story(self.user_id, story)
+            topic.add_canonical_story(story.id)
+
+        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
             story_models.StorySnapshotMetadataModel.get_by_id(
@@ -5354,7 +5360,9 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
+
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5363,6 +5371,9 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
 
         for story in stories:
             story_services.save_new_story(self.owner_id, story)
+            topic.add_canonical_story(story.id)
+
+        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
             story_models.StorySnapshotContentModel.get_by_id(
@@ -5484,7 +5495,9 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
         self.manager1 = user_services.UserActionsInfo(self.manager1_id)
         self.manager2 = user_services.UserActionsInfo(self.manager2_id)
 
-        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
+
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5493,6 +5506,9 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
 
         for story in stories:
             story_services.save_new_story(self.owner_id, story)
+            topic.add_canonical_story(story.id)
+
+        topic_services.save_new_topic(self.owner_id, topic)
 
         story_services.assign_role(
             self.admin, self.manager1, story_domain.ROLE_MANAGER, stories[0].id)
@@ -5613,7 +5629,9 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
+
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5625,6 +5643,9 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
                 story_services.save_new_story(self.owner_id, story)
             else:
                 story_services.save_new_story(self.user_id, story)
+            topic.add_canonical_story(story.id)
+
+        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
             story_models.StoryRightsSnapshotMetadataModel.get_by_id(
@@ -5764,7 +5785,9 @@ class StoryRightsSnapshotContentModelValidatorTests(
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
+
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5773,6 +5796,9 @@ class StoryRightsSnapshotContentModelValidatorTests(
 
         for story in stories:
             story_services.save_new_story(self.owner_id, story)
+            topic.add_canonical_story(story.id)
+
+        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
             story_models.StoryRightsSnapshotContentModel.get_by_id(
@@ -5869,7 +5895,9 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
+
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5878,6 +5906,9 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         for story in stories:
             story_services.save_new_story(self.owner_id, story)
+            topic.add_canonical_story(story.id)
+
+        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = (
             story_models.StoryCommitLogEntryModel.get_by_id(
@@ -6062,7 +6093,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'check of StoryCommitLogEntryModel\', '
                 '[u\'Entity id story-0-1: Commit command domain validation '
                 'failed with error: The following required attributes are '
-                'missing: node_id\']]'
+                'missing: node_id,title\']]'
             ),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -6078,7 +6109,9 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
 
         language_codes = ['ar', 'en', 'en']
 
-        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
+        topic = topic_domain.Topic.create_default_topic(
+            topic_id='0', name='topic')
+
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -6089,6 +6122,9 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             story.description = 'story-test'
             story.language_code = language_codes[index]
             story_services.save_new_story(self.owner_id, story)
+            topic.add_canonical_story(story.id)
+
+        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = story_models.StorySummaryModel.get_by_id('0')
         self.model_instance_1 = story_models.StorySummaryModel.get_by_id('1')
