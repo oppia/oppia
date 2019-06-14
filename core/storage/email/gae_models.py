@@ -238,6 +238,7 @@ class BulkEmailModel(base_models.BaseModel):
     id/key of instances of this model is randomly generated string of
     length 12.
     """
+
     # The user IDs of the email recipients.
     recipient_ids = ndb.JsonProperty(default=[], compressed=True)
     # The user ID of the email sender. For site-generated emails this is equal
