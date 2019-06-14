@@ -153,7 +153,7 @@ def get_questions_by_skill_ids(total_question_count, skill_ids):
     Returns:
         list(Question). The list containing an expected number of
             total_question_count questions linked to each given skill id.
-            question count per skill will be total_question_count divided by 
+            question count per skill will be total_question_count divided by
             length of skill_ids, and it will be rounded up if not evenly
             divisable. The order of questions will follow the order of given
             skill ids, but the order of questions for the same skill is random.
