@@ -67,7 +67,7 @@ class BaseModelValidator(object):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        """Defines a regex for model id.
+        """Returns a regex for model id.
 
         This should be implemented by subclasses.
 
@@ -95,7 +95,7 @@ class BaseModelValidator(object):
 
     @classmethod
     def _get_json_properties_schema(cls, item):
-        """Defines a schema for model properties.
+        """Returns a schema for model properties.
 
         This should be implemented by subclasses.
 
@@ -106,7 +106,7 @@ class BaseModelValidator(object):
             dict(str, dict). A dictionary whose keys are names of model
             properties and values are schemas for these properties.
             A schema defines a type for a custom object. The validation
-            for the schema is done using schema_utils.py. The schmea defined
+            for the schema is done using schema_utils.py. The schema defined
             here follow the same pattern as those defined in
             extensions/objects/models/objects.py.
         """
@@ -134,7 +134,7 @@ class BaseModelValidator(object):
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
-        """Defines a list of domain object instances created from
+        """Returns a list of domain object instances created from
         the model properties/model.
 
         This should be implemented by subclasses.
@@ -144,16 +144,16 @@ class BaseModelValidator(object):
 
         Returns:
             *: list. A list of domain object instances of the model.
-              The list contains domain object instances formed by using
-              model properties which follow a domain object. For instance,
-              each item in ActivityReferencesModel.activity_references
-              follows a ActivityReferences domain object. The list can also
-              contain a single instance if the model itself follows a
-              domain object. For instance, ExplorationModel follows a
-              Exploration domain object. If any model instance cannot be
-              converted to domain object instance, an error is added to
-              cls.errors which contains the exception which was raised during
-              the creating the domain object instance for the model.
+          The list contains domain object instances formed by using
+          model properties which follow a domain object. For instance,
+          each item in ActivityReferencesModel.activity_references
+          follows a ActivityReferences domain object. The list can also
+          contain a single instance if the model itself follows a
+          domain object. For instance, ExplorationModel follows a
+          Exploration domain object. If any model instance cannot be
+          converted to domain object instance, an error is added to
+          cls.errors which contains the exception which was raised during
+          the creation of the domain object instance for the model.
         """
         raise NotImplementedError
 
@@ -177,7 +177,7 @@ class BaseModelValidator(object):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        """Defines a mapping of external id to model class.
+        """Returns a mapping of external id to model class.
 
         This should be implemented by subclasses.
 
@@ -269,7 +269,7 @@ class BaseModelValidator(object):
 
     @classmethod
     def _get_change_domain_class(cls):
-        """Defines a Change domain class.
+        """Returns a Change domain class.
 
         This should be implemented by subclasses.
 
