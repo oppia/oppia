@@ -73,6 +73,7 @@ oppia.directive('stateResponses', [
         onResponsesInitialized: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveSolicitAnswerDetails: '=',
         navigateToState: '=',
         refreshWarnings: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='

@@ -53,6 +53,7 @@ oppia.directive('stateEditor', [
         onSaveInteractionId: '=',
         onSaveInteractionCustomizationArgs: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveSolicitAnswerDetails: '='
         onSaveSolution: '=',
         onSaveStateContent: '=',
         recomputeGraph: '=',

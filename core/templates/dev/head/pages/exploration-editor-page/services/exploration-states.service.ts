@@ -114,6 +114,7 @@ oppia.factory('ExplorationStatesService', [
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
+      solicit_answer_details: ['solicitAnswerDetails'],
       solution: ['interaction', 'solution'],
       widget_id: ['interaction', 'id'],
       widget_customization_args: ['interaction', 'customizationArgs'],
@@ -366,6 +367,13 @@ oppia.factory('ExplorationStatesService', [
       saveRecordedVoiceovers: function(stateName, newRecordedVoiceovers) {
         saveStateProperty(
           stateName, 'recorded_voiceovers', newRecordedVoiceovers);
+      },
+      getSolicitAnswerDetails: function(stateName) {
+        return getStatePropertyMemento(stateName, 'solicit_answer_details');
+      },
+      saveSolicitAnswerDetails: function(stateName, newSolicitAnswerDetails) {
+        saveStateProperty(
+          stateName, 'solicit_answer_details', newSolicitAnswerDetails);
       },
       getWrittenTranslationsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'written_translations');

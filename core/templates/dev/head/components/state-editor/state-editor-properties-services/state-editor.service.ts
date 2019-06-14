@@ -36,6 +36,7 @@ oppia.factory('StateEditorService', [
     var interaction = null;
     var misconceptions = [];
     var explorationIsWhitelisted = false;
+    var solicitAnswerDetails = null;
 
     return {
       getActiveStateName: function() {
@@ -121,6 +122,12 @@ oppia.factory('StateEditorService', [
         } else {
           return null;
         }
+      },
+      getSolicitAnswerDetails: function() {
+        return solicitAnswerDetails;
+      },
+      setSolicitAnswerDetails: function(newSolicitAnswerDetails) {
+        solicitAnswerDetails = newSolicitAnswerDetails;
       },
       setInQuestionMode: function(newModeValue) {
         inQuestionMode = newModeValue;
