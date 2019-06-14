@@ -3872,7 +3872,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'ExpSummaryModel\', '
                 '[u"Entity id 0: Property does not match the schema with '
                 'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
-                'extra attributes: [u\'10\']"]]'
+                'extra keys: [u\'10\']"]]'
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -5006,7 +5006,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
-        topic_domain.create_default_topic(topic_id='0', name='topic')
+        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
 
         language_codes = ['ar', 'en', 'en']
         stories = [story_domain.Story.create_default_story(
@@ -5197,7 +5197,7 @@ class StorySnapshotMetadataModelValidatorTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        topic_domain.create_default_topic(topic_id='0', name='topic')
+        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
 
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -5354,7 +5354,7 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        topic_domain.create_default_topic(topic_id='0', name='topic')
+        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5484,7 +5484,7 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
         self.manager1 = user_services.UserActionsInfo(self.manager1_id)
         self.manager2 = user_services.UserActionsInfo(self.manager2_id)
 
-        topic_domain.create_default_topic(topic_id='0', name='topic')
+        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5613,7 +5613,7 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
 
-        topic_domain.create_default_topic(topic_id='0', name='topic')
+        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5764,7 +5764,7 @@ class StoryRightsSnapshotContentModelValidatorTests(
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        topic_domain.create_default_topic(topic_id='0', name='topic')
+        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -5869,7 +5869,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-        topic_domain.create_default_topic(topic_id='0', name='topic')
+        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
@@ -6078,7 +6078,7 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
 
         language_codes = ['ar', 'en', 'en']
 
-        topic_domain.create_default_topic(topic_id='0', name='topic')
+        topic_domain.Topic.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
