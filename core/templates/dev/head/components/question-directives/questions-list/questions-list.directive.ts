@@ -242,8 +242,8 @@ oppia.directive('questionsList', [
                           function(misconceptionsBackendDict) {
                         return MisconceptionObjectFactory
                           .createFromBackendDict(misconceptionsBackendDict);
-                      });
-                  }));
+                      }));
+                  });
                   ctrl.initializeNewQuestionCreation();
                 }, function(error) {
                   AlertsService.addWarning();
