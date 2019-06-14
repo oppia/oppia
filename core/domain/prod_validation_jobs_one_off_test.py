@@ -36,6 +36,7 @@ from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
+from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -5005,10 +5006,13 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
+        topic_domain.create_default_topic(topic_id='0', name='topic')
+
         language_codes = ['ar', 'en', 'en']
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
-            title='title %d'
+            title='title %d',
+            corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for index, story in enumerate(stories):
@@ -5192,9 +5196,13 @@ class StorySnapshotMetadataModelValidatorTests(
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        topic_domain.create_default_topic(topic_id='0', name='topic')
+
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
+            corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for story in stories:
@@ -5345,9 +5353,12 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        topic_domain.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
+            corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for story in stories:
@@ -5473,9 +5484,11 @@ class StoryRightsModelValidatorTests(test_utils.GenericTestBase):
         self.manager1 = user_services.UserActionsInfo(self.manager1_id)
         self.manager2 = user_services.UserActionsInfo(self.manager2_id)
 
+        topic_domain.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
+            corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for story in stories:
@@ -5599,9 +5612,12 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        topic_domain.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
+            corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for story in stories:
@@ -5747,9 +5763,12 @@ class StoryRightsSnapshotContentModelValidatorTests(
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        topic_domain.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
+            corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for story in stories:
@@ -5849,9 +5868,12 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        topic_domain.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
+            corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for story in stories:
@@ -6055,9 +6077,12 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
         language_codes = ['ar', 'en', 'en']
+
+        topic_domain.create_default_topic(topic_id='0', name='topic')
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
             title='title %d' % i,
+            corresponding_topic_id='0'
         ) for i in xrange(3)]
 
         for index, story in enumerate(stories):
