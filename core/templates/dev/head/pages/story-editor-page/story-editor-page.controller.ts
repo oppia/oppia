@@ -72,6 +72,9 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
+
+require('objects/objectComponentsRequiresForPlayers.ts');
+
 require('services/HtmlEscaperService.ts');
 require('services/IdGenerationService.ts');
 require('services/RteHelperService.ts');
@@ -104,7 +107,7 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.constant('NODE_ID_PREFIX', 'node_');
+require('pages/story-editor-page/story-editor-page.constants.ts');
 
 oppia.controller('StoryEditor', [
   '$scope', '$uibModal', '$window', 'PageTitleService',

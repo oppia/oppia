@@ -24,10 +24,7 @@ require('domain/skill/SkillRightsBackendApiService.ts');
 require('domain/skill/SkillRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 
-oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
-oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
-oppia.constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
+require('pages/skill-editor-page/skill-editor-page.constants.ts');
 
 oppia.factory('SkillEditorStateService', [
   '$rootScope', 'AlertsService', 'EditableSkillBackendApiService',

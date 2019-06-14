@@ -16,37 +16,18 @@
  * @fileoverview Controller for landing page.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/string-utility-filters/capitalize.filter.ts');
 require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.controller.ts');
 require('services/PageTitleService.ts');
 require('services/SiteAnalyticsService.ts');
 
-// Note: This oppia constant needs to be keep in sync with
-// AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
-oppia.constant('TOPIC_LANDING_PAGE_DATA', {
-  maths: {
-    fractions: {
-      collection_id: '4UgTQUc1tala',
-      page_data: {
-        image_1: 'matthew_paper.png',
-        image_2: 'matthew_fractions.png',
-        video: 'fractions_video.mp4',
-      }
-    },
-    ratios: {
-      collection_id: '53gXGLIR044l',
-      page_data: {
-        image_1: 'ratios_James.png',
-        image_2: 'ratios_question.png',
-        video: 'ratios_video.mp4',
-      }
-    }
-  }
-});
-
-
+require(
+  'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts');
 
 oppia.controller('TopicLandingPage', [
   '$filter', '$scope', '$timeout', '$window', 'PageTitleService',
@@ -56,36 +37,42 @@ oppia.controller('TopicLandingPage', [
       SiteAnalyticsService, UrlInterpolationService, TOPIC_LANDING_PAGE_DATA) {
     var pathArray = $window.location.pathname.split('/');
     $scope.subject = pathArray[2];
-    $scope.topic = pathArray[3];
-    var landingPageData = (
-      TOPIC_LANDING_PAGE_DATA[$scope.subject][$scope.topic].page_data);
+    var topic = pathArray[3];
+    var topicData = TOPIC_LANDING_PAGE_DATA[$scope.subject][topic];
+    var landingPageData = topicData.page_data;
     var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
-
-    var capitalizedTopic = $filter('capitalize')($scope.topic);
-    var pageTitle = 'Learn ' + capitalizedTopic + ' - Oppia';
+    $scope.topicTitle = topicData.topic_title;
+    $scope.lessons = landingPageData.lessons;
+    var pageTitle = 'Learn ' + $scope.topicTitle + ' - Oppia';
     PageTitleService.setPageTitle(pageTitle);
+    $scope.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
+      '/splash/books.svg');
 
-    $scope.getRowImageUrl = function(index) {
+    var getImageData = function(index) {
       var imageKey = 'image_' + index;
       if (landingPageData[imageKey]) {
         var imagePath = UrlInterpolationService.interpolateUrl(
           angular.copy(assetsPathFormat), {
             subject: $scope.subject,
-            topic: $scope.topic,
-            file_name: landingPageData[imageKey]
+            topic: topic,
+            file_name: landingPageData[imageKey].file_name
           });
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      } else {
-        throw Error('page_data does not have ' + imageKey + ' key.');
+        return {
+          src: UrlInterpolationService.getStaticImageUrl(imagePath),
+          alt: landingPageData[imageKey].alt
+        };
       }
     };
+
+    $scope.image1 = getImageData(1);
+    $scope.image2 = getImageData(2);
 
     $scope.getVideoUrl = function() {
       if (landingPageData.video) {
         var videoPath = UrlInterpolationService.interpolateUrl(
           angular.copy(assetsPathFormat), {
             subject: $scope.subject,
-            topic: $scope.topic,
+            topic: topic,
             file_name: landingPageData.video
           });
         return UrlInterpolationService.getStaticVideoUrl(videoPath);
@@ -94,14 +81,8 @@ oppia.controller('TopicLandingPage', [
       }
     };
 
-    $scope.getStaticSubjectImageUrl = function(subjectName) {
-      return UrlInterpolationService.getStaticImageUrl(
-        '/subjects/' + subjectName + '.svg');
-    };
-
     $scope.onClickGetStartedButton = function() {
-      var collectionId = (
-        TOPIC_LANDING_PAGE_DATA[$scope.subject][$scope.topic].collection_id);
+      var collectionId = topicData.collection_id;
       SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
         collectionId);
       $timeout(function() {
