@@ -377,7 +377,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_reject_suggestion(self):
+    def test_reject_suggestion_to_exploration(self):
         self.login(self.EDITOR_EMAIL)
 
         response = self.get_html_response('/explore/%s' % self.EXP_ID)
@@ -902,7 +902,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_reject_suggestion(self):
+    def test_reject_suggestion_to_topic(self):
         self.login(self.ADMIN_EMAIL)
 
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
@@ -936,5 +936,44 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_REJECTED)
+
+        self.logout()
+
+    def test_accept_suggestion_to_topic(self):
+        self.login(self.ADMIN_EMAIL)
+
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        suggestion_to_accept = self.get_json(
+            '%s?author_id=%s' % (
+                feconf.SUGGESTION_LIST_URL_PREFIX,
+                self.author_id))['suggestions'][0]
+
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_to_accept['suggestion_id'])
+
+        self.assertEqual(
+            suggestion.status, suggestion_models.STATUS_IN_REVIEW)
+
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.put_json('%s/topic/%s/%s' % (
+                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted!',
+                    'skill_id': self.skill_id
+                }, csrf_token=csrf_token)
+
+        suggestion = suggestion_services.get_suggestion_by_id(
+            suggestion_to_accept['suggestion_id'])
+
+        self.assertEqual(
+            suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
         self.logout()
