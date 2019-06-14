@@ -21,7 +21,9 @@ oppia.factory('ReviewTestEngineService', [
     return {
       getReviewTestQuestionCount: function(numOfSkills) {
         // numOfSkills should be a non-negative integer.
-        if (numOfSkills < 6) {
+        if (numOfSkills < 0) {
+          return 0;
+        } else if (numOfSkills < 6) {
           return numOfSkills * 3;
         } else if (numOfSkills < 10) {
           return numOfSkills * 2;

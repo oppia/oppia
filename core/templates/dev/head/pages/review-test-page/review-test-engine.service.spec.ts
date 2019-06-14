@@ -26,6 +26,7 @@ describe('Review test engine service', function() {
   }));
 
   it('should return the correct count of review test questions', function() {
+    expect(ReviewTestEngineService.getReviewTestQuestionCount(-2)).toEqual(0);
     expect(ReviewTestEngineService.getReviewTestQuestionCount(0)).toEqual(0);
     expect(ReviewTestEngineService.getReviewTestQuestionCount(3)).toEqual(9);
     expect(ReviewTestEngineService.getReviewTestQuestionCount(8)).toEqual(16);
