@@ -305,8 +305,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryDomainUnitTests, self).setUp()
         self.STORY_ID = story_services.get_new_story_id()
+        self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
+            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID
         )
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.signup('user@example.com', 'user')
@@ -342,7 +344,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """Test the create_default_story and create_default_story_node
         method of class Story.
         """
-        story = story_domain.Story.create_default_story(self.STORY_ID, 'Title')
+        topic_id = utils.generate_random_string(12)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Title', topic_id)
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
@@ -356,6 +360,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'story_contents_schema_version': (
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'corresponding_topic_id': topic_id,
             'version': 0
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
@@ -409,6 +414,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
                 self.story.story_contents_schema_version)
         )
+
+    def test_corresponding_topic_id_validation(self):
+        # Generating valid topic id of type str.
+        valid_topic_id = utils.generate_random_string(12)
+        self.assertTrue(isinstance(valid_topic_id, basestring))
+        self.story.corresponding_topic_id = valid_topic_id
+        self.story.validate()
+
+        # Setting invalid topic id type.
+        invalid_topic_id = 123
+        self.story.corresponding_topic_id = invalid_topic_id
+        self._assert_validation_error(
+            'Expected corresponding_topic_id should be a string, received: %s' %
+            (invalid_topic_id))
 
     def test_add_node_validation(self):
         with self.assertRaisesRegexp(

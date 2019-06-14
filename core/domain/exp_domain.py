@@ -46,6 +46,7 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
+STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
@@ -113,6 +114,7 @@ class ExplorationChange(change_domain.BaseChange):
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
+        STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
@@ -598,6 +600,8 @@ class Exploration(object):
             state.written_translations = (
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
+
+            state.solicit_answer_details = sdict['solicit_answer_details']
 
             exploration.states[state_name] = state
 
@@ -2205,6 +2209,25 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
+        """Converts from version 28 to 29. Version 29 adds
+        solicit_answer_details boolean variable to the state, which
+        allows the creator to ask for answer details from the learner
+        about why they landed on a particular answer.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.itervalues():
+            state_dict['solicit_answer_details'] = False
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2239,7 +2262,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 33
+    CURRENT_EXP_SCHEMA_VERSION = 34
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2832,6 +2855,28 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
+        """Converts a v33 exploration dict into a v34 exploration dict.
+
+        Adds solicit_answer_details in state to ask learners for the
+        answer details.
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v33.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v34.
+        """
+        exploration_dict['schema_version'] = 34
+
+        exploration_dict['states'] = cls._convert_states_v28_dict_to_v29_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 29
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3028,6 +3073,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v32_dict_to_v33_dict(
                 exploration_dict)
             exploration_schema_version = 33
+
+        if exploration_schema_version == 33:
+            exploration_dict = cls._convert_v33_dict_to_v34_dict(
+                exploration_dict)
+            exploration_schema_version = 34
 
         return (exploration_dict, initial_schema_version)
 

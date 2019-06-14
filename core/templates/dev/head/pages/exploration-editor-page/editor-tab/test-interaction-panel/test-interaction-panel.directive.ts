@@ -18,7 +18,10 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
-require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 oppia.directive('testInteractionPanel', [
   'UrlInterpolationService', function(UrlInterpolationService) {
