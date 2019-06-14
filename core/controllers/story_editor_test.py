@@ -35,16 +35,25 @@ class BaseStoryEditorControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.topic_id = topic_services.get_new_topic_id()
         self.story_id = story_services.get_new_story_id()
         self.save_new_story(
-            self.story_id, self.admin_id, 'Title', 'Description', 'Notes')
-        self.topic_id = topic_services.get_new_topic_id()
+            self.story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description',
             [self.story_id], [], [], [], 1)
 
 
 class StoryEditorTests(BaseStoryEditorControllerTests):
+
+    def test_cannot_access_story_editor_page_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        self.get_html_response(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_URL_PREFIX, 'invalid_topic_id',
+                self.story_id), expected_status_int=404)
+        self.logout()
 
     def test_access_story_editor_page(self):
         """Test access to editor pages for the sample story."""
@@ -120,6 +129,23 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
                 self.story_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=401)
+
+    def test_can_not_delete_story_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+        self.delete_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, 'invalid_topic_id',
+                self.story_id), expected_status_int=404)
+        self.logout()
+
+    def test_guest_can_not_delete_story(self):
+        response = self.delete_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                self.story_id), expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_editable_story_handler_delete(self):
         # Check that admins can delete a story.

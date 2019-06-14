@@ -35,7 +35,7 @@ module.exports = {
       include: [
         path.resolve(__dirname, 'core/templates/dev/head'),
         path.resolve(__dirname, 'extensions'),
-        path.resolve(__dirname, 'typings'),
+        path.resolve(__dirname, 'typings')
       ],
       use: [
         'cache-loader',
@@ -53,6 +53,10 @@ module.exports = {
           }
         }
       ]
+    },
+    {
+      test: /\.html$/,
+      loader: 'underscore-template-loader'
     }]
   },
   output: {

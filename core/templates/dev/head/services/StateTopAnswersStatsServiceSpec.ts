@@ -18,7 +18,7 @@
  */
 
 require('App.ts');
-require('pages/exploration_editor/ExplorationStatesService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/StateTopAnswersStatsService.ts');
 
 var joC = jasmine.objectContaining;
@@ -76,6 +76,7 @@ describe('StateTopAnswersStatsService', function() {
             feedback_1: {},
           },
         },
+        solicit_answer_details: false,
         written_translations: {
           translations_mapping: {
             content: {},
