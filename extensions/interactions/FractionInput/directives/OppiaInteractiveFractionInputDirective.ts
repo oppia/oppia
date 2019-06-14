@@ -16,6 +16,14 @@
  * @fileoverview Directive for the FractionInput interaction.
  */
 
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/FractionInput/directives/FractionInputRulesService.ts');
+require('pages/exploration_player/CurrentInteractionService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.directive('oppiaInteractiveFractionInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

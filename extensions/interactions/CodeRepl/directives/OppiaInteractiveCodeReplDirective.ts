@@ -20,6 +20,12 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
+require('pages/exploration_player/CurrentInteractionService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 oppia.directive('oppiaInteractiveCodeRepl', [
   'CodeReplRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE',
