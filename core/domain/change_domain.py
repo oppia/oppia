@@ -111,7 +111,7 @@ class BaseChange(object):
             attributes of a command.
 
         Raises:
-            Validation Error. The change dict does not contain the cmd key,
+            ValidationError. The change dict does not contain the cmd key,
                 or the cmd name is not allowed for the Change domain object
                 or the command attributes are missing or extra.
         """
