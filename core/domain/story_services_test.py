@@ -16,6 +16,7 @@
 
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -36,9 +37,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryServicesUnitTests, self).setUp()
         self.STORY_ID = story_services.get_new_story_id()
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            self.TOPIC_ID, self.USER_ID, 'Topic', 'A new topic', [], [], [], [],
+            0)
         self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
-        )
+            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, self.STORY_ID)
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -219,6 +226,50 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[0].outline_is_finalized, False)
 
+    def test_update_story_with_invalid_corresponding_topic_id_value(self):
+        topic_id = topic_services.get_new_topic_id()
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Title 1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, ('Expected story to only belong to a valid topic, but '
+                        'found an topic with ID: %s' % topic_id)):
+            story_services.update_story(
+                self.USER_ID, story_id, changelist, 'Added node.')
+
+    def test_update_story_which_not_corresponding_topic_id(self):
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.USER_ID, 'A New Topic', 'A new topic description.',
+            [], [], [], [], 0)
+        story_id = story_services.get_new_story_id()
+        self.save_new_story(
+            story_id, self.USER_ID, 'Title', 'Description', 'Notes', topic_id)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_1,
+                'title': 'Title 1'
+            })
+        ]
+
+        with self.assertRaisesRegexp(
+            Exception, ('Expected story to belong to the topic %s, but it is '
+                        'neither a part of the canonical stories or the '
+                        'additional stories of the topic.' % topic_id)):
+            story_services.update_story(
+                self.USER_ID, story_id, changelist, 'Added node.')
+
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)
         self.assertEqual(story_services.get_story_by_id(
@@ -243,8 +294,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_publish_story_with_private_exploration(self):
         self.save_new_story(
-            'private_story', self.USER_ID, 'Title', 'Description', 'Notes'
+            'private_story', self.USER_ID, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID
         )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, 'private_story')
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -276,8 +330,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
 
     def test_publish_and_unpublish_story(self):
         self.save_new_story(
-            'public_story', self.USER_ID, 'Title', 'Description', 'Notes'
+            'public_story', self.USER_ID, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID
         )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, 'public_story')
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,
@@ -443,8 +500,12 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.NODE_ID_3 = 'node_3'
 
         self.owner_id = 'owner'
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            self.TOPIC_ID, self.USER_ID, 'New Topic', 'A new topic', [], [], [],
+            [], 0)
         story = story_domain.Story.create_default_story(
-            self.STORY_1_ID, 'Title')
+            self.STORY_1_ID, 'Title', self.TOPIC_ID)
         story.description = ('Description')
         self.node_1 = {
             'id': self.NODE_ID_1,
@@ -474,6 +535,8 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         story.story_contents.initial_node_id = 'node_1'
         story.story_contents.next_node_id = 'node_3'
         story_services.save_new_story(self.USER_ID, story)
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, story.id)
 
     def test_get_completed_node_ids(self):
         # There should be no exception if the user or story do not exist;
@@ -557,8 +620,11 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         # If the same node and another are completed within the context
         # of a different story, it shouldn't affect this one.
         self.story = self.save_new_story(
-            self.STORY_ID_1, self.USER_ID, 'Title', 'Description', 'Notes'
+            self.STORY_ID_1, self.USER_ID, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID
         )
+        topic_services.add_canonical_story(
+            self.USER_ID, self.TOPIC_ID, self.STORY_ID_1)
         story_services.record_completed_node_in_story_context(
             self.owner_id, self.STORY_ID_1, self.NODE_ID_1)
         story_services.record_completed_node_in_story_context(

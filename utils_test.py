@@ -200,6 +200,12 @@ class UtilsTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(utils.capitalize_string(datum[0]), datum[1])
 
+    def test_generate_random_string(self):
+        # Generate a random string of length 12.
+        random_string = utils.generate_random_string(12)
+        self.assertTrue(isinstance(random_string, basestring))
+        self.assertEqual(len(random_string), 12)
+
     def test_get_thumbnail_icon_url_for_category(self):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),

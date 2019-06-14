@@ -39,9 +39,8 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic_id_1 = 'topic1'
 
         self.story = story_domain.Story.create_default_story(
-            self.story_id, 'story_title')
+            self.story_id, 'story_title', self.topic_id_1)
         self.story.description = 'story_description'
-        story_services.save_new_story(self.admin_id, self.story)
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'public_topic_name')
@@ -51,6 +50,7 @@ class BaseTopicViewerControllerTests(test_utils.GenericTestBase):
         self.topic.next_subtopic_id = 2
         self.topic.canonical_story_ids.append(self.story_id)
         topic_services.save_new_topic(self.admin_id, self.topic)
+        story_services.save_new_story(self.admin_id, self.story)
 
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id_1, 'private_topic_name')
