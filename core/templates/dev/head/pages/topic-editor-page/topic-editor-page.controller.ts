@@ -30,6 +30,7 @@ require('components/forms/validators/is-integer.filter.ts');
 require('components/forms/validators/is-nonempty.filter.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require('components/forms/custom-forms-directives/html-select.directive.ts');
 require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
