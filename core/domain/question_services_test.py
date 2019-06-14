@@ -417,7 +417,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
                 self.assertEqual(question_skill.skill_difficulty, 0.5)
 
         question_services.update_skill_ids_of_questions(
-            'skill_1', 'Description 1', 'skill_3')
+            self.editor_id, 'skill_1', 'Description 1', 'skill_3')
 
         question_skill_links = (
             question_services.get_question_skill_links_of_skill(
@@ -436,6 +436,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             if question_skill.question_id == self.question_id:
                 self.assertEqual(question_skill.skill_difficulty, 0.5)
 
+        questions = question_services.get_questions_by_ids(
+            [self.question_id, question_id_2, question_id_3])
+        for question in questions:
+            if question.id in ([self.question_id, question_id_2]):
+                self.assertItemsEqual(question.linked_skill_ids, ['skill_3'])
+            else:
+                self.assertItemsEqual(question.linked_skill_ids, ['skill_2'])
 
     def test_compute_summary_of_question(self):
         question_summary = question_services.compute_summary_of_question(

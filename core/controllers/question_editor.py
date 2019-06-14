@@ -15,7 +15,6 @@
 """Controllers for the questions editor, from where questions are edited
 and are created.
 """
-import json
 
 from constants import constants
 from core.controllers import acl_decorators
@@ -32,7 +31,8 @@ class QuestionCreationHandler(base.BaseHandler):
 
     def validate_skill_ids(self, skill_ids):
         """Validates that the passed skill ids are a list of strings."""
-        if not(isinstance(skill_ids, list) and all(
+        if not(isinstance(skill_ids, basestring)) and not(
+            isinstance(skill_ids, list) and all(
                 [isinstance(
                     skill_id, basestring) for skill_id in skill_ids])):
             raise self.InvalidInputException
@@ -41,7 +41,7 @@ class QuestionCreationHandler(base.BaseHandler):
     def post(self, skill_ids):
         """Handles POST requests."""
         try:
-            skill_ids = json.loads(skill_ids)
+            skill_ids = skill_ids.split(',')
             self.validate_skill_ids(skill_ids)
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
