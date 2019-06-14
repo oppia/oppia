@@ -239,10 +239,10 @@ oppia.directive('questionsList', [
                   skillDicts.forEach(function(skillDict) {
                     ctrl.misconceptions = ctrl.misconceptions.concat(
                       skillDict.misconceptions.map(
-                          function(misconceptionsBackendDict) {
-                        return MisconceptionObjectFactory
-                          .createFromBackendDict(misconceptionsBackendDict);
-                      }));
+                        function(misconceptionsBackendDict) {
+                          return MisconceptionObjectFactory
+                            .createFromBackendDict(misconceptionsBackendDict);
+                        }));
                   });
                   ctrl.initializeNewQuestionCreation();
                 }, function(error) {
