@@ -559,6 +559,8 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
     def test_get_pending_nodes_in_story(self):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
 
+        # The starting index is 1 because the first story node is completed,
+        # and the pending nodes will start from the second node.
         for index, pending_node in enumerate(
                 story_services.get_pending_nodes_in_story(
                     self.owner_id, self.STORY_1_ID), start=1):

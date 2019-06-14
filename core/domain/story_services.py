@@ -567,9 +567,9 @@ def get_latest_completed_node_ids(user_id, story_id):
         story_id: str. ID of the story.
 
     Returns:
-        list(str). List of the completed node ids that come latest in story.
-        If length is larger than 3, return the lastest three of them. If length
-        is smaller or equal to 3, return all of them.
+        list(str). List of the completed node ids that come latest in the story.
+            If length is larger than 3, return the last three of them.
+            If length is smaller or equal to 3, return all of them.
     """
     progress_model = user_models.StoryProgressModel.get(
         user_id, story_id, strict=False)

@@ -662,11 +662,12 @@ class Story(object):
 
         Args:
             node_ids: list(str). The list of IDs of the nodes inside
-            the story.
+                the story.
 
         Returns:
-            list(str). The list of acquired skill ids for the node ids.
-            If no aquired skill id is linked to them, the list will be empty.
+            list(str). The union of the acquired skill IDs corresponding to
+                each of the node IDs. If no acquired skill id is linked to
+                them, the list will be empty.
         """
         acquired_skill_ids = []
         for node in self.story_contents.nodes:

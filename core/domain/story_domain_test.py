@@ -102,17 +102,38 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             ['skill_1', 'skill_2']
         )
 
-    def test_get_acquired_skill_ids_for_node_ids_special_cases(self):
+    def test_get_acquired_skill_ids_for_node_ids_empty(self):
+        self.story.story_contents.nodes[0].acquired_skill_ids = []
+        self.story.story_contents.nodes[1].acquired_skill_ids = []
+        self.assertEqual(
+            self.story.get_acquired_skill_ids_for_node_ids(
+                [self.NODE_ID_1, self.NODE_ID_2]), []
+        )
+
+    def test_get_acquired_skill_ids_for_node_ids_multi_skills(self):
         # Test cases when there are multiple acquired skill ids linked to
-        # one node, and multiple nodes have overlapping skill ids.
+        # one node.
         self.story.story_contents.nodes[0].acquired_skill_ids = [
             'skill_1', 'skill_2']
         self.story.story_contents.nodes[1].acquired_skill_ids = [
-            'skill_1', 'skill_3']
+            'skill_3']
         self.assertEqual(
             self.story.get_acquired_skill_ids_for_node_ids(
                 [self.NODE_ID_1, self.NODE_ID_2]),
             ['skill_1', 'skill_2', 'skill_3']
+        )
+
+    def test_get_acquired_skill_ids_for_node_ids_overlapping_skills(self):
+        # Test cases when there are and multiple nodes have overlapping
+        # skill ids.
+        self.story.story_contents.nodes[0].acquired_skill_ids = [
+            'skill_1', 'skill_2']
+        self.story.story_contents.nodes[1].acquired_skill_ids = [
+            'skill_1']
+        self.assertEqual(
+            self.story.get_acquired_skill_ids_for_node_ids(
+                [self.NODE_ID_1, self.NODE_ID_2]),
+            ['skill_1', 'skill_2']
         )
 
     def test_get_prerequisite_skill_ids(self):

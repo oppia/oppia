@@ -261,8 +261,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
                 corresponding to given skill_ids, with
                 total_question_count/len(skill_ids) number of questions for
-                each skill. If not enough questions for a skill, just return
-                all questions it links to.
+                each skill. If not evenly divisable, it will be rounder up.
+                If not enough questions for a skill, just return all questions
+                it links to.
         """
         question_count_per_skill = int(
             math.ceil(float(total_question_count) / float(len(skill_ids))))
