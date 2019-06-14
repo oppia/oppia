@@ -384,6 +384,7 @@ def update_skill_ids_of_questions(
     skill ID.
 
     Args:
+        user_id: str. ID of the creator.
         curr_skill_id: str. ID of the current skill.
         curr_skill_description: str. Description of the current skill.
         new_skill_id: str. ID of the superseding skill.
@@ -406,15 +407,16 @@ def update_skill_ids_of_questions(
         old_question_skill_link_models)
     question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
         new_question_skill_link_models)
-    
+
     questions = get_questions_by_ids(list(question_ids))
     for question in questions:
         new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
         new_linked_skill_ids.remove(curr_skill_id)
         new_linked_skill_ids.append(new_skill_id)
         _update_linked_skill_ids_of_question(
-            user_id, question.id, new_linked_skill_ids, question.linked_skill_ids)
-    
+            user_id, question.id, new_linked_skill_ids,
+            question.linked_skill_ids)
+
 
 
 def get_question_summaries_and_skill_descriptions(
@@ -535,6 +537,7 @@ def apply_change_list(question_id, change_list):
                 e.__class__.__name__, e, question_id, change_list)
         )
         raise
+
 
 def _save_question(committer_id, question, change_list, commit_message):
     """Validates a question and commits it to persistent storage.

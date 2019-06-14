@@ -1457,6 +1457,8 @@ tags: []
             question_state_data: State. The state data for the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
+            linked_skill_ids: list(str). List of skill IDs linked to the
+                question.
 
         Returns:
             Question. A newly-created question.
