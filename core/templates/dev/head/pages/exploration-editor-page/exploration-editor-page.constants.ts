@@ -54,3 +54,14 @@ oppia.constant(
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+  'The solution is now valid!');
+
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'The current solution is no longer valid.');
+
+oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
+oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
+
+oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');

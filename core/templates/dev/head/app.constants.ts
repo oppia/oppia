@@ -84,18 +84,10 @@ oppia.constant('ENABLE_ML_CLASSIFIERS', false);
 // Feature still in development.
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_EXPLORATION',
   'The current solution does not lead to another card.');
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_QUESTION',
-  'The current solution does not correspond to a correct answer.');
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
-  'The solution is now valid!');
-oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
-  'The current solution is no longer valid.');
 oppia.constant('PARAMETER_TYPES', {
   REAL: 'Real',
   UNICODE_STRING: 'UnicodeString'
 });
-oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
-oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
 
 // The maximum number of nodes to show in a row of the state graph.
 oppia.constant('MAX_NODES_PER_ROW', 4);
@@ -112,7 +104,6 @@ oppia.constant('COMPONENT_NAME_CONTENT', 'content');
 oppia.constant('COMPONENT_NAME_HINT', 'hint');
 oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
 oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
-oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
 oppia.constant('COMPONENT_NAME_EXPLANATION', 'explanation');
 oppia.constant('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
 
@@ -122,7 +113,6 @@ oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
 oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
 oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 3);
 oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
-oppia.constant('MAX_PLAYTHROUGHS_FOR_ISSUE', 5);
 
 oppia.constant('ACTION_TYPE_EXPLORATION_START', 'ExplorationStart');
 oppia.constant('ACTION_TYPE_ANSWER_SUBMIT', 'AnswerSubmit');
@@ -135,9 +125,6 @@ oppia.constant('ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'CyclicStateTransitions');
 oppia.constant('SITE_NAME', 'Oppia.org');
 
 oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
-oppia.constant('FEEDBACK_POPOVER_PATH',
-  '/pages/exploration-player-page/templates/' +
-  'feedback-popup-container.template.html');
 
 oppia.constant('LOGOUT_URL', '/logout');
 
@@ -159,5 +146,3 @@ oppia.constant(
   '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
 oppia.constant(
   'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
-
-
