@@ -41,12 +41,12 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
       '/pages/exploration-editor-page/history-tab/history-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$http', '$log', '$rootScope', '$scope',
+      '$http', '$log', '$rootScope', '$scope', '$window',
       '$uibModal', 'CompareVersionsService',
       'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
       'UrlInterpolationService', 'VersionTreeService',
       function(
-          $http, $log, $rootScope, $scope,
+          $http, $log, $rootScope, $scope, $window,
           $uibModal, CompareVersionsService,
           DateTimeFormatService, EditabilityService, ExplorationDataService,
           UrlInterpolationService, VersionTreeService) {
@@ -295,7 +295,7 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
               current_version: ExplorationDataService.data.version,
               revert_to_version: version
             }).then(function() {
-              location.reload();
+              $window.location.reload();
             });
           });
         };

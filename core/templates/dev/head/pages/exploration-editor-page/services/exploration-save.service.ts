@@ -299,7 +299,7 @@ oppia.factory('ExplorationSaveService', [
           // The reload is necessary because, otherwise, the
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
-          location.reload();
+          $window.location.reload();
         });
       },
 
