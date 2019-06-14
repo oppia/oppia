@@ -340,6 +340,11 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party.sh',
     '/.github/']
 
+NEW_CONVENTION_DIRECTORIES = [
+    'core/templates/dev/head/pages',
+    'core/templates/dev/head/filters',
+    'core/templates/dev/head/components']
+
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -2414,6 +2419,50 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_constants_declaration(self):
+        """Checks the declaration of constants in the TS files to ensure that
+        the constants are not declared in files other than *.constants.ts.
+        """
+
+        if self.verbose_mode_enabled:
+            print 'Starting constants declaration check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            all_ts_files = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.ts'))]
+            ts_files_to_check = [
+                filepath for filepath in all_ts_files if any(
+                    pattern in filepath for pattern in (
+                        NEW_CONVENTION_DIRECTORIES))]
+
+            for filepath in ts_files_to_check:
+                if not filepath.endswith('.constants.ts'):
+                    for line_num, line in enumerate(FileCache.readlines(
+                            filepath)):
+                        if 'oppia.constant(' in line:
+                            failed = True
+                            print ('%s --> Constant declaration found at line '
+                                   '%s. Please declare the constants in a '
+                                   'separate constants file.' % (
+                                       filepath, line_num))
+
+            if failed:
+                summary_message = '%s  Constants declaration check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Constants declaration check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+
+        return summary_messages
+
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2442,6 +2491,7 @@ class LintChecksManager(object):
         html_linter_messages = self._lint_html_files()
         pattern_messages = self._check_bad_patterns()
         codeowner_messages = self._check_codeowner_file()
+        constants_messages = self._check_constants_declaration()
         all_messages = (
             extra_js_files_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
@@ -2449,7 +2499,7 @@ class LintChecksManager(object):
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
-            codeowner_messages)
+            codeowner_messages + constants_messages)
         return all_messages
 
 
