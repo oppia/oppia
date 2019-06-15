@@ -247,6 +247,79 @@ class BaseModelValidator(object):
             func(item)
 
 
+class BaseSummaryModelValidator(BaseModelValidator):
+    """Base class for validating summary models."""
+
+    @classmethod
+    def _get_related_model_properties(cls):
+        """Returns a tuple of related external_models and properties.
+
+        This should be implemented by subclasses.
+
+        Returns:
+            tuple(str, list(tuple), dict): A tuple with first element as
+                related model name, second element as a tuple of
+                cls.external_instance_details and the third element
+                as a properties dict with key as property name in summary
+                model and value as property name in related model.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _validate_related_model_properties(cls, item):
+        """Validate that properties of the model match the corresponding
+        properties of the related model.
+
+        Args:
+            item: ndb.Model. BaseSummaryModel to validate.
+        """
+
+        for (
+                related_model_name,
+                related_model_class_model_id_model_tuples,
+                related_model_properties_dict
+            ) in cls._get_related_model_properties():
+
+            for (_, _, related_model) in (
+                    related_model_class_model_id_model_tuples):
+                for (property_name, related_model_property_name) in (
+                        related_model_properties_dict.iteritems()):
+                    value_in_summary_model = getattr(item, property_name)
+                    value_in_related_model = getattr(
+                        related_model, related_model_property_name)
+
+                    summary_model_output_value = value_in_summary_model
+                    if isinstance(summary_model_output_value, list):
+                        summary_model_output_value = (',').join(
+                            summary_model_output_value)
+
+                    related_model_output_value = (
+                        value_in_related_model)
+                    if isinstance(related_model_output_value, list):
+                        related_model_output_value = (',').join(
+                            related_model_output_value)
+
+                    if value_in_summary_model != value_in_related_model:
+                        cls.errors['%s field check' % property_name].append((
+                            'Entity id %s: %s field in entity: %s does not '
+                            'match corresponding %s %s field: %s') % (
+                                item.id, property_name,
+                                summary_model_output_value,
+                                related_model_name, related_model_property_name,
+                                related_model_output_value))
+
+    @classmethod
+    def validate(cls, item):
+        """Run _fetch_external_instance_details and all _validate functions.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        super(BaseSummaryModelValidator, cls).validate(item)
+
+        cls._validate_related_model_properties(item)
+
+
 class BaseSnapshotContentModelValidator(BaseModelValidator):
     """Base class for validating snapshot content models."""
 
@@ -690,7 +763,7 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         }
 
 
-class CollectionSummaryModelValidator(BaseModelValidator):
+class CollectionSummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating CollectionSummaryModel."""
 
     @classmethod
@@ -754,13 +827,7 @@ class CollectionSummaryModelValidator(BaseModelValidator):
                         item.id, item.node_count, len(nodes)))
 
     @classmethod
-    def _validate_related_model_properties(cls, item):
-        """Validate that model properties match the corresponding collection
-        model and collection rights model properties.
-
-        Args:
-            item: ndb.Model. CollectionSummaryModel to validate.
-        """
+    def _get_related_model_properties(cls):
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
         collection_rights_model_class_model_id_model_tuples = (
@@ -775,33 +842,6 @@ class CollectionSummaryModelValidator(BaseModelValidator):
             'collection_model_created_on': 'created_on',
         }
 
-        for (_, _, collection_model) in (
-                collection_model_class_model_id_model_tuples):
-            for (property_name, collection_model_property_name) in (
-                    collection_model_properties_dict.iteritems()):
-                value_in_summary_model = getattr(item, property_name)
-                value_in_collection_model = getattr(
-                    collection_model, collection_model_property_name)
-
-                summary_model_output_value = value_in_summary_model
-                if isinstance(summary_model_output_value, list):
-                    summary_model_output_value = (',').join(
-                        summary_model_output_value)
-
-                collection_model_output_value = (
-                    value_in_collection_model)
-                if isinstance(collection_model_output_value, list):
-                    collection_model_output_value = (',').join(
-                        collection_model_output_value)
-
-                if value_in_summary_model != value_in_collection_model:
-                    cls.errors['%s field check' % property_name].append((
-                        'Entity id %s: %s field in entity: %s does not match '
-                        'corresponding collection %s field: %s') % (
-                            item.id, property_name, summary_model_output_value,
-                            collection_model_property_name,
-                            collection_model_output_value))
-
         collection_rights_model_properties_dict = {
             'status': 'status',
             'community_owned': 'community_owned',
@@ -810,40 +850,22 @@ class CollectionSummaryModelValidator(BaseModelValidator):
             'viewer_ids': 'viewer_ids',
         }
 
-        for (_, _, collection_rights_model) in (
-                collection_rights_model_class_model_id_model_tuples):
-            for (property_name, collection_rights_model_property_name) in (
-                    collection_rights_model_properties_dict.iteritems()):
-                value_in_summary_model = getattr(item, property_name)
-                value_in_collection_rights_model = getattr(
-                    collection_rights_model,
-                    collection_rights_model_property_name)
-
-                summary_model_output_value = value_in_summary_model
-                if isinstance(summary_model_output_value, list):
-                    summary_model_output_value = (',').join(
-                        summary_model_output_value)
-
-                collection_rights_model_output_value = (
-                    value_in_collection_rights_model)
-                if isinstance(collection_rights_model_output_value, list):
-                    collection_rights_model_output_value = (',').join(
-                        collection_rights_model_output_value)
-
-                if value_in_summary_model != value_in_collection_rights_model:
-                    cls.errors['%s field check' % property_name].append((
-                        'Entity id %s: %s field in entity: %s does not match '
-                        'corresponding collection rights %s field: %s') % (
-                            item.id, property_name, summary_model_output_value,
-                            collection_rights_model_property_name,
-                            collection_rights_model_output_value))
+        return [(
+            'collection',
+            collection_model_class_model_id_model_tuples,
+            collection_model_properties_dict
+        ), (
+            'collection rights',
+            collection_rights_model_class_model_id_model_tuples,
+            collection_rights_model_properties_dict
+        )]
 
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_node_count,
             cls._validate_contributors_summary,
-            cls._validate_related_model_properties]
+            ]
 
 
 class ConfigPropertyModelValidator(BaseModelValidator):
@@ -1306,7 +1328,7 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         }
 
 
-class ExpSummaryModelValidator(BaseModelValidator):
+class ExpSummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating ExpSummaryModel."""
 
     @classmethod
@@ -1403,13 +1425,7 @@ class ExpSummaryModelValidator(BaseModelValidator):
                         last_human_update_time))
 
     @classmethod
-    def _validate_related_model_properties(cls, item):
-        """Validate that model properties match the corresponding exploration
-        model and exploration rights model properties.
-
-        Args:
-            item: ndb.Model. ExpSummaryModel to validate.
-        """
+    def _get_related_model_properties(cls):
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
         exploration_rights_model_class_model_id_model_tuples = (
@@ -1424,34 +1440,6 @@ class ExpSummaryModelValidator(BaseModelValidator):
             'exploration_model_created_on': 'created_on',
         }
 
-        for (_, _, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
-            for (property_name, exploration_model_property_name) in (
-                    exploration_model_properties_dict.iteritems()):
-                value_in_summary_model = getattr(item, property_name)
-                value_in_exploration_model = getattr(
-                    exploration_model, exploration_model_property_name)
-
-                summary_model_output_value = value_in_summary_model
-                if isinstance(summary_model_output_value, list):
-                    summary_model_output_value = (',').join(
-                        summary_model_output_value)
-
-                exploration_model_output_value = (
-                    value_in_exploration_model)
-                if isinstance(exploration_model_output_value, list):
-                    exploration_model_output_value = (',').join(
-                        exploration_model_output_value)
-
-                if value_in_summary_model != value_in_exploration_model:
-                    cls.errors['%s field check' % property_name].append((
-                        'Entity id %s: %s field in entity: %s does not match '
-                        'corresponding exploration %s field: %s') % (
-                            item.id, property_name, summary_model_output_value,
-                            exploration_model_property_name,
-                            exploration_model_output_value))
-
-
         exploration_rights_model_properties_dict = {
             'first_published_msec': 'first_published_msec',
             'status': 'status',
@@ -1461,41 +1449,22 @@ class ExpSummaryModelValidator(BaseModelValidator):
             'viewer_ids': 'viewer_ids',
         }
 
-        for (_, _, exploration_rights_model) in (
-                exploration_rights_model_class_model_id_model_tuples):
-            for (property_name, exploration_rights_model_property_name) in (
-                    exploration_rights_model_properties_dict.iteritems()):
-                value_in_summary_model = getattr(item, property_name)
-                value_in_exploration_rights_model = getattr(
-                    exploration_rights_model,
-                    exploration_rights_model_property_name)
-
-                summary_model_output_value = value_in_summary_model
-                if isinstance(summary_model_output_value, list):
-                    summary_model_output_value = (',').join(
-                        summary_model_output_value)
-
-                exploration_rights_model_output_value = (
-                    value_in_exploration_rights_model)
-                if isinstance(exploration_rights_model_output_value, list):
-                    exploration_rights_model_output_value = (',').join(
-                        exploration_rights_model_output_value)
-
-                if value_in_summary_model != value_in_exploration_rights_model:
-                    cls.errors['%s field check' % property_name].append((
-                        'Entity id %s: %s field in entity: %s does not match '
-                        'corresponding exploration rights %s field: %s') % (
-                            item.id, property_name, summary_model_output_value,
-                            exploration_rights_model_property_name,
-                            exploration_rights_model_output_value))
+        return [(
+            'exploration',
+            exploration_model_class_model_id_model_tuples,
+            exploration_model_properties_dict
+        ), (
+            'exploration rights',
+            exploration_rights_model_class_model_id_model_tuples,
+            exploration_rights_model_properties_dict
+        )]
 
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_first_published_msec,
             cls._validate_contributors_summary,
-            cls._validate_exploration_model_last_updated,
-            cls._validate_related_model_properties]
+            cls._validate_exploration_model_last_updated]
 
 
 class FileMetadataModelValidator(BaseModelValidator):
@@ -1962,7 +1931,7 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         }
 
 
-class StorySummaryModelValidator(BaseModelValidator):
+class StorySummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating StorySummaryModel."""
 
     @classmethod
@@ -1998,13 +1967,7 @@ class StorySummaryModelValidator(BaseModelValidator):
                         item.id, item.node_count, len(nodes)))
 
     @classmethod
-    def _validate_related_model_properties(cls, item):
-        """Validate that model properties match the corresponding story
-        model and story rights model properties.
-
-        Args:
-            item: ndb.Model. StorySummaryModel to validate.
-        """
+    def _get_related_model_properties(cls):
         story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
 
@@ -2015,25 +1978,15 @@ class StorySummaryModelValidator(BaseModelValidator):
             'story_model_created_on': 'created_on',
         }
 
-        for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            for (property_name, story_model_property_name) in (
-                    story_model_properties_dict.iteritems()):
-                value_in_summary_model = getattr(item, property_name)
-                value_in_story_model = getattr(
-                    story_model, story_model_property_name)
-                if value_in_summary_model != value_in_story_model:
-                    cls.errors['%s field check' % property_name].append((
-                        'Entity id %s: %s field in entity: %s does not match '
-                        'corresponding story %s field: %s') % (
-                            item.id, property_name, value_in_summary_model,
-                            story_model_property_name,
-                            value_in_story_model))
+        return [(
+            'story',
+            story_model_class_model_id_model_tuples,
+            story_model_properties_dict
+        )]
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_node_count,
-            cls._validate_related_model_properties]
+        return [cls._validate_node_count]
 
 
 class UserSubscriptionsModelValidator(BaseModelValidator):
