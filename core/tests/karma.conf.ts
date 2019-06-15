@@ -34,11 +34,12 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
+      'local_compiled_js/extensions/**/*.js',
       'core/templates/dev/head/**/*Spec.ts',
       'core/templates/dev/head/*Spec.ts',
       'core/templates/dev/head/**/*.spec.ts',
       'core/templates/dev/head/*.spec.ts',
-      'local_compiled_js/extensions/**/*.js',
+      'extensions/**/*Spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -71,6 +72,8 @@ module.exports = function(config) {
        'state-content-editor.directive.spec.ts'),
       ('core/templates/dev/head/components/state-editor/' +
        'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
+      ('extensions/interactions/MusicNotesInput/directives/' + 
+       'MusicNotesInputSpec.ts')
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -83,7 +86,6 @@ module.exports = function(config) {
       'core/templates/dev/head/*.ts': ['webpack'],
       'core/templates/dev/head/**/*.ts': ['webpack'],
       'extensions/**/*.ts': ['webpack'],
-      'core/templates/dev/head/**/*.ts': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/!(*.spec).js': ['coverage'],
