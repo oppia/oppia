@@ -18,33 +18,37 @@
  */
 
 oppia.factory('ImageObjectFactory', [function() {
-  var Image = function(src, placeholder, author_id, instructions) {
+  var Image = function(src, placeholder, authorId, instructions) {
     this.src = src;
     this.placeholder = placeholder;
-    this.author_id = author_id;
+    this.authorId = authorId;
     this.instrutions = instructions;
   };
 
   Image.prototype.toBackendDict = function() {
     return {
-        src: this.src,
-        placeholder: this.placeholder,
-        author_id: this.author_id,
-        instructions:  this.instructions
+      src: this.src,
+      placeholder: this.placeholder,
+      author_id: this.authorId,
+      instructions: this.instructions
     };
   };
 
-  Image['createNew'] = function(src, placeholder, author_id, instructions) {
-    return new Image(src, placeholder, author_id, instructions);
+  /* eslint-disable dot-notation */
+  Image['createNew'] = function(src, placeholder, authorId, instructions) {
+  /* eslint-enable dot-notation */
+    return new Image(src, placeholder, authorId, instructions);
   };
 
+  /* eslint-disable dot-notation */
   Image['createFromBackendDict'] = function(imageBackendDict) {
+  /* eslint-enable dot-notation */
     return new Image(
-            imageBackendDict.src,
-            imageBackendDict.placeholder,
-            imageBackendDict.author_id,
-            imageBackendDict.instructions
-        );
+      imageBackendDict.src,
+      imageBackendDict.placeholder,
+      imageBackendDict.author_id,
+      imageBackendDict.instructions
+    );
   };
 
   return Image;

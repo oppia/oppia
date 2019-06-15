@@ -207,8 +207,8 @@ class Question(object):
         """
         image_counter = 0
         (html_validation_service.
-                add_image_id_and_image_assets_in_state_dict(
-                    question_state_dict, image_counter))
+         add_image_id_and_image_assets_in_state_dict(
+             question_state_dict, image_counter))
         return question_state_dict
 
     @classmethod

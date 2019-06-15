@@ -21,34 +21,38 @@ require('domain/exploration/ImageObjectFactory.ts');
 
 oppia.factory('ImageAssetsObjectFactory', [
   'ImageObjectFactory', function(ImageObjectFactory) {
-    var ImageAssets = function(image_mapping) {
-        this.image_mapping = image_mapping;
-    }
+    var ImageAssets = function(imageMapping) {
+      this.imageMapping = imageMapping;
+    };
 
     ImageAssets.prototype.toBackendDict = function() {
-        var image_mapping = {}
-        for (var image_id in this.image_mapping) {
-            var image_object = this.image_mapping[image_id]
-            var image_dict = image_object.toBackendDict();
-            image_mapping[image_id] = image_dict;
-        }
-        return {
-            image_mapping: image_mapping;
-        }
+      var imageMapping = {};
+      for (var imageId in this.imageMapping) {
+        var imageObject = this.imageMapping[imageId];
+        var imageDict = imageObject.toBackendDict();
+        imageMapping[imageId] = imageDict;
+      }
+      return {
+        image_mapping: imageMapping
+      };
     };
 
-    ImageAssets['createNew'] = function(image_mapping) {
-        return new ImageAssets(image_mapping)
+    /* eslint-disable dot-notation */
+    ImageAssets['createNew'] = function(imageMapping) {
+    /* eslint-enable dot-notation */
+      return new ImageAssets(imageMapping);
     };
 
+    /* eslint-disable dot-notation */
     ImageAssets['createFromBackendDict'] = function(imageAssetsDict) {
-        var image_mapping = {}
-        for (var image_id in imageAssetsDict.image_mapping) {
-            var image_dict = imageAssetsDict.image_mapping[image_id];
-            var image_object = (ImageObjectFactory.
-                createFromBackendDict(image_dict));
-            image_mapping[image_id] = image_object;
-        }
-        return new ImageAssets(image_mapping);
+    /* eslint-enable dot-notation */
+      var imageMapping = {};
+      for (var imageId in imageAssetsDict.imageMapping) {
+        var imageDict = imageAssetsDict.imageMapping[imageId];
+        var imageObject = (ImageObjectFactory.
+          createFromBackendDict(imageDict));
+        imageMapping[imageId] = imageObject;
+      }
+      return new ImageAssets(imageMapping);
     };
-}]);
+  }]);
