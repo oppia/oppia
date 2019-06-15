@@ -461,7 +461,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected question state schema version to be between 1 and '
-                '%s' % feconf.CURRENTSTATES_SCHEMA_VERSION)
+                '%s' % feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -535,7 +535,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change skill_id must be equal to %s' %
                 self.change.skill_id)
-        if self.change.question_domain == change.question_dict:
+        if self.change.question_dict == change.question_dict:
             raise utils.ValidationError(
                 'The new change question_dict must not be equal to the old '
                 'question_dict')
