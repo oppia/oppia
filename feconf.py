@@ -793,8 +793,6 @@ CREATE_PAGE_DESCRIPTION = (
 CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
-DONATE_PAGE_DESCRIPTION = (
-    'Donate to The Oppia Foundation.')
 LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '

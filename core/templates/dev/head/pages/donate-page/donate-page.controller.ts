@@ -16,7 +16,7 @@
  * @fileoverview Controllers for the donate page.
  */
 
-require('pages/OppiaFooterDirective.ts');
+require('base_components/BaseContentDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
