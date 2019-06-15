@@ -36,7 +36,12 @@ oppia.directive('preferencesPage', ['UrlInterpolationService', function(
   return {
     restrict: 'E',
     scope: {},
-    bindToController: {},
+    bindToController: {
+      subjectInterests: '=',
+      preferredLanguageCodes: '=',
+      preferredSiteLanguageCode: '=',
+      preferredAudioLanguageCode: '='
+    },
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
       '/pages/preferences-page/preferences-page.directive.html'),
     controllerAs: '$ctrl',
@@ -70,8 +75,8 @@ oppia.directive('preferencesPage', ['UrlInterpolationService', function(
         preferencesPromise.then(function(response) {
           var data = response.data;
           ctrl.userBio = data.user_bio;
-          $scope.subjectInterests = data.subject_interests;
-          $scope.preferredLanguageCodes = data.preferred_language_codes;
+          ctrl.subjectInterests = data.subject_interests;
+          ctrl.preferredLanguageCodes = data.preferred_language_codes;
           ctrl.profilePictureDataUrl = data.profile_picture_data_url;
           ctrl.defaultDashboard = data.default_dashboard;
           ctrl.canReceiveEmailUpdates = data.can_receive_email_updates;
@@ -80,8 +85,8 @@ oppia.directive('preferencesPage', ['UrlInterpolationService', function(
             data.can_receive_subscription_email;
           ctrl.canReceiveFeedbackMessageEmail = (
             data.can_receive_feedback_message_email);
-          $scope.preferredSiteLanguageCode = data.preferred_site_language_code;
-          $scope.preferredAudioLanguageCode =
+          ctrl.preferredSiteLanguageCode = data.preferred_site_language_code;
+          ctrl.preferredAudioLanguageCode =
             data.preferred_audio_language_code;
           ctrl.subscriptionList = data.subscription_list;
           ctrl.hasPageLoaded = true;

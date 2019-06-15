@@ -14,7 +14,11 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <preferences-page></preferences-page>
+  <preferences-page subject-interests="subjectInterests"
+                    preferred-language-codes="preferredLanguageCodes"
+                    preferred-site-language-code="preferredSiteLanguageCode"
+                    preferred-audio-language-code="preferredAudioLanguageCode">
+  </preferences-page>
 {% endblock %}
 
 {% block footer %}

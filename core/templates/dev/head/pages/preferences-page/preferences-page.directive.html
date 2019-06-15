@@ -65,14 +65,14 @@
           <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
           <div class="col-lg-10 col-md-10 col-sm-10">
             <div ng-if="$ctrl.hasPageLoaded && $ctrl.select2DropdownIsShown">
-              <select2-dropdown item="$parent.subjectInterests"
-                                choices="$parent.subjectInterests"
+              <select2-dropdown item="$ctrl.subjectInterests"
+                                choices="$ctrl.subjectInterests"
                                 allow-multiple-choices="true"
                                 new-choice-regex="<[::$ctrl.TAG_REGEX_STRING]>"
                                 width="100%"
                                 placeholder="<['I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER' | translate]>"
                                 invalid-search-term-message="<['I18N_PREFERENCES_SUBJECT_INTERESTS_INVALID_SEARCH' | translate]>"
-                                on-selection-change="$ctrl.onSubjectInterestsSelectionChange($parent.subjectInterests)">
+                                on-selection-change="$ctrl.onSubjectInterestsSelectionChange($ctrl.subjectInterests)">
               </select2-dropdown>
             </div>
             <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK"></span>
@@ -126,11 +126,11 @@
             -->
             <div ng-if="$ctrl.hasPageLoaded">
               <select2-dropdown choices="$ctrl.LANGUAGE_CHOICES"
-                                item="$parent.preferredLanguageCodes"
+                                item="$ctrl.preferredLanguageCodes"
                                 allow-multiple-choices="true"
                                 width="100%"
                                 placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
-                                on-selection-change="$ctrl.savePreferredLanguageCodes($parent.preferredLanguageCodes)">
+                                on-selection-change="$ctrl.savePreferredLanguageCodes($ctrl.preferredLanguageCodes)">
               </select2-dropdown>
             </div>
             <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN">
@@ -150,11 +150,11 @@
             <div ng-if="$ctrl.hasPageLoaded && $ctrl.select2DropdownIsShown">
               <select2-dropdown class="protractor-test-system-language-selector"
                                 choices="$ctrl.SITE_LANGUAGE_CHOICES"
-                                item="$parent.preferredSiteLanguageCode"
+                                item="$ctrl.preferredSiteLanguageCode"
                                 allow-multiple-choices="false"
                                 width="100%"
                                 placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
-                                on-selection-change="$ctrl.savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
+                                on-selection-change="$ctrl.savePreferredSiteLanguageCodes($ctrl.preferredSiteLanguageCode)">
               </select2-dropdown>
             </div>
             <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN"></span>
@@ -173,11 +173,11 @@
             <div ng-if="$ctrl.hasPageLoaded && $ctrl.select2DropdownIsShown">
               <select2-dropdown class="protractor-test-preferred-audio-language-selector"
                                 choices="$ctrl.AUDIO_LANGUAGE_CHOICES"
-                                item="$parent.preferredAudioLanguageCode"
+                                item="$ctrl.preferredAudioLanguageCode"
                                 allow-multiple-choices="false"
                                 width="100%"
                                 placeholder="<['I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_PLACEHOLDER' | translate]>"
-                                on-selection-change="$ctrl.savePreferredAudioLanguageCode($parent.preferredAudioLanguageCode)">
+                                on-selection-change="$ctrl.savePreferredAudioLanguageCode($ctrl.preferredAudioLanguageCode)">
               </select2-dropdown>
             </div>
             <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN"></span>
