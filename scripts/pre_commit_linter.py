@@ -186,6 +186,13 @@ BAD_PATTERNS_JS_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': r'\b(beforeEach\(inject\(function)\(',
+        'message': 'In tests, please use \'angular.mock.inject\' instead of '
+                   '\'inject\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'templateUrl: \'',
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
@@ -1460,51 +1467,6 @@ class LintChecksManager(object):
             print ''
             return summary_messages
 
-    def _check_inject_usage_in_frontend_tests(self):
-        """This function ensures that all karma tests use angular.mock.inject
-        instead of inject.
-        """
-        if self.verbose_mode_enabled:
-            print 'Starting inject usage check'
-            print '----------------------------------------'
-        # Select JS files which need to be checked.
-        files_to_check = [
-            filepath for filepath in self.all_filepaths if not
-            any(fnmatch.fnmatch(filepath, pattern) for pattern in
-                EXCLUDED_PATHS)
-            and filepath.endswith(('Spec.js', 'Spec.ts'))]
-        failed = False
-        summary_messages = []
-        for filepath in files_to_check:
-            with open(filepath, 'r') as f:
-                file_lines = f.readlines()
-                with _redirect_stdout(_TARGET_STDOUT):
-                    for index, line in enumerate(file_lines):
-                        if 'beforeEach(inject(function' in line:
-                            failed = True
-                            error_message = (
-                                'Use angular.mock.inject instead of inject '
-                                'in %s on line: %s\n') % (
-                                    filepath, index + 1)
-                            print error_message
-
-        with _redirect_stdout(_TARGET_STDOUT):
-            if failed:
-                summary_message = (
-                    '%s  Inject usage check failed' %
-                    (_MESSAGE_TYPE_FAILED))
-                print summary_message
-                summary_messages.append(summary_message)
-            else:
-                summary_message = (
-                    '%s  Inject usage check passed' %
-                    (_MESSAGE_TYPE_SUCCESS))
-                print summary_message
-                summary_messages.append(summary_message)
-
-            print ''
-            return summary_messages
-
     def _check_for_mandatory_pattern_in_file(
             self, pattern_list, filepath, failed):
         """Checks for a given mandatory pattern in a file.
@@ -2471,8 +2433,6 @@ class LintChecksManager(object):
         extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
-        inject_usage_messages = (
-            self._check_inject_usage_in_frontend_tests())
         directive_scope_messages = self._check_directive_scope()
         mandatory_patterns_messages = self._check_mandatory_patterns()
         sorted_dependencies_messages = (
@@ -2491,12 +2451,12 @@ class LintChecksManager(object):
         codeowner_messages = self._check_codeowner_file()
         all_messages = (
             extra_js_files_messages + js_and_ts_component_messages +
-            inject_usage_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages +
-            import_order_messages + mandatory_patterns_messages +
-            docstring_messages + comment_messages +
-            html_tag_and_attribute_messages + html_linter_messages +
-            linter_messages + pattern_messages + codeowner_messages)
+            directive_scope_messages + sorted_dependencies_messages +
+            controller_dependency_messages + import_order_messages +
+            mandatory_patterns_messages + docstring_messages +
+            comment_messages + html_tag_and_attribute_messages +
+            html_linter_messages + linter_messages + pattern_messages +
+            codeowner_messages)
         return all_messages
 
 
