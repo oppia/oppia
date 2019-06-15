@@ -220,12 +220,12 @@ class BaseModelValidator(object):
     def _get_custom_validation_functions(cls):
         """Returns the list of custom validation functions to run.
 
-        This should be implemented by subclasses.
+        This method can be overridden by subclasses, if needed.
 
         Each validation function should accept only a single arg, which is the
         model instance to validate.
         """
-        raise NotImplementedError
+        return []
 
     @classmethod
     def validate(cls, item):
@@ -247,8 +247,58 @@ class BaseModelValidator(object):
             func(item)
 
 
-class BaseSnapshotMetadataModelValidator(BaseModelValidator):
+class BaseSnapshotContentModelValidator(BaseModelValidator):
+    """Base class for validating snapshot content models."""
+
+    model_name = 'snapshot content'
+    related_model_name = ''
+
+    @classmethod
+    def _validate_base_model_version_from_item_id(cls, item):
+        """Validate that related model corresponding to item.id
+        has a version greater than or equal to the version in item.id.
+
+        Args:
+            item: ndb.Model. BaseSnapshotContentModel to validate.
+        """
+
+        name_split_by_space = cls.related_model_name.split(' ')
+        key_to_fetch = ('_').join(name_split_by_space)
+        capitalized_related_model_name = ('').join([
+            val.capitalize() for val in name_split_by_space])
+
+        related_model_class_model_id_model_tuples = (
+            cls.external_instance_details['%s_ids' % key_to_fetch])
+
+        version = item.id[item.id.rfind('-') + 1:]
+        for (_, _, related_model) in (
+                related_model_class_model_id_model_tuples):
+            if int(related_model.version) < int(version):
+                cls.errors[
+                    '%s model version check' % cls.related_model_name].append((
+                        'Entity id %s: %s model corresponding to '
+                        'id %s has a version %s which is less than '
+                        'the version %s in %s model id' % (
+                            item.id, capitalized_related_model_name,
+                            related_model.id, related_model.version, version,
+                            cls.model_name)))
+
+    @classmethod
+    def validate(cls, item):
+        """Run _fetch_external_instance_details and all _validate functions.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        super(BaseSnapshotContentModelValidator, cls).validate(item)
+
+        cls._validate_base_model_version_from_item_id(item)
+
+
+class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
     """Base class for validating snapshot metadata models."""
+
+    model_name = 'snapshot metadata'
 
     @classmethod
     def _validate_commit_type(cls, item):
@@ -309,6 +359,8 @@ class BaseSnapshotMetadataModelValidator(BaseModelValidator):
 
 class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
     """Base class for validating commit log entry models."""
+
+    model_name = 'commit log entry'
 
     @classmethod
     def _validate_post_commit_status(cls, item):
@@ -407,10 +459,6 @@ class ActivityReferencesModelValidator(BaseModelValidator):
                 collection_models.CollectionModel, collection_ids),
         }
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
 
 class RoleQueryAuditModelValidator(BaseModelValidator):
     """Class for validating RoleQueryAuditModels."""
@@ -428,10 +476,6 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
 
 
 class CollectionModelValidator(BaseModelValidator):
@@ -480,14 +524,12 @@ class CollectionModelValidator(BaseModelValidator):
                 snapshot_model_ids),
         }
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
 
 class CollectionSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionSnapshotMetadataModel."""
+
+    related_model_name = 'collection'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -511,36 +553,12 @@ class CollectionSnapshotMetadataModelValidator(
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_collection_model_version_from_item_id(cls, item):
-        """Validate that collection model corresponding to snapshot
-        metadata model has a version greater than or equal to the
-        version that's represented in the item.id.
 
-        Args:
-            item: ndb.Model. CollectionSnapshotMetadataModel to validate.
-        """
-        collection_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, collection_model) in (
-                collection_model_class_model_id_model_tuples):
-            if int(collection_model.version) < int(version):
-                cls.errors['collection model version check'].append((
-                    'Entity id %s: Collection model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot metadata model id' % (
-                        item.id, collection_model.id, collection_model.version,
-                        version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_collection_model_version_from_item_id]
-
-
-class CollectionSnapshotContentModelValidator(BaseModelValidator):
+class CollectionSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
     """Class for validating CollectionSnapshotContentModel."""
+
+    related_model_name = 'collection'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -557,33 +575,6 @@ class CollectionSnapshotContentModelValidator(BaseModelValidator):
                 collection_models.CollectionModel,
                 [item.id[:item.id.find('-')]]),
         }
-
-    @classmethod
-    def _validate_collection_model_version_from_item_id(cls, item):
-        """Validate that collection model corresponding to snapshot
-        content model has a version greater than or equal to the version
-        in item.id.
-
-        Args:
-            item: ndb.Model. CollectionSnapshotContentModel to validate.
-        """
-        collection_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, collection_model) in (
-                collection_model_class_model_id_model_tuples):
-            if int(collection_model.version) < int(version):
-                cls.errors['collection model version check'].append((
-                    'Entity id %s: Collection model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot content model id' % (
-                        item.id, collection_model.id, collection_model.version,
-                        version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_collection_model_version_from_item_id]
 
 
 class CollectionRightsModelValidator(BaseModelValidator):
@@ -648,6 +639,8 @@ class CollectionRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionRightsSnapshotMetadataModel."""
 
+    related_model_name = 'collection rights'
+
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
@@ -670,36 +663,12 @@ class CollectionRightsSnapshotMetadataModelValidator(
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_collection_model_version_from_item_id(cls, item):
-        """Validate that collection rights model corresponding to snapshot
-        metadata model has a version greater than or equal to the version in
-        item.id.
 
-        Args:
-            item: ndb.Model. CollectionRightsSnapshotMetadataModel to validate.
-        """
-        collection_rights_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_rights_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, collection_rights_model) in (
-                collection_rights_model_class_model_id_model_tuples):
-            if int(collection_rights_model.version) < int(version):
-                cls.errors['collection rights model version check'].append((
-                    'Entity id %s: Collection Rights model corresponding to '
-                    'id %s has a version %s which is less '
-                    'than the version %s in snapshot metadata model id' % (
-                        item.id, collection_rights_model.id,
-                        collection_rights_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_collection_model_version_from_item_id]
-
-
-class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
+class CollectionRightsSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
     """Class for validating CollectionRightsSnapshotContentModel."""
+
+    related_model_name = 'collection rights'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -717,36 +686,11 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
                 [item.id[:item.id.find('-')]]),
         }
 
-    @classmethod
-    def _validate_collection_model_version_from_item_id(cls, item):
-        """Validate that collection rights model corresponding to snapshot
-        content model has a version greater than or equal to the version in
-        item.id.
-
-        Args:
-            item: ndb.Model. CollectionRightsSnapshotContentModel to validate.
-        """
-        collection_rights_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_rights_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, collection_rights_model) in (
-                collection_rights_model_class_model_id_model_tuples):
-            if int(collection_rights_model.version) < int(version):
-                cls.errors['collection rights model version check'].append((
-                    'Entity id %s: Collection Rights model corresponding to '
-                    'id %s has a version %s which is less '
-                    'than the version %s in snapshot content model id' % (
-                        item.id, collection_rights_model.id,
-                        collection_rights_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_collection_model_version_from_item_id]
-
 
 class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating CollectionCommitLogEntryModel."""
+
+    related_model_name = 'collection'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -770,32 +714,6 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             'collection_ids': (
                 collection_models.CollectionModel, [item.collection_id]),
         }
-
-    @classmethod
-    def _validate_collection_model_version_from_item_id(cls, item):
-        """Validate that collection model corresponding to item.collection_id
-        has a version greater than or equal to the exp version in item.id.
-
-        Args:
-            item: ndb.Model. CollectionCommitLogEntryModel to validate.
-        """
-        collection_model_class_model_id_model_tuples = (
-            cls.external_instance_details['collection_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, collection_model) in (
-                collection_model_class_model_id_model_tuples):
-            if int(collection_model.version) < int(version):
-                cls.errors['collection model version check'].append((
-                    'Entity id %s: Collection model corresponding to '
-                    'collection id %s has a version %s which is less than '
-                    'the version %s in commit log model id' % (
-                        item.id, item.collection_id, collection_model.version,
-                        version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_collection_model_version_from_item_id]
 
 
 class CollectionSummaryModelValidator(BaseModelValidator):
@@ -983,14 +901,12 @@ class ConfigPropertyModelValidator(BaseModelValidator):
                 snapshot_model_ids),
         }
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
 
 class ConfigPropertySnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ConfigPropertySnapshotMetadataModel."""
+
+    related_model_name = 'config property'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1014,36 +930,12 @@ class ConfigPropertySnapshotMetadataModelValidator(
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_config_property_model_version_from_item_id(cls, item):
-        """Validate that config property model corresponding to snapshot
-        metadata model has a version greater than or equal to the version
-        that's represented in the item.id.
 
-        Args:
-            item: ndb.Model. ConfigPropertySnapshotMetadataModel to validate.
-        """
-        config_property_model_class_model_id_model_tuples = (
-            cls.external_instance_details['config_property_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, config_property_model) in (
-                config_property_model_class_model_id_model_tuples):
-            if int(config_property_model.version) < int(version):
-                cls.errors['config property model version check'].append((
-                    'Entity id %s: ConfigProperty model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot metadata model id' % (
-                        item.id, config_property_model.id,
-                        config_property_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_config_property_model_version_from_item_id]
-
-
-class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
+class ConfigPropertySnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
     """Class for validating ConfigPropertySnapshotContentModel."""
+
+    related_model_name = 'config property'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1060,33 +952,6 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
                 config_models.ConfigPropertyModel,
                 [item.id[:item.id.find('-')]]),
         }
-
-    @classmethod
-    def _validate_config_property_model_version_from_item_id(cls, item):
-        """Validate that config property model corresponding to snapshot
-        content model has a version greater than or equal to the version
-        that's represented in the item.id.
-
-        Args:
-            item: ndb.Model. ConfigPropertySnapshotContentModel to validate.
-        """
-        config_property_model_class_model_id_model_tuples = (
-            cls.external_instance_details['config_property_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, config_property_model) in (
-                config_property_model_class_model_id_model_tuples):
-            if int(config_property_model.version) < int(version):
-                cls.errors['config property model version check'].append((
-                    'Entity id %s: ConfigProperty model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot content model id' % (
-                        item.id, config_property_model.id,
-                        config_property_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_config_property_model_version_from_item_id]
 
 
 class SentEmailModelValidator(BaseModelValidator):
@@ -1170,7 +1035,8 @@ class SentEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_sent_datetime, cls._validate_sender_email,
+            cls._validate_sent_datetime,
+            cls._validate_sender_email,
             cls._validate_recipient_email]
 
 
@@ -1247,7 +1113,8 @@ class BulkEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_id_length, cls._validate_sent_datetime,
+            cls._validate_id_length,
+            cls._validate_sent_datetime,
             cls._validate_sender_email]
 
 
@@ -1338,14 +1205,12 @@ class ExplorationModelValidator(BaseModelValidator):
                 snapshot_model_ids),
         }
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
 
 class ExplorationSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationSnapshotMetadataModel."""
+
+    related_model_name = 'exploration'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1368,37 +1233,12 @@ class ExplorationSnapshotMetadataModelValidator(
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_exploration_model_version_from_item_id(cls, item):
-        """Validate that exploration model corresponding to snapshot
-        metadata model has a version greater than or equal to the version
-        that's represented in the item.id.
 
-        Args:
-            item: ndb.Model. ExplorationSnapshotMetadataModel to validate.
-        """
-        exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-
-        for (_, _, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
-            if int(exploration_model.version) < int(version):
-                cls.errors['exploration model version check'].append((
-                    'Entity id %s: Exploration model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot metadata model id' % (
-                        item.id, exploration_model.id,
-                        exploration_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_exploration_model_version_from_item_id]
-
-
-class ExplorationSnapshotContentModelValidator(BaseModelValidator):
+class ExplorationSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
     """Class for validating ExplorationSnapshotContentModel."""
+
+    related_model_name = 'exploration'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1414,34 +1254,6 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
             'exploration_ids': (
                 exp_models.ExplorationModel, [item.id[:item.id.find('-')]]),
         }
-
-    @classmethod
-    def _validate_exploration_model_version_from_item_id(cls, item):
-        """Validate that exploration model corresponding to snapshot
-        content model has a version greater than or equal to the version
-        that's represented in the item.id.
-
-        Args:
-            item: ndb.Model. ExplorationSnapshotContentModel to validate.
-        """
-        exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-
-        for (_, _, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
-            if int(exploration_model.version) < int(version):
-                cls.errors['exploration model version check'].append((
-                    'Entity id %s: Exploration model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot content model id' % (
-                        item.id, exploration_model.id,
-                        exploration_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_exploration_model_version_from_item_id]
 
 
 class ExplorationRightsModelValidator(BaseModelValidator):
@@ -1512,6 +1324,8 @@ class ExplorationRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationRightsSnapshotMetadataModel."""
 
+    related_model_name = 'exploration rights'
+
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
@@ -1534,36 +1348,12 @@ class ExplorationRightsSnapshotMetadataModelValidator(
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_exploration_model_version_from_item_id(cls, item):
-        """Validate that exploration rights model corresponding to snapshot
-        metadata model has a version greater than or equal to the version in
-        item.id.
 
-        Args:
-            item: ndb.Model. ExplorationRightsSnapshotMetadataModel to validate.
-        """
-        exploration_rights_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_rights_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, exploration_rights_model) in (
-                exploration_rights_model_class_model_id_model_tuples):
-            if int(exploration_rights_model.version) < int(version):
-                cls.errors['exploration rights model version check'].append((
-                    'Entity id %s: Exploration Rights model corresponding to '
-                    'id %s has a version %s which is less '
-                    'than the version %s in snapshot metadata model id' % (
-                        item.id, exploration_rights_model.id,
-                        exploration_rights_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_exploration_model_version_from_item_id]
-
-
-class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
+class ExplorationRightsSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
     """Class for validating ExplorationRightsSnapshotContentModel."""
+
+    related_model_name = 'exploration rights'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1581,36 +1371,11 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
                 [item.id[:item.id.find('-')]]),
         }
 
-    @classmethod
-    def _validate_exploration_model_version_from_item_id(cls, item):
-        """Validate that exploration rights model corresponding to snapshot
-        content model has a version greater than or equal to the version in
-        item.id.
-
-        Args:
-            item: ndb.Model. ExplorationRightsSnapshotContentModel to validate.
-        """
-        exploration_rights_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_rights_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, exploration_rights_model) in (
-                exploration_rights_model_class_model_id_model_tuples):
-            if int(exploration_rights_model.version) < int(version):
-                cls.errors['exploration rights model version check'].append((
-                    'Entity id %s: Exploration Rights model corresponding to '
-                    'id %s has a version %s which is less '
-                    'than the version %s in snapshot content model id' % (
-                        item.id, exploration_rights_model.id,
-                        exploration_rights_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_exploration_model_version_from_item_id]
-
 
 class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating ExplorationCommitLogEntryModel."""
+
+    related_model_name = 'exploration'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1634,32 +1399,6 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             'exploration_ids': (
                 exp_models.ExplorationModel, [item.exploration_id]),
         }
-
-    @classmethod
-    def _validate_exploration_model_version_from_item_id(cls, item):
-        """Validate that exploration model corresponding to item.exploration_id
-        has a version greater than or equal to the exp version in item.id.
-
-        Args:
-            item: ndb.Model. ExplorationCommitLogEntryModel to validate.
-        """
-        exploration_model_class_model_id_model_tuples = (
-            cls.external_instance_details['exploration_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, exploration_model) in (
-                exploration_model_class_model_id_model_tuples):
-            if int(exploration_model.version) < int(version):
-                cls.errors['exploration model version check'].append((
-                    'Entity id %s: Exploration model corresponding to '
-                    'exploration id %s has a version %s which is less '
-                    'than the version %s in commit log model id' % (
-                        item.id, item.exploration_id, exploration_model.version,
-                        version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_exploration_model_version_from_item_id]
 
 
 class ExpSummaryModelValidator(BaseModelValidator):
@@ -1896,14 +1635,12 @@ class FileMetadataModelValidator(BaseModelValidator):
                 exploration_model_ids)
         }
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
 
 class FileMetadataSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating FileMetadataSnapshotMetadataModel."""
+
+    related_model_name = 'file metadata'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1927,36 +1664,12 @@ class FileMetadataSnapshotMetadataModelValidator(
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_file_metadata_model_version_from_item_id(cls, item):
-        """Validate that file_metadata model corresponding to snapshot
-        metadata model has a version greater than or equal to the version
-        that's represented in the item.id.
 
-        Args:
-            item: ndb.Model. FileMetadataSnapshotMetadataModel to validate.
-        """
-        file_metadata_model_class_model_id_model_tuples = (
-            cls.external_instance_details['file_metadata_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, file_metadata_model) in (
-                file_metadata_model_class_model_id_model_tuples):
-            if int(file_metadata_model.version) < int(version):
-                cls.errors['file_metadata model version check'].append((
-                    'Entity id %s: FileMetadata model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot metadata model id' % (
-                        item.id, file_metadata_model.id,
-                        file_metadata_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_file_metadata_model_version_from_item_id]
-
-
-class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
+class FileMetadataSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
     """Class for validating FileMetadataSnapshotContentModel."""
+
+    related_model_name = 'file metadata'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1973,33 +1686,6 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
                 file_models.FileMetadataModel,
                 [item.id[:item.id.find('-')]]),
         }
-
-    @classmethod
-    def _validate_file_metadata_model_version_from_item_id(cls, item):
-        """Validate that file_metadata model corresponding to snapshot
-        content model has a version greater than or equal to the version
-        that's represented in the item.id.
-
-        Args:
-            item: ndb.Model. FileMetadataSnapshotContentModel to validate.
-        """
-        file_metadata_model_class_model_id_model_tuples = (
-            cls.external_instance_details['file_metadata_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, file_metadata_model) in (
-                file_metadata_model_class_model_id_model_tuples):
-            if int(file_metadata_model.version) < int(version):
-                cls.errors['file_metadata model version check'].append((
-                    'Entity id %s: FileMetadata model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot content model id' % (
-                        item.id, file_metadata_model.id,
-                        file_metadata_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_file_metadata_model_version_from_item_id]
 
 
 class FileModelValidator(BaseModelValidator):
@@ -2040,13 +1726,11 @@ class FileModelValidator(BaseModelValidator):
                 exploration_model_ids)
         }
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
 
 class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating FileSnapshotMetadataModel."""
+
+    related_model_name = 'file'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2070,35 +1754,11 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_file_model_version_from_item_id(cls, item):
-        """Validate that file model corresponding to snapshot
-        metadata model has a version greater than or equal to the version
-        that's represented in the item.id.
 
-        Args:
-            item: ndb.Model. FileSnapshotMetadataModel to validate.
-        """
-        file_model_class_model_id_model_tuples = (
-            cls.external_instance_details['file_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, file_model) in file_model_class_model_id_model_tuples:
-            if int(file_model.version) < int(version):
-                cls.errors['file model version check'].append((
-                    'Entity id %s: File model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot metadata model id' % (
-                        item.id, file_model.id,
-                        file_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_file_model_version_from_item_id]
-
-
-class FileSnapshotContentModelValidator(BaseModelValidator):
+class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating FileSnapshotContentModel."""
+
+    related_model_name = 'file'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2115,32 +1775,6 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
                 file_models.FileModel,
                 [item.id[:item.id.find('-')]]),
         }
-
-    @classmethod
-    def _validate_file_model_version_from_item_id(cls, item):
-        """Validate that file model corresponding to snapshot
-        content model has a version greater than or equal to the version
-        that's represented in the item.id.
-
-        Args:
-            item: ndb.Model. FileSnapshotContentModel to validate.
-        """
-        file_model_class_model_id_model_tuples = (
-            cls.external_instance_details['file_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, file_model) in file_model_class_model_id_model_tuples:
-            if int(file_model.version) < int(version):
-                cls.errors['file model version check'].append((
-                    'Entity id %s: File model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot content model id' % (
-                        item.id, file_model.id,
-                        file_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_file_model_version_from_item_id]
 
 
 class ExplorationRecommendationsModelValidator(BaseModelValidator):
@@ -2326,13 +1960,11 @@ class StoryModelValidator(BaseModelValidator):
                 exploration_model_ids)
         }
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
 
 class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating StorySnapshotMetadataModel."""
+
+    related_model_name = 'story'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2355,35 +1987,11 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_story_model_version_from_item_id(cls, item):
-        """Validate that story model corresponding to snapshot
-        metadata model has a version greater than or equal to the version
-        that's represented in the item.id.
 
-        Args:
-            item: ndb.Model. StorySnapshotMetadataModel to validate.
-        """
-        story_model_class_model_id_model_tuples = cls.external_instance_details[
-            'story_ids']
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            if int(story_model.version) < int(version):
-                cls.errors['story model version check'].append((
-                    'Entity id %s: Story model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot metadata model id' % (
-                        item.id, story_model.id, story_model.version,
-                        version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_story_model_version_from_item_id]
-
-
-class StorySnapshotContentModelValidator(BaseModelValidator):
+class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating StorySnapshotContentModel."""
+
+    related_model_name = 'story'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2399,32 +2007,6 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
             'story_ids': (
                 story_models.StoryModel, [item.id[:item.id.find('-')]]),
         }
-
-    @classmethod
-    def _validate_story_model_version_from_item_id(cls, item):
-        """Validate that story model corresponding to snapshot
-        content model has a version greater than or equal to the version
-        that's represented in the item.id.
-
-        Args:
-            item: ndb.Model. StorySnapshotContentModel to validate.
-        """
-        story_model_class_model_id_model_tuples = cls.external_instance_details[
-            'story_ids']
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            if int(story_model.version) < int(version):
-                cls.errors['story model version check'].append((
-                    'Entity id %s: Story model corresponding to '
-                    'id %s has a version %s which is less than the version %s '
-                    'in snapshot content model id' % (
-                        item.id, story_model.id, story_model.version,
-                        version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_story_model_version_from_item_id]
 
 
 class StoryRightsModelValidator(BaseModelValidator):
@@ -2456,14 +2038,12 @@ class StoryRightsModelValidator(BaseModelValidator):
                 snapshot_model_ids),
         }
 
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
-
 
 class StoryRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating StoryRightsSnapshotMetadataModel."""
+
+    related_model_name = 'story rights'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2487,36 +2067,12 @@ class StoryRightsSnapshotMetadataModelValidator(
                 user_models.UserSettingsModel, [item.committer_id])
         }
 
-    @classmethod
-    def _validate_story_model_version_from_item_id(cls, item):
-        """Validate that story rights model corresponding to snapshot
-        metadata model has a version greater than or equal to the version in
-        item.id.
 
-        Args:
-            item: ndb.Model. StoryRightsSnapshotMetadataModel to validate.
-        """
-        story_rights_model_class_model_id_model_tuples = (
-            cls.external_instance_details['story_rights_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, story_rights_model) in (
-                story_rights_model_class_model_id_model_tuples):
-            if int(story_rights_model.version) < int(version):
-                cls.errors['story rights model version check'].append((
-                    'Entity id %s: Story Rights model corresponding to '
-                    'id %s has a version %s which is less '
-                    'than the version %s in snapshot metadata model id' % (
-                        item.id, story_rights_model.id,
-                        story_rights_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_story_model_version_from_item_id]
-
-
-class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
+class StoryRightsSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
     """Class for validating StoryRightsSnapshotContentModel."""
+
+    related_model_name = 'story rights'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2534,36 +2090,11 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
                 [item.id[:item.id.find('-')]]),
         }
 
-    @classmethod
-    def _validate_story_model_version_from_item_id(cls, item):
-        """Validate that story rights model corresponding to snapshot
-        content model has a version greater than or equal to the version in
-        item.id.
-
-        Args:
-            item: ndb.Model. StoryRightsSnapshotContentModel to validate.
-        """
-        story_rights_model_class_model_id_model_tuples = (
-            cls.external_instance_details['story_rights_ids'])
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, story_rights_model) in (
-                story_rights_model_class_model_id_model_tuples):
-            if int(story_rights_model.version) < int(version):
-                cls.errors['story rights model version check'].append((
-                    'Entity id %s: Story Rights model corresponding to '
-                    'id %s has a version %s which is less '
-                    'than the version %s in snapshot content model id' % (
-                        item.id, story_rights_model.id,
-                        story_rights_model.version, version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_story_model_version_from_item_id]
-
 
 class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating StoryCommitLogEntryModel."""
+
+    related_model_name = 'story'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2587,31 +2118,6 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
             'story_ids': (
                 story_models.StoryModel, [item.story_id]),
         }
-
-    @classmethod
-    def _validate_story_model_version_from_item_id(cls, item):
-        """Validate that story model corresponding to item.story_id
-        has a version greater than or equal to the exp version in item.id.
-
-        Args:
-            item: ndb.Model. StoryCommitLogEntryModel to validate.
-        """
-        story_model_class_model_id_model_tuples = cls.external_instance_details[
-            'story_ids']
-
-        version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, story_model) in story_model_class_model_id_model_tuples:
-            if int(story_model.version) < int(version):
-                cls.errors['story model version check'].append((
-                    'Entity id %s: Story model corresponding to story '
-                    'id %s has a version %s which is less than the version %s '
-                    'in commit log model id' % (
-                        item.id, item.story_id, story_model.version,
-                        version)))
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return [cls._validate_story_model_version_from_item_id]
 
 
 class StorySummaryModelValidator(BaseModelValidator):
@@ -2688,7 +2194,8 @@ class StorySummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_language_code, cls._validate_node_count,
+            cls._validate_language_code,
+            cls._validate_node_count,
             cls._validate_related_model_properties]
 
 
@@ -2716,10 +2223,6 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
             'creator_ids': (user_models.UserSettingsModel, item.creator_ids),
             'id': (user_models.UserSettingsModel, [item.id]),
         }
-
-    @classmethod
-    def _get_custom_validation_functions(cls):
-        return []
 
 
 MODEL_TO_VALIDATOR_MAPPING = {

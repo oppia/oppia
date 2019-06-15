@@ -3513,8 +3513,8 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for exploration model '
                 'version check of ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id %s: Exploration model corresponding '
-                'to exploration id 0 has a version 1 which is less than '
-                'the version 3 in commit log model id\']]'
+                'to id 0 has a version 1 which is less than '
+                'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -4199,7 +4199,7 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
-                u'[u\'failed validation check for file_metadata model '
+                u'[u\'failed validation check for file metadata model '
                 'version check of FileMetadataSnapshotMetadataModel\', '
                 '[u\'Entity id %s-3: FileMetadata model corresponding to '
                 'id %s has a version 1 which is less than the version 3 in '
@@ -4312,7 +4312,7 @@ class FileMetadataSnapshotContentModelValidatorTests(
         model_with_invalid_version_in_id.put()
         expected_output = [
             (
-                u'[u\'failed validation check for file_metadata model '
+                u'[u\'failed validation check for file metadata model '
                 'version check of FileMetadataSnapshotContentModel\', '
                 '[u\'Entity id %s-3: FileMetadata model corresponding to '
                 'id %s has a version 1 which is less than '
