@@ -13,14 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for NumberWithUnits interaction.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/NumberWithUnits/directives/' +
+  'NumberWithUnitsValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/NumberWithUnits/directives/' +
+  'OppiaInteractiveNumberWithUnitsDirective.ts');
+require(
+  'interactions/NumberWithUnits/directives/' +
+  'OppiaResponseNumberWithUnitsDirective.ts');
+require(
+  'interactions/NumberWithUnits/directives/' +
+  'OppiaShortResponseNumberWithUnitsDirective.ts');

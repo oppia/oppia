@@ -13,14 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for InteractiveMap interaction.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/InteractiveMap/directives/InteractiveMapValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/InteractiveMap/directives/' +
+  'OppiaInteractiveInteractiveMapDirective.ts');
+require(
+  'interactions/InteractiveMap/directives/' +
+  'OppiaResponseInteractiveMapDirective.ts');
+require(
+  'interactions/InteractiveMap/directives/' +
+  'OppiaShortResponseInteractiveMapDirective.ts');

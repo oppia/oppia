@@ -20,7 +20,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require(
   'interactions/DragAndDropSortInput/directives/' +
   'DragAndDropSortInputRulesService.ts');
-require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
 
 require('services/HtmlEscaperService.ts');
 require('services/contextual/UrlService.ts');

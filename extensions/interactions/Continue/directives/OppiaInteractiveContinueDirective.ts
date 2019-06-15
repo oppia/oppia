@@ -22,7 +22,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('interactions/Continue/directives/ContinueRulesService.ts');
-require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/contextual/WindowDimensionsService.ts');

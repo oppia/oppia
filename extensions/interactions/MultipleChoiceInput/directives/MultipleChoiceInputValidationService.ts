@@ -19,8 +19,8 @@
 require('interactions/baseInteractionValidationService.ts');
 
 oppia.factory('MultipleChoiceInputValidationService', [
-  '$filter', 'baseInteractionValidationService', 'WARNING_TYPES',
-  function($filter, baseInteractionValidationService, WARNING_TYPES) {
+  'baseInteractionValidationService', 'WARNING_TYPES',
+  function(baseInteractionValidationService, WARNING_TYPES) {
     return {
       getCustomizationArgsWarnings: function(customizationArgs) {
         var warningsList = [];

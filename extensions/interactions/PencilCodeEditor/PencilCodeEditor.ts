@@ -13,14 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for PencilCodeEditor interaction.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/PencilCodeEditor/directives/' +
+  'PencilCodeEditorValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/PencilCodeEditor/directives/' +
+  'OppiaInteractivePencilCodeEditorDirective.ts');
+require(
+  'interactions/PencilCodeEditor/directives/' +
+  'OppiaResponsePencilCodeEditorDirective.ts');
+require(
+  'interactions/PencilCodeEditor/directives/' +
+  'OppiaShortResponsePencilCodeEditorDirective.ts');

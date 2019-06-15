@@ -13,14 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for MusicNotesInput interaction.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/MusicNotesInput/directives/' +
+  'MusicNotesInputValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/MusicNotesInput/directives/' +
+  'OppiaInteractiveMusicNotesInputDirective.ts');
+require(
+  'interactions/MusicNotesInput/directives/' +
+  'OppiaResponseMusicNotesInputDirective.ts');
+require(
+  'interactions/MusicNotesInput/directives/' +
+  'OppiaShortResponseMusicNotesInputDirective.ts');

@@ -197,6 +197,7 @@ require(
   'exploration-footer.directive.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
+require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');
@@ -259,7 +260,6 @@ require('services/StateTopAnswersStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
-
 
 oppia.controller('ExplorationEditor', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',

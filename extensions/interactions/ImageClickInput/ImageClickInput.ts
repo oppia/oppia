@@ -13,14 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for ImageClickInput interaction.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/ImageClickInput/directives/' +
+  'ImageClickInputValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/ImageClickInput/directives/' +
+  'OppiaInteractiveImageClickInputDirective.ts');
+require(
+  'interactions/ImageClickInput/directives/' +
+  'OppiaResponseImageClickInputDirective.ts');
+require(
+  'interactions/ImageClickInput/directives/' +
+  'OppiaShortResponseImageClickInputDirective.ts');

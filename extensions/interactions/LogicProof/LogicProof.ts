@@ -13,14 +13,15 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for LogicProof interaction.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/LogicProof/directives/LogicProofValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/LogicProof/directives/OppiaInteractiveLogicProofDirective.ts');
+require(
+  'interactions/LogicProof/directives/OppiaResponseLogicProofDirective.ts');
+require(
+  'interactions/LogicProof/directives/' +
+  'OppiaShortResponseLogicProofDirective.ts');

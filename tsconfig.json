@@ -16,15 +16,11 @@
     "core/tests/karma-globals.ts",
     "core/tests/karma.conf.ts",
     "core/templates/dev/head/AppInit.ts",
-    "core/templates/dev/head/mathjaxConfig.ts",
-    "core/templates/dev/head/domain/classifier/PredictionResultObjectFactory.ts",
-    "core/templates/dev/head/expressions/ExpressionParserService.js",
-    "core/templates/dev/head/filters/string-utility-filters/convert-to-plain-text.filter.ts",
-    "core/templates/dev/head/filters/string-utility-filters/truncate-at-first-line.filter.ts"
+    "core/templates/dev/head/mathjaxConfig.ts"
   ],
   "include": [
     "extensions/ckeditor_plugins",
-    "extensions/classifiers",
+    "extensions/interactions/LogicProof/static/js",
     "typings"
   ]
 }

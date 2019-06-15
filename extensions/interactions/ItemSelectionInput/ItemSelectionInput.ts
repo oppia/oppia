@@ -13,14 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for ItemSelectionInput interaction.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/ItemSelectionInput/directives/' +
+  'ItemSelectionInputValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/ItemSelectionInput/directives/' +
+  'OppiaInteractiveItemSelectionInputDirective.ts');
+require(
+  'interactions/ItemSelectionInput/directives/' +
+  'OppiaResponseItemSelectionInputDirective.ts');
+require(
+  'interactions/ItemSelectionInput/directives/' +
+  'OppiaShortResponseItemSelectionInputDirective.ts');

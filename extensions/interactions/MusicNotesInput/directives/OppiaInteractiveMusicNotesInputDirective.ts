@@ -26,7 +26,7 @@ require(
 require(
   'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
 require(
-  'extensions/interactions/MusicNotesInput/directives/' +
+  'interactions/MusicNotesInput/directives/' +
   'MusicPhrasePlayerService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');

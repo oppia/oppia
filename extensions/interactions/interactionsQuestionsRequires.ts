@@ -13,14 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for question only interactions.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
-require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
-require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+require('interactions/MultipleChoiceInput/MultipleChoiceInput.ts');
+require('interactions/NumericInput/NumericInput.ts');
+require('interactions/TextInput/TextInput.ts');

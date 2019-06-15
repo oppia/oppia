@@ -13,14 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Requires for CodeRepl interaction.
+ * @fileoverview Requires for NumericInput interaction.
  */
 
-require('interactions/CodeRepl/CodeReplPredictionService.ts');
-
-require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');
-require('interactions/CodeRepl/directives/OppiaResponseCodeReplDirective.ts');
+  'interactions/NumericInput/directives/NumericInputValidationService.ts');
 require(
-  'interactions/CodeRepl/directives/OppiaShortResponseCodeReplDirective.ts');
+  'interactions/NumericInput/directives/' +
+  'OppiaInteractiveNumericInputDirective.ts');
+require(
+  'interactions/NumericInput/directives/OppiaResponseNumericInputDirective.ts');
+require(
+  'interactions/NumericInput/directives/' +
+  'OppiaShortResponseNumericInputDirective.ts');
