@@ -207,17 +207,12 @@ class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output)
 
-    def test_model_with_invalid_activity_references_schema(self):
+    def test_model_with_missing_id_in_activity_references(self):
         self.model_instance.activity_references = [{
             'type': 'exploration',
         }]
         self.model_instance.put()
         expected_output = [(
-            u'[u\'failed validation check for activity_references schema check '
-            'of ActivityReferencesModel\', '
-            '[u"Entity id featured: Property does not match the schema with '
-            'the error Missing keys: [\'id\'], Extra keys: []"]]'
-        ), (
             u'[u\'failed validation check for fetch properties of '
             'ActivityReferencesModel\', '
             '[u"Entity id featured: Entity properties cannot be fetched '
@@ -1720,33 +1715,6 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                     self.contributor_id, self.contributor_id),
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_ratings(self):
-        self.model_instance_0.ratings = {'10': 4, '5': 15}
-        self.model_instance_0.put()
-        expected_output = [
-            (
-                u'[u\'failed validation check for ratings schema check of '
-                'CollectionSummaryModel\', '
-                '[u"Entity id 0: Property does not match the schema with '
-                'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
-                'Extra keys: [u\'10\']"]]'
-            ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_language_code(self):
-        expected_output = [
-            (
-                u'[u\'failed validation check for language code check of '
-                'CollectionSummaryModel\', '
-                '[u\'Entity id %s: Language code %s for model is unsupported'
-                '\']]'
-            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
-            u'[u\'fully-validated CollectionSummaryModel\', 2]']
-        with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
-                'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_contributors_summary(self):
         self.model_instance_0.contributors_summary = {'invalid': 1}
@@ -3864,32 +3832,18 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_ratings(self):
+    def test_model_with_invalid_schema(self):
         self.model_instance_0.ratings = {'10': 4, '5': 15}
         self.model_instance_0.put()
         expected_output = [
             (
-                u'[u\'failed validation check for ratings schema check of '
+                u'[u\'failed validation check for domain object check of '
                 'ExpSummaryModel\', '
-                '[u"Entity id 0: Property does not match the schema with '
-                'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
-                'Extra keys: [u\'10\']"]]'
+                '[u\'Entity id 0: Entity fails domain validation with '
+                'the error Expected ratings to have keys: 1,2,3,4,5, '
+                'received: 10,5\']]'
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_language_code(self):
-        expected_output = [
-            (
-                u'[u\'failed validation check for language code check of '
-                'ExpSummaryModel\', '
-                '[u\'Entity id %s: Language code %s for entity is unsupported'
-                '\']]'
-            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
-            u'[u\'fully-validated ExpSummaryModel\', 2]']
-        with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
-                'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_contributors_summary(self):
         self.model_instance_0.contributors_summary = {'invalid': 1}
@@ -6191,20 +6145,6 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
                 'it doesn\'t exist"]]'),
             u'[u\'fully-validated StorySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
-
-    def test_model_with_invalid_language_code(self):
-        expected_output = [
-            (
-                u'[u\'failed validation check for language code check of '
-                'StorySummaryModel\', '
-                '[u\'Entity id %s: Language code %s for entity is unsupported'
-                '\']]'
-            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
-            u'[u\'fully-validated StorySummaryModel\', 2]']
-        with self.swap(
-            constants, 'ALL_LANGUAGE_CODES', [{
-                'code': 'en', 'description': 'English'}]):
-            run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_node_count(self):
         self.model_instance_0.node_count = 10

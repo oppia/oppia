@@ -1068,6 +1068,42 @@ class CollectionSummary(object):
             'collection_model_last_updated': self.collection_model_last_updated
         }
 
+    def validate(self):
+        """Validates various properties of the ExplorationSummary.
+
+        Raises:
+            ValidationError: One or more attributes of the ExplorationSummary
+                are invalid.
+        """
+        if not isinstance(self.status, basestring):
+            raise utils.ValidationError(
+                'Expected status to be string, received: %s' % self.status)
+
+        if not isinstance(self.community_owned, bool):
+            raise utils.ValidationError(
+                'Expected community_owned to be bool, received: %s' % (
+                    self.community_owned))
+
+        id_property_list = [
+            'owner_ids', 'editor_ids', 'viewer_ids', 'contributor_ids']
+
+        for id_property in id_property_list:
+            property_value = getattr(self, id_property)
+            if not isinstance(property_value, list):
+                raise utils.ValidationError(
+                    'Expected %s to be list, received: %s' % (
+                        id_property, property_value))
+            for val in property_value:
+                if not isinstance(val, basestring):
+                    raise utils.ValidationError(
+                        'Expected each id in %s to be string, received: %s' % (
+                            id_property, val))
+
+        if not isinstance(self.contributors_summary, dict):
+            raise utils.ValidationError(
+                'Expected contributors_summary to be dict, received: %s' % (
+                    self.contributors_summary))
+
     def is_editable_by(self, user_id=None):
         """Checks if a given user may edit the collection.
 

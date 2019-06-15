@@ -3275,6 +3275,69 @@ class ExplorationSummary(object):
         self.exploration_model_last_updated = exploration_model_last_updated
         self.first_published_msec = first_published_msec
 
+    def validate(self):
+        """Validates various properties of the ExplorationSummary.
+
+        Raises:
+            ValidationError: One or more attributes of the ExplorationSummary
+                are invalid.
+        """
+        if not isinstance(self.ratings, dict):
+            raise utils.ValidationError(
+                'Expected ratings to be a dict, received %s' % self.ratings)
+
+        if self.ratings:
+            valid_rating_keys = ['1', '2', '3', '4', '5']
+            actual_rating_keys = sorted(self.ratings.keys())
+            if valid_rating_keys != actual_rating_keys:
+                raise utils.ValidationError(
+                    'Expected ratings to have keys: %s, received: %s' % (
+                        (',').join(valid_rating_keys),
+                        (',').join(actual_rating_keys)))
+            for _, value in self.ratings.iteritems():
+                if not isinstance(value, int):
+                    raise utils.ValidationError(
+                        'Expected value to be int, received: %s' % value)
+                if value < 0:
+                    raise utils.ValidationError(
+                        'Expected value to be non-negative, received: %s' % (
+                            value))
+
+        if not isinstance(self.scaled_average_rating, float):
+            raise utils.ValidationError(
+                'Expected scaled_average_rating to be float, received: %s' % (
+                    self.scaled_average_rating))
+
+        if not isinstance(self.status, basestring):
+            raise utils.ValidationError(
+                'Expected status to be string, received: %s' % self.status)
+
+        if not isinstance(self.community_owned, bool):
+            raise utils.ValidationError(
+                'Expected community_owned to be bool, received: %s' % (
+                    self.community_owned))
+
+        id_property_list = [
+            'owner_ids', 'editor_ids', 'voice_artist_ids',
+            'viewer_ids', 'contributor_ids']
+
+        for id_property in id_property_list:
+            property_value = getattr(self, id_property)
+            if not isinstance(property_value, list):
+                raise utils.ValidationError(
+                    'Expected %s to be list, received: %s' % (
+                        id_property, property_value))
+            for val in property_value:
+                if not isinstance(val, basestring):
+                    raise utils.ValidationError(
+                        'Expected each id in %s to be string, received: %s' % (
+                            id_property, val))
+
+        if not isinstance(self.contributors_summary, dict):
+            raise utils.ValidationError(
+                'Expected contributors_summary to be dict, received: %s' % (
+                    self.contributors_summary))
+
     def to_metadata_dict(self):
         """Given an exploration summary, this method returns a dict containing
         id, title and objective of the exploration.

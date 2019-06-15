@@ -878,12 +878,12 @@ title: A title
 
 class CollectionSummaryTests(test_utils.GenericTestBase):
 
-    def test_collection_summary_gets_created(self):
-
-        collection_summary_dict = {
+    def setUp(self):
+        super(CollectionSummaryTests, self).setUp()
+        self.collection_summary_dict = {
             'category': 'category',
             'status': 'status',
-            'community_owned': 'True',
+            'community_owned': True,
             'viewer_ids': ['viewer_id'],
             'version': 1,
             'editor_ids': ['editor_id'],
@@ -899,9 +899,45 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'owner_ids': ['owner_id']
         }
 
-        collection_summary = collection_domain.CollectionSummary(
+        self.collection_summary = collection_domain.CollectionSummary(
             'col_id', 'title', 'category', 'objective', 'en', [], 'status',
-            'True', ['owner_id'], ['editor_id'], ['viewer_id'],
+            True, ['owner_id'], ['editor_id'], ['viewer_id'],
             ['contributor_id'], {}, 1, 1, {}, {})
 
-        self.assertEqual(collection_summary.to_dict(), collection_summary_dict)
+    def test_collection_summary_gets_created(self):
+        self.assertEqual(
+            self.collection_summary.to_dict(), self.collection_summary_dict)
+
+    def test_validation_fails_with_invalid_status(self):
+        self.collection_summary.status = ['public']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected status to be string, .+'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_community_owned(self):
+        self.collection_summary.community_owned = '1'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected community_owned to be bool, .+'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_contributors_summary(self):
+        self.collection_summary.contributors_summary = [1]
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected contributors_summary to be dict, .+'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_owner_ids_type(self):
+        self.collection_summary.owner_ids = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected owner_ids to be list, .+'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
+        self.collection_summary.owner_ids = ['1', ['2'], '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in owner_ids to be string, .+'):
+            self.collection_summary.validate()

@@ -55,6 +55,9 @@ class ActivityReference(object):
         if (self.type != constants.ACTIVITY_TYPE_EXPLORATION and
                 self.type != constants.ACTIVITY_TYPE_COLLECTION):
             raise Exception('Invalid activity type: %s' % self.type)
+        if not isinstance(self.id, basestring):
+            raise Exception(
+                'Expected id to be a string but found %s' % self.id)
 
     def to_dict(self):
         """Returns a dict representing this ActivityReference domain object.

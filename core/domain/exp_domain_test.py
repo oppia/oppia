@@ -890,6 +890,77 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(init_state.interaction.is_terminal)
 
 
+class ExplorationSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationSummaryTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exp_services.save_new_exploration(owner_id, exploration)
+        self.exp_summary = exp_services.get_exploration_summary_by_id('eid')
+
+    def test_validation_passes_with_valid_properties(self):
+        self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_rating_keys(self):
+        self.exp_summary.ratings = {'1': 0, '10': 1}
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected ratings to have keys: .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_value_type_for_ratings(self):
+        self.exp_summary.ratings = {'1': 0, '2': [1], '3': 0, '4': 0, '5': 0}
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected value to be int, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_value_for_ratings(self):
+        self.exp_summary.ratings = {'1': 0, '2': -1, '3': 0, '4': 0, '5': 0}
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected value to be non-negative, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_scaled_average_rating(self):
+        self.exp_summary.scaled_average_rating = '1.0'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected scaled_average_rating to be float, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_status(self):
+        self.exp_summary.status = ['public']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected status to be string, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_community_owned(self):
+        self.exp_summary.community_owned = '1'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected community_owned to be bool, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_contributors_summary(self):
+        self.exp_summary.contributors_summary = [1]
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected contributors_summary to be dict, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_owner_ids_type(self):
+        self.exp_summary.owner_ids = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected owner_ids to be list, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
+        self.exp_summary.owner_ids = ['1', ['2'], '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in owner_ids to be string, .+'):
+            self.exp_summary.validate()
+
+
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 

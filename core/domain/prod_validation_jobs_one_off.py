@@ -36,8 +36,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.platform import models
 import feconf
-import schema_utils
-import utils
 
 (
     activity_models, audit_models, base_models,
@@ -92,45 +90,6 @@ class BaseModelValidator(object):
             cls.errors['model id check'].append((
                 'Entity id %s: Entity id does not match regex pattern') % (
                     item.id))
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        """Returns a schema for model properties.
-
-        This should be implemented by subclasses.
-
-        Args:
-            item: ndb.Model. Entity to validate.
-
-        Returns:
-            dict(str, dict). A dictionary whose keys are names of model
-            properties and values are schemas for these properties.
-            A schema defines a type for a custom object. The validation
-            for the schema is done using schema_utils.py. The schema defined
-            here follow the same pattern as those defined in
-            extensions/objects/models/objects.py.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def _validate_model_json_properties(cls, item):
-        """Checks that the properties defined in the model follow a specified
-        schema.
-
-        Args:
-            item: ndb.Model. Entity to validate.
-        """
-        properties_schema_dict = cls._get_json_properties_schema(item)
-
-        for property_name, property_schema in (
-                properties_schema_dict.iteritems()):
-            try:
-                schema_utils.normalize_against_schema(
-                    getattr(item, property_name), property_schema)
-            except Exception as e:
-                cls.errors['%s schema check' % property_name].append((
-                    'Entity id %s: Property does not match the schema '
-                    'with the error %s' % (item.id, e)))
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -356,7 +315,6 @@ class BaseModelValidator(object):
 
         cls._validate_model_id(item)
         cls._validate_model_time_fields(item)
-        cls._validate_model_json_properties(item)
         cls._validate_model_domain_object_instances(item)
         cls._validate_external_id_relationships(item)
 
@@ -383,30 +341,6 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         regex_string = '^(%s)$' % '|'.join(
             feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES)
         return regex_string
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        activity_references_schema = {
-            'type': 'list',
-            'items': {
-                'type': 'dict',
-                'properties': [{
-                    'name': 'type',
-                    'schema': {
-                        'type': 'unicode',
-                    },
-                }, {
-                    'name': 'id',
-                    'schema': {
-                        'type': 'unicode'
-                    }
-                }]
-            }
-        }
-
-        return {
-            'activity_references': activity_references_schema
-        }
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -467,10 +401,6 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -493,10 +423,6 @@ class CollectionModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -556,10 +482,6 @@ class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -610,10 +532,6 @@ class CollectionSnapshotContentModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -661,10 +579,6 @@ class CollectionRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -731,10 +645,6 @@ class CollectionRightsSnapshotMetadataModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -785,10 +695,6 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -847,10 +753,6 @@ class CollectionCommitLogEntryModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -898,30 +800,8 @@ class CollectionSummaryModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        non_negative_int_schema = {
-            'type': 'int',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': 0
-            }]
-        }
-        ratings_schema = {
-            'type': 'dict',
-            'properties': [{
-                'name': '%s' % rating_value,
-                'schema': non_negative_int_schema,
-            } for rating_value in ['1', '2', '3', '4', '5']]
-        }
-
-        if item.ratings and len(item.ratings.keys()):
-            return {'ratings': ratings_schema}
-        else:
-            return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
-        return []
+        return [collection_services.get_collection_summary_from_model(item)]
 
     @classmethod
     def _get_change_domain_class(cls):
@@ -962,18 +842,6 @@ class CollectionSummaryModelValidator(BaseModelValidator):
                     item.id, (',').join(sorted(item.contributor_ids)),
                     (',').join(
                         sorted(contributor_ids_from_contributors_summary))))
-
-    @classmethod
-    def _validate_language_code(cls, item):
-        """Validate that language code is present in allowed language codes.
-
-        Args:
-            item: CollectionSummaryModel to validate.
-        """
-        if not utils.is_valid_language_code(item.language_code):
-            cls.errors['language code check'].append((
-                'Entity id %s: Language code %s for model is unsupported' % (
-                    item.id, item.language_code)))
 
     @classmethod
     def _validate_node_count(cls, item):
@@ -1080,7 +948,7 @@ class CollectionSummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_language_code, cls._validate_node_count,
+            cls._validate_node_count,
             cls._validate_contributors_summary,
             cls._validate_related_model_properties]
 
@@ -1091,10 +959,6 @@ class ConfigPropertyModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1131,10 +995,6 @@ class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1188,10 +1048,6 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1241,10 +1097,6 @@ class SentEmailModelValidator(BaseModelValidator):
         # Valid id: [intent].[random hash]
         regex_string = '^%s\\.\\..*$' % item.intent
         return regex_string
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1332,10 +1184,6 @@ class BulkEmailModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1413,10 +1261,6 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1465,10 +1309,6 @@ class ExplorationModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1523,10 +1363,6 @@ class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1578,10 +1414,6 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1629,10 +1461,6 @@ class ExplorationRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1705,10 +1533,6 @@ class ExplorationRightsSnapshotMetadataModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1760,10 +1584,6 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1823,10 +1643,6 @@ class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1875,30 +1691,8 @@ class ExpSummaryModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        non_negative_int_schema = {
-            'type': 'int',
-            'validators': [{
-                'id': 'is_at_least',
-                'min_value': 0
-            }]
-        }
-        ratings_schema = {
-            'type': 'dict',
-            'properties': [{
-                'name': '%s' % rating_value,
-                'schema': non_negative_int_schema,
-            } for rating_value in ['1', '2', '3', '4', '5']]
-        }
-
-        if item.ratings and len(item.ratings.keys()):
-            return {'ratings': ratings_schema}
-        else:
-            return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
-        return []
+        return [exp_services.get_exploration_summary_from_model(item)]
 
     @classmethod
     def _get_change_domain_class(cls):
@@ -1939,18 +1733,6 @@ class ExpSummaryModelValidator(BaseModelValidator):
                     item.id, (',').join(sorted(item.contributor_ids)),
                     (',').join(
                         sorted(contributor_ids_from_contributors_summary))))
-
-    @classmethod
-    def _validate_language_code(cls, item):
-        """Validate that language code is present in allowed language codes.
-
-        Args:
-            item: ExpSummaryModel to validate.
-        """
-        if not utils.is_valid_language_code(item.language_code):
-            cls.errors['language code check'].append((
-                'Entity id %s: Language code %s for entity is unsupported' % (
-                    item.id, item.language_code)))
 
     @classmethod
     def _validate_first_published_msec(cls, item):
@@ -2093,7 +1875,7 @@ class ExpSummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_language_code, cls._validate_first_published_msec,
+            cls._validate_first_published_msec,
             cls._validate_contributors_summary,
             cls._validate_exploration_model_last_updated,
             cls._validate_related_model_properties]
@@ -2105,10 +1887,6 @@ class FileMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2158,10 +1936,6 @@ class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2215,10 +1989,6 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2268,10 +2038,6 @@ class FileModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2319,10 +2085,6 @@ class FileSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2376,10 +2138,6 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2429,10 +2187,6 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2474,10 +2228,6 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
     def _get_model_id_regex(cls, item):
         # Valid id: topics.
         return '^%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2582,10 +2332,6 @@ class StoryModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         model_domain_object_instances = [
             story_services.get_story_from_model(item)]
@@ -2643,10 +2389,6 @@ class StorySnapshotMetadataModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2696,10 +2438,6 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2747,10 +2485,6 @@ class StoryRightsModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2789,10 +2523,6 @@ class StoryRightsSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2845,10 +2575,6 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2907,10 +2633,6 @@ class StoryCommitLogEntryModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2958,10 +2680,6 @@ class StorySummaryModelValidator(BaseModelValidator):
         return '.'
 
     @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2977,18 +2695,6 @@ class StorySummaryModelValidator(BaseModelValidator):
             'story_rights_ids': (
                 story_models.StoryRightsModel, [item.id]),
         }
-
-    @classmethod
-    def _validate_language_code(cls, item):
-        """Validate that language code is present in allowed language codes.
-
-        Args:
-            item: StorySummaryModel to validate.
-        """
-        if not utils.is_valid_language_code(item.language_code):
-            cls.errors['language code check'].append((
-                'Entity id %s: Language code %s for entity is unsupported' % (
-                    item.id, item.language_code)))
 
     @classmethod
     def _validate_node_count(cls, item):
@@ -3054,10 +2760,6 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         return '.'
-
-    @classmethod
-    def _get_json_properties_schema(cls, item):
-        return {}
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
