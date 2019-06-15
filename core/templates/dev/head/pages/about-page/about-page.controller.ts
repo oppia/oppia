@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-require('domain/utilities/UrlInterpolationService.ts');
-
 /**
  * @fileoverview Controllers for the about page.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
 
 oppia.directive('aboutPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
