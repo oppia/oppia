@@ -56,10 +56,10 @@ class BaseModelValidator(object):
     """Base class for validating models."""
 
     errors = collections.defaultdict(list)
-    # external_models is keyed by field name. Each value consists
-    # of the model class and a list of (external_key, external_model_instance)
+    # external_instance_details is keyed by field name. Each value consists
+    # of a list of (model class, external_key, external_model_instance)
     # tuples.
-    external_models = {}
+    external_instance_details = {}
     is_commit_log_entry_model = False
     is_snapshot_metadata_model = False
 
@@ -159,7 +159,7 @@ class BaseModelValidator(object):
             item: ndb.Model. Entity to validate.
         """
         for field_name, model_class_model_id_model_tuples in (
-                cls.external_models.iteritems()):
+                cls.external_instance_details.iteritems()):
             for model_class, model_id, model in (
                     model_class_model_id_model_tuples):
                 if model is None or model.deleted:
@@ -171,7 +171,7 @@ class BaseModelValidator(object):
                             str(model_class.__name__), model_id)))
 
     @classmethod
-    def _fetch_external_models(cls, item):
+    def _fetch_external_instance_details(cls, item):
         """Fetch external models based on _get_external_id_relationships.
 
         This should be called before we call other _validate methods.
@@ -187,13 +187,15 @@ class BaseModelValidator(object):
         fetched_model_instances = (
             datastore_services.fetch_multiple_entities_by_ids_and_models(
                 multiple_models_keys_to_fetch.values()))
-        for (field_name, (model_class, field_values)), external_models in zip(
-                multiple_models_keys_to_fetch.iteritems(),
-                fetched_model_instances):
-            cls.external_models[field_name] = (
+        for (
+                field_name, (model_class, field_values)), (
+                    external_instance_details) in zip(
+                        multiple_models_keys_to_fetch.iteritems(),
+                        fetched_model_instances):
+            cls.external_instance_details[field_name] = (
                 zip(
                     [model_class] * len(field_values),
-                    field_values, external_models))
+                    field_values, external_instance_details))
 
     @classmethod
     def _validate_model_time_fields(cls, item):
@@ -307,14 +309,14 @@ class BaseModelValidator(object):
 
     @classmethod
     def validate(cls, item):
-        """Run _fetch_external_models and all _validate functions.
+        """Run _fetch_external_instance_details and all _validate functions.
 
         Args:
             item: ndb.Model. Entity to validate.
         """
         cls.errors.clear()
-        cls.external_models.clear()
-        cls._fetch_external_models(item)
+        cls.external_instance_details.clear()
+        cls._fetch_external_instance_details(item)
 
         cls._validate_model_id(item)
         cls._validate_model_time_fields(item)
@@ -511,7 +513,7 @@ class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
             item: CollectionSnapshotMetadataModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
-            cls.external_models['collection_ids'])
+            cls.external_instance_details['collection_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, collection_model) in (
@@ -562,7 +564,7 @@ class CollectionSnapshotContentModelValidator(BaseModelValidator):
             item: CollectionSnapshotContentModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
-            cls.external_models['collection_ids'])
+            cls.external_instance_details['collection_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, collection_model) in (
@@ -679,7 +681,7 @@ class CollectionRightsSnapshotMetadataModelValidator(BaseModelValidator):
             item: CollectionRightsSnapshotMetadataModel to validate.
         """
         collection_rights_model_class_model_id_model_tuples = (
-            cls.external_models['collection_rights_ids'])
+            cls.external_instance_details['collection_rights_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, collection_rights_model) in (
@@ -730,7 +732,7 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
             item: CollectionRightsSnapshotContentModel to validate.
         """
         collection_rights_model_class_model_id_model_tuples = (
-            cls.external_models['collection_rights_ids'])
+            cls.external_instance_details['collection_rights_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, collection_rights_model) in (
@@ -785,7 +787,7 @@ class CollectionCommitLogEntryModelValidator(BaseModelValidator):
             item: CollectionCommitLogEntryModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
-            cls.external_models['collection_ids'])
+            cls.external_instance_details['collection_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, collection_model) in (
@@ -863,7 +865,7 @@ class CollectionSummaryModelValidator(BaseModelValidator):
             item: CollectionSummaryModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
-            cls.external_models['collection_ids'])
+            cls.external_instance_details['collection_ids'])
 
         for (_, _, collection_model) in (
                 collection_model_class_model_id_model_tuples):
@@ -883,9 +885,9 @@ class CollectionSummaryModelValidator(BaseModelValidator):
             item: CollectionSummaryModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
-            cls.external_models['collection_ids'])
+            cls.external_instance_details['collection_ids'])
         collection_rights_model_class_model_id_model_tuples = (
-            cls.external_models['collection_rights_ids'])
+            cls.external_instance_details['collection_rights_ids'])
 
         collection_model_properties_dict = {
             'title': 'title',
@@ -1037,7 +1039,7 @@ class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
             item: ConfigPropertySnapshotMetadataModel to validate.
         """
         config_property_model_class_model_id_model_tuples = (
-            cls.external_models['config_property_ids'])
+            cls.external_instance_details['config_property_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, config_property_model) in (
@@ -1087,7 +1089,7 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
             item: ConfigPropertySnapshotContentModel to validate.
         """
         config_property_model_class_model_id_model_tuples = (
-            cls.external_models['config_property_ids'])
+            cls.external_instance_details['config_property_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, config_property_model) in (
@@ -1153,7 +1155,7 @@ class SentEmailModelValidator(BaseModelValidator):
             item: SentEmailModel to validate.
         """
         sender_model_class_model_id_model_tuples = (
-            cls.external_models['sender_id'])
+            cls.external_instance_details['sender_id'])
 
         for (_, _, sender_model) in (
                 sender_model_class_model_id_model_tuples):
@@ -1174,7 +1176,7 @@ class SentEmailModelValidator(BaseModelValidator):
             item: SentEmailModel to validate.
         """
         recipient_model_class_model_id_model_tuples = (
-            cls.external_models['recipient_id'])
+            cls.external_instance_details['recipient_id'])
 
         for (_, _, recipient_model) in (
                 recipient_model_class_model_id_model_tuples):
@@ -1256,7 +1258,7 @@ class BulkEmailModelValidator(BaseModelValidator):
             item: BulkEmailModel to validate.
         """
         sender_model_class_model_id_model_tuples = (
-            cls.external_models['sender_id'])
+            cls.external_instance_details['sender_id'])
 
         for (_, _, sender_model) in (
                 sender_model_class_model_id_model_tuples):
@@ -1410,7 +1412,7 @@ class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
             item: ExplorationSnapshotMetadataModel to validate.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_models['exploration_ids'])
+            cls.external_instance_details['exploration_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
 
@@ -1460,7 +1462,7 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
             item: ExplorationSnapshotContentModel to validate.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_models['exploration_ids'])
+            cls.external_instance_details['exploration_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
 
@@ -1584,7 +1586,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(BaseModelValidator):
             item: ExplorationRightsSnapshotMetadataModel to validate.
         """
         exploration_rights_model_class_model_id_model_tuples = (
-            cls.external_models['exploration_rights_ids'])
+            cls.external_instance_details['exploration_rights_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, exploration_rights_model) in (
@@ -1635,7 +1637,7 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
             item: ExplorationRightsSnapshotContentModel to validate.
         """
         exploration_rights_model_class_model_id_model_tuples = (
-            cls.external_models['exploration_rights_ids'])
+            cls.external_instance_details['exploration_rights_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, exploration_rights_model) in (
@@ -1690,7 +1692,7 @@ class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
             item: ExplorationCommitLogEntryModel to validate.
         """
         exploration_model_class_model_id_model_tuples = (
-            cls.external_models['exploration_ids'])
+            cls.external_instance_details['exploration_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, exploration_model) in (
@@ -1787,8 +1789,8 @@ class ExpSummaryModelValidator(BaseModelValidator):
         Args:
             item: ExpSummaryModel to validate.
         """
-        exploration_model_class_model_id_model_tuples = cls.external_models[
-            'exploration_ids']
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
             if not exploration_model or exploration_model.deleted:
@@ -1820,10 +1822,10 @@ class ExpSummaryModelValidator(BaseModelValidator):
         Args:
             item: ExpSummaryModel to validate.
         """
-        exploration_model_class_model_id_model_tuples = cls.external_models[
-            'exploration_ids']
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
         exploration_rights_model_class_model_id_model_tuples = (
-            cls.external_models['exploration_rights_ids'])
+            cls.external_instance_details['exploration_rights_ids'])
 
         exploration_model_properties_dict = {
             'title': 'title',
@@ -1990,8 +1992,8 @@ class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: FileMetadataSnapshotMetadataModel to validate.
         """
-        file_metadata_model_class_model_id_model_tuples = cls.external_models[
-            'file_metadata_ids']
+        file_metadata_model_class_model_id_model_tuples = (
+            cls.external_instance_details['file_metadata_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, file_metadata_model) in (
@@ -2040,8 +2042,8 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: FileMetadataSnapshotContentModel to validate.
         """
-        file_metadata_model_class_model_id_model_tuples = cls.external_models[
-            'file_metadata_ids']
+        file_metadata_model_class_model_id_model_tuples = (
+            cls.external_instance_details['file_metadata_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, file_metadata_model) in (
@@ -2141,7 +2143,8 @@ class FileSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: FileSnapshotMetadataModel to validate.
         """
-        file_model_class_model_id_model_tuples = cls.external_models['file_ids']
+        file_model_class_model_id_model_tuples = (
+            cls.external_instance_details['file_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, file_model) in file_model_class_model_id_model_tuples:
@@ -2189,7 +2192,8 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: FileSnapshotContentModel to validate.
         """
-        file_model_class_model_id_model_tuples = cls.external_models['file_ids']
+        file_model_class_model_id_model_tuples = (
+            cls.external_instance_details['file_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, file_model) in file_model_class_model_id_model_tuples:
@@ -2440,7 +2444,7 @@ class StorySnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: StorySnapshotMetadataModel to validate.
         """
-        story_model_class_model_id_model_tuples = cls.external_models[
+        story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
 
         version = item.id[item.id.rfind('-') + 1:]
@@ -2488,7 +2492,7 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: StorySnapshotContentModel to validate.
         """
-        story_model_class_model_id_model_tuples = cls.external_models[
+        story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
 
         version = item.id[item.id.rfind('-') + 1:]
@@ -2580,8 +2584,8 @@ class StoryRightsSnapshotMetadataModelValidator(BaseModelValidator):
         Args:
             item: StoryRightsSnapshotMetadataModel to validate.
         """
-        story_rights_model_class_model_id_model_tuples = cls.external_models[
-            'story_rights_ids']
+        story_rights_model_class_model_id_model_tuples = (
+            cls.external_instance_details['story_rights_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, story_rights_model) in (
@@ -2631,8 +2635,8 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
         Args:
             item: StoryRightsSnapshotContentModel to validate.
         """
-        story_rights_model_class_model_id_model_tuples = cls.external_models[
-            'story_rights_ids']
+        story_rights_model_class_model_id_model_tuples = (
+            cls.external_instance_details['story_rights_ids'])
 
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, story_rights_model) in (
@@ -2686,7 +2690,7 @@ class StoryCommitLogEntryModelValidator(BaseModelValidator):
         Args:
             item: StoryCommitLogEntryModel to validate.
         """
-        story_model_class_model_id_model_tuples = cls.external_models[
+        story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
 
         version = item.id[item.id.rfind('-') + 1:]
@@ -2736,7 +2740,7 @@ class StorySummaryModelValidator(BaseModelValidator):
         Args:
             item: StorySummaryModel to validate.
         """
-        story_model_class_model_id_model_tuples = cls.external_models[
+        story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
 
         for (_, _, story_model) in story_model_class_model_id_model_tuples:
@@ -2755,7 +2759,7 @@ class StorySummaryModelValidator(BaseModelValidator):
         Args:
             item: StorySummaryModel to validate.
         """
-        story_model_class_model_id_model_tuples = cls.external_models[
+        story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
 
         story_model_properties_dict = {
