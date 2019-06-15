@@ -507,7 +507,8 @@ class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _validate_collection_model_version_from_item_id(cls, item):
         """Validate that collection model corresponding to snapshot
-        metadata model has a version greater than or equal to the in item.id.
+        metadata model has a version greater than or equal to the
+        version that's represented in the item.id.
 
         Args:
             item: ndb.Model. CollectionSnapshotMetadataModel to validate.
@@ -1033,7 +1034,8 @@ class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _validate_config_property_model_version_from_item_id(cls, item):
         """Validate that config property model corresponding to snapshot
-        metadata model has a version greater than or equal to the in item.id.
+        metadata model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. ConfigPropertySnapshotMetadataModel to validate.
@@ -1083,7 +1085,8 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _validate_config_property_model_version_from_item_id(cls, item):
         """Validate that config property model corresponding to snapshot
-        content model has a version greater than or equal to the in item.id.
+        content model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. ConfigPropertySnapshotContentModel to validate.
@@ -1406,7 +1409,8 @@ class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _validate_exploration_model_version_from_item_id(cls, item):
         """Validate that exploration model corresponding to snapshot
-        metadata model has a version greater than or equal to the in item.id.
+        metadata model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. ExplorationSnapshotMetadataModel to validate.
@@ -1456,7 +1460,8 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _validate_exploration_model_version_from_item_id(cls, item):
         """Validate that exploration model corresponding to snapshot
-        content model has a version greater than or equal to the in item.id.
+        content model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. ExplorationSnapshotContentModel to validate.
@@ -1987,7 +1992,8 @@ class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _validate_file_metadata_model_version_from_item_id(cls, item):
         """Validate that file_metadata model corresponding to snapshot
-        metadata model has a version greater than or equal to the in item.id.
+        metadata model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. FileMetadataSnapshotMetadataModel to validate.
@@ -2037,7 +2043,8 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _validate_file_metadata_model_version_from_item_id(cls, item):
         """Validate that file_metadata model corresponding to snapshot
-        content model has a version greater than or equal to the in item.id.
+        content model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. FileMetadataSnapshotContentModel to validate.
@@ -2138,7 +2145,8 @@ class FileSnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _validate_file_model_version_from_item_id(cls, item):
         """Validate that file model corresponding to snapshot
-        metadata model has a version greater than or equal to the in item.id.
+        metadata model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. FileSnapshotMetadataModel to validate.
@@ -2187,7 +2195,8 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _validate_file_model_version_from_item_id(cls, item):
         """Validate that file model corresponding to snapshot
-        content model has a version greater than or equal to the in item.id.
+        content model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. FileSnapshotContentModel to validate.
@@ -2439,7 +2448,8 @@ class StorySnapshotMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _validate_story_model_version_from_item_id(cls, item):
         """Validate that story model corresponding to snapshot
-        metadata model has a version greater than or equal to the in item.id.
+        metadata model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. StorySnapshotMetadataModel to validate.
@@ -2487,7 +2497,8 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
     @classmethod
     def _validate_story_model_version_from_item_id(cls, item):
         """Validate that story model corresponding to snapshot
-        content model has a version greater than or equal to the in item.id.
+        content model has a version greater than or equal to the version
+        that's represented in the item.id.
 
         Args:
             item: ndb.Model. StorySnapshotContentModel to validate.
