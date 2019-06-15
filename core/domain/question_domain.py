@@ -18,6 +18,7 @@
 
 from constants import constants
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
@@ -194,7 +195,20 @@ class Question(object):
 
     @classmethod
     def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
-        """Converts from version 28 to 29."""
+        """Converts from version 28 to 29. Version 29 add image assets
+        in the question_state_dict.
+
+         Args:
+            question_state_dict: dict. The dict representation of
+                question_state_data.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        image_counter = 0
+        (html_validation_service.
+                add_image_id_and_image_assets_in_state_dict(
+                    question_state_dict, image_counter))
         return question_state_dict
 
     @classmethod

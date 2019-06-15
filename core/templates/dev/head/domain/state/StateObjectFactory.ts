@@ -19,23 +19,26 @@
 
 require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/RecordedVoiceoversObjectFactory.ts');
+require('domain/exploration/ImageAssetsObjectFactory.ts');
 require('domain/exploration/InteractionObjectFactory.ts');
 require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/exploration/WrittenTranslationsObjectFactory.ts');
 
 oppia.factory('StateObjectFactory', [
-  'InteractionObjectFactory', 'ParamChangesObjectFactory',
-  'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',
-  'WrittenTranslationsObjectFactory', function(
-      InteractionObjectFactory, ParamChangesObjectFactory,
-      RecordedVoiceoversObjectFactory, SubtitledHtmlObjectFactory,
-      WrittenTranslationsObjectFactory) {
-    var State = function(name, classifierModelId, content, interaction,
-        paramChanges, recordedVoiceovers, writtenTranslations) {
+  'ImageAssetsObjectFactory', 'InteractionObjectFactory',
+  'ParamChangesObjectFactory', 'RecordedVoiceoversObjectFactory',
+  'SubtitledHtmlObjectFactory', 'WrittenTranslationsObjectFactory',
+  function(
+      ImageAssetsObjectFactory, InteractionObjectFactory,
+      ParamChangesObjectFactory, RecordedVoiceoversObjectFactory,
+      SubtitledHtmlObjectFactory, WrittenTranslationsObjectFactory) {
+    var State = function(name, classifierModelId, content, image_assets,
+        interaction, paramChanges, recordedVoiceovers, writtenTranslations) {
       this.name = name;
       this.classifierModelId = classifierModelId;
       this.content = content;
+      this.image_assets = image_assets;
       this.interaction = interaction;
       this.paramChanges = paramChanges;
       this.recordedVoiceovers = recordedVoiceovers;
@@ -51,6 +54,7 @@ oppia.factory('StateObjectFactory', [
       return {
         content: this.content.toBackendDict(),
         classifier_model_id: this.classifierModelId,
+        image_assets: this.image_assets.toBackendDict(),
         interaction: this.interaction.toBackendDict(),
         param_changes: this.paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
@@ -78,6 +82,7 @@ oppia.factory('StateObjectFactory', [
       var newState = this.createFromBackendDict(newStateName, {
         classifier_model_id: newStateTemplate.classifier_model_id,
         content: newStateTemplate.content,
+        image_assets: newStateTemplate.image_assets,
         interaction: newStateTemplate.interaction,
         param_changes: newStateTemplate.param_changes,
         recorded_voiceovers: newStateTemplate.recorded_voiceovers,
@@ -97,6 +102,7 @@ oppia.factory('StateObjectFactory', [
         stateName,
         stateDict.classifier_model_id,
         SubtitledHtmlObjectFactory.createFromBackendDict(stateDict.content),
+        ImageAssetsObjectFactory.createFromBackendDict(stateDict.image_assets),
         InteractionObjectFactory.createFromBackendDict(stateDict.interaction),
         ParamChangesObjectFactory.createFromBackendList(
           stateDict.param_changes),
