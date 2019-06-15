@@ -48,9 +48,8 @@
          ng-href="<[$ctrl.getExplorationUrl(node.getExplorationId())]>"
          ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
 
-        <div ng-if="[$index]%2===0" ng-style="{width:'160',position:'absolute',color:'#006553','font-size':'20px',bottom:'85%'}">{{node._explorationSummaryObject.title}}</div>
-        <div ng-if="[$index+1]%2===0&&[$index+1]%4!==0" ng-style="{width:'160',position:'absolute',color:'#006553',bottom:'85%','font-size':'20px', left:'20px'}">{{node._explorationSummaryObject.title}}</div>
-        <div ng-if="[$index+1]%4===0" ng-style="{width:'160px',position:'absolute',color:'#006553','font-size':'20px',bottom:'85%',left:'-35px'}">{{node._explorationSummaryObject.title}}</div>
+        <div ng-style="$ctrl.getExplorationTitlePosition($index)">{{node._explorationSummaryObject.title}}</div>
+
         <svg class="protractor-test-collection-exploration"
              width="150"
              height="150"
@@ -58,7 +57,7 @@
              xmlns="http://www.w3.org/2000/svg"
              xmlns:xlink="http://www.w3.org/1999/xlink"
              version="1.1"
-             ng-style="{position:'relative'}">
+             ng-style="{position:'relative',top:'20px'}">
           <defs>
             <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
               <circle cx="50"
@@ -117,7 +116,7 @@
     <div ng-if="$ctrl.collection" class="oppia-collection-table hidden-md hidden-lg hidden-xl">
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
-        <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;">
+        <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;text-align: center">
           <div ng-style="{color:'#006553','font-size':'20px'}">{{node._explorationSummaryObject.title}}</div>
           <svg class="protractor-mobile-test-collection-exploration"
                width="100"
