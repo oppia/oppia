@@ -251,7 +251,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
     'param_changes': [],
     'auto_tts_enabled': True,
     'tags': [],
-    'states_schema_version': 29,
+    'states_schema_version': 30,
     'title': u'A title',
     'id': 'An_exploration_id',
     'states': {
@@ -302,7 +302,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                         'instructions': u'no instructions'
                     }
                 }
-            }
+            },
+            'solicit_answer_details': False
         }
     },
     'param_specs': {},
@@ -317,6 +318,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.to_dict(), expected_exploration_dict)
+        # self.assertEqual(exploration.to_dict(), "keshav")
 
 
     def test_delete_image(self):
@@ -412,7 +414,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
     'param_changes': [],
     'auto_tts_enabled': True,
     'tags': [],
-    'states_schema_version': 29,
+    'states_schema_version': 30,
     'title': u'A title',
     'id': 'An_exploration_id',
     'states': {
@@ -473,7 +475,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                         'instructions': u'no instructions'
                     }
                 }
-            }
+            },
+            'solicit_answer_details': False
         }
     },
     'param_specs': {},
@@ -1857,6 +1860,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1893,6 +1897,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1952,6 +1957,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1988,6 +1994,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -2174,6 +2181,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -2213,6 +2221,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -2253,6 +2262,7 @@ recorded_voiceovers:
   voiceovers_mapping:
     content: {}
     default_outcome: {}
+solicit_answer_details: false
 written_translations:
   translations_mapping:
     content: {}
@@ -2707,6 +2717,39 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
             exploration.init_state.content.html, '<b>Test content</b>')
+
+    def test_update_solicit_answer_details(self):
+        """Test updating of solicit_answer_details."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, False)
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+                True),
+            '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, True)
+
+    def test_update_solicit_answer_details_with_non_bool_fails(self):
+        """Test updating of solicit_answer_details with non bool value."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, False)
+        with self.assertRaisesRegexp(
+            Exception, (
+                'Expected solicit_answer_details to be a bool, received ')):
+            exp_services.update_exploration(
+                self.owner_id, self.EXP_ID, _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
+                    'abc'),
+                '')
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertEqual(
+            exploration.init_state.solicit_answer_details, False)
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
@@ -3713,6 +3756,7 @@ states:
     recorded_voiceovers:
       voiceovers_mapping:
         content: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -3746,6 +3790,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}

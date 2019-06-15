@@ -195,10 +195,28 @@ class Question(object):
 
     @classmethod
     def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
-        """Converts from version 28 to 29. Version 29 add image assets
+
+        """Converts from version 28 to 29. Version 29 adds
+        solicit_answer_details boolean variable to the state, which
+        allows the creator to ask for answer details from the learner
+        about why they landed on a particular answer.
+
+        Args:
+            question_state_dict: dict. The dict representation of
+                question_state_data.
+
+        Returns:
+            dict. The converted question_state_dict.
+        """
+        question_state_dict['solicit_answer_details'] = False
+        return question_state_dict
+
+    @classmethod
+    def _convert_state_v29_dict_to_v30_dict(cls, question_state_dict):
+        """Converts from version 29 to 30. Version 30 add image assets
         in the question_state_dict.
 
-         Args:
+        Args:
             question_state_dict: dict. The dict representation of
                 question_state_data.
 
@@ -209,7 +227,9 @@ class Question(object):
         (html_validation_service.
          add_image_id_and_image_assets_in_state_dict(
              question_state_dict, image_counter))
+
         return question_state_dict
+
 
     @classmethod
     def update_state_from_model(

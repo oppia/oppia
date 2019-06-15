@@ -21,6 +21,8 @@ require('pages/admin-page/roles-tab/role-graph.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
+require('pages/admin-page/admin-page.constants.ts');
+
 oppia.directive('adminRolesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_ROLE_HANDLER_URL',

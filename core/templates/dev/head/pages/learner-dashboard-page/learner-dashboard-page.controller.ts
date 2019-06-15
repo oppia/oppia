@@ -40,55 +40,7 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-oppia.constant('LEARNER_DASHBOARD_SECTION_I18N_IDS', {
-  INCOMPLETE: 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION',
-  COMPLETED: 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION',
-  SUBSCRIPTIONS: 'I18N_LEARNER_DASHBOARD_SUBSCRIPTIONS_SECTION',
-  FEEDBACK: 'I18N_LEARNER_DASHBOARD_FEEDBACK_SECTION',
-  PLAYLIST: 'I18N_LEARNER_DASHBOARD_PLAYLIST_SECTION'
-});
-
-oppia.constant('LEARNER_DASHBOARD_SUBSECTION_I18N_IDS', {
-  EXPLORATIONS: 'I18N_DASHBOARD_EXPLORATIONS',
-  COLLECTIONS: 'I18N_DASHBOARD_COLLECTIONS'
-});
-
-oppia.constant('EXPLORATIONS_SORT_BY_KEYS_AND_I18N_IDS', {
-  LAST_PLAYED: {
-    key: 'last_played',
-    i18nId: 'I18N_LEARNER_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_PLAYED'
-  },
-  TITLE: {
-    key: 'title',
-    i18nId: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE'
-  },
-  CATEGORY: {
-    key: 'category',
-    i18nId: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_CATEGORY'
-  }
-});
-
-oppia.constant('SUBSCRIPTION_SORT_BY_KEYS_AND_I18N_IDS', {
-  USERNAME: {
-    key: 'subscriber_username',
-    i18nId: 'I18N_PREFERENCES_USERNAME'
-  },
-  IMPACT: {
-    key: 'subscriber_impact',
-    i18nId: 'I18N_CREATOR_IMPACT'
-  }
-});
-
-oppia.constant('FEEDBACK_THREADS_SORT_BY_KEYS_AND_I18N_IDS', {
-  LAST_UPDATED: {
-    key: 'last_updated',
-    i18nId: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
-  },
-  EXPLORATION: {
-    key: 'exploration',
-    i18nId: 'I18N_DASHBOARD_TABLE_HEADING_EXPLORATION'
-  }
-});
+require('pages/learner-dashboard-page/learner-dashboard-page.constants.ts');
 
 oppia.controller('LearnerDashboard', [
   '$scope', '$rootScope', '$q', '$window', '$http', '$uibModal',

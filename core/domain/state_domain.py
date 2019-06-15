@@ -1553,7 +1553,7 @@ class State(object):
     def __init__(
             self, content, param_changes, interaction, image_assets,
             recorded_voiceovers, written_translations,
-            classifier_model_id=None):
+            solicit_answer_details, classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1569,6 +1569,9 @@ class State(object):
                 the state contents and translations.
             written_translations: WrittenTranslations. The written translations
                 for the state contents.
+            solicit_answer_details: bool. Whether the creator wants to ask
+                for answer details from the learner about why they picked a
+                particular answer while playing the exploration.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
         """
@@ -1589,6 +1592,7 @@ class State(object):
         self.image_assets = image_assets
         self.recorded_voiceovers = recorded_voiceovers
         self.written_translations = written_translations
+        self.solicit_answer_details = solicit_answer_details
 
     def validate(
             self, exp_param_specs_dict, image_counter,
@@ -1675,6 +1679,18 @@ class State(object):
                     'Found a duplicate image id %s' % image_id)
 
         self.image_assets.validate()
+
+        if not isinstance(self.solicit_answer_details, bool):
+            raise utils.ValidationError(
+                'Expected solicit_answer_details to be a boolean, '
+                'received %s' % self.solicit_answer_details)
+        if self.solicit_answer_details:
+            if self.interaction.id in (
+                    feconf.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
+                raise utils.ValidationError(
+                    'The %s interaction does not support soliciting '
+                    'answer details from learners.' % (self.interaction.id))
+
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
 
@@ -2013,6 +2029,19 @@ class State(object):
         """
         self.written_translations = written_translations
 
+    def update_solicit_answer_details(self, solicit_answer_details):
+        """Update the solicit_answer_details of a state.
+
+        Args:
+            solicit_answer_details: bool. The new value of
+                solicit_answer_details for the state.
+        """
+        if not isinstance(solicit_answer_details, bool):
+            raise Exception(
+                'Expected solicit_answer_details to be a boolean, received %s'
+                % solicit_answer_details)
+        self.solicit_answer_details = solicit_answer_details
+
     def to_dict(self):
         """Returns a dict representing this State domain object.
 
@@ -2027,7 +2056,8 @@ class State(object):
             'classifier_model_id': self.classifier_model_id,
             'image_assets': self.image_assets.to_dict(),
             'recorded_voiceovers': self.recorded_voiceovers.to_dict(),
-            'written_translations': self.written_translations.to_dict()
+            'written_translations': self.written_translations.to_dict(),
+            'solicit_answer_details': self.solicit_answer_details
         }
 
     @classmethod
@@ -2048,6 +2078,7 @@ class State(object):
             ImageAssets.from_dict(state_dict['image_assets']),
             RecordedVoiceovers.from_dict(state_dict['recorded_voiceovers']),
             WrittenTranslations.from_dict(state_dict['written_translations']),
+            state_dict['solicit_answer_details'],
             state_dict['classifier_model_id'])
 
     @classmethod
@@ -2075,7 +2106,8 @@ class State(object):
             RecordedVoiceovers.from_dict(copy.deepcopy(
                 feconf.DEFAULT_RECORDED_VOICEOVERS)),
             WrittenTranslations.from_dict(
-                copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)))
+                copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
+            False)
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):

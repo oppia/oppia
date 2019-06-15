@@ -245,26 +245,30 @@ describe('Exploration history', function() {
         highlighted: true
       },
       44: {
-        text: 'written_translations:',
+        text: 'solicit_answer_details: false',
         highlighted: false
       },
       45: {
-        text: '  translations_mapping:',
+        text: 'written_translations:',
         highlighted: false
       },
       46: {
-        text: '    content: {}',
+        text: '  translations_mapping:',
         highlighted: false
       },
       47: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      48: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      48: {
+      49: {
         text: '    feedback_1: {}',
         highlighted: true
       },
-      49: {
+      50: {
         text: ' ',
         highlighted: false
       }
@@ -382,22 +386,26 @@ describe('Exploration history', function() {
         highlighted: true
       },
       28: {
-        text: 'written_translations:',
+        text: 'solicit_answer_details: false',
         highlighted: false
       },
       29: {
-        text: '  translations_mapping:',
+        text: 'written_translations:',
         highlighted: false
       },
       30: {
-        text: '    content: {}',
+        text: '  translations_mapping:',
         highlighted: false
       },
       31: {
+        text: '    content: {}',
+        highlighted: false
+      },
+      32: {
         text: '    default_outcome: {}',
         highlighted: true
       },
-      32: {
+      33: {
         text: ' ',
         highlighted: false
       }
@@ -433,6 +441,7 @@ describe('Exploration history', function() {
       '  voiceovers_mapping:\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
+      'solicit_answer_details: false\n' +
       'written_translations:\n' +
       '  translations_mapping:\n' +
       '    content: {}\n' +

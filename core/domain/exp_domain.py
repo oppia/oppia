@@ -45,6 +45,7 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
+STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_IMAGE_ASSETS = 'image_assets'
@@ -115,6 +116,7 @@ class ExplorationChange(object):
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
+        STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_IMAGE_ASSETS,
@@ -605,6 +607,8 @@ class Exploration(object):
                 state_domain.ImageAssets.from_dict(
                     sdict['image_assets'])
                 )
+
+            state.solicit_answer_details = sdict['solicit_answer_details']
 
             exploration.states[state_name] = state
 
@@ -2227,7 +2231,26 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
-        """Converts from version 28 to 29. Version 29 added image assets field
+        """Converts from version 28 to 29. Version 29 adds
+        solicit_answer_details boolean variable to the state, which
+        allows the creator to ask for answer details from the learner
+        about why they landed on a particular answer.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.itervalues():
+            state_dict['solicit_answer_details'] = False
+        return states_dict
+
+    @classmethod
+    def _convert_states_v29_dict_to_v30_dict(cls, states_dict):
+        """Converts from version 27 to 28. Version 29 added image assets field
         in state model.
 
          Args:
@@ -2282,7 +2305,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 34
+    CURRENT_EXP_SCHEMA_VERSION = 35
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2876,11 +2899,33 @@ class Exploration(object):
 
     @classmethod
     def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
-        """Converts a v33 exploration dict into a v34 exploration dict."""
+        """Converts a v33 exploration dict into a v34 exploration dict.
+
+        Adds solicit_answer_details in state to ask learners for the
+        answer details.
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v33.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v34.
+        """
         exploration_dict['schema_version'] = 34
 
+        exploration_dict['states'] = cls._convert_states_v28_dict_to_v29_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 29
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v34_dict_to_v35_dict(cls, exploration_dict):
+        """Converts a v33 exploration dict into a v34 exploration dict."""
+        exploration_dict['schema_version'] = 35
+
         exploration_dict['states'] = (
-            cls._convert_states_v28_dict_to_v29_dict(
+            cls._convert_states_v29_dict_to_v30_dict(
                 exploration_dict['states']))
 
         # Calculating image counter.
@@ -2889,7 +2934,7 @@ class Exploration(object):
             image_counter += len(state_dict['image_assets']['image_mapping'])
         exploration_dict['image_counter'] = image_counter
 
-        exploration_dict['states_schema_version'] = 29
+        exploration_dict['states_schema_version'] = 30
 
         return exploration_dict
 
@@ -3095,6 +3140,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v33_dict_to_v34_dict(
                 exploration_dict)
             exploration_schema_version = 34
+
+        if exploration_schema_version == 34:
+            exploration_dict = cls._convert_v34_dict_to_v35_dict(
+                exploration_dict)
+            exploration_schema_version = 35
 
         return (exploration_dict, initial_schema_version)
 
