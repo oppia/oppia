@@ -133,7 +133,8 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<collection_id>', self.MockHandler)],
+            [webapp2.Route(
+                '/mock_play_collection/<collection_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
         self.save_new_valid_exploration(
@@ -151,25 +152,29 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
 
     def test_guest_can_access_published_collection(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.published_col_id)
+            response = self.get_json(
+                '/mock_play_collection/%s' % self.published_col_id)
         self.assertEqual(response['collection_id'], self.published_col_id)
 
     def test_guest_cannot_access_private_collection(self):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_col_id, expected_status_int=404)
+                '/mock_play_collection/%s' % self.private_col_id,
+                expected_status_int=404)
 
     def test_admin_can_access_private_collection(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_col_id)
+            response = self.get_json(
+                '/mock_play_collection/%s' % self.private_col_id)
         self.assertEqual(response['collection_id'], self.private_col_id)
         self.logout()
 
     def test_owner_can_access_private_collection(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_col_id)
+            response = self.get_json(
+                '/mock_play_collection/%s' % self.private_col_id)
         self.assertEqual(response['collection_id'], self.private_col_id)
         self.logout()
 
@@ -177,7 +182,16 @@ class PlayCollectionDecoratorTests(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_col_id, expected_status_int=404)
+                '/mock_play_collection/%s' % self.private_col_id,
+                expected_status_int=404)
+        self.logout()
+
+    def test_cannot_access_collection_with_invalid_collection_id(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock_play_collection/invalid_collection_id',
+                expected_status_int=404)
         self.logout()
 
 

@@ -30,6 +30,7 @@ from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -202,9 +203,14 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
         story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, 'user', 'Topic', 'A new topic', [], [], [], [], 0)
         self.save_new_story(
-            story_id, 'user', 'Title', 'Description', 'Notes'
+            story_id, 'user', 'Title', 'Description', 'Notes', topic_id
         )
+        topic_services.add_canonical_story('user', topic_id, story_id)
+
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_ADD_STORY_NODE,

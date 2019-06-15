@@ -16,10 +16,10 @@
  * @fileoverview Controllers for the teach page.
  */
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('pages/OppiaFooterDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
