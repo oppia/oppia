@@ -80,7 +80,7 @@ module.exports = {
     privacy: commonPrefix + '/pages/privacy-page/privacy-page.controller.ts',
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
-    profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
+    profile: commonPrefix + '/pages/profile-page/profile-page.scripts.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
