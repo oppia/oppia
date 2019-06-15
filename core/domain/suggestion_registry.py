@@ -500,6 +500,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
+        question_dict['linked_skill_ids'] = []
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
         question_services.add_question(self.author_id, question)

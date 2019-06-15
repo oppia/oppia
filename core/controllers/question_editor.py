@@ -48,8 +48,9 @@ class QuestionCreationHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException
 
-        skills = skill_services.get_multi_skills(skill_ids)
-        if not skills:
+        try:
+            skill_services.get_multi_skills(skill_ids)
+        except Exception:
             raise self.PageNotFoundException(
                 'The skills with the given ids don\'t exist.')
 
@@ -67,16 +68,19 @@ class QuestionCreationHandler(base.BaseHandler):
         question_dict['linked_skill_ids'] = skill_ids
         try:
             question = question_domain.Question.from_dict(question_dict)
-        except:
+        except Exception:
             raise self.InvalidInputException
         question_services.add_question(self.user_id, question)
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
-        question_services.create_multi_question_skill_links_for_question(
-            self.user_id,
-            question.id,
-            skill_ids,
-            [constants.DEFAULT_SKILL_DIFFICULTY] * len(skill_ids))
+        try:
+            question_services.create_multi_question_skill_links_for_question(
+                self.user_id,
+                question.id,
+                skill_ids,
+                [constants.DEFAULT_SKILL_DIFFICULTY] * len(skill_ids))
+        except Exception:
+            raise self.PageNotFoundException
         self.values.update({
             'question_id': question.id
         })
@@ -126,7 +130,8 @@ class EditableQuestionDataHandler(base.BaseHandler):
                 'The question with the given id doesn\'t exist.')
 
         associated_skill_dicts = [
-            skill.to_dict() for skill in question.linked_skill_ids]
+            skill.to_dict() for skill in skill_services.get_multi_skills(
+                question.linked_skill_ids)]
 
         self.values.update({
             'question_dict': question.to_dict(),

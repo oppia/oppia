@@ -226,7 +226,7 @@ class MergeSkillHandlerTests(BaseTopicsAndSkillsDashboardTests):
             self.question_id, self.admin_id,
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            self.question_id, self.linked_skill_id, 0.5)
+            self.admin_id, self.question_id, self.linked_skill_id, 0.5)
 
     def test_merge_skill(self):
         self.login(self.ADMIN_EMAIL)

@@ -63,7 +63,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                                              'not match the exploration id '
                                              'present as part of the '
                                              'suggestion_id')
-
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 

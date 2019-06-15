@@ -240,10 +240,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             ).order(-cls.last_updated, cls.key).fetch_page(
                 question_count
             )
-
         skill_ids = [model.skill_id for model in question_skill_link_models]
         skills = skill_models.SkillModel.get_multi(skill_ids)
-        skill_descriptions = [skill.description for skill in skills]
+        skill_descriptions = (
+            [skill.description if skill else '' for skill in skills])
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )

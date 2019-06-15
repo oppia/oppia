@@ -110,14 +110,15 @@ def create_multi_question_skill_links_for_question(
     if not question:
         raise Exception('Question doesn\'t exist in the backend')
 
-    new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
-    new_linked_skill_ids.extend(skill_ids)
-
     new_question_skill_link_models = []
     for index, skill_id in enumerate(skill_ids):
         question_skill_link_model = (
             question_models.QuestionSkillLinkModel.create(
                 question_id, skill_id, skill_difficulties[index]))
+
+    new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
+    new_linked_skill_ids.extend(skill_ids)
+
     _update_linked_skill_ids_of_question(
         user_id, question_id, new_linked_skill_ids,
         question.linked_skill_ids)
@@ -134,7 +135,7 @@ def create_new_question_skill_link(
         user_id: str. ID of the creator.
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
-        skill_difficulty: float. The difficulty between [0, 1] of the skill.
+        skill_difficulty: float. The difficulty between [0, 1] of the skill..
     """
     question = get_question_by_id(question_id)
     if not question:
@@ -142,9 +143,10 @@ def create_new_question_skill_link(
 
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
         question_id, skill_id, skill_difficulty)
+    
+    
     new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
     new_linked_skill_ids.append(skill_id)
-
     _update_linked_skill_ids_of_question(
         user_id, question_id, new_linked_skill_ids,
         question.linked_skill_ids)

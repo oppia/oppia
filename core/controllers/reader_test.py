@@ -199,6 +199,15 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
     """Test the handler for initialising exploration with
     state_classifier_mapping.
     """
+    def setUp(self):
+        """Before each individual test, initialize data."""
+        super(ExplorationPretestsUnitTest, self).setUp()
+
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id, 'user', 'Description')
 
     def test_get_exploration_pretests(self):
         super(ExplorationPretestsUnitTest, self).setUp()
@@ -219,9 +228,6 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             })
         ]
         story_services.update_story('user', story_id, changelist, 'Added node.')
-        skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            skill_id, 'user', 'Description')
 
         exp_id = '0'
         exp_id_2 = '1'
@@ -234,7 +240,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             'property_name': (
                 story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS),
             'old_value': [],
-            'new_value': [skill_id],
+            'new_value': [self.skill_id],
             'node_id': 'node_1'
         }), story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
@@ -255,9 +261,9 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             question_id_2, 'user',
             self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
-            self.editor_id, question_id, skill_id, 0.3)
+            self.editor_id, question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
-            self.editor_id, question_id_2, skill_id, 0.5)
+            self.editor_id, question_id_2, self.skill_id, 0.5)
         # Call the handler.
         with self.swap(feconf, 'NUM_PRETEST_QUESTIONS', 1):
             json_response_1 = self.get_json(
@@ -292,6 +298,8 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
     def setUp(self):
         """Before each individual test, initialize data."""
         super(QuestionsUnitTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, 'user', 'Description')
