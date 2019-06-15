@@ -101,6 +101,8 @@ oppia.directive('stateResponses', [
           $scope.stateName = StateEditorService.getActiveStateName();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
+          $scope.solicitAnswerDetails = (
+            StateEditorService.getSolicitAnswerDetails());
 
           var _initializeTrainingData = function() {
             if (StateEditorService.isInQuestionMode()) {
@@ -517,6 +519,10 @@ oppia.directive('stateResponses', [
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
             });
+          };
+
+          $scope.SaveSolicitAnswerDetails = function(solicitAnswerDetails) {
+            $scope.onSaveSolicitAnswerDetails();
           };
 
           $scope.saveActiveAnswerGroupRules = function(updatedRules) {

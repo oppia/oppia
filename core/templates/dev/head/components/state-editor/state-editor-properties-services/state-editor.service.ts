@@ -126,6 +126,9 @@ oppia.factory('StateEditorService', [
       getSolicitAnswerDetails: function() {
         return solicitAnswerDetails;
       },
+      setSolicitAnswerDetailsToFalse: function() {
+        solicitAnswerDetails = false;
+      },
       setSolicitAnswerDetails: function(newSolicitAnswerDetails) {
         solicitAnswerDetails = newSolicitAnswerDetails;
       },
