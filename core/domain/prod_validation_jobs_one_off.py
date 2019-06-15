@@ -2194,7 +2194,6 @@ class StorySummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_language_code,
             cls._validate_node_count,
             cls._validate_related_model_properties]
 
