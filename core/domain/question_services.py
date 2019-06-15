@@ -155,8 +155,10 @@ def get_questions_by_skill_ids(total_question_count, skill_ids):
             total_question_count questions linked to each given skill id.
             question count per skill will be total_question_count divided by
             length of skill_ids, and it will be rounded up if not evenly
-            divisible. The order of questions will follow the order of given
-            skill ids, but the order of questions for the same skill is random.
+            divisible. If not enough questions for one skill, simply return
+            all questions linked to it. The order of questions will follow the
+            order of given skill ids, but the order of questions for the same
+            skill is random.
     """
 
     if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
