@@ -2530,7 +2530,7 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         self.login(self.second_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/%s,%s' % (
-                    self.first_skill_id, self.second_skill_id
+                self.first_skill_id, self.second_skill_id
                 ), expected_status_int=401)
         self.logout()
 
@@ -2539,7 +2539,7 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/%s,%s' % (
-                    self.first_skill_id, self.second_skill_id
+                self.first_skill_id, self.second_skill_id
                 ), expected_status_int=401)
         self.logout()
 
@@ -2563,7 +2563,7 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json('/mock/%s,%s' % (
-                    self.first_skill_id, self.second_skill_id
+                self.first_skill_id, self.second_skill_id
                 ), expected_status_int=401)
         self.logout()
 
