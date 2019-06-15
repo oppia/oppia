@@ -17,7 +17,8 @@
  */
 
 require(
-  'interactions/NumberWithUnits/directives/NumberWithUnitsValidationService.ts');
+  'interactions/NumberWithUnits/directives/' +
+  'NumberWithUnitsValidationService.ts');
 
 describe('NumberWithUnitsValidationService', function() {
   var validatorService, WARNING_TYPES;

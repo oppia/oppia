@@ -18,7 +18,7 @@
 
 require(
   'interactions/InteractiveMap/directives/InteractiveMapValidationService.ts');
-  
+
 describe('InteractiveMapValidationService', function() {
   var validatorService, WARNING_TYPES;
 

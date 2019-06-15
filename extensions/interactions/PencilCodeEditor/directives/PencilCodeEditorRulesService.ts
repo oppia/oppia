@@ -18,7 +18,8 @@
 
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require(
-  'filters/string-utility-filters/normalize-whitespace-punctuation-and-case.filter.ts');
+  'filters/string-utility-filters/' +
+  'normalize-whitespace-punctuation-and-case.filter.ts');
 require('services/CodeNormalizerService.ts');
 
 oppia.factory('PencilCodeEditorRulesService', [
