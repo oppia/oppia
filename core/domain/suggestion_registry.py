@@ -451,7 +451,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             None, state_domain.State.from_dict(
                 self.change.question_dict['question_state_data']),
             self.change.question_dict['question_state_data_schema_version'],
-            self.change.question_dict['language_code'], None)
+            self.change.question_dict['language_code'], None, [])
         question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
