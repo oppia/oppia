@@ -105,6 +105,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.save_new_question(
             question_id_3, self.editor_id,
             self._create_valid_question_data('ABC'))
+        with self.assertRaisesRegexp(
+            Exception, 'Skill difficulties and skill ids should match. '
+            'The lengths of the two lists are different.'):
+            question_services.create_multi_question_skill_links_for_question(
+            self.editor_id, self.question_id, ['skill_1', 'skill_2'],
+            [0.5])
         question_services.create_multi_question_skill_links_for_question(
             self.editor_id, self.question_id, ['skill_1', 'skill_2'],
             [0.5, 0.7])
