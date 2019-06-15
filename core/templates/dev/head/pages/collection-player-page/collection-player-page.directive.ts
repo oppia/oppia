@@ -256,21 +256,21 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
                 position: 'absolute',
                 color: '#006553',
                 'font-size': '20px',
-                bottom: '70%' }
+                bottom: '70%', }
             } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
               return { width: '160',
                 position: 'absolute',
                 color: '#006553',
                 bottom: '70%',
                 'font-size': '20px',
-                 left: '20px' }
+                left: '20px', }
             } else if ((index + 1) % 4 === 0) {
               return { width: '160px',
                 position: 'absolute',
                 color: '#006553',
                 'font-size': '20px',
                 bottom: '70%',
-                left: '-35px' }
+                left: '-35px', }
             }
           };
 
