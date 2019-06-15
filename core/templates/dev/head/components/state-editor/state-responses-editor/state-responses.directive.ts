@@ -56,6 +56,9 @@ require(
   'state-interaction-id.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
@@ -84,25 +87,29 @@ oppia.directive('stateResponses', [
       controller: [
         '$filter', '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService', 'EditabilityService',
-        'ResponsesService', 'StateCustomizationArgsService',
-        'StateEditorService', 'StateInteractionIdService',
+        'ExplorationStatesService', 'ResponsesService',
+        'StateCustomizationArgsService', 'StateEditorService',
+        'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
         'UrlInterpolationService', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
             $filter, $scope, $rootScope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService, EditabilityService,
-            ResponsesService, StateCustomizationArgsService,
-            StateEditorService, StateInteractionIdService,
+            ExplorationStatesService, ResponsesService,
+            StateCustomizationArgsService, StateEditorService,
+            StateInteractionIdService, StateSolicitAnswerDetailsService,
             UrlInterpolationService, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
+          $scope.StateSolicitAnswerDetailsService =
+          StateSolicitAnswerDetailsService;
           $scope.stateName = StateEditorService.getActiveStateName();
+          $scope.displayedSolicitAnswerDetails =
+          StateSolicitAnswerDetailsService.savedMemento;
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
-          $scope.solicitAnswerDetails = (
-            StateEditorService.getSolicitAnswerDetails());
 
           var _initializeTrainingData = function() {
             if (StateEditorService.isInQuestionMode()) {
@@ -201,7 +208,13 @@ oppia.directive('stateResponses', [
           };
 
           $scope.onChangeSolicitAnswerDetails = function() {
-            $scope.onSaveSolicitAnswerDetails($scope.solicitAnswerDetails);
+            StateSolicitAnswerDetailsService.displayed =
+            $scope.displayedSolicitAnswerDetails;
+            StateSolicitAnswerDetailsService.saveDisplayedValue();
+            $scope.onSaveSolicitAnswerDetails(
+              $scope.displayedSolicitAnswerDetails);
+            $scope.displayedSolicitAnswerDetails =
+            StateSolicitAnswerDetailsService.savedMemento;
           };
 
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
@@ -241,6 +254,16 @@ oppia.directive('stateResponses', [
           $scope.isCurrentInteractionLinear = function() {
             var interactionId = $scope.getCurrentInteractionId();
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
+
+          $scope.isCurrentInteractionTrivial = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            if (interactionId === 'Continue' ||
+            interactionId === 'EndExploration') {
+              return true;
+            } else {
+              return false;
+            }
           };
 
           $scope.isLinearWithNoFeedback = function(outcome) {

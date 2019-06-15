@@ -106,6 +106,8 @@ oppia.directive('stateEditor', [
               $scope.stateName, stateData.interaction.id);
             StateCustomizationArgsService.init(
               $scope.stateName, stateData.interaction.customizationArgs);
+            StateSolicitAnswerDetailsService.init(
+              $scope.stateName, stateData.solicitAnswerDetails);
             StateSolutionService.init(
               $scope.stateName, stateData.interaction.solution);
             updateInteractionVisibility(stateData.interaction.id);

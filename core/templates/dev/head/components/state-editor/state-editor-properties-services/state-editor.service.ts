@@ -123,15 +123,6 @@ oppia.factory('StateEditorService', [
           return null;
         }
       },
-      getSolicitAnswerDetails: function() {
-        return solicitAnswerDetails;
-      },
-      setSolicitAnswerDetailsToFalse: function() {
-        solicitAnswerDetails = false;
-      },
-      setSolicitAnswerDetails: function(newSolicitAnswerDetails) {
-        solicitAnswerDetails = newSolicitAnswerDetails;
-      },
       setInQuestionMode: function(newModeValue) {
         inQuestionMode = newModeValue;
       },
