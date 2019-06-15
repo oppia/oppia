@@ -17,4 +17,4 @@
  */
 
 require('pages/OppiaFooterDirective.ts');
-require('pages/error-pages/error-page.directive.ts');
+require('pages/error-pages/error-page.controller.ts');
