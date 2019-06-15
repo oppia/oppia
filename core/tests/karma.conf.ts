@@ -72,7 +72,7 @@ module.exports = function(config) {
        'state-content-editor.directive.spec.ts'),
       ('core/templates/dev/head/components/state-editor/' +
        'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
-      ('extensions/interactions/MusicNotesInput/directives/' + 
+      ('extensions/interactions/MusicNotesInput/directives/' +
        'MusicNotesInputSpec.ts')
     ],
     proxies: {
