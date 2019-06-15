@@ -16,6 +16,8 @@
  * @fileoverview Validator service for the interaction.
  */
 
+require('interactions/baseInteractionValidationService.ts');
+
 oppia.factory('MultipleChoiceInputValidationService', [
   '$filter', 'baseInteractionValidationService', 'WARNING_TYPES',
   function($filter, baseInteractionValidationService, WARNING_TYPES) {

@@ -22,7 +22,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
-require('pages/exploration_player/CurrentInteractionService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/HtmlEscaperService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 

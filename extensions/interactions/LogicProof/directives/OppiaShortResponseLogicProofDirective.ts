@@ -16,6 +16,9 @@
  * @fileoverview Directive for the LogicProof short response.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('oppiaShortResponseLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
