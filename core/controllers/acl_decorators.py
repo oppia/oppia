@@ -16,7 +16,6 @@
 
 """Decorators to provide authorization across the site."""
 
-import json
 import urllib
 
 from core.controllers import base

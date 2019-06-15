@@ -2516,8 +2516,8 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         skill_services.publish_skill(self.second_skill_id, self.admin_id)
         self.login(self.second_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s,%s' % (self.first_skill_id,
-                self.second_skill_id))
+            response = self.get_json('/mock/%s,%s' % (
+                self.first_skill_id, self.second_skill_id))
         self.assertEqual(len(response['skill_ids'].split(',')), 2)
         self.assertEqual(
             response['skill_ids'].split(',')[0], self.first_skill_id)
@@ -2529,16 +2529,18 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         skill_services.publish_skill(self.first_skill_id, self.admin_id)
         self.login(self.second_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/%s,%s' % (self.first_skill_id,
-                self.second_skill_id), expected_status_int=401)
+            self.get_json('/mock/%s,%s' % (
+                self.first_skill_id, self.second_skill_id),
+                expected_status_int=401)
         self.logout()
 
     def test_topic_manager_can_not_edit_when_contains_private_skill(self):
         skill_services.publish_skill(self.first_skill_id, self.admin_id)
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/%s,%s' % (self.first_skill_id,
-                self.second_skill_id), expected_status_int=401)
+            self.get_json('/mock/%s,%s' % (
+                self.first_skill_id, self.second_skill_id),
+                expected_status_int=401)
         self.logout()
 
     def test_topic_manager_can_edit_multiple_public_skills(self):
@@ -2546,8 +2548,8 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         skill_services.publish_skill(self.second_skill_id, self.admin_id)
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s,%s' % (self.first_skill_id,
-                self.second_skill_id))
+            response = self.get_json('/mock/%s,%s' % (
+                self.first_skill_id, self.second_skill_id))
         self.assertEqual(len(response['skill_ids'].split(',')), 2)
         self.assertEqual(
             response['skill_ids'].split(',')[0], self.first_skill_id)
@@ -2560,8 +2562,9 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         skill_services.publish_skill(self.second_skill_id, self.admin_id)
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json('/mock/%s,%s' % (self.first_skill_id,
-                self.second_skill_id), expected_status_int=401)
+            self.get_json('/mock/%s,%s' % (
+                self.first_skill_id, self.second_skill_id),
+                expected_status_int=401)
         self.logout()
 
 
