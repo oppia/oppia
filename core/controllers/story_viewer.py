@@ -21,6 +21,18 @@ from core.domain import story_services
 import feconf
 
 
+class StoryPage(base.BaseHandler):
+    """Page describing a single story."""
+
+    @acl_decorators.can_access_story_viewer_page
+    def get(self, _):
+        """Handles GET requests."""
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        self.render_template('dist/story-viewer-page.mainpage.html')
+
+
 class StoryPageDataHandler(base.BaseHandler):
     """Manages the data that needs to be displayed to a learner on the
     story viewer page.
