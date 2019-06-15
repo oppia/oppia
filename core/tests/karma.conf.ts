@@ -38,7 +38,6 @@ module.exports = function(config) {
       'core/templates/dev/head/*Spec.ts',
       'core/templates/dev/head/**/*.spec.ts',
       'core/templates/dev/head/*.spec.ts',
-      'local_compiled_js/core/templates/dev/head/**/*.js',
       'local_compiled_js/extensions/**/*.js',
       {
         pattern: 'extensions/**/*.png',
@@ -82,6 +81,8 @@ module.exports = function(config) {
     },
     preprocessors: {
       'core/templates/dev/head/*.ts': ['webpack'],
+      'core/templates/dev/head/**/*.ts': ['webpack'],
+      'extensions/**/*.ts': ['webpack'],
       'core/templates/dev/head/**/*.ts': ['webpack'],
       'core/templates/dev/head/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/!(*Spec).js': ['coverage'],
