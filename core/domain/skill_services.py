@@ -763,10 +763,10 @@ def get_skill_rights(skill_id, strict=True):
 
 
 def get_multi_skill_rights(skill_ids):
-    """Retrieves the rights object for the given skill.
+    """Retrieves the rights objects for the given skills.
 
     Args:
-        skill_ids: list(str). Skill IDs of the skill for which rights are
+        skill_ids: list(str). Skill IDs of the skills for which rights are
             requested.
 
     Returns:
