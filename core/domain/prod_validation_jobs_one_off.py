@@ -510,7 +510,7 @@ class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
         metadata model has a version greater than or equal to the in item.id.
 
         Args:
-            item: CollectionSnapshotMetadataModel to validate.
+            item: ndb.Model. CollectionSnapshotMetadataModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -561,7 +561,7 @@ class CollectionSnapshotContentModelValidator(BaseModelValidator):
         in item.id.
 
         Args:
-            item: CollectionSnapshotContentModel to validate.
+            item: ndb.Model. CollectionSnapshotContentModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -625,7 +625,7 @@ class CollectionRightsModelValidator(BaseModelValidator):
         time.
 
         Args:
-            item: CollectionRightsModel to validate.
+            item: ndb.Model. CollectionRightsModel to validate.
         """
         if not item.first_published_msec:
             return
@@ -678,7 +678,7 @@ class CollectionRightsSnapshotMetadataModelValidator(BaseModelValidator):
         item.id.
 
         Args:
-            item: CollectionRightsSnapshotMetadataModel to validate.
+            item: ndb.Model. CollectionRightsSnapshotMetadataModel to validate.
         """
         collection_rights_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_rights_ids'])
@@ -729,7 +729,7 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
         item.id.
 
         Args:
-            item: CollectionRightsSnapshotContentModel to validate.
+            item: ndb.Model. CollectionRightsSnapshotContentModel to validate.
         """
         collection_rights_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_rights_ids'])
@@ -784,7 +784,7 @@ class CollectionCommitLogEntryModelValidator(BaseModelValidator):
         has a version greater than or equal to the exp version in item.id.
 
         Args:
-            item: CollectionCommitLogEntryModel to validate.
+            item: ndb.Model. CollectionCommitLogEntryModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -843,7 +843,7 @@ class CollectionSummaryModelValidator(BaseModelValidator):
         from contributors summary.
 
         Args:
-            item: CollectionSummaryModel to validate.
+            item: ndb.Model. CollectionSummaryModel to validate.
         """
         contributor_ids_from_contributors_summary = (
             item.contributors_summary.keys())
@@ -862,7 +862,7 @@ class CollectionSummaryModelValidator(BaseModelValidator):
         in CollectionModel.collection_contents.
 
         Args:
-            item: CollectionSummaryModel to validate.
+            item: ndb.Model. CollectionSummaryModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -882,7 +882,7 @@ class CollectionSummaryModelValidator(BaseModelValidator):
         model and collection rights model properties.
 
         Args:
-            item: CollectionSummaryModel to validate.
+            item: ndb.Model. CollectionSummaryModel to validate.
         """
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -1036,7 +1036,7 @@ class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
         metadata model has a version greater than or equal to the in item.id.
 
         Args:
-            item: ConfigPropertySnapshotMetadataModel to validate.
+            item: ndb.Model. ConfigPropertySnapshotMetadataModel to validate.
         """
         config_property_model_class_model_id_model_tuples = (
             cls.external_instance_details['config_property_ids'])
@@ -1086,7 +1086,7 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
         content model has a version greater than or equal to the in item.id.
 
         Args:
-            item: ConfigPropertySnapshotContentModel to validate.
+            item: ndb.Model. ConfigPropertySnapshotContentModel to validate.
         """
         config_property_model_class_model_id_model_tuples = (
             cls.external_instance_details['config_property_ids'])
@@ -1137,7 +1137,7 @@ class SentEmailModelValidator(BaseModelValidator):
         """Validate that sent_datetime of model is less than current time.
 
         Args:
-            item: SentEmailModel to validate.
+            item: ndb.Model. SentEmailModel to validate.
         """
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
@@ -1152,7 +1152,7 @@ class SentEmailModelValidator(BaseModelValidator):
         by using the sender_id.
 
         Args:
-            item: SentEmailModel to validate.
+            item: ndb.Model. SentEmailModel to validate.
         """
         sender_model_class_model_id_model_tuples = (
             cls.external_instance_details['sender_id'])
@@ -1173,7 +1173,7 @@ class SentEmailModelValidator(BaseModelValidator):
         by using the recipient_id.
 
         Args:
-            item: SentEmailModel to validate.
+            item: ndb.Model. SentEmailModel to validate.
         """
         recipient_model_class_model_id_model_tuples = (
             cls.external_instance_details['recipient_id'])
@@ -1226,7 +1226,7 @@ class BulkEmailModelValidator(BaseModelValidator):
         """Validate that model id has length 12.
 
         Args:
-            item: BulkEmailModel to validate.
+            item: ndb.Model. BulkEmailModel to validate.
         """
         # The bulk email model has ids as randomly generated strings of
         # length 12.
@@ -1240,7 +1240,7 @@ class BulkEmailModelValidator(BaseModelValidator):
         """Validate that sent_datetime of model is less than current time.
 
         Args:
-            item: BulkEmailModel to validate.
+            item: ndb.Model. BulkEmailModel to validate.
         """
         current_datetime = datetime.datetime.utcnow()
         if item.sent_datetime > current_datetime:
@@ -1255,7 +1255,7 @@ class BulkEmailModelValidator(BaseModelValidator):
         by using the sender_id.
 
         Args:
-            item: BulkEmailModel to validate.
+            item: ndb.Model. BulkEmailModel to validate.
         """
         sender_model_class_model_id_model_tuples = (
             cls.external_instance_details['sender_id'])
@@ -1309,7 +1309,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
         REPLY_TO_ID_LENGTH.
 
         Args:
-            item: GeneralFeedbackEmailReplyToIdModel to validate.
+            item: ndb.Model. GeneralFeedbackEmailReplyToIdModel to validate.
         """
         # The reply_to_id of model is created using utils.get_random_int
         # method by using a upper bound as email_models.REPLY_TO_ID_LENGTH.
@@ -1409,7 +1409,7 @@ class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
         metadata model has a version greater than or equal to the in item.id.
 
         Args:
-            item: ExplorationSnapshotMetadataModel to validate.
+            item: ndb.Model. ExplorationSnapshotMetadataModel to validate.
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
@@ -1459,7 +1459,7 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
         content model has a version greater than or equal to the in item.id.
 
         Args:
-            item: ExplorationSnapshotContentModel to validate.
+            item: ndb.Model. ExplorationSnapshotContentModel to validate.
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
@@ -1530,7 +1530,7 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         time.
 
         Args:
-            item: ExplorationRightsModel to validate.
+            item: ndb.Model. ExplorationRightsModel to validate.
         """
         if not item.first_published_msec:
             return
@@ -1583,7 +1583,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(BaseModelValidator):
         item.id.
 
         Args:
-            item: ExplorationRightsSnapshotMetadataModel to validate.
+            item: ndb.Model. ExplorationRightsSnapshotMetadataModel to validate.
         """
         exploration_rights_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_rights_ids'])
@@ -1634,7 +1634,7 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
         item.id.
 
         Args:
-            item: ExplorationRightsSnapshotContentModel to validate.
+            item: ndb.Model. ExplorationRightsSnapshotContentModel to validate.
         """
         exploration_rights_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_rights_ids'])
@@ -1689,7 +1689,7 @@ class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
         has a version greater than or equal to the exp version in item.id.
 
         Args:
-            item: ExplorationCommitLogEntryModel to validate.
+            item: ndb.Model. ExplorationCommitLogEntryModel to validate.
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
@@ -1748,7 +1748,7 @@ class ExpSummaryModelValidator(BaseModelValidator):
         from contributors summary.
 
         Args:
-            item: ExpSummaryModel to validate.
+            item: ndb.Model. ExpSummaryModel to validate.
         """
         contributor_ids_from_contributors_summary = (
             item.contributors_summary.keys())
@@ -1767,7 +1767,7 @@ class ExpSummaryModelValidator(BaseModelValidator):
         time.
 
         Args:
-            item: ExpSummaryModel to validate.
+            item: ndb.Model. ExpSummaryModel to validate.
         """
         if not item.first_published_msec:
             return
@@ -1787,7 +1787,7 @@ class ExpSummaryModelValidator(BaseModelValidator):
         time when a last commit was made by a human contributor.
 
         Args:
-            item: ExpSummaryModel to validate.
+            item: ndb.Model. ExpSummaryModel to validate.
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
@@ -1820,7 +1820,7 @@ class ExpSummaryModelValidator(BaseModelValidator):
         model and exploration rights model properties.
 
         Args:
-            item: ExpSummaryModel to validate.
+            item: ndb.Model. ExpSummaryModel to validate.
         """
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
@@ -1990,7 +1990,7 @@ class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
         metadata model has a version greater than or equal to the in item.id.
 
         Args:
-            item: FileMetadataSnapshotMetadataModel to validate.
+            item: ndb.Model. FileMetadataSnapshotMetadataModel to validate.
         """
         file_metadata_model_class_model_id_model_tuples = (
             cls.external_instance_details['file_metadata_ids'])
@@ -2040,7 +2040,7 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
         content model has a version greater than or equal to the in item.id.
 
         Args:
-            item: FileMetadataSnapshotContentModel to validate.
+            item: ndb.Model. FileMetadataSnapshotContentModel to validate.
         """
         file_metadata_model_class_model_id_model_tuples = (
             cls.external_instance_details['file_metadata_ids'])
@@ -2141,7 +2141,7 @@ class FileSnapshotMetadataModelValidator(BaseModelValidator):
         metadata model has a version greater than or equal to the in item.id.
 
         Args:
-            item: FileSnapshotMetadataModel to validate.
+            item: ndb.Model. FileSnapshotMetadataModel to validate.
         """
         file_model_class_model_id_model_tuples = (
             cls.external_instance_details['file_ids'])
@@ -2190,7 +2190,7 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
         content model has a version greater than or equal to the in item.id.
 
         Args:
-            item: FileSnapshotContentModel to validate.
+            item: ndb.Model. FileSnapshotContentModel to validate.
         """
         file_model_class_model_id_model_tuples = (
             cls.external_instance_details['file_ids'])
@@ -2239,7 +2239,7 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
         """Validate that model id is not present in recommended exploration ids.
 
         Args:
-            item: ExplorationRecommendationsModel to validate.
+            item: ndb.Model. ExplorationRecommendationsModel to validate.
         """
         if item.id in item.recommended_exploration_ids:
             cls.errors['item exploration id check'].append((
@@ -2278,7 +2278,7 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
         values between 0.0 and 1.0.
 
         Args:
-            item: TopicSimilaritiesModel to validate.
+            item: ndb.Model. TopicSimilaritiesModel to validate.
         """
 
         topics = item.content.keys()
@@ -2442,7 +2442,7 @@ class StorySnapshotMetadataModelValidator(BaseModelValidator):
         metadata model has a version greater than or equal to the in item.id.
 
         Args:
-            item: StorySnapshotMetadataModel to validate.
+            item: ndb.Model. StorySnapshotMetadataModel to validate.
         """
         story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
@@ -2490,7 +2490,7 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
         content model has a version greater than or equal to the in item.id.
 
         Args:
-            item: StorySnapshotContentModel to validate.
+            item: ndb.Model. StorySnapshotContentModel to validate.
         """
         story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
@@ -2582,7 +2582,7 @@ class StoryRightsSnapshotMetadataModelValidator(BaseModelValidator):
         item.id.
 
         Args:
-            item: StoryRightsSnapshotMetadataModel to validate.
+            item: ndb.Model. StoryRightsSnapshotMetadataModel to validate.
         """
         story_rights_model_class_model_id_model_tuples = (
             cls.external_instance_details['story_rights_ids'])
@@ -2633,7 +2633,7 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
         item.id.
 
         Args:
-            item: StoryRightsSnapshotContentModel to validate.
+            item: ndb.Model. StoryRightsSnapshotContentModel to validate.
         """
         story_rights_model_class_model_id_model_tuples = (
             cls.external_instance_details['story_rights_ids'])
@@ -2688,7 +2688,7 @@ class StoryCommitLogEntryModelValidator(BaseModelValidator):
         has a version greater than or equal to the exp version in item.id.
 
         Args:
-            item: StoryCommitLogEntryModel to validate.
+            item: ndb.Model. StoryCommitLogEntryModel to validate.
         """
         story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
@@ -2738,7 +2738,7 @@ class StorySummaryModelValidator(BaseModelValidator):
         in StoryModel.story_contents.
 
         Args:
-            item: StorySummaryModel to validate.
+            item: ndb.Model. StorySummaryModel to validate.
         """
         story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
@@ -2757,7 +2757,7 @@ class StorySummaryModelValidator(BaseModelValidator):
         model and story rights model properties.
 
         Args:
-            item: StorySummaryModel to validate.
+            item: ndb.Model. StorySummaryModel to validate.
         """
         story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
