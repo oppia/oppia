@@ -563,6 +563,7 @@ var constants = {
               "default_outcome": {}
           }
       },
+      "solicit_answer_details": false,
       "written_translations": {
           "translations_mapping": {
               "content": {},
