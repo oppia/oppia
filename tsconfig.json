@@ -25,7 +25,6 @@
   "include": [
     "extensions/ckeditor_plugins",
     "extensions/classifiers",
-    "extensions/interactions",
     "typings"
   ]
 }
