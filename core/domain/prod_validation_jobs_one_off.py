@@ -846,7 +846,7 @@ class CollectionSummaryModelValidator(BaseModelValidator):
     @classmethod
     def _validate_node_count(cls, item):
         """Validate that node_count of model is equal to number of nodes
-        collection_contents in collection model.
+        in CollectionModel.collection_contents.
 
         Args:
             item: CollectionSummaryModel to validate.
@@ -2699,7 +2699,7 @@ class StorySummaryModelValidator(BaseModelValidator):
     @classmethod
     def _validate_node_count(cls, item):
         """Validate that node_count of model is equal to number of nodes
-        story_contents in story model.
+        in StoryModel.story_contents.
 
         Args:
             item: StorySummaryModel to validate.
