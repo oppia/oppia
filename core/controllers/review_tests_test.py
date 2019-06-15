@@ -42,6 +42,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
 
+        self.topic_id = 'topic_id'
         self.story_id_1 = 'story_id_1'
         self.story_id_2 = 'story_id_2'
         self.node_id = 'node_1'
@@ -63,7 +64,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         }
 
         self.story = story_domain.Story.create_default_story(
-            self.story_id_1, 'Public Story Title')
+            self.story_id_1, 'Public Story Title', self.topic_id)
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1)
         ]
@@ -72,7 +73,7 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
         story_services.save_new_story(self.admin_id, self.story)
 
         self.story_2 = story_domain.Story.create_default_story(
-            self.story_id_2, 'Private Story Title')
+            self.story_id_2, 'Private Story Title', self.topic_id)
         story_services.save_new_story(self.admin_id, self.story_2)
 
         story_services.publish_story(self.story_id_1, self.admin_id)
