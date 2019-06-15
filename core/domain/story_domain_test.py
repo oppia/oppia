@@ -44,6 +44,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.story.add_node(self.NODE_ID_2, 'Node title')
+        self.story.update_node_destination_node_ids(
+            self.NODE_ID_1, [self.NODE_ID_2])
         self.signup('user@example.com', 'user')
         self.signup('user1@example.com', 'user1')
 
