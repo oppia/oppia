@@ -90,7 +90,7 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
                 question_id, self.admin_id,
                 self._create_valid_question_data('ABC'))
             question_services.create_new_question_skill_link(
-                question_id, self.skill_id, 0.5)
+                self.admin_id, question_id, self.skill_id, 0.5)
 
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
