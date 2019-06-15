@@ -323,8 +323,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['notifications_dashboard'],
+      chunks: ['app', 'notifications_dashboard'],
       filename: 'notifications-dashboard-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Keep track of the lessons you have created, as well ' +
+          'as feedback from learners.'
+      },
       template: (
         commonPrefix +
         '/pages/notifications-dashboard-page/' +

@@ -16,6 +16,8 @@
  * @fileoverview Data and controllers for the user's notifications dashboard.
  */
 
+require('base_components/BaseContentDirective.ts');
+
 require('services/DateTimeFormatService.ts');
 
 oppia.controller('NotificationsDashboard', [
