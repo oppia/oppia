@@ -275,12 +275,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.SKILL_ID, strict=False), None)
 
     def test_get_multi_skill_rights(self):
-        SKILL_ID_1 = skill_services.get_new_skill_id()
-        self.save_new_skill(SKILL_ID_1, self.USER_ID, 'Description')
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, self.USER_ID, 'Description')
         skill_rights = skill_services.get_multi_skill_rights(
-            [self.SKILL_ID, SKILL_ID_1])
+            [self.SKILL_ID, skill_id_1])
         self.assertEqual(skill_rights[0].id, self.SKILL_ID)
-        self.assertEqual(skill_rights[1].id, SKILL_ID_1)
+        self.assertEqual(skill_rights[1].id, skill_id_1)
 
     def test_get_unpublished_skill_rights_by_creator(self):
         self.save_new_skill(
