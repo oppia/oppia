@@ -200,6 +200,10 @@ oppia.directive('stateResponses', [
             }
           };
 
+          $scope.onChangeSolicitAnswerDetails = function() {
+            $scope.onSaveSolicitAnswerDetails($scope.solicitAnswerDetails);
+          };
+
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
             if (!outcome) {
               return false;
@@ -519,10 +523,6 @@ oppia.directive('stateResponses', [
               $scope.onSaveInteractionAnswerGroups(newAnswerGroups);
               $scope.refreshWarnings()();
             });
-          };
-
-          $scope.SaveSolicitAnswerDetails = function(solicitAnswerDetails) {
-            $scope.onSaveSolicitAnswerDetails();
           };
 
           $scope.saveActiveAnswerGroupRules = function(updatedRules) {
