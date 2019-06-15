@@ -98,6 +98,11 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
                 question_summary_dicts_2[0]['summary']['id'])
         self.logout()
 
+    def test_get_fails_when_skill_id_not_valid(self):
+        self.get_json('%s/%s?cursor=' % (
+            feconf.QUESTIONS_LIST_URL_PREFIX, '1,2'),
+                      expected_status_int=404)
+
     def test_get_fails_when_skill_does_not_exist(self):
         self.get_json('%s/%s?cursor=' % (
             feconf.QUESTIONS_LIST_URL_PREFIX, self.skill_id_3),

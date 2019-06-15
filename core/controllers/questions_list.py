@@ -29,14 +29,16 @@ class QuestionsListHandler(base.BaseHandler):
     """
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_skills
+    @acl_decorators.open_access
     def get(self, skill_ids):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
         skill_ids = skill_ids.split(',')
 
         for skill_id in skill_ids:
-            skill_domain.Skill.require_valid_skill_id(skill_id)
+            if not skill_id.isalnum():
+                raise base.UserFacingExceptions.PageNotFoundException
+
             skill = skill_services.get_skill_by_id(skill_id, strict=False)
             if skill is None:
                 raise self.PageNotFoundException(
