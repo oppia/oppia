@@ -75,6 +75,9 @@ describe('Compare versions service', function() {
               default_outcome: {},
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             answer_groups: [],
             default_outcome: {

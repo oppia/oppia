@@ -48,6 +48,9 @@ describe('Question object factory', function() {
           html: 'Question 1',
           content_id: 'content_1'
         },
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           answer_groups: [{
             outcome: {

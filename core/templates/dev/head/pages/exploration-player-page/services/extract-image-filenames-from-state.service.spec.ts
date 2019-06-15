@@ -81,6 +81,9 @@ describe('Extracting Image file names in the state service', function() {
               default_outcome: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'Continue',
             default_outcome: {
@@ -122,6 +125,9 @@ describe('Extracting Image file names in the state service', function() {
               default_outcome: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'EndExploration',
             default_outcome: null,
@@ -158,6 +164,9 @@ describe('Extracting Image file names in the state service', function() {
               feedback_1: {},
               feedback_2: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -254,6 +263,9 @@ describe('Extracting Image file names in the state service', function() {
               feedback_1: {},
               feedback_2: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'ItemSelectionInput',
@@ -366,6 +378,9 @@ describe('Extracting Image file names in the state service', function() {
               feedback_4: {},
               feedback_5: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'ImageClickInput',
@@ -563,6 +578,9 @@ describe('Extracting Image file names in the state service', function() {
               hint_1: {},
               solution: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'TextInput',

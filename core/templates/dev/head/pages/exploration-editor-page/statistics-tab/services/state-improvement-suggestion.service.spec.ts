@@ -50,6 +50,9 @@ describe('StateImprovementSuggestionService', function() {
             feedback_1: {}
           }
         },
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
@@ -106,6 +109,9 @@ describe('StateImprovementSuggestionService', function() {
             feedback_1: {}
           }
         },
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
@@ -157,6 +163,9 @@ describe('StateImprovementSuggestionService', function() {
             default_outcome: {},
             feedback_1: {}
           }
+        },
+        image_assets: {
+          image_mapping: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -214,6 +223,9 @@ describe('StateImprovementSuggestionService', function() {
             feedback_1: {}
           }
         },
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
@@ -265,6 +277,9 @@ describe('StateImprovementSuggestionService', function() {
             default_outcome: {},
             feedback_1: {}
           }
+        },
+        image_assets: {
+          image_mapping: {}
         },
         interaction: {
           id: 'RuleTest',

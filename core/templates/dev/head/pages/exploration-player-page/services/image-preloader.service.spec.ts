@@ -86,6 +86,9 @@ describe('Image preloader service', function() {
               default_outcome: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'Continue',
             default_outcome: {
@@ -126,6 +129,9 @@ describe('Image preloader service', function() {
               content: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'EndExploration',
             default_outcome: null,
@@ -161,6 +167,9 @@ describe('Image preloader service', function() {
               feedback_1: {},
               feedback_2: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -260,6 +269,9 @@ describe('Image preloader service', function() {
               feedback_2: {},
               hint_1: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'TextInput',

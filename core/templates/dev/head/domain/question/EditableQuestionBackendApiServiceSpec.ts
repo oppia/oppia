@@ -47,6 +47,9 @@ describe('Editable question backend API service', function() {
           recorded_voiceovers: {
             voiceovers_mapping: {}
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],

@@ -56,6 +56,9 @@ describe('Exploration editor tab controller', function() {
               feedback_1: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -105,6 +108,9 @@ describe('Exploration editor tab controller', function() {
               feedback_1: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -153,6 +159,9 @@ describe('Exploration editor tab controller', function() {
               default_outcome: {},
               feedback_1: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'TextInput',

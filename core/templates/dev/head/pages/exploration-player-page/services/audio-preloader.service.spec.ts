@@ -88,6 +88,9 @@ describe('Audio preloader service', function() {
               default_outcome: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'Continue',
             default_outcome: {
@@ -134,6 +137,9 @@ describe('Audio preloader service', function() {
               }
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'EndExploration',
             default_outcome: null,
@@ -172,6 +178,9 @@ describe('Audio preloader service', function() {
               },
               default_outcome: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'Continue',
@@ -220,6 +229,9 @@ describe('Audio preloader service', function() {
               default_outcome: {},
               feedback_1: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'TextInput',

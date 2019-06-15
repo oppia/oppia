@@ -121,6 +121,9 @@ describe('Translation status service', function() {
               feedback_1: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             answer_groups: [{
               tagged_misconception_id: null,
@@ -208,6 +211,9 @@ describe('Translation status service', function() {
               feedback_1: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             answer_groups: [{
               tagged_misconception_id: null,
@@ -275,6 +281,9 @@ describe('Translation status service', function() {
                 }
               }
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             answer_groups: [],

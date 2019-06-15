@@ -48,6 +48,9 @@ describe('States object factory', function() {
             default_outcome: {}
           }
         },
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           answer_groups: [],
           confirmed_unclassified_answers: [],
@@ -96,6 +99,9 @@ describe('States object factory', function() {
               default_outcome: {},
               feedback_1: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'RuleTest',
@@ -201,6 +207,9 @@ describe('States object factory', function() {
               }
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             answer_groups: [{
               outcome: {
@@ -280,6 +289,9 @@ describe('States object factory', function() {
               }
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
@@ -335,6 +347,9 @@ describe('States object factory', function() {
               content: {},
               default_outcome: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             answer_groups: [],

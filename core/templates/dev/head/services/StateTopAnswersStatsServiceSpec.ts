@@ -51,6 +51,9 @@ describe('StateTopAnswersStatsService', function() {
       Hola: {
         content: {content_id: 'content', html: ''},
         param_changes: [],
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           answer_groups: [{
             rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],

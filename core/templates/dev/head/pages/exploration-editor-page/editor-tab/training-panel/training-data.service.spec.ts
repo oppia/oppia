@@ -90,6 +90,9 @@ describe('TrainingDataService', function() {
             feedback_1: {}
           }
         },
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           id: 'TextInput',
           answer_groups: [{

@@ -65,6 +65,9 @@ describe('Answer classification service with string classifier disabled',
             feedback_2: {}
           }
         },
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
@@ -208,6 +211,9 @@ describe('Answer classification service with string classifier disabled',
             feedback_1: {}
           }
         },
+        image_assets: {
+          image_mapping: {}
+        },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
@@ -317,6 +323,9 @@ describe('Answer classification service with string classifier enabled',
             feedback_1: {},
             feedback_2: {}
           }
+        },
+        image_assets: {
+          image_mapping: {}
         },
         interaction: {
           id: 'TrainableInteraction',
@@ -488,6 +497,9 @@ describe('Answer classification service with training data classification',
             feedback_1: {},
             feedback_2: {}
           }
+        },
+        image_assets: {
+          image_mapping: {}
         },
         interaction: {
           id: 'TrainableInteraction',

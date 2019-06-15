@@ -100,6 +100,9 @@ describe('State Interaction controller', function() {
               feedback_1: {}
             }
           },
+          image_assets: {
+            image_mapping: {}
+          },
           interaction: {
             id: 'TextInput',
             answer_groups: [{
@@ -148,6 +151,9 @@ describe('State Interaction controller', function() {
               default_outcome: {},
               feedback_1: {}
             }
+          },
+          image_assets: {
+            image_mapping: {}
           },
           interaction: {
             id: 'TextInput',
