@@ -203,7 +203,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.post_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                incorrect_skill_id)
+                incorrect_skill_id
             ), {}, csrf_token=csrf_token, expected_status_int=404)
         self.logout()
 
@@ -214,7 +214,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.post_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                self.skill_id)
+                self.skill_id
             ), {}, csrf_token=csrf_token)
         question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
@@ -233,7 +233,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.post_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
-                self.skill_id)
+                self.skill_id
             ), {}, csrf_token=csrf_token)
         question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
