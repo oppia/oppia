@@ -10,7 +10,7 @@
     </h2>
 
     <div ng-if="$ctrl.collection" class="oppia-collection-path-section hidden-sm hidden-xs">
-      <svg width="500px" ng-attr-height="<[$ctrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
+      <svg width="540px" ng-attr-height="<[$ctrl.svgHeight + 'px']>" xmlns="http://www.w3.org/2000/svg">
         <path fill="none"
               stroke="#296E5F"
               stroke-dasharray="15,28"
@@ -47,13 +47,18 @@
       <a ng-repeat="node in $ctrl.collection.getCollectionNodes()"
          ng-href="<[$ctrl.getExplorationUrl(node.getExplorationId())]>"
          ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
-        <div>{{node._explorationSummaryObject.title}}</div>
+
+        <div ng-if="[$index]%2===0" ng-style="{width:'160',position:'absolute',color:'#006553','font-size':'20px',bottom:'85%'}">{{node._explorationSummaryObject.title}}</div>
+        <div ng-if="[$index+1]%2===0&&[$index+1]%4!==0" ng-style="{width:'160',position:'absolute',color:'#006553',bottom:'85%','font-size':'20px', left:'20px'}">{{node._explorationSummaryObject.title}}</div>
+        <div ng-if="[$index+1]%4===0" ng-style="{width:'160px',position:'absolute',color:'#006553','font-size':'20px',bottom:'85%',left:'-35px'}">{{node._explorationSummaryObject.title}}</div>
         <svg class="protractor-test-collection-exploration"
-             width="100"
-             height="125"
+             width="150"
+             height="150"
+             overflow="visible"
              xmlns="http://www.w3.org/2000/svg"
              xmlns:xlink="http://www.w3.org/1999/xlink"
-             version="1.1">
+             version="1.1"
+          ng-style="{position:'relative'}">
           <defs>
             <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
               <circle cx="50"
@@ -105,15 +110,6 @@
                     stroke="#006553"
                     stroke-width="2"/>
           </a>
-          <text x="50%"
-                y="15"
-                alignment-baseline="middle"
-                font-family="Capriola, Roboto, Arial, sans-serif"
-                font-size="20"
-                fill="#006553"
-                text-anchor="middle">
-            <[$index + 1]>
-          </text>
         </svg>
       </a>
     </div>
@@ -122,7 +118,7 @@
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
         <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;">
-          <div>{{node._explorationSummaryObject.title}}</div>
+          <div ng-style="{color:'#006553','font-size':'20px'}">{{node._explorationSummaryObject.title}}</div>
           <svg class="protractor-mobile-test-collection-exploration"
                width="100"
                height="150"
@@ -255,5 +251,4 @@
     </div>
   </div>
 </div>
-
 <attribution-guide></attribution-guide>
