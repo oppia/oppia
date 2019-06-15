@@ -1730,7 +1730,7 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'CollectionSummaryModel\', '
                 '[u"Entity id 0: Property does not match the schema with '
                 'the error Missing keys: [\'1\', \'3\', \'2\', \'4\'], '
-                'extra attributes: [u\'10\']"]]'
+                'Extra keys: [u\'10\']"]]'
             ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -5009,7 +5009,7 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
 
         topic = topic_domain.Topic.create_default_topic(
             topic_id='0', name='topic')
-        topic_services.save_new_topic(self.owner_id, topic)
+
         language_codes = ['ar', 'en', 'en']
         stories = [story_domain.Story.create_default_story(
             '%s' % i,
@@ -5026,7 +5026,10 @@ class StoryModelValidatorTests(test_utils.GenericTestBase):
                 'node_1', explorations[index * 2].id)
             story.update_node_exploration_id(
                 'node_2', explorations[index * 2 + 1].id)
+            topic.add_canonical_story(story.id)
             story_services.save_new_story(self.owner_id, story)
+
+        topic_services.save_new_topic(self.owner_id, topic)
 
         self.model_instance_0 = story_models.StoryModel.get_by_id('0')
         self.model_instance_1 = story_models.StoryModel.get_by_id('1')
