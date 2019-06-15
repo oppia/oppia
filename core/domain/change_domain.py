@@ -99,8 +99,22 @@ class BaseChange(object):
             ValidationError: The given change_dict is not valid.
         """
         self.validate_dict(change_dict)
-        for key, value in change_dict.iteritems():
-            setattr(self, key, value)
+
+        cmd_name = change_dict['cmd']
+        self.cmd = cmd_name
+
+        all_allowed_commands = (
+            self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS)
+
+        cmd_attributes = []
+        for cmd in all_allowed_commands:
+            if cmd['name'] == cmd_name:
+                cmd_attributes = (
+                    cmd['required_attributes'] + cmd['optional_attributes'])
+                break
+
+        for attribute in cmd_attributes:
+            setattr(self, attribute, change_dict.get(attribute))
 
     def validate_dict(self, change_dict):
         """Checks that the command in change dict is valid for the domain
