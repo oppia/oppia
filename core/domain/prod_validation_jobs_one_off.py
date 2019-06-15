@@ -380,9 +380,8 @@ class ActivityReferencesModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: featured.
-        regex_list = [
-            '%s$' % item for item in feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES]
-        regex_string = '|'.join(regex_list)
+        regex_string = '^(%s)$' % '|'.join(
+            feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES)
         return regex_string
 
     @classmethod
@@ -464,7 +463,7 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [user_id].[timestamp_in_sec].[intent].[random_number]
-        regex_string = '%s\\.\\d*\\.%s\\.\\d*$' % (item.user_id, item.intent)
+        regex_string = '^%s\\.\\d*\\.%s\\.\\d*$' % (item.user_id, item.intent)
         return regex_string
 
     @classmethod
@@ -842,7 +841,7 @@ class CollectionCommitLogEntryModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [collection/rights]-[collection_id]-[collection_version].
-        regex_string = '(collection|rights)-%s-\\d*$' % (
+        regex_string = '^(collection|rights)-%s-\\d*$' % (
             item.collection_id)
 
         return regex_string
@@ -1240,7 +1239,7 @@ class SentEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [intent].[random hash]
-        regex_string = '%s\\.\\..*$' % item.intent
+        regex_string = '^%s\\.\\..*$' % item.intent
         return regex_string
 
     @classmethod
@@ -1818,7 +1817,7 @@ class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [exploration/rights]-[exploration_id]-[exploration-version].
-        regex_string = '(exploration|rights)-%s-\\d*$' % (
+        regex_string = '^(exploration|rights)-%s-\\d*$' % (
             item.exploration_id)
 
         return regex_string
@@ -2474,7 +2473,7 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: topics.
-        return '%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
+        return '^%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
 
     @classmethod
     def _get_json_properties_schema(cls, item):
@@ -2902,7 +2901,7 @@ class StoryCommitLogEntryModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [story/rights]-[story_id]-[story_version].
-        regex_string = '(story|rights)-%s-\\d*$' % (
+        regex_string = '^(story|rights)-%s-\\d*$' % (
             item.story_id)
 
         return regex_string
