@@ -55,4 +55,6 @@ oppia.factory('ImageAssetsObjectFactory', [
       }
       return new ImageAssets(imageMapping);
     };
+
+  return ImageAssets;
   }]);

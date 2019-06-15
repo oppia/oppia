@@ -90,7 +90,7 @@ describe('Skill Editor functionality', function() {
     skillEditorPage.expectWorkedExampleSummariesToMatch(['Example 2']);
   });
 
-  fit('should create a question for the skill', function() {
+  it('should create a question for the skill', function() {
     skillEditorPage.moveToQuestionsTab();
     skillEditorPage.clickCreateQuestionButton();
     explorationEditorMainTab.setContent(forms.toRichText('Question 1'));
