@@ -20,9 +20,6 @@
 oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');
-oppia.constant(
-  'EXPLORATION_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>');
 
 oppia.constant(
   'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');

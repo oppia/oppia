@@ -340,10 +340,14 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party.sh',
     '/.github/']
 
-NEW_CONVENTION_DIRECTORIES = [
-    'core/templates/dev/head/pages',
-    'core/templates/dev/head/filters',
-    'core/templates/dev/head/components']
+OLD_CONVENTION_DIRECTORIES = [
+    'core/templates/dev/head/services',
+    'core/templates/dev/head/base_components',
+    'core/templates/dev/head/directives',
+    'core/templates/dev/head/domain',
+    'core/templates/dev/head/expressions',
+    'core/templates/dev/head/tests',
+    'extensions/']
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -2436,11 +2440,13 @@ class LintChecksManager(object):
                 filepath for filepath in self.all_filepaths if (
                     filepath.endswith('.ts'))]
             ts_files_to_check = [
-                filepath for filepath in all_ts_files if any(
+                filepath for filepath in all_ts_files if not any(
                     pattern in filepath for pattern in (
-                        NEW_CONVENTION_DIRECTORIES))]
-
+                        OLD_CONVENTION_DIRECTORIES))]
+            constants_number_dict = {}
             for filepath in ts_files_to_check:
+                # Check that the constants are declared only in a *.constants.ts
+                # file.
                 if not filepath.endswith('.constants.ts'):
                     for line_num, line in enumerate(FileCache.readlines(
                             filepath)):
@@ -2450,6 +2456,32 @@ class LintChecksManager(object):
                                    '%s. Please declare the constants in a '
                                    'separate constants file.' % (
                                        filepath, line_num))
+
+                # Check if the constant has multiple declarations which is
+                # prohibited.
+                parsed_script = self.parsed_js_and_ts_files[filepath]
+                parsed_nodes = parsed_script.body
+                components_to_check = ['constant']
+                for parsed_node in parsed_nodes:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
+                        continue
+                    else:
+                        constant_name = expression.arguments[0].raw
+                        if constant_name == '\'INTERACTION_SPECS\'':
+                            continue
+                        if constant_name in constants_number_dict:
+                            failed = True
+                            print ('%s --> The constant %s is already declared '
+                                   'in %s. Please import the file where the '
+                                   'constant is declared or rename the constant'
+                                   '.' % (
+                                       filepath, constant_name,
+                                       constants_number_dict[constant_name]))
+                        else:
+                            constants_number_dict[constant_name] = filepath
+
 
             if failed:
                 summary_message = '%s  Constants declaration check failed' % (

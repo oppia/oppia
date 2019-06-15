@@ -223,8 +223,6 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
   };
 }]);
 
-oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
-
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
