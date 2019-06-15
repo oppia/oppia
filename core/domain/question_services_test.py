@@ -109,8 +109,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             Exception, 'Skill difficulties and skill ids should match. '
             'The lengths of the two lists are different.'):
             question_services.create_multi_question_skill_links_for_question(
-            self.editor_id, self.question_id, ['skill_1', 'skill_2'],
-            [0.5])
+                self.editor_id, self.question_id, ['skill_1', 'skill_2'],
+                [0.5])
         question_services.create_multi_question_skill_links_for_question(
             self.editor_id, self.question_id, ['skill_1', 'skill_2'],
             [0.5, 0.7])
