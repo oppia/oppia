@@ -23,8 +23,20 @@ from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
 
+import feconf
+
 (base_models, topic_models, ) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.topic])
+
+
+# TODO: Remove this mock class and the migrate_page_contents tests
+# once the actual functions for page content migrations are implemented.
+class MockSubtopicPage(subtopic_page_domain.SubtopicPage):
+
+    @classmethod
+    def _convert_page_contents_v1_dict_to_v2_dict(cls, page_contents):
+        """Mocks SubtopicPage._convert_page_contents_v1_dict_to_v2_dict()."""
+        return page_contents
 
 
 class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
@@ -212,3 +224,40 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
             subtopic_page_services.delete_subtopic_page(
                 self.user_id, self.TOPIC_ID, 1)
+
+    def test_migrate_page_contents_to_latest_schema(self):
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
+        subtopic_page_swap = self.swap(
+            subtopic_page_domain, 'SubtopicPage', MockSubtopicPage)
+
+        subtopic_page_model = topic_models.SubtopicPageModel.get(
+            self.subtopic_page_id)
+
+        self.assertEqual(subtopic_page_model.page_contents_schema_version, 1)
+
+        with current_schema_version_swap, subtopic_page_swap:
+            subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
+                subtopic_page_model)
+
+        self.assertEqual(subtopic_page.page_contents_schema_version, 2)
+
+    def test_cannot_migrate_page_contents_to_latest_schema_with_invalid_version(
+            self):
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION', 2)
+        subtopic_page_swap = self.swap(
+            subtopic_page_domain, 'SubtopicPage', MockSubtopicPage)
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v2 page schemas at present.')
+
+        subtopic_page_model = topic_models.SubtopicPageModel.get(
+            self.subtopic_page_id)
+        subtopic_page_model.page_contents_schema_version = 0
+        subtopic_page_model.commit(self.user_id, '', [])
+
+        with current_schema_version_swap, subtopic_page_swap, (
+            assert_raises_regexp_context_manager):
+            subtopic_page_services.get_subtopic_page_from_model(
+                subtopic_page_model)

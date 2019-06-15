@@ -898,10 +898,6 @@ def _assign_role(
             raise Exception(
                 'This user already can edit this %s.' % activity_type)
 
-        if activity_rights.community_owned:
-            raise Exception(
-                'Community-owned %ss can be edited by anyone.' % activity_type)
-
         activity_rights.editor_ids.append(assignee_id)
 
         if assignee_id in activity_rights.voice_artist_ids:
@@ -918,10 +914,6 @@ def _assign_role(
                 activity_rights.is_owner(assignee_id)):
             raise Exception(
                 'This user already can voiceover this %s.' % activity_type)
-        if activity_rights.community_owned:
-            raise Exception(
-                'Community-owned %ss can be voiceovered by anyone.' %
-                activity_type)
 
         activity_rights.voice_artist_ids.append(assignee_id)
 

@@ -335,8 +335,8 @@ class SubtopicPage(object):
         conversion_fn = getattr(
             cls, '_convert_page_contents_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
-        versioned_page_contents['skill_contents'] = conversion_fn(
-            versioned_page_contents['skill_contents'])
+        versioned_page_contents['page_contents'] = conversion_fn(
+            versioned_page_contents['page_contents'])
 
     def get_subtopic_id_from_subtopic_page_id(self):
         """Returns the id from the subtopic page id of the object.
