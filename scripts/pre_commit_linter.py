@@ -147,7 +147,7 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
-BAD_PATTERNS_JS_REGEXP = [
+BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
         'message': 'In tests, please do not use browser.explore().',
@@ -2166,7 +2166,7 @@ class LintChecksManager(object):
                         total_error_count += 1
 
                 if filepath.endswith(('.js', '.ts')):
-                    for regexp in BAD_PATTERNS_JS_REGEXP:
+                    for regexp in BAD_PATTERNS_JS_AND_TS_REGEXP:
                         if _check_bad_pattern_in_file(
                                 filepath, file_content, regexp):
                             failed = True
