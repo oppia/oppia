@@ -83,7 +83,7 @@ class MockDatetime13Hours(datetime.datetime):
 
     @classmethod
     def utcnow(cls):
-        """Returns the current date and time 13 hours behind of UTC."""
+        """Returns the current date and time 13 hours behind UTC."""
         return CURRENT_DATETIME - datetime.timedelta(hours=13)
 
 
