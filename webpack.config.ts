@@ -496,8 +496,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['topics_and_skills_dashboard'],
+      chunks: ['app', 'topics_and_skills_dashboard'],
       filename: 'topics-and-skills-dashboard-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. ' +
+          'Join the community to create or try an exploration today!'
+      },
       template: (
         commonPrefix +
         '/pages/topics-and-skills-dashboard-page/' +
