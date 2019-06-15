@@ -494,28 +494,22 @@ class CollectionModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        nodes = item.collection_contents['nodes']
-        exploration_model_ids = [node['exploration_id'] for node in nodes]
-        collection_commit_log_entry_model_ids = [
-            'collection-%s-%s' % (item.id, version) for version in range(
-                1, item.version + 1)]
-        collection_summary_model_ids = [item.id]
-        collection_rights_model_ids = [item.id]
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
             'exploration_ids': (
-                exp_models.ExplorationModel, exploration_model_ids),
+                exp_models.ExplorationModel,
+                [node['exploration_id'] for node in item.collection_contents[
+                    'nodes']]),
             'collection_commit_log_entry_ids': (
                 collection_models.CollectionCommitLogEntryModel,
-                collection_commit_log_entry_model_ids),
+                ['collection-%s-%s' % (item.id, version) for version in range(
+                    1, item.version + 1)]),
             'collection_summary_ids': (
-                collection_models.CollectionSummaryModel,
-                collection_summary_model_ids),
+                collection_models.CollectionSummaryModel, [item.id]),
             'collection_rights_ids': (
-                collection_models.CollectionRightsModel,
-                collection_rights_model_ids),
+                collection_models.CollectionRightsModel, [item.id]),
             'snapshot_metadata_ids': (
                 collection_models.CollectionSnapshotMetadataModel,
                 snapshot_model_ids),
@@ -1180,23 +1174,18 @@ class ExplorationModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        exploration_commit_log_entry_model_ids = [
-            'exploration-%s-%s' % (item.id, version) for version in range(
-                1, item.version + 1)]
-        exp_summary_model_ids = [item.id]
-        exploration_rights_model_ids = [item.id]
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
         return {
             'exploration_commit_log_entry_ids': (
                 exp_models.ExplorationCommitLogEntryModel,
-                exploration_commit_log_entry_model_ids),
+                ['exploration-%s-%s' % (item.id, version) for version in range(
+                    1, item.version + 1)]),
             'exp_summary_ids': (
-                exp_models.ExpSummaryModel, exp_summary_model_ids),
+                exp_models.ExpSummaryModel, [item.id]),
             'exploration_rights_ids': (
-                exp_models.ExplorationRightsModel,
-                exploration_rights_model_ids),
+                exp_models.ExplorationRightsModel, [item.id]),
             'snapshot_metadata_ids': (
                 exp_models.ExplorationSnapshotMetadataModel,
                 snapshot_model_ids),
@@ -1790,11 +1779,10 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        exploration_ids = [item.id]
-        exploration_ids = exploration_ids + item.recommended_exploration_ids
         return {
             'exploration_ids': (
-                exp_models.ExplorationModel, exploration_ids),
+                exp_models.ExplorationModel,
+                [item.id] + item.recommended_exploration_ids),
         }
 
     @classmethod
@@ -1930,25 +1918,18 @@ class StoryModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        story_commit_log_entry_model_ids = [
-            'story-%s-%s' % (item.id, version) for version in range(
-                1, item.version + 1)]
-        story_summary_model_ids = [item.id]
-        story_rights_model_ids = [item.id]
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
-        exploration_model_ids = [
-            node['exploration_id'] for node in item.story_contents['nodes']]
         return {
             'story_commit_log_entry_ids': (
                 story_models.StoryCommitLogEntryModel,
-                story_commit_log_entry_model_ids),
+                ['story-%s-%s' % (item.id, version) for version in range(
+                    1, item.version + 1)]),
             'story_summary_ids': (
-                story_models.StorySummaryModel, story_summary_model_ids),
+                story_models.StorySummaryModel, [item.id]),
             'story_rights_ids': (
-                story_models.StoryRightsModel,
-                story_rights_model_ids),
+                story_models.StoryRightsModel, [item.id]),
             'snapshot_metadata_ids': (
                 story_models.StorySnapshotMetadataModel,
                 snapshot_model_ids),
@@ -1957,7 +1938,8 @@ class StoryModelValidator(BaseModelValidator):
                 snapshot_model_ids),
             'exploration_ids': (
                 exp_models.ExplorationModel,
-                exploration_model_ids)
+                [node['exploration_id'] for node in (
+                    item.story_contents['nodes'])])
         }
 
 
