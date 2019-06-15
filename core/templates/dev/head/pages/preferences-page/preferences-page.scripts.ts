@@ -16,5 +16,6 @@
  * @fileoverview Directive scripts for the Oppia 'edit preferences' page.
  */
 
-require('pages/preferences-page/preferences-page.controller.ts');
 require('pages/OppiaFooterDirective.ts');
+
+require('pages/preferences-page/preferences-page.controller.ts');

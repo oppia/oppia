@@ -137,7 +137,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.directive.ts');
