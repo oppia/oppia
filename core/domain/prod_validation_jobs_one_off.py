@@ -60,8 +60,6 @@ class BaseModelValidator(object):
     # of a list of (model class, external_key, external_model_instance)
     # tuples.
     external_instance_details = {}
-    is_commit_log_entry_model = False
-    is_snapshot_metadata_model = False
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -219,6 +217,40 @@ class BaseModelValidator(object):
                 ) % (item.id, item.last_updated))
 
     @classmethod
+    def _get_custom_validation_functions(cls):
+        """Returns the list of custom validation functions to run.
+
+        This should be implemented by subclasses.
+
+        Each validation function should accept only a single arg, which is the
+        model instance to validate.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def validate(cls, item):
+        """Run _fetch_external_instance_details and all _validate functions.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        cls.errors.clear()
+        cls.external_instance_details.clear()
+        cls._fetch_external_instance_details(item)
+
+        cls._validate_model_id(item)
+        cls._validate_model_time_fields(item)
+        cls._validate_model_domain_object_instances(item)
+        cls._validate_external_id_relationships(item)
+
+        for func in cls._get_custom_validation_functions():
+            func(item)
+
+
+class BaseSnapshotMetadataModelValidator(BaseModelValidator):
+    """Base class for validating snapshot metadata models."""
+
+    @classmethod
     def _validate_commit_type(cls, item):
         """Validates that commit type is valid.
 
@@ -263,6 +295,22 @@ class BaseModelValidator(object):
                     'with error: %s') % (item.id, e))
 
     @classmethod
+    def validate(cls, item):
+        """Run _fetch_external_instance_details and all _validate functions.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        super(BaseSnapshotMetadataModelValidator, cls).validate(item)
+
+        cls._validate_commit_type(item)
+        cls._validate_commit_cmds_schema(item)
+
+
+class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
+    """Base class for validating commit log entry models."""
+
+    @classmethod
     def _validate_post_commit_status(cls, item):
         """Validates that post_commit_status is either public or private.
 
@@ -297,44 +345,16 @@ class BaseModelValidator(object):
                 'post_commit_is_private is True') % item.id)
 
     @classmethod
-    def _get_custom_validation_functions(cls):
-        """Returns the list of custom validation functions to run.
-
-        This should be implemented by subclasses.
-
-        Each validation function should accept only a single arg, which is the
-        model instance to validate.
-        """
-        raise NotImplementedError
-
-    @classmethod
     def validate(cls, item):
         """Run _fetch_external_instance_details and all _validate functions.
 
         Args:
             item: ndb.Model. Entity to validate.
         """
-        cls.errors.clear()
-        cls.external_instance_details.clear()
-        cls._fetch_external_instance_details(item)
+        super(BaseCommitLogEntryModelValidator, cls).validate(item)
 
-        cls._validate_model_id(item)
-        cls._validate_model_time_fields(item)
-        cls._validate_model_domain_object_instances(item)
-        cls._validate_external_id_relationships(item)
-
-        if cls.is_commit_log_entry_model:
-            cls._validate_commit_type(item)
-            cls._validate_commit_cmds_schema(item)
-            cls._validate_post_commit_status(item)
-            cls._validate_post_commit_is_private(item)
-
-        if cls.is_snapshot_metadata_model:
-            cls._validate_commit_type(item)
-            cls._validate_commit_cmds_schema(item)
-
-        for func in cls._get_custom_validation_functions():
-            func(item)
+        cls._validate_post_commit_status(item)
+        cls._validate_post_commit_is_private(item)
 
 
 class ActivityReferencesModelValidator(BaseModelValidator):
@@ -363,10 +383,6 @@ class ActivityReferencesModelValidator(BaseModelValidator):
             return []
 
         return model_domain_object_instances
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -410,10 +426,6 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
 
@@ -435,10 +447,6 @@ class CollectionModelValidator(BaseModelValidator):
             collection_services.get_collection_from_model(item)]
 
         return model_domain_object_instances
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -477,10 +485,9 @@ class CollectionModelValidator(BaseModelValidator):
         return []
 
 
-class CollectionSnapshotMetadataModelValidator(BaseModelValidator):
+class CollectionSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionSnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -544,10 +551,6 @@ class CollectionSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'collection_ids': (
@@ -593,10 +596,6 @@ class CollectionRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -645,10 +644,9 @@ class CollectionRightsModelValidator(BaseModelValidator):
         return [cls._validate_first_published_msec]
 
 
-class CollectionRightsSnapshotMetadataModelValidator(BaseModelValidator):
+class CollectionRightsSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionRightsSnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -712,10 +710,6 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'collection_rights_ids': (
@@ -751,10 +745,8 @@ class CollectionRightsSnapshotContentModelValidator(BaseModelValidator):
         return [cls._validate_collection_model_version_from_item_id]
 
 
-class CollectionCommitLogEntryModelValidator(BaseModelValidator):
+class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating CollectionCommitLogEntryModel."""
-
-    is_commit_log_entry_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -816,10 +808,6 @@ class CollectionSummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return [collection_services.get_collection_summary_from_model(item)]
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -982,10 +970,6 @@ class ConfigPropertyModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
@@ -1004,10 +988,9 @@ class ConfigPropertyModelValidator(BaseModelValidator):
         return []
 
 
-class ConfigPropertySnapshotMetadataModelValidator(BaseModelValidator):
+class ConfigPropertySnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
     """Class for validating ConfigPropertySnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1071,10 +1054,6 @@ class ConfigPropertySnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'config_property_ids': (
@@ -1122,10 +1101,6 @@ class SentEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1213,10 +1188,6 @@ class BulkEmailModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'recipient_id': (
@@ -1292,10 +1263,6 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'item.id.user_id': (
@@ -1345,10 +1312,6 @@ class ExplorationModelValidator(BaseModelValidator):
         return model_domain_object_instances
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         exploration_commit_log_entry_model_ids = [
             'exploration-%s-%s' % (item.id, version) for version in range(
@@ -1380,10 +1343,9 @@ class ExplorationModelValidator(BaseModelValidator):
         return []
 
 
-class ExplorationSnapshotMetadataModelValidator(BaseModelValidator):
+class ExplorationSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationSnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1447,10 +1409,6 @@ class ExplorationSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'exploration_ids': (
@@ -1496,10 +1454,6 @@ class ExplorationRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1554,10 +1508,9 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         return [cls._validate_first_published_msec]
 
 
-class ExplorationRightsSnapshotMetadataModelValidator(BaseModelValidator):
+class ExplorationRightsSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationRightsSnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1621,10 +1574,6 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'exploration_rights_ids': (
@@ -1660,10 +1609,8 @@ class ExplorationRightsSnapshotContentModelValidator(BaseModelValidator):
         return [cls._validate_exploration_model_version_from_item_id]
 
 
-class ExplorationCommitLogEntryModelValidator(BaseModelValidator):
+class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating ExplorationCommitLogEntryModel."""
-
-    is_commit_log_entry_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1725,10 +1672,6 @@ class ExpSummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return [exp_services.get_exploration_summary_from_model(item)]
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1927,10 +1870,6 @@ class FileMetadataModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
@@ -1962,10 +1901,9 @@ class FileMetadataModelValidator(BaseModelValidator):
         return []
 
 
-class FileMetadataSnapshotMetadataModelValidator(BaseModelValidator):
+class FileMetadataSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
     """Class for validating FileMetadataSnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2029,10 +1967,6 @@ class FileMetadataSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'file_metadata_ids': (
@@ -2080,10 +2014,6 @@ class FileModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
@@ -2115,10 +2045,8 @@ class FileModelValidator(BaseModelValidator):
         return []
 
 
-class FileSnapshotMetadataModelValidator(BaseModelValidator):
+class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating FileSnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2181,10 +2109,6 @@ class FileSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'file_ids': (
@@ -2231,10 +2155,6 @@ class ExplorationRecommendationsModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         exploration_ids = [item.id]
         exploration_ids = exploration_ids + item.recommended_exploration_ids
@@ -2272,10 +2192,6 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2379,10 +2295,6 @@ class StoryModelValidator(BaseModelValidator):
         return model_domain_object_instances
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         story_commit_log_entry_model_ids = [
             'story-%s-%s' % (item.id, version) for version in range(
@@ -2419,10 +2331,8 @@ class StoryModelValidator(BaseModelValidator):
         return []
 
 
-class StorySnapshotMetadataModelValidator(BaseModelValidator):
+class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating StorySnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2484,10 +2394,6 @@ class StorySnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'story_ids': (
@@ -2533,10 +2439,6 @@ class StoryRightsModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
@@ -2559,10 +2461,9 @@ class StoryRightsModelValidator(BaseModelValidator):
         return []
 
 
-class StoryRightsSnapshotMetadataModelValidator(BaseModelValidator):
+class StoryRightsSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
     """Class for validating StoryRightsSnapshotMetadataModel."""
-
-    is_snapshot_metadata_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2626,10 +2527,6 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
         return []
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return None
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'story_rights_ids': (
@@ -2665,10 +2562,8 @@ class StoryRightsSnapshotContentModelValidator(BaseModelValidator):
         return [cls._validate_story_model_version_from_item_id]
 
 
-class StoryCommitLogEntryModelValidator(BaseModelValidator):
+class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating StoryCommitLogEntryModel."""
-
-    is_commit_log_entry_model = True
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2729,10 +2624,6 @@ class StorySummaryModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2811,10 +2702,6 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
-
-    @classmethod
-    def _get_change_domain_class(cls):
-        return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
