@@ -181,9 +181,7 @@ describe('Editable question backend API service', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
-    var addQuestionSkillLinkUrl = '/manage_question_skill_link/0/' +
-      encodeURIComponent(JSON.stringify(['1']));
-    $httpBackend.expect('POST', addQuestionSkillLinkUrl).respond();
+    $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond();
     EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
       successHandler, failHandler);
     $httpBackend.flush();
@@ -197,9 +195,7 @@ describe('Editable question backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      var addQuestionSkillLinkUrl = '/manage_question_skill_link/0/' +
-        encodeURIComponent(JSON.stringify(['1']));
-      $httpBackend.expect('POST', addQuestionSkillLinkUrl).respond(
+      $httpBackend.expect('POST', '/manage_question_skill_link/0/1').respond(
         404, 'The skill with the given id doesn\'t exist.');
 
       EditableQuestionBackendApiService.addQuestionSkillLink('0', '1').then(
@@ -217,7 +213,7 @@ describe('Editable question backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var addQuestionSkillLinkUrl = '/manage_question_skill_link/0/' +
-        encodeURIComponent(JSON.stringify(['1', '2']));
+        encodeURIComponent('1,2');
       $httpBackend.expect('POST', addQuestionSkillLinkUrl).respond();
       EditableQuestionBackendApiService.addMultiQuestionSkillLinks(
         '0', ['1', '2']).then(successHandler, failHandler);

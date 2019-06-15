@@ -61,6 +61,10 @@ oppia.factory('QuestionBackendApiService', [
 
     var _fetchQuestionsForEditors = function(
         skillIds, cursor, successCallback, errorCallback) {
+      if (!isListOfStrings(skillIds)) {
+        errorCallback('Skill ids should be a list of strings');
+        return false;
+      }
       var questionsDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTIONS_LIST_URL_TEMPLATE, {
           skill_ids: skillIds.join(','),

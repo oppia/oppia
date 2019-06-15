@@ -91,9 +91,7 @@ describe('Editable skill backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      var skillDataUrl = '/skill_editor_handler/data/' +
-        encodeURIComponent(JSON.stringify(['1']));
-      $httpBackend.expect('GET', skillDataUrl).respond(
+      $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
         sampleResponse);
       EditableSkillBackendApiService.fetchSkill('1').then(
         successHandler, failHandler);
@@ -108,9 +106,7 @@ describe('Editable skill backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      var skillDataUrl = '/skill_editor_handler/data/' +
-        encodeURIComponent(JSON.stringify(['1']));
-      $httpBackend.expect('GET', skillDataUrl).respond(
+      $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
         500, 'Error loading skill 1.');
       EditableSkillBackendApiService.fetchSkill('1').then(
         successHandler, failHandler);
@@ -126,9 +122,8 @@ describe('Editable skill backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var skillDataUrl = '/skill_editor_handler/data/' +
-        encodeURIComponent(JSON.stringify(['1', '2']));
-      $httpBackend.expect('GET', skillDataUrl).respond(
-        sampleResponse2);
+        encodeURIComponent('1,2');
+      $httpBackend.expect('GET', skillDataUrl).respond(sampleResponse2);
       EditableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
         successHandler, failHandler);
       $httpBackend.flush();
@@ -142,9 +137,7 @@ describe('Editable skill backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      var skillDataUrl = '/skill_editor_handler/data/' +
-        encodeURIComponent(JSON.stringify(['1']));
-      $httpBackend.expect('GET', skillDataUrl).respond(
+      $httpBackend.expect('GET', '/skill_editor_handler/data/1').respond(
         sampleResponse);
 
       var skillDict = null;
@@ -154,12 +147,9 @@ describe('Editable skill backend API service', function() {
         });
       $httpBackend.flush();
 
-      var editableSkillDataUrl = '/skill_editor_handler/data/' +
-      encodeURIComponent(JSON.stringify(['1']));
-      $httpBackend.expect('PUT', editableSkillDataUrl)
-        .respond({
-          skill: skillDict
-        });
+      $httpBackend.expect('PUT', '/skill_editor_handler/data/1').respond({
+        skill: skillDict
+      });
 
       EditableSkillBackendApiService.updateSkill(
         skillDict.id, skillDict.version, 'commit message', []

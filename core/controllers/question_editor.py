@@ -16,8 +16,6 @@
 and are created.
 """
 
-import json
-
 from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
@@ -73,7 +71,7 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     def post(self, question_id, skill_ids):
         """Links a question to a skill."""
         try:
-            skill_ids = json.loads(skill_ids)
+            skill_ids = skill_ids.split(',')
         except Exception:
             raise self.PageNotFoundException
 

@@ -24,12 +24,12 @@ import feconf
 
 
 class QuestionsListHandler(base.BaseHandler):
-    """Manages the creation of a question and receiving of all question
-    summaries for display in topic editor page.
+    """Manages receiving of all question summaries for display in topic editor
+    and skill editor page.
     """
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.open_access
+    @acl_decorators.can_edit_skills
     def get(self, skill_ids):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')

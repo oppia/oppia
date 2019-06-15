@@ -118,7 +118,7 @@ oppia.factory('EditableQuestionBackendApiService', [
       var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
           question_id: questionId,
-          skill_ids: JSON.stringify([skillId])
+          skill_ids: skillId
         });
       $http.post(addQuestionSkillLinkUrl).then(function(response) {
         if (successCallback) {
@@ -136,7 +136,7 @@ oppia.factory('EditableQuestionBackendApiService', [
       var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_SKILL_LINK_URL_TEMPLATE, {
           question_id: questionId,
-          skill_ids: JSON.stringify(skillIds)
+          skill_ids: skillIds.join(',')
         });
       $http.post(addQuestionSkillLinkUrl).then(function(response) {
         if (successCallback) {

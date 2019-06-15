@@ -1872,7 +1872,7 @@ def can_edit_skills(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        decoded_skill_ids = json.loads(skill_ids)
+        decoded_skill_ids = skill_ids.split(',')
         for skill_id in decoded_skill_ids:
             if not skill_id.isalnum():
                 raise base.UserFacingExceptions.PageNotFoundException

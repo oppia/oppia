@@ -16,8 +16,6 @@
 
 """Tests for core.domain.acl_decorators."""
 
-import json
-
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
@@ -2518,33 +2516,29 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         skill_services.publish_skill(self.second_skill_id, self.admin_id)
         self.login(self.second_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % json.dumps(
-                [self.first_skill_id, self.second_skill_id]))
-        self.assertEqual(len(json.loads(response['skill_ids'])), 2)
+            response = self.get_json('/mock/%s,%s' % (self.first_skill_id,
+                self.second_skill_id))
+        self.assertEqual(len(response['skill_ids'].split(',')), 2)
         self.assertEqual(
-            json.loads(response['skill_ids'])[0], self.first_skill_id)
+            response['skill_ids'].split(',')[0], self.first_skill_id)
         self.assertEqual(
-            json.loads(response['skill_ids'])[1], self.second_skill_id)
+            response['skill_ids'].split(',')[1], self.second_skill_id)
         self.logout()
 
     def test_admin_can_not_edit_when_skills_list_contains_private_skill(self):
         skill_services.publish_skill(self.first_skill_id, self.admin_id)
         self.login(self.second_admin_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % json.dumps(
-                    [self.first_skill_id, self.second_skill_id]),
-                expected_status_int=401)
+            self.get_json('/mock/%s,%s' % (self.first_skill_id,
+                self.second_skill_id), expected_status_int=401)
         self.logout()
 
     def test_topic_manager_can_not_edit_when_contains_private_skill(self):
         skill_services.publish_skill(self.first_skill_id, self.admin_id)
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % json.dumps(
-                    [self.first_skill_id, self.second_skill_id]),
-                expected_status_int=401)
+            self.get_json('/mock/%s,%s' % (self.first_skill_id,
+                self.second_skill_id), expected_status_int=401)
         self.logout()
 
     def test_topic_manager_can_edit_multiple_public_skills(self):
@@ -2552,13 +2546,13 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         skill_services.publish_skill(self.second_skill_id, self.admin_id)
         self.login(self.manager_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % json.dumps(
-                [self.first_skill_id, self.second_skill_id]))
-        self.assertEqual(len(json.loads(response['skill_ids'])), 2)
+            response = self.get_json('/mock/%s,%s' % (self.first_skill_id,
+                self.second_skill_id))
+        self.assertEqual(len(response['skill_ids'].split(',')), 2)
         self.assertEqual(
-            json.loads(response['skill_ids'])[0], self.first_skill_id)
+            response['skill_ids'].split(',')[0], self.first_skill_id)
         self.assertEqual(
-            json.loads(response['skill_ids'])[1], self.second_skill_id)
+            response['skill_ids'].split(',')[1], self.second_skill_id)
         self.logout()
 
     def test_normal_user_can_not_edit_multiple_public_skills(self):
@@ -2566,10 +2560,8 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         skill_services.publish_skill(self.second_skill_id, self.admin_id)
         self.login(self.viewer_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            self.get_json(
-                '/mock/%s' % json.dumps(
-                    [self.first_skill_id, self.second_skill_id]),
-                expected_status_int=401)
+            self.get_json('/mock/%s,%s' % (self.first_skill_id,
+                self.second_skill_id), expected_status_int=401)
         self.logout()
 
 

@@ -14,8 +14,6 @@
 
 """Tests for the Question Editor controller."""
 
-import json
-
 from core.domain import question_services
 from core.domain import skill_services
 from core.domain import user_services

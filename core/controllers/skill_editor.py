@@ -14,8 +14,6 @@
 
 """Controllers for the skill editor."""
 
-import json
-
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import dependency_registry
@@ -149,7 +147,7 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Populates the data on the individual skill page."""
 
         try:
-            skill_ids = json.loads(skill_ids)
+            skill_ids = skill_ids.split(',')
         except Exception:
             raise self.PageNotFoundException
 
@@ -173,7 +171,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     def put(self, skill_ids):
         """Updates properties of the given skill."""
 
-        skill_id = json.loads(skill_ids)[0]
+        skill_id = skill_ids.split(',')[0]
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
         if skill is None:
@@ -207,7 +205,7 @@ class EditableSkillDataHandler(base.BaseHandler):
     def delete(self, skill_ids):
         """Handles Delete requests."""
 
-        skill_id = json.loads(skill_ids)[0]
+        skill_id = skill_ids.split(',')[0]
         skill_domain.Skill.require_valid_skill_id(skill_id)
         if skill_services.skill_has_associated_questions(skill_id):
             raise Exception(
