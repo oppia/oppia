@@ -62,18 +62,18 @@ class BaseModelValidator(object):
     external_instance_details = {}
 
     @classmethod
-    def _get_model_id_regex(cls, item):
+    def _get_model_id_regex(cls, unused_item):
         """Returns a regex for model id.
 
-        This should be implemented by subclasses.
+        This method can be overridden by subclasses, if needed.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            unused_item: ndb.Model. Entity to validate.
 
         Returns:
             str. A regex pattern to be followed by the model id.
         """
-        raise NotImplementedError
+        return '^[A-Za-z0-9+/]{1,%s}$' % base_models.ID_LENGTH
 
     @classmethod
     def _validate_model_id(cls, item):
@@ -254,6 +254,10 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
     related_model_name = ''
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9+/]{1,%s}$-\\d*' % base_models.ID_LENGTH
+
+    @classmethod
     def _validate_base_model_version_from_item_id(cls, item):
         """Validate that related model corresponding to item.id
         has a version greater than or equal to the version in item.id.
@@ -413,7 +417,7 @@ class ActivityReferencesModelValidator(BaseModelValidator):
     """Class for validating ActivityReferencesModels."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
+    def _get_model_id_regex(cls, unused_item):
         # Valid id: featured.
         regex_string = '^(%s)$' % '|'.join(
             feconf.ALL_ACTIVITY_REFERENCE_LIST_TYPES)
@@ -482,10 +486,6 @@ class CollectionModelValidator(BaseModelValidator):
     """Class for validating CollectionModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         model_domain_object_instances = [
             collection_services.get_collection_from_model(item)]
@@ -526,10 +526,6 @@ class CollectionSnapshotMetadataModelValidator(
     related_model_name = 'collection'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -555,10 +551,6 @@ class CollectionSnapshotContentModelValidator(
     related_model_name = 'collection'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -573,10 +565,6 @@ class CollectionSnapshotContentModelValidator(
 
 class CollectionRightsModelValidator(BaseModelValidator):
     """Class for validating CollectionRightsModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -636,10 +624,6 @@ class CollectionRightsSnapshotMetadataModelValidator(
     related_model_name = 'collection rights'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -663,10 +647,6 @@ class CollectionRightsSnapshotContentModelValidator(
     """Class for validating CollectionRightsSnapshotContentModel."""
 
     related_model_name = 'collection rights'
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -712,10 +692,6 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
 class CollectionSummaryModelValidator(BaseModelValidator):
     """Class for validating CollectionSummaryModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -874,10 +850,6 @@ class ConfigPropertyModelValidator(BaseModelValidator):
     """Class for validating ConfigPropertyModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -901,10 +873,6 @@ class ConfigPropertySnapshotMetadataModelValidator(
     """Class for validating ConfigPropertySnapshotMetadataModel."""
 
     related_model_name = 'config property'
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -932,10 +900,6 @@ class ConfigPropertySnapshotContentModelValidator(
     related_model_name = 'config property'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -954,7 +918,8 @@ class SentEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [intent].[random hash]
-        regex_string = '^%s\\.\\..*$' % item.intent
+        regex_string = '^%s\\.\\.[A-Za-z0-9+/]{1,%s}$' % (
+            item.intent, base_models.ID_LENGTH)
         return regex_string
 
     @classmethod
@@ -1037,12 +1002,6 @@ class SentEmailModelValidator(BaseModelValidator):
 class BulkEmailModelValidator(BaseModelValidator):
     """Class for validating BulkEmailModels."""
 
-    MODEL_ID_LENGTH = 12
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
     @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
@@ -1054,20 +1013,6 @@ class BulkEmailModelValidator(BaseModelValidator):
                 user_models.UserSettingsModel, item.recipient_ids),
             'sender_id': (user_models.UserSettingsModel, [item.sender_id]),
         }
-
-    @classmethod
-    def _validate_id_length(cls, item):
-        """Validate that model id has length 12.
-
-        Args:
-            item: ndb.Model. BulkEmailModel to validate.
-        """
-        # The bulk email model has ids as randomly generated strings of
-        # length 12.
-        if len(item.id) != cls.MODEL_ID_LENGTH:
-            cls.errors['model id length check'].append((
-                'Entity id %s: Entity id should be of length 12 but instead '
-                'has length %s' % (item.id, len(item.id))))
 
     @classmethod
     def _validate_sent_datetime(cls, item):
@@ -1107,17 +1052,12 @@ class BulkEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
-            cls._validate_id_length,
             cls._validate_sent_datetime,
             cls._validate_sender_email]
 
 
 class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     """Class for validating GeneralFeedbackEmailReplyToIdModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1162,10 +1102,6 @@ class ExplorationModelValidator(BaseModelValidator):
     """Class for validating ExplorationModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         model_domain_object_instances = [
             exp_services.get_exploration_from_model(item)]
@@ -1202,10 +1138,6 @@ class ExplorationSnapshotMetadataModelValidator(
     related_model_name = 'exploration'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1230,10 +1162,6 @@ class ExplorationSnapshotContentModelValidator(
     related_model_name = 'exploration'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1247,10 +1175,6 @@ class ExplorationSnapshotContentModelValidator(
 
 class ExplorationRightsModelValidator(BaseModelValidator):
     """Class for validating ExplorationRightsModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1316,10 +1240,6 @@ class ExplorationRightsSnapshotMetadataModelValidator(
     related_model_name = 'exploration rights'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1343,10 +1263,6 @@ class ExplorationRightsSnapshotContentModelValidator(
     """Class for validating ExplorationRightsSnapshotContentModel."""
 
     related_model_name = 'exploration rights'
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1392,10 +1308,6 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
 class ExpSummaryModelValidator(BaseModelValidator):
     """Class for validating ExpSummaryModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1590,10 +1502,6 @@ class FileMetadataModelValidator(BaseModelValidator):
     """Class for validating FileMetadataModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1632,10 +1540,6 @@ class FileMetadataSnapshotMetadataModelValidator(
     related_model_name = 'file metadata'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1661,10 +1565,6 @@ class FileMetadataSnapshotContentModelValidator(
     related_model_name = 'file metadata'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1679,10 +1579,6 @@ class FileMetadataSnapshotContentModelValidator(
 
 class FileModelValidator(BaseModelValidator):
     """Class for validating FileModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1722,10 +1618,6 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     related_model_name = 'file'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1750,10 +1642,6 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     related_model_name = 'file'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1768,10 +1656,6 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
 class ExplorationRecommendationsModelValidator(BaseModelValidator):
     """Class for validating ExplorationRecommendationsModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -1807,7 +1691,7 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
     """Class for validating TopicSimilaritiesModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
+    def _get_model_id_regex(cls, unused_item):
         # Valid id: topics.
         return '^%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
 
@@ -1906,10 +1790,6 @@ class StoryModelValidator(BaseModelValidator):
     """Class for validating StoryModel."""
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         model_domain_object_instances = [
             story_services.get_story_from_model(item)]
@@ -1949,10 +1829,6 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     related_model_name = 'story'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1976,10 +1852,6 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     related_model_name = 'story'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -1993,10 +1865,6 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
 class StoryRightsModelValidator(BaseModelValidator):
     """Class for validating StoryRightsModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2028,10 +1896,6 @@ class StoryRightsSnapshotMetadataModelValidator(
     related_model_name = 'story rights'
 
     @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
-
-    @classmethod
     def _get_model_domain_object_instances(cls, item):
         return []
 
@@ -2055,10 +1919,6 @@ class StoryRightsSnapshotContentModelValidator(
     """Class for validating StoryRightsSnapshotContentModel."""
 
     related_model_name = 'story rights'
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2104,10 +1964,6 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
 class StorySummaryModelValidator(BaseModelValidator):
     """Class for validating StorySummaryModel."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):
@@ -2182,10 +2038,6 @@ class StorySummaryModelValidator(BaseModelValidator):
 
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
-
-    @classmethod
-    def _get_model_id_regex(cls, item):
-        return '.'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):

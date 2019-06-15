@@ -2424,7 +2424,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
 
     def test_model_with_invalid_id(self):
         model_instance_with_invalid_id = email_models.BulkEmailModel(
-            id='invalid', recipient_ids=self.recipient_ids,
+            id='invalid-id', recipient_ids=self.recipient_ids,
             sender_id=self.sender_id, sender_email=self.sender_email,
             intent=feconf.BULK_EMAIL_INTENT_MARKETING,
             subject='Email Subject', html_body='Email Body',
@@ -2433,10 +2433,9 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'fully-validated BulkEmailModel\', 1]'
         ), (
-            u'[u\'failed validation check for model id length check of '
+            u'[u\'failed validation check for model id check of '
             'BulkEmailModel\', '
-            '[u\'Entity id %s: Entity id should be of length 12 but instead '
-            'has length 7\']]'
+            '[u\'Entity id %s: Entity id does not match regex pattern\']]'
         ) % model_instance_with_invalid_id.id]
         run_job_and_check_output(self, expected_output, sort=True)
 
