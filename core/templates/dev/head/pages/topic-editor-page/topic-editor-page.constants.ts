@@ -26,5 +26,3 @@ oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
 oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
 oppia.constant(
   'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
-oppia.constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');

@@ -16,7 +16,6 @@
  * @fileoverview Initialization and basic configuration for the Oppia module.
  */
 
-require('I18nFooter.ts');
 require('directives/FocusOnDirective.ts');
 
 require('pages/Base.ts');
@@ -64,6 +63,10 @@ require('domain/user/UserInfoObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 require('app.constants.ts');
+
+// The following file uses constants in app.constants.ts and hence needs to be
+// loaded after app.constants.ts
+require('I18nFooter.ts');
 
 oppia.config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',

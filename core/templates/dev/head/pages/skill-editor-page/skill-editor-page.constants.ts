@@ -28,5 +28,3 @@ oppia.constant(
   'EVENT_SKILL_INITIALIZED', 'skillInitialized');
 oppia.constant(
   'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
-oppia.constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');

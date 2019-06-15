@@ -18,8 +18,6 @@
 
 // TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
-oppia.constant(
   'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
   '/collection_editor_handler/data/<collection_id>');
 oppia.constant(

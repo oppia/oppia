@@ -2442,7 +2442,8 @@ class LintChecksManager(object):
             ts_files_to_check = [
                 filepath for filepath in all_ts_files if not any(
                     pattern in filepath for pattern in (
-                        OLD_CONVENTION_DIRECTORIES))]
+                        OLD_CONVENTION_DIRECTORIES)) and filepath.endswith(
+                            'App.ts')]
             constants_number_dict = {}
             for filepath in ts_files_to_check:
                 # Check that the constants are declared only in a *.constants.ts
