@@ -115,8 +115,9 @@ def create_multi_question_skill_links_for_question(
 
     new_question_skill_link_models = []
     for index, skill_id in enumerate(skill_ids):
-        question_skill_link_model = question_models.QuestionSkillLinkModel.create( #pylint: disable=line-too-long
-            question_id, skill_id, skill_difficulties[index])
+        question_skill_link_model = (
+            question_models.QuestionSkillLinkModel.create(
+                question_id, skill_id, skill_difficulties[index]))
     _update_linked_skill_ids_of_question(
         user_id, question_id, new_linked_skill_ids,
         question.linked_skill_ids)
