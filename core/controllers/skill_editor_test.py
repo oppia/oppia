@@ -191,8 +191,8 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
 
     def test_editable_skill_handler_get_multiple_skills(self):
         self.login(self.ADMIN_EMAIL)
-         # Check that admins can access two editable skills data at the same
-         # time.
+        # Check that admins can access two editable skills data at the same
+        # time.
         json_response = self.get_json(self.url_2)
         self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
         self.assertEqual(self.skill_id_2, json_response['skills'][1]['id'])
