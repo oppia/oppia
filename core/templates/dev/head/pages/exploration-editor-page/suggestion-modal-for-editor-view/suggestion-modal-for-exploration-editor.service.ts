@@ -22,7 +22,7 @@ require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
-require('pages/suggestion_editor/SuggestionModalService.ts');
+require('services/SuggestionModalService.ts');
 require('services/EditabilityService.ts');
 
 oppia.factory('SuggestionModalForExplorationEditorService', [

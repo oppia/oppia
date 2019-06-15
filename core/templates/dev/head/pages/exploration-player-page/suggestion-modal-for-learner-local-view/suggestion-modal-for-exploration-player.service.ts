@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
-require('pages/suggestion_editor/SuggestionModalService.ts');
+require('services/SuggestionModalService.ts');
 require('services/AlertsService.ts');
 
 oppia.factory('SuggestionModalForExplorationPlayerService', [
