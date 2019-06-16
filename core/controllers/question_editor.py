@@ -34,7 +34,7 @@ class QuestionCreationHandler(base.BaseHandler):
         if not(isinstance(skill_ids, basestring)) and not(
                 all([isinstance(
                     skill_id, basestring) for skill_id in skill_ids])):
-        raise self.InvalidInputException
+            raise self.InvalidInputException
 
     @acl_decorators.can_manage_question_skill_status
     def post(self, comma_separated_skill_ids):
