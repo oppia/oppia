@@ -281,9 +281,9 @@
         }
       },
       "codemirror": {
-        "version": "3.19.0",
+        "version": "5.47.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/marijnh/CodeMirror/archive/3.19.0.zip",
+        "url": "https://github.com/codemirror/CodeMirror/archive/5.47.0.zip",
         "rootDirPrefix": "CodeMirror-",
         "targetDirPrefix": "code-mirror-",
         "bundle": {
@@ -502,9 +502,9 @@
         }
       },
       "uiCodemirror": {
-        "version": "0.1.2",
+        "version": "0.3.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.1.2.zip",
+        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.3.0.zip",
         "rootDirPrefix": "ui-codemirror-src",
         "targetDirPrefix": "ui-codemirror-"
       },
