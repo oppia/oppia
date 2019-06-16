@@ -30,6 +30,9 @@ require(
 require(
   'components/state-editor/state-solution-editor/' +
   'state-solution-editor.directive.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts')
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
@@ -65,13 +68,13 @@ oppia.directive('stateEditor', [
       controller: [
         '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
         'StateContentService', 'StateHintsService', 'StateSolutionService',
-        'StateInteractionIdService', 'StateCustomizationArgsService',
         'StateSolicitAnswerDetailsService',
+        'StateInteractionIdService', 'StateCustomizationArgsService'
         function(
             $scope, $rootScope, INTERACTION_SPECS, StateEditorService,
             StateContentService, StateHintsService, StateSolutionService,
-            StateInteractionIdService, StateCustomizationArgsService,
-            StateSolicitAnswerDetailsService) {
+            StateSolicitAnswerDetailsService,
+            StateInteractionIdService, StateCustomizationArgsService) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;
