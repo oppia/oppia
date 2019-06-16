@@ -96,7 +96,7 @@ def create_multi_question_skill_links_for_question(
         question_id: str. ID of the question linked to the skill.
         skill_ids: list(str). ID of the skills to which the question is linked.
         skill_difficulties: list(float). The difficulty of the question with
-            respectnto a skill, represented by a flot between
+            respect to a skill, represented by a flot between
             0 and 1 (inclusive).
 
     Raises:
