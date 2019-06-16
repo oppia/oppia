@@ -292,8 +292,11 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_1),
             story_domain.StoryNode.from_dict(node_3)
         ]
-        self.assertEqual(
-            self.story.story_contents.get_ordered_nodes(), expected_list)
+
+        calculated_list = self.story.story_contents.get_ordered_nodes()
+        self.assertEqual(calculated_list[0].id, expected_list[0].id)
+        self.assertEqual(calculated_list[1].id, expected_list[1].id)
+        self.assertEqual(calculated_list[2].id, expected_list[2].id)
 
     def test_all_nodes_visited(self):
         self.story.story_contents.next_node_id = 'node_4'
