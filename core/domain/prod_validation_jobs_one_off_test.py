@@ -3840,11 +3840,11 @@ class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance_0 = file_models.FileMetadataModel.create(
-            'exp0', 'path/to/file1.png')
+            'exploration/exp0', 'path/to/file1')
         self.model_instance_0.commit(self.owner_id, [])
 
         self.model_instance_1 = file_models.FileMetadataModel.create(
-            'exp1', '/exp1/path/to/file2.png')
+            'exploration/exp1', '/exploration/exp1/path/to/file2')
         self.model_instance_1.commit(self.owner_id, [])
 
         self.job_class = (
@@ -3955,11 +3955,11 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         file_metadata_model_0 = file_models.FileMetadataModel.create(
-            'exp0', 'path/to/file1.png')
+            'exploration/exp0', 'path/to/file1')
         file_metadata_model_0.commit(self.owner_id, [])
 
         file_metadata_model_1 = file_models.FileMetadataModel.create(
-            'exp1', '/exp1/path/to/file2.png')
+            'exp1', '/exploration/exp1/path/to/file2')
         file_metadata_model_1.commit(self.user_id, [])
 
         self.id_0 = file_metadata_model_0.id
@@ -4084,11 +4084,11 @@ class FileMetadataSnapshotContentModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         file_metadata_model_0 = file_models.FileMetadataModel.create(
-            'exp0', 'path/to/file1.png')
+            'exploration/exp0', 'path/to/file1')
         file_metadata_model_0.commit(self.owner_id, [])
 
         file_metadata_model_1 = file_models.FileMetadataModel.create(
-            'exp1', '/exp1/path/to/file2.png')
+            'exp1', '/exploration/exp1/path/to/file2')
         file_metadata_model_1.commit(self.owner_id, [])
 
         self.id_0 = file_metadata_model_0.id
@@ -4156,7 +4156,7 @@ class FileMetadataSnapshotContentModelValidatorTests(
                 self.id_0, self.id_0, self.id_0, self.id_0, self.id_0,
                 self.id_0),
             u'[u\'fully-validated FileMetadataSnapshotContentModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        run_job_and_check_output(self, expected_output, literal_eval=True)
 
     def test_invalid_file_metadata_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -4196,11 +4196,11 @@ class FileModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance_0 = file_models.FileModel.create(
-            'exp0', 'path/to/file1.png')
+            'exploration/exp0', 'path/to/file1')
         self.model_instance_0.commit(self.owner_id, [])
 
         self.model_instance_1 = file_models.FileModel.create(
-            'exp1', '/exp1/path/to/file2.png')
+            'exp1', '/exploration/exp1/path/to/file2')
         self.model_instance_1.commit(self.owner_id, [])
 
         self.job_class = (
@@ -4310,11 +4310,11 @@ class FileSnapshotMetadataModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         file_model_0 = file_models.FileModel.create(
-            'exp0', 'path/to/file1.png')
+            'exploration/exp0', 'path/to/file1')
         file_model_0.commit(self.owner_id, [])
 
         file_model_1 = file_models.FileModel.create(
-            'exp1', '/exp1/path/to/file2.png')
+            'exp1', '/exploration/exp1/path/to/file2')
         file_model_1.commit(self.user_id, [])
 
         self.id_0 = file_model_0.id
@@ -4437,11 +4437,11 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         file_model_0 = file_models.FileModel.create(
-            'exp0', 'path/to/file1.png')
+            'exploration/exp0', 'path/to/file1')
         file_model_0.commit(self.owner_id, [])
 
         file_model_1 = file_models.FileModel.create(
-            'exp1', '/exp1/path/to/file2.png')
+            'exp1', '/exploration/exp1/path/to/file2')
         file_model_1.commit(self.owner_id, [])
 
         self.id_0 = file_model_0.id
@@ -4509,7 +4509,7 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
                 self.id_0, self.id_0, self.id_0, self.id_0, self.id_0,
                 self.id_0),
             u'[u\'fully-validated FileSnapshotContentModel\', 1]']
-        run_job_and_check_output(self, expected_output, sort=True)
+        run_job_and_check_output(self, expected_output, literal_eval=True)
 
     def test_invalid_file_version_in_model_id(self):
         model_with_invalid_version_in_id = (

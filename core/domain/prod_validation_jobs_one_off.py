@@ -1370,20 +1370,22 @@ class FileMetadataModelValidator(BaseModelValidator):
     """Class for validating FileMetadataModel."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^/exploration/[A-Za-z0-9+/]{1,}$'
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
-        exploration_model_ids = []
-        if item.id.startswith('/'):
-            next_index = item.id[1:].find('/')
-            if next_index == -1:
-                next_index = len(item.id)
-            else:
-                next_index = next_index + 1
-            exploration_model_ids = [item.id[1: next_index]]
-        else:
-            exploration_model_ids = [item.id[:item.id.find('/')]]
+
+        # Item id is of the format: /exploration/exp_id/filepath.
+        assets_path = 'exploration/'
+        end_index_for_assets_path = item.id.find(assets_path) + len(assets_path)
+        item_id_without_assets_path = item.id[end_index_for_assets_path:]
+        exp_id = item_id_without_assets_path[
+            :item_id_without_assets_path.find('/')]
+
         return {
             'snapshot_metadata_ids': (
                 file_models.FileMetadataSnapshotMetadataModel,
@@ -1391,9 +1393,7 @@ class FileMetadataModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 file_models.FileMetadataSnapshotContentModel,
                 snapshot_model_ids),
-            'exploration_ids': (
-                exp_models.ExplorationModel,
-                exploration_model_ids)
+            'exploration_ids': (exp_models.ExplorationModel, [exp_id])
         }
 
 
@@ -1402,6 +1402,10 @@ class FileMetadataSnapshotMetadataModelValidator(
     """Class for validating FileMetadataSnapshotMetadataModel."""
 
     related_model_name = 'file metadata'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^/exploration/[A-Za-z0-9+/]{1,}-\\d*$'
 
     @classmethod
     def _get_change_domain_class(cls):
@@ -1425,6 +1429,10 @@ class FileMetadataSnapshotContentModelValidator(
     related_model_name = 'file metadata'
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^/exploration/[A-Za-z0-9+/]{1,}-\\d*$'
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'file_metadata_ids': (
@@ -1437,20 +1445,22 @@ class FileModelValidator(BaseModelValidator):
     """Class for validating FileModel."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^/exploration/[A-Za-z0-9+/]{1,}$'
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
-        exploration_model_ids = []
-        if item.id.startswith('/'):
-            next_index = item.id[1:].find('/')
-            if next_index == -1:
-                next_index = len(item.id)
-            else:
-                next_index = next_index + 1
-            exploration_model_ids = [item.id[1: next_index]]
-        else:
-            exploration_model_ids = [item.id[:item.id.find('/')]]
+
+        # Item id is of the format: /exploration/exp_id/filepath.
+        assets_path = 'exploration/'
+        end_index_for_assets_path = item.id.find(assets_path) + len(assets_path)
+        item_id_without_assets_path = item.id[end_index_for_assets_path:]
+        exp_id = item_id_without_assets_path[
+            :item_id_without_assets_path.find('/')]
+
         return {
             'snapshot_metadata_ids': (
                 file_models.FileSnapshotMetadataModel,
@@ -1458,9 +1468,7 @@ class FileModelValidator(BaseModelValidator):
             'snapshot_content_ids': (
                 file_models.FileSnapshotContentModel,
                 snapshot_model_ids),
-            'exploration_ids': (
-                exp_models.ExplorationModel,
-                exploration_model_ids)
+            'exploration_ids': (exp_models.ExplorationModel, [exp_id])
         }
 
 
@@ -1468,6 +1476,10 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating FileSnapshotMetadataModel."""
 
     related_model_name = 'file'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^/exploration/[A-Za-z0-9+/]{1,}-\\d*$'
 
     @classmethod
     def _get_change_domain_class(cls):
@@ -1488,6 +1500,10 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating FileSnapshotContentModel."""
 
     related_model_name = 'file'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^/exploration/[A-Za-z0-9+/]{1,}-\\d*$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
