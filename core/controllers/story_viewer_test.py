@@ -111,6 +111,19 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self._record_completion(self.viewer_id, self.STORY_ID_1, self.NODE_ID_2)
 
 
+class StoryPageTests(BaseStoryViewerControllerTests):
+    def test_any_user_can_access_story_viewer_page(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+
+    def test_get_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
+            self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1),
+                expected_status_int=404)
+
+
 class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
     def test_can_not_access_story_viewer_page_with_unpublished_story(self):

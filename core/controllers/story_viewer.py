@@ -52,34 +52,30 @@ class StoryPageDataHandler(base.BaseHandler):
             completed_node.id for completed_node in
             story_services.get_completed_nodes_in_story(self.user_id, story_id)]
 
-        ordered_nodes_dict = [
+        ordered_node_dicts = [
             node.to_dict() for node in story.story_contents.get_ordered_nodes()
-        # TODO(aks681): Once the story publication is done, add a check so that
-        # only if all explorations in the story are published, can the story
-        # itself be published. After which, remove the following condition.
+            # TODO(aks681): Once the story publication is done, add a check so
+            # that only if all explorations in the story are published, can the
+            # story itself be published. After which, remove the following
+            # condition.
             if node.exploration_id]
-        for node in ordered_nodes_dict:
+        for node in ordered_node_dicts:
             node['completed'] = False
             if node['id'] in completed_node_ids:
                 node['completed'] = True
 
         exp_ids = [
-            node['exploration_id'] for node in ordered_nodes_dict]
+            node['exploration_id'] for node in ordered_node_dicts]
         exp_summary_dicts = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
                 exp_ids, user=self.user))
-        exp_summaries_dict_map = {
-            exp_summary_dict['id']: exp_summary_dict
-            for exp_summary_dict in exp_summary_dicts
-        }
 
-        for node in ordered_nodes_dict:
-            node['exp_summary_dict'] = exp_summaries_dict_map[
-                node['exploration_id']]
+        for ind, node in enumerate(ordered_node_dicts):
+            node['exp_summary_dict'] = exp_summary_dicts[ind]
 
         self.values.update({
             'story_title': story.title,
             'story_description': story.description,
-            'story_nodes': ordered_nodes_dict
+            'story_nodes': ordered_node_dicts
         })
         self.render_json(self.values)
