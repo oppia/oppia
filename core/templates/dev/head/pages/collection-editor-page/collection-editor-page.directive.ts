@@ -33,6 +33,7 @@ require(
 require('services/PageTitleService.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.directive('collectionEditorPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

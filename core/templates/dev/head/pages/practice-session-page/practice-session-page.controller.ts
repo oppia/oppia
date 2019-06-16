@@ -29,7 +29,7 @@ require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
 require('pages/practice-session-page/practice-session-page.constants.ts');
-require('pages/interaction-specs.contants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.controller('PracticeSession', [
   '$http', '$rootScope', '$scope', 'AlertsService',

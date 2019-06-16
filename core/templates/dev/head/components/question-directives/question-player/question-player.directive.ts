@@ -101,7 +101,7 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
 
-require('pages/interaction-specs.contants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',

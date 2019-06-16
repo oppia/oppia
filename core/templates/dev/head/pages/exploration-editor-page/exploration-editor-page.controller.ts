@@ -258,7 +258,7 @@ require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
-require('pages/interaction-specs.contants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.controller('ExplorationEditor', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',

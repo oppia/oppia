@@ -19,8 +19,6 @@
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
 oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
 oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
 oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');

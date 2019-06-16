@@ -31,7 +31,5 @@ oppia.constant(
   'SEARCH_EXPLORATION_URL_TEMPLATE',
   '/exploration/metadata_search?q=<query>');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
 oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
 oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');

@@ -17,8 +17,6 @@
  */
 
 oppia.constant(
-  'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant(
   'SKILL_RIGHTS_URL_TEMPLATE',
   '/skill_editor_handler/rights/<skill_id>');
 oppia.constant(

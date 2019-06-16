@@ -123,6 +123,7 @@ require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.controller('TopicEditor', [
   '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',
