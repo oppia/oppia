@@ -31,7 +31,7 @@ oppia.directive('signupPage', ['UrlInterpolationService', function(
     scope: {},
     bindToController: {},
     templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/signup/signup_page_directive.html'),
+      '/pages/signup-page/signup-page.directive.html'),
     controllerAs: '$ctrl',
     controller: [
       '$http', '$rootScope', '$uibModal', 'AlertsService',
