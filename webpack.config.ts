@@ -57,7 +57,7 @@ module.exports = {
       'exploration-editor-page.controller.ts',
     exploration_player:
       commonPrefix + '/pages/exploration-player-page/' +
-      'exploration-player-page.controller.ts',
+      'exploration-player-page.scripts.ts',
     get_started:
       commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
