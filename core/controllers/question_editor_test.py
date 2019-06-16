@@ -264,7 +264,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
             question_summaries[0].id, self.question_id)
         self.assertEqual(
             grouped_skill_descriptions[0],
-            ['Skill Description', 'Skill Description 2']
+            ['Skill Description 2', 'Skill Description']
         )
         self.logout()
 
