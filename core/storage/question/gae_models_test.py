@@ -17,8 +17,8 @@
 import datetime
 import types
 
-from core.domain import state_domain
 from core.domain import skill_services
+from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
 

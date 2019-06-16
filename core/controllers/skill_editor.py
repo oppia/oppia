@@ -144,7 +144,7 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_skills
     def get(self, skill_ids):
-        """Populates the data on skill pages of the skill ids"""
+        """Populates the data on skill pages of the skill ids."""
 
         try:
             skill_ids = skill_ids.split(',')
