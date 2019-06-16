@@ -19,6 +19,7 @@
 import collections
 import csv
 import datetime
+import itertools
 import re
 
 from constants import constants
@@ -51,6 +52,18 @@ import feconf
             models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
+ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
+ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
+    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
+ASSETS_PATH_REGEX = '/exploration/[A-Za-z0-9]{1,12}/assets/'
+IMAGE_PATH_REGEX = (
+    '%simage/[A-Za-z0-9_]{1,}\\.(%s)' % (
+        ASSETS_PATH_REGEX, ('|').join(ALLOWED_IMAGE_EXTENSIONS)))
+AUDIO_PATH_REGEX = (
+    '%saudio/[A-Za-z0-9_]{1,}\\.(%s)' % (
+        ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
+FILE_MODELS_REGEX = '(%s|%s)' % (IMAGE_PATH_REGEX, AUDIO_PATH_REGEX)
+
 
 class BaseModelValidator(object):
     """Base class for validating models."""
@@ -73,7 +86,7 @@ class BaseModelValidator(object):
         Returns:
             str. A regex pattern to be followed by the model id.
         """
-        return '^[A-Za-z0-9+/]{1,%s}$' % base_models.ID_LENGTH
+        return '^[A-Za-z0-9]{1,%s}$' % base_models.ID_LENGTH
 
     @classmethod
     def _validate_model_id(cls, item):
@@ -309,7 +322,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9+/]{1,%s}-\\d*$' % base_models.ID_LENGTH
+        return '^[A-Za-z0-9]{1,%s}-\\d*$' % base_models.ID_LENGTH
 
     @classmethod
     def _validate_base_model_version_from_item_id(cls, item):
@@ -878,7 +891,7 @@ class SentEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [intent].[random hash]
-        regex_string = '^%s\\.\\.[A-Za-z0-9+/]{1,%s}$' % (
+        regex_string = '^%s\\.\\.[A-Za-z0-9]{1,%s}$' % (
             item.intent, base_models.ID_LENGTH)
         return regex_string
 
@@ -1371,7 +1384,7 @@ class FileMetadataModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^/exploration/[A-Za-z0-9+/]{1,}$'
+        return '^%s$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1379,12 +1392,13 @@ class FileMetadataModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
 
-        # Item id is of the format: /exploration/exp_id/filepath.
-        assets_path = 'exploration/'
-        end_index_for_assets_path = item.id.find(assets_path) + len(assets_path)
-        item_id_without_assets_path = item.id[end_index_for_assets_path:]
-        exp_id = item_id_without_assets_path[
-            :item_id_without_assets_path.find('/')]
+        # Item id is of the format:
+        # /exploration/exp_id/assets/(image|audio)/filepath.
+        exp_val = '/exploration/'
+        assets_val = '/assets'
+        start_index = item.id.find(exp_val) + len(exp_val)
+        end_index = item.id.find(assets_val)
+        exp_id = item.id[start_index:end_index]
 
         return {
             'snapshot_metadata_ids': (
@@ -1405,7 +1419,7 @@ class FileMetadataSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^/exploration/[A-Za-z0-9+/]{1,}-\\d*$'
+        return '%s-\\d*$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_change_domain_class(cls):
@@ -1430,7 +1444,7 @@ class FileMetadataSnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^/exploration/[A-Za-z0-9+/]{1,}-\\d*$'
+        return '%s-\\d*$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1446,7 +1460,7 @@ class FileModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^/exploration/[A-Za-z0-9+/]{1,}$'
+        return '^%s$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1454,12 +1468,13 @@ class FileModelValidator(BaseModelValidator):
             '%s-%d' % (item.id, version) for version in range(
                 1, item.version + 1)]
 
-        # Item id is of the format: /exploration/exp_id/filepath.
-        assets_path = 'exploration/'
-        end_index_for_assets_path = item.id.find(assets_path) + len(assets_path)
-        item_id_without_assets_path = item.id[end_index_for_assets_path:]
-        exp_id = item_id_without_assets_path[
-            :item_id_without_assets_path.find('/')]
+        # Item id is of the format:
+        # /exploration/exp_id/assets/(image|audio)/filepath.
+        exp_val = '/exploration/'
+        assets_val = '/assets'
+        start_index = item.id.find(exp_val) + len(exp_val)
+        end_index = item.id.find(assets_val)
+        exp_id = item.id[start_index:end_index]
 
         return {
             'snapshot_metadata_ids': (
@@ -1479,7 +1494,7 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^/exploration/[A-Za-z0-9+/]{1,}-\\d*$'
+        return '%s-\\d*$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_change_domain_class(cls):
@@ -1503,7 +1518,7 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^/exploration/[A-Za-z0-9+/]{1,}-\\d*$'
+        return '%s-\\d*$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):

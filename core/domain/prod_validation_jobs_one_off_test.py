@@ -3840,11 +3840,11 @@ class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'path/to/file1')
+            'exploration/exp0', 'assets/image/img0.png')
         self.model_instance_0.commit(self.owner_id, [])
 
         self.model_instance_1 = file_models.FileMetadataModel.create(
-            'exploration/exp1', '/exploration/exp1/path/to/file2')
+            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
         self.model_instance_1.commit(self.owner_id, [])
 
         self.job_class = (
@@ -3955,11 +3955,11 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         file_metadata_model_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'path/to/file1')
+            'exploration/exp0', 'assets/image/img0.png')
         file_metadata_model_0.commit(self.owner_id, [])
 
         file_metadata_model_1 = file_models.FileMetadataModel.create(
-            'exp1', '/exploration/exp1/path/to/file2')
+            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
         file_metadata_model_1.commit(self.user_id, [])
 
         self.id_0 = file_metadata_model_0.id
@@ -4084,11 +4084,11 @@ class FileMetadataSnapshotContentModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         file_metadata_model_0 = file_models.FileMetadataModel.create(
-            'exploration/exp0', 'path/to/file1')
+            'exploration/exp0', 'assets/image/img0.png')
         file_metadata_model_0.commit(self.owner_id, [])
 
         file_metadata_model_1 = file_models.FileMetadataModel.create(
-            'exp1', '/exploration/exp1/path/to/file2')
+            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
         file_metadata_model_1.commit(self.owner_id, [])
 
         self.id_0 = file_metadata_model_0.id
@@ -4196,11 +4196,11 @@ class FileModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         self.model_instance_0 = file_models.FileModel.create(
-            'exploration/exp0', 'path/to/file1')
+            'exploration/exp0', 'assets/image/img0.png')
         self.model_instance_0.commit(self.owner_id, [])
 
         self.model_instance_1 = file_models.FileModel.create(
-            'exp1', '/exploration/exp1/path/to/file2')
+            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
         self.model_instance_1.commit(self.owner_id, [])
 
         self.job_class = (
@@ -4310,11 +4310,11 @@ class FileSnapshotMetadataModelValidatorTests(
             exp_services.save_new_exploration(self.owner_id, exp)
 
         file_model_0 = file_models.FileModel.create(
-            'exploration/exp0', 'path/to/file1')
+            'exploration/exp0', 'assets/image/img0.png')
         file_model_0.commit(self.owner_id, [])
 
         file_model_1 = file_models.FileModel.create(
-            'exp1', '/exploration/exp1/path/to/file2')
+            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
         file_model_1.commit(self.user_id, [])
 
         self.id_0 = file_model_0.id
@@ -4437,11 +4437,11 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             exp_services.save_new_exploration(self.owner_id, exp)
 
         file_model_0 = file_models.FileModel.create(
-            'exploration/exp0', 'path/to/file1')
+            'exploration/exp0', 'assets/image/img0.png')
         file_model_0.commit(self.owner_id, [])
 
         file_model_1 = file_models.FileModel.create(
-            'exp1', '/exploration/exp1/path/to/file2')
+            'exploration/exp1', '/exploration/exp1/assets/audio/aud1.mp3')
         file_model_1.commit(self.owner_id, [])
 
         self.id_0 = file_model_0.id
