@@ -393,17 +393,6 @@
         "rootDirPrefix": "jquery-ui-touch-punch-improved-",
         "targetDirPrefix": "jquery-ui-touch-punch-"
       },
-      "waveSurferJs": {
-        "version": "2.2.1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/katspaugh/wavesurfer.js/archive/2.2.1.zip",
-        "rootDirPrefix": "wavesurfer.js-",
-        "targetDirPrefix": "wavesurfer.js-",
-        "files": ["src/wavesurfer.js"],
-        "bundle": {
-          "js": ["src/wavesurfer.js"]
-        }
-      },
       "mathExpressions": {
         "version": "1.7.0",
         "downloadFormat": "files",
@@ -548,6 +537,17 @@
         "targetDirPrefix": "ui-utils-",
         "bundle": {
           "js": ["ui-utils.js"]
+        }
+      },
+      "waveSurferJs": {
+        "version": "1.0.46",
+        "downloadFormat": "files",
+        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
+        "rootDirPrefix": "waveSurfer-js-",
+        "targetDirPrefix": "wave-surfer-js-",
+        "files": ["wavesurfer.min.js"],
+        "bundle": {
+          "js": ["wavesurfer.min.js"]
         }
       }
     },
