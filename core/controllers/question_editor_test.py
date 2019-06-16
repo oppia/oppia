@@ -180,7 +180,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
         self.skill_id_2 = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id_2, self.admin_id, 'Skill Description 2')
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, self.editor_id,

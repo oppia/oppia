@@ -281,7 +281,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             [self.SKILL_ID, skill_id_1])
         self.assertEqual(skill_rights[0].id, self.SKILL_ID)
         self.assertEqual(skill_rights[1].id, skill_id_1)
-    
+
     def test_get_multi_skill_rights_when_skill_doesnt_exist(self):
         skill_id_1 = skill_services.get_new_skill_id()
         skill_rights = skill_services.get_multi_skill_rights(

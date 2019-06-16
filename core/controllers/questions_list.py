@@ -34,7 +34,7 @@ class QuestionsListHandler(base.BaseHandler):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
         skill_ids = skill_ids.split(',')
-  
+
         for skill_id in skill_ids:
             try:
                 skill_domain.Skill.require_valid_skill_id(skill_id)

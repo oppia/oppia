@@ -276,7 +276,7 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3, questionskilllink_model4])
 
-        question_skill_link_models, skill_descriptions, next_cursor_str = (
+        question_skill_link_models, skill_descriptions, _ = (
             question_models.QuestionSkillLinkModel.get_question_skill_links_and_skill_descriptions( #pylint: disable=line-too-long
                 1, [skill_id_1, skill_id_2, skill_id_3, skill_id_4], ''
             )
