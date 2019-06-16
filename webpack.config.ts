@@ -96,7 +96,7 @@ module.exports = {
     terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
     topic_editor:
-      commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
+      commonPrefix + '/pages/topic-editor-page/topic-editor-page.scripts.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
