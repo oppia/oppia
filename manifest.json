@@ -344,9 +344,9 @@
         "targetDir": "guppy-b5055b"
       },
       "hammerJs": {
-        "version": "2.0.4",
+        "version": "2.0.8",
         "downloadFormat": "zip",
-        "url": "https://github.com/hammerjs/hammer.js/archive/2.0.4.zip",
+        "url": "https://github.com/hammerjs/hammer.js/archive/v2.0.8.zip",
         "rootDirPrefix": "hammer.js-",
         "targetDirPrefix": "hammer-js-",
         "bundle": {
@@ -392,6 +392,17 @@
         "url": "https://github.com/Bantam/jquery-ui-touch-punch-improved/archive/0.3.1.zip",
         "rootDirPrefix": "jquery-ui-touch-punch-improved-",
         "targetDirPrefix": "jquery-ui-touch-punch-"
+      },
+      "waveSurferJs": {
+        "version": "2.2.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/katspaugh/wavesurfer.js/archive/2.2.1.zip",
+        "rootDirPrefix": "waveSurfer.js-",
+        "targetDirPrefix": "wave.surfer-js-",
+        "files": ["src/wavesurfer.js"],
+        "bundle": {
+          "js": ["src/wavesurfer.js"]
+        }
       },
       "mathExpressions": {
         "version": "1.7.0",
@@ -459,9 +470,9 @@
         }
       },
       "select2": {
-        "version": "4.0.3",
+        "version": "4.0.6",
         "downloadFormat": "zip",
-        "url": "https://github.com/select2/select2/archive/4.0.3.zip",
+        "url": "https://github.com/select2/select2/archive/4.0.6.zip",
         "rootDirPrefix": "select2-",
         "targetDirPrefix": "select2-",
         "bundle": {
@@ -537,17 +548,6 @@
         "targetDirPrefix": "ui-utils-",
         "bundle": {
           "js": ["ui-utils.js"]
-        }
-      },
-      "waveSurferJs": {
-        "version": "1.0.46",
-        "downloadFormat": "files",
-        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
-        "rootDirPrefix": "waveSurfer-js-",
-        "targetDirPrefix": "wave-surfer-js-",
-        "files": ["wavesurfer.min.js"],
-        "bundle": {
-          "js": ["wavesurfer.min.js"]
         }
       }
     },
