@@ -52,8 +52,7 @@ oppia.factory('ExplorationPlayerStateService', [
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
-  'PretestEngineService', 'QuestionPlayerBackendApiService',
-  'QuestionBackendApiService',
+  'QuestionBackendApiService', 'QuestionPlayerEngineService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
@@ -63,8 +62,7 @@ oppia.factory('ExplorationPlayerStateService', [
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
-      PretestEngineService, QuestionPlayerBackendApiService,
-      QuestionBackendApiService,
+      QuestionBackendApiService, QuestionPlayerEngineService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
