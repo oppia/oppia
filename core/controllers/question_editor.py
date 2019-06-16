@@ -86,7 +86,7 @@ class QuestionSkillLinkHandler(base.BaseHandler):
 
         if not all(
                 [isinstance(skill_id, basestring)
-                for skill_id in skill_ids_list]):
+                 for skill_id in skill_ids_list]):
             raise self.PageNotFoundException
 
         for skill_id in skill_ids_list:
