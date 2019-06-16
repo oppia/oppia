@@ -66,7 +66,7 @@ class CollectionEditorPage(CollectionEditorHandler):
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
         })
 
-        self.render_template('dist/collection_editor.html')
+        self.render_template('dist/collection-editor-page.mainpage.html')
 
 
 class EditableCollectionDataHandler(CollectionEditorHandler):
