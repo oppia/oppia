@@ -1141,6 +1141,11 @@ def can_resubmit_suggestion(handler):
             UnauthorizedUserException: The user does not have
                 credentials to edit this suggestion.
         """
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if not suggestion:
+            raise self.InvalidInputException(
+                'No suggestion found with given suggestion id')
+
         if suggestion_services.check_can_resubmit_suggestion(
                 suggestion_id, self.user_id):
             return handler(self, suggestion_id, **kwargs)
@@ -1499,11 +1504,12 @@ def require_user_id_else_redirect_to_homepage(handler):
 def can_edit_topic(handler):
     """Decorator to check whether the user can edit given topic."""
 
-    def test_can_edit(self, topic_id, **kwargs):
+    def test_can_edit(self, topic_id, *args, **kwargs):
         """Checks whether the user can edit a given topic.
 
         Args:
             topic_id: str. The topic id.
+            *args: arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1523,7 +1529,7 @@ def can_edit_topic(handler):
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
-            return handler(self, topic_id, **kwargs)
+            return handler(self, topic_id, *args, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this topic.')
@@ -2429,7 +2435,16 @@ def get_decorator_for_accepting_suggestion(decorator):
                     user_actions_info.actions):
                 return handler(self, target_id, suggestion_id, **kwargs)
 
+            if len(suggestion_id.split('.')) != 3:
+                raise self.InvalidInputException(
+                    'Invalid format for suggestion_id.'
+                    ' It must contain 3 parts separated by \'.\'')
+
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+            if suggestion is None:
+                raise self.PageNotFoundException
+
             if suggestion_services.check_user_can_review_in_category(
                     self.user_id, suggestion.score_category):
                 return handler(self, target_id, suggestion_id, **kwargs)

@@ -33,13 +33,13 @@ require('services/UtilsService.ts');
 
 oppia.controller('Preferences', [
   '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate', '$uibModal',
-  'AlertsService', 'LanguageUtilService', 'UrlInterpolationService',
+  '$window', 'AlertsService', 'LanguageUtilService', 'UrlInterpolationService',
   'UserService', 'UtilsService', 'DASHBOARD_TYPE_CREATOR',
   'DASHBOARD_TYPE_LEARNER', 'SUPPORTED_AUDIO_LANGUAGES',
   'SUPPORTED_SITE_LANGUAGES',
   function(
       $http, $q, $rootScope, $scope, $timeout, $translate, $uibModal,
-      AlertsService, LanguageUtilService, UrlInterpolationService,
+      $window, AlertsService, LanguageUtilService, UrlInterpolationService,
       UserService, UtilsService, DASHBOARD_TYPE_CREATOR,
       DASHBOARD_TYPE_LEARNER, SUPPORTED_AUDIO_LANGUAGES,
       SUPPORTED_SITE_LANGUAGES) {
@@ -243,7 +243,7 @@ oppia.controller('Preferences', [
           .then(function() {
             // The reload is needed in order to update the profile picture in
             // the top-right corner.
-            location.reload();
+            $window.location.reload();
           });
       });
     };

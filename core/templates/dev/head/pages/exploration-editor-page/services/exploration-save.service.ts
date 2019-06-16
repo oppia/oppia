@@ -52,7 +52,7 @@ require('services/SiteAnalyticsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
 oppia.factory('ExplorationSaveService', [
-  '$log', '$q', '$rootScope', '$timeout', '$uibModal',
+  '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
@@ -64,7 +64,7 @@ oppia.factory('ExplorationSaveService', [
   'RouterService', 'SiteAnalyticsService', 'StatesObjectFactory',
   'UrlInterpolationService',
   function(
-      $log, $q, $rootScope, $timeout, $uibModal,
+      $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
@@ -299,7 +299,7 @@ oppia.factory('ExplorationSaveService', [
           // The reload is necessary because, otherwise, the
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
-          location.reload();
+          $window.location.reload();
         });
       },
 
