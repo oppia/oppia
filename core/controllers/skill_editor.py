@@ -159,7 +159,7 @@ class EditableSkillDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
 
-        skill_dicts = [skill.to_dict() for skill in skills] 
+        skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
             'skills': skill_dicts
         })
