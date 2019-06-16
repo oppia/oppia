@@ -45,7 +45,7 @@ ACTIONS_DIR = (
 ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+    os.path.join('extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
