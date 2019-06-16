@@ -122,7 +122,6 @@ def create_multi_question_skill_links_for_question(
     _update_linked_skill_ids_of_question(
         user_id, question_id, new_linked_skill_ids,
         question.linked_skill_ids)
-    print "====TEST: Multi question skill link models: ", len(new_question_skill_link_models)
     question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
         new_question_skill_link_models)
 
