@@ -103,7 +103,7 @@ module.exports = {
       'topics-and-skills-dashboard-page.controller.ts'
     ),
     topic_viewer:
-      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.controller.ts',
+      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
     new HtmlWebpackPlugin({
