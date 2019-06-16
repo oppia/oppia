@@ -38,10 +38,10 @@ class QuestionCreationHandler(base.BaseHandler):
             raise self.InvalidInputException
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, skill_ids):
+    def post(self, comma_separated_skill_ids):
         """Handles POST requests."""
         try:
-            skill_ids = skill_ids.split(',')
+            skill_ids = comma_separated_skill_ids.split(',')
             self.validate_skill_ids(skill_ids)
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)

@@ -95,8 +95,8 @@ def create_multi_question_skill_links_for_question(
         user_id: str. ID of the creator.
         question_id: str. ID of the question linked to the skill.
         skill_ids: list(str). ID of the skills to which the question is linked.
-        skill_difficulties: list(float). The difficulty between [0, 1]
-        of the skills.
+        skill_difficulties: list(float). The difficulty of the question with respect
+            to a skill, represented by a flot between 0 and 1 (inclusive).
 
     Raises:
         Exception. Skill difficulties and skill ids should match. The lengths of
@@ -112,7 +112,7 @@ def create_multi_question_skill_links_for_question(
 
     new_question_skill_link_models = []
     for index, skill_id in enumerate(skill_ids):
-        question_skill_link_model = (
+        new_question_skill_link_models.append(
             question_models.QuestionSkillLinkModel.create(
                 question_id, skill_id, skill_difficulties[index]))
 
@@ -122,7 +122,8 @@ def create_multi_question_skill_links_for_question(
     _update_linked_skill_ids_of_question(
         user_id, question_id, new_linked_skill_ids,
         question.linked_skill_ids)
-    question_skill_link_model.put_multi_question_skill_links(
+    print "====TEST: Multi question skill link models: ", len(new_question_skill_link_models)
+    question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
         new_question_skill_link_models)
 
 

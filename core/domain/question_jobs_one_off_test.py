@@ -43,7 +43,7 @@ class QuestionMigrationOneOffJobTests(test_utils.GenericTestBase):
 
         self.question = self.save_new_question(
             self.QUESTION_ID, self.albert_id,
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [])
 
 
     def test_migration_job_does_not_convert_up_to_date_question(self):

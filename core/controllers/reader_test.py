@@ -255,11 +255,11 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
         question_id = question_services.get_new_question_id()
         self.save_new_question(
             question_id, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [])
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
@@ -307,14 +307,14 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         self.question_id = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, self.skill_id, 0.5)
 
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [])
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id_2, self.skill_id, 0.5)
 
@@ -348,7 +348,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
         question_id_3 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_3, 'user',
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, skill_id_2, 0.5)
         url = '%s?question_count=%s&skill_ids=%s,%s&start_cursor=' % (

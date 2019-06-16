@@ -1447,18 +1447,18 @@ tags: []
 
     def save_new_question( #pylint: disable=dangerous-default-value
             self, question_id, owner_id, question_state_data,
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            linked_skill_ids=[]):
+            linked_skill_ids,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
         Args:
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             question_state_data: State. The state data for the question.
-            language_code: str. The ISO 639-1 code for the language this
-                question is written in.
             linked_skill_ids: list(str). List of skill IDs linked to the
                 question.
+            language_code: str. The ISO 639-1 code for the language this
+                question is written in.
 
         Returns:
             Question. A newly-created question.
