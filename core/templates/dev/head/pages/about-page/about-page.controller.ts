@@ -24,8 +24,8 @@ require('domain/utilities/UrlInterpolationService.ts');
  */
 
 oppia.controller('About', [
-  '$scope', 'UrlInterpolationService',
-  function($scope, UrlInterpolationService) {
+  '$scope', '$window', 'UrlInterpolationService',
+  function($scope, $window, UrlInterpolationService) {
     // Define constants
     $scope.TAB_ID_ABOUT = 'about';
     $scope.TAB_ID_FOUNDATION = 'foundation';
@@ -62,7 +62,7 @@ oppia.controller('About', [
         activateTab($scope.TAB_ID_FOUNDATION);
         // Ensure page goes to the license section
         if (hashChange === 'license') {
-          location.reload(true);
+          $window.location.reload(true);
         }
       } else if (hashChange === $scope.TAB_ID_CREDITS) {
         activateTab($scope.TAB_ID_CREDITS);

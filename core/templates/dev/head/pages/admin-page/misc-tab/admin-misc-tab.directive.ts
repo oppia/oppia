@@ -45,7 +45,7 @@ oppia.directive('adminMiscTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          if (!confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 
