@@ -32,7 +32,7 @@ require(
   'state-solution-editor.directive.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
-  'state-solicit-answer-details.service.ts')
+  'state-solicit-answer-details.service.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
@@ -69,7 +69,7 @@ oppia.directive('stateEditor', [
         '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
         'StateContentService', 'StateHintsService', 'StateSolutionService',
         'StateSolicitAnswerDetailsService',
-        'StateInteractionIdService', 'StateCustomizationArgsService'
+        'StateInteractionIdService', 'StateCustomizationArgsService',
         function(
             $scope, $rootScope, INTERACTION_SPECS, StateEditorService,
             StateContentService, StateHintsService, StateSolutionService,
