@@ -347,13 +347,14 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party.sh',
     '/.github/']
 
-OLD_CONVENTION_DIRECTORIES = [
+OLD_CONVENTION_PATHS = [
     'core/templates/dev/head/services',
     'core/templates/dev/head/base_components',
     'core/templates/dev/head/directives',
     'core/templates/dev/head/domain',
     'core/templates/dev/head/expressions',
     'core/templates/dev/head/tests',
+    'core/templates/dev/head/App.ts',
     'extensions/']
 
 if not os.getcwd().endswith('oppia'):
@@ -2432,7 +2433,8 @@ class LintChecksManager(object):
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
-        the constants are not declared in files other than *.constants.ts.
+        the constants are not declared in files other than *.constants.ts and
+        that the constants are declared only single time.
         """
 
         if self.verbose_mode_enabled:
@@ -2448,10 +2450,9 @@ class LintChecksManager(object):
                     filepath.endswith('.ts'))]
             ts_files_to_check = [
                 filepath for filepath in all_ts_files if not any(
-                    pattern in filepath for pattern in (
-                        OLD_CONVENTION_DIRECTORIES)) and filepath.endswith(
-                            'App.ts')]
-            constants_number_dict = {}
+                    filepath.startswith(pattern) for pattern in (
+                        OLD_CONVENTION_PATHS))]
+            constants_to_source_filepaths_dict = {}
             for filepath in ts_files_to_check:
                 # Check that the constants are declared only in a *.constants.ts
                 # file.
@@ -2477,16 +2478,18 @@ class LintChecksManager(object):
                         continue
                     else:
                         constant_name = expression.arguments[0].raw
-                        if constant_name in constants_number_dict:
+                        if constant_name in constants_to_source_filepaths_dict:
                             failed = True
                             print ('%s --> The constant %s is already declared '
                                    'in %s. Please import the file where the '
                                    'constant is declared or rename the constant'
                                    '.' % (
                                        filepath, constant_name,
-                                       constants_number_dict[constant_name]))
+                                       constants_to_source_filepaths_dict[
+                                           constant_name]))
                         else:
-                            constants_number_dict[constant_name] = filepath
+                            constants_to_source_filepaths_dict[
+                                constant_name] = filepath
 
 
             if failed:
