@@ -19,58 +19,58 @@
 
 oppia.factory('StoryPlaythroughObjectFactory', [
   'ReadOnlyStoryNodeObjectFactory', function(ReadOnlyStoryNodeObjectFactory) {
-  // Stores information about a current playthrough of a story for a
-  // user.
-  var StoryPlaythrough = function(nodes) {
-    this._nodes = nodes;
-  };
+    // Stores information about a current playthrough of a story for a
+    // user.
+    var StoryPlaythrough = function(nodes) {
+      this._nodes = nodes;
+    };
 
-  StoryPlaythrough.prototype.getInitialNode = function() {
-    return this._nodes[0];
-  };
+    StoryPlaythrough.prototype.getInitialNode = function() {
+      return this._nodes[0];
+    };
 
-  StoryPlaythrough.prototype.getStoryNodeCount = function() {
-    return this._nodes.length;
-  };
+    StoryPlaythrough.prototype.getStoryNodeCount = function() {
+      return this._nodes.length;
+    };
 
-  StoryPlaythrough.prototype.getStoryNodes = function() {
-    return this._nodes;
-  };
+    StoryPlaythrough.prototype.getStoryNodes = function() {
+      return this._nodes;
+    };
 
-  StoryPlaythrough.prototype.hasFinishedStory = function() {
-    return this._nodes.slice(-1)[0].isCompleted();
-  };
+    StoryPlaythrough.prototype.hasFinishedStory = function() {
+      return this._nodes.slice(-1)[0].isCompleted();
+    };
 
-  StoryPlaythrough.prototype.getNextPendingNodeId = function() {
-    for(var i = 0; i < this._nodes.length; i++) {
-      if (!this._nodes[i].isCompleted()) {
-        return this._nodes[i].getId();
+    StoryPlaythrough.prototype.getNextPendingNodeId = function() {
+      for (var i = 0; i < this._nodes.length; i++) {
+        if (!this._nodes[i].isCompleted()) {
+          return this._nodes[i].getId();
+        }
       }
-    }
-  };
+    };
 
-  StoryPlaythrough.prototype.hasStartedStory = function() {
-    return this._nodes[0].isCompleted();
-  };
+    StoryPlaythrough.prototype.hasStartedStory = function() {
+      return this._nodes[0].isCompleted();
+    };
 
-  // Static class methods. Note that "this" is not available in static
-  // contexts. This function takes a JSON object which represents a backend
-  // story playthrough python dict.
-  // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
-  /* eslint-disable dot-notation */
-  StoryPlaythrough['createFromBackendDict'] = function(
-  /* eslint-enable dot-notation */
-      storyPlaythroughBackendObject) {
-    var nodeObjects = [];
+    // Static class methods. Note that "this" is not available in static
+    // contexts. This function takes a JSON object which represents a backend
+    // story playthrough python dict.
+    // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
+    /* eslint-disable dot-notation */
+    StoryPlaythrough['createFromBackendDict'] = function(
+    /* eslint-enable dot-notation */
+        storyPlaythroughBackendObject) {
+      var nodeObjects = [];
 
-    nodeObjects = storyPlaythroughBackendObject.story_nodes.map(
-      function(node) {
-        return ReadOnlyStoryNodeObjectFactory.createFromBackendDict(node);
-      }
-    );
+      nodeObjects = storyPlaythroughBackendObject.story_nodes.map(
+        function(node) {
+          return ReadOnlyStoryNodeObjectFactory.createFromBackendDict(node);
+        }
+      );
 
-    return new StoryPlaythrough(nodeObjects);
-  };
+      return new StoryPlaythrough(nodeObjects);
+    };
 
-  return StoryPlaythrough;
-}]);
+    return StoryPlaythrough;
+  }]);

@@ -138,7 +138,7 @@ oppia.directive('storyViewerChaptersList', ['UrlInterpolationService',
                 ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
               } else {
                 ctrl.svgHeight = y - ctrl.EVEN_SVG_HEIGHT_OFFSET_PX;
-                }
+              }
             } else {
               if (storyNodeCount === 1) {
                 ctrl.svgHeight = ctrl.MIN_HEIGHT_FOR_PATH_SVG_PX;
@@ -169,8 +169,8 @@ oppia.directive('storyViewerChaptersList', ['UrlInterpolationService',
             var countMiddleIcon = 1;
 
             for (
-                var i = 1; i < ctrl.storyPlaythroughObject.getStoryNodeCount();
-                i++) {
+              var i = 1; i < ctrl.storyPlaythroughObject.getStoryNodeCount();
+              i++) {
               if (countMiddleIcon === 0 && x === ctrl.ICON_X_MIDDLE_PX) {
                 x = ctrl.ICON_X_LEFT_PX;
                 y += ctrl.ICON_Y_INCREMENT_PX;
@@ -198,7 +198,7 @@ oppia.directive('storyViewerChaptersList', ['UrlInterpolationService',
           };
 
           ctrl.getExplorationUrl = function(node) {
-            if(!ctrl.isNextPendingNode) {
+            if (!ctrl.isNextPendingNode) {
               return null;
             }
             return ('/explore/' + node.getExplorationId());

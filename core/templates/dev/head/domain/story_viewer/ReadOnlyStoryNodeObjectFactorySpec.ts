@@ -26,7 +26,8 @@ describe('Read only story node object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector) {
-    ReadOnlyStoryNodeObjectFactory = $injector.get('ReadOnlyStoryNodeObjectFactory');
+    ReadOnlyStoryNodeObjectFactory = $injector.get(
+      'ReadOnlyStoryNodeObjectFactory');
 
     var sampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',

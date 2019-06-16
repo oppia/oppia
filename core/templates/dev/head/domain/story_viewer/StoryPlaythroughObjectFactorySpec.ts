@@ -26,7 +26,8 @@ describe('Story playthrough object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 
   beforeEach(angular.mock.inject(function($injector) {
-    StoryPlaythroughObjectFactory = $injector.get('StoryPlaythroughObjectFactory');
+    StoryPlaythroughObjectFactory = $injector.get(
+      'StoryPlaythroughObjectFactory');
 
     var firstSampleReadOnlyStoryNodeBackendDict = {
       id: 'node_1',
