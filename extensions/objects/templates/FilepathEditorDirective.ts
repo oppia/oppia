@@ -17,14 +17,15 @@
  */
 
 // This directive can only be used in the context of an exploration.
+require('services/CsrfService.ts');
 
 oppia.directive('filepathEditor', [
   '$http', '$sce', 'AlertsService', 'AssetsBackendApiService',
-  'ContextService', 'UrlInterpolationService',
+  'ContextService', 'CsrfService', 'UrlInterpolationService',
   'OBJECT_EDITOR_URL_PREFIX',
   function(
       $http, $sce, AlertsService, AssetsBackendApiService,
-      ContextService, UrlInterpolationService,
+      ContextService, CsrfService, UrlInterpolationService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
@@ -636,7 +637,7 @@ oppia.directive('filepathEditor', [
             filename: ctrl.generateImageFilename(
               dimensions.height, dimensions.width)
           }));
-          form.append('csrf_token', GLOBALS.csrf_token);
+          form.append('csrf_token', CsrfService.getToken());
 
           $.ajax({
             url: '/createhandler/imageupload/' + ctrl.explorationId,

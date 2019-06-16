@@ -200,7 +200,7 @@ class SignupTests(test_utils.GenericTestBase):
             u'username': None,
         }
         response = self.get_json(feconf.SIGNUP_DATA_URL)
-        self.assertEqual(response, values_dict)
+        self.assertDictContainsSubset(response, values_dict)
         self.logout()
 
     def test_user_settings_of_existing_user(self):
@@ -214,7 +214,7 @@ class SignupTests(test_utils.GenericTestBase):
         }
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             response = self.get_json(feconf.SIGNUP_DATA_URL)
-            self.assertEqual(response, values_dict)
+            self.assertDictContainsSubset(response, values_dict)
 
         self.logout()
 

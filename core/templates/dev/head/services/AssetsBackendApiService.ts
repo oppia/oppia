@@ -21,13 +21,16 @@ require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/CsrfService.ts');
 
 oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'FileDownloadRequestObjectFactory',
-  'ImageFileObjectFactory', 'UrlInterpolationService', 'DEV_MODE',
+  'ImageFileObjectFactory', 'CsrfService', 'UrlInterpolationService',
+  'DEV_MODE',
   function(
       $http, $q, AudioFileObjectFactory, FileDownloadRequestObjectFactory,
-      ImageFileObjectFactory, UrlInterpolationService, DEV_MODE) {
+      ImageFileObjectFactory, CsrfService, UrlInterpolationService,
+      DEV_MODE) {
     if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
       throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
@@ -152,7 +155,7 @@ oppia.factory('AssetsBackendApiService', [
       form.append('payload', JSON.stringify({
         filename: filename
       }));
-      form.append('csrf_token', GLOBALS.csrf_token);
+      form.append('csrf_token', CsrfService.getToken());
 
       $.ajax({
         url: _getAudioUploadUrl(explorationId),

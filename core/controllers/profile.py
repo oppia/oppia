@@ -284,6 +284,8 @@ class SignupHandler(base.BaseHandler):
             'has_ever_registered': bool(
                 user_settings.username and user_settings.last_agreed_to_terms),
             'username': user_settings.username,
+            'csrf_token': base.CsrfTokenManager.create_csrf_token(
+                self.user_id),
         })
 
     @acl_decorators.require_user_id_else_redirect_to_homepage
