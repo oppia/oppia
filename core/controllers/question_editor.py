@@ -32,9 +32,9 @@ class QuestionCreationHandler(base.BaseHandler):
     def validate_skill_ids(self, skill_ids):
         """Validates that the passed skill ids are a list of strings."""
         if not(isinstance(skill_ids, basestring)) and not(
-            all([isinstance(
-                skill_id, basestring) for skill_id in skill_ids])):
-            raise self.InvalidInputException
+                all([isinstance(
+                    skill_id, basestring) for skill_id in skill_ids])):
+        raise self.InvalidInputException
 
     @acl_decorators.can_manage_question_skill_status
     def post(self, comma_separated_skill_ids):
