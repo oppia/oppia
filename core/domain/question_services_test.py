@@ -122,6 +122,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_create_and_get_question_skill_link(self):
         question_id_2 = question_services.get_new_question_id()
+        with self.assertRaises(Exception):
+             question_services.create_new_question_skill_link(
+            self.editor_id, question_id_2, 'skill_1', 0.5)
+
         self.save_new_question(
             question_id_2, self.editor_id,
             self._create_valid_question_data('ABC'), [])

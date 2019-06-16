@@ -136,11 +136,9 @@ def create_new_question_skill_link(
         user_id: str. ID of the creator.
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
-        skill_difficulty: float. The difficulty between [0, 1] of the skill..
+        skill_difficulty: float. The difficulty between [0, 1] of the skill.
     """
     question = get_question_by_id(question_id)
-    if not question:
-        raise Exception('Question doesn\'t exist in the backend')
 
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
         question_id, skill_id, skill_difficulty)
