@@ -245,8 +245,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         object.
         """
         question_id = 'col1.random'
+        skill_ids = ['test_skill1', 'test_skill2']
         question = question_domain.Question.create_default_question(
-            question_id)
+            question_id, skill_ids)
         default_question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -255,7 +256,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question.question_state_data.to_dict(), default_question_data)
         self.assertEqual(question.language_code, 'en')
         self.assertEqual(question.version, 0)
-        self.assertEqual(question.linked_skill_ids, [])
+        self.assertEqual(question.linked_skill_ids, skill_ids)
 
     def test_update_language_code(self):
         """Test to verify update_language_code method of the Question domain

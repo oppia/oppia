@@ -56,7 +56,7 @@ class QuestionModel(base_models.VersionedModel):
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The skill ids linked to this question.
     linked_skill_ids = ndb.StringProperty(
-        required=False, indexed=True, repeated=True)
+        required=True, indexed=True, repeated=True)
 
     @classmethod
     def _get_new_id(cls):

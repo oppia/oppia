@@ -342,11 +342,12 @@ class Question(object):
         return question
 
     @classmethod
-    def create_default_question(cls, question_id):
+    def create_default_question(cls, question_id, skill_ids):
         """Returns a Question domain object with default values.
 
         Args:
             question_id: str. The unique ID of the question.
+            skill_ids: list(str). List of skills attached to this question.
 
         Returns:
             Question. A Question domain object with default values.
@@ -356,7 +357,7 @@ class Question(object):
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, [])
+            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
