@@ -3282,6 +3282,62 @@ class ExplorationSummary(object):
             ValidationError: One or more attributes of the ExplorationSummary
                 are invalid.
         """
+        if not isinstance(self.title, basestring):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' % self.title)
+        utils.require_valid_name(
+            self.title, 'the exploration title', allow_empty=True)
+
+        if not isinstance(self.category, basestring):
+            raise utils.ValidationError(
+                'Expected category to be a string, received %s'
+                % self.category)
+        utils.require_valid_name(
+            self.category, 'the exploration category', allow_empty=True)
+
+        if not isinstance(self.objective, basestring):
+            raise utils.ValidationError(
+                'Expected objective to be a string, received %s' %
+                self.objective)
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language_code to be a string, received %s' %
+                self.language_code)
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language_code: %s' % self.language_code)
+
+        if not isinstance(self.tags, list):
+            raise utils.ValidationError(
+                'Expected \'tags\' to be a list, received %s' % self.tags)
+        for tag in self.tags:
+            if not isinstance(tag, basestring):
+                raise utils.ValidationError(
+                    'Expected each tag in \'tags\' to be a string, received '
+                    '\'%s\'' % tag)
+
+            if not tag:
+                raise utils.ValidationError('Tags should be non-empty.')
+
+            if not re.match(feconf.TAG_REGEX, tag):
+                raise utils.ValidationError(
+                    'Tags should only contain lowercase letters and spaces, '
+                    'received \'%s\'' % tag)
+
+            if (tag[0] not in string.ascii_lowercase or
+                    tag[-1] not in string.ascii_lowercase):
+                raise utils.ValidationError(
+                    'Tags should not start or end with whitespace, received '
+                    ' \'%s\'' % tag)
+
+            if re.search(r'\s\s+', tag):
+                raise utils.ValidationError(
+                    'Adjacent whitespace in tags should be collapsed, '
+                    'received \'%s\'' % tag)
+        if len(set(self.tags)) != len(self.tags):
+            raise utils.ValidationError('Some tags duplicate each other')
+
         if not isinstance(self.ratings, dict):
             raise utils.ValidationError(
                 'Expected ratings to be a dict, received %s' % self.ratings)

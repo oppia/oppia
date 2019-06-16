@@ -1806,6 +1806,10 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating StorySummaryModel."""
 
     @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return story_services.get_story_summary_from_model(item)
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'story_ids': (

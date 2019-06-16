@@ -1069,12 +1069,75 @@ class CollectionSummary(object):
         }
 
     def validate(self):
-        """Validates various properties of the ExplorationSummary.
+        """Validates various properties of the CollectionSummary.
 
         Raises:
-            ValidationError: One or more attributes of the ExplorationSummary
+            ValidationError: One or more attributes of the CollectionSummary
                 are invalid.
         """
+        if not isinstance(self.title, basestring):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' % self.title)
+        utils.require_valid_name(
+            self.title, 'the collection title', allow_empty=True)
+
+        if not isinstance(self.category, basestring):
+            raise utils.ValidationError(
+                'Expected category to be a string, received %s'
+                % self.category)
+        utils.require_valid_name(
+            self.category, 'the collection category', allow_empty=True)
+
+        if not isinstance(self.objective, basestring):
+            raise utils.ValidationError(
+                'Expected objective to be a string, received %s' %
+                self.objective)
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+
+        if not self.language_code:
+            raise utils.ValidationError(
+                'A language must be specified (in the \'Settings\' tab).')
+
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.tags, list):
+            raise utils.ValidationError(
+                'Expected tags to be a list, received %s' % self.tags)
+
+        for tag in self.tags:
+            if not isinstance(tag, basestring):
+                raise utils.ValidationError(
+                    'Expected each tag to be a string, received \'%s\'' % tag)
+
+            if not tag:
+                raise utils.ValidationError('Tags should be non-empty.')
+
+            if not re.match(feconf.TAG_REGEX, tag):
+                raise utils.ValidationError(
+                    'Tags should only contain lowercase letters and spaces, '
+                    'received \'%s\'' % tag)
+
+            if (tag[0] not in string.ascii_lowercase or
+                    tag[-1] not in string.ascii_lowercase):
+                raise utils.ValidationError(
+                    'Tags should not start or end with whitespace, received '
+                    ' \'%s\'' % tag)
+
+            if re.search(r'\s\s+', tag):
+                raise utils.ValidationError(
+                    'Adjacent whitespace in tags should be collapsed, '
+                    'received \'%s\'' % tag)
+
+        if len(set(self.tags)) < len(self.tags):
+            raise utils.ValidationError(
+                'Expected tags to be unique, but found duplicates')
+
         if not isinstance(self.status, basestring):
             raise utils.ValidationError(
                 'Expected status to be string, received: %s' % self.status)

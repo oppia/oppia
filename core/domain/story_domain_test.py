@@ -14,6 +14,8 @@
 
 """Tests for story domain objects and methods defined on them."""
 
+import datetime
+
 from constants import constants
 from core.domain import story_domain
 from core.domain import story_services
@@ -758,3 +760,68 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(story_rights.is_manager(self.USER_ID))
         self.assertTrue(story_rights.is_manager(self.USER_ID_1))
         self.assertFalse(story_rights.is_manager('fakeuser'))
+
+
+class StorySummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(StorySummaryTests, self).setUp()
+        current_time = datetime.datetime.utcnow()
+        time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        self.story_summary_dict = {
+            'story_model_created_on': time_in_millisecs,
+            'version': 1,
+            'story_model_last_updated': time_in_millisecs,
+            'description': 'description',
+            'title': 'title',
+            'node_count': 10,
+            'language_code': 'en',
+            'id': 'story_id'
+        }
+
+        self.story_summary = story_domain.StorySummary(
+            'story_id', 'title', 'description', 'en', 1, 10,
+            current_time, current_time)
+
+    def test_story_summary_gets_created(self):
+        self.assertEqual(
+            self.story_summary.to_dict(), self.story_summary_dict)
+
+    def test_validation_passes_with_valid_properties(self):
+        self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_title(self):
+        self.story_summary.title = ['title']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected title to be a string, .+'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_empty_title(self):
+        self.story_summary.title = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Title field should not be empty'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_description(self):
+        self.story_summary.description = ['description']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected description to be a string, .+'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_node_count(self):
+        self.story_summary.node_count = [10]
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected node_count to be a int, .+'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_invalid_language_code(self):
+        self.story_summary.language_code = ['language_code']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected language code to be a string, .+'):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_unallowed_language_code(self):
+        self.story_summary.language_code = 'invalid'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language code: invalid'):
+            self.story_summary.validate()

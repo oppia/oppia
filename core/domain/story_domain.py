@@ -1019,6 +1019,39 @@ class StorySummary(object):
         self.story_model_created_on = story_model_created_on
         self.story_model_last_updated = story_model_last_updated
 
+    def validate(self):
+        """Validates various properties of the story summary object.
+
+        Raises:
+            ValidationError: One or more attributes of story summary are
+                invalid.
+        """
+        if not isinstance(self.title, basestring):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' % self.title)
+
+        if self.title == '':
+            raise utils.ValidationError('Title field should not be empty')
+
+        if not isinstance(self.description, basestring):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
+
+        if not isinstance(self.node_count, int):
+            raise utils.ValidationError(
+                'Expected node_count to be a int, received %s' % (
+                    self.node_count))
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
 

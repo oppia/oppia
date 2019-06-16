@@ -903,6 +903,89 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     def test_validation_passes_with_valid_properties(self):
         self.exp_summary.validate()
 
+    def test_validation_fails_with_invalid_title(self):
+        self.exp_summary.title = ['title']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected title to be a string, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_category(self):
+        self.exp_summary.category = ['category']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected category to be a string, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_objective(self):
+        self.exp_summary.objective = ['objective']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected objective to be a string, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_language_code(self):
+        self.exp_summary.language_code = ['language_code']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected language_code to be a string, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_unallowed_language_code(self):
+        self.exp_summary.language_code = 'invalid'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language_code: invalid'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_tags(self):
+        self.exp_summary.tags = 'tags'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected \'tags\' to be a list, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_tag_in_tags(self):
+        self.exp_summary.tags = ['tag', ['tag2']]
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each tag in \'tags\' to be a string, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_empty_tag_in_tags(self):
+        self.exp_summary.tags = ['', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Tags should be non-empty'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_unallowed_characters_in_tag(self):
+        self.exp_summary.tags = ['123', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Tags should only contain lowercase letters and spaces, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_whitespace_in_tag_start(self):
+        self.exp_summary.tags = [' ab', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_whitespace_in_tag_end(self):
+        self.exp_summary.tags = ['ab ', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_adjacent_whitespace_in_tag(self):
+        self.exp_summary.tags = ['a   b', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Adjacent whitespace in tags should be collapsed, .+'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_duplicate_tags(self):
+        self.exp_summary.tags = ['abc', 'abc', 'ab']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Some tags duplicate each other'):
+            self.exp_summary.validate()
+
     def test_validation_fails_with_invalid_rating_keys(self):
         self.exp_summary.ratings = {'1': 0, '10': 1}
         with self.assertRaisesRegexp(
