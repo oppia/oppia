@@ -93,10 +93,10 @@ def create_multi_question_skill_links_for_question(
 
     Args:
         user_id: str. ID of the creator.
-        question_id: str. ID of the question linked to the skill.
+        question_id: str. ID of the question linked to the skills.
         skill_ids: list(str). ID of the skills to which the question is linked.
         skill_difficulties: list(float). The difficulty of the question with
-            respect to a skill, represented by a flot between
+            respect to a skill, represented by a float between
             0 and 1 (inclusive).
 
     Raises:
@@ -108,8 +108,6 @@ def create_multi_question_skill_links_for_question(
             'Skill difficulties and skill ids should match. The lengths of the '
             'two lists are different.')
     question = get_question_by_id(question_id)
-    if not question:
-        raise Exception('Question doesn\'t exist in the backend')
 
     new_question_skill_link_models = []
     for index, skill_id in enumerate(skill_ids):
@@ -184,8 +182,6 @@ def delete_question_skill_link(user_id, question_id, skill_id):
         skill_id: str. ID of the skill to which the question is linked.
     """
     question = get_question_by_id(question_id)
-    if not question:
-        raise Exception('Question doesn\'t exist in the backend')
 
     new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
     new_linked_skill_ids.remove(skill_id)
@@ -418,7 +414,6 @@ def update_skill_ids_of_questions(
         _update_linked_skill_ids_of_question(
             user_id, question.id, new_linked_skill_ids,
             question.linked_skill_ids)
-
 
 
 def get_question_summaries_and_skill_descriptions(
