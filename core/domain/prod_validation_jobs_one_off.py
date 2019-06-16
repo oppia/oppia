@@ -835,6 +835,10 @@ class ConfigPropertyModelValidator(BaseModelValidator):
     """Class for validating ConfigPropertyModel."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^.*$'
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
@@ -856,6 +860,10 @@ class ConfigPropertySnapshotMetadataModelValidator(
     related_model_name = 'config property'
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^.*-\\d*$'
+
+    @classmethod
     def _get_change_domain_class(cls):
         return config_domain.ConfigPropertyChange
 
@@ -875,6 +883,10 @@ class ConfigPropertySnapshotContentModelValidator(
     """Class for validating ConfigPropertySnapshotContentModel."""
 
     related_model_name = 'config property'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^.*-\\d*$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1023,6 +1035,12 @@ class BulkEmailModelValidator(BaseModelValidator):
 
 class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     """Class for validating GeneralFeedbackEmailReplyToIdModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return (
+            '^\\d*\\.(exploration|topic)\\.[A-Za-z0-9]{1,12}\\.'
+            '[A-Za-z0-9=+/]{1,}')
 
     @classmethod
     def _get_external_id_relationships(cls, item):

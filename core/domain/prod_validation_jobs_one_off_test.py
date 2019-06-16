@@ -1156,7 +1156,7 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for collection rights model '
                 'version check of CollectionRightsSnapshotMetadataModel\', '
-                '[u\'Entity id 0-3: Collection Rights model corresponding to '
+                '[u\'Entity id 0-3: CollectionRights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -1301,7 +1301,7 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for collection rights model '
                 'version check of CollectionRightsSnapshotContentModel\', '
-                '[u\'Entity id 0-3: Collection Rights model corresponding to '
+                '[u\'Entity id 0-3: CollectionRights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot content model id\']]'
             ), (
@@ -1424,7 +1424,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'version check of CollectionCommitLogEntryModel\', '
                 '[u\'Entity id %s: Collection model corresponding '
                 'to collection id 0 has a version 1 which is less than '
-                'the version 3 in commit log model id\']]'
+                'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -3201,7 +3201,7 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for exploration rights model '
                 'version check of ExplorationRightsSnapshotMetadataModel\', '
-                '[u\'Entity id 0-3: Exploration Rights model corresponding to '
+                '[u\'Entity id 0-3: ExplorationRights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -3333,7 +3333,7 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for exploration rights model '
                 'version check of ExplorationRightsSnapshotContentModel\', '
-                '[u\'Entity id 0-3: Exploration Rights model corresponding to '
+                '[u\'Entity id 0-3: ExplorationRights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot content model id\']]'
             ), (
@@ -5549,7 +5549,7 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
             (
                 u'[u\'failed validation check for story rights model '
                 'version check of StoryRightsSnapshotMetadataModel\', '
-                '[u\'Entity id 0-3: Story Rights model corresponding to '
+                '[u\'Entity id 0-3: StoryRights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot metadata model id\']]'
             ), (
@@ -5688,7 +5688,7 @@ class StoryRightsSnapshotContentModelValidatorTests(
             (
                 u'[u\'failed validation check for story rights model '
                 'version check of StoryRightsSnapshotContentModel\', '
-                '[u\'Entity id 0-3: Story Rights model corresponding to '
+                '[u\'Entity id 0-3: StoryRights model corresponding to '
                 'id 0 has a version 1 which is less than the version 3 in '
                 'snapshot content model id\']]'
             ), (
@@ -5805,7 +5805,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'version check of StoryCommitLogEntryModel\', '
                 '[u\'Entity id %s: Story model corresponding '
                 'to story id 0 has a version 1 which is less than '
-                'the version 3 in commit log model id\']]'
+                'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
