@@ -246,11 +246,4 @@ if ! test_python_version $PYTHON_CMD; then
 fi
 export PYTHON_CMD
 
-# List all node modules that are currently installed. The "npm list" command is
-# slow, so we precompute this here and refer to it as needed.
-echo "Generating list of installed node modules..."
-NPM_INSTALLED_MODULES="$($NPM_CMD list)"
-export NPM_INSTALLED_MODULES
-echo "Generation completed."
-
 export SETUP_DONE=true
