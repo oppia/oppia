@@ -368,7 +368,7 @@ oppia.factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'recorded_voiceovers', newRecordedVoiceovers);
       },
-      getSolicitAnswerDetails: function(stateName) {
+      getSolicitAnswerDetailsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'solicit_answer_details');
       },
       saveSolicitAnswerDetails: function(stateName, newSolicitAnswerDetails) {

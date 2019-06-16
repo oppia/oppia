@@ -20,6 +20,9 @@ require(
   'components/state-editor/state-content-editor/' +
   'state-content-editor.directive.ts');
 require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts');
+require(
   'components/state-editor/state-hints-editor/state-hints-editor.directive.ts');
 require(
   'components/state-editor/state-interaction-editor/' +
@@ -30,9 +33,6 @@ require(
 require(
   'components/state-editor/state-solution-editor/' +
   'state-solution-editor.directive.ts');
-require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solicit-answer-details.service.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
@@ -66,15 +66,17 @@ oppia.directive('stateEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/state-editor/state-editor.directive.html'),
       controller: [
-        '$scope', '$rootScope', 'INTERACTION_SPECS', 'StateEditorService',
-        'StateContentService', 'StateHintsService', 'StateSolutionService',
-        'StateSolicitAnswerDetailsService',
-        'StateInteractionIdService', 'StateCustomizationArgsService',
+        '$rootScope', '$scope', 'StateContentService',
+        'StateCustomizationArgsService',
+        'StateEditorService', 'StateHintsService',
+        'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
+        'StateSolutionService', 'INTERACTION_SPECS',
         function(
-            $scope, $rootScope, INTERACTION_SPECS, StateEditorService,
-            StateContentService, StateHintsService, StateSolutionService,
-            StateSolicitAnswerDetailsService,
-            StateInteractionIdService, StateCustomizationArgsService) {
+            $rootScope, $scope, StateContentService,
+            StateCustomizationArgsService,
+            StateEditorService, StateHintsService,
+            StateInteractionIdService, StateSolicitAnswerDetailsService,
+            StateSolutionService, INTERACTION_SPECS) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;

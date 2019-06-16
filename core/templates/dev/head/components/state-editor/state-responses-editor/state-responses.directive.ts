@@ -85,7 +85,7 @@ oppia.directive('stateResponses', [
         '/components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
-        '$filter', '$scope', '$rootScope', '$uibModal', 'AlertsService',
+        '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
         'AnswerGroupObjectFactory', 'ContextService', 'EditabilityService',
         'ExplorationStatesService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
@@ -93,7 +93,7 @@ oppia.directive('stateResponses', [
         'UrlInterpolationService', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
-            $filter, $scope, $rootScope, $uibModal, AlertsService,
+            $filter, $rootScope, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService, EditabilityService,
             ExplorationStatesService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
@@ -103,11 +103,9 @@ oppia.directive('stateResponses', [
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
-          $scope.StateSolicitAnswerDetailsService =
-          StateSolicitAnswerDetailsService;
           $scope.stateName = StateEditorService.getActiveStateName();
-          $scope.displayedSolicitAnswerDetails =
-          StateSolicitAnswerDetailsService.savedMemento;
+          $scope.displayedSolicitAnswerDetails = (
+            StateSolicitAnswerDetailsService.savedMemento);
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
@@ -208,11 +206,11 @@ oppia.directive('stateResponses', [
           };
 
           $scope.onChangeSolicitAnswerDetails = function() {
-            StateSolicitAnswerDetailsService.displayed =
-            $scope.displayedSolicitAnswerDetails;
-            StateSolicitAnswerDetailsService.saveDisplayedValue();
+            StateSolicitAnswerDetailsService.displayed = (
+              $scope.displayedSolicitAnswerDetails);
             $scope.onSaveSolicitAnswerDetails(
               $scope.displayedSolicitAnswerDetails);
+            StateSolicitAnswerDetailsService.saveDisplayedValue();
             $scope.displayedSolicitAnswerDetails =
             StateSolicitAnswerDetailsService.savedMemento;
           };
