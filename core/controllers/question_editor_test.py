@@ -100,7 +100,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
-        incorrect_skill_id = [1,2]
+        incorrect_skill_id = [1, 2]
         self.post_json(
             '%s/%s' % (feconf.NEW_QUESTION_URL, incorrect_skill_id),
             {}, csrf_token=csrf_token, expected_status_int=404)
