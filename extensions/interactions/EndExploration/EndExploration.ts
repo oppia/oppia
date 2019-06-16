@@ -16,6 +16,7 @@
  * @fileoverview Requires for EndExploration interaction.
  */
 
+require('interactions/EndExploration/directives/EndExplorationRulesService.ts');
 require(
   'interactions/EndExploration/directives/EndExplorationValidationService.ts');
 require(

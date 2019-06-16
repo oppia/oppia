@@ -15,9 +15,8 @@
 /**
  * @fileoverview Requires for LogicProof interaction.
  */
-
-require(
-  'interactions/LogicProof/directives/LogicProofValidationService.ts');
+require('interactions/LogicProof/directives/LogicProofRulesService.ts');
+require('interactions/LogicProof/directives/LogicProofValidationService.ts');
 require(
   'interactions/LogicProof/directives/OppiaInteractiveLogicProofDirective.ts');
 require(

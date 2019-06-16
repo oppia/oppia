@@ -16,7 +16,8 @@
     "core/tests/karma-globals.ts",
     "core/tests/karma.conf.ts",
     "core/templates/dev/head/AppInit.ts",
-    "core/templates/dev/head/mathjaxConfig.ts"
+    "core/templates/dev/head/mathjaxConfig.ts",
+    "core/templates/dev/head/expressions/ExpressionParserService.js" 
   ],
   "include": [
     "extensions/ckeditor_plugins",

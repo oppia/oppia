@@ -256,6 +256,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             #    * A python file called {InteractionName}.py.
             #    * An __init__.py file used to import the Python file.
             #    * An html file called {InteractionName}.html.
+            #    * An TypeScript file called {InteractionName}.ts.
             #    * A directory name 'directives' containing TS and HTML files
             #      for directives
             #    * A directory named 'static' containing at least a .png file.

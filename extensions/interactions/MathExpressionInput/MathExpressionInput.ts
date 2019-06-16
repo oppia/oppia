@@ -18,6 +18,9 @@
 
 require(
   'interactions/MathExpressionInput/directives/' +
+  'MathExpressionInputRulesService.ts');
+require(
+  'interactions/MathExpressionInput/directives/' +
   'MathExpressionInputValidationService.ts');
 require(
   'interactions/MathExpressionInput/directives/' +

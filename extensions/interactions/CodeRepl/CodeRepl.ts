@@ -18,6 +18,7 @@
 
 require('interactions/CodeRepl/CodeReplPredictionService.ts');
 
+require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
 require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 require(
   'interactions/CodeRepl/directives/OppiaInteractiveCodeReplDirective.ts');

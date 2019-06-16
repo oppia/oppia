@@ -16,6 +16,7 @@
  * @fileoverview Requires for FractionInput interaction.
  */
 
+require('interactions/FractionInput/directives/FractionInputRulesService.ts');
 require(
   'interactions/FractionInput/directives/FractionInputValidationService.ts');
 require(

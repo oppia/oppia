@@ -18,6 +18,9 @@
 
 require(
   'interactions/DragAndDropSortInput/directives/' +
+  'DragAndDropSortInputRulesService.ts');
+require(
+  'interactions/DragAndDropSortInput/directives/' +
   'DragAndDropSortInputValidationService.ts');
 require(
   'interactions/DragAndDropSortInput/directives/' +

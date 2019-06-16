@@ -18,6 +18,7 @@
 
 require('interactions/TextInput/TextInputPredictionService.ts');
 
+require('interactions/TextInput/directives/TextInputRulesService.ts');
 require('interactions/TextInput/directives/TextInputValidationService.ts');
 require(
   'interactions/TextInput/directives/OppiaInteractiveTextInputDirective.ts');

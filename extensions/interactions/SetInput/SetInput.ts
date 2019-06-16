@@ -16,6 +16,7 @@
  * @fileoverview Requires for SetInput interaction.
  */
 
+require('interactions/SetInput/directives/SetInputRulesService.ts');
 require('interactions/SetInput/directives/SetInputValidationService.ts');
 require(
   'interactions/SetInput/directives/OppiaInteractiveSetInputDirective.ts');

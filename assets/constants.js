@@ -578,5 +578,5 @@ var constants = {
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 
-  "DEV_MODE": true
+  "DEV_MODE": true 
 };

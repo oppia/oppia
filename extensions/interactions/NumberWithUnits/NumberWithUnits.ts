@@ -17,6 +17,8 @@
  */
 
 require(
+  'interactions/NumberWithUnits/directives/NumberWithUnitsRulesService.ts');
+require(
   'interactions/NumberWithUnits/directives/' +
   'NumberWithUnitsValidationService.ts');
 require(

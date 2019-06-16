@@ -17,6 +17,8 @@
  */
 
 require(
+  'interactions/PencilCodeEditor/directives/PencilCodeEditorRulesService.ts');
+require(
   'interactions/PencilCodeEditor/directives/' +
   'PencilCodeEditorValidationService.ts');
 require(

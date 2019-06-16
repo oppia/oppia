@@ -17,6 +17,8 @@
  */
 
 require(
+  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts');
+require(
   'interactions/ImageClickInput/directives/' +
   'ImageClickInputValidationService.ts');
 require(

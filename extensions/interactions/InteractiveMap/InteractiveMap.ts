@@ -16,6 +16,7 @@
  * @fileoverview Requires for InteractiveMap interaction.
  */
 
+require('interactions/InteractiveMap/directives/InteractiveMapRulesService.ts');
 require(
   'interactions/InteractiveMap/directives/InteractiveMapValidationService.ts');
 require(

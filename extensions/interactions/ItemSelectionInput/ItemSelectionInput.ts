@@ -18,6 +18,9 @@
 
 require(
   'interactions/ItemSelectionInput/directives/' +
+  'ItemSelectionInputRulesService.ts');
+require(
+  'interactions/ItemSelectionInput/directives/' +
   'ItemSelectionInputValidationService.ts');
 require(
   'interactions/ItemSelectionInput/directives/' +

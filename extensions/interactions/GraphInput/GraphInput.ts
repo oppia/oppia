@@ -16,8 +16,8 @@
  * @fileoverview Requires for GraphInput interaction.
  */
 
-require(
-  'interactions/GraphInput/directives/GraphInputValidationService.ts');
+require('interactions/GraphInput/directives/GraphInputRulesService.ts');
+require('interactions/GraphInput/directives/GraphInputValidationService.ts');
 require(
   'interactions/GraphInput/directives/OppiaInteractiveGraphInputDirective.ts');
 require(

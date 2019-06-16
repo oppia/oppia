@@ -18,6 +18,9 @@
 
 require(
   'interactions/MultipleChoiceInput/directives/' +
+  'MultipleChoiceInputRulesService.ts');
+require(
+  'interactions/MultipleChoiceInput/directives/' +
   'MultipleChoiceInputValidationService.ts');
 require(
   'interactions/MultipleChoiceInput/directives/' +

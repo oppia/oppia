@@ -16,6 +16,7 @@
  * @fileoverview Requires for Continue interaction.
  */
 
+require('interactions/Continue/directives/ContinueRulesService.ts');
 require('interactions/Continue/directives/ContinueValidationService.ts');
 require(
   'interactions/Continue/directives/OppiaInteractiveContinueDirective.ts');

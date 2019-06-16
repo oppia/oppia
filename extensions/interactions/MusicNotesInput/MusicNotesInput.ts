@@ -17,6 +17,8 @@
  */
 
 require(
+  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+require(
   'interactions/MusicNotesInput/directives/' +
   'MusicNotesInputValidationService.ts');
 require(

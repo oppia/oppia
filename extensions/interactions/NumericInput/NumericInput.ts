@@ -16,6 +16,7 @@
  * @fileoverview Requires for NumericInput interaction.
  */
 
+require('interactions/NumericInput/directives/NumericInputRulesService.ts');
 require(
   'interactions/NumericInput/directives/NumericInputValidationService.ts');
 require(
