@@ -31,7 +31,7 @@ oppia.factory('QuestionBackendApiService', [
       $http, $q, UrlInterpolationService, QUESTIONS_LIST_URL_TEMPLATE,
       QUESTION_PLAYER_URL_TEMPLATE) {
     var _startCursor = '';
-    var _fetchQuestionsForPlayers = function(
+    var _fetchQuestions = function(
         skillIds, questionCount, resetHistory, successCallback, errorCallback) {
       if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
         return;
@@ -59,7 +59,7 @@ oppia.factory('QuestionBackendApiService', [
       });
     };
 
-    var _fetchQuestionsForEditors = function(
+    var _fetchQuestionSummaries = function(
         skillIds, cursor, successCallback, errorCallback) {
       if (!isListOfStrings(skillIds)) {
         errorCallback('Skill ids should be a list of strings');
@@ -130,17 +130,17 @@ oppia.factory('QuestionBackendApiService', [
      * of questions requested.
      */
     return {
-      fetchQuestionsForPlayers: function(
+      fetchQuestions: function(
           skillIds, questionCount, resetHistory) {
         return $q(function(resolve, reject) {
-          _fetchQuestionsForPlayers(
+          _fetchQuestions(
             skillIds, questionCount, resetHistory, resolve, reject);
         });
       },
 
-      fetchQuestionsForEditors: function(skillIds, cursor) {
+      fetchQuestionSummaries: function(skillIds, cursor) {
         return $q(function(resolve, reject) {
-          _fetchQuestionsForEditors(skillIds, cursor, resolve, reject);
+          _fetchQuestionSummaries(skillIds, cursor, resolve, reject);
         });
       }
     };

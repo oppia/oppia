@@ -33,22 +33,26 @@ class QuestionsListHandler(base.BaseHandler):
     def get(self, skill_ids):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
-        skill_ids = skill_ids.split(',')
+        try:
+            skill_ids_list = skill_ids.split(',')
+        except Exception:
+            raise self.PageNotFoundException
 
-        for skill_id in skill_ids:
+        for skill_id in skill_ids_list:
             try:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
             except Exception:
                 raise self.PageNotFoundException(Exception('Invalid skill id'))
 
-            skill = skill_services.get_skill_by_id(skill_id, strict=False)
-            if skill is None:
-                raise self.PageNotFoundException(
-                    'The skill with the given id doesn\'t exist.')
+        try:
+            skills = skill_services.get_multi_skills(skill_ids_list)
+        except:
+            raise self.PageNotFoundException(
+                'The skill with the given id doesn\'t exist.')
 
         question_summaries, skill_descriptions_list, next_start_cursor = (
             question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
+                constants.NUM_QUESTIONS_PER_PAGE, skill_ids_list, start_cursor)
         )
         return_dicts = []
         for index, summary in enumerate(question_summaries):

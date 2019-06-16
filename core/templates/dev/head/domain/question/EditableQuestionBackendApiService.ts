@@ -183,16 +183,15 @@ oppia.factory('EditableQuestionBackendApiService', [
 
       addQuestionSkillLink: function(
           questionId, skillId) {
-        return $q(function(resolve, reject) {
-          _addQuestionSkillLink(questionId, skillId, resolve, reject);
-        });
-      },
-
-      addMultiQuestionSkillLinks: function(
-          questionId, skillIds) {
-        return $q(function(resolve, reject) {
-          _addMultiQuestionSkillLinks(questionId, skillIds, resolve, reject);
-        });
+        if (typeof skillId === 'string') {
+          return $q(function(resolve, reject) {
+            _addQuestionSkillLink(questionId, skillId, resolve, reject);
+          });
+        } else if (Array.isArray(skillId)) {
+          return $q(function(resolve, reject) {
+            _addMultiQuestionSkillLinks(questionId, skillId, resolve, reject);
+          });
+        }
       }
     };
   }

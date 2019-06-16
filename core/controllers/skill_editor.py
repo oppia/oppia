@@ -147,17 +147,21 @@ class EditableSkillDataHandler(base.BaseHandler):
         """Populates the data on skill pages of the skill ids."""
 
         try:
-            skill_ids = skill_ids.split(',')
+            skill_ids_list = skill_ids.split(',')
         except Exception:
             raise self.PageNotFoundException
 
         try:
-            for skill_id in skill_ids:
+            for skill_id in skill_ids_list:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-            skills = skill_services.get_multi_skills(skill_ids)
         except Exception:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
+        try:
+            skills = skill_services.get_multi_skills(skill_ids_list)
+        except:
+            raise self.PageNotFoundException(
+                'The skill with the given id doesn\'t exist.')
 
         skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({

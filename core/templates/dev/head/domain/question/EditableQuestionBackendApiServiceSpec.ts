@@ -215,7 +215,7 @@ describe('Editable question backend API service', function() {
       var addQuestionSkillLinkUrl = '/manage_question_skill_link/0/' +
         encodeURIComponent('1,2');
       $httpBackend.expect('POST', addQuestionSkillLinkUrl).respond();
-      EditableQuestionBackendApiService.addMultiQuestionSkillLinks(
+      EditableQuestionBackendApiService.addQuestionSkillLink(
         '0', ['1', '2']).then(successHandler, failHandler);
       $httpBackend.flush();
 

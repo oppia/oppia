@@ -108,7 +108,7 @@ describe('Question backend Api service', function() {
       'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
       'start_cursor=').respond(
       sampleDataResults);
-    QuestionBackendApiService.fetchQuestionsForPlayers(
+    QuestionBackendApiService.fetchQuestions(
       ['1'], 1, true).then(successHandler, failHandler);
     $httpBackend.flush();
 
@@ -129,7 +129,7 @@ describe('Question backend Api service', function() {
         'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
         'start_cursor=').respond(
         sampleDataResultsWithCursor);
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         ['1'], 1, true).then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -143,7 +143,7 @@ describe('Question backend Api service', function() {
         sampleDataResults);
 
       // Here we don't want to reset history, thus we pass false
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         ['1'], 1, false).then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -165,7 +165,7 @@ describe('Question backend Api service', function() {
       'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
       'start_cursor=').respond(
       sampleDataResultsWithCursor);
-    QuestionBackendApiService.fetchQuestionsForPlayers(
+    QuestionBackendApiService.fetchQuestions(
       ['1'], 1, true).then(successHandler, failHandler);
     $httpBackend.flush();
 
@@ -179,7 +179,7 @@ describe('Question backend Api service', function() {
       sampleDataResults);
 
     // Here we want to reset history, thus we pass true
-    QuestionBackendApiService.fetchQuestionsForPlayers(
+    QuestionBackendApiService.fetchQuestions(
       ['1'], 1, true).then(successHandler, failHandler);
     $httpBackend.flush();
 
@@ -197,7 +197,7 @@ describe('Question backend Api service', function() {
         'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
         'start_cursor=').respond(
         500, 'Error loading questions.');
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         ['1'], 1, true).then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -211,7 +211,7 @@ describe('Question backend Api service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         ['1'], 'abc', true).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -224,7 +224,7 @@ describe('Question backend Api service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         ['1'], -1, true).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -237,7 +237,7 @@ describe('Question backend Api service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         ['1'], 1.5, true).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -250,7 +250,7 @@ describe('Question backend Api service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         'x', 1, true).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -263,7 +263,7 @@ describe('Question backend Api service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         [1, 2], 1, true).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -276,7 +276,7 @@ describe('Question backend Api service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         null, 1, true).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -289,7 +289,7 @@ describe('Question backend Api service', function() {
     function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         ['1'], null, true).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
@@ -306,7 +306,7 @@ describe('Question backend Api service', function() {
       $httpBackend.expect(
         'GET', '/questions_list_handler/1?cursor=').respond(
         sampleResponse);
-      QuestionBackendApiService.fetchQuestionsForEditors(
+      QuestionBackendApiService.fetchQuestionSummaries(
         ['1']).then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -326,7 +326,7 @@ describe('Question backend Api service', function() {
       $httpBackend.expect(
         'GET', '/questions_list_handler/1?cursor=').respond(
         500, 'Error loading questions.');
-      QuestionBackendApiService.fetchQuestionsForEditors(
+      QuestionBackendApiService.fetchQuestionSummaries(
         ['1']).then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -344,7 +344,7 @@ describe('Question backend Api service', function() {
         'GET', '/questions_list_handler/1?cursor=1').respond(
         sampleResponse);
 
-      QuestionBackendApiService.fetchQuestionsForEditors(
+      QuestionBackendApiService.fetchQuestionSummaries(
         ['1'], '1').then(successHandler, failHandler);
       $httpBackend.flush();
 

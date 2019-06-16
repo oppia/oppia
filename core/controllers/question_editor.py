@@ -32,13 +32,18 @@ class QuestionCreationHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def post(self, skill_ids):
         """Handles POST requests."""
-        skill_ids = skill_ids.split(',')
-        for skill_id in skill_ids:
+        skill_ids_list = skill_ids.split(',')
+        if len(skill_ids_list) > 3:
+            raise Exception('More than three QuestionSkillLink for one'
+                'question is not supported.')
+
+        for skill_id in skill_ids_list:
             skill_domain.Skill.require_valid_skill_id(skill_id)
-            skill = skill_services.get_skill_by_id(skill_id, strict=False)
-            if skill is None:
-                raise self.PageNotFoundException(
-                    'The skill with the given id doesn\'t exist.')
+        try:
+            skills = skill_services.get_multi_skills(skill_ids_list)
+        except:
+            raise self.PageNotFoundException(
+                'The skill with the given id doesn\'t exist.')
 
         question_dict = self.payload.get('question_dict')
         if (
@@ -58,7 +63,7 @@ class QuestionCreationHandler(base.BaseHandler):
         question_services.add_question(self.user_id, question)
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
-        for skill_id in skill_ids:
+        for skill_id in skill_ids_list:
             question_services.create_new_question_skill_link(
                 question.id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
         self.values.update({
@@ -74,22 +79,24 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     def post(self, question_id, skill_ids):
         """Links a question to a skill."""
         try:
-            skill_ids = skill_ids.split(',')
+            skill_ids_list = skill_ids.split(',')
         except Exception:
             raise self.PageNotFoundException
 
-        if (not isinstance(skill_ids, list) or not all([
-                isinstance(skill_id, basestring) for skill_id in skill_ids])):
+        if not all(
+            [isinstance(skill_id, basestring) for skill_id in skill_ids_list]):
             raise self.PageNotFoundException
 
-        for skill_id in skill_ids:
+        for skill_id in skill_ids_list:
             skill_domain.Skill.require_valid_skill_id(skill_id)
-            skill = skill_services.get_skill_by_id(
-                skill_id, strict=False)
-            if skill is None:
-                raise self.PageNotFoundException(
-                    'The skill with the given id doesn\'t exist.')
 
+        try:
+            skills = skill_services.get_multi_skills(skill_ids_list)
+        except:
+            raise self.PageNotFoundException(
+                'The skill with the given id doesn\'t exist.')
+
+        for skill_id in skill_ids_list:
             # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
             # with a value passed from the frontend.
             question_services.create_new_question_skill_link(

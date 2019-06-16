@@ -81,7 +81,7 @@ oppia.factory('QuestionsListService', [
 
         if ((index + 1) * num > _questionSummaries.length &&
             _nextCursorForQuestions !== null && fetchMore) {
-          QuestionBackendApiService.fetchQuestionsForEditors(
+          QuestionBackendApiService.fetchQuestionSummaries(
             skillIds, _nextCursorForQuestions).then(
             function(returnObject) {
               _setQuestionSummaries(returnObject.questionSummaries);

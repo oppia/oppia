@@ -1840,14 +1840,12 @@ def can_edit_skills(handler):
         Args:
             user: UserActionsInfo. Object having user id, role and actions for
                 given user.
-            skill_rights: SkillRights or None. Rights object for the given
+            skill_rights: SkillRights. Rights object for the given
                 skill.
 
         Returns:
             bool. Whether the given user can edit the given skill.
         """
-        if skill_rights is None:
-            return False
         if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
             if not skill_rights.is_private():
                 return True
@@ -1868,10 +1866,12 @@ def can_edit_skills(handler):
             *. The return value of the decorated function.
 
         Raises:
+            InvalidInputException: At least one of the given skill ids is
+                invalid.
             NotLoggedInException: The user is not logged in.
-            PageNotFoundException: The given page cannot be found.
+            PageNotFoundException: The page that edits skills cannot be found.
             UnauthorizedUserException: The user does not have the
-                credentials to edit the given skill.
+                credentials to edit the given skills.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -1879,7 +1879,7 @@ def can_edit_skills(handler):
         decoded_skill_ids = skill_ids.split(',')
         for skill_id in decoded_skill_ids:
             if not skill_id.isalnum():
-                raise base.UserFacingExceptions.PageNotFoundException
+                raise self.InvalidInputException('Invalid skill id.')
 
         skill_rights_list = skill_services.get_multi_skill_rights(
             decoded_skill_ids)

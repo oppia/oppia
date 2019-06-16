@@ -138,7 +138,7 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initQuestionPlayer = function(questionPlayerConfig, callback) {
       setQuestionPlayerMode();
-      QuestionBackendApiService.fetchQuestionsForPlayers(
+      QuestionBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
         questionPlayerConfig.questionCount, true).then(function(questionData) {
         $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
