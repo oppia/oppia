@@ -41,6 +41,7 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.login(self.ADMIN_EMAIL)
+        self.TOPIC_ID = 'topic_id'
         self.STORY_ID_1 = 'story_id_1'
         self.NODE_ID_1 = 'node_1'
         self.NODE_ID_2 = 'node_2'
@@ -51,8 +52,10 @@ class BaseStoryViewerControllerTests(test_utils.GenericTestBase):
             self.EXP_ID, self.admin_id, title='Bridges in England',
             category='Architecture', language_code='en')
         rights_manager.publish_exploration(self.admin, self.EXP_ID)
+        self.save_new_topic(
+            self.TOPIC_ID, 'user', 'Topic', 'A new topic', [], [], [], [], 0)
         story = story_domain.Story.create_default_story(
-            self.STORY_ID_1, 'Title')
+            self.STORY_ID_1, 'Title', self.TOPIC_ID)
         story.description = ('Description')
         exp_summary_dict = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -112,7 +115,8 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
     def test_can_not_access_story_viewer_page_with_unpublished_story(self):
         new_story_id = 'new_story_id'
-        story = story_domain.Story.create_default_story(new_story_id, 'Title')
+        story = story_domain.Story.create_default_story(
+            new_story_id, 'Title', 'topic_id')
         story_services.save_new_story(self.admin_id, story)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(

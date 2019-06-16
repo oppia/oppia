@@ -574,7 +574,8 @@ class Story(object):
     def __init__(
             self, story_id, title, description, notes,
             story_contents, story_contents_schema_version, language_code,
-            version, created_on=None, last_updated=None):
+            corresponding_topic_id, version, created_on=None,
+            last_updated=None):
         """Constructs a Story domain object.
 
         Args:
@@ -590,6 +591,8 @@ class Story(object):
                 story contents object.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             version: int. The version of the story.
             created_on: datetime.datetime. Date and time when the story is
                 created.
@@ -603,6 +606,7 @@ class Story(object):
         self.story_contents = story_contents
         self.story_contents_schema_version = story_contents_schema_version
         self.language_code = language_code
+        self.corresponding_topic_id = corresponding_topic_id
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
@@ -645,6 +649,11 @@ class Story(object):
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.corresponding_topic_id, basestring):
+            raise utils.ValidationError(
+                'Expected corresponding_topic_id should be a string, received: '
+                '%s' % self.corresponding_topic_id)
 
         self.story_contents.validate()
 
@@ -718,12 +727,13 @@ class Story(object):
             'notes': self.notes,
             'language_code': self.language_code,
             'story_contents_schema_version': self.story_contents_schema_version,
+            'corresponding_topic_id': self.corresponding_topic_id,
             'version': self.version,
             'story_contents': self.story_contents.to_dict()
         }
 
     @classmethod
-    def create_default_story(cls, story_id, title):
+    def create_default_story(cls, story_id, title, corresponding_topic_id):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
@@ -731,6 +741,8 @@ class Story(object):
         Args:
             story_id: str. The unique id of the story.
             title: str. The title for the newly created story.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
 
         Returns:
             Story. The Story domain object with the default values.
@@ -742,7 +754,7 @@ class Story(object):
             story_id, title,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE, corresponding_topic_id, 0)
 
     @classmethod
     def update_story_contents_from_model(
