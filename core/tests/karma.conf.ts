@@ -64,10 +64,10 @@ module.exports = function(config) {
       // is repaired, the templateCache is broken due to the fact that
       // webpack is not yet implemented for /extensions (#6732)
       'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
-      ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
-       'SolutionVerificationServiceSpec.ts'),
-      ('core/templates/dev/head/pages/exploration_editor/editor_tab/' +
-       'StateNameEditorDirectiveSpec.ts'),
+      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
+       'services/solution-verification.service.spec.ts'),
+      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
+       'state-name-editor/state-name-editor.directive.spec.ts'),
       ('core/templates/dev/head/components/state-editor/state-content-editor/' +
        'state-content-editor.directive.spec.ts'),
       ('core/templates/dev/head/components/state-editor/' +
@@ -173,6 +173,10 @@ module.exports = function(config) {
               }
             }
           ]
+        },
+        {
+          test: /\.html$/,
+          loader: 'underscore-template-loader'
         }]
       },
       plugins: [

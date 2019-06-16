@@ -23,7 +23,9 @@ require('directives/AngularHtmlBindDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('domain/exploration/SolutionObjectFactory.ts');
-require('pages/exploration_editor/editor_tab/SolutionVerificationService.ts');
+require(
+  'pages/exploration-editor-page/editor-tab/services/' +
+  'solution-verification.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
