@@ -81,7 +81,7 @@ module.exports = {
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.scripts.ts',
-    signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
+    signup: commonPrefix + '/pages/signup-page/signup-page.scripts.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
     splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
