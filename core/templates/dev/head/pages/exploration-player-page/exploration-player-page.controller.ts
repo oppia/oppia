@@ -105,6 +105,8 @@ require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 
 require('objects/objectComponentsRequiresForPlayers.ts');
 
+require('services/AutoplayedVideosService.ts');
+require('services/CodeNormalizerService.ts');
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
 
