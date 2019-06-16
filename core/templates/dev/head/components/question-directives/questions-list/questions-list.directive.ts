@@ -129,7 +129,7 @@ oppia.directive('questionsList', [
                   return summary;
                 });
             }
-          }
+          };
 
           ctrl.getSkillDescription = function(skillDescriptions) {
             return skillDescriptions.join(', ');
