@@ -25,7 +25,8 @@ require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
-require('pages/exploration-player-page/services/pretest-engine.service.ts');
+require(
+  'pages/exploration-player-page/services/question-player-engine.service.ts');
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
@@ -45,10 +46,10 @@ oppia.factory('ExplorationPlayerStateService', [
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
-  'PretestEngineService', 'PretestQuestionBackendApiService',
-  'QuestionPlayerBackendApiService',
-  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
+  'PretestQuestionBackendApiService', 'QuestionPlayerBackendApiService',
+  'QuestionPlayerEngineService', 'ReadOnlyExplorationBackendApiService',
+  'StateClassifierMappingService', 'StatsReportingService',
+  'UrlService', 'EXPLORATION_MODE',
   function(
       $log, $q, $rootScope, ContextService,
       EditableExplorationBackendApiService,
@@ -56,10 +57,10 @@ oppia.factory('ExplorationPlayerStateService', [
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
-      PretestEngineService, PretestQuestionBackendApiService,
-      QuestionPlayerBackendApiService,
-      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlService, EXPLORATION_MODE) {
+      PretestQuestionBackendApiService, QuestionPlayerBackendApiService,
+      QuestionPlayerEngineService, ReadOnlyExplorationBackendApiService,
+      StateClassifierMappingService, StatsReportingService,
+      UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -87,12 +88,12 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initializePretestServices = function(pretestQuestionDicts, callback) {
       PlayerCorrectnessFeedbackEnabledService.init(true);
-      PretestEngineService.init(pretestQuestionDicts, callback);
+      QuestionPlayerEngineService.init(pretestQuestionDicts, callback);
     };
 
     var initializeQuestionPlayerServices = function(questionDicts, callback) {
       PlayerCorrectnessFeedbackEnabledService.init(true);
-      PretestEngineService.init(questionDicts, callback);
+      QuestionPlayerEngineService.init(questionDicts, callback);
     };
 
     var setExplorationMode = function() {
@@ -102,12 +103,12 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var setPretestMode = function() {
       explorationMode = EXPLORATION_MODE.PRETEST;
-      currentEngineService = PretestEngineService;
+      currentEngineService = QuestionPlayerEngineService;
     };
 
     var setQuestionPlayerMode = function() {
       explorationMode = EXPLORATION_MODE.QUESTION_PLAYER;
-      currentEngineService = PretestEngineService;
+      currentEngineService = QuestionPlayerEngineService;
     };
 
     var initExplorationPreviewPlayer = function(callback) {
@@ -194,7 +195,7 @@ oppia.factory('ExplorationPlayerStateService', [
         return explorationMode === EXPLORATION_MODE.QUESTION_PLAYER;
       },
       getPretestQuestionCount: function() {
-        return PretestEngineService.getPretestQuestionCount();
+        return QuestionPlayerEngineService.getPretestQuestionCount();
       },
       moveToExploration: function(callback) {
         setExplorationMode();
