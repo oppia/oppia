@@ -31,7 +31,7 @@ oppia.constant(
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   '/question_editor_handler/data/<question_id>');
 oppia.constant(
-  'QUESTION_CREATION_URL', '/question_editor_handler/create_new/<skill_id>');
+  'QUESTION_CREATION_URL', '/question_editor_handler/create_new/<skill_ids>');
 oppia.constant(
   'QUESTION_SKILL_LINK_URL_TEMPLATE',
   '/manage_question_skill_link/<question_id>/<skill_ids>');
@@ -45,10 +45,10 @@ oppia.factory('EditableQuestionBackendApiService', [
       EDITABLE_QUESTION_DATA_URL_TEMPLATE, QUESTION_CREATION_URL,
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
-        skillId, questionDict, successCallback, errorCallback) {
+        skillIds, questionDict, successCallback, errorCallback) {
       var questionCreationUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_CREATION_URL, {
-          skill_id: skillId
+          skill_ids: skillIds.join(',');
         });
       var postData = {
         question_dict: questionDict

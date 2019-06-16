@@ -776,6 +776,7 @@ def get_multi_skill_rights(skill_ids):
     skill_rights_models = skill_models.SkillRightsModel.get_multi(skill_ids)
     skill_rights_list = [
         get_skill_rights_from_model(skill_rights_model)
+        if skill_rights_model else None
         for skill_rights_model in skill_rights_models]
     return skill_rights_list
 

@@ -1851,9 +1851,9 @@ def can_edit_skills(handler):
         if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
             if not skill_rights.is_private():
                 return True
-            if skill_rights.is_private() and skill_rights.is_creator(
-                    user.user_id):
-                return True
+        if skill_rights.is_private() and skill_rights.is_creator(
+                user.user_id):
+            return True
         return False
 
     def test_can_edit_skills(self, skill_ids, **kwargs):

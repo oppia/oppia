@@ -144,23 +144,22 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_skills
     def get(self, skill_ids):
-        """Populates the data on the individual or multiple skill pages."""
+        """Populates the data on skill pages of the skill ids"""
 
         try:
             skill_ids = skill_ids.split(',')
         except Exception:
             raise self.PageNotFoundException
 
-        skill_dicts = []
-        for skill_id in skill_ids:
-            skill_domain.Skill.require_valid_skill_id(skill_id)
-            skill = skill_services.get_skill_by_id(
-                skill_id, strict=False)
-            if skill is None:
-                raise self.PageNotFoundException(
-                    Exception('The skill with the given id doesn\'t exist.'))
-            skill_dicts.append(skill.to_dict())
+        try:      
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+            skills = skill_services.get_multi_skills(skill_ids)
+        except Exception:
+            raise self.PageNotFoundException(
+                Exception('The skill with the given id doesn\'t exist.'))
 
+        skill_dicts = [skill.to_dict() for skill in skills]       
         self.values.update({
             'skills': skill_dicts
         })

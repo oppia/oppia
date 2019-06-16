@@ -2476,6 +2476,8 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
     manager_email = 'topicmanager@example.com'
     viewer_username = 'viewer'
     viewer_email = 'viewer@example.com'
+    creator_username = 'creator'
+    creator_email = 'creator@example.com'
     first_skill_id = '1'
     second_skill_id = '2'
 
@@ -2492,6 +2494,7 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         self.signup(self.second_admin_email, self.second_admin_username)
         self.signup(self.manager_email, self.manager_username)
         self.signup(self.viewer_email, self.viewer_username)
+        self.signup(self.creator_email, self.creator_username)
         self.set_admins([self.ADMIN_USERNAME, self.second_admin_username])
         self.set_topic_managers([self.manager_username])
 
@@ -2499,6 +2502,7 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
         self.second_admin_id = self.get_user_id_from_email(
             self.second_admin_email)
         self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.creator_id = self.get_user_id_from_email(self.creator_email)
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.manager = user_services.UserActionsInfo(self.manager_id)
 
@@ -2507,9 +2511,21 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         skill_services.create_new_skill_rights(
-            self.first_skill_id, self.admin_id)
+            self.first_skill_id, self.creator_id)
         skill_services.create_new_skill_rights(
-            self.second_skill_id, self.admin_id)
+            self.second_skill_id, self.creator_id)
+
+    def test_creator_can_edit_created_skills(self):
+        self.login(self.creator_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s,%s' % (
+                self.first_skill_id, self.second_skill_id))
+        self.assertEqual(len(response['skill_ids'].split(',')), 2)
+        self.assertEqual(
+            response['skill_ids'].split(',')[0], self.first_skill_id)
+        self.assertEqual(
+            response['skill_ids'].split(',')[1], self.second_skill_id)
+        self.logout()
 
     def test_admin_can_edit_multiple_public_skills(self):
         skill_services.publish_skill(self.first_skill_id, self.admin_id)
@@ -2566,6 +2582,16 @@ class EditSkillsDecoratorTests(test_utils.GenericTestBase):
                 self.first_skill_id, self.second_skill_id
                 ), expected_status_int=401)
         self.logout()
+
+    def test_logged_out_user_can_not_edit_multiple_public_skills(self):
+        self.logout()
+        skill_services.publish_skill(self.first_skill_id, self.admin_id)
+        skill_services.publish_skill(self.second_skill_id, self.admin_id)
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s,%s' % (
+                self.first_skill_id, self.second_skill_id
+                ), expected_status_int=401)
 
 
 class EditQuestionDecoratorTests(test_utils.GenericTestBase):

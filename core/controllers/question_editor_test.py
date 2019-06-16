@@ -179,6 +179,8 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         super(QuestionSkillLinkHandlerTest, self).setUp()
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, self.editor_id,
@@ -242,6 +244,27 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.assertEqual(question_summaries[0].id, self.question_id)
         self.assertEqual(
             grouped_skill_descriptions[0], ['Skill Description'])
+        self.logout()
+
+    def test_post_when_multiple_skills_link_to_one_question(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.post_json(
+            '%s/%s/%s,%s' % (
+                feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                self.skill_id, self.skill_id_2
+            ), {}, csrf_token=csrf_token)
+        question_summaries, grouped_skill_descriptions, _ = (
+            question_services.get_question_summaries_and_skill_descriptions(
+                5, [self.skill_id, self.skill_id_2], ''))
+        self.assertEqual(len(question_summaries), 1)
+        self.assertEqual(
+            question_summaries[0].id, self.question_id)
+        self.assertEqual(
+            grouped_skill_descriptions[0],
+            ['Skill Description', 'Skill Description 2']
+        )
         self.logout()
 
     def test_delete_with_non_admin_or_topic_manager_disallows_access(self):

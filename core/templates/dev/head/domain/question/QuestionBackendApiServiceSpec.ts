@@ -334,4 +334,24 @@ describe('Question backend Api service', function() {
       expect(failHandler).toHaveBeenCalledWith('Error loading questions.');
     }
   );
+
+  it('should successfully fetch questions from the backend with cursor',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect(
+        'GET', '/questions_list_handler/1?cursor=1').respond(
+        sampleResponse);
+
+      QuestionBackendApiService.fetchQuestionsForEditors(
+        ['1'], '1').then(successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith({
+        questionSummaries: sampleResponse.question_summary_dicts,
+        nextCursor: null
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    });
 });

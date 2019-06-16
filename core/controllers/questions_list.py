@@ -18,6 +18,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import question_services
+from core.domain import skill_domain
 from core.domain import skill_services
 import feconf
 
@@ -33,10 +34,12 @@ class QuestionsListHandler(base.BaseHandler):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
         skill_ids = skill_ids.split(',')
-
+  
         for skill_id in skill_ids:
-            if not skill_id.isalnum():
-                raise base.UserFacingExceptions.PageNotFoundException
+            try:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+            except Exception:
+                raise self.PageNotFoundException(Exception('Invalid skill id'))
 
             skill = skill_services.get_skill_by_id(skill_id, strict=False)
             if skill is None:

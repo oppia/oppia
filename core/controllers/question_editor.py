@@ -30,13 +30,15 @@ class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, skill_id):
+    def post(self, skill_ids):
         """Handles POST requests."""
-        skill_domain.Skill.require_valid_skill_id(skill_id)
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
-        if skill is None:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+        skill_ids = skill_ids.split(',')
+        for skill_id in skill_ids:
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+            skill = skill_services.get_skill_by_id(skill_id, strict=False)
+            if skill is None:
+                raise self.PageNotFoundException(
+                    'The skill with the given id doesn\'t exist.')
 
         question_dict = self.payload.get('question_dict')
         if (
@@ -56,8 +58,9 @@ class QuestionCreationHandler(base.BaseHandler):
         question_services.add_question(self.user_id, question)
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
-        question_services.create_new_question_skill_link(
-            question.id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
+        for skill_id in skill_ids:
+            question_services.create_new_question_skill_link(
+                question.id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
         self.values.update({
             'question_id': question.id
         })
