@@ -397,8 +397,8 @@
         "version": "2.2.1",
         "downloadFormat": "zip",
         "url": "https://github.com/katspaugh/wavesurfer.js/archive/2.2.1.zip",
-        "rootDirPrefix": "wave.surfer-js-",
-        "targetDirPrefix": "wave.surfer-js-",
+        "rootDirPrefix": "wavesurfer.js-",
+        "targetDirPrefix": "wavesurfer.js-",
         "files": ["src/wavesurfer.js"],
         "bundle": {
           "js": ["src/wavesurfer.js"]
