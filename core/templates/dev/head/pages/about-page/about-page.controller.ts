@@ -32,8 +32,8 @@ oppia.directive('aboutPage', ['UrlInterpolationService',
         '/pages/about-page/about-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'UrlInterpolationService',
-        function(UrlInterpolationService) {
+        'UrlInterpolationService', '$window',
+        function($window, UrlInterpolationService) {
           var ctrl = this;
           // Define constants
           ctrl.TAB_ID_ABOUT = 'about';
@@ -72,7 +72,7 @@ oppia.directive('aboutPage', ['UrlInterpolationService',
               activateTab(ctrl.TAB_ID_FOUNDATION);
               // Ensure page goes to the license section
               if (hashChange === 'license') {
-                location.reload(true);
+                $window.reload(true);
               }
             } else if (hashChange === ctrl.TAB_ID_CREDITS) {
               activateTab(ctrl.TAB_ID_CREDITS);

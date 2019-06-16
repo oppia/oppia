@@ -47,13 +47,13 @@ oppia.directive('preferencesPage', ['UrlInterpolationService', function(
     controllerAs: '$ctrl',
     controller: [
       '$http', '$q', '$rootScope', '$scope', '$timeout', '$translate',
-      '$uibModal', 'AlertsService', 'LanguageUtilService',
+      '$window', '$uibModal', 'AlertsService', 'LanguageUtilService',
       'UrlInterpolationService', 'UserService', 'UtilsService',
       'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
       'SUPPORTED_AUDIO_LANGUAGES', 'SUPPORTED_SITE_LANGUAGES',
       function(
           $http, $q, $rootScope, $scope, $timeout, $translate,
-          $uibModal, AlertsService, LanguageUtilService,
+          $window, $uibModal, AlertsService, LanguageUtilService,
           UrlInterpolationService, UserService, UtilsService,
           DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER,
           SUPPORTED_AUDIO_LANGUAGES, SUPPORTED_SITE_LANGUAGES) {
@@ -262,7 +262,7 @@ oppia.directive('preferencesPage', ['UrlInterpolationService', function(
               .then(function() {
                 // The reload is needed in order to update the profile picture
                 // in the top-right corner.
-                location.reload();
+                $window.reload();
               });
           });
         };
