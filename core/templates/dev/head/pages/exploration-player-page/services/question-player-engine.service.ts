@@ -28,7 +28,7 @@ require('services/stateful/FocusManagerService.ts');
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
-oppia.factory('PretestEngineService', [
+oppia.factory('QuestionPlayerEngineService', [
   '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',
   'ContextService', 'ExplorationHtmlFormatterService',
   'ExpressionInterpolationService', 'FocusManagerService',
