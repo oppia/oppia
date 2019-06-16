@@ -18,14 +18,13 @@
 
 import ast
 import datetime
+import logging
 
 from constants import constants
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
-from core.domain import fs_domain
-from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
@@ -37,47 +36,9 @@ import utils
     models.Registry.import_models([
         models.NAMES.job, models.NAMES.exploration, models.NAMES.base_model,
         models.NAMES.classifier]))
+memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
-
-
-def mock_get_filename_with_dimensions(filename, unused_exp_id):
-    return html_validation_service.regenerate_image_filename_using_dimensions(
-        filename, 490, 120)
-
-
-def mock_save_original_and_compressed_versions_of_image(
-        user_id, filename, exp_id, original_image_content):
-    filepath = 'image/%s' % filename
-
-    filename_wo_filetype = filename[:filename.rfind('.')]
-    filetype = filename[filename.rfind('.') + 1:]
-
-    compressed_image_filename = '%s_compressed.%s' % (
-        filename_wo_filetype, filetype)
-    compressed_image_filepath = 'image/%s' % compressed_image_filename
-
-    micro_image_filename = '%s_micro.%s' % (
-        filename_wo_filetype, filetype)
-    micro_image_filepath = 'image/%s' % micro_image_filename
-
-    fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
-        fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
-
-    if not fs.isfile(filepath.encode('utf-8')):
-        fs.commit(
-            user_id, filepath.encode('utf-8'), original_image_content,
-            mimetype='image/%s' % filetype)
-
-    if not fs.isfile(compressed_image_filepath.encode('utf-8')):
-        fs.commit(
-            user_id, compressed_image_filepath.encode('utf-8'),
-            original_image_content, mimetype='image/%s' % filetype)
-
-    if not fs.isfile(micro_image_filepath.encode('utf-8')):
-        fs.commit(
-            user_id, micro_image_filepath.encode('utf-8'),
-            original_image_content, mimetype='image/%s' % filetype)
 
 
 def run_job_for_deleted_exp(
@@ -135,6 +96,13 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
         super(ExpSummariesCreationOneOffJobTest, self).setUp()
 
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.VOICE_ARTIST_EMAIL, self.VOICE_ARTIST_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.voice_artist_id = self.get_user_id_from_email(
+            self.VOICE_ARTIST_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.login(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -145,6 +113,12 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
         self._run_batch_job_once_and_verify_output(
             self.EXP_SPECS,
             default_status=rights_manager.ACTIVITY_STATUS_PUBLIC)
+
+    def test_all_exps_private(self):
+        """Test summary batch job if all explorations are private."""
+        self._run_batch_job_once_and_verify_output(
+            self.EXP_SPECS,
+            default_status=rights_manager.ACTIVITY_STATUS_PRIVATE)
 
     def _run_batch_job_once_and_verify_output(
             self, exp_specs,
@@ -186,12 +160,20 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 exp_id = str(ind)
                 spec = default_spec
                 spec.update(exp_specs[ind])
-                self.save_new_valid_exploration(
-                    exp_id,
-                    self.admin_id,
-                    title=spec['title'],
-                    category=spec['category'])
+
+                exploration = exp_domain.Exploration.create_default_exploration(
+                    exp_id, title=spec['title'], category=spec['category'])
+                exploration.tags = ['computer science', 'analysis', 'a b c']
+                exp_services.save_new_exploration(self.admin_id, exploration)
+
                 exploration = exp_services.get_exploration_by_id(exp_id)
+
+                rights_manager.assign_role_for_exploration(
+                    self.admin, exp_id, self.voice_artist_id, 'voice artist')
+                rights_manager.assign_role_for_exploration(
+                    self.admin, exp_id, self.viewer_id, 'viewer')
+                rights_manager.assign_role_for_exploration(
+                    self.admin, exp_id, self.editor_id, 'editor')
 
                 # Publish exploration.
                 if spec['status'] == rights_manager.ACTIVITY_STATUS_PUBLIC:
@@ -1060,6 +1042,35 @@ class ExplorationMigrationJobTests(test_utils.GenericTestBase):
             [initial_state_name])[0]
         self.assertEqual(
             classifier_exp_mapping_model.job_id, classifier_model_id)
+
+    def test_migration_job_fails_with_invalid_exploration(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.language_code = 'invalid_language_code'
+        exploration_model.commit(
+            self.albert_id, 'Changed language_code.', [])
+        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+
+        job_id = exp_jobs_one_off.ExplorationMigrationJobManager.create_new()
+        exp_jobs_one_off.ExplorationMigrationJobManager.enqueue(job_id)
+        with self.swap(logging, 'error', _mock_logging_function):
+            self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Exploration %s failed non-strict validation: '
+             'Invalid language_code: invalid_language_code'
+             % (self.VALID_EXP_ID)])
 
 
 class InteractionAuditOneOffJobTests(test_utils.GenericTestBase):
@@ -1963,6 +1974,34 @@ class InteractionCustomizationArgsValidationJobTests(
             self,
             exp_jobs_one_off.InteractionCustomizationArgsValidationJob)
 
+    def test_validation_job_fails_for_invalid_schema_version(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        exploration_model = exp_models.ExplorationModel.get(self.VALID_EXP_ID)
+        exploration_model.states_schema_version = 100
+        exploration_model.commit(
+            self.albert_id, 'Changed states_schema_version.', [])
+        memcache_services.delete('exploration:%s' % self.VALID_EXP_ID)
+
+        job_id = (
+            exp_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.create_new())
+        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off
+            .InteractionCustomizationArgsValidationJob.get_output(job_id))
+        expected_output = [
+            u'[u\'Error Sorry, we can only process v1-v29 and unversioned '
+            'exploration state schemas at present. when loading exploration\', '
+            '[u\'exp_id0\']]']
+
+        self.assertEqual(actual_output, expected_output)
+
 
 class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [
@@ -2101,7 +2140,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
         exp_services.delete_exploration(self.user_a_id, exp_id)
 
         run_job_for_deleted_exp(
-            self, exp_jobs_one_off.ExpSummariesContributorsOneOffJob)
+            self, exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob)
 
 
 class TestDeleteStateIdMappingModelsOneOffJob(test_utils.GenericTestBase):
