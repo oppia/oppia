@@ -288,25 +288,14 @@ class BaseSummaryModelValidator(BaseModelValidator):
                     value_in_related_model = getattr(
                         related_model, related_model_property_name)
 
-                    summary_model_output_value = value_in_summary_model
-                    if isinstance(summary_model_output_value, list):
-                        summary_model_output_value = (',').join(
-                            summary_model_output_value)
-
-                    related_model_output_value = (
-                        value_in_related_model)
-                    if isinstance(related_model_output_value, list):
-                        related_model_output_value = (',').join(
-                            related_model_output_value)
-
                     if value_in_summary_model != value_in_related_model:
                         cls.errors['%s field check' % property_name].append((
                             'Entity id %s: %s field in entity: %s does not '
                             'match corresponding %s %s field: %s') % (
                                 item.id, property_name,
-                                summary_model_output_value,
+                                value_in_summary_model,
                                 related_model_name, related_model_property_name,
-                                related_model_output_value))
+                                value_in_related_model))
 
     @classmethod
     def validate(cls, item):
@@ -328,7 +317,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9+/]{1,%s}$-\\d*' % base_models.ID_LENGTH
+        return '^[A-Za-z0-9+/]{1,%s}-\\d*$' % base_models.ID_LENGTH
 
     @classmethod
     def _validate_base_model_version_from_item_id(cls, item):
@@ -1991,6 +1980,10 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
 
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^\\d*$'
 
     @classmethod
     def _get_model_domain_object_instances(cls, item):

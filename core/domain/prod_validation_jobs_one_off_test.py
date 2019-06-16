@@ -115,7 +115,6 @@ def run_job_and_check_output(
             if isinstance(value, list):
                 value = sorted(value)
             expected_output_dict[item[0]] = value
-
         self.assertEqual(
             sorted(actual_output_dict.keys()),
             sorted(expected_output_dict.keys()))
@@ -1748,100 +1747,32 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_collection_model_related_properties(self):
-        mock_created_on_time = datetime.datetime.utcnow()
-        properties_dict = {
-            'title': 'invalid',
-            'category': 'invalid',
-            'objective': 'invalid',
-            'language_code': 'en',
-            'tags': ['invalid1', 'invalid2'],
-            'collection_model_created_on': mock_created_on_time
-        }
+    def test_model_with_invalid_collection_related_property(self):
+        self.model_instance_0.title = 'invalid'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for title field check of '
+                'CollectionSummaryModel\', '
+                '[u\'Entity id %s: title field in entity: invalid does not '
+                'match corresponding collection title field: New title\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
-        output_dict = {
-            'title': 'invalid',
-            'category': 'invalid',
-            'objective': 'invalid',
-            'language_code': 'en',
-            'tags': 'invalid1,invalid2',
-            'collection_model_created_on': mock_created_on_time
-        }
-
-        for property_name in properties_dict:
-            actual_value = getattr(self.model_instance_0, property_name)
-            setattr(
-                self.model_instance_0, property_name,
-                properties_dict[property_name])
-            self.model_instance_0.put()
-            corresponding_property_name = property_name
-            if property_name == 'collection_model_created_on':
-                corresponding_property_name = 'created_on'
-            output_actual_value = actual_value
-            if isinstance(actual_value, list):
-                output_actual_value = (',').join(actual_value)
-            expected_output = [
-                (
-                    u'[u\'failed validation check for %s field check of '
-                    'CollectionSummaryModel\', '
-                    '[u\'Entity id %s: %s field in entity: %s does not match '
-                    'corresponding collection %s field: %s\']]'
-                ) % (
-                    property_name, self.model_instance_0.id, property_name,
-                    output_dict[property_name], corresponding_property_name,
-                    output_actual_value),
-                u'[u\'fully-validated CollectionSummaryModel\', 2]']
-            run_job_and_check_output(self, expected_output, sort=True)
-            setattr(self.model_instance_0, property_name, actual_value)
-            self.model_instance_0.put()
-
-    def test_model_with_invalid_collection_rights_model_related_properties(
-            self):
-        user_models.UserSettingsModel(
-            id='invalid1', email='invalid1@email.com').put()
-        user_models.UserSettingsModel(
-            id='invalid2', email='invalid2@email.com').put()
-        properties_dict = {
-            'status': 'public',
-            'community_owned': True,
-            'owner_ids': ['invalid1', 'invalid2'],
-            'editor_ids': ['invalid1', 'invalid2'],
-            'viewer_ids': ['invalid1', 'invalid2']
-        }
-
-        output_dict = {
-            'status': 'public',
-            'community_owned': True,
-            'owner_ids': 'invalid1,invalid2',
-            'editor_ids': 'invalid1,invalid2',
-            'viewer_ids': 'invalid1,invalid2'
-        }
-
-        for property_name in properties_dict:
-            actual_value = getattr(self.model_instance_0, property_name)
-            setattr(
-                self.model_instance_0, property_name,
-                properties_dict[property_name])
-            self.model_instance_0.put()
-            corresponding_property_name = property_name
-            output_actual_value = actual_value
-            if isinstance(actual_value, list):
-                output_actual_value = (',').join(actual_value)
-            expected_output = [
-                (
-                    u'[u\'failed validation check for %s field check of '
-                    'CollectionSummaryModel\', '
-                    '[u\'Entity id %s: %s field in entity: %s does not match '
-                    'corresponding collection rights %s field: %s\']]'
-                ) % (
-                    property_name, self.model_instance_0.id, property_name,
-                    output_dict[property_name], corresponding_property_name,
-                    output_actual_value
-                ),
-                u'[u\'fully-validated CollectionSummaryModel\', 2]']
-            run_job_and_check_output(self, expected_output, sort=True)
-            setattr(self.model_instance_0, property_name, actual_value)
-            self.model_instance_0.put()
+    def test_model_with_invalid_collection_rights_related_property(self):
+        self.model_instance_0.status = 'public'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for status field check of '
+                'CollectionSummaryModel\', '
+                '[u\'Entity id %s: status field in entity: public does not '
+                'match corresponding collection rights status field: '
+                'private\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class ConfigPropertyModelValidatorTests(test_utils.GenericTestBase):
@@ -3862,108 +3793,32 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_exploration_model_related_properties(self):
-        mock_created_on_time = datetime.datetime.utcnow()
-        properties_dict = {
-            'title': 'invalid',
-            'category': 'invalid',
-            'objective': 'invalid',
-            'language_code': 'en',
-            'tags': ['invalid1', 'invalid2'],
-            'exploration_model_created_on': mock_created_on_time
-        }
+    def test_model_with_invalid_exploration_related_property(self):
+        self.model_instance_0.title = 'invalid'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for title field check of '
+                'ExpSummaryModel\', '
+                '[u\'Entity id %s: title field in entity: invalid does not '
+                'match corresponding exploration title field: New title\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
-        output_dict = {
-            'title': 'invalid',
-            'category': 'invalid',
-            'objective': 'invalid',
-            'language_code': 'en',
-            'tags': 'invalid1,invalid2',
-            'exploration_model_created_on': mock_created_on_time
-        }
-
-        for property_name in properties_dict:
-            actual_value = getattr(self.model_instance_0, property_name)
-            setattr(
-                self.model_instance_0, property_name,
-                properties_dict[property_name])
-            self.model_instance_0.put()
-            corresponding_property_name = property_name
-            if property_name == 'exploration_model_created_on':
-                corresponding_property_name = 'created_on'
-            output_actual_value = actual_value
-            if isinstance(actual_value, list):
-                output_actual_value = (',').join(actual_value)
-            expected_output = [
-                (
-                    u'[u\'failed validation check for %s field check of '
-                    'ExpSummaryModel\', '
-                    '[u\'Entity id %s: %s field in entity: %s does not match '
-                    'corresponding exploration %s field: %s\']]'
-                ) % (
-                    property_name, self.model_instance_0.id, property_name,
-                    output_dict[property_name], corresponding_property_name,
-                    output_actual_value),
-                u'[u\'fully-validated ExpSummaryModel\', 2]']
-            run_job_and_check_output(self, expected_output, sort=True)
-            setattr(self.model_instance_0, property_name, actual_value)
-            self.model_instance_0.put()
-
-    def test_model_with_invalid_exploration_rights_model_related_properties(
-            self):
-        user_models.UserSettingsModel(
-            id='invalid1', email='invalid1@email.com').put()
-        user_models.UserSettingsModel(
-            id='invalid2', email='invalid2@email.com').put()
-        rights_manager.publish_exploration(self.owner, '0')
-        rights_manager.publish_exploration(self.owner, '1')
-        self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')
-        epoch = datetime.datetime.utcfromtimestamp(0)
-        mock_published_time = (
-            datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
-        properties_dict = {
-            'status': 'private',
-            'community_owned': True,
-            'first_published_msec': mock_published_time,
-            'owner_ids': ['invalid1', 'invalid2'],
-            'editor_ids': ['invalid1', 'invalid2'],
-            'viewer_ids': ['invalid1', 'invalid2']
-        }
-
-        output_dict = {
-            'status': 'private',
-            'community_owned': True,
-            'first_published_msec': mock_published_time,
-            'owner_ids': 'invalid1,invalid2',
-            'editor_ids': 'invalid1,invalid2',
-            'viewer_ids': 'invalid1,invalid2'
-        }
-
-        for property_name in properties_dict:
-            actual_value = getattr(self.model_instance_0, property_name)
-            setattr(
-                self.model_instance_0, property_name,
-                properties_dict[property_name])
-            self.model_instance_0.put()
-            corresponding_property_name = property_name
-            output_actual_value = actual_value
-            if isinstance(actual_value, list):
-                output_actual_value = (',').join(actual_value)
-            expected_output = [
-                (
-                    u'[u\'failed validation check for %s field check of '
-                    'ExpSummaryModel\', '
-                    '[u\'Entity id %s: %s field in entity: %s does not match '
-                    'corresponding exploration rights %s field: %s\']]'
-                ) % (
-                    property_name, self.model_instance_0.id, property_name,
-                    output_dict[property_name], corresponding_property_name,
-                    output_actual_value
-                ),
-                u'[u\'fully-validated ExpSummaryModel\', 2]']
-            run_job_and_check_output(self, expected_output, sort=True)
-            setattr(self.model_instance_0, property_name, actual_value)
-            self.model_instance_0.put()
+    def test_model_with_invalid_exploration_rights_related_property(self):
+        self.model_instance_0.status = 'public'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for status field check of '
+                'ExpSummaryModel\', '
+                '[u\'Entity id %s: status field in entity: public does not '
+                'match corresponding exploration rights status field: '
+                'private\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class FileMetadataModelValidatorTests(test_utils.GenericTestBase):
@@ -6159,48 +6014,18 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated StorySummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_invalid_story_model_related_properties(self):
-        mock_created_on_time = datetime.datetime.utcnow()
-        properties_dict = {
-            'title': 'invalid',
-            'description': 'invalid',
-            'language_code': 'en',
-            'story_model_created_on': mock_created_on_time
-        }
-
-        output_dict = {
-            'title': 'invalid',
-            'description': 'invalid',
-            'language_code': 'en',
-            'story_model_created_on': mock_created_on_time
-        }
-
-        for property_name in properties_dict:
-            actual_value = getattr(self.model_instance_0, property_name)
-            setattr(
-                self.model_instance_0, property_name,
-                properties_dict[property_name])
-            self.model_instance_0.put()
-            corresponding_property_name = property_name
-            if property_name == 'story_model_created_on':
-                corresponding_property_name = 'created_on'
-            output_actual_value = actual_value
-            if isinstance(actual_value, list):
-                output_actual_value = (',').join(actual_value)
-            expected_output = [
-                (
-                    u'[u\'failed validation check for %s field check of '
-                    'StorySummaryModel\', '
-                    '[u\'Entity id %s: %s field in entity: %s does not match '
-                    'corresponding story %s field: %s\']]'
-                ) % (
-                    property_name, self.model_instance_0.id, property_name,
-                    output_dict[property_name], corresponding_property_name,
-                    output_actual_value),
-                u'[u\'fully-validated StorySummaryModel\', 2]']
-            run_job_and_check_output(self, expected_output, sort=True)
-            setattr(self.model_instance_0, property_name, actual_value)
-            self.model_instance_0.put()
+    def test_model_with_invalid_story_related_property(self):
+        self.model_instance_0.title = 'invalid'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for title field check of '
+                'StorySummaryModel\', '
+                '[u\'Entity id %s: title field in entity: invalid does not '
+                'match corresponding story title field: title 0\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated StorySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
 
 
 class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
