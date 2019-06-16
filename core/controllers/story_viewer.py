@@ -18,6 +18,7 @@ from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import story_services
+from core.domain import summary_services
 import feconf
 
 
@@ -47,20 +48,35 @@ class StoryPageDataHandler(base.BaseHandler):
 
         story = story_services.get_story_by_id(story_id)
 
-        completed_nodes = [completed_node.to_dict()
-                           for completed_node in
-                           story_services.get_completed_nodes_in_story(
-                               self.user_id, story_id)]
+        completed_node_ids = [
+            completed_node.id for completed_node in
+            story_services.get_completed_nodes_in_story(self.user_id, story_id)]
 
-        pending_nodes = [pending_node.to_dict()
-                         for pending_node in
-                         story_services.get_pending_nodes_in_story(
-                             self.user_id, story_id)]
+        ordered_nodes_dict = [
+            node.to_dict() for node in story.story_contents.get_ordered_nodes()
+            if node.exploration_id]
+        for node in ordered_nodes_dict:
+            node['completed'] = False
+            if node['id'] in completed_node_ids:
+                node['completed'] = True
+
+        exp_ids = [
+            node['exploration_id'] for node in ordered_nodes_dict]
+        exp_summary_dicts = (
+            summary_services.get_displayable_exp_summary_dicts_matching_ids(
+                exp_ids, user=self.user))
+        exp_summaries_dict_map = {
+            exp_summary_dict['id']: exp_summary_dict
+            for exp_summary_dict in exp_summary_dicts
+        }
+
+        for node in ordered_nodes_dict:
+            node['exp_summary_dict'] = exp_summaries_dict_map[
+                node['exploration_id']]
 
         self.values.update({
             'story_title': story.title,
             'story_description': story.description,
-            'completed_nodes': completed_nodes,
-            'pending_nodes': pending_nodes
+            'story_nodes': ordered_nodes_dict
         })
         self.render_json(self.values)

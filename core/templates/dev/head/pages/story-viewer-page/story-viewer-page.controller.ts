@@ -22,32 +22,40 @@ require(
 require(
   'pages/story-viewer-page/navbar-breadcrumb/' +
   'story-viewer-navbar-breadcrumb.directive.ts');
+require(
+  'pages/story-viewer-page/chapters-list/' +
+  'story-viewer-chapters-list.directive.ts');
 
+require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 require('domain/story_viewer/StoryViewerBackendApiService.ts');
+require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
+
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 oppia.controller('StoryViewer', [
   '$rootScope', '$scope', '$window', 'AlertsService',
-  'PageTitleService', 'StoryViewerBackendApiService',
-  'UrlService', 'FATAL_ERROR_CODES',
+  'PageTitleService', 'StoryPlaythroughObjectFactory',
+  'StoryViewerBackendApiService', 'UrlService', 'FATAL_ERROR_CODES',
   function(
       $rootScope, $scope, $window, AlertsService,
-      PageTitleService, StoryViewerBackendApiService,
-      UrlService, FATAL_ERROR_CODES) {
+      PageTitleService, StoryPlaythroughObjectFactory,
+      StoryViewerBackendApiService, UrlService, FATAL_ERROR_CODES) {
     $scope.checkMobileView = function() {
       return ($window.innerWidth < 500);
     };
-
+    $scope.storyIsLoaded = false;
     $rootScope.loadingMessage = 'Loading';
     var storyId = UrlService.getStoryIdFromViewerUrl();
     StoryViewerBackendApiService.fetchStoryData(storyId).then(
       function(storyDataDict) {
+        $scope.storyIsLoaded = true;
+        $scope.storyPlaythroughObject =
+          StoryPlaythroughObjectFactory.createFromBackendDict(storyDataDict);
         PageTitleService.setPageTitle(storyDataDict.story_title + ' - Oppia');
-        $scope.completedNodes = storyDataDict.completed_nodes;
-        $scope.pendingNodes = storyDataDict.pending_nodes;
         $scope.storyTitle = storyDataDict.story_title;
+        $scope.storyDescription = storyDataDict.story_description;
         $rootScope.loadingMessage = '';
       },
       function(errorResponse) {

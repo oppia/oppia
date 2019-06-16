@@ -230,6 +230,52 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected prerequisite skill ids and acquired skill ids '
             'to be mutually exclusive.')
 
+    def test_get_ordered_nodes(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'title': 'Title 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'title': 'Title 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.initial_node_id = 'node_2'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        expected_list = [
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self.assertEqual(
+            self.story.story_contents.get_ordered_nodes(), expected_list)
+
     def test_all_nodes_visited(self):
         self.story.story_contents.next_node_id = 'node_4'
         # Case 1: Prerequisite skills not acquired.
