@@ -343,8 +343,9 @@ class QuestionRightsDomainTest(test_utils.GenericTestBase):
         super(QuestionRightsDomainTest, self).setUp()
         self.question_id = 'question_id'
         self.signup('user@example.com', 'User')
+        self.skill_ids = ['skill_1']
         self.question = question_domain.Question.create_default_question(
-            self.question_id)
+            self.question_id, self.skill_ids)
 
         self.user_id = self.get_user_id_from_email('user@example.com')
 
