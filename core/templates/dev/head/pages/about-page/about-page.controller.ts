@@ -32,7 +32,7 @@ oppia.directive('aboutPage', ['UrlInterpolationService',
         '/pages/about-page/about-page.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'UrlInterpolationService', '$window',
+        '$window', 'UrlInterpolationService',
         function($window, UrlInterpolationService) {
           var ctrl = this;
           // Define constants
