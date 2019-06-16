@@ -90,29 +90,18 @@ class BaseModelValidator(object):
                     item.id))
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        """Returns a list of domain object instances created from
-        the model properties/model.
+    def _get_model_domain_object_instance(cls, unused_item):
+        """Returns a domain object instance created from the model.
 
-        This should be implemented by subclasses.
+        This method can be overridden by subclasses, if needed.
 
         Args:
-            item: ndb.Model. Entity to validate.
+            unused_item: ndb.Model. Entity to validate.
 
         Returns:
-            *: list. A list of domain object instances of the model.
-          The list contains domain object instances formed by using
-          model properties which follow a domain object. For instance,
-          each item in ActivityReferencesModel.activity_references
-          follows a ActivityReferences domain object. The list can also
-          contain a single instance if the model itself follows a
-          domain object. For instance, ExplorationModel follows a
-          Exploration domain object. If any model instance cannot be
-          converted to domain object instance, an error is added to
-          cls.errors which contains the exception which was raised during
-          the creation of the domain object instance for the model.
+            *: A domain object to validate.
         """
-        raise NotImplementedError
+        return None
 
     @classmethod
     def _validate_model_domain_object_instances(cls, item):
@@ -122,15 +111,18 @@ class BaseModelValidator(object):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        model_domain_object_instances = cls._get_model_domain_object_instances(
+        model_domain_object_instance = cls._get_model_domain_object_instance(
             item)
-        for model_domain_object_instance in model_domain_object_instances:
-            try:
-                model_domain_object_instance.validate()
-            except Exception as e:
-                cls.errors['domain object check'].append((
-                    'Entity id %s: Entity fails domain validation with the '
-                    'error %s' % (item.id, e)))
+
+        if not model_domain_object_instance:
+            return
+
+        try:
+            model_domain_object_instance.validate()
+        except Exception as e:
+            cls.errors['domain object check'].append((
+                'Entity id %s: Entity fails domain validation with the '
+                'error %s' % (item.id, e)))
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -486,21 +478,21 @@ class ActivityReferencesModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        model_domain_object_instances = []
+    def _get_model_domain_object_instance(cls, item):
+        activity_references_list = []
 
         try:
             for reference in item.activity_references:
-                model_domain_object_instances.append(
+                activity_references_list.append(
                     activity_domain.ActivityReference(
                         reference['type'], reference['id']))
         except Exception as e:
             cls.errors['fetch properties'].append((
                 'Entity id %s: Entity properties cannot be fetched completely '
                 'with the error %s') % (item.id, e))
-            return []
+            return None
 
-        return model_domain_object_instances
+        return activity_domain.ActivityReferences(activity_references_list)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -536,10 +528,6 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
 
@@ -548,11 +536,8 @@ class CollectionModelValidator(BaseModelValidator):
     """Class for validating CollectionModel."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        model_domain_object_instances = [
-            collection_services.get_collection_from_model(item)]
-
-        return model_domain_object_instances
+    def _get_model_domain_object_instance(cls, item):
+        return collection_services.get_collection_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -588,10 +573,6 @@ class CollectionSnapshotMetadataModelValidator(
     related_model_name = 'collection'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return collection_domain.CollectionChange
 
@@ -613,10 +594,6 @@ class CollectionSnapshotContentModelValidator(
     related_model_name = 'collection'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'collection_ids': (
@@ -627,10 +604,6 @@ class CollectionSnapshotContentModelValidator(
 
 class CollectionRightsModelValidator(BaseModelValidator):
     """Class for validating CollectionRightsModel."""
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -686,10 +659,6 @@ class CollectionRightsSnapshotMetadataModelValidator(
     related_model_name = 'collection rights'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return rights_manager.CollectionRightsChange
 
@@ -709,10 +678,6 @@ class CollectionRightsSnapshotContentModelValidator(
     """Class for validating CollectionRightsSnapshotContentModel."""
 
     related_model_name = 'collection rights'
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -737,10 +702,6 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return collection_domain.CollectionChange
 
@@ -756,8 +717,8 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating CollectionSummaryModel."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return [collection_services.get_collection_summary_from_model(item)]
+    def _get_model_domain_object_instance(cls, item):
+        return collection_services.get_collection_summary_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -861,10 +822,6 @@ class ConfigPropertyModelValidator(BaseModelValidator):
     """Class for validating ConfigPropertyModel."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
@@ -884,10 +841,6 @@ class ConfigPropertySnapshotMetadataModelValidator(
     """Class for validating ConfigPropertySnapshotMetadataModel."""
 
     related_model_name = 'config property'
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_change_domain_class(cls):
@@ -911,10 +864,6 @@ class ConfigPropertySnapshotContentModelValidator(
     related_model_name = 'config property'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'config_property_ids': (
@@ -932,10 +881,6 @@ class SentEmailModelValidator(BaseModelValidator):
         regex_string = '^%s\\.\\.[A-Za-z0-9+/]{1,%s}$' % (
             item.intent, base_models.ID_LENGTH)
         return regex_string
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1014,10 +959,6 @@ class BulkEmailModelValidator(BaseModelValidator):
     """Class for validating BulkEmailModels."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'recipient_id': (
@@ -1071,10 +1012,6 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     """Class for validating GeneralFeedbackEmailReplyToIdModels."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'item.id.user_id': (
@@ -1113,11 +1050,8 @@ class ExplorationModelValidator(BaseModelValidator):
     """Class for validating ExplorationModel."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        model_domain_object_instances = [
-            exp_services.get_exploration_from_model(item)]
-
-        return model_domain_object_instances
+    def _get_model_domain_object_instance(cls, item):
+        return exp_services.get_exploration_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1149,10 +1083,6 @@ class ExplorationSnapshotMetadataModelValidator(
     related_model_name = 'exploration'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return exp_domain.ExplorationChange
 
@@ -1173,10 +1103,6 @@ class ExplorationSnapshotContentModelValidator(
     related_model_name = 'exploration'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'exploration_ids': (
@@ -1186,10 +1112,6 @@ class ExplorationSnapshotContentModelValidator(
 
 class ExplorationRightsModelValidator(BaseModelValidator):
     """Class for validating ExplorationRightsModel."""
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1251,10 +1173,6 @@ class ExplorationRightsSnapshotMetadataModelValidator(
     related_model_name = 'exploration rights'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return rights_manager.ExplorationRightsChange
 
@@ -1274,10 +1192,6 @@ class ExplorationRightsSnapshotContentModelValidator(
     """Class for validating ExplorationRightsSnapshotContentModel."""
 
     related_model_name = 'exploration rights'
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1302,10 +1216,6 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return exp_domain.ExplorationChange
 
@@ -1321,8 +1231,8 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating ExpSummaryModel."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return [exp_services.get_exploration_summary_from_model(item)]
+    def _get_model_domain_object_instance(cls, item):
+        return exp_services.get_exploration_summary_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1460,10 +1370,6 @@ class FileMetadataModelValidator(BaseModelValidator):
     """Class for validating FileMetadataModel."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
             '%s-%d' % (item.id, version) for version in range(
@@ -1498,10 +1404,6 @@ class FileMetadataSnapshotMetadataModelValidator(
     related_model_name = 'file metadata'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return fs_domain.FileMetadataChange
 
@@ -1523,10 +1425,6 @@ class FileMetadataSnapshotContentModelValidator(
     related_model_name = 'file metadata'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'file_metadata_ids': (
@@ -1537,10 +1435,6 @@ class FileMetadataSnapshotContentModelValidator(
 
 class FileModelValidator(BaseModelValidator):
     """Class for validating FileModel."""
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1576,10 +1470,6 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     related_model_name = 'file'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return fs_domain.FileChange
 
@@ -1600,10 +1490,6 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     related_model_name = 'file'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'file_ids': (
@@ -1614,10 +1500,6 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
 class ExplorationRecommendationsModelValidator(BaseModelValidator):
     """Class for validating ExplorationRecommendationsModel."""
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1652,10 +1534,6 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
     def _get_model_id_regex(cls, unused_item):
         # Valid id: topics.
         return '^%s$' % recommendations_models.TOPIC_SIMILARITIES_ID
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1748,11 +1626,8 @@ class StoryModelValidator(BaseModelValidator):
     """Class for validating StoryModel."""
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        model_domain_object_instances = [
-            story_services.get_story_from_model(item)]
-
-        return model_domain_object_instances
+    def _get_model_domain_object_instance(cls, item):
+        return story_services.get_story_from_model(item)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1787,10 +1662,6 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     related_model_name = 'story'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return story_domain.StoryChange
 
@@ -1810,10 +1681,6 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     related_model_name = 'story'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'story_ids': (
@@ -1823,10 +1690,6 @@ class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
 class StoryRightsModelValidator(BaseModelValidator):
     """Class for validating StoryRightsModel."""
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1854,10 +1717,6 @@ class StoryRightsSnapshotMetadataModelValidator(
     related_model_name = 'story rights'
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return story_domain.StoryRightsChange
 
@@ -1877,10 +1736,6 @@ class StoryRightsSnapshotContentModelValidator(
     """Class for validating StoryRightsSnapshotContentModel."""
 
     related_model_name = 'story rights'
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1905,10 +1760,6 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
-
-    @classmethod
     def _get_change_domain_class(cls):
         return story_domain.StoryChange
 
@@ -1922,10 +1773,6 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
 class StorySummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating StorySummaryModel."""
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1984,10 +1831,6 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return '^\\d*$'
-
-    @classmethod
-    def _get_model_domain_object_instances(cls, item):
-        return []
 
     @classmethod
     def _get_external_id_relationships(cls, item):

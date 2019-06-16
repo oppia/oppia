@@ -70,3 +70,32 @@ class ActivityReference(object):
             'type': self.type,
             'id': self.id,
         }
+
+
+class ActivityReferences(object):
+    """Domain object for a list of activity reference.
+
+    Attributes:
+        activity_reference_list: list(ActivityReference). A list of
+            ActivityReference domain objects.
+    """
+
+    def __init__(self, activity_reference_list):
+        """Constructs an ActivityReferences domain object.
+
+        Args:
+            activity_reference_list: list(ActivityReference). A list of
+                ActivityReference domain objects.
+        """
+        self.activity_reference_list = activity_reference_list
+
+    def validate(self):
+        """Checks that all ActivityReference domain object in
+        self.activity_reference_list are valid.
+
+        Raises:
+            Exception: Any ActivityReference in self.activity_reference_list
+                is invalid.
+        """
+        for reference in self.activity_reference_list:
+            reference.validate()
