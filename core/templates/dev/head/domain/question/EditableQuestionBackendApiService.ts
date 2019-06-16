@@ -48,7 +48,7 @@ oppia.factory('EditableQuestionBackendApiService', [
         skillIds, questionDict, successCallback, errorCallback) {
       var questionCreationUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_CREATION_URL, {
-          skill_ids: skillIds.join(',');
+          skill_ids: skillIds.join(',')
         });
       var postData = {
         question_dict: questionDict
