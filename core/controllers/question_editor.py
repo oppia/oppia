@@ -34,13 +34,14 @@ class QuestionCreationHandler(base.BaseHandler):
         """Handles POST requests."""
         skill_ids_list = skill_ids.split(',')
         if len(skill_ids_list) > 3:
-            raise Exception('More than three QuestionSkillLink for one'
+            raise Exception(
+                'More than three QuestionSkillLink for one '
                 'question is not supported.')
 
         for skill_id in skill_ids_list:
             skill_domain.Skill.require_valid_skill_id(skill_id)
         try:
-            skills = skill_services.get_multi_skills(skill_ids_list)
+            skill_services.get_multi_skills(skill_ids_list)
         except:
             raise self.PageNotFoundException(
                 'The skill with the given id doesn\'t exist.')
@@ -84,14 +85,15 @@ class QuestionSkillLinkHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         if not all(
-            [isinstance(skill_id, basestring) for skill_id in skill_ids_list]):
+                [isinstance(skill_id, basestring)
+                for skill_id in skill_ids_list]):
             raise self.PageNotFoundException
 
         for skill_id in skill_ids_list:
             skill_domain.Skill.require_valid_skill_id(skill_id)
 
         try:
-            skills = skill_services.get_multi_skills(skill_ids_list)
+            skill_services.get_multi_skills(skill_ids_list)
         except:
             raise self.PageNotFoundException(
                 'The skill with the given id doesn\'t exist.')

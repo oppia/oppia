@@ -45,7 +45,7 @@ class QuestionsListHandler(base.BaseHandler):
                 raise self.PageNotFoundException(Exception('Invalid skill id'))
 
         try:
-            skills = skill_services.get_multi_skills(skill_ids_list)
+            skill_services.get_multi_skills(skill_ids_list)
         except:
             raise self.PageNotFoundException(
                 'The skill with the given id doesn\'t exist.')
