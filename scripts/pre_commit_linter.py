@@ -2477,8 +2477,6 @@ class LintChecksManager(object):
                         continue
                     else:
                         constant_name = expression.arguments[0].raw
-                        if constant_name == '\'INTERACTION_SPECS\'':
-                            continue
                         if constant_name in constants_number_dict:
                             failed = True
                             print ('%s --> The constant %s is already declared '

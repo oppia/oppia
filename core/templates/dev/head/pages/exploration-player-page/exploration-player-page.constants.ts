@@ -94,8 +94,6 @@ oppia.constant('STATS_REPORTING_URLS', {
   STATS_EVENTS: '/explorehandler/stats_events/<exploration_id>'
 });
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
 oppia.constant('FEEDBACK_POPOVER_PATH',
   '/pages/exploration-player-page/templates/' +
   'feedback-popup-container.template.html');

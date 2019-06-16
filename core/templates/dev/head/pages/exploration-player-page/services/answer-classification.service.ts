@@ -25,6 +25,7 @@ require(
 require('services/AlertsService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require('pages/interaction-specs.contants.ts');
 
 oppia.factory('AnswerClassificationService', [
   'AlertsService', 'AnswerClassificationResultObjectFactory',

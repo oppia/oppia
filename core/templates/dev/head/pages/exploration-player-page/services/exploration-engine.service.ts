@@ -47,6 +47,7 @@ require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+require('pages/interaction-specs.contants.ts');
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.

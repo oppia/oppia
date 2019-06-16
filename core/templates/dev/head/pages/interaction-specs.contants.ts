@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the questions player directive.
+ * @fileoverview Constant file for the INTERACTION_SPECS constant.
  */
 
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);

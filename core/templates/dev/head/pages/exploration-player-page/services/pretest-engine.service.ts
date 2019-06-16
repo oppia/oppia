@@ -27,6 +27,7 @@ require('services/ExplorationHtmlFormatterService.ts');
 require('services/stateful/FocusManagerService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require('pages/interaction-specs.contants.ts');
 
 oppia.factory('PretestEngineService', [
   '$http', '$q', '$rootScope', 'AlertsService', 'AnswerClassificationService',

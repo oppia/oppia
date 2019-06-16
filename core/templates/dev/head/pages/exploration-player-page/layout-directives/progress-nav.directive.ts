@@ -30,6 +30,7 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require('pages/interaction-specs.contants.ts');
 
 oppia.directive('progressNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {

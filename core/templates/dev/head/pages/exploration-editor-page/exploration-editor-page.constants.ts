@@ -50,8 +50,6 @@ oppia.constant(
 
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
   'The solution is now valid!');
 
