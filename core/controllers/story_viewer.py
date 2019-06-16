@@ -54,6 +54,9 @@ class StoryPageDataHandler(base.BaseHandler):
 
         ordered_nodes_dict = [
             node.to_dict() for node in story.story_contents.get_ordered_nodes()
+        # TODO(aks681): Once the story publication is done, add a check so that
+        # only if all explorations in the story are published, can the story
+        # itself be published. After which, remove the following condition.
             if node.exploration_id]
         for node in ordered_nodes_dict:
             node['completed'] = False
