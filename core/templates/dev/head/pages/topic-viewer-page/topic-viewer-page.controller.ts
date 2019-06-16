@@ -27,7 +27,7 @@ require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 oppia.directive('topicViewerPage', ['UrlInterpolationService', function(
-    UrlInterpolationService){
+    UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},

@@ -110,7 +110,7 @@ require('services/contextual/UrlService.ts');
 require('pages/story-editor-page/story-editor-page.constants.ts');
 
 oppia.directive('storyEditorPage', ['UrlInterpolationService', function(
-    UrlInterpolationService){
+    UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},

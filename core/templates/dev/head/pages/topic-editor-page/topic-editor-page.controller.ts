@@ -125,8 +125,8 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 
-oppia.directive('topicEditorPage',  ['UrlInterpolationService', function(
-    UrlInterpolationService){
+oppia.directive('topicEditorPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
   return {
     restrict: 'E',
     scope: {},
