@@ -157,17 +157,6 @@ class QuestionModel(base_models.VersionedModel):
         cls.put_multi(questions)
 
 
-    @classmethod
-    def delete_multi_questions(cls, questions):
-        """Deletes multiple questions from the datastore.
-
-        Args:
-            questions: list(Question). The list of question objects
-            to delete from the datastore.
-        """
-        cls.delete_multi(questions)
-
-
 class QuestionSkillLinkModel(base_models.BaseModel):
     """Model for storing Question-Skill Links.
 

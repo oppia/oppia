@@ -413,7 +413,6 @@ def replace_skill_id_for_all_questions(
         new_question.linked_skill_ids.remove(curr_skill_id)
         new_question.linked_skill_ids.append(new_skill_id)
         new_questions.append(new_question)
-    question_models.QuestionModel.delete_multi_questions(old_questions)
     question_models.QuestionModel.put_multi_questions(new_questions)
 
 
