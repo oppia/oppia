@@ -1472,6 +1472,7 @@ tags: []
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1498,7 +1499,7 @@ tags: []
             language_code=language_code,
             version=1,
             question_state_data_schema_version=27,
-            linked_skill_ids=[]
+            linked_skill_ids=linked_skill_ids
         )
         question_model.commit(
             owner_id, 'New question created',

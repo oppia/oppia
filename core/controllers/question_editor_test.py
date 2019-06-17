@@ -201,7 +201,7 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'), [])
+            self._create_valid_question_data('ABC'), [self.skill_id])
 
     def test_post_with_non_admin_or_topic_manager_email_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)
