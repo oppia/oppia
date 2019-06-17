@@ -60,7 +60,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes')
+            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
 
         self.get_html_response(
             '%s/%s/%s' % (
@@ -69,7 +70,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.logout()
 
-    def test_get_can_not_access_story_handler_with_invalid_story_id(self):
+    def test_can_not_get_access_story_handler_with_invalid_story_id(self):
         self.login(self.ADMIN_EMAIL)
 
         new_story_id = story_services.get_new_story_id()
@@ -82,7 +83,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes')
+            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
         self.get_json(
             '%s/%s/%s' % (
                 feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
@@ -119,7 +121,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
         # Raises error 404 even when story is saved as the new story id is not
         # associated with the topic.
         self.save_new_story(
-            new_story_id, self.admin_id, 'Title', 'Description', 'Notes')
+            new_story_id, self.admin_id, 'Title', 'Description', 'Notes',
+            self.topic_id)
         response = self.get_html_response(
             '%s/%s/%s' % (
                 feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
