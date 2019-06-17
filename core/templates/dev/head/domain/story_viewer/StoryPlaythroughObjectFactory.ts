@@ -17,6 +17,8 @@
  * story playthrough domain objects.
  */
 
+require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
+
 oppia.factory('StoryPlaythroughObjectFactory', [
   'ReadOnlyStoryNodeObjectFactory', function(ReadOnlyStoryNodeObjectFactory) {
     // Stores information about a current playthrough of a story for a

@@ -16,6 +16,7 @@
  * @fileoverview Directive for the navbar breadcrumb of the story viewer.
  */
 
+require('domain/story_viewer/StoryViewerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/UrlService.ts');
 
@@ -24,15 +25,18 @@ oppia.directive('storyViewerNavbarBreadcrumb', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-viewer-page/navbar-breadcrumb/' +
         'story-viewer-navbar-breadcrumb.directive.html'),
-      controller: ['$scope', 'StoryViewerBackendApiService', 'UrlService',
-        function($scope, StoryViewerBackendApiService, UrlService) {
+      controllerAs: '$ctrl',
+      controller: ['StoryViewerBackendApiService', 'UrlService',
+        function(StoryViewerBackendApiService, UrlService) {
+          var ctrl = this;
           StoryViewerBackendApiService.fetchStoryData(
             UrlService.getStoryIdFromViewerUrl()).then(
             function(storyDataDict) {
-              $scope.storyTitle = storyDataDict.story_title;
+              ctrl.storyTitle = storyDataDict.story_title;
             });
         }
       ]

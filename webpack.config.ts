@@ -93,7 +93,7 @@ module.exports = {
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
     story_viewer:
-      commonPrefix + '/pages/story-viewer-page/story-viewer-page.controller.ts',
+      commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',

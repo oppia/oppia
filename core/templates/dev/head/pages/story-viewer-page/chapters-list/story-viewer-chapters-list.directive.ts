@@ -19,7 +19,6 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
-
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
@@ -42,24 +41,24 @@ oppia.directive('storyViewerChaptersList', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
+      scope: {},
+      bindToController: {
         getPlaythroughObject: '&playthroughObject'
       },
-      bindToController: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/story-viewer-page/chapters-list' +
         '/story-viewer-chapters-list.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$anchorScroll', '$http', '$location', '$scope',
-        'AlertsService', 'PageTitleService',
-        'StoryPlaythroughObjectFactory', 'UrlInterpolationService',
+        '$anchorScroll', '$http', '$location', 'AlertsService',
+        'PageTitleService', 'StoryPlaythroughObjectFactory',
+        'UrlInterpolationService',
         function(
-            $anchorScroll, $http, $location, $scope,
-            AlertsService, PageTitleService,
-            StoryPlaythroughObjectFactory, UrlInterpolationService) {
+            $anchorScroll, $http, $location, AlertsService,
+            PageTitleService, StoryPlaythroughObjectFactory,
+            UrlInterpolationService) {
           var ctrl = this;
-          ctrl.storyPlaythroughObject = $scope.getPlaythroughObject();
+          ctrl.storyPlaythroughObject = ctrl.getPlaythroughObject();
           ctrl.isLoggedIn = GLOBALS.isLoggedIn;
           ctrl.explorationCardIsShown = false;
           ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;

@@ -7,19 +7,7 @@
 
 {% block content %}
   <background-banner></background-banner>
-  <div ng-controller="StoryViewer" class="oppia-story-viewer-container">
-    <div class="oppia-story-title">
-      <[storyTitle]>
-    </div>
-    <div class="oppia-story-description">
-      <[storyDescription]>
-    </div>
-    <div ng-if="storyIsLoaded">
-      <story-viewer-chapters-list ng-if="storyPlaythroughObject.getStoryNodeCount() > 0"
-                                  playthrough-object="storyPlaythroughObject">
-      </story-viewer-chapters-list>
-    </div>
-  </div>
+  <story-viewer-page></story-viewer-page>
   <style>
     html, body {
       background: #eeeeee no-repeat center center fixed;
@@ -111,9 +99,6 @@
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
-  <script src="/templates/dev/head/mathjaxConfig.js"></script>
-  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <!-- This code is used for inserting webpack bundles
      https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
   <% for (var chunk in htmlWebpackPlugin.files.js) { %>
