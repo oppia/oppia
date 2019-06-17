@@ -857,8 +857,7 @@ class SignUpTests(test_utils.GenericTestBase):
         during signup.
         """
         self.login('abc@example.com')
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         response = self.get_html_response('/about', expected_status_int=302)
         self.assertIn('Logout', response.location)
@@ -878,9 +877,7 @@ class SignUpTests(test_utils.GenericTestBase):
         after signup.
         """
         self.login('abc@example.com')
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
-
+        csrf_token = self.get_csrf_token()
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
                 'username': 'abc',

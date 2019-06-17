@@ -946,8 +946,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             thread_id = threadlist[0].id
 
             self.login(self.EDITOR_EMAIL)
-            response = self.get_json('/csrf')
-            csrf_token = response['token']
+            csrf_token = self.get_csrf_token()
             self.post_json(
                 '%s/%s' % (
                     feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),

@@ -69,8 +69,7 @@ class FeaturedActivitiesHandlerTests(test_utils.GenericTestBase):
 
     def test_unpublished_activities_cannot_be_added_to_featured_list(self):
         self.login(self.MODERATOR_EMAIL)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         # Posting a list that includes private activities results in an error.
         self.post_json(

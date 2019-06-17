@@ -56,8 +56,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test that configuration properties can be changed."""
 
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         new_config_value = True
 
         response_dict = self.get_json('/adminhandler')
@@ -92,8 +91,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     def test_generate_count_greater_than_publish_count(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_explorations',
@@ -108,8 +106,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     def test_generate_count_equal_to_publish_count(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_explorations',
@@ -124,8 +121,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     def test_generate_count_less_than_publish_count(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         generated_exps_response = self.post_json(
             '/adminhandler', {
                 'action': 'generate_dummy_explorations',
@@ -164,8 +160,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
             response_dict, {'user1': feconf.ROLE_ID_EXPLORATION_EDITOR})
 
         # Check role correctly gets updated.
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         response_dict = self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
@@ -186,15 +181,14 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
 
         # Trying to view role of non-existent user.
-        response = self.get_json(
+        self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             params={'method': 'username', 'username': username},
             expected_status_int=400)
 
         # Trying to update role of non-existent user.
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
-        response = self.post_json(
+        csrf_token = self.get_csrf_token()
+        self.post_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
             {'role': feconf.ROLE_ID_MODERATOR, 'username': username},
             csrf_token=csrf_token,
@@ -294,8 +288,7 @@ class ClearSearchIndexTest(test_utils.GenericTestBase):
         self.assertEqual(result_collections, ['0'])
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         generated_exps_response = self.post_json(
             '/adminhandler', {
                 'action': 'clear_search_index'

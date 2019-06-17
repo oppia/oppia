@@ -143,14 +143,12 @@ class EditorTests(BaseEditorControllerTests):
         """
         self.login(self.EDITOR_EMAIL)
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         exp_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, {}, csrf_token=csrf_token
         )[creator_dashboard.EXPLORATION_ID_KEY]
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
         self.put_json(
             publish_url, {
@@ -164,8 +162,7 @@ class EditorTests(BaseEditorControllerTests):
         current_version = 1
 
         self.login(self.EDITOR_EMAIL)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         def _get_payload(new_state_name, version=None):
             """Gets the payload in the dict format."""
@@ -240,8 +237,7 @@ class EditorTests(BaseEditorControllerTests):
         exp_id = exp_services.get_new_exploration_id()
         self.save_new_valid_exploration(
             exp_id, self.admin_id, end_state_name='end state')
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         publish_url = '%s/%s' % (feconf.EXPLORATION_STATUS_PREFIX, exp_id)
 
         exploration_rights = self.put_json(
@@ -597,8 +593,7 @@ written_translations:
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         response = self.post_json('/createhandler/state_yaml/%s' % exp_id, {
             'state_dict': exploration.states['State A'].to_dict(),
             'width': 50,
@@ -615,8 +610,7 @@ written_translations:
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.save_new_valid_exploration(exp_id, owner_id)
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         self.post_json(
             '/createhandler/state_yaml/%s' % exp_id, {},
@@ -766,8 +760,7 @@ class StartedTutorialEventHandlerTests(test_utils.GenericTestBase):
 
         self.save_new_valid_exploration(exp_id, owner_id)
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         user_settings = user_services.get_user_settings(owner_id)
 
@@ -1113,8 +1106,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
         # Open editor page.
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         # May not revert to any version that's not 1.
         for rev_version in (-1, 0, 2, 3, 4, '1', ()):
@@ -1198,8 +1190,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
             expected_status_int=404)
 
     def test_revert_with_invalid_current_version_raises_error(self):
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         response = self.post_json(
             '/createhandler/revert/%s' % self.EXP_ID, {
@@ -1287,8 +1278,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         # Owner adds rights for other users.
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
@@ -1331,8 +1321,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         response = self.get_html_response('/create/%s' % exp_id)
         self.assert_can_edit(response.body)
         self.assert_can_voiceover(response.body)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         # Check that collaborator can add a new state called 'State 4'.
         add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
@@ -1373,8 +1362,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.login(self.COLLABORATOR2_EMAIL)
         response = self.get_html_response('/create/%s' % exp_id)
         self.assert_can_edit(response.body)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         # Check that collaborator2 can add a new state called 'State 5'.
         add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exp_id)
@@ -1415,8 +1403,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         response = self.get_html_response('/create/%s' % exp_id)
         self.assert_cannot_edit(response.body)
         self.assert_can_voiceover(response.body)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         # Check that voice artist cannot add new members.
         exploration = exp_services.get_exploration_by_id(exp_id)
@@ -1440,8 +1427,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.save_new_valid_exploration(
             exp_id, self.owner_id, title='My Exploration',
             end_state_name='END')
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         rights_manager.publish_exploration(self.owner, exp_id)
 
         # Owner transfers ownership to the community.
@@ -1494,8 +1480,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         # The exploration is now invalid due to invalid language code.
         # Therefore, the following PUT request will raise an exception after
         # creating a domain object from the exploration model and validating it.
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         response = self.put_json(
@@ -1520,8 +1505,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         exploration = exp_services.get_exploration_by_id(exp_id)
 
         response = self.put_json(
@@ -1539,8 +1523,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         exploration = exp_services.get_exploration_by_id(exp_id)
         exploration_rights = rights_manager.get_exploration_rights(exp_id)
         self.assertFalse(exploration_rights.viewable_if_private)
@@ -1557,8 +1540,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTests):
         self.login(self.OWNER_EMAIL)
         exp_id = 'exp_id'
         self.save_new_valid_exploration(exp_id, self.owner_id)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         exploration = exp_services.get_exploration_by_id(exp_id)
 
         response = self.put_json(
@@ -1585,9 +1567,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
 
         exploration = exp_services.get_exploration_by_id(exp_id)
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
-
+        csrf_token = self.get_csrf_token()
         exp_email_preferences = (
             user_services.get_email_preferences_for_exploration(
                 self.owner_id, exp_id))
@@ -1634,8 +1614,7 @@ class UserExplorationEmailsIntegrationTest(BaseEditorControllerTests):
         self.login(self.OWNER_EMAIL)
         exp_id = 'eid'
         self.save_new_valid_exploration(exp_id, self.owner_id)
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         response = self.put_json(
             '%s/%s' % (feconf.USER_EXPLORATION_EMAILS_PREFIX, exp_id),
@@ -1683,8 +1662,7 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
             self.login(self.MODERATOR_EMAIL)
 
             # Get csrf token.
-            response = self.get_json('/csrf')
-            csrf_token = response['token']
+            csrf_token = self.get_csrf_token()
 
             # Try to unpublish the exploration without an email body. This
             # should cause an error.
@@ -1736,8 +1714,7 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
             self.login(self.MODERATOR_EMAIL)
 
             # Go to the exploration editor page.
-            response = self.get_json('/csrf')
-            csrf_token = response['token']
+            csrf_token = self.get_csrf_token()
 
             new_email_body = 'Your exploration is unpublished :('
 
@@ -1797,8 +1774,7 @@ class ModeratorEmailsTests(test_utils.GenericTestBase):
             self.login(self.EDITOR_EMAIL)
 
             # Go to the exploration editor page.
-            response = self.get_json('/csrf')
-            csrf_token = response['token']
+            csrf_token = self.get_csrf_token()
 
             new_email_body = 'Your exploration is unpublished :('
 
@@ -2063,8 +2039,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             'is_valid': True
         }
 
-        response = self.get_json('/csrf')
-        self.csrf_token = response['token']
+        self.csrf_token = self.get_csrf_token()
 
     def test_resolve_issue_handler(self):
         """Test that resolving an issue deletes associated playthroughs."""
@@ -2185,8 +2160,7 @@ class EditorAutosaveTest(BaseEditorControllerTests):
         self._create_exp_user_data_model_objects_for_tests()
 
         # Generate CSRF token.
-        response = self.get_json('/csrf')
-        self.csrf_token = response['token']
+        self.csrf_token = self.get_csrf_token()
 
     def test_exploration_loaded_with_draft_applied(self):
         response = self.get_json(

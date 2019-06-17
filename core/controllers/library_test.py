@@ -273,8 +273,7 @@ class LibraryIndexHandlerTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['en'],
         }, response_dict)
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         # Change the user's preferred language to de.
         self.put_json(
@@ -402,8 +401,7 @@ class LibraryGroupPageTests(test_utils.GenericTestBase):
             'preferred_language_codes': ['en'],
         }, response_dict)
 
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
 
         self.put_json(
             feconf.PREFERENCES_DATA_URL,

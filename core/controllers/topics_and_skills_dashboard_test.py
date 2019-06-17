@@ -48,8 +48,7 @@ class BaseTopicsAndSkillsDashboardTests(test_utils.GenericTestBase):
 
     def _get_csrf_token_for_put(self):
         """Gets the csrf token."""
-        response = self.get_json('/csrf')
-        csrf_token = response['token']
+        csrf_token = self.get_csrf_token()
         return csrf_token
 
 
