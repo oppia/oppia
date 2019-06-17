@@ -164,6 +164,22 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             }]
         }
 
+    def test_guest_can_not_delete_skill(self):
+        response = self.delete_json(self.url, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
+    def test_new_user_can_not_delete_skill(self):
+        self.login(self.NEW_USER_EMAIL)
+
+        response = self.delete_json(self.url, expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You do not have credentials to delete the skill.')
+
+        self.logout()
+
     def test_editable_skill_handler_get_succeeds(self):
         self.login(self.ADMIN_EMAIL)
         # Check that admins can access the editable skill data.
@@ -255,8 +271,7 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
         # Check that a non-existing skill cannot be published.
         url = '%s/non-existing-id' % (feconf.SKILL_PUBLISH_URL_PREFIX)
         self.put_json(
-            url, {'version': 1}, csrf_token=csrf_token,
-            expected_status_int=500)
+            url, {'version': 1}, csrf_token=csrf_token, expected_status_int=404)
 
         # Check that the status is 401 when call to publish_skill raises an
         # exception.
@@ -268,6 +283,7 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
             self.put_json(
                 self.url, {'version': 1}, csrf_token=csrf_token,
                 expected_status_int=401)
+
         self.logout()
 
 

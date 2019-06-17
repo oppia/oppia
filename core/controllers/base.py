@@ -37,7 +37,6 @@ import jinja_utils
 import utils
 
 from google.appengine.api import users
-import jinja2
 import webapp2
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -50,14 +49,6 @@ CSRF_SECRET = config_domain.ConfigProperty(
     'oppia_csrf_secret', {'type': 'unicode'},
     'Text used to encrypt CSRF tokens.', DEFAULT_CSRF_SECRET)
 
-BEFORE_END_HEAD_TAG_HOOK = config_domain.ConfigProperty(
-    'before_end_head_tag_hook', {
-        'type': 'unicode',
-        'ui_config': {
-            'rows': 7,
-        },
-    },
-    'Code to insert just before the closing </head> tag in all pages.', '')
 
 
 def _clear_login_cookies(response_headers):
@@ -150,8 +141,6 @@ class BaseHandler(webapp2.RequestHandler):
 
         self.user_id = current_user_services.get_current_user_id()
         self.username = None
-        self.has_seen_editor_tutorial = False
-        self.has_seen_translation_tutorial = False
         self.partially_logged_in = False
 
         if self.user_id:
@@ -171,10 +160,6 @@ class BaseHandler(webapp2.RequestHandler):
             else:
                 self.username = user_settings.username
                 self.values['username'] = self.username
-                if user_settings.last_started_state_editor_tutorial:
-                    self.has_seen_editor_tutorial = True
-                if user_settings.last_started_state_translation_tutorial:
-                    self.has_seen_translation_tutorial = True
                 # In order to avoid too many datastore writes, we do not bother
                 # recording a log-in if the current time is sufficiently close
                 # to the last log-in time.
@@ -314,8 +299,6 @@ class BaseHandler(webapp2.RequestHandler):
         scheme, netloc, path, _, _ = urlparse.urlsplit(self.request.uri)
 
         values.update({
-            'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
-                BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': constants.DEV_MODE,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
@@ -326,8 +309,6 @@ class BaseHandler(webapp2.RequestHandler):
                 app_identity_services.get_gcs_resource_bucket_name()),
             # The 'path' variable starts with a forward slash.
             'FULL_URL': '%s://%s%s' % (scheme, netloc, path),
-            'user_is_logged_in': user_services.has_fully_registered(
-                self.user_id)
         })
 
         if 'status_code' not in values:
@@ -385,9 +366,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.values.update(values)
             if 'iframed' in self.values and self.values['iframed']:
                 self.render_template(
-                    'pages/error/error_iframed.html', iframe_restriction=None)
+                    'pages/error-pages/error-iframed.mainpage.html',
+                    iframe_restriction=None)
             else:
-                self.render_template('dist/error.html')
+                self.render_template('dist/error-page.mainpage.html')
         else:
             if return_type != feconf.HANDLER_TYPE_JSON and (
                     return_type != feconf.HANDLER_TYPE_DOWNLOADABLE):
@@ -441,7 +423,10 @@ class BaseHandler(webapp2.RequestHandler):
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
                     feconf.HANDLER_TYPE_JSON):
                 self.error(401)
-                self._render_exception(401, {'error': unicode(exception)})
+                self._render_exception(
+                    401, {
+                        'error': (
+                            'You must be logged in to access this resource.')})
             else:
                 self.redirect(
                     current_user_services.create_login_url(self.request.uri))

@@ -56,7 +56,7 @@ Please report security issues directly to admin@oppia.org.
 
 ## License
 
-The Oppia code is released under the [Apache v2 license](https://github.com/oppia/oppia/blob/master/LICENSE).
+The Oppia code is released under the [Apache v2 license](https://github.com/oppia/oppia/blob/develop/LICENSE).
 
 
 ## Keeping in touch

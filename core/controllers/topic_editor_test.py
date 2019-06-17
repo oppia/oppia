@@ -491,6 +491,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
         self.logout()
 
+    def test_guest_can_not_delete_topic(self):
+        response = self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
+
     def test_editable_topic_handler_delete(self):
         # Check that admins can delete a topic.
         self.login(self.ADMIN_EMAIL)

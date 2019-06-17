@@ -1,0 +1,106 @@
+<style>
+  .roles-tab .form-horizontal .control-label {
+    text-align: left;
+  }
+  .roles-tab .view-results-table {
+    margin-top: 20px;
+  }
+</style>
+
+<div class="container-fluid roles-tab">
+  <div class="row">
+    <div class="col-md-8">
+      <md-card class="oppia-page-card oppia-long-text">
+        <form class="form-horizontal" name="$ctrl.viewRoleForm" ng-submit="$ctrl.submitRoleViewForm($ctrl.viewFormValues)">
+          <legend class="text-center">View User Roles</legend>
+          <div class="form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left" for="$ctrl.viewFormValues.method">
+              Select Method
+            </label>
+            <div class="col-md-8">
+              <select ng-model="$ctrl.viewFormValues.method" class="form-control">
+                <option value="role">By Role</option>
+                <option value="username">By Username</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group" ng-if="$ctrl.viewFormValues.method==='role'">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Select Role</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <select ng-options="roleName as roleString for (roleName, roleString) in $ctrl.VIEWABLE_ROLES" ng-model="$ctrl.viewFormValues.role" class="form-control">
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" ng-if="$ctrl.viewFormValues.method==='username'">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <input type="text" name="username" placeholder="Enter username" ng-model="$ctrl.viewFormValues.username" class="form-control">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success"
+                  ng-disabled="($ctrl.viewFormValues.method==='role' && !$ctrl.viewFormValues.role) || ($ctrl.viewFormValues.method==='username' && !$ctrl.viewFormValues.username)"
+                  value="view role">
+            View Role
+          </button>
+        </form>
+
+        <div ng-show="$ctrl.resultRolesVisible">
+          <table class="table text-center view-results-table">
+            <thead>
+              <tr>
+                <td><strong>Username</strong></td>
+                <td><strong>Role</strong></td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="(name, role) in $ctrl.result">
+                <td><[name]></td>
+                <td><[role]></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </md-card>
+
+      <md-card class="oppia-page-card oppia-long-text">
+        <form class="form-horizontal" name="$ctrl.updateRoleForm" ng-submit="$ctrl.submitUpdateRoleForm($ctrl.updateFormValues)">
+          <legend class="text-center">Update Role</legend>
+          <div class="form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label">Enter Username</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <input type="text" placeholder="Enter username" ng-model="$ctrl.updateFormValues.username" class="form-control protractor-update-form-name">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Select Role</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <select ng-options="roleName as roleString for (roleName, roleString) in $ctrl.UPDATABLE_ROLES" ng-model="$ctrl.updateFormValues.newRole" class="form-control protractor-update-form-role-select">
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" ng-if="$ctrl.updateFormValues.newRole==='TOPIC_MANAGER'">
+            <label class="col-md-4 col-lg-4 col-sm-4 control-label pull-left">Enter Topic for Topic Manager</label>
+            <div class="col-md-8 col-lg-8 col-sm-8">
+              <select ng-options="topic.id as topic.name for topic in $ctrl.topicSummaries" ng-model="$ctrl.updateFormValues.topicId" class="form-control protractor-update-form-role-select">
+              </select>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-success protractor-update-form-submit" ng-disabled="!$ctrl.updateFormValues.newRole || !$ctrl.updateFormValues.username || ($ctrl.updateFormValues.newRole==='TOPIC_MANAGER' && !$ctrl.updateFormValues.topicId)" value="update role">Update Role</button>
+        </form>
+      </md-card>
+    </div>
+
+    <div class="col-md-4">
+      <md-card class="oppia-page-card oppia-long-text" style="">
+        <legend class="text-center">Role Hierarchy</legend>
+        <role-graph graph-data="$ctrl.graphData"
+                    graph-data-loaded="$ctrl.graphDataLoaded">
+        </role-graph>
+      </md-card>
+    </div>
+  </div>
+</div>
