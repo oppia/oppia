@@ -24,13 +24,13 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/CsrfService.ts');
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q', 'AudioFileObjectFactory', 'FileDownloadRequestObjectFactory',
-  'ImageFileObjectFactory', 'CsrfService', 'UrlInterpolationService',
-  'DEV_MODE',
+  '$http', '$q', 'AudioFileObjectFactory', 'CsrfService',
+  'FileDownloadRequestObjectFactory', 'ImageFileObjectFactory',
+  'UrlInterpolationService', 'DEV_MODE',
   function(
-      $http, $q, AudioFileObjectFactory, FileDownloadRequestObjectFactory,
-      ImageFileObjectFactory, CsrfService, UrlInterpolationService,
-      DEV_MODE) {
+      $http, $q, AudioFileObjectFactory, CsrfService,
+      FileDownloadRequestObjectFactory, ImageFileObjectFactory,
+      UrlInterpolationService, DEV_MODE) {
     if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
       throw Error('GCS_RESOURCE_BUCKET_NAME is not set in prod.');
     }
