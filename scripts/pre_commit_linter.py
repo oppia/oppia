@@ -347,6 +347,10 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party.sh',
     '/.github/']
 
+# This list contains the directories and files that do not follow the new
+# constant declaration rules.
+# TODO(YashJipkate) Bring these directories and files under the new constant
+# declaration rules and empty the list.
 OLD_CONVENTION_PATHS = [
     'core/templates/dev/head/services',
     'core/templates/dev/head/base_components',
