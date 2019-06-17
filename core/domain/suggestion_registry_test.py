@@ -17,6 +17,7 @@
 import datetime
 
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import question_domain
 from core.domain import skill_services
 from core.domain import state_domain
@@ -171,6 +172,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.suggestion_type = 'invalid_suggestion_type'
         with self.assertRaisesRegexp(
             Exception, 'Expected suggestion_type to be among allowed choices'):
@@ -185,6 +188,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.target_type = 'invalid_target_type'
         with self.assertRaisesRegexp(
@@ -201,6 +206,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.target_id = 0
         with self.assertRaisesRegexp(
             Exception, 'Expected target_id to be a string'):
@@ -215,6 +222,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.target_version_at_submission = 'invalid_version'
         with self.assertRaisesRegexp(
@@ -231,6 +240,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.status = 'invalid_status'
         with self.assertRaisesRegexp(
             Exception, 'Expected status to be among allowed choices'):
@@ -245,6 +256,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.author_id = 0
         with self.assertRaisesRegexp(
@@ -261,6 +274,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.final_reviewer_id = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected final_reviewer_id to be a string'):
@@ -275,6 +290,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.score_category = 0
         with self.assertRaisesRegexp(
@@ -291,7 +308,16 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.score_category = 'score.score_type.score_sub_type'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected score_category to be of the form'
+            ' score_type.score_sub_type'):
+            suggestion.validate()
+
+        suggestion.score_category = 'invalid_score_category'
         with self.assertRaisesRegexp(
             Exception,
             'Expected score_category to be of the form'
@@ -307,6 +333,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.score_category = 'invalid_score_type.score_sub_type'
         with self.assertRaisesRegexp(
@@ -325,6 +353,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.change = {}
         with self.assertRaisesRegexp(
             Exception, 'Expected change to be an ExplorationChange'):
@@ -339,6 +369,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.score_category = 'question.score_sub_type'
         with self.assertRaisesRegexp(
@@ -355,6 +387,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.score_category = 'content.invalid_score_sub_type'
         with self.assertRaisesRegexp(
@@ -373,6 +407,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.change.cmd = 'invalid_cmd'
         with self.assertRaisesRegexp(
             Exception, 'Expected cmd to be edit_state_property'):
@@ -387,6 +423,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.change.property_name = 'invalid_property'
         with self.assertRaisesRegexp(
@@ -403,6 +441,17 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        exp_services.update_exploration(
+            self.author_id, 'exp1', [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'State A',
+                })
+            ], 'Added state')
+        suggestion.change.state_name = 'State A'
+
+        suggestion.pre_accept_validate()
 
         suggestion.change.state_name = 'invalid_state_name'
         with self.assertRaisesRegexp(
@@ -422,11 +471,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.change.state_name = 'invalid_state_name'
 
-        self.assertIsNone(suggestion.change.old_value)
-
-        suggestion.populate_old_value_of_change()
-
-        self.assertIsNone(suggestion.change.old_value)
+        with self.assertRaisesRegexp(
+            Exception, 'The state invalid_state_name does not exist.'):
+            suggestion.populate_old_value_of_change()
 
     def test_pre_update_validate_change_cmd(self):
         expected_suggestion_dict = self.suggestion_dict
@@ -441,7 +488,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         change = {
             'cmd': exp_domain.CMD_ADD_STATE,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'state_1',
+            'state_name': suggestion.change.state_name,
             'new_value': 'new suggestion content',
             'old_value': None
         }
@@ -463,7 +510,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_PARAM_CHANGES,
-            'state_name': 'state_1',
+            'state_name': suggestion.change.state_name,
             'new_value': 'new suggestion content',
             'old_value': None
         }
@@ -509,7 +556,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'state_1',
+            'state_name': suggestion.change.state_name,
             'new_value': new_content,
             'old_value': None
         }
@@ -608,6 +655,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.score_category = 'content.score_sub_type'
 
         with self.assertRaisesRegexp(
@@ -625,6 +674,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.change = 'invalid_change'
 
@@ -644,6 +695,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.change.cmd = None
 
         with self.assertRaisesRegexp(
@@ -660,6 +713,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.change.cmd = 'invalid_cmd'
 
@@ -679,6 +734,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        suggestion.validate()
+
         suggestion.change.question_dict = None
 
         with self.assertRaisesRegexp(
@@ -695,6 +752,8 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
 
         suggestion.change.question_dict[
             'question_state_data_schema_version'] = 0
@@ -716,6 +775,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, 'description')
+        suggestion.change.skill_id = skill_id
+
+        suggestion.pre_accept_validate()
+
         suggestion.change.skill_id = None
 
         with self.assertRaisesRegexp(
@@ -734,6 +799,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, 'description')
+        suggestion.change.skill_id = skill_id
+
+        suggestion.pre_accept_validate()
+
         suggestion.change.question_dict[
             'question_state_data_schema_version'] = 1
 
@@ -751,6 +822,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             expected_suggestion_dict['status'], self.author_id,
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
+
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, 'description')
+        suggestion.change.skill_id = skill_id
+
+        suggestion.pre_accept_validate()
 
         suggestion.change.skill_id = skill_services.get_new_skill_id()
 
