@@ -26,7 +26,7 @@ require('domain/story/StoryUpdateService.ts');
 require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/AlertsService.ts');
 
-oppia.constant('EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
+require('pages/story-editor-page/story-editor-page.constants.ts');
 
 oppia.directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

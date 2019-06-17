@@ -15,11 +15,6 @@
 /**
  * @fileoverview Controllers for the practice session.
  */
-oppia.constant('TOTAL_QUESTIONS', 20);
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant(
-  'PRACTICE_SESSIONS_DATA_URL',
-  '/practice-session-page/data/<topic_name>');
 
 require(
   'components/common-layout-directives/common-elements/' +
@@ -28,32 +23,49 @@ require(
   'components/question-directives/question-player/' +
   'question-player.directive.ts');
 
+require('objects/objectComponentsRequiresForPlayers.ts');
+
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.controller('PracticeSession', [
-  '$http', '$rootScope', '$scope', 'AlertsService',
-  'UrlInterpolationService', 'UrlService',
-  'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL', 'TOTAL_QUESTIONS',
-  function(
-      $http, $rootScope, $scope, AlertsService,
-      UrlInterpolationService, UrlService,
-      FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL, TOTAL_QUESTIONS
-  ) {
-    $scope.topicName = UrlService.getTopicNameFromLearnerUrl();
-    var _fetchSkillDetails = function() {
-      var practiceSessionsDataUrl = UrlInterpolationService.interpolateUrl(
-        PRACTICE_SESSIONS_DATA_URL, {
-          topic_name: $scope.topicName
-        });
-      $http.get(practiceSessionsDataUrl).then(function(result) {
-        var questionPlayerConfig = {
-          skillList: result.data.skill_list,
-          questionCount: TOTAL_QUESTIONS
+require('pages/practice-session-page/practice-session-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
+
+oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/practice-session-page/practice-session-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$http', '$rootScope', 'AlertsService',
+      'UrlInterpolationService', 'UrlService',
+      'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL', 'TOTAL_QUESTIONS',
+      function(
+          $http, $rootScope, AlertsService,
+          UrlInterpolationService, UrlService,
+          FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL, TOTAL_QUESTIONS
+      ) {
+        var ctrl = this;
+        ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
+        var _fetchSkillDetails = function() {
+          var practiceSessionsDataUrl = UrlInterpolationService.interpolateUrl(
+            PRACTICE_SESSIONS_DATA_URL, {
+              topic_name: ctrl.topicName
+            });
+          $http.get(practiceSessionsDataUrl).then(function(result) {
+            var questionPlayerConfig = {
+              skillList: result.data.skill_list,
+              questionCount: TOTAL_QUESTIONS
+            };
+            ctrl.questionPlayerConfig = questionPlayerConfig;
+          });
         };
-        $scope.questionPlayerConfig = questionPlayerConfig;
-      });
-    };
-    _fetchSkillDetails();
-  }
-]);
+        _fetchSkillDetails();
+      }
+    ]
+  };
+}]);
