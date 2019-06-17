@@ -16,21 +16,21 @@
  * @fileoverview Directive for the main page of the story viewer.
  */
 
- require(
-   'components/common-layout-directives/common-elements/' +
-   'background-banner.directive.ts');
- require(
-   'pages/story-viewer-page/navbar-breadcrumb/' +
-   'story-viewer-navbar-breadcrumb.directive.ts');
- require(
-   'pages/story-viewer-page/chapters-list/' +
-   'story-viewer-chapters-list.directive.ts');
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+require(
+  'pages/story-viewer-page/navbar-breadcrumb/' +
+  'story-viewer-navbar-breadcrumb.directive.ts');
+require(
+  'pages/story-viewer-page/chapters-list/' +
+  'story-viewer-chapters-list.directive.ts');
 
- require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
- require('domain/story_viewer/StoryViewerBackendApiService.ts');
- require('services/AlertsService.ts');
- require('services/contextual/UrlService.ts');
- require('services/PageTitleService.ts');
+require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
+require('domain/story_viewer/StoryViewerBackendApiService.ts');
+require('services/AlertsService.ts');
+require('services/contextual/UrlService.ts');
+require('services/PageTitleService.ts');
 
 oppia.directive('storyViewerPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -60,8 +60,10 @@ oppia.directive('storyViewerPage', [
             function(storyDataDict) {
               ctrl.storyIsLoaded = true;
               ctrl.storyPlaythroughObject =
-                StoryPlaythroughObjectFactory.createFromBackendDict(storyDataDict);
-              PageTitleService.setPageTitle(storyDataDict.story_title + ' - Oppia');
+                StoryPlaythroughObjectFactory.createFromBackendDict(
+                  storyDataDict);
+              PageTitleService.setPageTitle(
+                storyDataDict.story_title + ' - Oppia');
               ctrl.storyTitle = storyDataDict.story_title;
               ctrl.storyDescription = storyDataDict.story_description;
               $rootScope.loadingMessage = '';
