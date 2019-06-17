@@ -217,13 +217,13 @@
         }
       },
       "messageFormat": {
-        "version": "2.2.1",
+        "version": "0.3.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/messageformat/messageformat/archive/messageformat@2.2.1.zip",
-        "targetDirPrefix": "messageformat-messageformat-",
-        "rootDirPrefix": "messageformat-messageformat-",
+        "url": "https://github.com/messageformat/messageformat/archive/v0.3.1.zip",
+        "targetDirPrefix": "messageformat-",
+        "rootDirPrefix": "messageformat-",
         "bundle": {
-          "js": ["packages/messageformat/src/messageformat.js"]
+          "js": ["messageformat.js"]
         }
       },
       "angularTranslateInterpolationMessageFormat": {
