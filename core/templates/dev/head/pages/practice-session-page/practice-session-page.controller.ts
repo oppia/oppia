@@ -30,23 +30,6 @@ require('services/contextual/UrlService.ts');
 require('pages/practice-session-page/practice-session-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
-oppia.directive('practiceSessionPage', [
-  '$http', '$rootScope', '$scope', 'AlertsService',
-  'UrlInterpolationService', 'UrlService',
-  'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL',
-  'PRACTICE_SESSIONS_URL', 'TOPIC_VIEWER_PAGE',
-  'TOTAL_QUESTIONS',
-  function(
-      $http, $rootScope, $scope, AlertsService,
-      UrlInterpolationService, UrlService,
-      FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL,
-      PRACTICE_SESSIONS_URL, TOPIC_VIEWER_PAGE,
-      TOTAL_QUESTIONS
-  ) {
-    
-=======
-
-
 oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
