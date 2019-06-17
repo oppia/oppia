@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the reivew tests page."""
+"""Controllers for the review tests page."""
 
 from constants import constants
 from core.controllers import acl_decorators
