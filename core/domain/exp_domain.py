@@ -3542,3 +3542,13 @@ class ExplorationSummary(object):
             'title': self.title,
             'objective': self.objective,
         }
+
+{
+  'id': '<image_id'>,
+  'info' : {
+    'src' : '<image_src>',
+    'placeholder': false,
+    'author_id': 'user_id',
+    'instrutions' = ''
+  }
+}

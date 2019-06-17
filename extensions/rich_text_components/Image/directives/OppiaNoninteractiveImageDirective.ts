@@ -42,10 +42,18 @@ oppia.directive('oppiaNoninteractiveImage', [
         '/rich_text_components/Image/directives/image_directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
+
+        console.log('attrs')
+        console.log($attrs)
+        console.log('attrs')
+
+
         var ctrl = this;
         ctrl.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
         ctrl.imageUrl = '';
+        ctrl.imageid = HtmlEscaperService.escapedJsonToObj(
+          $attrs.imageidWithValue);
         ctrl.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
           LOADING_INDICATOR_URL);
         ctrl.isLoadingIndicatorShown = false;
@@ -88,6 +96,10 @@ oppia.directive('oppiaNoninteractiveImage', [
           ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
             ContextService.getExplorationId(), ctrl.filepath);
         }
+
+        // Get filepath with the help of imageid.
+        // TODO: Get imgage filepath from image assets.
+
 
         ctrl.imageCaption = '';
         if ($attrs.captionWithValue) {

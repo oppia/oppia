@@ -77,6 +77,30 @@ oppia.run([
                 customizationArgSpecs,
                 customizationArgs,
                 function(customizationArgsDict) {
+
+                  // Adding imageId and removing filepath.
+                  if (ckName === 'oppiaimage') {
+                    var imageSrc = customizationArgsDict.filepath;
+
+                    // TODO: Generate image id.
+                    // var imageId = ExplorationObjectFactory.getImageId()
+
+                    // Add image id in.
+                    customizationArgsDict.imageId = 0;
+                    var imageId = {
+                      name: 'imageid',
+                      description: 'Id for an image',
+                      default_value: ''
+                    }
+                    customizationArgSpecs.push(imageId)
+                    // delete customizationArgSpecs[0];
+                    delete customizationArgsDict.filpath;
+                    console.log(customizationArgsDict)
+
+
+                    // TODO: store in image tag and add image in image assets.
+                  }
+
                   for (var arg in customizationArgsDict) {
                     if (customizationArgsDict.hasOwnProperty(arg)) {
                       that.setData(arg, customizationArgsDict[arg]);
@@ -151,6 +175,8 @@ oppia.run([
             },
             data: function() {
               var that = this;
+              console.log(customizationArgSpecs)
+              console.log("keshav")
               // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
                 that.element.getChild(0).setAttribute(
