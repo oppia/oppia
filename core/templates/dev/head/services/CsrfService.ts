@@ -28,8 +28,8 @@ oppia.factory('CsrfService', [function() {
     },
 
     // For Signup page
-    setToken: function(csrf_token) {
-      token = csrf_token;
+    setToken: function(csrfToken) {
+      token = csrfToken;
     },
 
     getToken: function() {

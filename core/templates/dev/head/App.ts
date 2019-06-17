@@ -192,7 +192,7 @@ oppia.config([
     // warnings for error responses.
     $httpProvider.interceptors.push([
       '$q', '$log', 'AlertsService', 'CsrfService',
-      function ($q, $log, AlertsService, CsrfService) {
+      function($q, $log, AlertsService, CsrfService) {
         return {
           request: function(config) {
             if (config.data) {
@@ -272,49 +272,50 @@ oppia.config(['toastrConfig', function(toastrConfig) {
 // (so that they can be fixed).
 oppia.factory('$exceptionHandler', ['$log', 'CsrfService',
   function($log, CsrfService) {
-  var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
-  var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
+    var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
+    var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
-  return function(exception, cause) {
-    var messageAndSourceAndStackTrace = [
-      '',
-      'Cause: ' + cause,
-      exception.message,
-      String(exception.stack),
-      '    at URL: ' + window.location.href
-    ].join('\n');
+    return function(exception, cause) {
+      var messageAndSourceAndStackTrace = [
+        '',
+        'Cause: ' + cause,
+        exception.message,
+        String(exception.stack),
+        '    at URL: ' + window.location.href
+      ].join('\n');
 
-    // To prevent an overdose of errors, throttle to at most 1 error every
-    // MIN_TIME_BETWEEN_ERRORS_MSEC.
-    if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
-      // Catch all errors, to guard against infinite recursive loops.
-      try {
-        // We use jQuery here instead of Angular's $http, since the latter
-        // creates a circular dependency.
-        $.ajax({
-          type: 'POST',
-          url: '/frontend_errors',
-          data: $.param({
-            csrf_token: CsrfService.getToken(),
-            payload: JSON.stringify({
-              error: messageAndSourceAndStackTrace
-            }),
-            source: document.URL
-          }, true),
-          contentType: 'application/x-www-form-urlencoded',
-          dataType: 'text',
-          async: true
-        });
+      // To prevent an overdose of errors, throttle to at most 1 error every
+      // MIN_TIME_BETWEEN_ERRORS_MSEC.
+      if (Date.now() - timeOfLastPostedError > MIN_TIME_BETWEEN_ERRORS_MSEC) {
+        // Catch all errors, to guard against infinite recursive loops.
+        try {
+          // We use jQuery here instead of Angular's $http, since the latter
+          // creates a circular dependency.
+          $.ajax({
+            type: 'POST',
+            url: '/frontend_errors',
+            data: $.param({
+              csrf_token: CsrfService.getToken(),
+              payload: JSON.stringify({
+                error: messageAndSourceAndStackTrace
+              }),
+              source: document.URL
+            }, true),
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: 'text',
+            async: true
+          });
 
-        timeOfLastPostedError = Date.now();
-      } catch (loggingError) {
-        $log.warn('Error logging failed.');
+          timeOfLastPostedError = Date.now();
+        } catch (loggingError) {
+          $log.warn('Error logging failed.');
+        }
       }
-    }
 
-    $log.error.apply($log, arguments);
-  };
-}]);
+      $log.error.apply($log, arguments);
+    };
+  }
+]);
 
 oppia.constant('LABEL_FOR_CLEARING_FOCUS', 'labelForClearingFocus');
 

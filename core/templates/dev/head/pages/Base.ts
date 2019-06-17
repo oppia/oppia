@@ -55,7 +55,7 @@ oppia.controller('Base', [
     });
 
     if (UrlService.getPathname() !== '/signup') {
-      CsrfService.fetchToken(); 
+      CsrfService.fetchToken();
     }
     // TODO(sll): use 'touchstart' for mobile.
     $document.on('click', function() {

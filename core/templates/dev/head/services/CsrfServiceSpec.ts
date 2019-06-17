@@ -18,7 +18,7 @@
 
 require('services/CsrfService.ts');
 
-describe('Csrf Service', function () {
+describe('Csrf Service', function() {
   var CsrfService, $httpBackend;
 
   beforeEach(angular.mock.module('oppia'));
@@ -29,18 +29,18 @@ describe('Csrf Service', function () {
 
   it('should return the correct csrf token', function() {
     var response = ')]}\'{token: \'sample csrf token\'}';
-    
+
     $httpBackend.expect('GET', '/csrf').respond(
       200, response);
 
     CsrfService.fetchToken();
 
     expect(CsrfService.getToken()).toBe('sample csrf token');
-  })
+  });
 
   it('should correctly set the csrf token', function() {
     CsrfService.setToken('sample csrf token');
 
     expect(CsrfService.getToken()).toBe('sample csrf token');
-  })
-})
+  });
+});
