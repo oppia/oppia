@@ -29,8 +29,8 @@ require(
 require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
 require('domain/story_viewer/StoryViewerBackendApiService.ts');
 require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
 require('services/PageTitleService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.directive('storyViewerPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
