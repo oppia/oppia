@@ -850,7 +850,7 @@ def add_image_id_in_image_tag(
         image_counter += 1
         image['image_id-with-value'] = image_counter
 
-    new_content_html = unicode(soup)
+    new_content_html = unicode(soup).replace('<br/>', '<br>')
 
     return (new_content_html, image_counter)
 
@@ -872,7 +872,6 @@ def get_image_info_from_html(html):
             'info': {
                 'src': image['filepath-with-value'],
                 'placeholder': False,
-                'author_id': '',
                 'instructions': ''
             }
         }
@@ -895,7 +894,7 @@ def remove_filepath_from_image_tag(html):
     for image in soup.findAll(name='oppia-noninteractive-image'):
         del image['filepath-with-value']
 
-    return unicode(soup)
+    return unicode(soup).replace('<br/>', '<br>')
 
 
 def add_image_id_and_image_assets_in_state_dict(state_dict, image_counter):

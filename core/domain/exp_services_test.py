@@ -136,7 +136,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_info': {
                 'src': '',
                 'placeholder': True,
-                'author_id': 'random',
                 'instructions': 'no instructions'
                 }
             }
@@ -158,7 +157,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_info': {
                 'src': '',
                 'placeholder': True,
-                'author_id': 'random',
                 'instructions': 'no instructions'
                 }
             }
@@ -179,7 +177,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_info': {
                 'src': '',
                 'placeholder': True,
-                'author_id': 'random',
                 'instructions': 'no instructions'
                 }
             }
@@ -235,7 +232,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_info': {
                 'src': '',
                 'placeholder': True,
-                'author_id': 'random',
                 'instructions': 'no instructions'
                 }
             }
@@ -297,7 +293,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                 'image_mapping': {
                     u'1': {
                         'src': u'',
-                        'author_id': u'random',
                         'placeholder': True,
                         'instructions': u'no instructions'
                     }
@@ -362,7 +357,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_info': {
                 'src': '',
                 'placeholder': True,
-                'author_id': 'random',
                 'instructions': 'no instructions'
             }
         }
@@ -376,7 +370,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_info': {
                 'src': '',
                 'placeholder': False,
-                'author_id': 'random 2',
                 'instructions': 'no instructions'
             }
         }
@@ -390,7 +383,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_info': {
                 'src': '',
                 'placeholder': True,
-                'author_id': 'random',
                 'instructions': 'no instructions'
             }
         }
@@ -464,13 +456,11 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                 'image_mapping': {
                     u'1': {
                         'src': u'',
-                        'author_id': u'random',
                         'placeholder': True,
                         'instructions': u'no instructions'
                     },
                     u'2': {
                         'src': u'',
-                        'author_id':u'random 2',
                         'placeholder': False,
                         'instructions': u'no instructions'
                     }
@@ -536,7 +526,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_info': {
                 'src': '',
                 'placeholder': True,
-                'author_id': 'random',
                 'instructions': 'no instructions'
                 }
             }

@@ -607,7 +607,6 @@ class ImageDomainUnitTests(test_utils.GenericTestBase):
         image_dict = {
             'src': '',
             'placeholder': True,
-            'author_id': 'random_1',
             'instructions': 'no instructions'
         }
         image_object = state_domain.Image.from_dict(image_dict)
@@ -621,13 +620,11 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
                 1: {
                     'src': '',
                     'placeholder': True,
-                    'author_id': 'random_1',
                     'instructions': 'no instructions'
                 },
                 2: {
                     'src': '',
                     'placeholder': False,
-                    'author_id': 'random_2',
                     'instructions': 'no instructions'
                 }
             }
@@ -642,13 +639,11 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
                 u'1': {
                     'src': '',
                     'placeholder': True,
-                    'author_id': 'random_1',
                     'instructions': 'no instructions'
                 },
                 u'2': {
                     'src': '',
                     'placeholder': False,
-                    'author_id': 'random_2',
                     'instructions': 'no instructions'
                 }
             }
@@ -659,7 +654,6 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
                 u'1': {
                     'src': '',
                     'placeholder': True,
-                    'author_id': 'random_1',
                     'instructions': 'no instructions'
                 }
             }
@@ -675,13 +669,11 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
                 u'1': {
                     'src': '',
                     'placeholder': True,
-                    'author_id': 'random_1',
                     'instructions': 'no instructions'
                 },
                 u'2': {
                     'src': '',
                     'placeholder': False,
-                    'author_id': 'random_2',
                     'instructions': 'no instructions'
                 }
             }
@@ -692,19 +684,16 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
                 u'1': {
                     'src': '',
                     'placeholder': True,
-                    'author_id': 'random_1',
                     'instructions': 'no instructions'
                 },
                 u'2': {
                     'src': '',
                     'placeholder': False,
-                    'author_id': 'random_2',
                     'instructions': 'no instructions'
                 },
                 u'3': {
                     'src': '',
                     'placeholder': True,
-                    'author_id': 'random_3',
                     'instructions': 'no instructions'
                 }
             }
@@ -713,7 +702,6 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         image_info = {
             'src': '',
             'placeholder': True,
-            'author_id': 'random_3',
             'instructions': 'no instructions'
         }
         image_assets.add_image(u'3', image_info)
@@ -725,13 +713,11 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
                 u'1': {
                     'src': '',
                     'placeholder': True,
-                    'author_id': 'random_1',
                     'instructions': 'no instructions'
                 },
                 u'2': {
                     'src': '',
                     'placeholder': False,
-                    'author_id': 'random_2',
                     'instructions': 'no instructions'
                 }
             }

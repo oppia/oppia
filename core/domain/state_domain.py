@@ -176,19 +176,17 @@ class Hint(object):
 
 class Image(object):
     """Value object representing the image for the state."""
-    def __init__(self, src, placeholder, author_id, instructions):
+    def __init__(self, src, placeholder, instructions):
         """Constructs an Image domain object.
 
         Args:
             src: str. The source of an image.
             placeholder: bool. Is image a placeholder.
-            author_id: str. Id of an author which uploads an image.
             instructions: str. Instructions for the image which needs in place
                 of a placeholder.
         """
         self.src = src
         self.placeholder = placeholder
-        self.author_id = author_id
         self.instructions = instructions
         self.validate()
 
@@ -218,10 +216,9 @@ class Image(object):
         """
         src = image_info['src']
         placeholder = image_info['placeholder']
-        author_id = image_info['author_id']
         instructions = image_info['instructions']
 
-        return cls(src, placeholder, author_id, instructions)
+        return cls(src, placeholder, instructions)
 
     def validate(self):
         """Validates all properties of an Image.
@@ -237,10 +234,6 @@ class Image(object):
         if not isinstance(self.src, basestring):
             raise utils.ValidationError(
                 'Invalid image_src, received %s' % self.src)
-        if not isinstance(self.author_id, basestring):
-            raise utils.ValidationError(
-                'Expected author_id to be str, received %s' %
-                self.author_id)
         if not isinstance(self.placeholder, bool):
             raise utils.ValidationError(
                 'Expected placeholder to be bool, received %s' %
@@ -330,10 +323,9 @@ class ImageAssets(object):
 
         src = image_info['src']
         placeholder = image_info['placeholder']
-        author_id = image_info['author_id']
         instructions = image_info['instructions']
 
-        image = Image(src, placeholder, author_id, instructions)
+        image = Image(src, placeholder, instructions)
         self.image_mapping[image_id] = image
 
     def delete_image(self, image_id):

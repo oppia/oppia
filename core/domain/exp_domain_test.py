@@ -4609,12 +4609,10 @@ states:
     image_assets:
       image_mapping:
         \'1\':
-          author_id: ''
           instructions: ''
           placeholder: false
           src: \'&quot;startBlue_height_490_width_120.png&quot;\'
         \'2\':
-          author_id: ''
           instructions: ''
           placeholder: false
           src: \'&quot;startBlue_height_490_width_120.png&quot;\'
@@ -4816,7 +4814,6 @@ states:
     image_assets:
       image_mapping:
         \'1\':
-          author_id: ''
           instructions: ''
           placeholder: false
           src: \'&quot;random_height_490_width_120.png&quot;\'

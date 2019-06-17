@@ -18,10 +18,9 @@
  */
 
 oppia.factory('ImageObjectFactory', [function() {
-  var Image = function(src, placeholder, authorId, instructions) {
+  var Image = function(src, placeholder, instructions) {
     this.src = src;
     this.placeholder = placeholder;
-    this.authorId = authorId;
     this.instrutions = instructions;
   };
 
@@ -29,15 +28,14 @@ oppia.factory('ImageObjectFactory', [function() {
     return {
       src: this.src,
       placeholder: this.placeholder,
-      author_id: this.authorId,
       instructions: this.instructions
     };
   };
 
   /* eslint-disable dot-notation */
-  Image['createNew'] = function(src, placeholder, authorId, instructions) {
+  Image['createNew'] = function(src, placeholder, instructions) {
   /* eslint-enable dot-notation */
-    return new Image(src, placeholder, authorId, instructions);
+    return new Image(src, placeholder, instructions);
   };
 
   /* eslint-disable dot-notation */
@@ -46,7 +44,6 @@ oppia.factory('ImageObjectFactory', [function() {
     return new Image(
       imageBackendDict.src,
       imageBackendDict.placeholder,
-      imageBackendDict.author_id,
       imageBackendDict.instructions
     );
   };
