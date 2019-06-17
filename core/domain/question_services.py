@@ -142,13 +142,13 @@ def create_new_question_skill_link(
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
         question_id, skill_id, skill_difficulty)
 
-
-    new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
-    new_linked_skill_ids.append(skill_id)
-    _update_linked_skill_ids_of_question(
-        user_id, question_id, new_linked_skill_ids,
-        question.linked_skill_ids)
-    question_skill_link_model.put()
+    if skill_id not in question.linked_skill_ids:
+        new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
+        new_linked_skill_ids.append(skill_id)
+        _update_linked_skill_ids_of_question(
+            user_id, question_id, new_linked_skill_ids,
+            question.linked_skill_ids)
+        question_skill_link_model.put()
 
 
 def _update_linked_skill_ids_of_question(
