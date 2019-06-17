@@ -1365,27 +1365,46 @@ class LearnerAnswerDetails(object):
                 feconf.CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION)):
         """Constructs a LearnerAnswerDetail domain object.
 
-            Args:
-                state_reference: str. The reference to the state.
-                entity_type: str. The type of entity, eg. exploration,
-                    question etc.
-                interaction_id: str. The ID of the interaction.
-                learner_answer_info_list: list. The list of LearnerAnswerInfo
-                    objects and version specified in this object.
-                schema_version: str. The schema version of this object.
+        Args:
+            state_reference: str. This field is used to refer to a state
+                in an exploration or question. Like for an exploration the
+                value will be equal to 'exp_id.state_name' & for question
+                this will be equal to 'question_id' only.
+            entity_type: str. The type of entity, for which the domain
+                object is being created, and the value must be one of
+                ENTITY_TYPE_EXPLORATION or ENTITY_TYPE_QUESTION.
+            interaction_id: str. The ID of the interaction, but this value
+                should not be equal to EndExploration and
+                Continue as these interactions cannot solicit answer
+                details.
+            learner_answer_info_list: list(LearnerAnswerInfo). The list of
+                LearnerAnswerInfo objects.
+            schema_version: int. The schema version of the
+                LearnerAnswerInfo class.
         """
+
         self.state_reference = state_reference
         self.entity_type = entity_type
         self.interaction_id = interaction_id
         self.learner_answer_info_list = learner_answer_info_list
         self.schema_version = schema_version
 
-    def get_learner_answer_info_dict_list(self):
-        """Returns the learner_answer_info_list stored within this object as
-        a list of LearnerAnswerInfo dicts.
+    def to_dict(self):
+        """Returns a dict representing LearnerAnswerDetails domain object.
+
+        Returns:
+            dict. A dict, mapping all fields of LearnerAnswerDetails instance.
         """
-        return [learner_answer_info.to_dict()
-                for learner_answer_info in self.learner_answer_info_list]
+        return {
+            'state_reference': self.state_reference,
+            'entity_type': self.entity_type,
+            'interaction_id': self.interaction_id,
+            'learner_answer_info_list': [
+                learner_answer_info.to_dict() for learner_answer_info in (
+                    self.learner_answer_info_list)
+            ],
+            'schema_version': self.schema_version
+        }
 
     def validate(self):
         """Validates LearnerAnswerDetails domain object."""
@@ -1400,22 +1419,61 @@ class LearnerAnswerDetails(object):
                 'Expected entity_type to be a string, received %s' % str(
                     self.entity_type))
 
+        if isinstance(self.entity_type, basestring):
+            split_state_reference = self.state_reference.split('.')
+            if self.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+                if len(split_state_reference) < 2:
+                    raise utils.ValidationError(
+                        'For entity type exploration, the state reference '
+                        'should be of the form \'exp_id.state_name\', but '
+                        'received %s' % (self.state_reference))
+            elif self.entity_type == feconf.ENTITY_TYPE_QUESTION:
+                if len(split_state_reference) > 1:
+                    raise utils.ValidationError(
+                        'For entity type question, the state reference should '
+                        'be of the form \'question_id\', but received %s' % (
+                            self.state_reference))
+            else:
+                raise utils.ValidationError(
+                    'The entity type should be either exploration or question, '
+                    'but received %s' % (self.entity_type))
+
         if not isinstance(self.interaction_id, basestring):
             raise utils.ValidationError(
                 'Expected interaction_id to be a string, received %s' % str(
                     self.interaction_id))
+
+        if self.interaction_id in feconf.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS:
+            raise utils.ValidationError(
+                'The %s interaction does not support soliciting '
+                'answer details from learners.' % (self.interaction.id))
 
         if not isinstance(self.learner_answer_info_list, list):
             raise utils.ValidationError(
                 'Expected learner_answer_info_list to be a list, '
                 'received %s' % str(self.learner_answer_info_list))
 
+        for learner_answer_info in self.learner_answer_info_list:
+            learner_answer_info.validate()
+
 
 class LearnerAnswerInfo(object):
     """Domain object containing the answer details submitted by the learner."""
 
     def __init__(self, answer, answer_details, created_on):
-        """Constructs a LearnerAnswerInfo domain object."""
+        """Constructs a LearnerAnswerInfo domain object.
+
+        Args:
+            answer: dict. The answer which is submitted by the learner,
+                actually type of the answer is interaction dependent but mostly
+                it will be of dict type for most interactions, but it can be
+                string for TextInput interaction.
+            answer_details: str. The details the learner will submit when the
+                learner will be asked questions like 'Hey how did you landed on
+                this answer', 'Why did you picked that answer' etc.
+            created_on: datetime. The time at which the answer details was
+                received.
+        """
 
         self.answer = answer
         self.answer_details = answer_details
@@ -1436,12 +1494,12 @@ class LearnerAnswerInfo(object):
 
     @classmethod
     def from_dict(cls, learner_answer_info_dict):
-        """Returns the domain object representing an answer info to a
-        state.
+        """Returns a dict representing LearnerAnswerInfo domain object.
 
         Returns:
-            LearnerAnswerInfo. The LearnerAnswerInfo domin object.
+            dict. A dict, mapping all fields of LearnerAnswerInfo instance.
         """
+
         return cls(
             learner_answer_info_dict['answer'],
             learner_answer_info_dict['answer_details'],
@@ -1450,12 +1508,18 @@ class LearnerAnswerInfo(object):
 
     def validate(self):
         """Validates the LearnerAnswerInfo domain object."""
+
+        max_answer_details_size = 10000
+
         if self.answer is None:
             raise utils.ValidationError(
                 'The answer submitted by the learner cannot be empty')
         if self.answer_details is None:
             raise utils.ValidationError(
                 'LearnerAnswerInfo must have a provided answer details')
+        if sys.getsizeof(self.answer_details) > max_answer_details_size:
+            raise utils.ValidationError('The answer details size is to large '
+                                        'to be stored')
         if not isinstance(self.answer_details, basestring):
             raise utils.ValidationError(
                 'Expected answer details to be a string, received %s' % str(
