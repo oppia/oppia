@@ -1,0 +1,88 @@
+<div>
+  <div class="oppia-content">
+    <br>
+    <uib-tabset>
+      <uib-tab heading="Recent Commits" active>
+        <h3>Recent Commits (all non-private explorations)</h3>
+        <div ng-show="$ctrl.allCommits.length">
+          <table class="oppia-padded-table">
+            <tr>
+              <th>Timestamp</th>
+              <th>Exploration</th>
+              <th>Category</th>
+              <th>Username</th>
+              <th>Commit message</th>
+              <th>Community-owned?</th>
+            </tr>
+            <tr ng-repeat="commit in $ctrl.allCommits track by $index">
+              <td><[$ctrl.getDatetimeAsString(commit.last_updated)]></td>
+              <td>
+                <a ng-href="<[$ctrl.getExplorationCreateUrl(commit.exploration_id)]>">
+                  <[$ctrl.explorationData[commit.exploration_id].title]>
+                </a>
+              </td>
+              <td>
+                <[$ctrl.explorationData[commit.exploration_id].category]>
+              </td>
+              <td><[commit.username]></td>
+              <td><[commit.commit_message]></td>
+              <td><[commit.post_commit_community_owned]></td>
+            </tr>
+          </table>
+        </div>
+      </uib-tab>
+
+      <uib-tab heading="Recent Feedback Messages">
+        <h3>Recent Feedback Messages</h3>
+        (Note that some of these links may be to private explorations, and thus result in authorization errors.)
+        <br>
+        <br>
+        <div ng-show="$ctrl.allFeedbackMessages.length">
+          <table class="oppia-padded-table">
+            <tr>
+              <th>Timestamp</th>
+              <th>Exploration ID</th>
+              <th>Username</th>
+            </tr>
+            <tr ng-repeat="message in $ctrl.allFeedbackMessages track by $index">
+              <td><[$ctrl.getDatetimeAsString(message.created_on)]></td>
+              <td>
+                <a ng-href="<[$ctrl.getExplorationCreateUrl(message.exploration_id)]>">
+                  <[message.exploration_id]>
+                </a>
+              </td>
+              <td><[message.author_username]></td>
+            </tr>
+          </table>
+        </div>
+      </uib-tab>
+
+      <uib-tab heading="Featured Activities">
+        <h3>Activities to feature in the library</h3>
+        <br>
+        <br>
+
+        <schema-based-editor schema="$ctrl.FEATURED_ACTIVITY_REFERENCES_SCHEMA"
+                             local-value="$ctrl.displayedFeaturedActivityReferences">
+        </schema-based-editor>
+        <br>
+        <br>
+
+        <button class="btn btn-success" ng-click="$ctrl.saveFeaturedActivityReferences()"
+                ng-disabled="$ctrl.isSaveFeaturedActivitiesButtonDisabled()">
+          Save Featured Activities
+        </button>
+      </uib-tab>
+    </uib-tabset>
+  </div>
+</div>
+<style>
+  table.oppia-padded-table {
+    border: 1px solid black;
+    padding: 5px;
+  }
+  table.oppia-padded-table th, table.oppia-padded-table td {
+    border: 1px solid black;
+    padding: 5px;
+  }
+</style>
