@@ -17,7 +17,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/suggestion_editor/SuggestionModalService.ts');
+require('services/SuggestionModalService.ts');
 
 oppia.factory('SuggestionModalForCreatorDashboardService', [
   '$http', '$log', '$rootScope',
