@@ -94,10 +94,13 @@ class BaseChange(object):
     # for the attribute.
     # This list can be overriden by subclasses, if needed.
     ALLOWED_COMMANDS = []
+
+    # This is a list of common commands which is valid for all subclasses.
+    # This should not be overriden by subclasses.
     COMMON_ALLOWED_COMMANDS = [{
         'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
-        'required_attributes': [],
-        'optional_attributes': []
+        'required_attribute_names': [],
+        'optional_attribute_names': []
     }]
 
     def __init__(self, change_dict):
