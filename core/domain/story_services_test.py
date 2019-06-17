@@ -531,6 +531,16 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.node_3 = {
             'id': self.NODE_ID_3,
             'title': 'Title 3',
+            'destination_node_ids': ['node_4'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.node_4 = {
+            'id': self.NODE_ID_4,
+            'title': 'Title 4',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -541,11 +551,12 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
             story_domain.StoryNode.from_dict(self.node_2),
-            story_domain.StoryNode.from_dict(self.node_3)
+            story_domain.StoryNode.from_dict(self.node_3),
+            story_domain.StoryNode.from_dict(self.node_4)
         ]
         self.nodes = story.story_contents.nodes
         story.story_contents.initial_node_id = 'node_1'
-        story.story_contents.next_node_id = 'node_4'
+        story.story_contents.next_node_id = 'node_5'
         story_services.save_new_story(self.USER_ID, story)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, story.id)
@@ -596,13 +607,23 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
 
-    def test_get_latest_completed_node_ids_with_special_cases(self):
-        # If record completion in different orders and record multiple times.
+    def test_get_latest_completed_node_ids_different_completion_order(self):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
-        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+
+        self.assertEqual(
+            story_services.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID),
+            [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
+
+    def test_get_latest_completed_node_ids_multiple_completions(self):
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
 
         self.assertEqual(
             story_services.get_latest_completed_node_ids(
