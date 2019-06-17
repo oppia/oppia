@@ -62,8 +62,8 @@ oppia.factory('ExplorationPlayerStateService', [
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
-      PretestQuestionBackendApiService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
+      PretestQuestionBackendApiService,
       QuestionBackendApiService, QuestionPlayerEngineService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlService, EXPLORATION_MODE) {
