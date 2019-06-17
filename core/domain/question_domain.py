@@ -137,6 +137,7 @@ class Question(object):
                 question is written in.
             version: int. The version of the question.
             linked_skill_ids: list(str). Skill ids linked to the question.
+                Note: Do not update this field manually.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -251,12 +252,20 @@ class Question(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
 
+        if not self.linked_skill_ids:
+            raise utils.ValidationError(
+                'linked_skill_ids is either null or an empty list')
+
         if not (isinstance(self.linked_skill_ids, list) and (
                 all(isinstance(
                     elem, basestring) for elem in self.linked_skill_ids))):
             raise utils.ValidationError(
                 'Expected linked_skill_ids to be a list of strings, '
                 'received %s' % self.linked_skill_ids)
+
+        if len(set(self.linked_skill_ids)) != len(self.linked_skill_ids):
+            raise utils.ValidationError(
+                'linked_skill_ids has duplicate skill ids')
 
         if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(

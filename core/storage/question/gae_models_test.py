@@ -56,6 +56,36 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             question_model.linked_skill_ids, linked_skill_ids)
 
+    def test_put_and_delete_multi_questions(self):
+        question_state_data = self._create_valid_question_data('ABC')
+        linked_skill_ids = ['skill_id1', 'skill_id2']
+        self.save_new_question(
+            'question_id1', 'owner_id',
+            question_state_data,
+            linked_skill_ids)
+        self.save_new_question(
+            'question_id2', 'owner_id',
+            question_state_data,
+            linked_skill_ids)
+        question_ids = ['question_id1', 'question_id2']
+        question_model1 = question_models.QuestionModel.get(question_ids[0])
+        question_model2 = question_models.QuestionModel.get(question_ids[1])
+
+        question_models.QuestionModel.delete_multi_questions(
+            [question_model1, question_model2])
+
+        with self.assertRaises(Exception):
+            question_models.QuestionModel.get(
+                question_ids[0])
+            question_models.QuestionModel.get(
+                question_ids[1])
+
+        question_models.QuestionModel.put_multi_questions(
+            [question_model1, question_model2])
+        self.assertEqual(question_models.QuestionModel.get(
+            question_ids[0]), question_model1)
+        self.assertEqual(question_models.QuestionModel.get(
+            question_ids[1]), question_model2)
 
     def test_raise_exception_by_mocking_collision(self):
         state = state_domain.State.create_default_state('ABC')

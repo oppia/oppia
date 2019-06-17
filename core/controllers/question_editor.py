@@ -33,10 +33,6 @@ class QuestionCreationHandler(base.BaseHandler):
     def post(self, comma_separated_skill_ids):
         """Handles POST requests."""
         skill_ids = comma_separated_skill_ids.split(',')
-        if not(all([isinstance(
-                skill_id, basestring) for skill_id in skill_ids])):
-            raise self.InvalidInputException
-
         try:
             for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
@@ -67,14 +63,12 @@ class QuestionCreationHandler(base.BaseHandler):
         question_services.add_question(self.user_id, question)
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
-        try:
-            question_services.link_multiple_skills_for_question(
-                self.user_id,
-                question.id,
-                skill_ids,
-                [constants.DEFAULT_SKILL_DIFFICULTY] * len(skill_ids))
-        except Exception:
-            raise self.PageNotFoundException
+        question_services.link_multiple_skills_for_question(
+            self.user_id,
+            question.id,
+            skill_ids,
+            [constants.DEFAULT_SKILL_DIFFICULTY] * len(skill_ids))
+
         self.values.update({
             'question_id': question.id
         })

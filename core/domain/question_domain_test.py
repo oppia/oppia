@@ -121,7 +121,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, [])
+            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'])
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -136,7 +136,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'language_code': 'en',
             'version': 1,
-            'linked_skill_ids': []
+            'linked_skill_ids': ['skill1']
         }
 
         observed_object = question_domain.Question.from_dict(question_dict)
@@ -227,9 +227,21 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected linked_skill_ids to be a list of strings')
 
+        self.question.linked_skill_ids = None
+        self._assert_validation_error(
+            'inked_skill_ids is either null or an empty list')
+
+        self.question.linked_skill_ids = []
+        self._assert_validation_error(
+            'linked_skill_ids is either null or an empty list')
+
         self.question.linked_skill_ids = ['Test', 1]
         self._assert_validation_error(
             'Expected linked_skill_ids to be a list of strings')
+
+        self.question.linked_skill_ids = ['skill1', 'skill1']
+        self._assert_validation_error(
+            'linked_skill_ids has duplicate skill ids')
 
         self.question.language_code = 1
         self._assert_validation_error('Expected language_code to be a string')

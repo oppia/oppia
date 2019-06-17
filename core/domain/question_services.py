@@ -89,8 +89,8 @@ def _create_new_question(committer_id, question, commit_message):
 def link_multiple_skills_for_question(
         user_id, question_id, skill_ids, skill_difficulties):
     """Links multiple skill IDs to a question. To do that, it creates
-        multiple new QuestionSkillLink models. It also adds
-        the skill ids to the linked_skill_ids of the Question.
+    multiple new QuestionSkillLink models. It also adds
+    the skill ids to the linked_skill_ids of the Question.
 
     Args:
         user_id: str. ID of the creator.
@@ -141,6 +141,7 @@ def create_new_question_skill_link(
 
     question_skill_link_model = question_models.QuestionSkillLinkModel.create(
         question_id, skill_id, skill_difficulty)
+    question_skill_link_model.put()
 
     if skill_id not in question.linked_skill_ids:
         new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
@@ -148,7 +149,6 @@ def create_new_question_skill_link(
         _update_linked_skill_ids_of_question(
             user_id, question_id, new_linked_skill_ids,
             question.linked_skill_ids)
-        question_skill_link_model.put()
 
 
 def _update_linked_skill_ids_of_question(
@@ -378,12 +378,11 @@ def get_skills_linked_to_question(question_id):
 
 
 def replace_skill_id_for_all_questions(
-        user_id, curr_skill_id, curr_skill_description, new_skill_id):
+        curr_skill_id, curr_skill_description, new_skill_id):
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
     skill ID.
 
     Args:
-        user_id: str. ID of the creator.
         curr_skill_id: str. ID of the current skill.
         curr_skill_description: str. Description of the current skill.
         new_skill_id: str. ID of the superseding skill.
@@ -407,14 +406,15 @@ def replace_skill_id_for_all_questions(
     question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
         new_question_skill_link_models)
 
-    questions = get_questions_by_ids(list(question_ids))
-    for question in questions:
-        new_linked_skill_ids = copy.deepcopy(question.linked_skill_ids)
-        new_linked_skill_ids.remove(curr_skill_id)
-        new_linked_skill_ids.append(new_skill_id)
-        _update_linked_skill_ids_of_question(
-            user_id, question.id, new_linked_skill_ids,
-            question.linked_skill_ids)
+    old_questions = question_models.QuestionModel.get_multi(list(question_ids))
+    new_questions = []
+    for question in old_questions:
+        new_question = copy.deepcopy(question)
+        new_question.linked_skill_ids.remove(curr_skill_id)
+        new_question.linked_skill_ids.append(new_skill_id)
+        new_questions.append(new_question)
+    question_models.QuestionModel.delete_multi_questions(old_questions)
+    question_models.QuestionModel.put_multi_questions(new_questions)
 
 
 def get_question_summaries_and_skill_descriptions(
@@ -564,7 +564,7 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model.language_code = question.language_code
     question_model.question_state_data_schema_version = (
         question.question_state_data_schema_version)
-    question_model.linked_skill_ids = list(set(question.linked_skill_ids))
+    question_model.linked_skill_ids = question.linked_skill_ids
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1
