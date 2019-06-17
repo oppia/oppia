@@ -451,7 +451,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             None, state_domain.State.from_dict(
                 self.change.question_dict['question_state_data']),
             self.change.question_dict['question_state_data_schema_version'],
-            self.change.question_dict['language_code'], None, [])
+            self.change.question_dict['language_code'], None,
+            self.change.question_dict['linked_skill_ids'])
         question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
@@ -500,7 +501,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
-        question_dict['linked_skill_ids'] = []
+        question_dict['linked_skill_ids'] = [self.change.skill_id]
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
         question_services.add_question(self.author_id, question)
