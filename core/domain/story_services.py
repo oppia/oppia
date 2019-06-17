@@ -598,7 +598,8 @@ def get_latest_completed_node_ids(user_id, story_id):
     ordered_node_ids = (
         [node.id for node in story.story_contents.get_ordered_nodes()])
     ordered_completed_node_ids = (
-        [id for id in ordered_node_ids if id in progress_model.completed_node_ids]
+        [node_id for node_id in ordered_node_ids
+         if node_id in progress_model.completed_node_ids]
     )
     return ordered_completed_node_ids[-num_of_nodes:]
 
