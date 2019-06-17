@@ -62,27 +62,27 @@ ALLOWED_STATUS = [ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC]
 
 COMMON_ALLOWED_COMMANDS = [{
     'name': CMD_CREATE_NEW,
-    'required_attributes': [],
-    'optional_attributes': []
+    'required_attribute_names': [],
+    'optional_attribute_names': []
 }, {
     'name': CMD_CHANGE_ROLE,
-    'required_attributes': ['assignee_id', 'old_role', 'new_role'],
-    'optional_attributes': [],
+    'required_attribute_names': ['assignee_id', 'old_role', 'new_role'],
+    'optional_attribute_names': [],
     'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
 }, {
     'name': CMD_CHANGE_PRIVATE_VIEWABILITY,
-    'required_attributes': [
+    'required_attribute_names': [
         'old_viewable_if_private', 'new_viewable_if_private'],
-    'optional_attributes': []
+    'optional_attribute_names': []
 }, {
     'name': CMD_RELEASE_OWNERSHIP,
-    'required_attributes': [],
-    'optional_attributes': [],
+    'required_attribute_names': [],
+    'optional_attribute_names': [],
 }, {
     'name': CMD_UPDATE_FIRST_PUBLISHED_MSEC,
-    'required_attributes': [
+    'required_attribute_names': [
         'old_first_published_msec', 'new_first_published_msec'],
-    'optional_attributes': [],
+    'optional_attribute_names': [],
 }]
 
 
@@ -276,11 +276,6 @@ class ActivityRightsChange(change_domain.BaseChange):
     A status must be one of the ALLOWED_STATUS.
     """
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'assignee_id', 'old_role', 'new_role', 'old_viewable_if_private',
-        'new_viewable_if_private', 'old_first_published_msec',
-        'new_first_published_msec', 'old_status', 'new_status']
-
     ALLOWED_COMMANDS = COMMON_ALLOWED_COMMANDS
 
 
@@ -290,8 +285,8 @@ class ExplorationRightsChange(ActivityRightsChange):
     ALLOWED_COMMANDS = copy.deepcopy(COMMON_ALLOWED_COMMANDS)
     ALLOWED_COMMANDS.append({
         'name': CMD_CHANGE_EXPLORATION_STATUS,
-        'required_attributes': ['old_status', 'new_status'],
-        'optional_attributes': [],
+        'required_attribute_names': ['old_status', 'new_status'],
+        'optional_attribute_names': [],
         'allowed_values': {
             'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
     })
@@ -303,8 +298,8 @@ class CollectionRightsChange(ActivityRightsChange):
     ALLOWED_COMMANDS = copy.deepcopy(COMMON_ALLOWED_COMMANDS)
     ALLOWED_COMMANDS.append({
         'name': CMD_CHANGE_COLLECTION_STATUS,
-        'required_attributes': ['old_status', 'new_status'],
-        'optional_attributes': [],
+        'required_attribute_names': ['old_status', 'new_status'],
+        'optional_attribute_names': [],
         'allowed_values': {
             'old_status': ALLOWED_STATUS, 'new_status': ALLOWED_STATUS}
     })

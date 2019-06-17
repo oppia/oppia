@@ -96,47 +96,42 @@ class StoryChange(change_domain.BaseChange):
 
     STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID,)
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'node_id', 'from_version',
-        'to_version', 'title', 'finalized'
-    ]
-
     ALLOWED_COMMANDS = [{
         'name': CMD_UPDATE_STORY_PROPERTY,
-        'required_attributes': ['property_name', 'new_value', 'old_value'],
-        'optional_attributes': [],
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
         'allowed_values': {'property_name': STORY_PROPERTIES}
     }, {
         'name': CMD_UPDATE_STORY_NODE_PROPERTY,
-        'required_attributes': [
+        'required_attribute_names': [
             'node_id', 'property_name', 'new_value', 'old_value'],
-        'optional_attributes': [],
+        'optional_attribute_names': [],
         'allowed_values': {'property_name': STORY_NODE_PROPERTIES}
     }, {
         'name': CMD_UPDATE_STORY_CONTENTS_PROPERTY,
-        'required_attributes': ['property_name', 'new_value', 'old_value'],
-        'optional_attributes': [],
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
         'allowed_values': {'property_name': STORY_CONTENTS_PROPERTIES}
     }, {
         'name': CMD_ADD_STORY_NODE,
-        'required_attributes': ['node_id', 'title'],
-        'optional_attributes': []
+        'required_attribute_names': ['node_id', 'title'],
+        'optional_attribute_names': []
     }, {
         'name': CMD_DELETE_STORY_NODE,
-        'required_attributes': ['node_id'],
-        'optional_attributes': []
+        'required_attribute_names': ['node_id'],
+        'optional_attribute_names': []
     }, {
         'name': CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
-        'required_attributes': ['node_id', 'old_value', 'new_value'],
-        'optional_attributes': []
+        'required_attribute_names': ['node_id', 'old_value', 'new_value'],
+        'optional_attribute_names': []
     }, {
         'name': CMD_CREATE_NEW,
-        'required_attributes': ['title'],
-        'optional_attributes': []
+        'required_attribute_names': ['title'],
+        'optional_attribute_names': []
     }, {
         'name': CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION,
-        'required_attributes': ['from_version', 'to_version'],
-        'optional_attributes': []
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
     }]
 
 
@@ -1136,27 +1131,23 @@ class StoryRightsChange(change_domain.BaseChange):
         - 'unpublish_story'.
     """
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'assignee_id', 'new_role', 'old_role'
-    ]
-
     ALLOWED_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
-        'required_attributes': [],
-        'optional_attributes': []
+        'required_attribute_names': [],
+        'optional_attribute_names': []
     }, {
         'name': CMD_CHANGE_ROLE,
-        'required_attributes': ['assignee_id', 'new_role', 'old_role'],
-        'optional_attributes': [],
+        'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
+        'optional_attribute_names': [],
         'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
     }, {
         'name': CMD_PUBLISH_STORY,
-        'required_attributes': [],
-        'optional_attributes': []
+        'required_attribute_names': [],
+        'optional_attribute_names': []
     }, {
         'name': CMD_UNPUBLISH_STORY,
-        'required_attributes': [],
-        'optional_attributes': []
+        'required_attribute_names': [],
+        'optional_attribute_names': []
     }]

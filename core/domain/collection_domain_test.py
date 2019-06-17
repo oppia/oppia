@@ -90,20 +90,6 @@ class CollectionChangeTests(test_utils.GenericTestBase):
                 'new_value': 'new_value',
             })
 
-    def test_collection_change_object_with_invalid_collection_node_property(
-            self):
-        with self.assertRaisesRegexp(
-            utils.ValidationError, (
-                'Value for property_name in cmd edit_collection_node_property: '
-                'invalid is not allowed')):
-            collection_domain.CollectionChange({
-                'cmd': 'edit_collection_node_property',
-                'exploration_id': 'exploration_id',
-                'property_name': 'invalid',
-                'old_value': 'old_value',
-                'new_value': 'new_value',
-            })
-
     def test_collection_change_object_with_create_new(self):
         col_change_object = collection_domain.CollectionChange({
             'cmd': 'create_new',

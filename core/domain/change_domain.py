@@ -24,17 +24,17 @@ import utils
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
-def validate_cmd(cmd_name, valid_cmd_specs, actual_cmd_specs):
+def validate_cmd(cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes):
     """Validates that the attributes of a command contain all the required
     attributes and some/all of optional attributes. It also checks that
     the values of attributes belong to a set of allowed values if any.
 
     Args:
         cmd_name: str. The command for which validation process is being done.
-        valid_cmd_specs: dict. A dict containing the required and
+        valid_cmd_attribute_specs: dict. A dict containing the required and
             optional attributes for a command along with allowed values
             for attributes if any.
-        actual_cmd_specs: dict. A dict containing the actual
+        actual_cmd_attributes: dict. A dict containing the actual
             attributes of a command with values for the attributes.
 
     Raises:
@@ -42,51 +42,65 @@ def validate_cmd(cmd_name, valid_cmd_specs, actual_cmd_specs):
             exists or the value of an attribute is not allowed.
     """
 
-    required_attributes = valid_cmd_specs['required_attributes']
-    optional_attributes = valid_cmd_specs['optional_attributes']
-    actual_attributes = actual_cmd_specs.keys()
+    required_attribute_names = valid_cmd_attribute_specs[
+        'required_attribute_names']
+    optional_attribute_names = valid_cmd_attribute_specs[
+        'optional_attribute_names']
+    actual_attribute_names = actual_cmd_attributes.keys()
 
-    missing_attributes = [
-        key for key in required_attributes if key not in actual_attributes]
+    missing_attribute_names = [
+        key for key in required_attribute_names if key not in (
+            actual_attribute_names)]
 
-    extra_attributes = [key for key in actual_attributes if key not in (
-        required_attributes + optional_attributes)]
+    extra_attribute_names = [
+        key for key in actual_attribute_names if key not in (
+            required_attribute_names + optional_attribute_names)]
 
     error_msg_list = []
-    if missing_attributes:
+    if missing_attribute_names:
         error_msg_list.append(
             'The following required attributes are missing: %s' % (
-                (', ').join(sorted(missing_attributes))))
+                (', ').join(sorted(missing_attribute_names))))
 
-    if extra_attributes:
+    if extra_attribute_names:
         error_msg_list.append(
             'The following extra attributes are present: %s' % (
-                (', ').join(sorted(extra_attributes))))
+                (', ').join(sorted(extra_attribute_names))))
 
     if error_msg_list:
         raise utils.ValidationError((', ').join(error_msg_list))
 
-    allowed_values = valid_cmd_specs.get('allowed_values')
+    allowed_values = valid_cmd_attribute_specs.get('allowed_values')
     if not allowed_values:
         return
 
-    for attribute, attribute_values in allowed_values.iteritems():
-        actual_value = actual_cmd_specs[attribute]
+    for attribute_name, attribute_values in allowed_values.iteritems():
+        actual_value = actual_cmd_attributes[attribute_name]
         if actual_value not in attribute_values:
             raise utils.ValidationError(
                 'Value for %s in cmd %s: %s is not allowed' % (
-                    attribute, cmd_name, actual_value))
+                    attribute_name, cmd_name, actual_value))
 
 
 class BaseChange(object):
     """Domain object for changes made to storage models' domain objects."""
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = []
+    # The list of allowed commands of a change domain object. Each item in the
+    # list is a dict with keys as: name (command name), required_attribute_names
+    # (a list of required attribute names of a command),
+    # optional_attribute_name (the list of optional attribute names of a
+    # command). There can be a optional key allowed_values which is a
+    # dict with key as attribute name and value as allowed values
+    # for the attribute.
+    # This list can be overriden by subclasses, if needed.
     ALLOWED_COMMANDS = []
+
+    # This is a list of common commands which is valid for all subclasses.
+    # This should not be overriden by subclasses.
     COMMON_ALLOWED_COMMANDS = [{
         'name': base_models.VersionedModel.CMD_DELETE_COMMIT,
-        'required_attributes': [],
-        'optional_attributes': []
+        'required_attribute_names': [],
+        'optional_attribute_names': []
     }]
 
     def __init__(self, change_dict):
@@ -100,21 +114,8 @@ class BaseChange(object):
         """
         self.validate_dict(change_dict)
 
-        cmd_name = change_dict['cmd']
-        self.cmd = cmd_name
-
-        all_allowed_commands = (
-            self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS)
-
-        cmd_attributes = []
-        for cmd in all_allowed_commands:
-            if cmd['name'] == cmd_name:
-                cmd_attributes = (
-                    cmd['required_attributes'] + cmd['optional_attributes'])
-                break
-
-        for attribute in cmd_attributes:
-            setattr(self, attribute, change_dict.get(attribute))
+        for key, value in change_dict.iteritems():
+            setattr(self, key, value)
 
     def validate_dict(self, change_dict):
         """Checks that the command in change dict is valid for the domain
@@ -134,25 +135,25 @@ class BaseChange(object):
 
         cmd_name = change_dict['cmd']
 
-        valid_cmd_specs = None
+        valid_cmd_attribute_specs = None
 
         all_allowed_commands = (
             self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS)
         for cmd in all_allowed_commands:
             if cmd['name'] == cmd_name:
-                valid_cmd_specs = copy.deepcopy(cmd)
+                valid_cmd_attribute_specs = copy.deepcopy(cmd)
                 break
 
-        if not valid_cmd_specs:
+        if not valid_cmd_attribute_specs:
             raise utils.ValidationError('Command %s is not allowed' % cmd_name)
 
-        valid_cmd_specs.pop('name', None)
+        valid_cmd_attribute_specs.pop('name', None)
 
-        actual_cmd_specs = copy.deepcopy(change_dict)
-        actual_cmd_specs.pop('cmd', None)
+        actual_cmd_attributes = copy.deepcopy(change_dict)
+        actual_cmd_attributes.pop('cmd', None)
 
         validate_cmd(
-            cmd_name, valid_cmd_specs, actual_cmd_specs)
+            cmd_name, valid_cmd_attribute_specs, actual_cmd_attributes)
 
     def to_dict(self):
         """Returns a dict representing the BaseChange domain object.
@@ -162,7 +163,18 @@ class BaseChange(object):
         """
         base_change_dict = {}
         base_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+
+        all_allowed_commands = (
+            self.ALLOWED_COMMANDS + self.COMMON_ALLOWED_COMMANDS)
+        valid_cmd_attribute_names = []
+        for cmd in all_allowed_commands:
+            if cmd['name'] == self.cmd:
+                valid_cmd_attribute_names = (
+                    cmd['required_attribute_names'] + cmd[
+                        'optional_attribute_names'])
+                break
+
+        for attribute_name in valid_cmd_attribute_names:
             if hasattr(self, attribute_name):
                 base_change_dict[attribute_name] = getattr(
                     self, attribute_name)

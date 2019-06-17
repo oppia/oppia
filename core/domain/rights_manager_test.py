@@ -40,7 +40,7 @@ class ActivityRightsChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, (
                 'The following required attributes are missing: '
-                'new_role,old_role')):
+                'new_role, old_role')):
             rights_manager.ActivityRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',

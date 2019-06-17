@@ -145,46 +145,41 @@ class ExplorationChange(change_domain.BaseChange):
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'state_name', 'old_state_name', 'new_state_name',
-        'property_name', 'new_value', 'old_value', 'name', 'from_version',
-        'to_version', 'title', 'category'
-    ]
-
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
-        'required_attributes': ['category', 'title'],
-        'optional_attributes': []
+        'required_attribute_names': ['category', 'title'],
+        'optional_attribute_names': []
     }, {
         'name': CMD_ADD_STATE,
-        'required_attributes': ['state_name'],
-        'optional_attributes': []
+        'required_attribute_names': ['state_name'],
+        'optional_attribute_names': []
     }, {
         'name': CMD_DELETE_STATE,
-        'required_attributes': ['state_name'],
-        'optional_attributes': []
+        'required_attribute_names': ['state_name'],
+        'optional_attribute_names': []
     }, {
         'name': CMD_RENAME_STATE,
-        'required_attributes': ['new_state_name', 'old_state_name'],
-        'optional_attributes': []
+        'required_attribute_names': ['new_state_name', 'old_state_name'],
+        'optional_attribute_names': []
     }, {
         'name': CMD_EDIT_STATE_PROPERTY,
-        'required_attributes': ['property_name', 'state_name', 'new_value'],
-        'optional_attributes': ['old_value'],
+        'required_attribute_names': [
+            'property_name', 'state_name', 'new_value'],
+        'optional_attribute_names': ['old_value'],
         'allowed_values': {'property_name': STATE_PROPERTIES}
     }, {
         'name': CMD_EDIT_EXPLORATION_PROPERTY,
-        'required_attributes': ['property_name', 'new_value'],
-        'optional_attributes': ['old_value'],
+        'required_attribute_names': ['property_name', 'new_value'],
+        'optional_attribute_names': ['old_value'],
         'allowed_values': {'property_name': EXPLORATION_PROPERTIES}
     }, {
         'name': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
-        'required_attributes': ['from_version', 'to_version'],
-        'optional_attributes': []
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
     }, {
         'name': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
-        'required_attributes': ['version_number'],
-        'optional_attributes': []
+        'required_attribute_names': ['version_number'],
+        'optional_attribute_names': []
     }]
 
 

@@ -74,14 +74,10 @@ class ConfigPropertyChange(change_domain.BaseChange):
         - 'change_property_value' (with new_value)
     """
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'new_value'
-    ]
-
     ALLOWED_COMMANDS = [{
         'name': CMD_CHANGE_PROPERTY_VALUE,
-        'required_attributes': ['new_value'],
-        'optional_attributes': []
+        'required_attribute_names': ['new_value'],
+        'optional_attribute_names': []
     }]
 
 
