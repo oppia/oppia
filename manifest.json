@@ -56,9 +56,9 @@
         "targetDirPrefix": "html5lib-python-"
       },
       "requests": {
-        "version": "2.10.0",
+        "version": "2.21.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/49/6f/183063f01aae1e025cf0130772b55848750a2f3a89bfa11b385b35d7329d/requests-2.10.0.tar.gz#md5=a36f7a64600f1bfec4d55ae021d232ae",
+        "url": "https://files.pythonhosted.org/packages/52/2c/514e4ac25da2b08ca5a464c50463682126385c4272c18193876e91f4bc38/requests-2.21.0.tar.gz",
         "tarRootDirPrefix": "requests-",
         "rootDirPrefix": "requests-",
         "targetDirPrefix": "requests-"
@@ -217,13 +217,13 @@
         }
       },
       "messageFormat": {
-        "version": "0.3.1",
+        "version": "2.2.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/messageformat/messageformat/archive/v0.3.1.zip",
-        "targetDirPrefix": "messageformat-",
-        "rootDirPrefix": "messageformat-",
+        "url": "https://github.com/messageformat/messageformat/archive/messageformat@2.2.1.zip",
+        "targetDirPrefix": "messageformat-messageformat-",
+        "rootDirPrefix": "messageformat-messageformat-",
         "bundle": {
-          "js": ["messageformat.js"]
+          "js": ["packages/messageformat/src/messageformat.js"]
         }
       },
       "angularTranslateInterpolationMessageFormat": {
