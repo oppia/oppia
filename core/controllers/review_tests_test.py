@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the reivew tests page."""
+"""Tests for the review tests page."""
 
 from constants import constants
 from core.domain import story_domain
