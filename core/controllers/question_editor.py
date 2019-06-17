@@ -27,8 +27,7 @@ import feconf
 
 
 class QuestionCreationHandler(base.BaseHandler):
-    """A handler that creates the question model given a question dict."""
-            
+    """A handler that creates the question model given a question dict."""     
 
     @acl_decorators.can_manage_question_skill_status
     def post(self, comma_separated_skill_ids):
@@ -47,7 +46,7 @@ class QuestionCreationHandler(base.BaseHandler):
         try:
             skill_services.get_multi_skills(skill_ids)
         except Exception, e:
-            raise self.PageNotFoundException
+            raise self.PageNotFoundException(e)
 
         question_dict = self.payload.get('question_dict')
         if (
