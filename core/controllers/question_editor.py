@@ -28,13 +28,7 @@ import feconf
 
 class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
-
-    def validate_skill_ids(self, skill_ids):
-        """Validates that the passed skill ids are a list of strings."""
-        if not(isinstance(skill_ids, basestring)) and not(
-                all([isinstance(
-                    skill_id, basestring) for skill_id in skill_ids])):
-            raise self.InvalidInputException
+            
 
     @acl_decorators.can_manage_question_skill_status
     def post(self, comma_separated_skill_ids):
@@ -47,11 +41,14 @@ class QuestionCreationHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException
 
+        if not(all([isinstance(
+            skill_id, basestring) for skill_id in skill_ids])):
+            raise self.InvalidInputException
+
         try:
             skill_services.get_multi_skills(skill_ids)
-        except Exception:
-            raise self.PageNotFoundException(
-                'The skills with the given ids don\'t exist.')
+        except Exception, e:
+            raise self.PageNotFoundException(e)
 
         question_dict = self.payload.get('question_dict')
         if (
@@ -73,7 +70,7 @@ class QuestionCreationHandler(base.BaseHandler):
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
         try:
-            question_services.create_multi_question_skill_links_for_question(
+            question_services.link_multiple_skills_for_question(
                 self.user_id,
                 question.id,
                 skill_ids,

@@ -347,7 +347,7 @@ class Question(object):
 
         Args:
             question_id: str. The unique ID of the question.
-            skill_ids: list(str). List of skills attached to this question.
+            skill_ids: list(str). List of skill IDs attached to this question.
 
         Returns:
             Question. A Question domain object with default values.
@@ -374,7 +374,7 @@ class Question(object):
         Args:
             linked_skill_ids: list(str). The skill ids linked to the question.
         """
-        self.linked_skill_ids = linked_skill_ids
+        self.linked_skill_ids = list(set(linked_skill_ids))
 
     def update_question_state_data(self, question_state_data_dict):
         """Updates the question data of the question.

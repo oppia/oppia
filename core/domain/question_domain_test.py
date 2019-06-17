@@ -274,7 +274,6 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(['skill_id1'], self.question.linked_skill_ids)
 
-
     def test_update_question_state_data(self):
         """Test to verify update_question_state_data method of the Question
         domain object.

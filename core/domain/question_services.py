@@ -86,10 +86,11 @@ def _create_new_question(committer_id, question, commit_message):
     create_question_summary(question.id, committer_id)
 
 
-def create_multi_question_skill_links_for_question(
+def link_multiple_skills_for_question(
         user_id, question_id, skill_ids, skill_difficulties):
-    """Creates multiple new QuestionSkillLink models. Also adds
-    the skill ids to the linked skill ids of the Question model.
+    """Links multiple skill IDs to a question. To do that, it creates
+        multiple new QuestionSkillLink models. It also adds
+        the skill ids to the linked_skill_ids of the Question.
 
     Args:
         user_id: str. ID of the creator.
@@ -100,8 +101,8 @@ def create_multi_question_skill_links_for_question(
             0 and 1 (inclusive).
 
     Raises:
-        Exception. Skill difficulties and skill ids should match. The lengths of
-        the two lists are different.
+        Exception. The lengths of the skill_ids and skill_difficulties
+        lists are different.
     """
     if len(skill_ids) != len(skill_difficulties):
         raise Exception(
@@ -119,7 +120,7 @@ def create_multi_question_skill_links_for_question(
     new_linked_skill_ids.extend(skill_ids)
 
     _update_linked_skill_ids_of_question(
-        user_id, question_id, new_linked_skill_ids,
+        user_id, question_id, list(set(new_linked_skill_ids)),
         question.linked_skill_ids)
     question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
         new_question_skill_link_models)
@@ -376,7 +377,7 @@ def get_skills_linked_to_question(question_id):
     return skills
 
 
-def update_skill_ids_of_questions(
+def replace_skill_id_for_all_questions(
         user_id, curr_skill_id, curr_skill_description, new_skill_id):
     """Updates the skill ID of QuestionSkillLinkModels to the superseding
     skill ID.
@@ -563,7 +564,7 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model.language_code = question.language_code
     question_model.question_state_data_schema_version = (
         question.question_state_data_schema_version)
-    question_model.linked_skill_ids = set(question.linked_skill_ids)
+    question_model.linked_skill_ids = list(set(question.linked_skill_ids))
     change_dicts = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_dicts)
     question.version += 1

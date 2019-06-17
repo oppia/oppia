@@ -56,7 +56,7 @@ class QuestionModel(base_models.VersionedModel):
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The skill ids linked to this question.
     linked_skill_ids = ndb.StringProperty(
-        required=False, indexed=True, repeated=True)
+        indexed=True, repeated=True)
 
     @classmethod
     def _get_new_id(cls):
@@ -128,7 +128,7 @@ class QuestionModel(base_models.VersionedModel):
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
             version: str. The version of the question.
-            linked_skill_ids: set(str). The skill ids linked to the question.
+            linked_skill_ids: list(str). The skill ids linked to the question.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.
@@ -142,7 +142,7 @@ class QuestionModel(base_models.VersionedModel):
             question_state_data=question_state_data,
             language_code=language_code,
             version=version,
-            linked_skill_ids=set(linked_skill_ids))
+            linked_skill_ids=linked_skill_ids)
 
         return question_model_instance
 
@@ -243,7 +243,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         skill_ids = [model.skill_id for model in question_skill_link_models]
         skills = skill_models.SkillModel.get_multi(skill_ids)
         skill_descriptions = (
-            [skill.description if skill else '' for skill in skills])
+            [skill.description if skill else None for skill in skills])
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )

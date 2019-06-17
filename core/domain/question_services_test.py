@@ -108,10 +108,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Skill difficulties and skill ids should match. '
             'The lengths of the two lists are different.'):
-            question_services.create_multi_question_skill_links_for_question(
+            question_services.link_multiple_skills_for_question(
                 self.editor_id, self.question_id, ['skill_1', 'skill_2'],
                 [0.5])
-        question_services.create_multi_question_skill_links_for_question(
+        question_services.link_multiple_skills_for_question(
             self.editor_id, self.question_id, ['skill_1', 'skill_2'],
             [0.5, 0.7])
         skill_ids = [skill.id for skill in
@@ -396,7 +396,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'AttributeError \'str\' object has no attribute \'cmd\' %s '
             'invalid_change_list' % self.question_id)
 
-    def test_update_skill_ids_of_questions(self):
+    def test_replace_skill_id_for_all_questions(self):
         question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             question_id_2, self.editor_id,
@@ -426,7 +426,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             if question_skill.question_id == self.question_id:
                 self.assertEqual(question_skill.skill_difficulty, 0.5)
 
-        question_services.update_skill_ids_of_questions(
+        question_services.replace_skill_id_for_all_questions(
             self.editor_id, 'skill_1', 'Description 1', 'skill_3')
 
         question_skill_links = (

@@ -1445,7 +1445,7 @@ tags: []
                 'name': name
             }])
 
-    def save_new_question( #pylint: disable=dangerous-default-value
+    def save_new_question(
             self, question_id, owner_id, question_state_data,
             linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
