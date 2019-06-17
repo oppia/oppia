@@ -77,7 +77,7 @@ class TopicEditorStoryHandler(base.BaseHandler):
 
         new_story_id = story_services.get_new_story_id()
         story = story_domain.Story.create_default_story(
-            new_story_id, title=title)
+            new_story_id, title, topic_id)
         story_services.save_new_story(self.user_id, story)
         self.render_json({
             'storyId': new_story_id
@@ -152,7 +152,7 @@ class TopicEditorPage(base.BaseHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html)
         })
 
-        self.render_template('dist/topic_editor.html')
+        self.render_template('dist/topic-editor-page.mainpage.html')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):

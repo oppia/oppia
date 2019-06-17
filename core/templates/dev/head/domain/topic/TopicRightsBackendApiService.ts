@@ -18,6 +18,12 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+oppia.constant(
+  'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
+  '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
+oppia.constant(
+  'TOPIC_RIGHTS_URL_TEMPLATE', '/rightshandler/get_topic_rights/<topic_id>');
+
 oppia.factory('TopicRightsBackendApiService', [
   '$http', '$log', '$q', 'UrlInterpolationService',
   'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE', 'TOPIC_RIGHTS_URL_TEMPLATE',
