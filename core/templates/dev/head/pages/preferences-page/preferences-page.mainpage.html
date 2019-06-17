@@ -1,0 +1,39 @@
+{% extends 'dist/base.html' %}
+
+{% block maintitle %}
+  Preferences - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span translate="I18N_PREFERENCES_BREADCRUMB"></span>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+  <preferences-page subject-interests="subjectInterests"
+                    preferred-language-codes="preferredLanguageCodes"
+                    preferred-site-language-code="preferredSiteLanguageCode"
+                    preferred-audio-language-code="preferredAudioLanguageCode">
+  </preferences-page>
+{% endblock %}
+
+{% block footer %}
+  <oppia-footer></oppia-footer>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+{% endblock footer_js %}

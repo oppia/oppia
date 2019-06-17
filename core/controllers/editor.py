@@ -20,7 +20,6 @@ import datetime
 import imghdr
 import logging
 
-from constants import constants
 from core.controllers import acl_decorators
 from core.controllers import base
 from core.domain import config_domain
@@ -38,8 +37,6 @@ from core.domain import state_domain
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
-from core.domain import value_generators_domain
-from core.domain import visualization_registry
 from core.platform import models
 import feconf
 import utils
@@ -58,16 +55,6 @@ DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
     default_value=(
         'Check out this interactive lesson I created on Oppia - a free '
         'platform for teaching and learning!'))
-
-
-def get_value_generators_js():
-    """Return a string that concatenates the JS for all value generators."""
-    all_value_generators = (
-        value_generators_domain.Registry.get_all_generator_classes())
-    value_generators_js = ''
-    for _, generator_cls in all_value_generators.iteritems():
-        value_generators_js += generator_cls.get_js_template()
-    return value_generators_js
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -96,17 +83,8 @@ class ExplorationPage(EditorHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        if exploration_id in constants.DISABLED_EXPLORATION_IDS:
-            self.render_template(
-                'pages/error/disabled_exploration.html',
-                iframe_restriction=None)
-            return
-
-        (exploration, exploration_rights) = (
-            exp_services.get_exploration_and_exploration_rights_by_id(
-                exploration_id))
-
-        visualizations_html = visualization_registry.Registry.get_full_html()
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
 
         interaction_ids = (
             interaction_registry.Registry.get_all_interaction_ids())
@@ -140,8 +118,8 @@ class ExplorationPage(EditorHandler):
             'can_release_ownership': (
                 rights_manager.check_can_release_ownership(
                     self.user, exploration_rights)),
-            'can_translate': (
-                rights_manager.check_can_translate_activity(
+            'can_voiceover': (
+                rights_manager.check_can_voiceover_activity(
                     self.user, exploration_rights)),
             'can_unpublish': rights_manager.check_can_unpublish_activity(
                 self.user, exploration_rights),
@@ -149,17 +127,13 @@ class ExplorationPage(EditorHandler):
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'meta_description': feconf.CREATE_PAGE_DESCRIPTION,
-            'value_generators_js': jinja2.utils.Markup(
-                get_value_generators_js()),
-            'title': exploration.title,
-            'visualizations_html': jinja2.utils.Markup(visualizations_html),
             'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'SHOW_TRAINABLE_UNRESOLVED_ANSWERS': (
                 feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS),
             'TAG_REGEX': feconf.TAG_REGEX,
         })
 
-        self.render_template('dist/exploration_editor.html')
+        self.render_template('dist/exploration-editor-page.mainpage.html')
 
 
 class ExplorationHandler(EditorHandler):
@@ -175,14 +149,24 @@ class ExplorationHandler(EditorHandler):
         # are not used by that tab.
         version = self.request.get('v', default_value=None)
         apply_draft = self.request.get('apply_draft', default_value=False)
+
+        user_settings = user_services.get_user_settings(self.user_id)
+        has_seen_editor_tutorial = False
+        has_seen_translation_tutorial = False
+        if user_settings is not None:
+            if user_settings.last_started_state_editor_tutorial:
+                has_seen_editor_tutorial = True
+            if user_settings.last_started_state_translation_tutorial:
+                has_seen_translation_tutorial = True
+
         try:
             exploration_data = exp_services.get_user_exploration_data(
                 self.user_id, exploration_id, apply_draft=apply_draft,
                 version=version)
             exploration_data['show_state_editor_tutorial_on_load'] = (
-                self.user_id and not self.has_seen_editor_tutorial)
+                self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
-                self.user_id and not self.has_seen_translation_tutorial)
+                self.user_id and not has_seen_translation_tutorial)
         except:
             raise self.PageNotFoundException
 
@@ -206,15 +190,9 @@ class ExplorationHandler(EditorHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        try:
-            exploration_data = exp_services.get_user_exploration_data(
-                self.user_id, exploration_id)
-            exploration_data['show_state_editor_tutorial_on_load'] = (
-                self.user_id and not self.has_seen_editor_tutorial)
-            exploration_data['show_state_translation_tutorial_on_load'] = (
-                self.user_id and not self.has_seen_translation_tutorial)
-        except:
-            raise self.PageNotFoundException
+        exploration_data = exp_services.get_user_exploration_data(
+            self.user_id, exploration_id)
+
         self.values.update(exploration_data)
         self.render_json(self.values)
 
@@ -256,7 +234,7 @@ class ExplorationRightsHandler(EditorHandler):
             new_member_id = user_services.get_user_id_from_username(
                 new_member_username)
             if new_member_id is None:
-                raise Exception(
+                raise self.InvalidInputException(
                     'Sorry, we could not find the specified user.')
 
             rights_manager.assign_role_for_exploration(
@@ -412,14 +390,15 @@ class ExplorationFileDownloader(EditorHandler):
     @acl_decorators.can_download_exploration
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
-            raise self.PageNotFoundException
+        exploration = exp_services.get_exploration_by_id(exploration_id)
 
-        version = self.request.get('v', default_value=exploration.version)
+        version_str = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
-        width = int(self.request.get('width', default_value=80))
+
+        try:
+            version = int(version_str)
+        except ValueError:
+            version = exploration.version
 
         # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s.zip' % (
@@ -432,7 +411,7 @@ class ExplorationFileDownloader(EditorHandler):
                 filename, 'text/plain')
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
-                exploration_id, version=version, width=width))
+                exploration_id, version=version))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
@@ -448,31 +427,16 @@ class StateYamlHandler(EditorHandler):
     @acl_decorators.can_play_exploration
     def post(self, unused_exploration_id):
         """Handles POST requests."""
-        try:
-            state_dict = self.payload.get('state_dict')
-            width = self.payload.get('width')
-        except Exception:
+        state_dict = self.payload.get('state_dict')
+        width = self.payload.get('width')
+
+        if not width or not state_dict:
             raise self.PageNotFoundException
 
         self.render_json({
             'yaml': state_domain.State.convert_state_dict_to_yaml(
                 state_dict, width),
         })
-
-
-class ExplorationResourcesHandler(EditorHandler):
-    """Manages assets associated with an exploration."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_edit_exploration
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        dir_list = fs.listdir('')
-
-        self.render_json({'filepaths': dir_list})
 
 
 class ExplorationSnapshotsHandler(EditorHandler):
@@ -484,11 +448,8 @@ class ExplorationSnapshotsHandler(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
 
-        try:
-            snapshots = exp_services.get_exploration_snapshots_metadata(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        snapshots = exp_services.get_exploration_snapshots_metadata(
+            exploration_id)
 
         # Patch `snapshots` to use the editor's display name.
         snapshots_committer_ids = [
@@ -542,11 +503,8 @@ class ExplorationStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            current_exploration = exp_services.get_exploration_by_id(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(
+            exploration_id)
 
         self.render_json(stats_services.get_exploration_stats(
             exploration_id, current_exploration.version).to_frontend_dict())
@@ -560,11 +518,8 @@ class StateRulesStatsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
-        try:
-            current_exploration = exp_services.get_exploration_by_id(
-                exploration_id)
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(
+            exploration_id)
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
@@ -594,7 +549,8 @@ class FetchIssuesHandler(EditorHandler):
         exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
         if exp_issues is None:
             raise self.PageNotFoundException(
-                'Invalid exploration ID %s' % (exp_id))
+                'Invalid version %s for exploration ID %s'
+                % (exp_version, exp_id))
         unresolved_issues = []
         for issue in exp_issues.unresolved_issues:
             if issue.is_valid:
@@ -716,7 +672,7 @@ class ImageUploadHandler(EditorHandler):
 
         file_system_class = fs_services.get_exploration_file_system_class()
         fs = fs_domain.AbstractFileSystem(file_system_class(
-            'exploration/%s' % exploration_id))
+            fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
 
         if fs.isfile(filepath):
@@ -786,15 +742,17 @@ class StateAnswerStatisticsHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            current_exploration = (
-                exp_services.get_exploration_by_id(exploration_id))
-        except:
-            raise self.PageNotFoundException
+        current_exploration = exp_services.get_exploration_by_id(exploration_id)
 
+        top_state_answers = stats_services.get_top_state_answer_stats_multi(
+            exploration_id, current_exploration.states)
+        top_state_interaction_ids = {
+            state_name: current_exploration.states[state_name].interaction.id
+            for state_name in top_state_answers
+        }
         self.render_json({
-            'answers': stats_services.get_top_state_answer_stats_multi(
-                exploration_id, current_exploration.states)
+            'answers': top_state_answers,
+            'interaction_ids': top_state_interaction_ids,
         })
 
 
@@ -806,9 +764,8 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
         """Handles GET requests for unresolved answers."""
-        try:
-            state_name = self.request.get('state_name')
-        except Exception:
+        state_name = self.request.get('state_name')
+        if not state_name:
             raise self.PageNotFoundException
 
         unresolved_answers_with_frequency = (

@@ -1,0 +1,42 @@
+{% extends 'dist/base.html' %}
+
+{% block navbar_breadcrumb %}
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <search-bar></search-bar>
+{% endblock %}
+
+{% block base_url %}
+  <base href="/search/">
+{% endblock %}
+
+{% block header_js %}
+  {{ super() }}
+  <style>
+    html, body {
+      background-color: #afd2eb;
+    }
+  </style>
+{% endblock header_js %}
+
+{% block content %}
+  <library-page></library-page>
+{% endblock %}
+
+{% block footer %}
+  <library-footer></library-footer>
+{% endblock footer %}
+
+{% block footer_js %}
+  {{ super() }}
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+{% endblock footer_js %}

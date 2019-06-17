@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the LogicProof Interaction.
+ * @fileoverview Directive for the LogicProof Interaction.
  */
 
 oppia.directive('oppiaInteractiveLogicProof', [
@@ -176,7 +176,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             }
             // NOTE: this line is necessary to force angular to refresh the
             // displayed errorMessage.
-            ctrl.$apply();
+            $scope.$apply();
           };
 
           ctrl.clearMessage = function() {

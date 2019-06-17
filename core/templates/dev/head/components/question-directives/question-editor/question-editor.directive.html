@@ -1,0 +1,23 @@
+<div class="oppia-editor-cards-container" ng-if="$ctrl.stateEditorInitialized">
+  <state-editor on-save-state-content="$ctrl.saveStateContent"
+                on-save-interaction-customization-args="$ctrl.saveInteractionCustomizationArgs"
+                on-save-interaction-id="$ctrl.saveInteractionId"
+                on-save-interaction-default-outcome="$ctrl.saveInteractionDefaultOutcome"
+                on-save-interaction-answer-groups="$ctrl.saveInteractionAnswerGroups"
+                on-save-solution="$ctrl.saveSolution"
+                on-save-hints="$ctrl.saveHints"
+                state-content-placeholder="$ctrl.getStateContentPlaceholder()"
+                show-mark-all-audio-as-needing-update-modal-if-required="$ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired"
+                interaction-is-shown="$ctrl.interactionIsShown"
+                recompute-graph="$ctrl.recomputeGraph"
+                navigate-to-state="$ctrl.navigateToState"
+                add-state="$ctrl.addState"
+                refresh-warnings="$ctrl.refreshWarnings">
+  </state-editor>
+</div>
+
+<style>
+  question-editor .oppia-editor-cards-container {
+    padding-bottom: 5vh;
+  }
+</style>

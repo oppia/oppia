@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Production environment config file for Webpack.
+ */
 
 var commonWebpackConfig = require('./webpack.config.ts');
 var path = require('path');
@@ -21,6 +24,7 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
+      path.resolve(__dirname, 'extensions')
     ],
   },
   entry: commonWebpackConfig.entries,
@@ -30,6 +34,7 @@ module.exports = {
       test: /\.ts$/,
       include: [
         path.resolve(__dirname, 'core/templates/dev/head'),
+        path.resolve(__dirname, 'extensions'),
         path.resolve(__dirname, 'typings')
       ],
       use: [
@@ -43,6 +48,10 @@ module.exports = {
           }
         }
       ]
+    },
+    {
+      test: /\.html$/,
+      loader: 'underscore-template-loader'
     }]
   },
   output: {

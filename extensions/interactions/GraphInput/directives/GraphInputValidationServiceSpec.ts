@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for graph input validation service.
+ */
+
 describe('GraphInputValidationService', function() {
   var WARNING_TYPES, validatorService;
   var currentState, customizationArguments, answerGroups, goodDefaultOutcome;

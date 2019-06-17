@@ -7,6 +7,11 @@
  * 3. All values and keys must be constant, you can't use any Javascript
  *    functions.
  */
+
+/**
+ * @fileoverview Initializes constants for the Oppia codebase.
+ */
+
 var constants = {
   // Whether to allow custom event reporting to Google Analytics.
   "CAN_SEND_ANALYTICS_EVENTS": false,
@@ -520,8 +525,6 @@ var constants = {
 
   "DEFAULT_SKILL_DIFFICULTY": 0.3,
 
-  "ENABLE_NEW_STRUCTURE_EDITORS": true,
-
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
@@ -560,6 +563,7 @@ var constants = {
               "default_outcome": {}
           }
       },
+      "solicit_answer_details": false,
       "written_translations": {
           "translations_mapping": {
               "content": {},
@@ -567,6 +571,10 @@ var constants = {
           }
       }
   },
+
+  // Data required for Google Analytics. 
+  "ANALYTICS_ID": "",
+  "SITE_NAME_FOR_ANALYTICS": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 

@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview File for initializing the main oppia module.
+ */
+
 var oppia = angular.module(
   'oppia', [
-    'angularAudioRecorder', 'dndLists', 'headroom', 'infinite-scroll',
-    'ngAnimate', 'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
-    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate', 'toastr',
-    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
+    'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
+    'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
+    'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
+    'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
-
-for (var constantName in constants) {
-  oppia.constant(constantName, constants[constantName]);
-}

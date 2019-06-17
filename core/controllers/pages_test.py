@@ -14,7 +14,14 @@
 
 """Tests for various static pages (like the About page)."""
 
+from core.controllers import pages
+from core.platform import models
 from core.tests import test_utils
+import feconf
+import main
+
+import webapp2
+import webtest
 
 
 class NoninteractivePagesTests(test_utils.GenericTestBase):
@@ -24,5 +31,32 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
         response = self.get_html_response('/about')
         self.assertEqual(response.content_type, 'text/html')
         response.mustcontain(
-            'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING',
-            'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING')
+            '<about-page></about-page>')
+
+    def test_splash_page_with_valid_c_value(self):
+        response = self.get_html_response('/splash', params={'c': 'at0'})
+        self.assertIn(
+            'Create fun interactive quizzes that students can do at home.',
+            response.body)
+
+    def test_splash_page_with_invalid_c_value_redirects(self):
+        response = self.get_html_response(
+            '/splash?data=value', params={'c': 'invalid'},
+            expected_status_int=302)
+        self.assertTrue(
+            response.headers['Location'].endswith('/splash?data=value'))
+
+    def test_maintenance_page(self):
+        fake_urls = []
+        fake_urls.append(
+            main.get_redirect_route(r'/maintenance', pages.MaintenancePage))
+        with self.swap(main, 'URLS', fake_urls):
+            transaction_services = models.Registry.import_transaction_services()
+            app = transaction_services.toplevel_wrapper(
+                webapp2.WSGIApplication(main.URLS, debug=feconf.DEBUG))
+            self.testapp = webtest.TestApp(app)
+
+            response = self.get_html_response('/maintenance')
+            self.assertIn(
+                'Oppia is currently being upgraded, and the site should be up',
+                response.body)

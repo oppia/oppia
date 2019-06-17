@@ -13,5 +13,5 @@
 // limitations under the License.
 
 /**
-* @fileoverview End-to-end tests for user profile features.
-*/
+ * @fileoverview End-to-end tests for user profile features.
+ */
