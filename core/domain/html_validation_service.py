@@ -895,3 +895,20 @@ def remove_filepath_from_image_tag(html):
         del image['filepath-with-value']
 
     return unicode(soup).replace('<br/>', '<br>')
+
+def get_image_ids_from_image_tag(html):
+    """Returns a list of image_ids present in the html.
+
+    Args:
+        html: str. the HTML from which image_ids are extracted.
+
+    Returns:
+        image_ids. List of ids, of all images present in an exploration.
+    """
+    image_ids = []
+    soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
+    for image in soup.findAll(name='oppia-noninteractive-image'):
+        image_id = image['image_id-with-value']
+        image_ids.append(image_id)
+
+    return image_ids

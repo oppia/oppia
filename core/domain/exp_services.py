@@ -31,7 +31,6 @@ import os
 import pprint
 import traceback
 import zipfile
-import bs4
 
 from constants import constants
 from core.domain import activity_services
@@ -41,6 +40,7 @@ from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -575,16 +575,11 @@ def get_images_ids_of_exploration(exploration):
         exploration: An exploration object..
 
     Returns:
-        list. List of ids, of all images present in an exploration.
+        image_ids. List of ids, of all images present in an exploration.
     """
-    image_ids = []
-
-    exploration_content = exploration.get_all_html_content_strings()[0]
-    soup = bs4.BeautifulSoup(exploration_content.encode('utf-8'), 'html.parser')
-
-    for image in soup.findAll(name='oppia-noninteractive-image'):
-        image_id = image['image_id-with-value']
-        image_ids.append(image_id)
+    exploration_html = exploration.get_all_html_content_strings()[0]
+    image_ids = (html_validation_service.get_image_ids_from_image_tag(
+        exploration_html))
 
     return image_ids
 
@@ -818,7 +813,7 @@ def apply_change_list(exploration_id, change_list):
                         exp_domain.STATE_PROPERTY_IMAGE_ASSETS):
 
                     if change.action == exp_domain.ACTION_ADD_IMAGE:
-                        # Increment image_counter
+                        # Increment image_counter.
                         image_counter = exploration.image_counter
                         image_counter += 1
                         if exploration.get_all_html_content_strings()[0] != '':
