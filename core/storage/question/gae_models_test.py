@@ -68,14 +68,14 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_state_data,
             linked_skill_ids)
         question_ids = ['question_id1', 'question_id2']
-        
+
         self.assertItemsEqual(
             question_models.QuestionModel.get(question_ids[0]).linked_skill_ids,
             ['skill_id1', 'skill_id2'])
         self.assertItemsEqual(
             question_models.QuestionModel.get(question_ids[1]).linked_skill_ids,
             ['skill_id1', 'skill_id2'])
-    
+
         question_model1 = question_models.QuestionModel.get(question_ids[0])
         question_model1.linked_skill_ids = ['skill_id3']
         question_model2 = question_models.QuestionModel.get(question_ids[1])
