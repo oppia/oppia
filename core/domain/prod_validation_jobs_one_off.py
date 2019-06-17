@@ -68,6 +68,7 @@ FILE_MODELS_REGEX = '(%s|%s)' % (IMAGE_PATH_REGEX, AUDIO_PATH_REGEX)
 class BaseModelValidator(object):
     """Base class for validating models."""
 
+    # The dict to store errors found during audit of model.
     errors = collections.defaultdict(list)
     # external_instance_details is keyed by field name. Each value consists
     # of a list of (model class, external_key, external_model_instance)
@@ -127,7 +128,8 @@ class BaseModelValidator(object):
         model_domain_object_instance = cls._get_model_domain_object_instance(
             item)
 
-        if not model_domain_object_instance:
+        if model_domain_object_instance is None:
+            # No domain object exists for this storage model class.
             return
 
         try:
@@ -317,7 +319,17 @@ class BaseSummaryModelValidator(BaseModelValidator):
 class BaseSnapshotContentModelValidator(BaseModelValidator):
     """Base class for validating snapshot content models."""
 
+    # The name of the model which is to be used in the error messages.
+    # This can be overridden by subclasses, if needed.
     model_name = 'snapshot content'
+
+    # The name of the related model in lowercase which is used to obtain
+    # the name of the key for the fetch of related model and the name
+    # of the related model to be used in error messages.
+    # For example, if related model is CollectionRights, then
+    # related_model_name = collection rights, key to fetch = collection_rights
+    # Name of model to be used in error message = CollectionRights
+    # This should be overridden by subclasses.
     related_model_name = ''
 
     @classmethod
@@ -549,6 +561,10 @@ class CollectionModelValidator(BaseModelValidator):
     """Class for validating CollectionModel."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}$' % base_models.ID_LENGTH
+
+    @classmethod
     def _get_model_domain_object_instance(cls, item):
         return collection_services.get_collection_from_model(item)
 
@@ -586,6 +602,10 @@ class CollectionSnapshotMetadataModelValidator(
     related_model_name = 'collection'
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}-\\d*$' % base_models.ID_LENGTH
+
+    @classmethod
     def _get_change_domain_class(cls):
         return collection_domain.CollectionChange
 
@@ -607,6 +627,10 @@ class CollectionSnapshotContentModelValidator(
     related_model_name = 'collection'
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}-\\d*$' % base_models.ID_LENGTH
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'collection_ids': (
@@ -617,6 +641,10 @@ class CollectionSnapshotContentModelValidator(
 
 class CollectionRightsModelValidator(BaseModelValidator):
     """Class for validating CollectionRightsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}$' % base_models.ID_LENGTH
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -672,6 +700,10 @@ class CollectionRightsSnapshotMetadataModelValidator(
     related_model_name = 'collection rights'
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}-\\d*$' % base_models.ID_LENGTH
+
+    @classmethod
     def _get_change_domain_class(cls):
         return rights_manager.CollectionRightsChange
 
@@ -691,6 +723,10 @@ class CollectionRightsSnapshotContentModelValidator(
     """Class for validating CollectionRightsSnapshotContentModel."""
 
     related_model_name = 'collection rights'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}-\\d*$' % base_models.ID_LENGTH
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -728,6 +764,10 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
 class CollectionSummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating CollectionSummaryModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}$' % base_models.ID_LENGTH
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
@@ -1081,6 +1121,10 @@ class ExplorationModelValidator(BaseModelValidator):
     """Class for validating ExplorationModel."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}$' % base_models.ID_LENGTH
+
+    @classmethod
     def _get_model_domain_object_instance(cls, item):
         return exp_services.get_exploration_from_model(item)
 
@@ -1114,6 +1158,10 @@ class ExplorationSnapshotMetadataModelValidator(
     related_model_name = 'exploration'
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}-\\d*$' % base_models.ID_LENGTH
+
+    @classmethod
     def _get_change_domain_class(cls):
         return exp_domain.ExplorationChange
 
@@ -1134,6 +1182,10 @@ class ExplorationSnapshotContentModelValidator(
     related_model_name = 'exploration'
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}-\\d*$' % base_models.ID_LENGTH
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         return {
             'exploration_ids': (
@@ -1143,6 +1195,10 @@ class ExplorationSnapshotContentModelValidator(
 
 class ExplorationRightsModelValidator(BaseModelValidator):
     """Class for validating ExplorationRightsModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}$' % base_models.ID_LENGTH
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1204,6 +1260,10 @@ class ExplorationRightsSnapshotMetadataModelValidator(
     related_model_name = 'exploration rights'
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}-\\d*$' % base_models.ID_LENGTH
+
+    @classmethod
     def _get_change_domain_class(cls):
         return rights_manager.ExplorationRightsChange
 
@@ -1223,6 +1283,10 @@ class ExplorationRightsSnapshotContentModelValidator(
     """Class for validating ExplorationRightsSnapshotContentModel."""
 
     related_model_name = 'exploration rights'
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}-\\d*$' % base_models.ID_LENGTH
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1260,6 +1324,10 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
 class ExpSummaryModelValidator(BaseSummaryModelValidator):
     """Class for validating ExpSummaryModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9_-]{1,%s}$' % base_models.ID_LENGTH
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):

@@ -57,7 +57,11 @@ ROLE_NONE = 'none'
 ROLE_ADMIN = 'admin'
 ROLE_MODERATOR = 'moderator'
 
+# The allowed list of roles which can be used in change_role command.
 ALLOWED_ROLES = [ROLE_OWNER, ROLE_EDITOR, ROLE_VOICE_ARTIST, ROLE_VIEWER]
+
+# The allowed list of status which can be used in change_exploration_status
+# and change_collection_status commands.
 ALLOWED_STATUS = [ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC]
 
 COMMON_ALLOWED_COMMANDS = [{

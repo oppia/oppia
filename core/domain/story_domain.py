@@ -84,16 +84,22 @@ class StoryChange(change_domain.BaseChange):
         to_version)
         - 'create_new' (with title)
     """
+    # The allowed list of story properties which can be used in
+    # update_story_property command.
     STORY_PROPERTIES = (
         STORY_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
         STORY_PROPERTY_NOTES, STORY_PROPERTY_LANGUAGE_CODE)
 
+    # The allowed list of story node properties which can be used in
+    # update_story_node_property command.
     STORY_NODE_PROPERTIES = (
         STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
         STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
         STORY_NODE_PROPERTY_EXPLORATION_ID, STORY_NODE_PROPERTY_TITLE)
 
+    # The allowed list of story contente properties which can be used in
+    # update_story_contents_property command.
     STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID,)
 
     ALLOWED_COMMANDS = [{
@@ -1131,6 +1137,7 @@ class StoryRightsChange(change_domain.BaseChange):
         - 'unpublish_story'.
     """
 
+    # The allowed list of roles which can be used in change_role command.
     ALLOWED_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
     ALLOWED_COMMANDS = [{

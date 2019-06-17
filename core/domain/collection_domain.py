@@ -95,6 +95,8 @@ class CollectionChange(change_domain.BaseChange):
     COLLECTION_PROPERTIES.
     """
 
+    # The allowed list of collection properties which can be used in
+    # edit_collection_property command.
     COLLECTION_PROPERTIES = (
         COLLECTION_PROPERTY_TITLE, COLLECTION_PROPERTY_CATEGORY,
         COLLECTION_PROPERTY_OBJECTIVE, COLLECTION_PROPERTY_LANGUAGE_CODE,
@@ -1136,20 +1138,42 @@ class CollectionSummary(object):
                 'Expected community_owned to be bool, received %s' % (
                     self.community_owned))
 
-        id_property_list = [
-            'owner_ids', 'editor_ids', 'viewer_ids', 'contributor_ids']
-
-        for id_property in id_property_list:
-            property_value = getattr(self, id_property)
-            if not isinstance(property_value, list):
+        if not isinstance(self.owner_ids, list):
+            raise utils.ValidationError(
+                'Expected owner_ids to be list, received %s' % self.owner_ids)
+        for owner_id in self.owner_ids:
+            if not isinstance(owner_id, basestring):
                 raise utils.ValidationError(
-                    'Expected %s to be list, received %s' % (
-                        id_property, property_value))
-            for val in property_value:
-                if not isinstance(val, basestring):
-                    raise utils.ValidationError(
-                        'Expected each id in %s to be string, received %s' % (
-                            id_property, val))
+                    'Expected each id in owner_ids to '
+                    'be string, received %s' % owner_id)
+
+        if not isinstance(self.editor_ids, list):
+            raise utils.ValidationError(
+                'Expected editor_ids to be list, received %s' % self.editor_ids)
+        for editor_id in self.editor_ids:
+            if not isinstance(editor_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each id in editor_ids to '
+                    'be string, received %s' % editor_id)
+
+        if not isinstance(self.viewer_ids, list):
+            raise utils.ValidationError(
+                'Expected viewer_ids to be list, received %s' % self.viewer_ids)
+        for viewer_id in self.viewer_ids:
+            if not isinstance(viewer_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each id in viewer_ids to '
+                    'be string, received %s' % viewer_id)
+
+        if not isinstance(self.contributor_ids, list):
+            raise utils.ValidationError(
+                'Expected contributor_ids to be list, received %s' % (
+                    self.contributor_ids))
+        for contributor_id in self.contributor_ids:
+            if not isinstance(contributor_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each id in contributor_ids to '
+                    'be string, received %s' % contributor_id)
 
         if not isinstance(self.contributors_summary, dict):
             raise utils.ValidationError(

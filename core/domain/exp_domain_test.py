@@ -1059,6 +1059,64 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected each id in owner_ids to be string, received 2'):
             self.exp_summary.validate()
 
+    def test_validation_fails_with_invalid_editor_ids_type(self):
+        self.exp_summary.editor_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected editor_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_editor_id_in_editor_ids(self):
+        self.exp_summary.editor_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in editor_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_voice_artist_ids_type(self):
+        self.exp_summary.voice_artist_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected voice_artist_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_voice_artist_id_in_voice_artists_ids(
+            self):
+        self.exp_summary.voice_artist_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in voice_artist_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_viewer_ids_type(self):
+        self.exp_summary.viewer_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected viewer_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(self):
+        self.exp_summary.viewer_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in viewer_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_contributor_ids_type(self):
+        self.exp_summary.contributor_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected contributor_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
+            self):
+        self.exp_summary.contributor_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in contributor_ids to be string, received 2'):
+            self.exp_summary.validate()
+
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
