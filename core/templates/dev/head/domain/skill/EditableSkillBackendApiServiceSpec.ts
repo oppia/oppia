@@ -72,7 +72,7 @@ describe('Editable skill backend API service', function() {
     };
 
     sampleResponse = {
-      skills: [skillDict]
+      skill: skillDict
     };
 
     sampleResponse2 = {
@@ -97,7 +97,7 @@ describe('Editable skill backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResponse.skills[0]);
+      expect(successHandler).toHaveBeenCalledWith(sampleResponse.skill);
       expect(failHandler).not.toHaveBeenCalled();
     });
 
@@ -114,22 +114,6 @@ describe('Editable skill backend API service', function() {
 
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Error loading skill 1.');
-    });
-
-  it('should succesfully fetch multiple existing skills from the backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
-
-      var skillDataUrl = '/skill_editor_handler/data/' +
-        encodeURIComponent('1,2');
-      $httpBackend.expect('GET', skillDataUrl).respond(sampleResponse2);
-      EditableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
-        successHandler, failHandler);
-      $httpBackend.flush();
-
-      expect(successHandler).toHaveBeenCalledWith(sampleResponse2.skills);
-      expect(failHandler).not.toHaveBeenCalled();
     });
 
   it('should make a request to update the skill in the backend',
@@ -159,4 +143,20 @@ describe('Editable skill backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith(skillDict);
       expect(failHandler).not.toHaveBeenCalled();
     });
+
+  it('should succesfully fetch multiple existing skills from the backend',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      var skillDataUrl = '/skill_data_handler/' + encodeURIComponent('1,2');
+      $httpBackend.expect('GET', skillDataUrl).respond(sampleResponse2);
+      EditableSkillBackendApiService.fetchMultiSkills(['1', '2']).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(sampleResponse2.skills);
+      expect(failHandler).not.toHaveBeenCalled();
+    });
+
 });
