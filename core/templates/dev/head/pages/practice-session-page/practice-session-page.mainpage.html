@@ -22,40 +22,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
-  <background-banner></background-banner>
-  <div ng-controller="PracticeSession" class="oppia-practice_session-container" style="position: relative;">
-    <div class="oppia-practice-session">
-      Practice Session
-    </div>
-    <question-player ng-if="questionPlayerConfig.skillList &&
-                            questionPlayerConfig.skillList.length > 0"
-                     player-config="questionPlayerConfig">
-    </question-player>
-  </div>
-  <style>
-    .oppia-practice_session-container .oppia-practice-session {
-      color: #01645c;
-      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-      font-size: 3em;
-      margin-top: 0px;
-      margin-bottom: 25px;
-      padding-top: 66.5px;
-      text-align: center;
-    }
-    .oppia-practice_session-container {
-      color: black;
-      font-family: 'Roboto', Arial, sans-serif;
-      margin: 0 auto;
-      text-decoration: none;
-    }
-
-    @media(max-width: 925px) {
-      .oppia-practice_session-containerr {
-        max-width: 95%;
-      }
-    }
-  </style>
-
+  <practice-session-page></practice-session-page>
 {% endblock %}
 
 {% block footer_js %}
@@ -64,10 +31,6 @@
 
   <script src="/templates/dev/head/mathjaxConfig.js"></script>
   <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-  <script src="/extensions/objects/templates/MathLatexStringEditorDirective.js"></script>
-  <script src="/extensions/objects/templates/SanitizedUrlEditorDirective.js"></script>
-  <script src="/extensions/objects/templates/ListOfTabsEditorDirective.js"></script>
 
   <!-- This code is used for inserting webpack bundles
      https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
@@ -78,7 +41,6 @@
       <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
     <% } %>
   <% } %>
-  {% include 'components/ck-editor-helpers/rich-text-components.template.html' %}
   {{ interaction_templates }}
   {{ dependencies_html }}
 {% endblock footer_js %}

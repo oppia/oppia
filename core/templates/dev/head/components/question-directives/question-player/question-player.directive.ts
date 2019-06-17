@@ -15,8 +15,7 @@
 /**
  * @fileoverview Controller for the questions player directive.
  */
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant('HASH_PARAM', 'question-player-result=');
+
 
 require('domain/question/QuestionPlayerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
@@ -81,6 +80,7 @@ require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require('components/question-player/question-player.constants.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
@@ -91,10 +91,20 @@ require(
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
-require('pages/exploration_player/ConversationSkinDirective.ts');
-require('pages/exploration_player/ExplorationFooterDirective.ts');
-require('pages/exploration_player/LearnerLocalNavDirective.ts');
-require('pages/exploration_player/LearnerViewInfoDirective.ts');
+require(
+  'pages/exploration-player-page/learner-experience/' +
+  'conversation-skin.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'exploration-footer.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'learner-local-nav.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'learner-view-info.directive.ts');
+
+require('pages/interaction-specs.constants.ts');
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',

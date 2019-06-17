@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title itemprop="name" translate="Down for Maintenance - Oppia"></title>
-    {% include 'pages/header_css_libs.html' %}
+    <!-- Require head styles file using webpack -->
+    @require('../header_css_libs.html')
 
     <script>
       var GLOBALS = {
@@ -12,7 +13,8 @@
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
       };
     </script>
-    {% include 'pages/header_js_libs.html' %}
+    <!-- Require head javascript file using webpack -->
+    @require('../header_js_libs.html')
   </head>
   <body>
     <div class="oppia-base-container">
@@ -48,16 +50,6 @@
       </div>
     </div>
 
-    {% include 'pages/footer_js_libs.html' %}
-    <script src="/templates/dev/head/AppInit.js"></script>
-    <!-- This code is used for inserting webpack bundles
-       https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-    <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-      <% if (webpackConfig.mode == 'production') { %>
-        <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } else { %>
-        <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-      <% } %>
-    <% } %>
+    @require('../footer_js_libs.html')
   </body>
 </html>

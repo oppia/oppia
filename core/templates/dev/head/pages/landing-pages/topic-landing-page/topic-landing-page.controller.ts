@@ -16,112 +16,108 @@
  * @fileoverview Controller for landing page.
  */
 
+require(
+  'components/common-layout-directives/common-elements/' +
+  'background-banner.directive.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
-require('filters/string-utility-filters/capitalize.filter.ts');
 require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.controller.ts');
 require('services/PageTitleService.ts');
 require('services/SiteAnalyticsService.ts');
 
-// Note: This oppia constant needs to be keep in sync with
-// AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
-oppia.constant('TOPIC_LANDING_PAGE_DATA', {
-  maths: {
-    fractions: {
-      collection_id: '4UgTQUc1tala',
-      page_data: {
-        image_1: 'matthew_paper.png',
-        image_2: 'matthew_fractions.png',
-        video: 'fractions_video.mp4',
+require(
+  'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts');
+
+oppia.directive('topicLandingPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/landing-pages/topic-landing-page/' +
+      'topic-landing-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$filter', '$timeout', '$window', 'PageTitleService',
+      'SiteAnalyticsService', 'UrlInterpolationService',
+      'TOPIC_LANDING_PAGE_DATA',
+      function(
+          $filter, $timeout, $window, PageTitleService,
+          SiteAnalyticsService, UrlInterpolationService,
+          TOPIC_LANDING_PAGE_DATA) {
+        var ctrl = this;
+        var pathArray = $window.location.pathname.split('/');
+        ctrl.subject = pathArray[2];
+        var topic = pathArray[3];
+        var topicData = TOPIC_LANDING_PAGE_DATA[ctrl.subject][topic];
+        var landingPageData = topicData.page_data;
+        var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
+        ctrl.topicTitle = topicData.topic_title;
+        ctrl.lessons = landingPageData.lessons;
+        var pageTitle = 'Learn ' + ctrl.topicTitle + ' - Oppia';
+        PageTitleService.setPageTitle(pageTitle);
+        ctrl.bookImageUrl = UrlInterpolationService.getStaticImageUrl(
+          '/splash/books.svg');
+
+        var getImageData = function(index) {
+          var imageKey = 'image_' + index;
+          if (landingPageData[imageKey]) {
+            var imagePath = UrlInterpolationService.interpolateUrl(
+              angular.copy(assetsPathFormat), {
+                subject: ctrl.subject,
+                topic: topic,
+                file_name: landingPageData[imageKey].file_name
+              });
+            return {
+              src: UrlInterpolationService.getStaticImageUrl(imagePath),
+              alt: landingPageData[imageKey].alt
+            };
+          }
+        };
+
+        ctrl.image1 = getImageData(1);
+        ctrl.image2 = getImageData(2);
+
+        ctrl.getVideoUrl = function() {
+          if (landingPageData.video) {
+            var videoPath = UrlInterpolationService.interpolateUrl(
+              angular.copy(assetsPathFormat), {
+                subject: ctrl.subject,
+                topic: topic,
+                file_name: landingPageData.video
+              });
+            return UrlInterpolationService.getStaticVideoUrl(videoPath);
+          } else {
+            throw Error(
+              'There is no video data available for this landing page.');
+          }
+        };
+
+        ctrl.onClickGetStartedButton = function() {
+          var collectionId = topicData.collection_id;
+          SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
+            collectionId);
+          $timeout(function() {
+            $window.location = UrlInterpolationService.interpolateUrl(
+              '/collection/<collection_id>', {
+                collection_id: collectionId
+              });
+          }, 150);
+        };
+
+        ctrl.onClickLearnMoreButton = function() {
+          $timeout(function() {
+            $window.location = '/splash';
+          }, 150);
+        };
+
+        ctrl.onClickExploreLessonsButton = function() {
+          $timeout(function() {
+            $window.location = '/library';
+          }, 150);
+        };
       }
-    },
-    ratios: {
-      collection_id: '53gXGLIR044l',
-      page_data: {
-        image_1: 'ratios_James.png',
-        image_2: 'ratios_question.png',
-        video: 'ratios_video.mp4',
-      }
-    }
-  }
-});
-
-
-
-oppia.controller('TopicLandingPage', [
-  '$filter', '$scope', '$timeout', '$window', 'PageTitleService',
-  'SiteAnalyticsService', 'UrlInterpolationService', 'TOPIC_LANDING_PAGE_DATA',
-  function(
-      $filter, $scope, $timeout, $window, PageTitleService,
-      SiteAnalyticsService, UrlInterpolationService, TOPIC_LANDING_PAGE_DATA) {
-    var pathArray = $window.location.pathname.split('/');
-    $scope.subject = pathArray[2];
-    $scope.topic = pathArray[3];
-    var landingPageData = (
-      TOPIC_LANDING_PAGE_DATA[$scope.subject][$scope.topic].page_data);
-    var assetsPathFormat = '/landing/<subject>/<topic>/<file_name>';
-
-    var capitalizedTopic = $filter('capitalize')($scope.topic);
-    var pageTitle = 'Learn ' + capitalizedTopic + ' - Oppia';
-    PageTitleService.setPageTitle(pageTitle);
-
-    $scope.getRowImageUrl = function(index) {
-      var imageKey = 'image_' + index;
-      if (landingPageData[imageKey]) {
-        var imagePath = UrlInterpolationService.interpolateUrl(
-          angular.copy(assetsPathFormat), {
-            subject: $scope.subject,
-            topic: $scope.topic,
-            file_name: landingPageData[imageKey]
-          });
-        return UrlInterpolationService.getStaticImageUrl(imagePath);
-      } else {
-        throw Error('page_data does not have ' + imageKey + ' key.');
-      }
-    };
-
-    $scope.getVideoUrl = function() {
-      if (landingPageData.video) {
-        var videoPath = UrlInterpolationService.interpolateUrl(
-          angular.copy(assetsPathFormat), {
-            subject: $scope.subject,
-            topic: $scope.topic,
-            file_name: landingPageData.video
-          });
-        return UrlInterpolationService.getStaticVideoUrl(videoPath);
-      } else {
-        throw Error('There is no video data available for this landing page.');
-      }
-    };
-
-    $scope.getStaticSubjectImageUrl = function(subjectName) {
-      return UrlInterpolationService.getStaticImageUrl(
-        '/subjects/' + subjectName + '.svg');
-    };
-
-    $scope.onClickGetStartedButton = function() {
-      var collectionId = (
-        TOPIC_LANDING_PAGE_DATA[$scope.subject][$scope.topic].collection_id);
-      SiteAnalyticsService.registerOpenCollectionFromLandingPageEvent(
-        collectionId);
-      $timeout(function() {
-        $window.location = UrlInterpolationService.interpolateUrl(
-          '/collection/<collection_id>', {
-            collection_id: collectionId
-          });
-      }, 150);
-    };
-
-    $scope.onClickLearnMoreButton = function() {
-      $timeout(function() {
-        $window.location = '/splash';
-      }, 150);
-    };
-
-    $scope.onClickExploreLessonsButton = function() {
-      $timeout(function() {
-        $window.location = '/library';
-      }, 150);
-    };
-  }
-]);
+    ]};
+}]);

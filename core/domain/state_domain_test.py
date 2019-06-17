@@ -75,6 +75,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     'default_outcome': {}
                 }
             },
+            'solicit_answer_details': False,
             'written_translations': {
                 'translations_mapping': {
                     'content': {},
@@ -212,6 +213,24 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
+    def test_update_solicit_answer_details(self):
+        """Test updating solicit_answer_details."""
+        state = state_domain.State.create_default_state('state_1')
+        self.assertEqual(state.solicit_answer_details, False)
+        state.update_solicit_answer_details(True)
+        self.assertEqual(state.solicit_answer_details, True)
+
+    def test_update_solicit_answer_details_with_non_bool_fails(self):
+        """Test updating solicit_answer_details with non bool value."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
+        with self.assertRaisesRegexp(Exception, (
+            'Expected solicit_answer_details to be a boolean, received')):
+            init_state.update_solicit_answer_details('abc')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
+
     def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
         state_dict = {
@@ -220,6 +239,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -252,6 +272,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -284,6 +305,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -317,6 +339,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'content_ids_to_audio_translations': {'content': {}},
+            'solicit_answer_details': False,
             'classifier_model_id': None,
             'interaction': {
                 'solution': None,
@@ -515,7 +538,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
-                'html': {}
+                'html': ''
             },
         })
         init_state.update_interaction_hints(hints_list)
@@ -544,6 +567,35 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
         init_state.update_interaction_solution(solution)
         exploration.validate()
+
+    def test_validate_state_solicit_answer_details(self):
+        """Test validation of solicit_answer_details."""
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, False)
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected solicit_answer_details to be ' +
+            'a boolean, received'):
+            with self.swap(init_state, 'solicit_answer_details', 'abc'):
+                exploration.validate()
+        self.assertEqual(init_state.solicit_answer_details, False)
+        init_state.update_interaction_id('Continue')
+        self.assertEqual(init_state.interaction.id, 'Continue')
+        exploration.validate()
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'The Continue interaction does not ' +
+            'support soliciting answer details from learners.'):
+            with self.swap(init_state, 'solicit_answer_details', True):
+                exploration.validate()
+        init_state.update_interaction_id('TextInput')
+        self.assertEqual(init_state.interaction.id, 'TextInput')
+        self.assertEqual(init_state.solicit_answer_details, False)
+        exploration.validate()
+        init_state.solicit_answer_details = True
+        self.assertEqual(init_state.solicit_answer_details, True)
+        exploration.validate()
+        init_state = exploration.states[exploration.init_state_name]
+        self.assertEqual(init_state.solicit_answer_details, True)
 
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):

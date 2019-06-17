@@ -31,71 +31,83 @@ var commonPrefix = './core/templates/dev/head';
 
 module.exports = {
   entries: {
-    about: commonPrefix + '/pages/about-page/about-page.controller.ts',
-    admin: commonPrefix + '/pages/admin/Admin.ts',
+    about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
+    admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
-      commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
+      commonPrefix + '/pages/collection-editor-page/' +
+      'collection-editor-page.scripts.ts',
     collection_player:
-      commonPrefix + '/pages/collection_player/CollectionPlayer.ts',
+      commonPrefix + '/pages/collection-player-page/' +
+      'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
-      commonPrefix + '/pages/creator_dashboard/CreatorDashboard.ts',
-    donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
+      commonPrefix + '/pages/creator-dashboard-page/' +
+      'creator-dashboard-page.scripts.ts',
+    donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-page.controller.ts',
+      '/pages/email-dashboard-pages/email-dashboard-page.scripts.ts',
     email_dashboard_result:
       commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-result.controller.ts',
-    error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
+      '/pages/email-dashboard-pages/email-dashboard-result.scripts.ts',
+    error: commonPrefix + '/pages/error-pages/error-page.scripts.ts',
     exploration_editor:
-      commonPrefix + '/pages/exploration_editor/ExplorationEditor.ts',
+      commonPrefix + '/pages/exploration-editor-page/' +
+      'exploration-editor-page.controller.ts',
     exploration_player:
-      commonPrefix + '/pages/exploration_player/ExplorationPlayer.ts',
+      commonPrefix + '/pages/exploration-player-page/' +
+      'exploration-player-page.controller.ts',
     get_started:
       commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
       commonPrefix + '/pages/landing-pages/topic-landing-page/' +
-      'topic-landing-page.controller.ts',
+      'topic-landing-page.scripts.ts',
     learner_dashboard:
-      commonPrefix + '/pages/learner_dashboard/LearnerDashboard.ts',
-    library: commonPrefix + '/pages/library/Library.ts',
+      commonPrefix + '/pages/learner-dashboard-page/' +
+      'learner-dashboard-page.controller.ts',
+    library: commonPrefix + '/pages/library-page/library-page.scripts.ts',
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
     moderator:
-      commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
+      commonPrefix + '/pages/moderator-page/moderator-page.scripts.ts',
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
-      'notifications-dashboard-page.controller.ts',
+      'notifications-dashboard-page.scripts.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
-      'practice-session-page.controller.ts',
+        'practice-session-page.scripts.ts',
+    privacy: commonPrefix + '/pages/privacy-page/privacy-page.controller.ts',
     preferences:
-      commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
+      commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
-    skill_editor: commonPrefix + '/pages/skill_editor/SkillEditor.ts',
-    splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
+    skill_editor:
+      commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
+    splash: commonPrefix + '/pages/splash-page/splash-page.scripts.ts',
     stewards:
       commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
-      'stewards-landing-page.controller.ts',
-    story_editor: commonPrefix + '/pages/story_editor/StoryEditor.ts',
+      'stewards-landing-page.scripts.ts',
+    story_editor:
+      commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
+    terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
-    topic_editor: commonPrefix + '/pages/topic_editor/TopicEditor.ts',
+    topic_editor:
+      commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
-      '/pages/topics_and_skills_dashboard/' +
-      'TopicsAndSkillsDashboard.ts'
+      '/pages/topics-and-skills-dashboard-page/' +
+      'topics-and-skills-dashboard-page.controller.ts'
     ),
-    topic_viewer: commonPrefix + '/pages/topic_viewer/TopicViewer.ts',
+    topic_viewer:
+      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.controller.ts',
   },
   plugins: [
     new HtmlWebpackPlugin({
       chunks: ['app', 'admin'],
-      filename: 'admin.html',
-      template: commonPrefix + '/pages/admin/admin.html',
+      filename: 'admin-page.mainpage.html',
+      template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -107,25 +119,33 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['about'],
+      chunks: ['app', 'about'],
       filename: 'about-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is an open source learning platform that ' +
+        'connects a community of teachers and learners. You can use this ' +
+        'site to create 1-1 learning scenarios for others.'
+      },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['collection_editor'],
-      filename: 'collection_editor.html',
+      filename: 'collection-editor-page.mainpage.html',
       template:
-        commonPrefix + '/pages/collection_editor/collection_editor.html',
+        commonPrefix + '/pages/collection-editor-page/' +
+        'collection-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['collection_player'],
-      filename: 'collection_player.html',
+      filename: 'collection-player-page.mainpage.html',
       template:
-        commonPrefix + '/pages/collection_player/collection_player.html',
+        commonPrefix + '/pages/collection-player-page/' +
+        'collection-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -144,9 +164,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['creator_dashboard'],
-      filename: 'creator_dashboard.html',
+      filename: 'creator-dashboard-page.mainpage.html',
       template:
-        commonPrefix + '/pages/creator_dashboard/creator_dashboard.html',
+        commonPrefix + '/pages/creator-dashboard-page/' +
+        'creator-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -184,23 +205,29 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_editor'],
-      filename: 'exploration_editor.html',
+      filename: 'exploration-editor-page.mainpage.html',
       template:
-        commonPrefix + '/pages/exploration_editor/exploration_editor.html',
+        commonPrefix + '/pages/exploration-editor-page/' +
+        'exploration-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['exploration_player'],
-      filename: 'exploration_player.html',
+      filename: 'exploration-player-page.mainpage.html',
       template:
-        commonPrefix + '/pages/exploration_player/exploration_player.html',
+        commonPrefix + '/pages/exploration-player-page/' +
+        'exploration-player-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['get_started'],
+      chunks: ['app', 'get_started'],
       filename: 'get-started-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Learn how to get started using Oppia.'
+      },
       template:
         commonPrefix + '/pages/get-started-page/get-started-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -217,16 +244,17 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['learner_dashboard'],
-      filename: 'learner_dashboard.html',
+      filename: 'learner-dashboard-page.mainpage.html',
       template:
-        commonPrefix + '/pages/learner_dashboard/learner_dashboard.html',
+        commonPrefix + '/pages/learner-dashboard-page/' +
+        'learner-dashboard-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['library'],
-      filename: 'library.html',
-      template: commonPrefix + '/pages/library/library.html',
+      filename: 'library-page.mainpage.html',
+      template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -247,7 +275,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['app', 'privacy'],
       filename: 'privacy-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. Join ' +
+          'the community to create or try an exploration today!'
+      },
       template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -296,21 +330,35 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['skill_editor'],
-      filename: 'skill_editor.html',
-      template: commonPrefix + '/pages/skill_editor/skill_editor.html',
+      filename: 'skill-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/skill-editor-page/' +
+        'skill-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['splash'],
+      chunks: ['app', 'splash'],
       filename: 'splash-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['splash'],
+      chunks: ['app', 'splash'],
       filename: 'splash_at0.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash-page/splash_at0.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -318,6 +366,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash_at1.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash-page/splash_at1.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -334,20 +388,35 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['story_editor'],
-      filename: 'story_editor.html',
-      template: commonPrefix + '/pages/story_editor/story_editor.html',
+      filename: 'story-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/story-editor-page/' +
+        'story-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['teach'],
+      chunks: ['app', 'teach'],
       filename: 'teach-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'The Oppia library is full of user-created lessons ' +
+        'called \'explorations\'. Read about how to participate in the ' +
+        'community and begin creating explorations.'
+      },
       template: commonPrefix + '/pages/teach-page/teach-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['app', 'terms'],
       filename: 'terms-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a 501(c)(3) registered non-profit open-source' +
+        ' e-learning platform. Learn about our terms and conditions for ' +
+        'creating and distributing learning material.'
+      },
       template: commonPrefix + '/pages/terms-page/terms-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -361,25 +430,30 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['topic_editor'],
-      filename: 'topic_editor.html',
-      template: commonPrefix + '/pages/topic_editor/topic_editor.html',
+      filename: 'topic-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/topic-editor-page/' +
+        'topic-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['topics_and_skills_dashboard'],
-      filename: 'topics_and_skills_dashboard.html',
+      filename: 'topics-and-skills-dashboard-page.mainpage.html',
       template: (
         commonPrefix +
-        '/pages/topics_and_skills_dashboard/topics_and_skills_dashboard.html'
+        '/pages/topics-and-skills-dashboard-page/' +
+        'topics-and-skills-dashboard-page.mainpage.html'
       ),
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['topic_viewer'],
-      filename: 'topic_viewer.html',
-      template: commonPrefix + '/pages/topic_viewer/topic_viewer.html',
+      filename: 'topic-viewer-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/topic-viewer-page/' +
+        'topic-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
