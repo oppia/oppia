@@ -61,8 +61,7 @@ module.exports = function(config) {
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
       // TODO(vojtechjelinek): add these back after the templateCache
-      // is repaired, the templateCache is broken due to the fact that
-      // webpack is not yet implemented for /extensions (#6732)
+      // is repaired (#6960)
       'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
       ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
        'services/solution-verification.service.spec.ts'),
