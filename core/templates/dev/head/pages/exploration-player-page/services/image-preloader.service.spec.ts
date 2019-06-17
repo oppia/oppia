@@ -106,6 +106,7 @@ describe('Image preloader service', function() {
             answer_groups: [],
             hints: []
           },
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -138,6 +139,7 @@ describe('Image preloader service', function() {
             answer_groups: [],
             hints: []
           },
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {}
@@ -234,6 +236,7 @@ describe('Image preloader service', function() {
             hints: [],
             solution: null
           },
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -327,6 +330,7 @@ describe('Image preloader service', function() {
             }],
             solution: null,
           },
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},

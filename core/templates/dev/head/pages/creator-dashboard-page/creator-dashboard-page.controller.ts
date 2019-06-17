@@ -137,7 +137,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.directive.ts');
@@ -152,6 +151,9 @@ require(
   'domain/topics_and_skills_dashboard/' +
   'TopicsAndSkillsDashboardBackendApiService.ts'
 );
+
+require('objects/objectComponentsRequires.ts');
+
 require(
   'pages/exploration-editor-page/feedback-tab/services/' +
   'thread-status-display.service.ts');
@@ -163,35 +165,7 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-oppia.constant('EXPLORATION_DROPDOWN_STATS', {
-  OPEN_FEEDBACK: 'open_feedback'
-});
-
-oppia.constant('EXPLORATIONS_SORT_BY_KEYS', {
-  TITLE: 'title',
-  RATING: 'ratings',
-  NUM_VIEWS: 'num_views',
-  OPEN_FEEDBACK: 'num_open_threads',
-  LAST_UPDATED: 'last_updated_msec'
-});
-
-oppia.constant('HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
-  TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE ',
-  RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
-  NUM_VIEWS: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS',
-  OPEN_FEEDBACK: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_OPEN_FEEDBACK',
-  LAST_UPDATED: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_LAST_UPDATED'
-});
-
-oppia.constant('SUBSCRIPTION_SORT_BY_KEYS', {
-  USERNAME: 'subscriber_username',
-  IMPACT: 'subscriber_impact'
-});
-
-oppia.constant('HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
-  USERNAME: 'Username',
-  IMPACT: 'Impact'
-});
+require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
 
 oppia.controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',

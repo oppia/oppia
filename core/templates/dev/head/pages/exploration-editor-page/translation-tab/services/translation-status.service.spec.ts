@@ -185,6 +185,7 @@ describe('Translation status service', function() {
             },
             confirmed_unclassified_answers: []
           },
+          solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
         },
@@ -250,6 +251,7 @@ describe('Translation status service', function() {
             },
             confirmed_unclassified_answers: []
           },
+          solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
         },
@@ -287,6 +289,7 @@ describe('Translation status service', function() {
             default_outcome: null,
             confirmed_unclassified_answers: []
           },
+          solicit_answer_details: false,
           classifier_model_id: null,
           param_changes: []
         }

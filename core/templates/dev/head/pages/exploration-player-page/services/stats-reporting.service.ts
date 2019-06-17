@@ -20,40 +20,12 @@ require('domain/utilities/StopwatchObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('services/ContextService.ts');
 require('services/MessengerService.ts');
 require('services/PlaythroughService.ts');
 require('services/SiteAnalyticsService.ts');
 
-oppia.constant('STATS_EVENT_TYPES', {
-  EVENT_TYPE_START_EXPLORATION: 'start',
-  EVENT_TYPE_ACTUAL_START_EXPLORATION: 'actual_start',
-  EVENT_TYPE_COMPLETE_EXPLORATION: 'complete',
-  EVENT_TYPE_STATE_HIT: 'state_hit',
-  EVENT_TYPE_STATE_COMPLETED: 'state_complete',
-  EVENT_TYPE_ANSWER_SUBMITTED: 'answer_submitted',
-  EVENT_TYPE_SOLUTION_HIT: 'solution_hit',
-  EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP: 'leave_for_refresher_exp',
-});
-
-oppia.constant('STATS_REPORTING_URLS', {
-  ANSWER_SUBMITTED: '/explorehandler/answer_submitted_event/<exploration_id>',
-  EXPLORATION_COMPLETED: (
-    '/explorehandler/exploration_complete_event/<exploration_id>'),
-  EXPLORATION_MAYBE_LEFT: (
-    '/explorehandler/exploration_maybe_leave_event/<exploration_id>'),
-  EXPLORATION_STARTED: (
-    '/explorehandler/exploration_start_event/<exploration_id>'),
-  STATE_HIT: '/explorehandler/state_hit_event/<exploration_id>',
-  STATE_COMPLETED: '/explorehandler/state_complete_event/<exploration_id>',
-  EXPLORATION_ACTUALLY_STARTED: (
-    '/explorehandler/exploration_actual_start_event/<exploration_id>'),
-  SOLUTION_HIT: '/explorehandler/solution_hit_event/<exploration_id>',
-  LEAVE_FOR_REFRESHER_EXP: (
-    '/explorehandler/leave_for_refresher_exp_event/<exploration_id>'),
-  STATS_EVENTS: '/explorehandler/stats_events/<exploration_id>'
-});
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',

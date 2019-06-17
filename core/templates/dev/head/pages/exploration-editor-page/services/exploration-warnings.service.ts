@@ -29,9 +29,7 @@ require(
 require('services/ImprovementsService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
-// When an unresolved answer's frequency exceeds this threshold, an exploration
-// will be blocked from being published until the answer is resolved.
-oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',

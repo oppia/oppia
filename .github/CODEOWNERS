@@ -40,7 +40,7 @@
 /core/storage/collection/ @kevinlee12
 /core/templates/dev/head/components/entity-creation-services/collection-creation.service*.ts @kevinlee12
 /core/templates/dev/head/domain/collection/ @kevinlee12
-/core/templates/dev/head/pages/collection_editor/ @kevinlee12
+/core/templates/dev/head/pages/collection-editor-page/ @kevinlee12
 /core/templates/dev/head/pages/collection-player-page/ @kevinlee12
 
 
@@ -259,6 +259,7 @@
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/components/question-directives/question-editor/ @aks681
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681
+/core/templates/dev/head/components/question-directives/modal-templates/ @aks681
 /core/templates/dev/head/components/question-directives/question-player/ @vinitamurthi
 
 # Skill project.
@@ -288,7 +289,7 @@
 /core/templates/dev/head/components/entity-creation-services/topic-creation.service.ts.ts @aks681
 /core/templates/dev/head/domain/topic/ @aks681
 /core/templates/dev/head/domain/topic_viewer @aks681
-/core/templates/dev/head/pages/topic_editor/ @aks681
+/core/templates/dev/head/pages/topic-editor-page/ @aks681
 /core/templates/dev/head/pages/topic-viewer-page/ @aks681
 
 # Topics and skills dashboard project.
@@ -313,6 +314,8 @@
 /core/jobs*.py @seanlip
 /core/platform/ @seanlip
 /core/templates/dev/head/App*.ts @ankita240796
+/core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek
 /core/templates/dev/head/I18nFooter.ts @seanlip
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @seanlip
 
@@ -363,7 +366,7 @@
 /core/domain/suggestion*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
-/core/templates/dev/head/pages/suggestion_editor/ @nithusha21
+/core/templates/dev/head/services/SuggestionModalService.ts @nithusha21
 
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21
@@ -428,6 +431,8 @@
 #
 #     https://help.github.com/en/articles/about-code-owners
 #
+# On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
+# in scripts/pre_commit_linter.py in sync with the modifications.
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
 /core/domain/dependency_registry*.py @seanlip
