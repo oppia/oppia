@@ -107,11 +107,8 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s/%s' % (
-                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.get_json('/csrf')
+        csrf_token = response['token']
 
         json_response = self.put_json(
             '%s/%s/%s' % (

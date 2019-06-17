@@ -844,7 +844,8 @@ tags: []
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_csrf_token_from_response(response)
+            response = self.get_json('/csrf')
+            csrf_token = response['token']
             response = self.testapp.post(
                 feconf.SIGNUP_DATA_URL, params={
                     'csrf_token': csrf_token,
@@ -862,8 +863,8 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            response = self.get_json('/csrf')
+            csrf_token = response['token']
             self.post_json(
                 '/adminhandler', {
                     'action': 'save_config_properties',
@@ -881,8 +882,8 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            response = self.get_html_response('/admin')
-            csrf_token = self.get_csrf_token_from_response(response)
+            response = self.get_json('/csrf')
+            csrf_token = response['token']
             self.post_json(
                 '/adminrolehandler', {
                     'username': username,

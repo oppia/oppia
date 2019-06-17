@@ -672,7 +672,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             # cannot be imported.
             if (handler.__name__ == 'LogoutPage' or
                     handler.__name__ == 'Error404Handler' or
-                    handler-__name__ == 'CsrfTokenHandler'):
+                    handler.__name__ == 'CsrfTokenHandler'):
                 continue
 
             if handler.get != base.BaseHandler.get:
@@ -857,8 +857,8 @@ class SignUpTests(test_utils.GenericTestBase):
         during signup.
         """
         self.login('abc@example.com')
-        response = self.get_html_response(feconf.SIGNUP_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.get_json('/csrf')
+        csrf_token = response['token']
 
         response = self.get_html_response('/about', expected_status_int=302)
         self.assertIn('Logout', response.location)
@@ -878,8 +878,8 @@ class SignUpTests(test_utils.GenericTestBase):
         after signup.
         """
         self.login('abc@example.com')
-        response = self.get_html_response(feconf.SIGNUP_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.get_json('/csrf')
+        csrf_token = response['token']
 
         self.post_json(
             feconf.SIGNUP_DATA_URL, {
@@ -892,7 +892,7 @@ class SignUpTests(test_utils.GenericTestBase):
 
 
 class CsrfTokenHandlerTests(test_utils.GenericTestBase):
-    
+
     def test_valid_token_is_returned(self):
         """Test that a valid csrf token is returned by
         the handler.
@@ -903,4 +903,3 @@ class CsrfTokenHandlerTests(test_utils.GenericTestBase):
 
         self.assertTrue(base.CsrfTokenManager.is_csrf_token_valid(
             None, csrf_token))
-

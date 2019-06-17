@@ -258,8 +258,8 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
 
         super(LibraryGroupsTest, self).setUp()
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.get_json('/csrf')
+        csrf_token = response['token']
 
         with self.swap(
             html_validation_service, 'get_filename_with_dimensions',
