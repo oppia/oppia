@@ -198,12 +198,11 @@ class Image(object):
         Returns:
             dict. A dict, mapping all fields of Image instance.
         """
-        image = {}
-        image['src'] = self.src
-        image['placeholder'] = self.placeholder
-        image['author_id'] = self.author_id
-        image['instructions'] = self.instructions
-        return image
+        return {
+            'src': self.src,
+            'placeholder': self.placeholder,
+            'instructions': self.instructions
+        }
 
     @classmethod
     def from_dict(cls, image_info):

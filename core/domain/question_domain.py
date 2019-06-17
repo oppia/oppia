@@ -195,7 +195,6 @@ class Question(object):
 
     @classmethod
     def _convert_state_v28_dict_to_v29_dict(cls, question_state_dict):
-
         """Converts from version 28 to 29. Version 29 adds
         solicit_answer_details boolean variable to the state, which
         allows the creator to ask for answer details from the learner

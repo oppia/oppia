@@ -98,6 +98,7 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
+
 class ExplorationChange(object):
     """Domain object class for an exploration change.
 
@@ -480,8 +481,8 @@ class Exploration(object):
         taken from feconf; 'tags' and 'param_changes_list' are initialized to
         empty list; 'states_schema_version' is taken from feconf; 'states_dict'
         is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
-        'author_notes' are initialized to empty string; 'version' is
-        initializated to 0.
+        'author_notes' are initialized to empty string; 'version' and image_counter
+        is initializated to 0.
 
         Args:
             exploration_id: str. The id of the exploration.
@@ -495,8 +496,6 @@ class Exploration(object):
             Exploration. The Exploration domain object with default
             values.
         """
-        image_counter = 0
-
         init_state_dict = state_domain.State.create_default_state(
             init_state_name, is_initial_state=True).to_dict()
 
@@ -508,8 +507,7 @@ class Exploration(object):
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_STATE_SCHEMA_VERSION,
             init_state_name, states_dict, {}, [], 0,
-            feconf.DEFAULT_AUTO_TTS_ENABLED, False,
-            image_counter)
+            feconf.DEFAULT_AUTO_TTS_ENABLED, False, 0)
 
     @classmethod
     def from_dict(
@@ -2250,7 +2248,7 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v29_dict_to_v30_dict(cls, states_dict):
-        """Converts from version 27 to 28. Version 29 added image assets field
+        """Converts from version 29 to 30. Version 30 added image assets field
         in state model.
 
          Args:
@@ -2921,7 +2919,16 @@ class Exploration(object):
 
     @classmethod
     def _convert_v34_dict_to_v35_dict(cls, exploration_dict):
-        """Converts a v33 exploration dict into a v34 exploration dict."""
+        """Converts a v34 exploration dict into a v35 exploration dict.
+
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v33.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v34.
+        """
         exploration_dict['schema_version'] = 35
 
         exploration_dict['states'] = (

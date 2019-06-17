@@ -85,6 +85,7 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     correctness_feedback_enabled = ndb.BooleanProperty(
         default=False, indexed=True)
+    image_counter = ndb.IntegerProperty(default=0, indexed=False)
 
     # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
     # caused GAE to raise an error on fetching a specific version of the
@@ -96,7 +97,6 @@ class ExplorationModel(base_models.VersionedModel):
     default_skin = ndb.StringProperty(default='conversation_v1')
     # DEPRECATED in v2.5.4. Do not use.
     skin_customizations = ndb.JsonProperty(indexed=False)
-    image_counter = ndb.IntegerProperty(default=0, indexed=False)
 
     @classmethod
     def get_exploration_count(cls):
