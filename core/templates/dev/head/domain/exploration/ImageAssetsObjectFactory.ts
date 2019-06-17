@@ -37,6 +37,18 @@ oppia.factory('ImageAssetsObjectFactory', [
       };
     };
 
+    ImageAssets.prototype.addImage = function(imageId, imageInfo) {
+      var src = imageInfo.src;
+      var placeholder = imageInfo.placeholder;
+      var authorId = imageInfo.authorId;
+      var instrutions = imageInfo.instructions;
+
+      var imageObject = (
+        ImageObjectFactory.createNew(src, placeholder, authorId, instrutions));
+
+      this.imageMapping[imageId] = imageObject;
+    };
+
     /* eslint-disable dot-notation */
     ImageAssets['createNew'] = function(imageMapping) {
     /* eslint-enable dot-notation */
@@ -56,5 +68,5 @@ oppia.factory('ImageAssetsObjectFactory', [
       return new ImageAssets(imageMapping);
     };
 
-  return ImageAssets;
+    return ImageAssets;
   }]);

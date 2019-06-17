@@ -32,13 +32,15 @@ oppia.factory('ExplorationObjectFactory', [
       INTERACTION_DISPLAY_MODE_INLINE,
       INTERACTION_SPECS) {
     var Exploration = function(
-        initStateName, paramChanges, paramSpecs, states, title, languageCode) {
+        initStateName, paramChanges, paramSpecs, states, title, languageCode,
+        imageCounter) {
       this.initStateName = initStateName;
       this.paramChanges = paramChanges;
       this.paramSpecs = paramSpecs;
       this.states = states;
       this.title = title;
       this.languageCode = languageCode;
+      this.image_counter = imageCounter;
     };
 
     // Instance methods
@@ -167,6 +169,14 @@ oppia.factory('ExplorationObjectFactory', [
       return this.states.getAllVoiceoverLanguageCodes();
     };
 
+    Exploration.prototype.getImageCounter = function() {
+      return this.imageCounter;
+    };
+
+    Exploration.prototype.updateImageCounter = function(imageCounter) {
+      this.imageCounter = imageCounter;
+    };
+
     // Static class methods. Note that "this" is not available in
     // static contexts.
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
@@ -182,7 +192,8 @@ oppia.factory('ExplorationObjectFactory', [
         StatesObjectFactory.createFromBackendDict(
           explorationBackendDict.states),
         explorationBackendDict.title,
-        explorationBackendDict.language_code);
+        explorationBackendDict.language_code,
+        explorationBackendDict.image_counter);
     };
 
     return Exploration;
