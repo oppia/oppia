@@ -3770,8 +3770,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for domain object check of '
                 'ExpSummaryModel\', '
                 '[u\'Entity id 0: Entity fails domain validation with '
-                'the error Expected ratings to have keys: 1,2,3,4,5, '
-                'received: 10,5\']]'
+                'the error Expected ratings to have keys: 1, 2, 3, 4, 5, '
+                'received: 10, 5\']]'
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
