@@ -218,6 +218,56 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
+    def test_cannot_create_subtopic_page_change_with_invalid_change_dict(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            subtopic_page_domain.SubtopicPageChange({})
+
+    def test_cannot_create_subtopic_page_change_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'invalid_cmd'
+            })
+
+    def test_cannot_update_subtopic_page_property_with_invalid_property(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+                'property_name': 'invalid_property'
+            })
+
+    def test_create_subtopic_page_change(self):
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+            'topic_id': self.topic_id
+        })
+
+        self.assertEqual(
+            subtopic_page_change_object.to_dict(), {
+                'cmd': subtopic_page_domain.CMD_CREATE_NEW,
+                'topic_id': self.topic_id
+            })
+
+    def test_validate_version_number(self):
+        self.subtopic_page.version = 'invalid_version'
+        with self.assertRaisesRegexp(
+            Exception, 'Expected version number to be an int'):
+            self.subtopic_page.validate()
+
+    def test_validate_page_contents_schema_version_type(self):
+        self.subtopic_page.page_contents_schema_version = 'invalid_version'
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected page contents schema version to be an integer'):
+            self.subtopic_page.validate()
+
+    def test_validate_page_contents_schema_version(self):
+        self.subtopic_page.page_contents_schema_version = 0
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected page contents schema version to be %s'
+            % feconf.CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION):
+            self.subtopic_page.validate()
+
 
 class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
@@ -298,3 +348,52 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 subtopic_page_contents_dict))
         self.assertEqual(subtopic_page_contents.to_dict(),
                          subtopic_page_contents_dict)
+
+    def test_validate_content_id(self):
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            0: {
+                'en': {
+                    'filename': 'test.mp3',
+                    'file_size_bytes': 100,
+                    'needs_update': False
+                }
+            }
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'Expected content_id to be a string'):
+            self.subtopic_page_contents.validate()
+
+    def test_validate_audio_translations(self):
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            'content': []
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'Expected audio_translations to be a dict'):
+            self.subtopic_page_contents.validate()
+
+    def test_validate_language_code_type(self):
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            'content': {
+                0: {
+                    'filename': 'test.mp3',
+                    'file_size_bytes': 100,
+                    'needs_update': False
+                }
+            }
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'Expected language code to be a string'):
+            self.subtopic_page_contents.validate()
+
+    def test_validate_language_code(self):
+        self.subtopic_page_contents.content_ids_to_audio_translations = {
+            'content': {
+                'invalid_language_code': {
+                    'filename': 'test.mp3',
+                    'file_size_bytes': 100,
+                    'needs_update': False
+                }
+            }
+        }
+        with self.assertRaisesRegexp(Exception, 'Unrecognized language code'):
+            self.subtopic_page_contents.validate()
