@@ -314,6 +314,8 @@
 /core/jobs*.py @seanlip
 /core/platform/ @seanlip
 /core/templates/dev/head/App*.ts @ankita240796
+/core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek
 /core/templates/dev/head/I18nFooter.ts @seanlip
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @seanlip
 
@@ -364,7 +366,7 @@
 /core/domain/suggestion*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
-/core/templates/dev/head/pages/suggestion_editor/ @nithusha21
+/core/templates/dev/head/services/SuggestionModalService.ts @nithusha21
 
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21
@@ -429,6 +431,8 @@
 #
 #     https://help.github.com/en/articles/about-code-owners
 #
+# On modifying this list make sure to keep the CODEOWNER_IMPORTANT_PATHS list
+# in scripts/pre_commit_linter.py in sync with the modifications.
 /core/controllers/acl_decorators*.py @seanlip
 /core/controllers/base*.py @seanlip
 /core/domain/dependency_registry*.py @seanlip

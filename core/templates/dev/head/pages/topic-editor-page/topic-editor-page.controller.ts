@@ -30,6 +30,7 @@ require('components/forms/validators/is-integer.filter.ts');
 require('components/forms/validators/is-nonempty.filter.ts');
 require(
   'components/forms/custom-forms-directives/apply-validation.directive.ts');
+require('components/forms/custom-forms-directives/html-select.directive.ts');
 require(
   'components/forms/custom-forms-directives/require-is-float.directive.ts');
 require('directives/AngularHtmlBindDirective.ts');
@@ -121,10 +122,8 @@ require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
-oppia.constant(
-  'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.controller('TopicEditor', [
   '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',
