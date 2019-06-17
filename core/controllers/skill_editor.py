@@ -142,39 +142,24 @@ class EditableSkillDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_edit_skills
-    def get(self, skill_ids):
-        """Populates the data on skill pages of the skill ids."""
-
-        try:
-            skill_ids_list = skill_ids.split(',')
-        except Exception:
-            raise self.PageNotFoundException
-
-        try:
-            for skill_id in skill_ids_list:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
+    @acl_decorators.can_edit_skill
+    def get(self, skill_id):
+        """Populates the data on the individual skill page."""
+        skill_domain.Skill.require_valid_skill_id(skill_id)
+        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
-        try:
-            skills = skill_services.get_multi_skills(skill_ids_list)
-        except:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
 
-        skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({
-            'skills': skill_dicts
+            'skill': skill.to_dict()
         })
 
         self.render_json(self.values)
 
-    @acl_decorators.can_edit_skills
-    def put(self, skill_ids):
+    @acl_decorators.can_edit_skill
+    def put(self, skill_id):
         """Updates properties of the given skill."""
-
-        skill_id = skill_ids.split(',')[0]
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
         if skill is None:
@@ -205,10 +190,8 @@ class EditableSkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_skill
-    def delete(self, skill_ids):
+    def delete(self, skill_id):
         """Handles Delete requests."""
-
-        skill_id = skill_ids.split(',')[0]
         skill_domain.Skill.require_valid_skill_id(skill_id)
         if skill_services.skill_has_associated_questions(skill_id):
             raise Exception(
@@ -216,6 +199,40 @@ class EditableSkillDataHandler(base.BaseHandler):
                 'first.')
 
         skill_services.delete_skill(self.user_id, skill_id)
+
+        self.render_json(self.values)
+
+
+class SkillDataHandler(base.BaseHandler):
+    """A handler for accessing skills data."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.open_access
+    def get(self, skill_ids):
+        """Populates the data on skill pages of the skill ids."""
+
+        try:
+            skill_ids_list = skill_ids.split(',')
+        except Exception:
+            raise self.PageNotFoundException
+
+        try:
+            for skill_id in skill_ids_list:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.PageNotFoundException(
+                Exception('The skill with the given id doesn\'t exist.'))
+        try:
+            skills = skill_services.get_multi_skills(skill_ids_list)
+        except:
+            raise self.PageNotFoundException(
+                'The skill with the given id doesn\'t exist.')
+
+        skill_dicts = [skill.to_dict() for skill in skills]
+        self.values.update({
+            'skills': skill_dicts
+        })
 
         self.render_json(self.values)
 

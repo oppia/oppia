@@ -43,9 +43,8 @@ oppia.directive('questionsList', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        getSkill: '&skill',
         getTopicId: '&topicId',
-        getTopicSkillIds: '&topicSkillIds',
+        getSkillIds: '&skillIds',
         getQuestionSummariesAsync: '=',
         isLastPage: '=isLastQuestionBatch',
         getAllSkillSummaries: '&allSkillSummaries',
@@ -75,11 +74,7 @@ oppia.directive('questionsList', [
           ctrl.skillIds = [];
 
           var _initTab = function() {
-            if (ctrl.getSkill()) {
-              ctrl.skillIds = [ctrl.getSkill().getId()];
-            } else {
-              ctrl.skillIds = ctrl.getTopicSkillIds();
-            }
+            ctrl.skillIds = ctrl.getSkillIds();
             ctrl.questionEditorIsShown = false;
             ctrl.question = null;
             ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
@@ -90,13 +85,6 @@ oppia.directive('questionsList', [
             ctrl.activeQuestion = null;
             ctrl.questionIsBeingUpdated = false;
             ctrl.misconceptions = [];
-            if (ctrl.getSkill()) {
-              ctrl.misconceptions = ctrl.getSkill().getMisconceptions();
-              ctrl.skillId = ctrl.getSkill().getId();
-              ctrl.entityId = ctrl.skillId;
-            } else {
-              ctrl.entityId = ctrl.getTopicId();
-            }
           };
 
           ctrl.getQuestionIndex = function(index) {
@@ -184,9 +172,12 @@ oppia.directive('questionsList', [
           };
 
           ctrl.createQuestion = function() {
-            if (ctrl.getSkill()) {
-              ctrl.newQuestionSkillIds = [ctrl.getSkill().getId()];
-              ctrl.initializeNewQuestionCreation();
+            if (!ctrl.getTopicId()) {
+              ctrl.newQuestionSkillIds = ctrl.skillIds;
+              ctrl.getMisconceptions(ctrl.skillIds);
+              if (AlertsService.warnings.length === 0) {
+                ctrl.initializeNewQuestionCreation();
+              }
               return;
             }
             var allSkillSummaries = ctrl.getAllSkillSummaries();
@@ -232,22 +223,28 @@ oppia.directive('questionsList', [
 
             modalInstance.result.then(function(skillIds) {
               ctrl.newQuestionSkillIds = skillIds;
-              EditableSkillBackendApiService.fetchMultiSkills(
-                skillIds).then(
-                function(skillDicts) {
-                  skillDicts.forEach(function(skillDict) {
-                    ctrl.misconceptions = ctrl.misconceptions.concat(
-                      skillDict.misconceptions.map(
-                        function(misconceptionsBackendDict) {
-                          return MisconceptionObjectFactory
-                            .createFromBackendDict(misconceptionsBackendDict);
-                        }));
-                  });
-                  ctrl.initializeNewQuestionCreation();
-                }, function(error) {
-                  AlertsService.addWarning();
-                });
+              ctrl.getMisconceptions(skillIds);
+              if (AlertsService.warnings.length === 0) {
+                ctrl.initializeNewQuestionCreation();
+              }
             });
+          };
+
+          ctrl.getMisconceptions = function(skillIds) {
+            EditableSkillBackendApiService.fetchMultiSkills(
+              skillIds).then(
+              function(skillDicts) {
+                skillDicts.forEach(function(skillDict) {
+                  ctrl.misconceptions = ctrl.misconceptions.concat(
+                    skillDict.misconceptions.map(
+                      function(misconceptionsBackendDict) {
+                        return MisconceptionObjectFactory
+                          .createFromBackendDict(misconceptionsBackendDict);
+                      }));
+                });
+              }, function(error) {
+                AlertsService.addWarning();
+              });
           };
 
           ctrl.editQuestion = function(questionSummary) {

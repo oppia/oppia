@@ -603,10 +603,13 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<question_id>/<skill_ids>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
         question_editor.QuestionSkillLinkHandler),
     get_redirect_route(
+        r'%s/<skill_ids>' % feconf.SKILL_DATA_URL_PREFIX,
+        skill_editor.SkillDataHandler),
+    get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
     get_redirect_route(
-        r'%s/<skill_ids>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_RIGHTS_URL_PREFIX,

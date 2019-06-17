@@ -153,8 +153,6 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         super(EditableSkillDataHandlerTest, self).setUp()
         self.url = '%s/%s' % (
             feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id)
-        self.url_2 = '%s/%s,%s' % (
-            feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
         self.put_payload = {
             'version': 1,
             'commit_message': 'changed description',
@@ -186,16 +184,7 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.login(self.ADMIN_EMAIL)
         # Check that admins can access the editable skill data.
         json_response = self.get_json(self.url)
-        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
-        self.logout()
-
-    def test_editable_skill_handler_get_multiple_skills(self):
-        self.login(self.ADMIN_EMAIL)
-        # Check that admins can access two editable skills data at the same
-        # time.
-        json_response = self.get_json(self.url_2)
-        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
-        self.assertEqual(self.skill_id_2, json_response['skills'][1]['id'])
+        self.assertEqual(self.skill_id, json_response['skill']['id'])
         self.logout()
 
     def test_editable_skill_handler_get_fails(self):
@@ -248,6 +237,40 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
             skill_services, 'skill_has_associated_questions', lambda x: True)
         with skill_has_questions_swap:
             self.delete_json(self.url, expected_status_int=500)
+        self.logout()
+
+
+class SkillDataHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for SkillDataHandler."""
+
+    def setUp(self):
+        super(SkillDataHandlerTest, self).setUp()
+        self.url = '%s/%s,%s' % (
+            feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
+        self.put_payload = {
+            'version': 1,
+            'commit_message': 'changed description',
+            'change_dicts': [{
+                'cmd': 'update_skill_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+    def test_skill_data_handler_get_multiple_skills(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check that admins can access two skills data at the same time.
+        json_response = self.get_json(self.url)
+        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
+        self.assertEqual(self.skill_id_2, json_response['skills'][1]['id'])
+        self.logout()
+
+    def test_skill_data_handler_get_fails(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check GET returns 404 when cannot get skill by id.
+        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
         self.logout()
 
 

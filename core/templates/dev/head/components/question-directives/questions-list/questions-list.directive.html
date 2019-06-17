@@ -16,7 +16,7 @@
     <th class="dashboard-table-headings">
       <p> Question Content </p>
     </th>
-    <th class="dashboard-table-headings" ng-if="!$ctrl.getSkill()">
+    <th class="dashboard-table-headings" ng-if="$ctrl.getTopicId()">
       <p> Skill Description </p>
     </th>
   </tr>
@@ -26,7 +26,7 @@
       ng-click="$ctrl.editQuestion(question.summary)">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
     <td> <[$ctrl.truncatedQuestionSummaries[$index]]> </td>
-    <td ng-if="!$ctrl.getSkill()"> <[$ctrl.getSkillDescription(question.skill_descriptions)]> </td>
+    <td ng-if="$ctrl.getTopicId()"> <[$ctrl.getSkillDescription(question.skill_descriptions)]> </td>
   </tr>
 </table>
 <h4 ng-if="$ctrl.questionSummaries.length === 0" style="color: gray;">
