@@ -27,17 +27,6 @@ describe('Csrf Service', function() {
     $httpBackend = $injector.get('$httpBackend');
   }));
 
-  it('should return the correct csrf token', function() {
-    var response = ')]}\'{token: \'sample csrf token\'}';
-
-    $httpBackend.expect('GET', '/csrf').respond(
-      200, response);
-
-    CsrfService.fetchToken();
-
-    expect(CsrfService.getToken()).toBe('sample csrf token');
-  });
-
   it('should correctly set the csrf token', function() {
     CsrfService.setToken('sample csrf token');
 

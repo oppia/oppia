@@ -18,19 +18,20 @@
 
 oppia.factory('CsrfService', [function() {
   var token = null;
+  var setToken = function(csrfToken) {
+    token = csrfToken;
+  };
+
   return {
     fetchToken: function() {
       fetch('/csrf').then(function(response) {
         return response.text();
       }).then(function(response) {
-        token = JSON.parse(response.substring(5)).token;
+        setToken(JSON.parse(response.substring(5)).token);
       });
     },
 
-    // For Signup page
-    setToken: function(csrfToken) {
-      token = csrfToken;
-    },
+    setToken: setToken,
 
     getToken: function() {
       return token;
