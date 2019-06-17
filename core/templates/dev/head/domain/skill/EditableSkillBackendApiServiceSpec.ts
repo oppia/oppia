@@ -158,5 +158,4 @@ describe('Editable skill backend API service', function() {
       expect(successHandler).toHaveBeenCalledWith(sampleResponse2.skills);
       expect(failHandler).not.toHaveBeenCalled();
     });
-
 });
