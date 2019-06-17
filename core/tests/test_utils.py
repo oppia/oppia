@@ -1489,6 +1489,7 @@ tags: []
         Args:
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
+            linked_skill_ids: list(str). The skill IDs linked to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
