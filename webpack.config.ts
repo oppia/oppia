@@ -54,7 +54,7 @@ module.exports = {
     error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
-      'exploration-editor-page.controller.ts',
+      'exploration-editor-page.scripts.ts',
     exploration_player:
       commonPrefix + '/pages/exploration-player-page/' +
       'exploration-player-page.scripts.ts',
