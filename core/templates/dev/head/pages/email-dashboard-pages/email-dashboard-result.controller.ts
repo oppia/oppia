@@ -18,132 +18,146 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.controller('EmailDashboardResult', [
-  '$http', '$scope', '$timeout', '$window', 'UrlInterpolationService',
-  function($http, $scope, $timeout, $window, UrlInterpolationService) {
-    var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
-    var CANCEL_EMAIL_HANDLER_URL = '/emaildashboardcancelresult/<query_id>';
-    var EMAIL_DASHBOARD_PAGE = '/emaildashboard';
-    var TEST_BULK_EMAIL_URL = '/emaildashboardtestbulkemailhandler/<query_id>';
+oppia.directive('emailDashboardResultPage', [
+  'UrlInterpolationService', function(
+      UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/email_dashboard/email_dashboard_result_directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        '$http', '$timeout', '$window', 'UrlInterpolationService',
+        function($http, $timeout, $window, UrlInterpolationService) {
+          var ctrl = this;
+          var RESULT_HANDLER_URL = '/emaildashboardresult/<query_id>';
+          var CANCEL_EMAIL_HANDLER_URL =
+            '/emaildashboardcancelresult/<query_id>';
+          var EMAIL_DASHBOARD_PAGE = '/emaildashboard';
+          var TEST_BULK_EMAIL_URL =
+            '/emaildashboardtestbulkemailhandler/<query_id>';
 
-    var getQueryId = function() {
-      return $window.location.pathname.split('/').slice(-1)[0];
-    };
+          var getQueryId = function() {
+            return $window.location.pathname.split('/').slice(-1)[0];
+          };
 
-    var validateEmailSubjectAndBody = function() {
-      var dataIsValid = true;
-      if ($scope.emailSubject.length === 0) {
-        $scope.invalid.subject = true;
-        dataIsValid = false;
-      }
-      if ($scope.emailBody.length === 0) {
-        $scope.invalid.body = true;
-        dataIsValid = false;
-      }
-      return dataIsValid;
-    };
+          var validateEmailSubjectAndBody = function() {
+            var dataIsValid = true;
+            if (ctrl.emailSubject.length === 0) {
+              ctrl.invalid.subject = true;
+              dataIsValid = false;
+            }
+            if (ctrl.emailBody.length === 0) {
+              ctrl.invalid.body = true;
+              dataIsValid = false;
+            }
+            return dataIsValid;
+          };
 
-    $scope.submitEmail = function() {
-      var resultHandlerUrl = UrlInterpolationService.interpolateUrl(
-        RESULT_HANDLER_URL, {
-          query_id: getQueryId()
-        });
-      var dataIsValid = validateEmailSubjectAndBody();
+          ctrl.submitEmail = function() {
+            var resultHandlerUrl = UrlInterpolationService.interpolateUrl(
+              RESULT_HANDLER_URL, {
+                query_id: getQueryId()
+              });
+            var dataIsValid = validateEmailSubjectAndBody();
 
-      if ($scope.emailOption === 'custom' &&
-        $scope.maxRecipients === null) {
-        $scope.invalid.maxRecipients = true;
-        dataIsValid = false;
-      }
+            if (ctrl.emailOption === 'custom' &&
+              ctrl.maxRecipients === null) {
+              ctrl.invalid.maxRecipients = true;
+              dataIsValid = false;
+            }
 
-      if (dataIsValid) {
-        $scope.submitIsInProgress = true;
-        var data = {
-          email_subject: $scope.emailSubject,
-          email_body: $scope.emailBody,
-          email_intent: $scope.emailIntent,
-          max_recipients: (
-            $scope.emailOption !== 'all' ? $scope.max_recipients : null)
-        };
+            if (dataIsValid) {
+              ctrl.submitIsInProgress = true;
+              var data = {
+                email_subject: ctrl.emailSubject,
+                email_body: ctrl.emailBody,
+                email_intent: ctrl.emailIntent,
+                max_recipients: (
+                  ctrl.emailOption !== 'all' ? ctrl.max_recipients : null)
+              };
 
-        $http.post(resultHandlerUrl, {
-          data: data
-        }).success(function() {
-          $scope.emailSubmitted = true;
-          $timeout(function() {
-            $window.location.href = EMAIL_DASHBOARD_PAGE;
-          }, 4000);
-        }).error(function() {
-          $scope.errorHasOccurred = true;
-          $scope.submitIsInProgress = false;
-        });
-        $scope.invalid.subject = false;
-        $scope.invalid.body = false;
-        $scope.invalid.maxRecipients = false;
-      }
-    };
+              $http.post(resultHandlerUrl, {
+                data: data
+              }).success(function() {
+                ctrl.emailSubmitted = true;
+                $timeout(function() {
+                  $window.location.href = EMAIL_DASHBOARD_PAGE;
+                }, 4000);
+              }).error(function() {
+                ctrl.errorHasOccurred = true;
+                ctrl.submitIsInProgress = false;
+              });
+              ctrl.invalid.subject = false;
+              ctrl.invalid.body = false;
+              ctrl.invalid.maxRecipients = false;
+            }
+          };
 
-    $scope.resetForm = function() {
-      $scope.emailSubject = '';
-      $scope.emailBody = '';
-      $scope.emailOption = 'all';
-    };
+          ctrl.resetForm = function() {
+            ctrl.emailSubject = '';
+            ctrl.emailBody = '';
+            ctrl.emailOption = 'all';
+          };
 
-    $scope.cancelEmail = function() {
-      $scope.submitIsInProgress = true;
-      var cancelUrlHandler = UrlInterpolationService.interpolateUrl(
-        CANCEL_EMAIL_HANDLER_URL, {
-          query_id: getQueryId()
-        });
+          ctrl.cancelEmail = function() {
+            ctrl.submitIsInProgress = true;
+            var cancelUrlHandler = UrlInterpolationService.interpolateUrl(
+              CANCEL_EMAIL_HANDLER_URL, {
+                query_id: getQueryId()
+              });
 
-      $http.post(cancelUrlHandler).success(function() {
-        $scope.emailCancelled = true;
-        $timeout(function() {
-          $window.location.href = EMAIL_DASHBOARD_PAGE;
-        }, 4000);
-      }).error(function() {
-        $scope.errorHasOccurred = true;
-        $scope.submitIsInProgress = false;
-      });
-    };
+            $http.post(cancelUrlHandler).success(function() {
+              ctrl.emailCancelled = true;
+              $timeout(function() {
+                $window.location.href = EMAIL_DASHBOARD_PAGE;
+              }, 4000);
+            }).error(function() {
+              ctrl.errorHasOccurred = true;
+              ctrl.submitIsInProgress = false;
+            });
+          };
 
-    $scope.sendTestEmail = function() {
-      var testEmailHandlerUrl = UrlInterpolationService.interpolateUrl(
-        TEST_BULK_EMAIL_URL, {
-          query_id: getQueryId()
-        });
-      var dataIsValid = validateEmailSubjectAndBody();
+          ctrl.sendTestEmail = function() {
+            var testEmailHandlerUrl = UrlInterpolationService.interpolateUrl(
+              TEST_BULK_EMAIL_URL, {
+                query_id: getQueryId()
+              });
+            var dataIsValid = validateEmailSubjectAndBody();
 
-      if (dataIsValid) {
-        $http.post(testEmailHandlerUrl, {
-          email_subject: $scope.emailSubject,
-          email_body: $scope.emailBody
-        }).success(function() {
-          $scope.testEmailSentSuccesfully = true;
-        });
-        $scope.invalid.subject = false;
-        $scope.invalid.body = false;
-        $scope.invalid.maxRecipients = false;
-      }
-    };
+            if (dataIsValid) {
+              $http.post(testEmailHandlerUrl, {
+                email_subject: ctrl.emailSubject,
+                email_body: ctrl.emailBody
+              }).success(function() {
+                ctrl.testEmailSentSuccesfully = true;
+              });
+              ctrl.invalid.subject = false;
+              ctrl.invalid.body = false;
+              ctrl.invalid.maxRecipients = false;
+            }
+          };
 
-    $scope.emailOption = 'all';
-    $scope.emailSubject = '';
-    $scope.emailBody = '';
-    $scope.invalid = {
-      subject: false,
-      body: false,
-      maxRecipients: false
-    };
-    $scope.maxRecipients = null;
-    $scope.POSSIBLE_EMAIL_INTENTS = [
-      'bulk_email_marketing', 'bulk_email_improve_exploration',
-      'bulk_email_create_exploration', 'bulk_email_creator_reengagement',
-      'bulk_email_learner_reengagement'];
-    $scope.emailIntent = $scope.POSSIBLE_EMAIL_INTENTS[0];
-    $scope.emailSubmitted = false;
-    $scope.submitIsInProgress = false;
-    $scope.errorHasOccurred = false;
-    $scope.testEmailSentSuccesfully = false;
-  }
-]);
+          ctrl.emailOption = 'all';
+          ctrl.emailSubject = '';
+          ctrl.emailBody = '';
+          ctrl.invalid = {
+            subject: false,
+            body: false,
+            maxRecipients: false
+          };
+          ctrl.maxRecipients = null;
+          ctrl.POSSIBLE_EMAIL_INTENTS = [
+            'bulk_email_marketing', 'bulk_email_improve_exploration',
+            'bulk_email_create_exploration', 'bulk_email_creator_reengagement',
+            'bulk_email_learner_reengagement'];
+          ctrl.emailIntent = ctrl.POSSIBLE_EMAIL_INTENTS[0];
+          ctrl.emailSubmitted = false;
+          ctrl.submitIsInProgress = false;
+          ctrl.errorHasOccurred = false;
+          ctrl.testEmailSentSuccesfully = false;
+        }
+      ]};
+  }]);

@@ -31,8 +31,7 @@ class NoninteractivePagesTests(test_utils.GenericTestBase):
         response = self.get_html_response('/about')
         self.assertEqual(response.content_type, 'text/html')
         response.mustcontain(
-            'I18N_ABOUT_PAGE_CREDITS_TAB_HEADING',
-            'I18N_ABOUT_PAGE_FOUNDATION_TAB_PARAGRAPH_5_LICENSE_HEADING')
+            '<about-page></about-page>')
 
     def test_splash_page_with_valid_c_value(self):
         response = self.get_html_response('/splash', params={'c': 'at0'})
