@@ -104,8 +104,8 @@ oppia.directive('stateResponses', [
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
           $scope.stateName = StateEditorService.getActiveStateName();
-          $scope.displayedSolicitAnswerDetails = (
-            StateSolicitAnswerDetailsService.savedMemento);
+          $scope.stateSolicitAnswerDetailsService = (
+            StateSolicitAnswerDetailsService);
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
@@ -206,13 +206,11 @@ oppia.directive('stateResponses', [
           };
 
           $scope.onChangeSolicitAnswerDetails = function() {
-            StateSolicitAnswerDetailsService.displayed = (
-              $scope.displayedSolicitAnswerDetails);
             $scope.onSaveSolicitAnswerDetails(
-              $scope.displayedSolicitAnswerDetails);
+              $scope.stateSolicitAnswerDetailsService.displayed);
+            StateSolicitAnswerDetailsService.displayed = (
+              $scope.stateSolicitAnswerDetailsService.displayed);
             StateSolicitAnswerDetailsService.saveDisplayedValue();
-            $scope.displayedSolicitAnswerDetails =
-            StateSolicitAnswerDetailsService.savedMemento;
           };
 
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
