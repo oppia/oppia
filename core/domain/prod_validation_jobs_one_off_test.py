@@ -3771,7 +3771,7 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'ExpSummaryModel\', '
                 '[u\'Entity id 0: Entity fails domain validation with '
                 'the error Expected ratings to have keys: 1, 2, 3, 4, 5, '
-                'received: 10, 5\']]'
+                'received 10, 5\']]'
             ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -4702,10 +4702,11 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
 
         expected_output = [(
-            u'[u\'failed validation check for topic similarities column '
+            u'[u\'failed validation check for topic similarity '
             'check of TopicSimilaritiesModel\', '
-            '[u\'Entity id %s: Length of topic similarities columns: 1 '
-            'does not match length of topic list: 2\']]') % (
+            '[u\'Entity id %s: Topic similarity validation fails with error: '
+            'Length of topic similarities columns: 1 '
+            'does not match length of topic list: 2.\']]') % (
                 self.model_instance.id)]
 
         run_job_and_check_output(self, expected_output, sort=True)
@@ -4719,9 +4720,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
 
         expected_output = [(
-            u'[u\'failed validation check for topic check of '
+            u'[u\'failed validation check for topic similarity check of '
             'TopicSimilaritiesModel\', '
-            '[u\'Entity id %s: Topic invalid not in list of known topics\']]'
+            '[u\'Entity id %s: Topic similarity validation fails with error: '
+            'Topic invalid not in list of known topics.\']]'
         ) % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output)
@@ -4734,10 +4736,11 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
 
         expected_output = [(
-            u'[u\'failed validation check for topic similarities row 0 '
+            u'[u\'failed validation check for topic similarity '
             'check of TopicSimilaritiesModel\', '
-            '[u\'Entity id %s: Length of topic similarities rows: 2 '
-            'does not match length of topic list: 1\']]') % (
+            '[u\'Entity id %s: Topic similarity validation fails with error: '
+            'Length of topic similarities rows: 2 '
+            'does not match length of topic list: 1.\']]') % (
                 self.model_instance.id)]
 
         run_job_and_check_output(self, expected_output)
@@ -4752,15 +4755,12 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
 
         expected_output = [
             (
-                u'[u\'failed validation check for similarity type check of '
+                u'[u\'failed validation check for topic similarity check of '
                 'TopicSimilaritiesModel\', '
-                '[u\'Entity id %s: Expected similarity to be a float, '
+                '[u\'Entity id %s: Topic similarity validation fails with '
+                'error: Expected similarity to be a float, '
                 'received one\']]'
-            ) % self.model_instance.id, (
-                u'[u\'failed validation check for similarity value check of '
-                'TopicSimilaritiesModel\', '
-                '[u\'Entity id %s: Expected similarity to be between 0.0 '
-                'and 1.0, received one\']]') % self.model_instance.id]
+            ) % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -4773,9 +4773,10 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
 
         expected_output = [(
-            u'[u\'failed validation check for similarity value check '
+            u'[u\'failed validation check for topic similarity check '
             'of TopicSimilaritiesModel\', '
-            '[u\'Entity id %s: Expected similarity to be between '
+            '[u\'Entity id %s: Topic similarity validation fails with error: '
+            'Expected similarity to be between '
             '0.0 and 1.0, received 10.0\']]') % self.model_instance.id]
 
         run_job_and_check_output(self, expected_output)
@@ -4789,10 +4790,11 @@ class TopicSimilaritiesModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
 
         expected_output = [(
-            u'[u\'failed validation check for symmetry check of '
+            u'[u\'failed validation check for topic similarity check of '
             'TopicSimilaritiesModel\', '
-            '[u\'Entity id %s: Expected topic similarities '
-            'to be symmetric\']]') % self.model_instance.id]
+            '[u\'Entity id %s: Topic similarity validation fails with error: '
+            'Expected topic similarities to be symmetric.\']]') % (
+                self.model_instance.id)]
 
         run_job_and_check_output(self, expected_output)
 

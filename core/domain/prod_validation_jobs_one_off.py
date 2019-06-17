@@ -17,7 +17,6 @@
 """One-off jobs for validating prod models."""
 
 import collections
-import csv
 import datetime
 import itertools
 import re
@@ -1403,15 +1402,8 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
                 exploration_model_class_model_id_model_tuples):
             if not exploration_model or exploration_model.deleted:
                 continue
-            last_human_update_ms = 0
-            snapshots_metadata = (
-                exp_services.get_exploration_snapshots_metadata(
-                    exploration_model.id))
-            for snapshot_metadata in reversed(snapshots_metadata):
-                if snapshot_metadata['committer_id'] != (
-                        feconf.MIGRATION_BOT_USER_ID):
-                    last_human_update_ms = snapshot_metadata['created_on_ms']
-                    break
+            last_human_update_ms = exp_services.get_last_updated_by_human_ms(
+                exploration_model.id)
             last_human_update_time = datetime.datetime.fromtimestamp(
                 last_human_update_ms / 1000.0)
             if item.exploration_model_last_updated != last_human_update_time:
@@ -1675,64 +1667,12 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
             if len(similarity_list):
                 data = data + '%s\n' % (',').join(similarity_list)
 
-        data = data.splitlines()
-        data = list(csv.reader(data))
-        topics_list = data[0]
-        topics_length = len(topics_list)
-        topic_similarities_values = data[1:]
-
-        invalid_model = False
-
-        if len(topic_similarities_values) != topics_length:
-            invalid_model = True
-            cls.errors['topic similarities column check'].append((
-                'Entity id %s: Length of topic similarities columns: %s does '
-                'not match length of topic list: %s') % (
-                    item.id, len(topic_similarities_values), topics_length))
-
-        for topic in topics_list:
-            if topic not in recommendations_services.RECOMMENDATION_CATEGORIES:
-                cls.errors['topic check'].append((
-                    'Entity id %s: Topic %s not in list of known topics') % (
-                        item.id, topic))
-
-        if invalid_model:
-            return
-
-        for index, topic in enumerate(topics_list):
-            if len(topic_similarities_values[index]) != topics_length:
-                invalid_model = topic_similarities_values
-                cls.errors['topic similarities row %s check' % index].append((
-                    'Entity id %s: Length of topic similarities rows: %s does '
-                    'not match length of topic list: %s') % (
-                        item.id, len(topic_similarities_values[index]),
-                        topics_length))
-
-        if invalid_model:
-            return
-
-        for row_ind in range(topics_length):
-            for col_ind in range(topics_length):
-                similarity = topic_similarities_values[row_ind][col_ind]
-                try:
-                    similarity = float(similarity)
-                except Exception:
-                    cls.errors['similarity type check'].append((
-                        'Entity id %s: Expected similarity to be a float, '
-                        'received %s') % (item.id, similarity))
-
-                if similarity < 0.0 or similarity > 1.0:
-                    cls.errors['similarity value check'].append((
-                        'Entity id %s: Expected similarity to be between 0.0 '
-                        'and 1.0, received %s') % (item.id, similarity))
-
-        for row_ind in range(topics_length):
-            for col_ind in range(topics_length):
-                if (topic_similarities_values[row_ind][col_ind] !=
-                        topic_similarities_values[col_ind][row_ind]):
-                    cls.errors['symmetry check'].append((
-                        'Entity id %s: Expected topic similarities to be '
-                        'symmetric') % item.id)
+        try:
+            recommendations_services.validate_topic_similarities(data)
+        except Exception as e:
+            cls.errors['topic similarity check'].append(
+                'Entity id %s: Topic similarity validation fails '
+                'with error: %s' % (item.id, e))
 
     @classmethod
     def _get_custom_validation_functions(cls):
