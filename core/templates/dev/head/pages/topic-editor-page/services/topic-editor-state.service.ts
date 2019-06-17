@@ -29,11 +29,7 @@ require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 require('services/QuestionsListService.ts');
 
-oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
-oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
-oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
-oppia.constant(
-  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
+require('pages/topic-editor-page/topic-editor-page.constants.ts');
 
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService',

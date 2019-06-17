@@ -16,10 +16,8 @@
  * @fileoverview Directive for the exploration editor feedback tab.
  */
 
-require('domain/state/StateObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/change-list.service.ts');
-require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
@@ -31,7 +29,10 @@ require(
   'suggestion-modal-for-exploration-editor.service.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
+require('services/EditabilityService.ts');
 require('services/UserService.ts');
+
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
 oppia.directive('feedbackTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
@@ -44,23 +45,15 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
       'feedback-tab.directive.html'),
     controllerAs: '$ctrl',
     controller: [
-      '$log', '$q', '$rootScope', '$uibModal',
-      'AlertsService', 'ChangeListService', 'DateTimeFormatService',
-      'ExplorationDataService', 'ExplorationStatesService',
-      'SuggestionModalForExplorationEditorService',
-      'StateObjectFactory',
-      'ThreadDataService', 'ThreadStatusDisplayService',
-      'UrlInterpolationService', 'UserService',
-      'ACTION_ACCEPT_SUGGESTION', 'ACTION_REJECT_SUGGESTION',
+      '$q', '$rootScope', '$uibModal', 'AlertsService', 'ChangeListService',
+      'DateTimeFormatService', 'EditabilityService', 'ExplorationStatesService',
+      'SuggestionModalForExplorationEditorService', 'ThreadDataService',
+      'ThreadStatusDisplayService', 'UrlInterpolationService', 'UserService',
       function(
-          $log, $q, $rootScope, $uibModal,
-          AlertsService, ChangeListService, DateTimeFormatService,
-          ExplorationDataService, ExplorationStatesService,
-          SuggestionModalForExplorationEditorService,
-          StateObjectFactory,
-          ThreadDataService, ThreadStatusDisplayService,
-          UrlInterpolationService, UserService,
-          ACTION_ACCEPT_SUGGESTION, ACTION_REJECT_SUGGESTION) {
+          $q, $rootScope, $uibModal, AlertsService, ChangeListService,
+          DateTimeFormatService, EditabilityService, ExplorationStatesService,
+          SuggestionModalForExplorationEditorService, ThreadDataService,
+          ThreadStatusDisplayService, UrlInterpolationService, UserService) {
         var ctrl = this;
         ctrl.STATUS_CHOICES = ThreadStatusDisplayService.STATUS_CHOICES;
         ctrl.threadData = ThreadDataService.data;
@@ -73,6 +66,7 @@ oppia.directive('feedbackTab', ['UrlInterpolationService', function(
         ctrl.activeThread = null;
         ctrl.userIsLoggedIn = null;
         ctrl.threadIsUpdated = false;
+        ctrl.isExplorationEditable = EditabilityService.isEditable;
         $rootScope.loadingMessage = 'Loading';
         var userInfoPromise = UserService.getUserInfoAsync();
         userInfoPromise.then(function(userInfo) {

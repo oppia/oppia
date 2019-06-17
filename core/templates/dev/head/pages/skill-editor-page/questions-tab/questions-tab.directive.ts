@@ -36,8 +36,6 @@ require('services/contextual/UrlService.ts');
 require('services/QuestionsListService.ts');
 
 
-require('pages/skill-editor-page/skill-editor-page.constants.ts');
-
 oppia.directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
