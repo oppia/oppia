@@ -563,6 +563,7 @@ var constants = {
               "default_outcome": {}
           }
       },
+      "solicit_answer_details": false,
       "written_translations": {
           "translations_mapping": {
               "content": {},
@@ -570,6 +571,10 @@ var constants = {
           }
       }
   },
+
+  // Data required for Google Analytics. 
+  "ANALYTICS_ID": "",
+  "SITE_NAME_FOR_ANALYTICS": "",
 
   "ALLOW_YAML_FILE_UPLOAD": false,
 

@@ -69,6 +69,7 @@ import tempfile
 import threading
 import time
 
+import build # pylint: disable=relative-import
 import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
@@ -146,7 +147,7 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
-BAD_PATTERNS_JS_REGEXP = [
+BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
         'message': 'In tests, please do not use browser.explore().',
@@ -185,10 +186,17 @@ BAD_PATTERNS_JS_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': r'\b(beforeEach\(inject\(function)\(',
+        'message': 'In tests, please use \'angular.mock.inject\' instead of '
+                   '\'inject\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'templateUrl: \'',
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
+            'core/templates/dev/head/pages/exploration-player-page/'
             'FeedbackPopupDirective.js'
         ),
         'excluded_dirs': (
@@ -320,6 +328,39 @@ CONFIG_FILE_PATHS = (
     'webpack.dev.config.ts',
     'webpack.prod.config.ts')
 
+CODEOWNER_FILEPATH = '.github/CODEOWNERS'
+
+# This list needs to be in sync with the important patterns in the CODEOWNERS
+# file.
+CODEOWNER_IMPORTANT_PATHS = [
+    '/core/controllers/acl_decorators*.py',
+    '/core/controllers/base*.py',
+    '/core/domain/dependency_registry*.py',
+    '/core/domain/html*.py',
+    '/core/domain/rights_manager*.py',
+    '/core/domain/role_services*.py',
+    '/core/domain/user*.py',
+    '/core/storage/',
+    '/export/',
+    '/manifest.json',
+    '/package*.json',
+    '/scripts/install_third_party.sh',
+    '/.github/']
+
+# This list contains the directories and files that do not follow the new
+# constant declaration rules.
+# TODO(YashJipkate) Bring these directories and files under the new constant
+# declaration rules and empty the list.
+OLD_CONVENTION_PATHS = [
+    'core/templates/dev/head/services',
+    'core/templates/dev/head/base_components',
+    'core/templates/dev/head/directives',
+    'core/templates/dev/head/domain',
+    'core/templates/dev/head/expressions',
+    'core/templates/dev/head/tests',
+    'core/templates/dev/head/App.ts',
+    'extensions/']
+
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -353,16 +394,19 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.5'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
-    os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
-    os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
-    os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
-    os.path.join('third_party', 'mutagen-1.38'),
-    os.path.join('third_party', 'soupsieve-1.8'),
+    os.path.join('third_party', 'bleach-3.1.0'),
+    os.path.join('third_party', 'callbacks-0.3.0'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
+    os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
+    os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
+    os.path.join('third_party', 'mutagen-1.38'),
+    os.path.join('third_party', 'soupsieve-1.9.1'),
+    os.path.join('third_party', 'six-1.12.0'),
+    os.path.join('third_party', 'webencodings-0.5.1'),
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
@@ -939,7 +983,7 @@ def _lint_js_and_ts_files(
     num_js_and_ts_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
-        print 'There are no JavaScript files to lint.'
+        print 'There are no JavaScript or Typescript files to lint.'
         return
 
     print 'Total js and ts files: ', num_js_and_ts_files
@@ -1397,12 +1441,10 @@ class LintChecksManager(object):
                 not filepath.endswith('App.ts'))]
         failed = False
         summary_messages = []
-        component_name = ''
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         for filepath in files_to_check:
             component_num = 0
             # Filename without its path and extension.
-            exact_filename = filepath.split('/')[-1][:-3]
             parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
@@ -1421,35 +1463,6 @@ class LintChecksManager(object):
                             'component in the file.' % (filepath))
                         failed = True
                         break
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    # The first argument of the expression is the
-                    # name of the component.
-                    component_name = arguments[0].value
-                    component = expression.callee.property.name
-
-                    # If the component is directive or filter and its name is
-                    # xxx then the filename containing it should be
-                    # XxxDirective.js or XxxFilter.js respectively.
-                    if component == 'directive' or component == 'filter':
-                        if (component_name[0].swapcase() + component_name[1:] +
-                                component.capitalize() != (exact_filename)):
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
-                    # If the component is controller or factory, then the
-                    # component name should exactly match the filename
-                    # containing it. If the component's name is xxx then the
-                    # filename should be xxx.js.
-                    else:
-                        if component_name != exact_filename:
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -2167,7 +2180,7 @@ class LintChecksManager(object):
                         total_error_count += 1
 
                 if filepath.endswith(('.js', '.ts')):
-                    for regexp in BAD_PATTERNS_JS_REGEXP:
+                    for regexp in BAD_PATTERNS_JS_AND_TS_REGEXP:
                         if _check_bad_pattern_in_file(
                                 filepath, file_content, regexp):
                             failed = True
@@ -2215,42 +2228,102 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def check_for_important_patterns_at_bottom_of_codeowners(
+            self, important_patterns):
+        """Checks that the most important patterns are at the bottom
+        of the CODEOWNERS file.
+
+        Arguments:
+            important_patterns: list(str). List of the important
+                patterns for CODEOWNERS file.
+
+        Returns:
+            bool. Whether the CODEOWNERS "important pattern" check fails.
+        """
+
+        failed = False
+
+        # Check that there are no duplicate elements in the lists.
+        important_patterns_set = set(important_patterns)
+        codeowner_important_paths_set = set(CODEOWNER_IMPORTANT_PATHS)
+        if len(important_patterns_set) != len(important_patterns):
+            print('%s --> Duplicate pattern(s) found in critical rules'
+                  ' section.' % CODEOWNER_FILEPATH)
+            failed = True
+        if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
+            print('scripts/pre_commit_linter.py --> Duplicate pattern(s) found '
+                  'in CODEOWNER_IMPORTANT_PATHS list.')
+            failed = True
+
+        # Check missing rules by set difference operation.
+        critical_rule_section_minus_list_set = (
+            important_patterns_set.difference(codeowner_important_paths_set))
+        list_minus_critical_rule_section_set = (
+            codeowner_important_paths_set.difference(important_patterns_set))
+        for rule in critical_rule_section_minus_list_set:
+            print('%s --> Rule %s is not present in the '
+                  'CODEOWNER_IMPORTANT_PATHS list in '
+                  'scripts/pre_commit_linter.py. Please add this rule in the '
+                  'mentioned list or remove this rule from the \'Critical files'
+                  '\' section.' % (CODEOWNER_FILEPATH, rule))
+            failed = True
+        for rule in list_minus_critical_rule_section_set:
+            print('%s --> Rule \'%s\' is not present in the \'Critical files\' '
+                  'section. Please place it under the \'Critical files\' '
+                  'section since it is an important rule. Alternatively please '
+                  'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
+                  'scripts/pre_commit_linter.py if it is no longer an '
+                  'important rule.' % (CODEOWNER_FILEPATH, rule))
+            failed = True
+
+        return failed
+
     def _check_codeowner_file(self):
         """Checks the CODEOWNERS file for any uncovered dirs/files and also
         checks that every pattern in the CODEOWNERS file matches at least one
         file/dir. Note that this checks the CODEOWNERS file according to the
         glob patterns supported by Python2.7 environment. For more information
         please refer https://docs.python.org/2/library/glob.html.
+        This function also ensures that the most important rules are at the
+        bottom of the CODEOWNERS file.
         """
         if self.verbose_mode_enabled:
             print 'Starting CODEOWNERS file check'
             print '----------------------------------------'
 
         with _redirect_stdout(_TARGET_STDOUT):
-            codeowner_filepath = '.github/CODEOWNERS'
             failed = False
             summary_messages = []
             # Checks whether every pattern in the CODEOWNERS file matches at
             # least one dir/file.
+            critical_file_section_found = False
+            important_rules_in_critical_section = []
             file_patterns = []
             dir_patterns = []
             for line_num, line in enumerate(FileCache.readlines(
-                    codeowner_filepath)):
+                    CODEOWNER_FILEPATH)):
                 stripped_line = line.strip()
+                if '# Critical files' in line:
+                    critical_file_section_found = True
                 if stripped_line and stripped_line[0] != '#':
                     if '@' not in line:
                         print ('%s --> Pattern on line %s doesn\'t have '
-                               'codeowner' % (codeowner_filepath, line_num + 1))
+                               'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
                         failed = True
                     else:
                         # Extract the file pattern from the line.
                         line_in_concern = line.split('@')[0].strip()
+                        # This is being populated for the important rules
+                        # check.
+                        if critical_file_section_found:
+                            important_rules_in_critical_section.append(
+                                line_in_concern)
                         # Checks if the path is the full path relative to the
                         # root oppia directory.
                         if not line_in_concern.startswith('/'):
                             print ('%s --> Pattern on line %s is invalid. Use '
                                    'full path relative to the root directory'
-                                   % (codeowner_filepath, line_num + 1))
+                                   % (CODEOWNER_FILEPATH, line_num + 1))
                             failed = True
 
                         # The double asterisks pattern is supported by the
@@ -2259,7 +2332,7 @@ class LintChecksManager(object):
                         if '**' in line_in_concern:
                             print ('%s --> Pattern on line %s is invalid. '
                                    '\'**\' wildcard not allowed' % (
-                                       codeowner_filepath, line_num + 1))
+                                       CODEOWNER_FILEPATH, line_num + 1))
                             failed = True
                         # Adjustments to the dir paths in CODEOWNERS syntax
                         # for glob-style patterns to match correctly.
@@ -2277,7 +2350,7 @@ class LintChecksManager(object):
                         if not glob.glob(line_in_concern):
                             print ('%s --> Pattern on line %s doesn\'t match '
                                    'any file or directory' % (
-                                       codeowner_filepath, line_num + 1))
+                                       CODEOWNER_FILEPATH, line_num + 1))
                             failed = True
                         # The following list is being populated with the
                         # paths in the CODEOWNERS file with the removal of the
@@ -2302,6 +2375,10 @@ class LintChecksManager(object):
                         print '%s is not covered under CODEOWNERS' % file_path
                         failed = True
 
+            failed = failed or (
+                self.check_for_important_patterns_at_bottom_of_codeowners(
+                    important_rules_in_critical_section))
+
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
                     _MESSAGE_TYPE_FAILED)
@@ -2315,6 +2392,122 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_extra_js_files(self):
+        """Checks if the changes made include extra js files in core
+        or extensions folder which are not specified in
+        build.JS_FILEPATHS_NOT_TO_BUILD.
+        """
+
+        if self.verbose_mode_enabled:
+            print 'Starting extra js files check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+        with _redirect_stdout(_TARGET_STDOUT):
+            js_files_to_check = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.js'))]
+
+            for filepath in js_files_to_check:
+                if filepath.startswith(('core/templates', 'extensions')) and (
+                        filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
+                            not filepath.endswith('protractor.js')):
+                    print '%s  --> Found extra .js file\n' % filepath
+                    failed = True
+
+            if failed:
+                err_msg = (
+                    'If you want the above files to be present as js files, '
+                    'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                    'build.py. Otherwise, rename them to .ts\n')
+                print err_msg
+
+            if failed:
+                summary_message = '%s  Extra JS files check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Extra JS files check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+            print ''
+
+        return summary_messages
+
+    def _check_constants_declaration(self):
+        """Checks the declaration of constants in the TS files to ensure that
+        the constants are not declared in files other than *.constants.ts and
+        that the constants are declared only single time.
+        """
+
+        if self.verbose_mode_enabled:
+            print 'Starting constants declaration check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            all_ts_files = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.ts'))]
+            ts_files_to_check = [
+                filepath for filepath in all_ts_files if not any(
+                    filepath.startswith(pattern) for pattern in (
+                        OLD_CONVENTION_PATHS))]
+            constants_to_source_filepaths_dict = {}
+            for filepath in ts_files_to_check:
+                # Check that the constants are declared only in a *.constants.ts
+                # file.
+                if not filepath.endswith('.constants.ts'):
+                    for line_num, line in enumerate(FileCache.readlines(
+                            filepath)):
+                        if 'oppia.constant(' in line:
+                            failed = True
+                            print ('%s --> Constant declaration found at line '
+                                   '%s. Please declare the constants in a '
+                                   'separate constants file.' % (
+                                       filepath, line_num))
+
+                # Check if the constant has multiple declarations which is
+                # prohibited.
+                parsed_script = self.parsed_js_and_ts_files[filepath]
+                parsed_nodes = parsed_script.body
+                components_to_check = ['constant']
+                for parsed_node in parsed_nodes:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
+                        continue
+                    else:
+                        constant_name = expression.arguments[0].raw
+                        if constant_name in constants_to_source_filepaths_dict:
+                            failed = True
+                            print ('%s --> The constant %s is already declared '
+                                   'in %s. Please import the file where the '
+                                   'constant is declared or rename the constant'
+                                   '.' % (
+                                       filepath, constant_name,
+                                       constants_to_source_filepaths_dict[
+                                           constant_name]))
+                        else:
+                            constants_to_source_filepaths_dict[
+                                constant_name] = filepath
+
+
+            if failed:
+                summary_message = '%s  Constants declaration check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Constants declaration check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+
+        return summary_messages
+
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2324,6 +2517,7 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
+        extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
@@ -2332,8 +2526,6 @@ class LintChecksManager(object):
             self._check_sorted_dependencies())
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
-        html_directive_name_messages = (
-            self._check_html_directive_name())
         import_order_messages = self._check_import_order()
         docstring_messages = self._check_docstrings()
         comment_messages = self._check_comments()
@@ -2344,14 +2536,15 @@ class LintChecksManager(object):
         html_linter_messages = self._lint_html_files()
         pattern_messages = self._check_bad_patterns()
         codeowner_messages = self._check_codeowner_file()
+        constants_messages = self._check_constants_declaration()
         all_messages = (
-            js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages +
-            html_directive_name_messages + import_order_messages +
+            extra_js_files_messages + js_and_ts_component_messages +
+            directive_scope_messages + sorted_dependencies_messages +
+            controller_dependency_messages + import_order_messages +
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
-            codeowner_messages)
+            codeowner_messages + constants_messages)
         return all_messages
 
 

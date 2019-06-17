@@ -26,12 +26,8 @@ class SplashPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         c_value = self.request.get('c')
-        self.values.update({
-            'meta_description': feconf.SPLASH_PAGE_DESCRIPTION,
-        })
-
         if not c_value:
-            self.render_template('dist/splash.html')
+            self.render_template('dist/splash-page.mainpage.html')
         else:
             try:
                 self.render_template('dist/splash_%s.html' % c_value)
@@ -57,10 +53,7 @@ class AboutPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
-        })
-        self.render_template('dist/about.html')
+        self.render_template('dist/about-page.mainpage.html')
 
 
 class GetStartedPage(base.BaseHandler):
@@ -69,10 +62,7 @@ class GetStartedPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.GET_STARTED_PAGE_DESCRIPTION,
-        })
-        self.render_template('dist/get_started.html')
+        self.render_template('dist/get-started-page.mainpage.html')
 
 
 class TeachPage(base.BaseHandler):
@@ -81,10 +71,7 @@ class TeachPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
-        })
-        self.render_template('dist/teach.html')
+        self.render_template('dist/teach-page.mainpage.html')
 
 
 class ContactPage(base.BaseHandler):
@@ -96,7 +83,7 @@ class ContactPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/contact.html')
+        self.render_template('dist/contact-page.mainpage.html')
 
 
 class DonatePage(base.BaseHandler):
@@ -108,7 +95,7 @@ class DonatePage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/donate.html')
+        self.render_template('dist/donate-page.mainpage.html')
 
 
 class ThanksPage(base.BaseHandler):
@@ -120,7 +107,7 @@ class ThanksPage(base.BaseHandler):
         self.values.update({
             'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
         })
-        self.render_template('dist/thanks.html')
+        self.render_template('dist/thanks-page.mainpage.html')
 
 
 class ForumRedirectPage(base.BaseHandler):
@@ -137,11 +124,7 @@ class TermsPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
-        })
-
-        self.render_template('dist/terms.html')
+        self.render_template('dist/terms-page.mainpage.html')
 
 
 class PrivacyPage(base.BaseHandler):
@@ -150,7 +133,7 @@ class PrivacyPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/privacy.html')
+        self.render_template('dist/privacy-page.mainpage.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
@@ -195,4 +178,4 @@ class MaintenancePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self, *args, **kwargs):
         """Handles GET requests."""
-        self.render_template('dist/maintenance.html')
+        self.render_template('dist/maintenance-page.mainpage.html')
