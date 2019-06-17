@@ -423,7 +423,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/mudcube/MIDI.js/archive/a8a84257afa70721ae462448048a87301fc1554a.zip",
         "rootDirPrefix": "MIDI.js-",
-        "targetDirPrefix": "MIDI.js-"
+        "targetDir": "midi-js-a8a842"
       },
       "ngJoyride": {
         "version": "5b25d076405c9a787db602d2a8ff49919228f4fc",
