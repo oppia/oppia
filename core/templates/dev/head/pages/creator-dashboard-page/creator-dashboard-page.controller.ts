@@ -166,7 +166,6 @@ require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
