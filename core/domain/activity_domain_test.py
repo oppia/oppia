@@ -95,5 +95,6 @@ class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
         self.valid_activity_references.validate()
 
     def test_validate_fails_with_invalid_type_in_activity_reference_list(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid activity type: invalid_activity_type'):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid activity type: invalid_activity_type'):
             self.invalid_activity_references.validate()
