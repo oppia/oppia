@@ -79,16 +79,17 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(response['canonical_story_summary_dicts'], [])
         self.assertEqual(response['additional_story_summary_dicts'], [])
 
-        self.save_new_story(
-            canonical_story_id, self.admin_id, 'title', 'description',
-            'note')
-        self.save_new_story(
-            additional_story_id, self.admin_id, 'another title',
-            'another description', 'another note')
         self.save_new_topic(
             topic_id, self.admin_id, 'New name', 'New description',
             [canonical_story_id], [additional_story_id], [self.skill_id],
             [], 1)
+
+        self.save_new_story(
+            canonical_story_id, self.admin_id, 'title', 'description',
+            'note', topic_id)
+        self.save_new_story(
+            additional_story_id, self.admin_id, 'another title',
+            'another description', 'another note', topic_id)
 
         response = self.get_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
