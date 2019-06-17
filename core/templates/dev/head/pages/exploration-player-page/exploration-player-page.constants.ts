@@ -22,16 +22,6 @@ oppia.constant('TWO_CARD_THRESHOLD_PX', 960);
 
 oppia.constant('CONTINUE_BUTTON_FOCUS_LABEL', 'continueButton');
 
-/* New card is available but user hasn't gone to it yet (when oppia
-   gives a feedback and waits for user to press 'continue').
-   Not called when a card is selected by clicking progress dots */
-oppia.constant('EVENT_NEW_CARD_AVAILABLE', 'newCardAvailable');
-/* Called when the learner moves to a new card that they haven't seen before. */
-oppia.constant('EVENT_NEW_CARD_OPENED', 'newCardOpened');
-/* Called always when learner moves to a new card.
-   Also called when card is selected by clicking on progress dots */
-oppia.constant('EVENT_ACTIVE_CARD_CHANGED', 'activeCardChanged');
-
 /* Called when a new audio-equippable component is loaded and displayed
    to the user, allowing for the automatic playing of audio if necessary. */
 oppia.constant('EVENT_AUTOPLAY_AUDIO', 'autoPlayAudio');
@@ -52,23 +42,58 @@ oppia.constant(
     'I18N_PLAYER_HINT_REQUEST_STRING_2',
     'I18N_PLAYER_HINT_REQUEST_STRING_3']);
 
-oppia.constant(
-  'EXPLORATION_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>');
-oppia.constant(
-  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>?v=<version>');
-oppia.constant(
-  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/data/<exploration_id>');
-oppia.constant(
-  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
-  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
-oppia.constant(
-  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/voiceover/<exploration_id>');
-
-
 /* This should match the CSS class defined in the tutor card directive. */
 oppia.constant(
   'AUDIO_HIGHLIGHT_CSS_CLASS', 'conversation-skin-audio-highlight');
+
+oppia.constant(
+  'FLAG_EXPLORATION_URL_TEMPLATE', '/flagexplorationhandler/<exploration_id>');
+
+// TODO(bhenning): Find a better place for these constants.
+
+// NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
+// the corresponding classification constants defined in core.domain.exp_domain.
+oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit');
+oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match');
+oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
+oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
+
+oppia.constant('EXPLORATION_MODE', {
+  EXPLORATION: 'exploration',
+  PRETEST: 'pretest',
+  QUESTION_PLAYER: 'question_player',
+  OTHER: 'other'
+});
+
+oppia.constant('STATS_EVENT_TYPES', {
+  EVENT_TYPE_START_EXPLORATION: 'start',
+  EVENT_TYPE_ACTUAL_START_EXPLORATION: 'actual_start',
+  EVENT_TYPE_COMPLETE_EXPLORATION: 'complete',
+  EVENT_TYPE_STATE_HIT: 'state_hit',
+  EVENT_TYPE_STATE_COMPLETED: 'state_complete',
+  EVENT_TYPE_ANSWER_SUBMITTED: 'answer_submitted',
+  EVENT_TYPE_SOLUTION_HIT: 'solution_hit',
+  EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP: 'leave_for_refresher_exp',
+});
+
+oppia.constant('STATS_REPORTING_URLS', {
+  ANSWER_SUBMITTED: '/explorehandler/answer_submitted_event/<exploration_id>',
+  EXPLORATION_COMPLETED: (
+    '/explorehandler/exploration_complete_event/<exploration_id>'),
+  EXPLORATION_MAYBE_LEFT: (
+    '/explorehandler/exploration_maybe_leave_event/<exploration_id>'),
+  EXPLORATION_STARTED: (
+    '/explorehandler/exploration_start_event/<exploration_id>'),
+  STATE_HIT: '/explorehandler/state_hit_event/<exploration_id>',
+  STATE_COMPLETED: '/explorehandler/state_complete_event/<exploration_id>',
+  EXPLORATION_ACTUALLY_STARTED: (
+    '/explorehandler/exploration_actual_start_event/<exploration_id>'),
+  SOLUTION_HIT: '/explorehandler/solution_hit_event/<exploration_id>',
+  LEAVE_FOR_REFRESHER_EXP: (
+    '/explorehandler/leave_for_refresher_exp_event/<exploration_id>'),
+  STATS_EVENTS: '/explorehandler/stats_events/<exploration_id>'
+});
+
+oppia.constant('FEEDBACK_POPOVER_PATH',
+  '/pages/exploration-player-page/templates/' +
+  'feedback-popup-container.template.html');

@@ -314,6 +314,8 @@
 /core/jobs*.py @seanlip
 /core/platform/ @seanlip
 /core/templates/dev/head/App*.ts @ankita240796
+/core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek
 /core/templates/dev/head/I18nFooter.ts @seanlip
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @seanlip
 

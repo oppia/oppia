@@ -17,14 +17,6 @@
  *  like engine service.
  */
 
-
-oppia.constant('EXPLORATION_MODE', {
-  EXPLORATION: 'exploration',
-  PRETEST: 'pretest',
-  QUESTION_PLAYER: 'question_player',
-  OTHER: 'other'
-});
-
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
@@ -44,6 +36,8 @@ require('services/ExplorationFeaturesService.ts');
 require('services/PlaythroughIssuesService.ts');
 require('services/PlaythroughService.ts');
 require('services/contextual/UrlService.ts');
+
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', '$rootScope', 'ContextService',

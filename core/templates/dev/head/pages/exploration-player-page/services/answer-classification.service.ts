@@ -24,14 +24,8 @@ require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('services/AlertsService.ts');
 
-// TODO(bhenning): Find a better place for these constants.
-
-// NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
-// the corresponding classification constants defined in core.domain.exp_domain.
-oppia.constant('EXPLICIT_CLASSIFICATION', 'explicit');
-oppia.constant('TRAINING_DATA_CLASSIFICATION', 'training_data_match');
-oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
-oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.factory('AnswerClassificationService', [
   'AlertsService', 'AnswerClassificationResultObjectFactory',

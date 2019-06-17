@@ -87,24 +87,3 @@ oppia.factory('StatePropertyService', [
     };
   }
 ]);
-
-oppia.constant('WARNING_TYPES', {
-  // These must be fixed before the exploration can be saved.
-  CRITICAL: 'critical',
-  // These must be fixed before publishing an exploration to the public
-  // library.
-  ERROR: 'error'
-});
-
-oppia.constant('STATE_ERROR_MESSAGES', {
-  ADD_INTERACTION: 'Please add an interaction to this card.',
-  STATE_UNREACHABLE: 'This card is unreachable.',
-  UNABLE_TO_END_EXPLORATION: (
-    'There\'s no way to complete the exploration starting from this card. ' +
-      'To fix this, make sure that the last card in the chain starting from ' +
-      'this one has an \'End Exploration\' question type.'),
-  INCORRECT_SOLUTION: (
-    'The current solution does not lead to another card.'),
-  UNRESOLVED_ANSWER: (
-    'There is an answer among the top 10 which has no explicit feedback.')
-});

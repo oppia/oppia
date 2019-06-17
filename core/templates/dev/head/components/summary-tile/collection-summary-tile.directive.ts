@@ -23,10 +23,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-oppia.constant(
-  'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
-oppia.constant(
-  'COLLECTION_EDITOR_URL', '/collection_editor/create/<collection_id>');
+require('components/summary-tile/collection-summary-tile.constants.ts');
 
 oppia.directive('collectionSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {

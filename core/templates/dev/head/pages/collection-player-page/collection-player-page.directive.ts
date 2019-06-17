@@ -39,8 +39,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 
-require('pages/collection-player-page/collection-player-page.constants.ts');
-
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
     enter: function(element) {

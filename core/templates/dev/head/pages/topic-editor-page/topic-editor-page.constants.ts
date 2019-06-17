@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,26 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia admin page.
+ * @fileoverview Constants for the topic editor page.
  */
 
 oppia.constant(
-  'ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
+  'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
+oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
+oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
+oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
 oppia.constant(
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
-
-oppia.constant(
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-
-oppia.constant('ADMIN_TAB_URLS', {
-  ACTIVITIES: '#activities',
-  JOBS: '#jobs',
-  CONFIG: '#config',
-  ROLES: '#roles',
-  MISC: '#misc'
-});
-
-oppia.constant(
-  'PROFILE_URL_TEMPLATE', '/profile/<username>');
+  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');

@@ -13,26 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the Oppia admin page.
+ * @fileoverview Constants for the collection editor page.
  */
 
+// TODO(bhenning): These constants should be provided by the backend.
 oppia.constant(
-  'ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
-
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
+  'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',
+  '/collection_editor_handler/data/<collection_id>');
 oppia.constant(
-  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
-
-oppia.constant(
-  'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-
-oppia.constant('ADMIN_TAB_URLS', {
-  ACTIVITIES: '#activities',
-  JOBS: '#jobs',
-  CONFIG: '#config',
-  ROLES: '#roles',
-  MISC: '#misc'
-});
+  'COLLECTION_RIGHTS_URL_TEMPLATE',
+  '/collection_editor_handler/rights/<collection_id>');
 
 oppia.constant(
-  'PROFILE_URL_TEMPLATE', '/profile/<username>');
+  'COLLECTION_TITLE_INPUT_FOCUS_LABEL', 'collectionTitleInputFocusLabel');
+
+oppia.constant(
+  'SEARCH_EXPLORATION_URL_TEMPLATE',
+  '/exploration/metadata_search?q=<query>');
+
+oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
+oppia.constant('EVENT_COLLECTION_REINITIALIZED', 'collectionReinitialized');
