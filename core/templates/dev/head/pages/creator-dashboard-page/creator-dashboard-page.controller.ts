@@ -137,7 +137,6 @@ require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.directive.ts');
@@ -167,7 +166,6 @@ require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
 require('pages/creator-dashboard-page/creator-dashboard-page.constants.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.controller('CreatorDashboard', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$uibModal', '$window',

@@ -33,6 +33,8 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+
 oppia.directive('feedbackTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

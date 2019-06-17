@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the learner's view of a collection.
+ * @fileoverview Constants for summary tile for collections.
  */
 
 oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+  'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
+oppia.constant(
+  'COLLECTION_EDITOR_URL', '/collection_editor/create/<collection_id>');
