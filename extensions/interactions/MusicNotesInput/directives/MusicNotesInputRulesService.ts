@@ -43,12 +43,12 @@ oppia.factory('MusicNotesInputRulesService', [
           _convertSequenceToMidi(inputs.x));
       },
       IsLongerThan: function(answer, inputs) {
-        return _convertSequenceToMidi(answer).length > inputs.x;
+        return _convertSequenceToMidi(answer).length > inputs.k;
       },
       // TODO(wxy): validate that inputs.a <= inputs.b
       HasLengthInclusivelyBetween: function(answer, inputs) {
         var answerLength = _convertSequenceToMidi(answer).length;
-        return length >= inputs.a && length <= inputs.b;
+        return answerLength >= inputs.a && answerLength <= inputs.b;
       },
       IsEqualToExceptFor: function(answer, inputs) {
         var targetSequence = _convertSequenceToMidi(inputs.x);

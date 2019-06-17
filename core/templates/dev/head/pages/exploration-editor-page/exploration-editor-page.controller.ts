@@ -136,8 +136,6 @@ require(
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
-require('services/AutoplayedVideosService.ts');
-require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
@@ -259,7 +257,7 @@ require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.controller('ExplorationEditor', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',

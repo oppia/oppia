@@ -105,6 +105,7 @@ require(
 require('pages/skill-editor-page/questions-tab/questions-tab.directive.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.controller('SkillEditor', [
   'SkillEditorStateService', 'UrlService',
