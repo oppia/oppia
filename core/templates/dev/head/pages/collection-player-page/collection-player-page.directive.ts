@@ -250,22 +250,15 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               ctrl.collectionId);
           };
 
-          ctrl.getExplorationTitleStyle = function(index) {
-            var explorationTitleStyle = {
-              width: '160px',
-              position: 'absolute',
-              color: '#006553',
-              'font-size': '20px',
-              bottom: '70%',
-              left: '0'
-            };
-
-            if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
-              explorationTitleStyle.left = '20px';
+          ctrl.getExplorationTitlePosition = function(index) {
+            if(index % 2 === 0 ){
+              return '0px';
+            } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
+              console.log("Second");
+              return '20px';
             } else if ((index + 1) % 4 === 0) {
-              explorationTitleStyle.left = '-35px';
+              return '-35px';
             }
-            return explorationTitleStyle;
           };
 
           $http.get('/collectionsummarieshandler/data', {

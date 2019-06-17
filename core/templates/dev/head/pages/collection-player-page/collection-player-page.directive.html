@@ -48,7 +48,16 @@
          ng-href="<[$ctrl.getExplorationUrl(node.getExplorationId())]>"
          ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
 
-        <div ng-style="$ctrl.getExplorationTitleStyle($index)">{{node._explorationSummaryObject.title}}</div>
+        <div ng-style="{width: '160px',
+              position: 'absolute',
+              color: '#006553',
+              'font-family' : 'Capriola, Roboto, Arial, sans-serif',
+              'font-size': '18px',
+              bottom: '70%',
+              left: '<[$ctrl.getExplorationTitleStylePosition($index)]>'
+                }">
+          {{node._explorationSummaryObject.title}}
+        </div>
 
         <svg class="protractor-test-collection-exploration"
              width="150"
