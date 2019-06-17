@@ -56,15 +56,15 @@ def validate_cmd(cmd_name, valid_cmd_specs, actual_cmd_specs):
     if missing_attributes:
         error_msg_list.append(
             'The following required attributes are missing: %s' % (
-                (',').join(sorted(missing_attributes))))
+                (', ').join(sorted(missing_attributes))))
 
     if extra_attributes:
         error_msg_list.append(
             'The following extra attributes are present: %s' % (
-                (',').join(sorted(extra_attributes))))
+                (', ').join(sorted(extra_attributes))))
 
     if error_msg_list:
-        raise utils.ValidationError((',').join(error_msg_list))
+        raise utils.ValidationError((', ').join(error_msg_list))
 
     allowed_values = valid_cmd_specs.get('allowed_values')
     if not allowed_values:

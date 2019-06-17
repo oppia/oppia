@@ -44,7 +44,8 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(collection_hash, invalid_activity_hash)
 
     def test_validate_with_invalid_type(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid activity type: .+'):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid activity type: invalid_activity_type'):
             self.invalid_activity_reference_with_invalid_type.validate()
 
     def test_validate_with_invalid_id(self):

@@ -695,7 +695,7 @@ class CollectionSnapshotMetadataModelValidatorTests(
                 'check of CollectionSnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
                 'with error: The following required attributes are missing: '
-                'exploration_id,'
+                'exploration_id, '
                 'The following extra attributes are present: '
                 'invalid_attribute\']]'
             ), (
@@ -1519,7 +1519,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'check of CollectionCommitLogEntryModel\', '
                 '[u\'Entity id collection-0-1: Commit command domain '
                 'validation failed with error: The following required '
-                'attributes are missing: exploration_id,The following '
+                'attributes are missing: exploration_id, The following '
                 'extra attributes are present: invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd '
@@ -1984,7 +1984,7 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
                 'check of ConfigPropertySnapshotMetadataModel\', '
                 '[u\'Entity id config_model-1: Commit command domain '
                 'validation failed with error: The following required '
-                'attributes are missing: new_value,The following extra '
+                'attributes are missing: new_value, The following extra '
                 'attributes are present: invalid_attribute\']]'
             ),
             u'[u\'fully-validated ConfigPropertySnapshotMetadataModel\', 1]']
@@ -2771,7 +2771,7 @@ class ExplorationSnapshotMetadataModelValidatorTests(
                 'check of ExplorationSnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
                 'with error: The following required attributes are missing: '
-                'state_name,The following extra attributes are present: '
+                'state_name, The following extra attributes are present: '
                 'invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_state '
@@ -3536,7 +3536,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'check of ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id exploration-0-1: Commit command domain '
                 'validation failed with error: The following required '
-                'attributes are missing: state_name,The following extra '
+                'attributes are missing: state_name, The following extra '
                 'attributes are present: invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_state '
@@ -5149,14 +5149,14 @@ class StorySnapshotMetadataModelValidatorTests(
                 'check of StorySnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
                 'with error: The following required attributes are missing: '
-                'node_id,The following extra attributes are present: '
+                'node_id, The following extra attributes are present: '
                 'invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_story_node '
                 'check of StorySnapshotMetadataModel\', '
                 '[u\'Entity id 0-1: Commit command domain validation failed '
                 'with error: The following required attributes are missing: '
-                'node_id,title\']]'
+                'node_id, title\']]'
             ),
             u'[u\'fully-validated StorySnapshotMetadataModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -5897,14 +5897,14 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'check of StoryCommitLogEntryModel\', '
                 '[u\'Entity id story-0-1: Commit command domain validation '
                 'failed with error: The following required attributes are '
-                'missing: node_id,The following extra attributes are present: '
+                'missing: node_id, The following extra attributes are present: '
                 'invalid_attribute\']]'
             ), (
                 u'[u\'failed validation check for commit cmd add_story_node '
                 'check of StoryCommitLogEntryModel\', '
                 '[u\'Entity id story-0-1: Commit command domain validation '
                 'failed with error: The following required attributes are '
-                'missing: node_id,title\']]'
+                'missing: node_id, title\']]'
             ),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)

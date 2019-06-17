@@ -1127,7 +1127,7 @@ class CollectionSummary(object):
                     tag[-1] not in string.ascii_lowercase):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
-                    ' \'%s\'' % tag)
+                    '\'%s\'' % tag)
 
             if re.search(r'\s\s+', tag):
                 raise utils.ValidationError(
@@ -1140,11 +1140,11 @@ class CollectionSummary(object):
 
         if not isinstance(self.status, basestring):
             raise utils.ValidationError(
-                'Expected status to be string, received: %s' % self.status)
+                'Expected status to be string, received %s' % self.status)
 
         if not isinstance(self.community_owned, bool):
             raise utils.ValidationError(
-                'Expected community_owned to be bool, received: %s' % (
+                'Expected community_owned to be bool, received %s' % (
                     self.community_owned))
 
         id_property_list = [
@@ -1154,17 +1154,17 @@ class CollectionSummary(object):
             property_value = getattr(self, id_property)
             if not isinstance(property_value, list):
                 raise utils.ValidationError(
-                    'Expected %s to be list, received: %s' % (
+                    'Expected %s to be list, received %s' % (
                         id_property, property_value))
             for val in property_value:
                 if not isinstance(val, basestring):
                     raise utils.ValidationError(
-                        'Expected each id in %s to be string, received: %s' % (
+                        'Expected each id in %s to be string, received %s' % (
                             id_property, val))
 
         if not isinstance(self.contributors_summary, dict):
             raise utils.ValidationError(
-                'Expected contributors_summary to be dict, received: %s' % (
+                'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
     def is_editable_by(self, user_id=None):

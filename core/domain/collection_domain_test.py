@@ -58,7 +58,7 @@ class CollectionChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, (
                 'The following required attributes are missing: '
-                'exploration_id,new_value')):
+                'exploration_id, new_value')):
             collection_domain.CollectionChange({
                 'cmd': 'edit_collection_node_property',
                 'property_name': 'category',
@@ -915,27 +915,30 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
         self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_title(self):
-        self.collection_summary.title = ['title']
+        self.collection_summary.title = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected title to be a string, .+'):
+            utils.ValidationError, 'Expected title to be a string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_category(self):
-        self.collection_summary.category = ['category']
+        self.collection_summary.category = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected category to be a string, .+'):
+            utils.ValidationError,
+            'Expected category to be a string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_objective(self):
-        self.collection_summary.objective = ['objective']
+        self.collection_summary.objective = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected objective to be a string, .+'):
+            utils.ValidationError,
+            'Expected objective to be a string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):
-        self.collection_summary.language_code = ['language_code']
+        self.collection_summary.language_code = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected language code to be a string, .+'):
+            utils.ValidationError,
+            'Expected language code to be a string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self):
@@ -947,14 +950,14 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_tags(self):
         self.collection_summary.tags = 'tags'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected tags to be a list, .+'):
+            utils.ValidationError, 'Expected tags to be a list, received tags'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_tag_in_tags(self):
-        self.collection_summary.tags = ['tag', ['tag2']]
+        self.collection_summary.tags = ['tag', 2]
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected each tag to be a string, .+'):
+            'Expected each tag to be a string, received \'2\''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self):
@@ -966,29 +969,31 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_unallowed_characters_in_tag(self):
         self.collection_summary.tags = ['123', 'abc']
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Tags should only contain lowercase letters and spaces, .+'):
+            utils.ValidationError, (
+                'Tags should only contain lowercase '
+                'letters and spaces, received \'123\'')):
             self.collection_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_start(self):
         self.collection_summary.tags = [' ab', 'abc']
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Tags should not start or end with whitespace, .+'):
+            'Tags should not start or end with whitespace, received \' ab\''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_end(self):
         self.collection_summary.tags = ['ab ', 'abc']
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Tags should not start or end with whitespace, .+'):
+            'Tags should not start or end with whitespace, received \'ab \''):
             self.collection_summary.validate()
 
     def test_validation_fails_with_adjacent_whitespace_in_tag(self):
         self.collection_summary.tags = ['a   b', 'abc']
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Adjacent whitespace in tags should be collapsed, .+'):
+            utils.ValidationError, (
+                'Adjacent whitespace in tags should '
+                'be collapsed, received \'a   b\'')):
             self.collection_summary.validate()
 
     def test_validation_fails_with_duplicate_tags(self):
@@ -999,35 +1004,35 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_status(self):
-        self.collection_summary.status = ['public']
+        self.collection_summary.status = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected status to be string, .+'):
+            utils.ValidationError, 'Expected status to be string, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_community_owned(self):
-        self.collection_summary.community_owned = '1'
+        self.collection_summary.community_owned = 0
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected community_owned to be bool, .+'):
+            'Expected community_owned to be bool, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_contributors_summary(self):
-        self.collection_summary.contributors_summary = [1]
+        self.collection_summary.contributors_summary = 0
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected contributors_summary to be dict, .+'):
+            'Expected contributors_summary to be dict, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_owner_ids_type(self):
-        self.collection_summary.owner_ids = 1
+        self.collection_summary.owner_ids = 0
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected owner_ids to be list, .+'):
+            'Expected owner_ids to be list, received 0'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
-        self.collection_summary.owner_ids = ['1', ['2'], '3']
+        self.collection_summary.owner_ids = ['1', 2, '3']
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected each id in owner_ids to be string, .+'):
+            'Expected each id in owner_ids to be string, received 2'):
             self.collection_summary.validate()

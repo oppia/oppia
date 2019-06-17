@@ -73,7 +73,7 @@ class ActivityReference(object):
 
 
 class ActivityReferences(object):
-    """Domain object for a list of activity reference.
+    """Domain object for a list of activity references.
 
     Attributes:
         activity_reference_list: list(ActivityReference). A list of

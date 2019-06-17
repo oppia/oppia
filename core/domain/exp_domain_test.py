@@ -904,27 +904,31 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
         self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_title(self):
-        self.exp_summary.title = ['title']
+        self.exp_summary.title = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected title to be a string, .+'):
+            utils.ValidationError,
+            'Expected title to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_category(self):
-        self.exp_summary.category = ['category']
+        self.exp_summary.category = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected category to be a string, .+'):
+            utils.ValidationError,
+            'Expected category to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_objective(self):
-        self.exp_summary.objective = ['objective']
+        self.exp_summary.objective = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected objective to be a string, .+'):
+            utils.ValidationError,
+            'Expected objective to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):
-        self.exp_summary.language_code = ['language_code']
+        self.exp_summary.language_code = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected language_code to be a string, .+'):
+            utils.ValidationError,
+            'Expected language_code to be a string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self):
@@ -936,14 +940,15 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_invalid_tags(self):
         self.exp_summary.tags = 'tags'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected \'tags\' to be a list, .+'):
+            utils.ValidationError,
+            'Expected \'tags\' to be a list, received tags'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_tag_in_tags(self):
-        self.exp_summary.tags = ['tag', ['tag2']]
+        self.exp_summary.tags = ['tag', 2]
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected each tag in \'tags\' to be a string, .+'):
+            'Expected each tag in \'tags\' to be a string, received \'2\''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_empty_tag_in_tags(self):
@@ -955,29 +960,31 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
     def test_validation_fails_with_unallowed_characters_in_tag(self):
         self.exp_summary.tags = ['123', 'abc']
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Tags should only contain lowercase letters and spaces, .+'):
+            utils.ValidationError, (
+                'Tags should only contain lowercase '
+                'letters and spaces, received \'123\'')):
             self.exp_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_start(self):
         self.exp_summary.tags = [' ab', 'abc']
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Tags should not start or end with whitespace, .+'):
+            'Tags should not start or end with whitespace, received \' ab\''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_whitespace_in_tag_end(self):
         self.exp_summary.tags = ['ab ', 'abc']
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Tags should not start or end with whitespace, .+'):
+            'Tags should not start or end with whitespace, received \'ab \''):
             self.exp_summary.validate()
 
     def test_validation_fails_with_adjacent_whitespace_in_tag(self):
         self.exp_summary.tags = ['a   b', 'abc']
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Adjacent whitespace in tags should be collapsed, .+'):
+            utils.ValidationError, (
+                'Adjacent whitespace in tags should '
+                'be collapsed, received \'a   b\'')):
             self.exp_summary.validate()
 
     def test_validation_fails_with_duplicate_tags(self):
@@ -986,61 +993,70 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             utils.ValidationError, 'Some tags duplicate each other'):
             self.exp_summary.validate()
 
+    def test_validation_fails_with_invalid_rating_type(self):
+        self.exp_summary.ratings = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected ratings to be a dict, received 0'):
+            self.exp_summary.validate()
+
     def test_validation_fails_with_invalid_rating_keys(self):
         self.exp_summary.ratings = {'1': 0, '10': 1}
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected ratings to have keys: .+'):
+            utils.ValidationError,
+            'Expected ratings to have keys: 1, 2, 3, 4, 5, received 1, 10'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_value_type_for_ratings(self):
-        self.exp_summary.ratings = {'1': 0, '2': [1], '3': 0, '4': 0, '5': 0}
+        self.exp_summary.ratings = {'1': 0, '2': 'one', '3': 0, '4': 0, '5': 0}
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected value to be int, .+'):
+            utils.ValidationError, 'Expected value to be int, received one'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_value_for_ratings(self):
         self.exp_summary.ratings = {'1': 0, '2': -1, '3': 0, '4': 0, '5': 0}
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected value to be non-negative, .+'):
+            utils.ValidationError,
+            'Expected value to be non-negative, received -1'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_scaled_average_rating(self):
-        self.exp_summary.scaled_average_rating = '1.0'
+        self.exp_summary.scaled_average_rating = 'one'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected scaled_average_rating to be float, .+'):
+            'Expected scaled_average_rating to be float, received one'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_status(self):
-        self.exp_summary.status = ['public']
+        self.exp_summary.status = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected status to be string, .+'):
+            utils.ValidationError, 'Expected status to be string, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_community_owned(self):
         self.exp_summary.community_owned = '1'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected community_owned to be bool, .+'):
+            utils.ValidationError,
+            'Expected community_owned to be bool, received 1'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_contributors_summary(self):
-        self.exp_summary.contributors_summary = [1]
+        self.exp_summary.contributors_summary = 0
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected contributors_summary to be dict, .+'):
+            'Expected contributors_summary to be dict, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_owner_ids_type(self):
-        self.exp_summary.owner_ids = 1
+        self.exp_summary.owner_ids = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected owner_ids to be list, .+'):
+            utils.ValidationError, 'Expected owner_ids to be list, received 0'):
             self.exp_summary.validate()
 
     def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
-        self.exp_summary.owner_ids = ['1', ['2'], '3']
+        self.exp_summary.owner_ids = ['1', 2, '3']
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected each id in owner_ids to be string, .+'):
+            'Expected each id in owner_ids to be string, received 2'):
             self.exp_summary.validate()
 
 

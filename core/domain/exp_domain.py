@@ -3329,7 +3329,7 @@ class ExplorationSummary(object):
                     tag[-1] not in string.ascii_lowercase):
                 raise utils.ValidationError(
                     'Tags should not start or end with whitespace, received '
-                    ' \'%s\'' % tag)
+                    '\'%s\'' % tag)
 
             if re.search(r'\s\s+', tag):
                 raise utils.ValidationError(
@@ -3342,35 +3342,34 @@ class ExplorationSummary(object):
             raise utils.ValidationError(
                 'Expected ratings to be a dict, received %s' % self.ratings)
 
-        if self.ratings:
-            valid_rating_keys = ['1', '2', '3', '4', '5']
-            actual_rating_keys = sorted(self.ratings.keys())
-            if valid_rating_keys != actual_rating_keys:
+        valid_rating_keys = ['1', '2', '3', '4', '5']
+        actual_rating_keys = sorted(self.ratings.keys())
+        if valid_rating_keys != actual_rating_keys:
+            raise utils.ValidationError(
+                'Expected ratings to have keys: %s, received %s' % (
+                    (', ').join(valid_rating_keys),
+                    (', ').join(actual_rating_keys)))
+        for _, value in self.ratings.iteritems():
+            if not isinstance(value, int):
                 raise utils.ValidationError(
-                    'Expected ratings to have keys: %s, received: %s' % (
-                        (',').join(valid_rating_keys),
-                        (',').join(actual_rating_keys)))
-            for _, value in self.ratings.iteritems():
-                if not isinstance(value, int):
-                    raise utils.ValidationError(
-                        'Expected value to be int, received: %s' % value)
-                if value < 0:
-                    raise utils.ValidationError(
-                        'Expected value to be non-negative, received: %s' % (
-                            value))
+                    'Expected value to be int, received %s' % value)
+            if value < 0:
+                raise utils.ValidationError(
+                    'Expected value to be non-negative, received %s' % (
+                        value))
 
         if not isinstance(self.scaled_average_rating, float):
             raise utils.ValidationError(
-                'Expected scaled_average_rating to be float, received: %s' % (
+                'Expected scaled_average_rating to be float, received %s' % (
                     self.scaled_average_rating))
 
         if not isinstance(self.status, basestring):
             raise utils.ValidationError(
-                'Expected status to be string, received: %s' % self.status)
+                'Expected status to be string, received %s' % self.status)
 
         if not isinstance(self.community_owned, bool):
             raise utils.ValidationError(
-                'Expected community_owned to be bool, received: %s' % (
+                'Expected community_owned to be bool, received %s' % (
                     self.community_owned))
 
         id_property_list = [
@@ -3381,17 +3380,17 @@ class ExplorationSummary(object):
             property_value = getattr(self, id_property)
             if not isinstance(property_value, list):
                 raise utils.ValidationError(
-                    'Expected %s to be list, received: %s' % (
+                    'Expected %s to be list, received %s' % (
                         id_property, property_value))
             for val in property_value:
                 if not isinstance(val, basestring):
                     raise utils.ValidationError(
-                        'Expected each id in %s to be string, received: %s' % (
+                        'Expected each id in %s to be string, received %s' % (
                             id_property, val))
 
         if not isinstance(self.contributors_summary, dict):
             raise utils.ValidationError(
-                'Expected contributors_summary to be dict, received: %s' % (
+                'Expected contributors_summary to be dict, received %s' % (
                     self.contributors_summary))
 
     def to_metadata_dict(self):

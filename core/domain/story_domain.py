@@ -1040,7 +1040,7 @@ class StorySummary(object):
 
         if not isinstance(self.node_count, int):
             raise utils.ValidationError(
-                'Expected node_count to be a int, received %s' % (
+                'Expected node_count to be a int, received \'%s\'' % (
                     self.node_count))
 
         if not isinstance(self.language_code, basestring):

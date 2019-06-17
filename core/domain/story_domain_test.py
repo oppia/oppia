@@ -40,7 +40,7 @@ class StoryChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, (
                 'The following required attributes are missing: '
-                'new_value,old_value')):
+                'new_value, old_value')):
             story_domain.StoryChange({
                 'cmd': 'update_story_property',
                 'property_name': 'title',
@@ -216,7 +216,7 @@ class StoryRightsChangeTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, (
                 'The following required attributes are missing: '
-                'new_role,old_role')):
+                'new_role, old_role')):
             story_domain.StoryRightsChange({
                 'cmd': 'change_role',
                 'assignee_id': 'assignee_id',
@@ -791,9 +791,9 @@ class StorySummaryTests(test_utils.GenericTestBase):
         self.story_summary.validate()
 
     def test_validation_fails_with_invalid_title(self):
-        self.story_summary.title = ['title']
+        self.story_summary.title = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected title to be a string, .+'):
+            utils.ValidationError, 'Expected title to be a string, received 0'):
             self.story_summary.validate()
 
     def test_validation_fails_with_empty_title(self):
@@ -803,21 +803,24 @@ class StorySummaryTests(test_utils.GenericTestBase):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_description(self):
-        self.story_summary.description = ['description']
+        self.story_summary.description = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected description to be a string, .+'):
+            utils.ValidationError,
+            'Expected description to be a string, received 0'):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_node_count(self):
-        self.story_summary.node_count = [10]
+        self.story_summary.node_count = '10'
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected node_count to be a int, .+'):
+            utils.ValidationError,
+            'Expected node_count to be a int, received \'10\''):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):
-        self.story_summary.language_code = ['language_code']
+        self.story_summary.language_code = 0
         with self.assertRaisesRegexp(
-            utils.ValidationError, 'Expected language code to be a string, .+'):
+            utils.ValidationError,
+            'Expected language code to be a string, received 0'):
             self.story_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self):
