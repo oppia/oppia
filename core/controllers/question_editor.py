@@ -33,22 +33,21 @@ class QuestionCreationHandler(base.BaseHandler):
     @acl_decorators.can_manage_question_skill_status
     def post(self, comma_separated_skill_ids):
         """Handles POST requests."""
-        try:
-            skill_ids = comma_separated_skill_ids.split(',')
-            self.validate_skill_ids(skill_ids)
-            for skill_id in skill_ids:
-                skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
-            raise self.PageNotFoundException
-
+        skill_ids = comma_separated_skill_ids.split(',')
         if not(all([isinstance(
             skill_id, basestring) for skill_id in skill_ids])):
             raise self.InvalidInputException
 
         try:
+            for skill_id in skill_ids:
+                skill_domain.Skill.require_valid_skill_id(skill_id)
+        except Exception:
+            raise self.InvalidInputException
+
+        try:
             skill_services.get_multi_skills(skill_ids)
         except Exception, e:
-            raise self.PageNotFoundException(e)
+            raise self.PageNotFoundException
 
         question_dict = self.payload.get('question_dict')
         if (
