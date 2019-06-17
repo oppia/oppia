@@ -1423,7 +1423,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for collection model '
                 'version check of CollectionCommitLogEntryModel\', '
                 '[u\'Entity id %s: Collection model corresponding '
-                'to collection id 0 has a version 1 which is less than '
+                'to id 0 has a version 1 which is less than '
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
@@ -2378,7 +2378,7 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
         super(GeneralFeedbackEmailReplyToIdModelValidatorTests, self).setUp()
 
         self.thread_id = feedback_services.create_thread(
-            'exploration', 'exp_id', None, 'a subject', 'some text')
+            'exploration', 'expid', None, 'a subject', 'some text')
 
         self.signup(USER_EMAIL, USER_NAME)
         self.user_id = self.get_user_id_from_email(USER_EMAIL)
@@ -5804,7 +5804,7 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for story model '
                 'version check of StoryCommitLogEntryModel\', '
                 '[u\'Entity id %s: Story model corresponding '
-                'to story id 0 has a version 1 which is less than '
+                'to id 0 has a version 1 which is less than '
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
