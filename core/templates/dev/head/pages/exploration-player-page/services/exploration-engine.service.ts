@@ -47,7 +47,7 @@ require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+require('pages/interaction-specs.constants.ts');
 
 // A service that provides a number of utility functions for JS used by
 // the player skin.

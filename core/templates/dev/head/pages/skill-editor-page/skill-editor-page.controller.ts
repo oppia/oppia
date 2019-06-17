@@ -108,6 +108,7 @@ require('pages/skill-editor-page/services/skill-editor-routing.service.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.directive('skillEditorPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
