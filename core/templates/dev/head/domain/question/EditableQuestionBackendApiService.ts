@@ -47,6 +47,11 @@ oppia.factory('EditableQuestionBackendApiService', [
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
         skillId, questionDict, successCallback, errorCallback) {
+      // Note: We are passing only a single skillId for now because the
+      // frontend doesn't support multiple ids.
+      // The backend however can take in 1-n skill ids (comma separated)
+      // TODO(vinitamurthi): Pass a list of skill ids (comma separated)
+      // as part of the question_dict to the backend.
       var questionCreationUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_CREATION_URL, {
           comma_separated_skill_ids: skillId
