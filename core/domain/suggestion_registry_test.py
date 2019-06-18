@@ -471,9 +471,11 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
 
         suggestion.change.state_name = 'invalid_state_name'
 
-        with self.assertRaisesRegexp(
-            Exception, 'The state invalid_state_name does not exist.'):
-            suggestion.populate_old_value_of_change()
+        self.assertIsNone(suggestion.change.old_value)
+
+        suggestion.populate_old_value_of_change()
+
+        self.assertIsNone(suggestion.change.old_value)
 
     def test_pre_update_validate_change_cmd(self):
         expected_suggestion_dict = self.suggestion_dict

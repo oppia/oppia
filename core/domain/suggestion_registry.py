@@ -329,8 +329,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         if self.change.state_name not in exploration.states:
             # As the state doesn't exist now, we cannot find the content of the
             # state to populate the old_value field. So we set it as None.
-            raise Exception(
-                'The state %s does not exist.' % self.change.state_name)
+            old_content = None
         else:
             old_content = (
                 exploration.states[self.change.state_name].content.to_dict())
