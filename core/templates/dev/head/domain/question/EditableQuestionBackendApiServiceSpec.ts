@@ -206,3 +206,4 @@ describe('Editable question backend API service', function() {
       expect(failHandler).toHaveBeenCalledWith(
         'The skill with the given id doesn\'t exist.');
     });
+}
