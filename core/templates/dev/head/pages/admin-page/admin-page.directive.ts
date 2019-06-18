@@ -106,7 +106,7 @@ oppia.directive('adminPage', ['UrlInterpolationService',
           ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
           $http.get('/csrf').then(function(response) {
-            CsrfService.setToken(response.token);
+            CsrfService.setToken(response.data.token);
           })
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;
