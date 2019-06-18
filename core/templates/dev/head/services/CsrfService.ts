@@ -24,7 +24,6 @@ oppia.factory('CsrfService', [function() {
 
   return {
     setToken: setToken,
-
     getToken: function() {
       return token;
     }

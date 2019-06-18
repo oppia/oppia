@@ -48,11 +48,6 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
             self.topic_id, self.admin_id, 'Name', 'Description',
             [], [], [self.skill_id], [], 1)
 
-    def _get_csrf_token_for_put(self):
-        """Gets the csrf token."""
-        csrf_token = self.get_csrf_token()
-        return csrf_token
-
     def _delete_skill_model_and_memcache(self, user_id, skill_id):
         """Deletes skill model and memcache corresponding to the given skill
         id.
