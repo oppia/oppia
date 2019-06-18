@@ -262,6 +262,10 @@ class ImageAssets(object):
             valid.
         """
         for image_id in self.image_mapping:
+            image_re = r'(image_id_)+[0-9]'
+            if not re.match(image_re, image_id):
+                raise utils.ValidationError(
+                    'Invalid image_id')
             image = self.image_mapping[image_id]
             image.validate()
 
