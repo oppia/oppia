@@ -59,10 +59,10 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
           $http.get(practiceSessionsDataUrl).then(function(result) {
             var skillList = [];
             var skillDescriptions = [];
-            for (var skill in result.data.skills_with_description) {
-              skillList.push(skill);
+            for (var skillId in result.data.skills_with_description) {
+              skillList.push(skillId);
               skillDescriptions.push(
-                result.data.skills_with_description[skill]);
+                result.data.skills_with_description[skillId]);
             }
             var questionPlayerConfig = {
               skillList: skillList,
