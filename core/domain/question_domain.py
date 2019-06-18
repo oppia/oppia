@@ -213,7 +213,12 @@ class Question(object):
     @classmethod
     def _convert_state_v29_dict_to_v30_dict(cls, question_state_dict):
         """Converts from version 29 to 30. Version 30 add image assets
-        in the question_state_dict.
+        in the question_state_dict. This funtion is extracting HTMl of state
+        and do 3 operations on each HTML content.
+        The 3 operations and their sequence were.
+        1) Add image_id in each image tag present in the HTML.
+        2) Extract image info of each image from HTML.
+        3) Remove filepath of each image present in the HTML.
 
         Args:
             question_state_dict: dict. The dict representation of
@@ -223,9 +228,146 @@ class Question(object):
             dict. The converted question_state_dict.
         """
         image_counter = 0
-        (html_validation_service.
-         add_image_id_and_image_assets_in_state_dict(
-             question_state_dict, image_counter))
+        image_assets = {}
+        image_mapping = {}
+        image_info_list = []
+
+        # Adding image_id, getting image info and removing filepath from
+        # image tag present in state content.
+        content_html = question_state_dict['content']['html']
+        (new_content_html, image_counter) = (
+            html_validation_service.add_image_id_in_image_tag(
+                content_html, image_counter))
+
+        image_info_list = image_info_list + (
+            html_validation_service.get_image_info_from_html(
+                new_content_html))
+
+        question_state_dict['content']['html'] = (
+            html_validation_service.remove_filepath_from_image_tag(
+                new_content_html))
+
+        # Adding image_id, getting image info and removing filepath from
+        # image tag present in state interaction.
+        if question_state_dict['interaction']['default_outcome']:
+            interaction_feedback_html = question_state_dict[
+                'interaction']['default_outcome']['feedback']['html']
+            (new_interaction_feedback_html, image_counter) = (
+                html_validation_service.add_image_id_in_image_tag(
+                    interaction_feedback_html, image_counter))
+
+            image_info_list = image_info_list + (
+                html_validation_service.get_image_info_from_html(
+                    new_interaction_feedback_html))
+
+            (
+                question_state_dict['interaction']['default_outcome']
+                ['feedback']['html']) = (
+                    html_validation_service.
+                    remove_filepath_from_image_tag(
+                        new_interaction_feedback_html))
+
+        # Adding image_id, getting image info and removing filepath from
+        # image tag present in state interaction answer_groups.
+        for answer_group_index, answer_group in enumerate(
+                question_state_dict['interaction']['answer_groups']):
+            answer_group_html = answer_group['outcome']['feedback']['html']
+            (new_answer_group_html, image_counter) = (
+                html_validation_service.add_image_id_in_image_tag(
+                    answer_group_html, image_counter))
+
+            image_info_list = image_info_list + (
+                html_validation_service.get_image_info_from_html(
+                    new_answer_group_html))
+
+            question_state_dict['interaction']['answer_groups'][
+                answer_group_index]['outcome']['feedback']['html'] = (
+                    html_validation_service.remove_filepath_from_image_tag(
+                        new_answer_group_html))
+
+            if question_state_dict['interaction']['id'] == 'ItemSelectionInput':
+                for rule_spec_index, rule_spec in enumerate(
+                        answer_group['rule_specs']):
+                    for x_index, x in enumerate(rule_spec['inputs']['x']):
+                        (new_x, image_counter) = (
+                            html_validation_service.
+                            add_image_id_in_image_tag(x, image_counter))
+
+                        image_info_list = image_info_list + (
+                            html_validation_service.
+                            get_image_info_from_html(new_x))
+
+                        question_state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['x'][x_index] = (
+                                    html_validation_service.
+                                    remove_filepath_from_image_tag(new_x))
+
+        # Adding image_id, getting image info and removing filepath from
+        # image tag present in hint interaction.
+        for hint_index, hint in enumerate(
+                question_state_dict['interaction']['hints']):
+            # Adding image.
+            hint_html = hint['hint_content']['html']
+            (new_hint_html, image_counter) = (
+                html_validation_service.add_image_id_in_image_tag(
+                    hint_html, image_counter))
+
+            image_info_list = image_info_list + (
+                html_validation_service.get_image_info_from_html(
+                    new_hint_html))
+
+            question_state_dict['interaction']['hints'][hint_index][
+                'hint_content']['html'] = (
+                    html_validation_service.
+                    remove_filepath_from_image_tag(new_hint_html))
+
+        # Adding image_id, getting image info and removing filepath from
+        # image tag present in solution interaction.
+        if question_state_dict['interaction']['solution']:
+            solution_html = question_state_dict[
+                'interaction']['solution']['explanation']['html']
+            (new_solution_html, image_counter) = (
+                html_validation_service.add_image_id_in_image_tag(
+                    solution_html, image_counter))
+
+            image_info_list = image_info_list + (
+                html_validation_service.get_image_info_from_html(
+                    new_solution_html))
+
+            (question_state_dict['interaction']['solution']
+             ['explanation']['html']) = (
+                 html_validation_service.remove_filepath_from_image_tag(
+                     new_solution_html))
+
+        # Adding image_id, getting image info and removing filepath from
+        # image tag present in following given below interactions.
+        if question_state_dict['interaction']['id'] in (
+                'MultipleChoiceInput', 'DragAndDropSortInput'):
+            for value_index, value in enumerate(
+                    question_state_dict['interaction']['customization_args'][
+                        'choices']['value']):
+                (new_value, image_counter) = (
+                    html_validation_service.add_image_id_in_image_tag(
+                        value, image_counter))
+
+                image_info_list = image_info_list + (
+                    html_validation_service.get_image_info_from_html(
+                        new_value))
+
+                (question_state_dict['interaction']['customization_args'][
+                    'choices']['value'][value_index]) = (
+                        html_validation_service.
+                        remove_filepath_from_image_tag(new_value))
+
+        # Add image info in image assets.
+        for image in image_info_list:
+            image_id = unicode(image['id'])
+            image_mapping[image_id] = image['info']
+
+        # Add image mapping in image assets.
+        image_assets['image_mapping'] = image_mapping
+        question_state_dict['image_assets'] = image_assets
 
         return question_state_dict
 
