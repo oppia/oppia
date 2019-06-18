@@ -16,7 +16,7 @@
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
-oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
+require('services/services.constants.ts');
 
 oppia.factory('RteHelperService', [
   '$document', '$filter', '$interpolate', '$log', '$uibModal',
