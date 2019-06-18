@@ -4611,11 +4611,11 @@ states:
         \'1\':
           instructions: ''
           placeholder: false
-          src: \'&quot;startBlue_height_490_width_120.png&quot;\'
+          src: startBlue_height_490_width_120.png
         \'2\':
           instructions: ''
           placeholder: false
-          src: \'&quot;startBlue_height_490_width_120.png&quot;\'
+          src: startBlue_height_490_width_120.png
     interaction:
       answer_groups:
       - outcome:
@@ -4816,7 +4816,7 @@ states:
         \'1\':
           instructions: ''
           placeholder: false
-          src: \'&quot;random_height_490_width_120.png&quot;\'
+          src: random_height_490_width_120.png
     interaction:
       answer_groups:
       - outcome:

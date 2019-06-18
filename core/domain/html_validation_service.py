@@ -867,10 +867,13 @@ def get_image_info_from_html(html):
     image_info_list = []
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
+        image_id = json.loads(unescape_html(image['image_id-with-value']))
+        filepath = json.loads(unescape_html(image['filepath-with-value']))
+
         image_info = {
-            'id': image['image_id-with-value'],
+            'id': image_id,
             'info': {
-                'src': image['filepath-with-value'],
+                'src': filepath,
                 'placeholder': False,
                 'instructions': ''
             }

@@ -726,7 +726,6 @@ def apply_change_list(exploration_id, change_list):
         Exception: Any entries in the changelist are invalid.
     """
     exploration = get_exploration_by_id(exploration_id)
-    image_ids_before_change = get_images_ids_of_exploration(exploration)
     try:
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
@@ -843,17 +842,6 @@ def apply_change_list(exploration_id, change_list):
                         state.image_assets.add_image(
                             change.image_id, change.image_info)
                         exploration.update_image_counter(image_counter)
-
-                # Deletes the image_ids of deleted images from the
-                # ImageAssets.
-                image_ids_after_change = (
-                    get_images_ids_of_exploration(exploration))
-                deleted_image_ids = get_deleted_images_ids(
-                    image_ids_after_change, image_ids_before_change)
-
-                if deleted_image_ids != []:
-                    for image_id in deleted_image_ids:
-                        state.image_assets.delete_image(image_id)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -1228,6 +1216,53 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
             contributor, contribution_time_msec)
 
 
+def clean_image_assets(exploration_before_change, exploration_after_change):
+    """Rempve all deleted images from image assests.
+
+    Args:
+        exploration_before_change: The exploration domain object that results
+            before applying any change command.
+        exploration_after_change: The exploration domain object that results
+            after applying any change command.
+
+    Returns:
+        exploration: the exploration that results after removing all images
+            from image assets
+    """
+    image_ids_before_change = (
+        get_images_ids_of_exploration(exploration_before_change))
+    image_ids_after_change = (
+        get_images_ids_of_exploration(exploration_after_change))
+
+    deleted_image_ids = get_deleted_images_ids(
+        image_ids_after_change, image_ids_before_change)
+
+    exploration = copy.deepcopy(exploration_after_change)
+    if deleted_image_ids != []:
+        for image_id in deleted_image_ids:
+            delete_image_from_exploration(exploration, image_id)
+
+    return exploration
+ 
+
+def delete_image_from_exploration(exploration, image_id):
+    """Deletes image from image assets.
+
+    Args:
+        Exploration. The exploration domain object. results after
+            deleting an image.
+        image_id: The id of an image to delete.
+
+    Returns:
+        Exploration. The exploration domain object.        
+    """
+
+    for state in exploration.states.itervalues():
+        if image_id in state.image_assets.image_mapping:
+            state.image_assets.delete_image(image_id)
+            return exploration
+
+
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
         is_suggestion=False, is_by_voice_artist=False):
@@ -1279,7 +1314,11 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    exploration = apply_change_list(exploration_id, change_list)
+    exploration_before_change = get_exploration_by_id(exploration_id)    
+    exploration_after_change = apply_change_list(exploration_id, change_list)
+
+    # Removing images from image assets, which gets deleted.
+    exploration = clean_image_assets(exploration_before_change, exploration_after_change)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
