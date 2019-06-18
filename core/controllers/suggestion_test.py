@@ -243,6 +243,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             'language_code': 'en',
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids':[]
         }
 
         exp_id = 'new_exp_id'
