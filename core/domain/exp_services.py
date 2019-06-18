@@ -821,7 +821,9 @@ def apply_change_list(exploration_id, change_list):
                                 get_images_ids_of_exploration(exploration))
 
                             # Adds a new image.
-                            if not isinstance(change.image_id, unicode):
+                            expected_image_id = (
+                                int(change.image_id.strip('image_id')))
+                            if not isinstance(expected_image_id, int):
                                 raise Exception(
                                     'Expected image_id to be unicode, '
                                     'received %s' % change.image_id)
@@ -833,7 +835,7 @@ def apply_change_list(exploration_id, change_list):
                                 raise Exception(
                                     'Image Id does not exist in exploration, '
                                     'received image_id is %s' % change.image_id)
-                            if int(change.image_id) > image_counter:
+                            if expected_image_id > image_counter:
                                 raise Exception(
                                     'Image Id is greater then image_id counter'
                                     'not possible, received image_id is %s' %

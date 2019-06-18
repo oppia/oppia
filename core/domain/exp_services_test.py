@@ -111,7 +111,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'image_id-with-value="1"></oppia-noninteractive-image>')
+                    'image_id-with-value="image_id_1"></oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -132,7 +132,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction',
             'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
-            'image_id': u'50',
+            'image_id': 'image_id_50',
             'image_info': {
                 'src': '',
                 'placeholder': True,
@@ -153,7 +153,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction',
             'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
-            'image_id': u'22',
+            'image_id': 'image_id_22',
             'image_info': {
                 'src': '',
                 'placeholder': True,
@@ -173,7 +173,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction',
             'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
-            'image_id': 'invalid',
+            'image_id': 'image_id_invalid',
             'image_info': {
                 'src': '',
                 'placeholder': True,
@@ -208,7 +208,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'image_id-with-value="1"></oppia-noninteractive-image>')
+                    'image_id-with-value="image_id_1"></oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -228,7 +228,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction',
             'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
-            'image_id': u'1',
+            'image_id': 'image_id_1',
             'image_info': {
                 'src': '',
                 'placeholder': True,
@@ -291,7 +291,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             },
             'image_assets': {
                 'image_mapping': {
-                    u'1': {
+                    'image_id_1': {
                         'src': u'',
                         'placeholder': True,
                         'instructions': u'no instructions'
@@ -321,16 +321,16 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html_before_deleting_image = ('''<p>ssssssssssssssss</p>
-            <oppia-noninteractive-image image_id-with-value="1">
+            <oppia-noninteractive-image image_id-with-value="image_id_1">
             </oppia-noninteractive-image> hjkhjkhkjh
-            <oppia-noninteractive-image image_id-with-value="2">
+            <oppia-noninteractive-image image_id-with-value="image_id_2">
             </oppia-noninteractive-image> dgfsdgfd ggggggggggg
-            <oppia-noninteractive-image image_id-with-value="3">\
+            <oppia-noninteractive-image image_id-with-value="image_id_3">\
             </oppia-noninteractive-image>ffffff ''')
 
         new_html_after_deleting_image = ('''
-            <p>ssssssssssssssss</p><oppia-noninteractive-image image_id-with-value="1">
-            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image image_id-with-value="2">
+            <p>ssssssssssssssss</p><oppia-noninteractive-image image_id-with-value="image_id_1">
+            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image image_id-with-value="image_id_2">
             </oppia-noninteractive-image>dgfsdgfd
             ''')
 
@@ -353,7 +353,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction',
             'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
-            'image_id': u'1',
+            'image_id': 'image_id_1',
             'image_info': {
                 'src': '',
                 'placeholder': True,
@@ -366,7 +366,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction',
             'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
-            'image_id': u'2',
+            'image_id': 'image_id_2',
             'image_info': {
                 'src': '',
                 'placeholder': False,
@@ -379,7 +379,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction',
             'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
-            'image_id': u'3',
+            'image_id': 'image_id_3',
             'image_info': {
                 'src': '',
                 'placeholder': True,
@@ -441,8 +441,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'content': {
                 'content_id': u'content',
                 'html': u'''
-            <p>ssssssssssssssss</p><oppia-noninteractive-image image_id-with-value="1">
-            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image image_id-with-value="2">
+            <p>ssssssssssssssss</p><oppia-noninteractive-image image_id-with-value="image_id_1">
+            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image image_id-with-value="image_id_2">
             </oppia-noninteractive-image>dgfsdgfd
             '''
             },
@@ -454,12 +454,12 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             },
             'image_assets': {
                 'image_mapping': {
-                    u'1': {
+                    u'image_id_1': {
                         'src': u'',
                         'placeholder': True,
                         'instructions': u'no instructions'
                     },
-                    u'2': {
+                    u'image_id_2': {
                         'src': u'',
                         'placeholder': False,
                         'instructions': u'no instructions'
@@ -502,7 +502,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'image_id-with-value="1"></oppia-noninteractive-image>')
+                    'image_id-with-value="image_id_1"></oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -522,7 +522,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'state_name': 'Introduction',
             'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
-            'image_id': u'1',
+            'image_id': 'image_id_1',
             'image_info': {
                 'src': '',
                 'placeholder': True,
@@ -538,7 +538,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         image_ids = exp_services.get_images_ids_of_exploration(exploration)
-        expected_image_ids_list = [u'1']
+        expected_image_ids_list = ['image_id_1']
         self.assertEqual(expected_image_ids_list, image_ids)
 
     def test_get_deleted_images_ids(self):

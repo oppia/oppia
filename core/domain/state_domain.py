@@ -311,14 +311,6 @@ class ImageAssets(object):
             raise utils.ValidationError('Image Id already exist. %s' %
                                         image_id)
 
-        # Reason for converting image_id to int, is to check that
-        # image_id is numeric or not.
-        try:
-            image_id = int(image_id)
-            image_id = unicode(image_id)
-        except ValueError:
-            raise utils.ValidationError('Invalid image Id')
-
         src = image_info['src']
         placeholder = image_info['placeholder']
         instructions = image_info['instructions']
@@ -332,7 +324,6 @@ class ImageAssets(object):
         Args:
             image_id: str. ID of an image.
         """
-        image_id = unicode(image_id)
         del self.image_mapping[image_id]
 
     def get_all_image_ids(self):
@@ -1654,14 +1645,15 @@ class State(object):
         image_ids = self.image_assets.get_all_image_ids()
         copied_image_ids = copy.deepcopy(image_ids)
         for image_id in image_ids:
-            if not isinstance(image_id, unicode):
+            validated_image_id = int(image_id.strip('image_id'))
+            if not isinstance(image_id, basestring):
                 raise utils.ValidationError(
-                    'Expected image_id to be unicode, received %s' %
+                    'Expected image_id to be string, received %s' %
                     type(image_id))
-            if image_id > image_counter:
+            if validated_image_id > image_counter:
                 utils.ValidationError(
                     'Found image id to be greater then image counter %s' %
-                    image_id)
+                    validated_image_id)
             copied_image_ids.remove(image_id)
             if image_id in copied_image_ids:
                 raise utils.ValidationError(
