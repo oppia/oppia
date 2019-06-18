@@ -535,6 +535,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestions), 2)
 
     def test_cannot_resubmit_suggestion_with_invalid_suggestion_id(self):
+        self.login(self.EDITOR_EMAIL)
         csrf_token = self.get_csrf_token()
 
         response = self.put_json(

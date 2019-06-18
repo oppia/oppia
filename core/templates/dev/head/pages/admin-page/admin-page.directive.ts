@@ -107,7 +107,8 @@ oppia.directive('adminPage', ['UrlInterpolationService',
 
           $http.get('/csrf').then(function(response) {
             CsrfService.setToken(response.data.token);
-          })
+          });
+
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;
           };

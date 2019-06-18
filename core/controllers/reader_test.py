@@ -1363,8 +1363,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         super(StorePlaythroughHandlerTest, self).setUp()
         self.exp_id = '15'
 
-        self.login(self.VIEWER_EMAIL)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
         exp_services.load_demo(self.exp_id)
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
         playthrough_id = stats_models.PlaythroughModel.create(

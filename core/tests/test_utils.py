@@ -823,9 +823,14 @@ tags: []
         return self._parse_json_response(json_response, expect_errors)
 
     def get_csrf_token(self):
-        """Generates csrf token for test."""
-        return base.CsrfTokenManager.create_csrf_token(
+        """Generates CSRF token for test."""
+        return self.get_csrf_token_for_id(
             self.get_current_logged_in_user_id())
+
+    def get_csrf_token_for_id(self, id):
+        """Generates CSRF token for specific id."""
+        return base.CsrfTokenManager.create_csrf_token(id)
+
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
