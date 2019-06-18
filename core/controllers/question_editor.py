@@ -87,15 +87,14 @@ class QuestionSkillLinkHandler(base.BaseHandler):
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
         question_services.create_new_question_skill_link(
-            self.user_id, question_id, skill_id,
-            constants.DEFAULT_SKILL_DIFFICULTY)
+            question_id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status
     def delete(self, question_id, skill_id):
         """Unlinks a question from a skill."""
         question_services.delete_question_skill_link(
-            self.user_id, question_id, skill_id)
+            question_id, skill_id)
         self.render_json(self.values)
 
 
