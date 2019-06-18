@@ -1713,8 +1713,7 @@ class ExplorationContentValidationJobForCKEditorTests(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
-                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                '<p><oppia-noninteractive-image image_id-with-value=""></oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
         }
@@ -1752,8 +1751,8 @@ class ExplorationContentValidationJobForCKEditorTests(
                 'content_id': 'default_outcome',
                 'html': (
                     '<pre>Hello this is <b> testing '
-                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
-                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
+                    '<oppia-noninteractive-image>'
+                    '</oppia-noninteractive-image> in '
                     '</b>progress</pre>'
 
                 )
@@ -1788,12 +1787,12 @@ class ExplorationContentValidationJobForCKEditorTests(
                 '[u\'strings\', '
                 '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
                 'oppia </code>\', u\'<pre>Hello this is <b> testing <oppia-'
-                'noninteractive-image filepath-with-value="amp;quot;random.'
-                'png&amp;quot;"></oppia-noninteractive-image>'
+                'noninteractive-image>'
+                '</oppia-noninteractive-image>'
                 ' in </b>progress</pre>\', '
                 'u\'<ol><ol><li>Item1</li></ol><li>Item2</li></ol>\', '
-                'u\'<p><oppia-noninteractive-image filepath-with-value="'
-                'amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>'
+                'u\'<p><oppia-noninteractive-image>'
+                '</oppia-noninteractive-image>'
                 'Hello this is test case to check '
                 'image tag inside p tag</p>\', '
                 'u\'<oppia-noninteractive-collapsible content-'

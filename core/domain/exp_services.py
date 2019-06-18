@@ -1218,6 +1218,26 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
             contributor, contribution_time_msec)
 
 
+def delete_image_from_exploration(exploration, image_id):
+    """Deletes image from image assets.
+
+    Args:
+        Exploration. The exploration domain object. results after
+            deleting an image.
+        image_id: The id of an image to delete.
+
+    Returns:
+        Exploration. The exploration domain object.
+    """
+
+    for state in exploration.states.itervalues():
+        if image_id in state.image_assets.image_mapping:
+            state.image_assets.delete_image(image_id)
+            break
+
+    return exploration
+
+
 def clean_image_assets(exploration_before_change, exploration_after_change):
     """Rempve all deleted images from image assests.
 
@@ -1245,24 +1265,6 @@ def clean_image_assets(exploration_before_change, exploration_after_change):
             delete_image_from_exploration(exploration, image_id)
 
     return exploration
-
-
-def delete_image_from_exploration(exploration, image_id):
-    """Deletes image from image assets.
-
-    Args:
-        Exploration. The exploration domain object. results after
-            deleting an image.
-        image_id: The id of an image to delete.
-
-    Returns:
-        Exploration. The exploration domain object.
-    """
-
-    for state in exploration.states.itervalues():
-        if image_id in state.image_assets.image_mapping:
-            state.image_assets.delete_image(image_id)
-            return exploration
 
 
 def update_exploration(

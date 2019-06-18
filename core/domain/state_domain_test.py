@@ -617,12 +617,12 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
     def test_from_and_to_dict_works_correctly(self):
         image_assets_dict = {
             'image_mapping': {
-                1: {
+                'image_id_1': {
                     'src': '',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 },
-                2: {
+                'image_id_2': {
                     'src': '',
                     'placeholder': False,
                     'instructions': 'no instructions'
@@ -636,12 +636,12 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_image(self):
         image_assets_dict = {
             'image_mapping': {
-                u'1': {
+                u'image_id_1': {
                     'src': '',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 },
-                u'2': {
+                u'image_id_2': {
                     'src': '',
                     'placeholder': False,
                     'instructions': 'no instructions'
@@ -651,7 +651,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
 
         expected_image_assets_dict = {
             'image_mapping': {
-                u'1': {
+                u'image_id_1': {
                     'src': '',
                     'placeholder': True,
                     'instructions': 'no instructions'
@@ -660,18 +660,18 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         }
 
         image_assets = state_domain.ImageAssets.from_dict(image_assets_dict)
-        image_assets.delete_image(2)
+        image_assets.delete_image('image_id_2')
         self.assertEqual(image_assets.to_dict(), expected_image_assets_dict)
 
     def test_add_image(self):
         image_assets_dict = {
             'image_mapping': {
-                u'1': {
+                u'image_id_1': {
                     'src': '',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 },
-                u'2': {
+                u'image_id_2': {
                     'src': '',
                     'placeholder': False,
                     'instructions': 'no instructions'
@@ -681,17 +681,17 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
 
         expected_image_assets_dict = {
             'image_mapping': {
-                u'1': {
+                u'image_id_1': {
                     'src': '',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 },
-                u'2': {
+                u'image_id_2': {
                     'src': '',
                     'placeholder': False,
                     'instructions': 'no instructions'
                 },
-                u'3': {
+                u'image_id_3': {
                     'src': '',
                     'placeholder': True,
                     'instructions': 'no instructions'
@@ -704,18 +704,18 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
             'placeholder': True,
             'instructions': 'no instructions'
         }
-        image_assets.add_image(u'3', image_info)
+        image_assets.add_image('image_id_3', image_info)
         self.assertEqual(image_assets.to_dict(), expected_image_assets_dict)
 
     def test_get_all_image_ids(self):
         image_assets_dict = {
             'image_mapping': {
-                u'1': {
+                u'image_id_1': {
                     'src': '',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 },
-                u'2': {
+                u'image_id_2': {
                     'src': '',
                     'placeholder': False,
                     'instructions': 'no instructions'
@@ -724,7 +724,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         }
         image_assets = state_domain.ImageAssets.from_dict(image_assets_dict)
         image_ids = image_assets.get_all_image_ids()
-        expected_image_ids = [u'1', u'2']
+        expected_image_ids = [u'image_id_2', u'image_id_1']
         self.assertEqual(image_ids, expected_image_ids)
 
 

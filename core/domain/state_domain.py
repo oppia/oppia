@@ -312,7 +312,7 @@ class ImageAssets(object):
                                         image_id)
         image_re = r'(image_id_)+[0-9]'
         if not re.match(image_re, image_id):
-            raise uitls.ValidationError(
+            raise utils.ValidationError(
                 'Invalid image_id')
 
         src = image_info['src']

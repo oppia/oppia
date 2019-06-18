@@ -899,6 +899,7 @@ def remove_filepath_from_image_tag(html):
 
     return unicode(soup).replace('<br/>', '<br>')
 
+
 def get_image_ids_from_image_tag(html):
     """Returns a list of image_ids present in the html.
 

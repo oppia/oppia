@@ -18,6 +18,7 @@
 
 import bs4
 import constants
+import re
 from extensions.objects.models import objects
 import feconf
 
@@ -64,7 +65,7 @@ class BaseRteComponent(object):
             customization_arg_specs.pop(0)
             image_id_arg_spec = {
                 u'default_value': u'',
-                u'schema' : {u'type': u'int'},
+                u'schema' : {u'type': u'unicode'},
                 u'name': u'image_id',
                 u'description': u'The id of an image'
             }
@@ -122,10 +123,9 @@ class Image(BaseRteComponent):
         """Validates Image component."""
         super(Image, cls).validate(value_dict)
         image_id = value_dict['image_id-with-value']
-        try:
-            image_id = int(image_id)
-        except:
-            raise Exception('Invalid image_id,  received %s' %
+        image_re = r'(image_id_)+[0-9]'
+        if not re.match(image_re, image_id):
+            raise Exception('Invalid image_id, received %s' %
                             image_id)
 
 class Link(BaseRteComponent):
