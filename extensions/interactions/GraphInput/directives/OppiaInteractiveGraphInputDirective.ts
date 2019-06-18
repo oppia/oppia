@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
+require('interactions/interactions-extension.constants.ts');
 
 oppia.directive('oppiaInteractiveGraphInput', [
   'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
