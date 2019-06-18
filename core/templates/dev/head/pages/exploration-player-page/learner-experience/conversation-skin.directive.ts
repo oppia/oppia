@@ -17,7 +17,7 @@
  */
  
 require(
-  'components/question-player/services/question-player-state.service.ts');
+  'components/question-directives/question-player/services/question-player-state.service.ts');
 require('components/ratings/rating-display/rating-display.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
@@ -330,7 +330,8 @@ oppia.directive('conversationSkin', [
         'ExplorationEngineService', 'UrlService', 'FocusManagerService',
         'LearnerViewRatingService', 'WindowDimensionsService',
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
-        'LearnerParamsService', 'ExplorationRecommendationsService',
+        'QuestionPlayerStateService', 'LearnerParamsService',
+        'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
@@ -357,7 +358,8 @@ oppia.directive('conversationSkin', [
             ExplorationEngineService, UrlService, FocusManagerService,
             LearnerViewRatingService, WindowDimensionsService,
             EditableExplorationBackendApiService, PlayerTranscriptService,
-            LearnerParamsService, ExplorationRecommendationsService,
+            QuestionPlayerStateService, LearnerParamsService,
+            ExplorationRecommendationsService,
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
@@ -594,6 +596,16 @@ oppia.directive('conversationSkin', [
             }, TIME_NUM_CARDS_CHANGE_MSEC);
           };
 
+          $rootScope.$on('hintConsumed', function(evt) {
+            QuestionPlayerStateService.hintUsed(
+              QuestionPlayerEngineService.getCurrentQuestionId());
+          });
+
+          $rootScope.$on('solutionViewed', function(evt, timestamp) {
+            QuestionPlayerStateService.solutionViewed(
+              QuestionPlayerEngineService.getCurrentQuestionId());
+          });
+
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getDisplayedCardIndex());
@@ -805,6 +817,10 @@ oppia.directive('conversationSkin', [
                 if (!ExplorationPlayerStateService.isInQuestionMode()) {
                   $rootScope.$broadcast(
                     'playerStateChange', nextCard.getStateName());
+                } else {
+                  QuestionPlayerStateService.answerSubmitted(
+                    QuestionPlayerEngineService.getCurrentQuestionId(),
+                    !remainOnCurrentCard);
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
@@ -898,6 +914,11 @@ oppia.directive('conversationSkin', [
                     // the feedback, and display a 'Continue' button.
                     $scope.displayedCard.markAsCompleted();
                     if (isFinalQuestion) {
+                      if (ExplorationPlayerStateService.
+                        isInQuestionPlayerMode()) {
+                        // We will redirect to the results page here
+                        $scope.questionSessionCompleted = true;
+                      }
                       $scope.moveToExploration = true;
                       if (feedbackHtml) {
                         PlayerTranscriptService.addNewResponse(feedbackHtml);
@@ -996,6 +1017,12 @@ oppia.directive('conversationSkin', [
               $scope.returnToExplorationAfterConceptCard();
               return;
             }
+            if ($scope.questionSessionCompleted) {
+              $rootScope.$broadcast(
+                'questionSessionCompleted',
+                QuestionPlayerStateService.getQuestionStateData());
+              return;
+            }
             if ($scope.moveToExploration) {
               $scope.moveToExploration = false;
               ExplorationPlayerStateService.moveToExploration(
@@ -1005,7 +1032,7 @@ oppia.directive('conversationSkin', [
             if (
               $scope.displayedCard.isCompleted() &&
               ($scope.nextCard.getStateName() ===
-              $scope.displayedCard.getStateName())) {
+              $scope.displayedCard.getStateName()) && $scope.conceptCard) {
               ExplorationPlayerStateService.recordNewCardAdded();
               _addNewCard(
                 StateCardObjectFactory.createNewCard(
