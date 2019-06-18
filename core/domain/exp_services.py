@@ -1243,7 +1243,7 @@ def clean_image_assets(exploration_before_change, exploration_after_change):
             delete_image_from_exploration(exploration, image_id)
 
     return exploration
- 
+
 
 def delete_image_from_exploration(exploration, image_id):
     """Deletes image from image assets.
@@ -1254,7 +1254,7 @@ def delete_image_from_exploration(exploration, image_id):
         image_id: The id of an image to delete.
 
     Returns:
-        Exploration. The exploration domain object.        
+        Exploration. The exploration domain object.
     """
 
     for state in exploration.states.itervalues():
@@ -1314,11 +1314,12 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    exploration_before_change = get_exploration_by_id(exploration_id)    
+    exploration_before_change = get_exploration_by_id(exploration_id)
     exploration_after_change = apply_change_list(exploration_id, change_list)
 
     # Removing images from image assets, which gets deleted.
-    exploration = clean_image_assets(exploration_before_change, exploration_after_change)
+    exploration = (
+        clean_image_assets(exploration_before_change, exploration_after_change))
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
