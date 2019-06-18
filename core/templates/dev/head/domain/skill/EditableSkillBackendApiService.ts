@@ -24,7 +24,7 @@ oppia.constant(
 
 oppia.constant(
   'SKILL_DATA_URL_TEMPLATE',
-  '/skill_data_handler/<skill_ids>');
+  '/skill_data_handler/<comma_separated_skill_ids>');
 
 oppia.factory('EditableSkillBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
@@ -53,7 +53,7 @@ oppia.factory('EditableSkillBackendApiService', [
     var _fetchMultiSkills = function(skillIds, successCallback, errorCallback) {
       var skillDataUrl = UrlInterpolationService.interpolateUrl(
         SKILL_DATA_URL_TEMPLATE, {
-          skill_ids: skillIds.join(',')
+          comma_separated_skill_ids: skillIds.join(',')
         });
 
       $http.get(skillDataUrl).then(function(response) {

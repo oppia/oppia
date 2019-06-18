@@ -81,7 +81,7 @@ oppia.directive('questionsList', [
               ctrl.currentPage, ctrl.skillIds, false, false
             );
             ctrl.truncatedQuestionSummaries = [];
-            ctrl.getTruncatedQuestionSummaries();
+            ctrl.populateTruncatedQuestionSummaries();
             ctrl.activeQuestion = null;
             ctrl.questionIsBeingUpdated = false;
             ctrl.misconceptions = [];
@@ -96,7 +96,7 @@ oppia.directive('questionsList', [
             ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
               ctrl.currentPage, ctrl.skillIds, true, false
             );
-            ctrl.getTruncatedQuestionSummaries();
+            ctrl.populateTruncatedQuestionSummaries();
           };
 
           ctrl.goToPreviousPage = function() {
@@ -104,10 +104,10 @@ oppia.directive('questionsList', [
             ctrl.questionSummaries = ctrl.getQuestionSummariesAsync(
               ctrl.currentPage, ctrl.skillIds, false, false
             );
-            ctrl.getTruncatedQuestionSummaries();
+            ctrl.populateTruncatedQuestionSummaries();
           };
 
-          ctrl.getTruncatedQuestionSummaries = function() {
+          ctrl.populateTruncatedQuestionSummaries = function() {
             if (ctrl.questionSummaries) {
               ctrl.truncatedQuestionSummaries =
                 ctrl.questionSummaries.map(function(question) {
@@ -174,7 +174,7 @@ oppia.directive('questionsList', [
           ctrl.createQuestion = function() {
             if (!ctrl.getTopicId()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
-              ctrl.getMisconceptions(ctrl.skillIds);
+              ctrl.populateMisconceptions(ctrl.skillIds);
               if (AlertsService.warnings.length === 0) {
                 ctrl.initializeNewQuestionCreation();
               }
@@ -223,14 +223,14 @@ oppia.directive('questionsList', [
 
             modalInstance.result.then(function(skillIds) {
               ctrl.newQuestionSkillIds = skillIds;
-              ctrl.getMisconceptions(skillIds);
+              ctrl.populateMisconceptions(skillIds);
               if (AlertsService.warnings.length === 0) {
                 ctrl.initializeNewQuestionCreation();
               }
             });
           };
 
-          ctrl.getMisconceptions = function(skillIds) {
+          ctrl.populateMisconceptions = function(skillIds) {
             EditableSkillBackendApiService.fetchMultiSkills(
               skillIds).then(
               function(skillDicts) {

@@ -22,7 +22,7 @@ oppia.constant(
 
 oppia.constant(
   'QUESTIONS_LIST_URL_TEMPLATE',
-  '/questions_list_handler/<skill_ids>?cursor=<cursor>');
+  '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>');
 
 oppia.factory('QuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTIONS_LIST_URL_TEMPLATE',
@@ -41,7 +41,7 @@ oppia.factory('QuestionBackendApiService', [
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
-          skill_ids: skillIds.join(','),
+          comma_separated_skill_ids: skillIds.join(','),
           question_count: questionCount.toString(),
           start_cursor: _startCursor
         });
@@ -67,7 +67,7 @@ oppia.factory('QuestionBackendApiService', [
       }
       var questionsDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTIONS_LIST_URL_TEMPLATE, {
-          skill_ids: skillIds.join(','),
+          comma_separated_skill_ids: skillIds.join(','),
           cursor: cursor ? cursor : ''
         });
 

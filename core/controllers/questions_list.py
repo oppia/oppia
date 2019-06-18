@@ -30,29 +30,28 @@ class QuestionsListHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, skill_ids):
+    def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
         try:
-            skill_ids_list = skill_ids.split(',')
+            skill_ids = comma_separated_skill_ids.split(',')
         except Exception:
             raise self.PageNotFoundException
 
-        for skill_id in skill_ids_list:
+        for skill_id in skill_ids:
             try:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
             except Exception:
                 raise self.PageNotFoundException(Exception('Invalid skill id'))
 
         try:
-            skill_services.get_multi_skills(skill_ids_list)
-        except:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+            skill_services.get_multi_skills(skill_ids)
+        except Exception, e:
+            raise self.PageNotFoundException(e)
 
         question_summaries, skill_descriptions_list, next_start_cursor = (
             question_services.get_question_summaries_and_skill_descriptions(
-                constants.NUM_QUESTIONS_PER_PAGE, skill_ids_list, start_cursor)
+                constants.NUM_QUESTIONS_PER_PAGE, skill_ids, start_cursor)
         )
         return_dicts = []
         for index, summary in enumerate(question_summaries):

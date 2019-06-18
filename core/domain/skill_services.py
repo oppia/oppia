@@ -905,3 +905,16 @@ def skill_has_associated_questions(skill_id):
         question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
             skill_id))
     return len(question_ids) > 0
+
+
+def get_skill_descriptions_by_skill_id(skill_id):
+    """Returns skill descriptions of correponding skill by skill id.
+
+    Args:
+        skill_id: str. The ID of the skill.
+
+    Returns:
+        str. Descriptions of corresponding skill.
+    """
+    skill = get_skill_by_id(skill_id)
+    return skill.description

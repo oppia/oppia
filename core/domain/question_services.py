@@ -125,22 +125,28 @@ def get_questions_and_skill_descriptions_by_skill_ids(
             questions are to be returned. This value should be urlsafe.
 
     Returns:
-        list(Question), list(str), str. The list of questions and the
+        list(Question), list(list(str)), str. The list of questions and the
             corresponding linked skill descriptions which are linked to the
             given skill ids and the next cursor value to be used for the next
             batch of questions (or None if no more pages are left). The returned
             next cursor value is urlsafe.
     """
-    question_skill_link_models, skill_descriptions, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_skill_links_and_skill_descriptions( #pylint: disable=line-too-long
+    question_skill_link_models, next_cursor = (
+        question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
             question_count, skill_ids, start_cursor))
-    question_skill_links = [
-        get_question_skill_link_from_model(model, skill_descriptions[index])
-        for index, model in enumerate(question_skill_link_models)]
     question_ids = []
-    for obj in question_skill_links:
-        if obj.question_id not in question_ids:
-            question_ids.append(obj.question_id)
+    skill_descriptions = []
+    for question_skill_link in question_skill_link_models:
+        if question_skill_link.question_id not in question_ids:
+            question_ids.append(question_skill_link.question_id)
+            skill_descriptions.append(
+                [skill_services.get_skill_descriptions_by_skill_id(
+                    question_skill_link.skill_id)])
+        else:
+            skill_descriptions[-1].append(
+                skill_services.get_skill_descriptions_by_skill_id(
+                    question_skill_link.skill_id)
+            )
     questions = get_questions_by_ids(question_ids)
     return questions, skill_descriptions, next_cursor
 
@@ -354,21 +360,25 @@ def get_question_summaries_and_skill_descriptions(
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
-    question_skill_link_models, skill_descriptions, next_cursor = (
-        question_models.QuestionSkillLinkModel.get_question_skill_links_and_skill_descriptions( #pylint: disable=line-too-long
+    question_skill_link_models, next_cursor = (
+        question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
             question_count, skill_ids, start_cursor))
 
     # Deduplicate question_ids and group skill_descriptions that are linked to
     # the same question.
     question_ids = []
     grouped_skill_descriptions = []
-    for (question_skill_link, skill_description) in (
-            zip(question_skill_link_models, skill_descriptions)):
+    for question_skill_link in question_skill_link_models:
         if question_skill_link.question_id not in question_ids:
             question_ids.append(question_skill_link.question_id)
-            grouped_skill_descriptions.append([skill_description])
+            grouped_skill_descriptions.append(
+                [skill_services.get_skill_descriptions_by_skill_id(
+                    question_skill_link.skill_id)])
         else:
-            grouped_skill_descriptions[-1].append(skill_description)
+            grouped_skill_descriptions[-1].append(
+                skill_services.get_skill_descriptions_by_skill_id(
+                    question_skill_link.skill_id)
+            )
 
     question_summaries = get_question_summaries_by_ids(question_ids)
     return question_summaries, grouped_skill_descriptions, next_cursor

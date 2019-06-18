@@ -209,25 +209,23 @@ class SkillDataHandler(base.BaseHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.open_access
-    def get(self, skill_ids):
+    def get(self, comma_separated_skill_ids):
         """Populates the data on skill pages of the skill ids."""
 
         try:
-            skill_ids_list = skill_ids.split(',')
+            skill_ids = comma_separated_skill_ids.split(',')
         except Exception:
             raise self.PageNotFoundException
 
         try:
-            for skill_id in skill_ids_list:
+            for skill_id in skill_ids:
                 skill_domain.Skill.require_valid_skill_id(skill_id)
-        except Exception:
-            raise self.PageNotFoundException(
-                Exception('The skill with the given id doesn\'t exist.'))
+        except Exception, e:
+            raise self.PageNotFoundException('Invalid skill id.')
         try:
-            skills = skill_services.get_multi_skills(skill_ids_list)
-        except:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+            skills = skill_services.get_multi_skills(skill_ids)
+        except Exception, e:
+            raise self.PageNotFoundException(e)
 
         skill_dicts = [skill.to_dict() for skill in skills]
         self.values.update({

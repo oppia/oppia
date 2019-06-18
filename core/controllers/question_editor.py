@@ -30,21 +30,20 @@ class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, skill_ids):
+    def post(self, comma_separated_skill_ids):
         """Handles POST requests."""
-        skill_ids_list = skill_ids.split(',')
-        if len(skill_ids_list) > 3:
+        skill_ids = comma_separated_skill_ids.split(',')
+        if len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION:
             raise Exception(
                 'More than three QuestionSkillLink for one '
                 'question is not supported.')
 
-        for skill_id in skill_ids_list:
+        for skill_id in skill_ids:
             skill_domain.Skill.require_valid_skill_id(skill_id)
         try:
-            skill_services.get_multi_skills(skill_ids_list)
-        except:
-            raise self.PageNotFoundException(
-                'The skill with the given id doesn\'t exist.')
+            skill_services.get_multi_skills(skill_ids)
+        except Exception, e:
+            raise self.PageNotFoundException(e)
 
         question_dict = self.payload.get('question_dict')
         if (
@@ -64,7 +63,7 @@ class QuestionCreationHandler(base.BaseHandler):
         question_services.add_question(self.user_id, question)
         # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
         # with a value passed from the frontend.
-        for skill_id in skill_ids_list:
+        for skill_id in skill_ids:
             question_services.create_new_question_skill_link(
                 question.id, skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
         self.values.update({
@@ -77,40 +76,26 @@ class QuestionSkillLinkHandler(base.BaseHandler):
     """A handler for linking and unlinking questions to or from a skill."""
 
     @acl_decorators.can_manage_question_skill_status
-    def post(self, question_id, skill_ids):
+    def post(self, question_id, skill_id):
         """Links a question to a skill."""
-        try:
-            skill_ids_list = skill_ids.split(',')
-        except Exception:
-            raise self.PageNotFoundException
-
-        if not all(
-                [isinstance(skill_id, basestring)
-                 for skill_id in skill_ids_list]):
-            raise self.PageNotFoundException
-
-        for skill_id in skill_ids_list:
-            skill_domain.Skill.require_valid_skill_id(skill_id)
-
-        try:
-            skill_services.get_multi_skills(skill_ids_list)
-        except:
+        skill_domain.Skill.require_valid_skill_id(skill_id)
+        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        if skill is None:
             raise self.PageNotFoundException(
                 'The skill with the given id doesn\'t exist.')
 
-        for skill_id in skill_ids_list:
-            # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
-            # with a value passed from the frontend.
-            question_services.create_new_question_skill_link(
-                question_id, skill_id,
-                constants.DEFAULT_SKILL_DIFFICULTY)
+        # TODO(vinitamurthi): Replace DEFAULT_SKILL_DIFFICULTY
+        # with a value passed from the frontend.
+        question_services.create_new_question_skill_link(
+            self.user_id, question_id, skill_id,
+            constants.DEFAULT_SKILL_DIFFICULTY)
         self.render_json(self.values)
 
     @acl_decorators.can_manage_question_skill_status
-    def delete(self, question_id, skill_ids):
+    def delete(self, question_id, skill_id):
         """Unlinks a question from a skill."""
         question_services.delete_question_skill_link(
-            question_id, skill_ids)
+            self.user_id, question_id, skill_id)
         self.render_json(self.values)
 
 
