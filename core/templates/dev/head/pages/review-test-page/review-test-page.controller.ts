@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the review tests.
+ * @fileoverview Controllers for the review tests page.
  */
 
 require(
@@ -28,34 +28,44 @@ require('pages/review-test-page/review-test-engine.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-oppia.controller('ReviewTest', [
-  '$http', '$rootScope', '$scope', 'AlertsService',
-  'ReviewTestEngineService',
-  'UrlInterpolationService', 'UrlService',
-  'FATAL_ERROR_CODES', 'REVIEW_TEST_DATA_URL',
-  function(
-      $http, $rootScope, $scope, AlertsService,
-      ReviewTestEngineService,
-      UrlInterpolationService, UrlService,
-      FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL
-  ) {
-    $scope.storyId = UrlService.getStoryIdFromUrl();
-    $scope.questionPlayerConfig = null;
+oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/review-test-page/review-test-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$http', '$rootScope', 'AlertsService', 'ReviewTestEngineService',
+      'UrlInterpolationService', 'UrlService',
+      'FATAL_ERROR_CODES', 'REVIEW_TEST_DATA_URL',
+      function(
+          $http, $rootScope, AlertsService, ReviewTestEngineService,
+          UrlInterpolationService, UrlService,
+          FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL
+      ) {
+        var ctrl = this;
+        ctrl.storyId = UrlService.getStoryIdFromUrl();
+        ctrl.questionPlayerConfig = null;
 
-    var _fetchSkillDetails = function() {
-      var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
-        REVIEW_TEST_DATA_URL, {
-          story_id: $scope.storyId
-        });
-      $http.get(reviewTestsDataUrl).then(function(result) {
-        var questionPlayerConfig = {
-          skillIds: result.data.skill_ids,
-          questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
-            result.data.skill_ids.length)
+        var _fetchSkillDetails = function() {
+          var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
+            REVIEW_TEST_DATA_URL, {
+              story_id: ctrl.storyId
+            });
+          $http.get(reviewTestsDataUrl).then(function(result) {
+            var questionPlayerConfig = {
+              skillList: result.data.skill_ids,
+              questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
+                result.data.skill_ids.length)
+            };
+            ctrl.questionPlayerConfig = questionPlayerConfig;
+          });
         };
-        $scope.questionPlayerConfig = questionPlayerConfig;
-      });
-    };
-    _fetchSkillDetails();
-  }
-]);
+        _fetchSkillDetails();
+      }
+    ]
+  };
+});
