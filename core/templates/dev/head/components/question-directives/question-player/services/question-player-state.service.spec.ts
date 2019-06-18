@@ -72,23 +72,22 @@ describe('Question player state service', function() {
       var stateData = qpservice.getQuestionStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].viewedSolution).toBeDefined();
-      expect(stateData[questionId].viewedSolution.timestamp).toBeDefined()
+      expect(stateData[questionId].viewedSolution.timestamp).toBeDefined();
       expect(
         stateData[questionId].viewedSolution.timestamp).toBeGreaterThan(0);
     });
 
-    it('should shouldn\'t record a correct answer if a solution was viewed',
+  it('should shouldn\'t record a correct answer if a solution was viewed',
     function() {
       qpservice.solutionViewed(questionId);
       var stateData = qpservice.getQuestionStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].viewedSolution).toBeDefined();
-      expect(stateData[questionId].viewedSolution.timestamp).toBeDefined()
+      expect(stateData[questionId].viewedSolution.timestamp).toBeDefined();
       expect(
         stateData[questionId].viewedSolution.timestamp).toBeGreaterThan(0);
       qpservice.answerSubmitted(questionId, true);
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].answers.length).toEqual(0);
     });
-
 });
