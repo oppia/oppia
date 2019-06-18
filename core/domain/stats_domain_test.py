@@ -1316,3 +1316,10 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.state_answers_calc_output,
             'calculation_output is too big to be stored')
+
+class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LearnerAnswerDetailsDomainTests, self).setUp()
+        self.learner_answer_details = stats_domain.LearnerAnswerDetails()
+

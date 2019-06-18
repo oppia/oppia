@@ -17,6 +17,7 @@
 """Domain object for statistics models."""
 
 import datetime
+import json
 import numbers
 import sys
 
@@ -49,6 +50,18 @@ MIGRATED_STATE_ANSWER_TIME_SPENT_IN_SEC = 0.0
 CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
 CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
     'CategorizedAnswerFrequencyLists')
+
+CMD_RECORD_LEARNER_ANSWER_INFO = 'record_learner_answer_info'
+CMD_DELETE_LEARNER_ANSWER_INFO = 'delete_learner_answer_info'
+CMD_UPDATE_STATE_REFERENCE = 'update_state_reference'
+
+# The maximum size in bytes the learner_answer_info_list can take
+# in LearnerAnswerDetails.
+MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
+
+# The maximum size in bytes the answer_details can take in
+# LearnerAnswerInfo.
+MAX_ANSWER_DETAILS_BYTE_SIZE = 10000
 
 
 class ExplorationStats(object):
@@ -1354,6 +1367,62 @@ class StateAnswersCalcOutput(object):
                     sys.getsizeof(output_data), str(output_data)))
 
 
+class LearnerAnswerDetailsChange(object):
+    """Domain object for changes made in LearnerAnswerDetails."""
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'new_value', 'old_value', 'answer', 'answer_details']
+
+    def __init__(self, change_dict):
+        """Intialize a domain object for LearnerAnswerDetails from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                - 'record_learner_answer_info' (with answer, answer_details)
+                - 'delete_learner_answer_info' (with learner_answer_info_id)
+                - 'update_state_reference' (with new_value, old_value)
+
+        Raises:
+            Exception: The given change dict is not valid.
+        """
+
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change dict for learner answer '
+                            'details %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_RECORD_LEARNER_ANSWER_INFO:
+            self.answer = change_dict['answer']
+            self.answer_details = change_dict['answer_details']
+        elif self.cmd == CMD_DELETE_LEARNER_ANSWER_INFO:
+            self.learner_answer_info_id = change_dict['learner_answer_info_id']
+        elif self.cmd == CMD_UPDATE_STATE_REFERENCE:
+            self.new_value = change_dict['new_value']
+            self.old_value = change_dict['old_value']
+        else:
+            raise Exception('Invalid change dict for learner answer '
+                            'details %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the LearnerAnswerDetailsChange domain
+         object.
+
+        Returns:
+            A dict, mapping all fields of LearnerAnswerDetails instance.
+        """
+        learner_answer_details_change_dict = {}
+        learner_answer_details_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                learner_answer_details_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return learner_answer_details_change_dict
+
+
 class LearnerAnswerDetails(object):
     """Domain object that represents the answer details submitted by the
     learner.
@@ -1361,7 +1430,8 @@ class LearnerAnswerDetails(object):
 
     def __init__(
             self, state_reference, entity_type, interaction_id,
-            learner_answer_info_list, schema_version=(
+            learner_answer_info_list, accumulated_answer_info_json_size_bytes,
+            schema_version=(
                 feconf.CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION)):
         """Constructs a LearnerAnswerDetail domain object.
 
@@ -1379,6 +1449,8 @@ class LearnerAnswerDetails(object):
                 details.
             learner_answer_info_list: list(LearnerAnswerInfo). The list of
                 LearnerAnswerInfo objects.
+            accumulated_answer_info_json_size_bytes: int. The size of
+                learner_answer_info_list in bytes.
             schema_version: int. The schema version of the
                 LearnerAnswerInfo class.
         """
@@ -1387,6 +1459,8 @@ class LearnerAnswerDetails(object):
         self.entity_type = entity_type
         self.interaction_id = interaction_id
         self.learner_answer_info_list = learner_answer_info_list
+        self.accumulated_answer_info_json_size_bytes = (
+            accumulated_answer_info_json_size_bytes)
         self.schema_version = schema_version
 
     def to_dict(self):
@@ -1403,8 +1477,34 @@ class LearnerAnswerDetails(object):
                 learner_answer_info.to_dict() for learner_answer_info in (
                     self.learner_answer_info_list)
             ],
+            'accumulated_answer_info_json_size_bytes': (
+                self.accumulated_answer_info_json_size_bytes),
             'schema_version': self.schema_version
         }
+
+    @classmethod
+    def from_dict(cls, learner_answer_details_dict):
+        """Return a LearnerAnswerDetails domain object from a dict.
+
+        Args:
+            learner_answer_details_dict: dict. The dict representation of
+                LearnerAnswerDetails object.
+
+        Returns:
+            LearnerAnswerDetails. The corresponding LearnerAnswerDetails
+                domain object.
+        """
+        return cls(
+            learner_answer_details_dict['state_reference'],
+            learner_answer_details_dict['entity_type'],
+            learner_answer_details_dict['interaction_id'],
+            [LearnerAnswerInfo.from_dict(learner_answer_info_dict)
+             for learner_answer_info_dict in learner_answer_details_dict[
+                 'learner_answer_info_list']],
+            learner_answer_details_dict[
+                'accumulated_answer_info_json_size_bytes'],
+            learner_answer_details_dict['schema_version']
+        )
 
     def validate(self):
         """Validates LearnerAnswerDetails domain object."""
@@ -1456,14 +1556,73 @@ class LearnerAnswerDetails(object):
         for learner_answer_info in self.learner_answer_info_list:
             learner_answer_info.validate()
 
+        if not isinstance(self.schema_version, int):
+            raise utils.ValidationError(
+                'Expected schema_version to be an int, '
+                'received %s' % self.schema_version)
+
+        if not isinstance(self.accumulated_answer_info_json_size_bytes, int):
+            raise utils.ValidationError(
+                'Expected accumulated_answer_info_json_size_bytes to be an int '
+                'received %s' % self.accumulated_answer_info_json_size_bytes)
+
+    def add_learner_answer_info(self, learner_answer_info):
+        """Adds new learner answer info in the learner_answer_info_list.
+
+        Args:
+            learner_answer_info: LearnerAnswerInfo. The learner answer info
+                object, which is created after the learner has sbumitted the
+                details of the answer.
+        """
+        learner_answer_info_dict_size = (
+            learner_answer_info.get_learner_answer_info_dict_size())
+        if (self.accumulated_answer_info_json_size_bytes +
+                learner_answer_info_dict_size <= (
+                    MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE)):
+            self.learner_answer_info_list.append(learner_answer_info)
+            self.accumulated_answer_info_json_size_bytes += (
+                learner_answer_info_dict_size)
+
+    def delete_learner_answer_info(self, learner_answer_info_id):
+        """Delete the learner answer info from the learner_answer_info_list.
+
+        Args:
+            learner_answer_info_id: str. The learner answer info
+                id, which needs to be deleted from
+                the learner_answer_info_list.
+        """
+        deleted_learner_answer_info_id = (
+            learner_answer_info_id)
+        new_learner_answer_info_list = []
+        new_accumulated_answer_info_json_size_bytes = 0
+        for learner_answer_info in self.learner_answer_info_list:
+            if learner_answer_info.id != deleted_learner_answer_info_id:
+                new_learner_answer_info_list.append(learner_answer_info)
+                new_accumulated_answer_info_json_size_bytes += (
+                    learner_answer_info.accumulated_answer_info_json_size_bytes)
+        self.accumulated_answer_info_json_size_bytes = (
+            new_accumulated_answer_info_json_size_bytes)
+
+    def update_state_reference(self, new_state_reference):
+        """Updates the state_reference of the LearnerAnswerDetails object.
+
+        Args:
+            new_state_reference: str. The new state reference of the
+                LearnerAnswerDetails.
+        """
+        self.state_reference = new_state_reference
+
 
 class LearnerAnswerInfo(object):
     """Domain object containing the answer details submitted by the learner."""
 
-    def __init__(self, answer, answer_details, created_on):
+    def __init__(
+            self, learner_answer_info_id, answer,
+            answer_details, created_on):
         """Constructs a LearnerAnswerInfo domain object.
 
         Args:
+            learner_answer_info_id: str. The id of the LearnerAnswerInfo object.
             answer: dict. The answer which is submitted by the learner,
                 actually type of the answer is interaction dependent but mostly
                 it will be of dict type for most interactions, but it can be
@@ -1474,7 +1633,7 @@ class LearnerAnswerInfo(object):
             created_on: datetime. The time at which the answer details was
                 received.
         """
-
+        self.id = learner_answer_info_id
         self.answer = answer
         self.answer_details = answer_details
         self.created_on = created_on
@@ -1486,6 +1645,7 @@ class LearnerAnswerInfo(object):
             dict. The learner_answer_info dict.
         """
         learner_answer_info_dict = {
+            'id': self.learner_answer_info_id,
             'answer': self.answer,
             'answer_details': self.answer_details,
             'created_on': self.created_on
@@ -1501,23 +1661,48 @@ class LearnerAnswerInfo(object):
         """
 
         return cls(
+            learner_answer_info_dict['id'],
             learner_answer_info_dict['answer'],
             learner_answer_info_dict['answer_details'],
             learner_answer_info_dict['created_on']
         )
 
+    @classmethod
+    def get_learner_answer_info_id(cls, state_reference, entity_type):
+        """Generates the learner answer info domain object id.
+
+        Args:
+            state_reference: str. This is used to refer to a state
+                in an exploration or question. Like for an exploration the
+                value will be equal to 'exp_id.state_name' & for question
+                this will be equal to 'question_id' only.
+            entity_type: str. The type of entity i.e 'exploration' or
+                'question '.
+
+        Return:
+            learner_answer_info_id: str. The id generated by the function.
+        """
+        learner_answer_info_id = (state_reference + '.' + entity_type + '.' +
+                                  utils.base64_from_int(
+                                      utils.get_current_time_in_millisecs()) +
+                                  utils.base64_from_int(
+                                      utils.get_random_int(127 * 127)))
+        return learner_answer_info_id
+
     def validate(self):
         """Validates the LearnerAnswerInfo domain object."""
 
-        max_answer_details_size = 10000
 
+        if not isinstance(self.id, basestring):
+            raise utils.ValidationError(
+                'Expected ID to be a string, received %s' % self.id)
         if self.answer is None:
             raise utils.ValidationError(
                 'The answer submitted by the learner cannot be empty')
         if self.answer_details is None:
             raise utils.ValidationError(
                 'LearnerAnswerInfo must have a provided answer details')
-        if sys.getsizeof(self.answer_details) > max_answer_details_size:
+        if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
             raise utils.ValidationError('The answer details size is to large '
                                         'to be stored')
         if not isinstance(self.answer_details, basestring):
@@ -1528,3 +1713,13 @@ class LearnerAnswerInfo(object):
             raise utils.ValdationError(
                 'Expected created on to be a datetime, received %s' % str(
                     self.created_on))
+
+    def get_learner_answer_info_dict_size(self):
+        """Returns a size overestimate (in bytes) of the given learner answer
+        info dict.
+
+        Returns:
+            int. Size of the learner_answer_info_dict in bytes.
+        """
+        learner_answer_info_dict = self.to_dict()
+        return sys.getsizeof(json.dumps(learner_answer_info_dict))

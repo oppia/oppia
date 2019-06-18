@@ -455,3 +455,77 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         with assert_raises_regexp_context_manager, get_by_id_swap:
             stats_models.PlaythroughModel.create(
                 'exp_id1', 1, 'EarlyQuit', {}, [])
+
+
+class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
+    """Tests the LearnerAnswerDetailsModel class."""
+
+    def test_get_state_reference_for_exploration(self):
+        exp_id_1 = 'expid1'
+        state_name_1 = 'intro'
+        state_reference_1 = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_1, state_name_1)) #pylint: disable=line-too-long
+        self.assertEqual(state_reference_1, 'expid1.intro')
+        exp_id_2 = 'exp_id_2'
+        state_name_2 = 'first state'
+        state_reference_2 = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_2, state_name_2)) #pylint: disable=line-too-long
+        self.assertEqual(state_reference_2, 'exp_id_2.first state')
+        exp_id_3 = 'exp id 1.2.3'
+        state_name_3 = 'this_is first_state version 1.1'
+        state_reference_3 = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_3, state_name_3)) #pylint: disable=line-too-long
+        self.assertEqual(
+            state_reference_3, 'exp id 1.2.3.this_is first_state version 1.1')
+
+    def test_get_state_reference_for_question(self):
+        question_id_1 = 'first question'
+        state_reference_1 = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_1)) #pylint: disable=line-too-long
+        self.assertEqual(state_reference_1, 'first question')
+        question_id_2 = 'first.question'
+        state_reference_2 = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_2)) #pylint: disable=line-too-long
+        self.assertEqual(state_reference_2, 'first.question')
+
+    def test_create_model_instance(self):
+        # Test to create model instance for exploration state.
+        state_reference = 'exp_id.state_name'
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        interaction_id = 'TextInput'
+        learner_answer_info_list = []
+        schema_version = feconf.CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION
+        accumulated_answer_info_json_size_bytes = 40000
+        stats_models.LearnerAnswerDetailsModel.create_model_instance(
+            state_reference, entity_type, interaction_id,
+            learner_answer_info_list, schema_version,
+            accumulated_answer_info_json_size_bytes)
+        model_instances = (
+            stats_models.LearnerAnswerDetailsModel.get_model_instance(
+                feconf.ENTITY_TYPE_EXPLORATION, state_reference))
+        self.assertEqual(len(model_instances), 1)
+        model_instance = model_instances[0]
+        self.assertEqual(model_instance.state_reference, state_reference)
+        self.assertEqual(
+            model_instance.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(model_instance.learner_answer_info_list, [])
+
+        # Test to create model instance for question state.
+        state_reference = 'question_id'
+        entity_type = feconf.ENTITY_TYPE_QUESTION
+        interaction_id = 'TextInput'
+        learner_answer_info_list = []
+        schema_version = feconf.CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION
+        accumulated_answer_info_json_size_bytes = 40000
+        stats_models.LearnerAnswerDetailsModel.create_model_instance(
+            state_reference, entity_type, interaction_id,
+            learner_answer_info_list, schema_version,
+            accumulated_answer_info_json_size_bytes)
+        model_instances = (
+            stats_models.LearnerAnswerDetailsModel.get_model_instance(
+                feconf.ENTITY_TYPE_QUESTION, state_reference))
+        model_instance = model_instances[0]
+        self.assertEqual(model_instance.state_reference, state_reference)
+        self.assertEqual(
+            model_instance.entity_type, feconf.ENTITY_TYPE_QUESTION)
+        self.assertEqual(model_instance.learner_answer_info_list, [])

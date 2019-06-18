@@ -1147,11 +1147,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     the model instance is created.
     """
 
-    # The maximum size in bytes that learner_answer_info_list can take,
-    # although the maximum size is 1000000 bytes, but 100000 bytes are
-    # left for other fields in the model.
-    _MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
-
     # The reference to the state for which model instance is created.
     # For exploration state the state reference is of the form
     # 'exp_id'.'state_name', while for question state reference is of the form
@@ -1204,125 +1199,35 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return question_id
 
     @classmethod
-    def insert_learner_answer_info_for_exploration(
-            cls, exploration_id, state_name, interaction_id,
-            new_learner_answer_info_dict):
-        """Insert a new learner answer info in the learner answer info list in
-        the existing model instance of the state, if the model instance for the
-        state does not exist then create a new model instance and then add it.
+    def create_model_instance(
+            cls, state_reference, entity_type, interaction_id,
+            learner_answer_info_list, schema_version,
+            accumulated_answer_info_json_size_bytes):
+        """Creates a new LearnerAnswerDetailsModel for the given entity type
+        then writes it to the datastore.
 
         Args:
-            exploration_id: str. The ID of the exploration.
-            state_name: str. The name of the state.
-            interaction_id: str. The ID of the interaction.
-            new_learner_answer_info_dict: dict. The dict representation of
-                LearnerAnswerInfo class in stats_domain.
+            state_reference: str. The reference to the state for which model
+                instance is being created. For exploration state it will be of
+                the form 'exp_id.state_name', & for question it will be of the
+                form 'question_id'.
+            entity_type: str. The type of entity i.e "exploration" or
+                "question".
+            interaction_id: str.  The ID of the interaction for which the
+                answer details are received.
+            learner_answer_info_list: list. The list of LearnerAnswerInfo
+                objects in dict format, which is defined in the stats_domain.
+            schema_version: int. The version of LearnerAnswerInfo dict, which
+                is currently supported by the Oppia.
+            accumulated_answer_info_json_size_bytes: int. The size of the
+                learner_answer_info_list in bytes.
         """
-        state_reference = cls.get_state_reference_for_exploration(
-            exploration_id, state_name)
-        model_instance = cls.get_model_instance(
-            feconf.ENTITY_TYPE_EXPLORATION, state_reference)
-        learner_answer_info_dict_size = cls._get_learner_answer_info_dict_size(
-            new_learner_answer_info_dict)
-        if model_instance:
-            if (model_instance.accumulated_answer_info_json_size_bytes) + (
-                    learner_answer_info_dict_size) <= (
-                        cls._MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE):
-                model_instance.learner_answer_info_list.append(
-                    new_learner_answer_info_dict)
-                model_instance.accumulated_answer_info_json_size_bytes += (
-                    learner_answer_info_dict_size)
-                model_instance.put()
-        else:
-            cls.create_model_instance_for_exploration(
-                exploration_id, state_name, interaction_id,
-                new_learner_answer_info_dict)
-
-    @classmethod
-    def insert_learner_answer_info_for_question(
-            cls, question_id, interaction_id, new_learner_answer_info_dict):
-        """Insert a new learner answer info in the learner answer info list in
-        the existing model instance of the state, if the model instance for the
-        state does not exist then the model instance is created.
-
-        Args:
-            question_id: str. The ID of the question.
-            interaction_id: str. The ID of the interaction.
-            new_learner_answer_info_dict: dict. The dict representation of
-                LearnerAnswerInfo class in stats_domain.
-        """
-        state_reference = cls.get_state_reference_for_question(question_id)
-        model_instance = cls.get_model_instance(
-            feconf.ENTITY_TYPE_QUESTION, state_reference)
-        learner_answer_info_dict_size = cls._get_learner_answer_info_dict_size(
-            new_learner_answer_info_dict)
-        if model_instance:
-            if (model_instance.accumulated_answer_info_json_size_bytes) + (
-                    learner_answer_info_dict_size) <= (
-                        cls._MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE):
-                model_instance.learner_answer_info_list.append(
-                    new_learner_answer_info_dict)
-                model_instance.accumulated_answer_info_json_size_bytes += (
-                    learner_answer_info_dict_size)
-            model_instance.put()
-        else:
-            cls.create_model_instance_for_question(
-                question_id, interaction_id, new_learner_answer_info_dict)
-
-    @classmethod
-    def create_model_instance_for_exploration(
-            cls, exp_id, state_name, interaction_id, learner_answer_info_dict):
-        """Creates a new LearnerAnswerDetailsModel for the entity type
-        exploration and then writes it to the datastore.
-
-        Args:
-            exp_id: str. ID of the exploration.
-            state_name: str. The name of the state.
-            interaction_id: str. The id of the interaction.
-            learner_answer_info_dict: dict. The dict representation of
-                LearnerAnswerInfo in stats_domain.
-
-        Returns:
-            LearnerAnswerDetailsModel. The instance of the
-                LearnerAnswerDetailsModel.
-        """
-
-        state_reference = cls.get_state_reference_for_exploration(
-            exp_id, state_name)
-        accumulated_answer_info_json_size_bytes = (
-            cls._get_learner_answer_info_dict_size(learner_answer_info_dict))
-        learner_answer_info_list = [learner_answer_info_dict]
         answer_details_instance = cls(
             state_reference=state_reference,
-            entity_type=feconf.ENTITY_TYPE_EXPLORATION,
+            entity_type=entity_type,
             interaction_id=interaction_id,
             learner_answer_info_list=learner_answer_info_list,
-            accumulated_answer_info_json_size_bytes=(
-                accumulated_answer_info_json_size_bytes))
-        answer_details_instance.put()
-
-    @classmethod
-    def create_model_instance_for_question(
-            cls, question_id, interaction_id, learner_answer_info_dict):
-        """Creates a new LearnerAnswerDetailsModel for the entity type
-        question and then writes it to the datastore.
-
-        Args:
-            question_id: str. ID of the question.
-            interaction_id: str. The id of the interaction.
-            learner_answer_info_dict: dict. The dict representation of
-                LearnerAnswerInfo in stats_domain.
-        """
-
-        state_reference = cls.get_state_reference_for_question(question_id)
-        accumulated_answer_info_json_size_bytes = (
-            cls._get_learner_answer_info_dict_size(learner_answer_info_dict))
-        learner_answer_info_list = [learner_answer_info_dict]
-        answer_details_instance = cls(
-            state_reference=state_reference,
-            entity_type=feconf.ENTITY_TYPE_QUESTION,
-            interaction_id=interaction_id,
-            learner_answer_info_list=learner_answer_info_list,
+            schema_version=schema_version,
             accumulated_answer_info_json_size_bytes=(
                 accumulated_answer_info_json_size_bytes))
         answer_details_instance.put()
@@ -1334,29 +1239,19 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         state reference.
 
         Args:
-            entity_type: str. The type of the entity.
-            state_reference: str. The reference to a state.
+            entity_type: str. The type of the entity i.e "exploration" or
+                "question".
+            state_reference: str. The reference to a state, for which the model
+                is to be fetched. Foe exploration state it will be of the form
+                'exp_id.state_name', and for question state it will be of the
+                form 'question_id'.
 
         Returns:
             list(LearnerAnswerDetailsModel). List of answer details associated
                 with the entity. Doesn't include deleted entries.
         """
         return cls.get_all().filter(cls.entity_type == entity_type).filter(
-            cls.state_reference == state_reference)
-
-    @classmethod
-    def _get_learner_answer_info_dict_size(cls, learner_answer_info_dict):
-        """Returns a size overestimate (in bytes) of the given learner answer
-        info dict.
-
-        Args:
-            learner_answer_info_dict: dict. The dict representation of
-                LearnerAnswerInfo in stats_domain.
-
-        Returns:
-            int. Size of the learner_answer_info_dict.
-        """
-        return sys.getsizeof(json.dumps(learner_answer_info_dict))
+            cls.state_reference == state_reference).fetch()
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
