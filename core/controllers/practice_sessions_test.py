@@ -105,6 +105,7 @@ class PracticeSessionsPageDataHandlerTests(BasePracticeSessionsControllerTests):
             'topic_id_3', 'topic_without_skills')
         topic.uncategorized_skill_ids.append('non_existent_skill')
         topic_services.save_new_topic(self.admin_id, topic)
+        topic_services.publish_topic('topic_id_3', self.admin_id)
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
                 '%s/%s' % (
