@@ -53,98 +53,111 @@ require('base_components/BaseContentDirective.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 
-oppia.controller('Moderator', [
-  '$http', '$rootScope', '$scope', 'AlertsService', 'DateTimeFormatService',
-  function($http, $rootScope, $scope, AlertsService, DateTimeFormatService) {
-    $rootScope.loadingMessage = 'Loading';
-    $scope.getDatetimeAsString = function(millisSinceEpoch) {
-      return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
-        millisSinceEpoch);
-    };
+oppia.directive('moderatorPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/moderator-page/moderator-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$http', '$rootScope', 'AlertsService', 'DateTimeFormatService',
+      function($http, $rootScope, AlertsService, DateTimeFormatService) {
+        var ctrl = this;
+        $rootScope.loadingMessage = 'Loading';
+        ctrl.getDatetimeAsString = function(millisSinceEpoch) {
+          return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
+            millisSinceEpoch);
+        };
 
-    $scope.getExplorationCreateUrl = function(explorationId) {
-      return '/create/' + explorationId;
-    };
+        ctrl.getExplorationCreateUrl = function(explorationId) {
+          return '/create/' + explorationId;
+        };
 
-    $scope.getActivityCreateUrl = function(reference) {
-      return (
-        (reference.type === 'exploration' ? '/create' : '/create_collection') +
-        '/' + reference.id);
-    };
+        ctrl.getActivityCreateUrl = function(reference) {
+          return (
+            (reference.type === (
+              'exploration' ? '/create' : '/create_collection')) +
+            '/' + reference.id);
+        };
 
-    $scope.allCommits = [];
-    $scope.allFeedbackMessages = [];
-    // Map of exploration ids to objects containing a single key: title.
-    $scope.explorationData = {};
+        ctrl.allCommits = [];
+        ctrl.allFeedbackMessages = [];
+        // Map of exploration ids to objects containing a single key: title.
+        ctrl.explorationData = {};
 
-    $scope.displayedFeaturedActivityReferences = [];
-    $scope.lastSavedFeaturedActivityReferences = [];
-    $scope.FEATURED_ACTIVITY_REFERENCES_SCHEMA = {
-      type: 'list',
-      items: {
-        type: 'dict',
-        properties: [{
-          name: 'type',
-          schema: {
-            type: 'unicode',
-            choices: ['exploration', 'collection']
+        ctrl.displayedFeaturedActivityReferences = [];
+        ctrl.lastSavedFeaturedActivityReferences = [];
+        ctrl.FEATURED_ACTIVITY_REFERENCES_SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'dict',
+            properties: [{
+              name: 'type',
+              schema: {
+                type: 'unicode',
+                choices: ['exploration', 'collection']
+              }
+            }, {
+              name: 'id',
+              schema: {
+                type: 'unicode'
+              }
+            }]
           }
-        }, {
-          name: 'id',
-          schema: {
-            type: 'unicode'
+        };
+
+        var RECENT_COMMITS_URL = (
+          '/recentcommitshandler/recent_commits' +
+          '?query_type=all_non_private_commits');
+        // TODO(sll): Update this to also support collections.
+        $http.get(RECENT_COMMITS_URL).then(function(response) {
+          // Update the explorationData object with information about newly-
+          // discovered explorations.
+          var data = response.data;
+          var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
+          for (var expId in explorationIdsToExplorationData) {
+            if (!ctrl.explorationData.hasOwnProperty(expId)) {
+              ctrl.explorationData[expId] = (
+                explorationIdsToExplorationData[expId]);
+            }
           }
-        }]
+          ctrl.allCommits = data.results;
+          $rootScope.loadingMessage = '';
+        });
+
+        $http.get('/recent_feedback_messages').then(function(response) {
+          ctrl.allFeedbackMessages = response.data.results;
+        });
+
+        $http.get('/moderatorhandler/featured').then(function(response) {
+          ctrl.displayedFeaturedActivityReferences = (
+            response.data.featured_activity_references);
+          ctrl.lastSavedFeaturedActivityReferences = angular.copy(
+            ctrl.displayedFeaturedActivityReferences);
+        });
+
+        ctrl.isSaveFeaturedActivitiesButtonDisabled = function() {
+          return angular.equals(
+            ctrl.displayedFeaturedActivityReferences,
+            ctrl.lastSavedFeaturedActivityReferences);
+        };
+
+        ctrl.saveFeaturedActivityReferences = function() {
+          AlertsService.clearWarnings();
+
+          var activityReferencesToSave = angular.copy(
+            ctrl.displayedFeaturedActivityReferences);
+          $http.post('/moderatorhandler/featured', {
+            featured_activity_reference_dicts: activityReferencesToSave
+          }).then(function() {
+            ctrl.lastSavedFeaturedActivityReferences = activityReferencesToSave;
+            AlertsService.addSuccessMessage('Featured activities saved.');
+          });
+        };
       }
-    };
-
-    var RECENT_COMMITS_URL = (
-      '/recentcommitshandler/recent_commits' +
-      '?query_type=all_non_private_commits');
-    // TODO(sll): Update this to also support collections.
-    $http.get(RECENT_COMMITS_URL).then(function(response) {
-      // Update the explorationData object with information about newly-
-      // discovered explorations.
-      var data = response.data;
-      var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
-      for (var expId in explorationIdsToExplorationData) {
-        if (!$scope.explorationData.hasOwnProperty(expId)) {
-          $scope.explorationData[expId] = (
-            explorationIdsToExplorationData[expId]);
-        }
-      }
-      $scope.allCommits = data.results;
-      $rootScope.loadingMessage = '';
-    });
-
-    $http.get('/recent_feedback_messages').then(function(response) {
-      $scope.allFeedbackMessages = response.data.results;
-    });
-
-    $http.get('/moderatorhandler/featured').then(function(response) {
-      $scope.displayedFeaturedActivityReferences = (
-        response.data.featured_activity_references);
-      $scope.lastSavedFeaturedActivityReferences = angular.copy(
-        $scope.displayedFeaturedActivityReferences);
-    });
-
-    $scope.isSaveFeaturedActivitiesButtonDisabled = function() {
-      return angular.equals(
-        $scope.displayedFeaturedActivityReferences,
-        $scope.lastSavedFeaturedActivityReferences);
-    };
-
-    $scope.saveFeaturedActivityReferences = function() {
-      AlertsService.clearWarnings();
-
-      var activityReferencesToSave = angular.copy(
-        $scope.displayedFeaturedActivityReferences);
-      $http.post('/moderatorhandler/featured', {
-        featured_activity_reference_dicts: activityReferencesToSave
-      }).then(function() {
-        $scope.lastSavedFeaturedActivityReferences = activityReferencesToSave;
-        AlertsService.addSuccessMessage('Featured activities saved.');
-      });
-    };
-  }
-]);
+    ]
+  };
+}]);

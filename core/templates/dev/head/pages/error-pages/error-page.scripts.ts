@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the learner's view of a collection.
+ * @fileoverview Directive scripts for the error page.
  */
 
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+require('pages/OppiaFooterDirective.ts');
+require('pages/error-pages/error-page.controller.ts');

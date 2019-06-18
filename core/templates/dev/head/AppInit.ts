@@ -24,7 +24,3 @@ var oppia = angular.module(
     'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate'
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
-
-for (var constantName in constants) {
-  oppia.constant(constantName, constants[constantName]);
-}
