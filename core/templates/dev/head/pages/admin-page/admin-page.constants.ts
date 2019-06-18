@@ -25,7 +25,6 @@ oppia.constant(
 
 oppia.constant(
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
 
 oppia.constant('ADMIN_TAB_URLS', {
   ACTIVITIES: '#activities',
