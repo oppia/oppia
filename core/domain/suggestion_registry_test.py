@@ -30,7 +30,7 @@ import utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class MockBaseSuggestion(suggestion_registry.BaseSuggestion):
+class MockInvalidSuggestion(suggestion_registry.BaseSuggestion):
 
     def __init__(self):  # pylint: disable=super-init-not-called
         pass
@@ -41,7 +41,7 @@ class BaseSuggestionUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(BaseSuggestionUnitTests, self).setUp()
-        self.base_suggestion = MockBaseSuggestion()
+        self.base_suggestion = MockInvalidSuggestion()
 
     def test_base_class_init_raises_error(self):
         with self.assertRaisesRegexp(
