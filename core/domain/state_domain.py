@@ -310,6 +310,10 @@ class ImageAssets(object):
         if image_id in self.image_mapping:
             raise utils.ValidationError('Image Id already exist. %s' %
                                         image_id)
+        image_re = r'(image_id_)+[0-9]'
+        if not re.match(image_re, image_id):
+            raise uitls.ValidationError(
+                'Invalid image_id')
 
         src = image_info['src']
         placeholder = image_info['placeholder']
