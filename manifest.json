@@ -459,9 +459,9 @@
         }
       },
       "select2": {
-        "version": "4.0.6",
+        "version": "4.0.7",
         "downloadFormat": "zip",
-        "url": "https://github.com/select2/select2/archive/4.0.6.zip",
+        "url": "https://github.com/select2/select2/archive/4.0.7.zip",
         "rootDirPrefix": "select2-",
         "targetDirPrefix": "select2-",
         "bundle": {
@@ -540,14 +540,14 @@
         }
       },
       "waveSurferJs": {
-        "version": "1.0.46",
-        "downloadFormat": "files",
-        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
-        "rootDirPrefix": "waveSurfer-js-",
+        "version": "1.4.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/katspaugh/wavesurfer.js/archive/1.4.0.zip",
+        "rootDirPrefix": "wavesurfer.js-",
         "targetDirPrefix": "wave-surfer-js-",
-        "files": ["wavesurfer.min.js"],
+        "files": ["src/wavesurfer.js"],
         "bundle": {
-          "js": ["wavesurfer.min.js"]
+          "js": ["src/wavesurfer.js"]
         }
       }
     },
