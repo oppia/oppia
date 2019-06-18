@@ -21,10 +21,12 @@ require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-task-manager.service.ts');
 
+require('pages/admin-page/admin-page.constants.ts');
+
 oppia.directive('adminDevModeActivitiesTab', [
-  '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
+  '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL',
-  function($http, AdminTaskManagerService, UrlInterpolationService,
+  function($http, $window, AdminTaskManagerService, UrlInterpolationService,
       ADMIN_HANDLER_URL) {
     return {
       restrict: 'E',
@@ -42,7 +44,7 @@ oppia.directive('adminDevModeActivitiesTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          if (!confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 
@@ -71,7 +73,7 @@ oppia.directive('adminDevModeActivitiesTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          if (!confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 
@@ -140,7 +142,7 @@ oppia.directive('adminDevModeActivitiesTab', [
           if (AdminTaskManagerService.isTaskRunning()) {
             return;
           }
-          if (!confirm('This action is irreversible. Are you sure?')) {
+          if (!$window.confirm('This action is irreversible. Are you sure?')) {
             return;
           }
 

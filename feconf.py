@@ -112,6 +112,9 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+# Interaction IDs for which answer details cannot be solicited.
+INTERACTION_IDS_WITHOUT_ANSWER_DETAILS = ['EndExploration', 'Continue']
+
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 
@@ -156,7 +159,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 28
+CURRENT_STATE_SCHEMA_VERSION = 29
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -661,6 +664,7 @@ SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
@@ -787,12 +791,6 @@ DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
 # The following are all page descriptions for the meta tag.
-ABOUT_PAGE_DESCRIPTION = (
-    'Oppia is an open source learning platform that connects a community of '
-    'teachers and learners. You can use this site to create 1-1 learning '
-    'scenarios for others.')
-GET_STARTED_PAGE_DESCRIPTION = (
-    'Learn how to get started using Oppia.')
 CONTACT_PAGE_DESCRIPTION = (
     'Contact the Oppia team, submit feedback, and learn how to get involved '
     'with the Oppia project.')
@@ -819,18 +817,6 @@ SEARCH_PAGE_DESCRIPTION = (
     'one for the community.')
 SIGNUP_PAGE_DESCRIPTION = (
     'Sign up for Oppia and begin exploring a new subject.')
-SPLASH_PAGE_DESCRIPTION = (
-    'Oppia is a free site for sharing knowledge via interactive lessons '
-    'called \'explorations\'. Learn from user-created explorations, or teach '
-    'and create your own.')
-TEACH_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
-TERMS_PAGE_DESCRIPTION = (
-    'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
-    'platform. Learn about our terms and conditions for creating and '
-    'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
 

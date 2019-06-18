@@ -19,7 +19,9 @@
 require(
   'components/common-layout-directives/common-elements/' +
   'loading-dots.directive.ts');
-
+require(
+  'components/common-layout-directives/common-elements/' +
+  'sharing-links.directive.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
@@ -50,7 +52,7 @@ require('services/SiteAnalyticsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
 oppia.factory('ExplorationSaveService', [
-  '$log', '$q', '$rootScope', '$timeout', '$uibModal',
+  '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'AutosaveInfoModalsService', 'ChangeListService',
   'ExplorationCategoryService', 'ExplorationDataService',
   'ExplorationDiffService', 'ExplorationInitStateNameService',
@@ -62,7 +64,7 @@ oppia.factory('ExplorationSaveService', [
   'RouterService', 'SiteAnalyticsService', 'StatesObjectFactory',
   'UrlInterpolationService',
   function(
-      $log, $q, $rootScope, $timeout, $uibModal,
+      $log, $q, $rootScope, $timeout, $uibModal, $window,
       AlertsService, AutosaveInfoModalsService, ChangeListService,
       ExplorationCategoryService, ExplorationDataService,
       ExplorationDiffService, ExplorationInitStateNameService,
@@ -297,7 +299,7 @@ oppia.factory('ExplorationSaveService', [
           // The reload is necessary because, otherwise, the
           // exploration-with-draft-changes will be reloaded
           // (since it is already cached in ExplorationDataService).
-          location.reload();
+          $window.location.reload();
         });
       },
 

@@ -195,7 +195,6 @@ require(
 require(
   'pages/exploration-player-page/layout-directives/' +
   'exploration-footer.directive.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
 require('objects/objectComponentsRequires.ts');
@@ -258,28 +257,8 @@ require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-oppia.constant(
-  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
-  'explorationTitleInputFocusLabel');
-oppia.constant(
-  'EXPLORATION_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>');
-oppia.constant(
-  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>?v=<version>');
-oppia.constant(
-  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/data/<exploration_id>');
-oppia.constant(
-  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/voiceover/<exploration_id>');
-oppia.constant(
-  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
-  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
-oppia.constant(
-  'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
-
+require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require('pages/interaction-specs.constants.ts');
 
 oppia.controller('ExplorationEditor', [
   '$http', '$log', '$q', '$rootScope', '$scope', '$templateCache', '$timeout',

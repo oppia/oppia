@@ -37,8 +37,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(StoryDomainUnitTests, self).setUp()
         self.STORY_ID = story_services.get_new_story_id()
+        self.TOPIC_ID = utils.generate_random_string(12)
         self.story = self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
+            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
+            self.TOPIC_ID
         )
         self.story.add_node(self.NODE_ID_1, 'Node title')
         self.signup('user@example.com', 'user')
@@ -74,7 +76,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         """Test the create_default_story and create_default_story_node
         method of class Story.
         """
-        story = story_domain.Story.create_default_story(self.STORY_ID, 'Title')
+        topic_id = utils.generate_random_string(12)
+        story = story_domain.Story.create_default_story(
+            self.STORY_ID, 'Title', topic_id)
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': 'Title',
@@ -88,6 +92,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'story_contents_schema_version': (
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'corresponding_topic_id': topic_id,
             'version': 0
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
@@ -141,6 +146,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
                 self.story.story_contents_schema_version)
         )
+
+    def test_corresponding_topic_id_validation(self):
+        # Generating valid topic id of type str.
+        valid_topic_id = utils.generate_random_string(12)
+        self.assertTrue(isinstance(valid_topic_id, basestring))
+        self.story.corresponding_topic_id = valid_topic_id
+        self.story.validate()
+
+        # Setting invalid topic id type.
+        invalid_topic_id = 123
+        self.story.corresponding_topic_id = invalid_topic_id
+        self._assert_validation_error(
+            'Expected corresponding_topic_id should be a string, received: %s' %
+            (invalid_topic_id))
 
     def test_add_node_validation(self):
         with self.assertRaisesRegexp(
@@ -229,6 +248,55 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected prerequisite skill ids and acquired skill ids '
             'to be mutually exclusive.')
+
+    def test_get_ordered_nodes(self):
+        self.story.story_contents.next_node_id = 'node_4'
+        node_1 = {
+            'id': 'node_1',
+            'title': 'Title 1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'title': 'Title 2',
+            'destination_node_ids': ['node_1'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'title': 'Title 3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.story.story_contents.initial_node_id = 'node_2'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        expected_list = [
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+
+        calculated_list = self.story.story_contents.get_ordered_nodes()
+        self.assertEqual(calculated_list[0].id, expected_list[0].id)
+        self.assertEqual(calculated_list[1].id, expected_list[1].id)
+        self.assertEqual(calculated_list[2].id, expected_list[2].id)
 
     def test_all_nodes_visited(self):
         self.story.story_contents.next_node_id = 'node_4'

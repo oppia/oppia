@@ -16,52 +16,64 @@
  * @fileoverview Data and controllers for the Oppia splash page.
  */
 
-require('pages/OppiaFooterDirective.ts');
+require('base_components/BaseContentDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 
-oppia.controller('Splash', [
-  '$rootScope', '$scope', '$timeout', '$window', 'SiteAnalyticsService',
-  'UrlInterpolationService', 'UserService',
-  function($rootScope, $scope, $timeout, $window, SiteAnalyticsService,
-      UrlInterpolationService, UserService) {
-    $scope.userIsLoggedIn = null;
-    $rootScope.loadingMessage = 'Loading';
-    UserService.getUserInfoAsync().then(function(userInfo) {
-      $scope.userIsLoggedIn = userInfo.isLoggedIn();
-      $rootScope.loadingMessage = '';
-    });
-    $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
-    $scope.getStaticSubjectImageUrl = function(subjectName) {
-      return UrlInterpolationService.getStaticImageUrl('/subjects/' +
-        subjectName + '.svg');
-    };
+oppia.directive('splashPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/splash-page/splash-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$rootScope', '$timeout', '$window', 'SiteAnalyticsService',
+      'UrlInterpolationService', 'UserService',
+      function($rootScope, $timeout, $window, SiteAnalyticsService,
+          UrlInterpolationService, UserService) {
+        var ctrl = this;
+        ctrl.userIsLoggedIn = null;
+        $rootScope.loadingMessage = 'Loading';
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          ctrl.userIsLoggedIn = userInfo.isLoggedIn();
+          $rootScope.loadingMessage = '';
+        });
+        ctrl.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+        ctrl.getStaticSubjectImageUrl = function(subjectName) {
+          return UrlInterpolationService.getStaticImageUrl('/subjects/' +
+            subjectName + '.svg');
+        };
 
-    $scope.onRedirectToLogin = function(destinationUrl) {
-      SiteAnalyticsService.registerStartLoginEvent(
-        'splashPageCreateExplorationButton');
-      $timeout(function() {
-        $window.location = destinationUrl;
-      }, 150);
-      return false;
-    };
+        ctrl.onRedirectToLogin = function(destinationUrl) {
+          SiteAnalyticsService.registerStartLoginEvent(
+            'splashPageCreateExplorationButton');
+          $timeout(function() {
+            $window.location = destinationUrl;
+          }, 150);
+          return false;
+        };
 
-    $scope.onClickBrowseLibraryButton = function() {
-      SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
-      $timeout(function() {
-        $window.location = '/library';
-      }, 150);
-      return false;
-    };
+        ctrl.onClickBrowseLibraryButton = function() {
+          SiteAnalyticsService.registerClickBrowseLibraryButtonEvent();
+          $timeout(function() {
+            $window.location = '/library';
+          }, 150);
+          return false;
+        };
 
-    $scope.onClickCreateExplorationButton = function() {
-      SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
-      $timeout(function() {
-        $window.location = '/creator_dashboard?mode=create';
-      }, 150);
-      return false;
-    };
-  }
-]);
+        ctrl.onClickCreateExplorationButton = function() {
+          SiteAnalyticsService.registerClickCreateExplorationButtonEvent();
+          $timeout(function() {
+            $window.location = '/creator_dashboard?mode=create';
+          }, 150);
+          return false;
+        };
+      }
+    ]
+  };
+}]);

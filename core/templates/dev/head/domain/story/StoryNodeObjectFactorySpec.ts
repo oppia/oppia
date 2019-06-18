@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for StoryContentsObjectFactory.
+ * @fileoverview Tests for StoryNodeObjectFactory.
  */
 
 require('domain/story/StoryNodeObjectFactory.ts');
