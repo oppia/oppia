@@ -422,6 +422,7 @@
 /core/templates/dev/head/pages/profile-page/ @kevinlee12
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
+/core/templates/dev/head/services/services.constants.ts @kevinlee12 @seanlip
 
 # Critical files.
 #
