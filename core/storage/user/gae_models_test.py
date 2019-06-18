@@ -44,6 +44,31 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             feconf.ROLE_ID_ADMIN)
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
+    def test_export_data(self):
+        user = user_models.UserSettingsModel.get_by_role(
+            feconf.ROLE_ID_ADMIN)[0]
+        user_data = user.export_data(user.id)
+        self.assertEqual('user@example.com', user_data['email'])
+        self.assertEqual(feconf.ROLE_ID_ADMIN, user_data['role'])
+        self.assertEqual(None, user_data['username'])
+        self.assertEqual(None, user_data['normalized_username'])
+        self.assertEqual(None, user_data['last_agreed_to_terms'])
+        self.assertEqual(None, user_data['last_started_state_editor_tutorial'])
+        self.assertEqual(
+            None,
+            user_data['last_started_state_translation_tutorial'])
+        self.assertEqual(None, user_data['last_logged_in'])
+        self.assertEqual(None, user_data['last_edited_an_exploration'])
+        self.assertEqual(None, user_data['profile_picture_data_url'])
+        self.assertEqual('learner', user_data['default_dashboard'])
+        self.assertEqual('card', user_data['creator_dashboard_display_pref'])
+        self.assertEqual(None, user_data['user_bio'])
+        self.assertEqual([], user_data['subject_interests'])
+        self.assertEqual(None, user_data['first_contribution_msec'])
+        self.assertEqual([], user_data['preferred_language_codes'])
+        self.assertEqual(None, user_data['preferred_site_language_code'])
+        self.assertEqual(None, user_data['preferred_audio_language_code'])
+
 
 class StoryProgressModelTests(test_utils.GenericTestBase):
 
@@ -443,3 +468,52 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertIn('category1', score_categories)
         self.assertIn('category3', score_categories)
         self.assertNotIn('category2', score_categories)
+
+
+class UserSubscriptionsModelTests(test_utils.GenericTestBase):
+    """Tests for UserSubscriptionsModel."""
+    USER_ID_1 = 'user_id_1'
+    USER_ID_2 = 'user_id_2'
+    CREATOR_IDS = ['4', '8', '16']
+    COLLECTION_IDS = ['23', '42', '4']
+    ACTIVITY_IDS = ['8', '16', '23']
+    GENERAL_FEEDBACK_THREAD_IDS = ['42', '4', '8']
+
+    def setUp(self):
+        """Set up user models in datastore for use in testing."""
+        super(UserSubscriptionsModelTests, self).setUp()
+        user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
+
+        user_model_2 = user_models.UserSubscriptionsModel(id=self.USER_ID_2)
+        user_model_2.creator_ids = self.CREATOR_IDS
+        user_model_2.collection_ids = self.COLLECTION_IDS
+        user_model_2.activity_ids = self.ACTIVITY_IDS
+        user_model_2.general_feedback_thread_ids = (
+            self.GENERAL_FEEDBACK_THREAD_IDS)
+        user_models.UserSubscriptionsModel.put(user_model_2)
+
+    def test_export_data_trivial(self):
+        """Test if empty user data is properly exported."""
+        user_data = (
+            user_models.UserSubscriptionsModel.export_data(self.USER_ID_1))
+        test_data = {
+            'creator_ids': [],
+            'collection_ids': [],
+            'activity_ids': [],
+            'general_feedback_thread_ids': [],
+            'last_checked': None
+        }
+        self.assertEqual(user_data, test_data)
+
+    def test_export_data_nontrivial(self):
+        """Test if nonempty user data is properly exported."""
+        user_data = (
+            user_models.UserSubscriptionsModel.export_data(self.USER_ID_2))
+        test_data = {
+            'creator_ids': self.CREATOR_IDS,
+            'collection_ids': self.COLLECTION_IDS,
+            'activity_ids': self.ACTIVITY_IDS,
+            'general_feedback_thread_ids': self.GENERAL_FEEDBACK_THREAD_IDS,
+            'last_checked': None
+        }
+        self.assertEqual(user_data, test_data)

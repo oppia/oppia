@@ -94,6 +94,41 @@ class UserSettingsModel(base_models.BaseModel):
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
+    @staticmethod
+    def export_data(user_id):
+        """Exports the data from UserSettingsModel into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserSettingsModel.
+        """
+        user = UserSettingsModel.get(user_id)
+        return {
+            'email': user.email,
+            'role': user.role,
+            'username': user.username,
+            'normalized_username': user.normalized_username,
+            'last_agreed_to_terms': user.last_agreed_to_terms,
+            'last_started_state_editor_tutorial': (
+                user.last_started_state_editor_tutorial),
+            'last_started_state_translation_tutorial': (
+                user.last_started_state_translation_tutorial),
+            'last_logged_in': user.last_logged_in,
+            'last_edited_an_exploration': user.last_edited_an_exploration,
+            'profile_picture_data_url': user.profile_picture_data_url,
+            'default_dashboard': user.default_dashboard,
+            'creator_dashboard_display_pref': (
+                user.creator_dashboard_display_pref),
+            'user_bio': user.user_bio,
+            'subject_interests': user.subject_interests,
+            'first_contribution_msec': user.first_contribution_msec,
+            'preferred_language_codes': user.preferred_language_codes,
+            'preferred_site_language_code': user.preferred_site_language_code,
+            'preferred_audio_language_code': user.preferred_audio_language_code
+        }
+
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
         """Returns whether or not a given normalized_username is taken.
@@ -295,6 +330,25 @@ class UserSubscriptionsModel(base_models.BaseModel):
     creator_ids = ndb.StringProperty(repeated=True, indexed=True)
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
+
+    @staticmethod
+    def export_data(user_id):
+        """Export UserSubscriptionsModel data."""
+        user_model = UserSubscriptionsModel.get(user_id, strict=False)
+
+        if user_model is None:
+            user_model = UserSubscriptionsModel(id=user_id)
+
+        user_data = {
+            'activity_ids': user_model.activity_ids,
+            'collection_ids': user_model.collection_ids,
+            'general_feedback_thread_ids': (
+                user_model.general_feedback_thread_ids),
+            'creator_ids': user_model.creator_ids,
+            'last_checked': user_model.last_checked
+        }
+
+        return user_data
 
 
 class UserSubscribersModel(base_models.BaseModel):
