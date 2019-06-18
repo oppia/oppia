@@ -17,9 +17,6 @@
  * Changes may be undone, redone, or replaced.
  */
 
-oppia.constant(
-  'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED', 'undoRedoServiceChangeApplied');
-
 /**
  * Stores a stack of changes to a domain object. Please note that only one
  * instance of this service exists at a time, so multiple undo/redo stacks are
