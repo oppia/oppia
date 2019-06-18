@@ -41,7 +41,7 @@ oppia.factory('QuestionBackendApiService', [
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
-          comma_separated_skill_ids: skillIds.join(','),
+          skill_ids: skillIds.join(','),
           question_count: questionCount.toString(),
           start_cursor: _startCursor
         });

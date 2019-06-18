@@ -167,7 +167,7 @@ oppia.factory('EditableQuestionBackendApiService', [
       addQuestionSkillLink: function(
           questionId, skillId) {
         return $q(function(resolve, reject) {
-          _addQuestionSkillLinks(questionId, skillId, resolve, reject);
+          _addQuestionSkillLink(questionId, skillId, resolve, reject);
         });
       }
     };
