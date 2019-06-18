@@ -1713,7 +1713,8 @@ class ExplorationContentValidationJobForCKEditorTests(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image image_id-with-value="image_id_1"></oppia-noninteractive-image>Hello this '
+                '<p><oppia-noninteractive-image image_id-with-value="&amp;quot;image_id_1&amp;quot;">'
+                '</oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
         }
@@ -1792,7 +1793,7 @@ class ExplorationContentValidationJobForCKEditorTests(
                 ' in </b>progress</pre>\', '
                 'u\'<ol><ol><li>Item1</li></ol><li>Item2</li></ol>\', '
                 'u\'<p><oppia-noninteractive-image image_id-with-value='
-                '"image_id_1"></oppia-noninteractive-image>'
+                '"&amp;quot;image_id_1&amp;quot;"></oppia-noninteractive-image>'
                 'Hello this is test case to check '
                 'image tag inside p tag</p>\', '
                 'u\'<oppia-noninteractive-collapsible content-'

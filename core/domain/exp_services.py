@@ -29,6 +29,7 @@ import logging
 import math
 import os
 import pprint
+import re
 import traceback
 import zipfile
 
@@ -588,9 +589,9 @@ def get_deleted_images_ids(image_ids_after_change, image_ids_before_change):
     """Returns a list of image_ids of all deleted images.
 
     Args:
-        image_ids_after_change: list. List of all ids of all images present
+        image_ids_after_change: list. List of all image ids present
             in an exploration after change.
-        image_ids_before_change: list. List of all ids of all images present
+        image_ids_before_change: list. List of all image ids present
             in an exploration before change.
 
     Returns:
@@ -821,12 +822,11 @@ def apply_change_list(exploration_id, change_list):
                                 get_images_ids_of_exploration(exploration))
 
                             # Adds a new image.
-                            expected_image_id = (
-                                int(change.image_id.strip('image_id')))
-                            if not isinstance(expected_image_id, int):
-                                raise Exception(
-                                    'Expected image_id to be unicode, '
-                                    'received %s' % change.image_id)
+                            image_re = r'(image_id_)+[0-9]'
+                            if not re.match(image_re, change.image_id):
+                                raise utils.ValidationError(
+                                    'Invalid image_id, received %s' % 
+                                    change.image_id)
                             if not isinstance(change.image_info, dict):
                                 raise Exception(
                                     'Expected image_info to be dict, '
@@ -1229,7 +1229,6 @@ def delete_image_from_exploration(exploration, image_id):
     Returns:
         Exploration. The exploration domain object.
     """
-
     for state in exploration.states.itervalues():
         if image_id in state.image_assets.image_mapping:
             state.image_assets.delete_image(image_id)

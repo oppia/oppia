@@ -833,8 +833,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
     return new_filename
 
 
-def add_image_id_in_image_tag(
-        html, image_counter):
+def add_image_id_in_image_tag(html, image_counter):
     """Adds image_id-with-value in image tag.
 
     Args:
@@ -857,7 +856,7 @@ def add_image_id_in_image_tag(
 
 
 def get_image_info_from_html(html):
-    """Extracts info of each image present in the HTML.
+    """Extracts info about each image present in the HTML.
 
     Args:
         html: str. the HTML in which the images are present.

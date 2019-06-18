@@ -311,13 +311,13 @@ class ImageAssets(object):
             image_id: int. The image_id of an image.
             image_info: dict. The dicts representation of image info.
         """
-        if image_id in self.image_mapping:
-            raise utils.ValidationError('Image Id already exist. %s' %
-                                        image_id)
         image_re = r'(image_id_)+[0-9]'
         if not re.match(image_re, image_id):
             raise utils.ValidationError(
                 'Invalid image_id')
+        if image_id in self.image_mapping:
+            raise utils.ValidationError(
+                'Image Id already exist. %s' % image_id)
 
         src = image_info['src']
         placeholder = image_info['placeholder']
@@ -1654,10 +1654,10 @@ class State(object):
         copied_image_ids = copy.deepcopy(image_ids)
         for image_id in image_ids:
             validated_image_id = int(image_id.strip('image_id'))
-            if not isinstance(image_id, basestring):
+            image_re = r'(image_id_)+[0-9]'
+            if not re.match(image_re, image_id):
                 raise utils.ValidationError(
-                    'Expected image_id to be string, received %s' %
-                    type(image_id))
+                    'Invalid image_id received %s' % image_id)
             if validated_image_id > image_counter:
                 utils.ValidationError(
                     'Found image id to be greater then image counter %s' %
