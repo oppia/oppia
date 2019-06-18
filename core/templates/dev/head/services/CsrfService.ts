@@ -23,14 +23,6 @@ oppia.factory('CsrfService', [function() {
   };
 
   return {
-    fetchToken: function() {
-      fetch('/csrf').then(function(response) {
-        return response.text();
-      }).then(function(response) {
-        setToken(JSON.parse(response.substring(5)).token);
-      });
-    },
-
     setToken: setToken,
 
     getToken: function() {

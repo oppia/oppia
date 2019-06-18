@@ -24,12 +24,14 @@ require('services/stateful/BackgroundMaskService.ts');
  */
 
 oppia.controller('Base', [
-  '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',
-  'CsrfService', 'SidebarStatusService', 'UrlInterpolationService',
-  'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
-  function($document, $rootScope, $scope, AlertsService, BackgroundMaskService,
-      CsrfService, SidebarStatusService, UrlInterpolationService,
-      UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL, SITE_NAME) {
+  '$document', '$rootScope', '$http', '$scope', 'AlertsService',
+  'BackgroundMaskService', 'CsrfService', 'SidebarStatusService',
+  'UrlInterpolationService', 'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL',
+  'SITE_NAME',
+  function($document, $rootScope, $http, $scope, AlertsService,
+      BackgroundMaskService, CsrfService, SidebarStatusService,
+      UrlInterpolationService, UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL,
+      SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
@@ -55,7 +57,9 @@ oppia.controller('Base', [
     });
 
     if (UrlService.getPathname() !== '/signup') {
-      CsrfService.fetchToken();
+      $http.get('/csrf').then(function(response) {
+        CsrfService.setToken(response.data.token);
+      });
     }
     // TODO(sll): use 'touchstart' for mobile.
     $document.on('click', function() {
