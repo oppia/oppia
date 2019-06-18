@@ -27,14 +27,7 @@ require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
-  '/question_editor_handler/data/<question_id>');
-oppia.constant(
-  'QUESTION_CREATION_URL', '/question_editor_handler/create_new/<skill_id>');
-oppia.constant(
-  'QUESTION_SKILL_LINK_URL_TEMPLATE',
-  '/manage_question_skill_link/<question_id>/<skill_id>');
+require('domain/question/question-domain.constants.ts');
 
 oppia.factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
