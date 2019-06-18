@@ -57,8 +57,16 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
               topic_name: ctrl.topicName
             });
           $http.get(practiceSessionsDataUrl).then(function(result) {
+            var skillList = [];
+            var skillDescriptions = [];
+            for (var skillId in result.data.skills_with_description) {
+              skillList.push(skillId);
+              skillDescriptions.push(
+                result.data.skills_with_description[skillId]);
+            }
             var questionPlayerConfig = {
-              skillList: result.data.skill_list,
+              skillList: skillList,
+              skillDescriptions: skillDescriptions,
               questionCount: TOTAL_QUESTIONS
             };
             ctrl.questionPlayerConfig = questionPlayerConfig;
