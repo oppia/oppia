@@ -848,7 +848,8 @@ def add_image_id_in_image_tag(
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
         image_counter += 1
-        image['image_id-with-value'] = image_counter
+        image_id = 'image_id_' + str(image_counter)
+        image['image_id-with-value'] = escape_html(json.dumps(image_id))
 
     new_content_html = unicode(soup).replace('<br/>', '<br>')
 

@@ -1713,7 +1713,7 @@ class ExplorationContentValidationJobForCKEditorTests(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image image_id-with-value=""></oppia-noninteractive-image>Hello this '
+                '<p><oppia-noninteractive-image image_id-with-value="image_id_1"></oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
         }
@@ -1791,8 +1791,8 @@ class ExplorationContentValidationJobForCKEditorTests(
                 '</oppia-noninteractive-image>'
                 ' in </b>progress</pre>\', '
                 'u\'<ol><ol><li>Item1</li></ol><li>Item2</li></ol>\', '
-                'u\'<p><oppia-noninteractive-image>'
-                '</oppia-noninteractive-image>'
+                'u\'<p><oppia-noninteractive-image image_id-with-value='
+                '"image_id_1"></oppia-noninteractive-image>'
                 'Hello this is test case to check '
                 'image tag inside p tag</p>\', '
                 'u\'<oppia-noninteractive-collapsible content-'
@@ -1917,17 +1917,17 @@ class InteractionCustomizationArgsValidationJobTests(
             .InteractionCustomizationArgsValidationJob.get_output(job_id))
 
         expected_output = [(
+            '[u\'Invalid image_id, received invalid\', '
+            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" caption-with-value'
+            '="&amp;quot;Hello&amp;quot;" image_id-with-value="&amp;quot;invalid'
+            '&amp;quot;"></oppia-noninteractive-image>\']]'
+        ),(
             '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
             'https://\'; received htt://link.com", '
             '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
             'is a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com'
             '&amp;quot;"></oppia-noninteractive-link></p>\']]'
-        ), (
-            '[u"invalid literal for int() with base 10: \'invalid\'", '
-            '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
-            'circle divided into equal fifths.&amp;quot;" caption-with-value'
-            '="&amp;quot;Hello&amp;quot;" image_id-with-value="&amp;quot;invalid'
-            '&amp;quot;"></oppia-noninteractive-image>\']]'
         )]
 
         self.assertEqual(actual_output, expected_output)

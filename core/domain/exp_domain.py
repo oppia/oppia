@@ -482,7 +482,7 @@ class Exploration(object):
         empty list; 'states_schema_version' is taken from feconf; 'states_dict'
         is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
         'author_notes' are initialized to empty string; 'version' and
-        image_counter is initializated to 0.
+        'image_counter' is initializated to 0.
 
         Args:
             exploration_id: str. The id of the exploration.
@@ -601,10 +601,8 @@ class Exploration(object):
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
 
-            state.image_assets = (
-                state_domain.ImageAssets.from_dict(
-                    sdict['image_assets'])
-                )
+            state.image_assets = state_domain.ImageAssets.from_dict(
+                sdict['image_assets'])
 
             state.solicit_answer_details = sdict['solicit_answer_details']
 
@@ -668,7 +666,7 @@ class Exploration(object):
 
         if not isinstance(self.image_counter, int):
             raise utils.ValidationError(
-                'Expected image_counter to be a integer, received %s' %
+                'Expected image_counter to be an integer, received %s' %
                 self.image_counter)
 
         if not isinstance(self.tags, list):
@@ -3062,11 +3060,11 @@ class Exploration(object):
 
         Args:
             exploration_dict: dict. The dict representation of an exploration
-                with schema version v33.
+                with schema version v34.
 
         Returns:
             dict. The dict representation of the Exploration domain object,
-            following schema version v34.
+            following schema version v35.
         """
         exploration_dict['schema_version'] = 35
 

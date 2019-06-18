@@ -4608,11 +4608,11 @@ states:
       html: <p>Hello, this is state3</p>
     image_assets:
       image_mapping:
-        \'1\':
+        image_id_1:
           instructions: ''
           placeholder: false
           src: startBlue_height_490_width_120.png
-        \'2\':
+        image_id_2:
           instructions: ''
           placeholder: false
           src: startBlue_height_490_width_120.png
@@ -4623,9 +4623,9 @@ states:
           feedback:
             content_id: feedback_1
             html: <p>Here is the image1 </p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-              image_id-with-value="1"> </oppia-noninteractive-image><p>Here is the
-              image2 </p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-              image_id-with-value="2"> </oppia-noninteractive-image>
+              image_id-with-value="&amp;quot;image_id_1&amp;quot;"> </oppia-noninteractive-image><p>Here
+              is the image2 </p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+              image_id-with-value="&amp;quot;image_id_2&amp;quot;"> </oppia-noninteractive-image>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -4809,11 +4809,11 @@ states:
     content:
       content_id: content
       html: <oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-        image_id-with-value="1"></oppia-noninteractive-image><p>Hello this is test
-        case to check image tag inside p tag</p>
+        image_id-with-value="&amp;quot;image_id_1&amp;quot;"></oppia-noninteractive-image><p>Hello
+        this is test case to check image tag inside p tag</p>
     image_assets:
       image_mapping:
-        \'1\':
+        image_id_1:
           instructions: ''
           placeholder: false
           src: random_height_490_width_120.png

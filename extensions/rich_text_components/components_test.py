@@ -81,10 +81,10 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         valid_items = [{
             'alt-with-value': '1234',
             'caption-with-value': 'hello',
-            'image_id-with-value': u'1'
+            'image_id-with-value': 'image_id_1'
         }, {
             'alt-with-value': 'hello',
-            'image_id-with-value': u'2'
+            'image_id-with-value': 'image_id_2'
         }]
         invalid_items = [{
             'caption-with-value': 'abc',
