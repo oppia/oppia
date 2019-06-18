@@ -68,4 +68,4 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
       }
     ]
   };
-});
+}]);
