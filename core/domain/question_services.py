@@ -371,8 +371,6 @@ def get_skills_linked_to_question(question_id):
         list(Skill). The list of skills that are linked to the question.
     """
     question = get_question_by_id(question_id)
-    if not question:
-        raise Exception('Question doesn\'t exist in the backend')
     skills = skill_services.get_multi_skills(question.linked_skill_ids)
     return skills
 
