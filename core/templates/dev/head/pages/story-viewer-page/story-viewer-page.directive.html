@@ -1,0 +1,13 @@
+<div class="oppia-story-viewer-container">
+  <div class="oppia-story-title">
+    <[$ctrl.storyTitle]>
+  </div>
+  <div class="oppia-story-description">
+    <[$ctrl.storyDescription]>
+  </div>
+  <div ng-if="$ctrl.storyIsLoaded">
+    <story-viewer-chapters-list ng-if="$ctrl.storyPlaythroughObject.getStoryNodeCount() > 0"
+                                playthrough-object="$ctrl.storyPlaythroughObject">
+    </story-viewer-chapters-list>
+  </div>
+</div>

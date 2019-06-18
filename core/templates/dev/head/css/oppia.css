@@ -1742,10 +1742,26 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 
+.oppia-story-player-tiles-container {
+  height: 100%;
+  margin: 0 auto;
+  max-width: 975px;
+  min-height: 500px;
+  padding-bottom: 25px;
+  padding-top: 30px;
+  position: relative;
+}
+
 .oppia-page-heading {
   margin-bottom: 5px;
 }
 .oppia-collection-player-tiles-container .oppia-page-heading {
+  color: #005048;
+  text-align: center;
+  width: 100%;
+}
+
+.oppia-story-player-tiles-container .oppia-page-heading {
   color: #005048;
   text-align: center;
   width: 100%;
