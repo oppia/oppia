@@ -831,8 +831,8 @@ class IframeRestrictionTests(test_utils.GenericTestBase):
         self.get_html_response('/mock')
 
         response = self.get_html_response(
-            '/mock', params={str('iframe_restriction'): str('DENY')})
-        self.assertEqual(response.headers[str('X-Frame-Options')], str('DENY'))
+            '/mock', params={'iframe_restriction': 'DENY'})
+        self.assertEqual(response.headers['X-Frame-Options'], 'DENY')
 
         response = self.get_html_response(
             '/mock', params={'iframe_restriction': 'SAMEORIGIN'})

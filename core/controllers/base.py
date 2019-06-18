@@ -339,8 +339,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.headers['X-Xss-Protection'] = '1; mode=block'
 
         if iframe_restriction is not None:
-            if iframe_restriction in [str('SAMEORIGIN'), str('DENY')]:
-                self.response.headers[str('X-Frame-Options')] = str(
+            if iframe_restriction in ['SAMEORIGIN', 'DENY']:
+                self.response.headers['X-Frame-Options'] = str(
                     iframe_restriction)
             else:
                 raise Exception(
