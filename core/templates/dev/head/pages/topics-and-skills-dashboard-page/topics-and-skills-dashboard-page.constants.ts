@@ -17,14 +17,6 @@
  */
 
 oppia.constant(
-  'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
-  '/topic_editor_handler/data/<topic_id>');
-
-oppia.constant(
-  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
-  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
-
-oppia.constant(
   'EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
 
 oppia.constant(
