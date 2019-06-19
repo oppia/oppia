@@ -1371,7 +1371,7 @@ class LearnerAnswerDetailsChange(object):
     """Domain object for changes made in LearnerAnswerDetails."""
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'new_value', 'old_value', 'answer', 'answer_details']
+        'new_value', 'old_value', 'answer', 'answer_details', 'learner_answer_info_id']
 
     def __init__(self, change_dict):
         """Intialize a domain object for LearnerAnswerDetails from a dict.
