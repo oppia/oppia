@@ -326,8 +326,7 @@ class AssetDevHandlerAudioTest(test_utils.GenericTestBase):
             mock_accepted_audio_extensions)
 
     def test_guest_can_not_upload(self):
-        self.logout()
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_csrf_token(self.get_user_id_from_email(self.EDITOR_EMAIL))
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, self.TEST_AUDIO_FILE_MP3),
                   mode='rb') as f:

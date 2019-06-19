@@ -188,10 +188,10 @@ class SignupTests(test_utils.GenericTestBase):
 
     def test_user_settings_of_non_existing_user(self):
         self.login(self.OWNER_EMAIL)
-        can_send_emails = False,
-        has_agreed_to_latest_terms = False,
-        has_ever_registered = False,
-        username = None,
+        can_send_emails = False
+        has_agreed_to_latest_terms = False
+        has_ever_registered = False
+        username = None
 
         response = self.get_json(feconf.SIGNUP_DATA_URL)
         self.assertEqual(can_send_emails, response['can_send_emails'])
@@ -205,10 +205,10 @@ class SignupTests(test_utils.GenericTestBase):
     def test_user_settings_of_existing_user(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.login(self.OWNER_EMAIL)
-        can_send_emails = True,
-        has_agreed_to_latest_terms = True,
-        has_ever_registered = True,
-        username = 'owner',
+        can_send_emails = True
+        has_agreed_to_latest_terms = True
+        has_ever_registered = True
+        username = 'owner'
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             response = self.get_json(feconf.SIGNUP_DATA_URL)
             self.assertEqual(can_send_emails, response['can_send_emails'])
