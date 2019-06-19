@@ -64,12 +64,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.question_id_1 = question_services.get_new_question_id()
         self.question_1 = self.save_new_question(
             self.question_id_1, self.editor_id,
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), ['skill_2'])
 
         self.question_id_2 = question_services.get_new_question_id()
         self.question_2 = self.save_new_question(
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), ['skill_2'])
 
         self.save_new_skill(
             'skill_1', self.admin_id, 'Skill Description 1')
@@ -101,11 +101,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_questions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
-            self.question_id, 'skill_1', 0.3)
+            self.editor_id, self.question_id, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
-            self.question_id_1, 'skill_2', 0.8)
+            self.editor_id, self.question_id_1, 'skill_2', 0.8)
         question_services.create_new_question_skill_link(
-            self.question_id_2, 'skill_2', 0.5)
+            self.editor_id, self.question_id_2, 'skill_2', 0.5)
 
         questions = question_services.get_questions_by_skill_ids(
             4, ['skill_1', 'skill_2'])
