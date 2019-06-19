@@ -192,9 +192,9 @@ class SignupTests(test_utils.GenericTestBase):
         has_agreed_to_latest_terms = False,
         has_ever_registered = False,
         username = None,
-        
+
         response = self.get_json(feconf.SIGNUP_DATA_URL)
-        self.assertEqual(can_send_emails, response['can_send_email'])
+        self.assertEqual(can_send_emails, response['can_send_emails'])
         self.assertEqual(has_agreed_to_latest_terms,
                 response['has_agreed_to_latest_terms'])
         self.assertEqual(has_ever_registered,
@@ -211,7 +211,7 @@ class SignupTests(test_utils.GenericTestBase):
         username = 'owner',
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             response = self.get_json(feconf.SIGNUP_DATA_URL)
-            self.assertEqual(can_send_emails, response['can_send_email'])
+            self.assertEqual(can_send_emails, response['can_send_emails'])
             self.assertEqual(has_agreed_to_latest_terms,
                 response['has_agreed_to_latest_terms'])
             self.assertEqual(has_ever_registered,
