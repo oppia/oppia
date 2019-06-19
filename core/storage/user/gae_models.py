@@ -400,21 +400,15 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         if not user_model:
             return None
 
-        validated_weekly_creator_stats_list = []
-        for weekly_stat in user_model.weekly_creator_stats_list:
-            if isinstance(weekly_stat, dict) and len(weekly_stat) == 1:
-                key_obj = list(weekly_stat.keys())[0]
-                if isinstance(weekly_stat[key_obj], dict):
-                    key_entries = sorted(list(weekly_stat[key_obj].keys()))
-                    if key_entries == ['average_ratings', 'total_plays']:
-                        validated_weekly_creator_stats_list.append(weekly_stat)
+        weekly_stats = user_model.weekly_creator_stats_list
+        weekly_stats_constructed = [weekly_stat for weekly_stat in weekly_stats]
 
         user_data = {
             'impact_score': user_model.impact_score,
             'total_plays': user_model.total_plays,
             'average_ratings': user_model.average_ratings,
             'num_ratings': user_model.num_ratings,
-            'weekly_creator_stats_list': validated_weekly_creator_stats_list
+            'weekly_creator_stats_list': weekly_stats_constructed
         }
 
         return user_data
