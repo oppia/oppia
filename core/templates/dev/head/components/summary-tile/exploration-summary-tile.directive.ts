@@ -172,9 +172,9 @@ oppia.directive('explorationSummaryTile', [
               } else if (
                 UrlService.getPathname().match(/\/story\/(\w|-){12}/g) &&
                 $scope.getStoryNodeId()) {
-                  storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
-                  storyNodeIdToAdd = $scope.getStoryNodeId();
-                }
+                storyIdToAdd = UrlService.getStoryIdFromViewerUrl();
+                storyNodeIdToAdd = $scope.getStoryNodeId();
+              }
 
               if (collectionIdToAdd) {
                 result = UrlService.addField(
