@@ -597,15 +597,17 @@ oppia.directive('conversationSkin', [
             }, TIME_NUM_CARDS_CHANGE_MSEC);
           };
 
-          $rootScope.$on('hintConsumed', function(evt) {
-            QuestionPlayerStateService.hintUsed(
-              QuestionPlayerEngineService.getCurrentQuestionId());
-          });
+          if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
+            $rootScope.$on('hintConsumed', function(evt) {
+              QuestionPlayerStateService.hintUsed(
+                QuestionPlayerEngineService.getCurrentQuestionId());
+            });
 
-          $rootScope.$on('solutionViewed', function(evt, timestamp) {
-            QuestionPlayerStateService.solutionViewed(
-              QuestionPlayerEngineService.getCurrentQuestionId());
-          });
+            $rootScope.$on('solutionViewed', function(evt, timestamp) {
+              QuestionPlayerStateService.solutionViewed(
+                QuestionPlayerEngineService.getCurrentQuestionId());
+            });
+          }
 
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
