@@ -834,6 +834,18 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
                 'empty but received %s' % (item.id, item.ratings))
 
     @classmethod
+    def _validate_ratings_is_empty(cls, item):
+        """Validate that ratings for the entity is empty.
+
+        Args:
+            item: ndb.Model. CollectionSummaryModel to validate.
+        """
+        if item.ratings:
+            cls.errors['ratings check'].append(
+                'Entity id %s: Expected ratings for the entity to be '
+                'empty but received %s' % (item.id, item.ratings))
+
+    @classmethod
     def _get_related_model_properties(cls):
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
