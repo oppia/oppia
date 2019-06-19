@@ -1518,24 +1518,22 @@ class LearnerAnswerDetails(object):
                 'Expected entity_type to be a string, received %s' % str(
                     self.entity_type))
 
-        if isinstance(self.entity_type, basestring):
-            split_state_reference = self.state_reference.split('.')
-            if self.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-                if len(split_state_reference) < 2:
-                    raise utils.ValidationError(
-                        'For entity type exploration, the state reference '
-                        'should be of the form \'exp_id.state_name\', but '
-                        'received %s' % (self.state_reference))
-            elif self.entity_type == feconf.ENTITY_TYPE_QUESTION:
-                if len(split_state_reference) > 1:
-                    raise utils.ValidationError(
-                        'For entity type question, the state reference should '
-                        'be of the form \'question_id\', but received %s' % (
-                            self.state_reference))
-            else:
+        split_state_reference = self.state_reference.split('.')
+        if self.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
+            if len(split_state_reference) < 2:
                 raise utils.ValidationError(
-                    'The entity type should be either exploration or question, '
-                    'but received %s' % (self.entity_type))
+                    'For entity type exploration, the state reference '
+                    'should be of the form \'exp_id.state_name\', but '
+                    'received %s' % (self.state_reference))
+        elif self.entity_type == feconf.ENTITY_TYPE_QUESTION:
+            if len(split_state_reference) > 1:
+                raise utils.ValidationError(
+                    'For entity type question, the state reference should '
+                    'be of the form \'question_id\', but received %s' % (
+                        self.state_reference))
+        else:
+            raise utils.ValidationError(
+                'Invalid entity type received %s' % (self.entity_type))
 
         if not isinstance(self.interaction_id, basestring):
             raise utils.ValidationError(
@@ -1570,7 +1568,7 @@ class LearnerAnswerDetails(object):
 
         Args:
             learner_answer_info: LearnerAnswerInfo. The learner answer info
-                object, which is created after the learner has sbumitted the
+                object, which is created after the learner has submitted the
                 details of the answer.
         """
         learner_answer_info_dict_size = (
@@ -1589,17 +1587,22 @@ class LearnerAnswerDetails(object):
             learner_answer_info_id: str. The learner answer info
                 id, which needs to be deleted from
                 the learner_answer_info_list.
+
+        Raises:
+            Exception: If the learner answer info with the given id is not
+                found in the learner answer info list.
         """
-        deleted_learner_answer_info_id = (
-            learner_answer_info_id)
         new_learner_answer_info_list = []
         for learner_answer_info in self.learner_answer_info_list:
-            if learner_answer_info.id != deleted_learner_answer_info_id:
+            if learner_answer_info.id != learner_answer_info_id:
                 new_learner_answer_info_list.append(learner_answer_info)
             else:
                 self.accumulated_answer_info_json_size_bytes -= (
                     learner_answer_info.get_learner_answer_info_dict_size())
-        self.learner_answer_info_list = new_learner_answer_info_list
+        if self.learner_answer_info_list == new_learner_answer_info_list:
+            raise Exception('Learner answer info with the given id not found.')
+        else:
+            self.learner_answer_info_list = new_learner_answer_info_list
 
     def update_state_reference(self, new_state_reference):
         """Updates the state_reference of the LearnerAnswerDetails object.
@@ -1621,14 +1624,14 @@ class LearnerAnswerInfo(object):
 
         Args:
             learner_answer_info_id: str. The id of the LearnerAnswerInfo object.
-            answer: dict. The answer which is submitted by the learner,
-                actually type of the answer is interaction dependent but mostly
+            answer: dict or str. The answer which is submitted by the learner.
+                Actually type of the answer is interaction dependent but mostly
                 it will be of dict type for most interactions, but it can be
                 string for TextInput interaction.
             answer_details: str. The details the learner will submit when the
-                learner will be asked questions like 'Hey how did you landed on
-                this answer', 'Why did you picked that answer' etc.
-            created_on: datetime. The time at which the answer details was
+                learner will be asked questions like 'Hey how did you land on
+                this answer', 'Why did you pick that answer' etc.
+            created_on: datetime. The time at which the answer details were
                 received.
         """
         self.id = learner_answer_info_id
@@ -1690,24 +1693,27 @@ class LearnerAnswerInfo(object):
 
     def validate(self):
         """Validates the LearnerAnswerInfo domain object."""
-
-
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
                 'Expected id to be a string, received %s' % self.id)
         if self.answer is None:
             raise utils.ValidationError(
                 'The answer submitted by the learner cannot be empty')
-        if self.answer_details is None:
-            raise utils.ValidationError(
-                'LearnerAnswerInfo must have a provided answer details')
-        if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
-            raise utils.ValidationError('The answer details size is to large '
-                                        'to be stored')
+        if isinstance(self.answer, dict):
+            if self.answer == {}:
+                raise utils.ValidationError(
+                    'The answer submitted cannot be an empty dict.')
+        if isinstance(self.answer, basestring):
+            if self.answer == '':
+                raise utils.ValidationError(
+                    'The answer submitted cannot be an empty string')
         if not isinstance(self.answer_details, basestring):
             raise utils.ValidationError(
                 'Expected answer_details to be a string, received %s' % str(
                     self.answer_details))
+        if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
+            raise utils.ValidationError('The answer details size is to large '
+                                        'to be stored')
         if not isinstance(self.created_on, datetime.datetime):
             raise utils.ValidationError(
                 'Expected created_on to be a datetime, received %s' % str(

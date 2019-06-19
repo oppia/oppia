@@ -1378,10 +1378,10 @@ class LearnerAnswerDetailsChangeDomainTests(test_utils.GenericTestBase):
                 learner_answer_details_change_dict)
 
 
-class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
+class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LearnerAnswerDetailsDomainTests, self).setUp()
+        super(LearnerAnswerDetailsTests, self).setUp()
         self.learner_answer_details = stats_domain.LearnerAnswerDetails(
             'exp_id.state_name', feconf.ENTITY_TYPE_EXPLORATION,
             'TextInput', [stats_domain.LearnerAnswerInfo(
@@ -1471,6 +1471,11 @@ class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
         self.assertNotEqual(
             self.learner_answer_details.accumulated_answer_info_json_size_bytes,
             0)
+        with self.assertRaisesRegexp(
+            Exception, 'Learner answer info with the given id not found'):
+            self.learner_answer_details.delete_learner_answer_info('id_3')
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
 
     def test_update_state_reference(self):
         self.assertEqual(
@@ -1480,18 +1485,6 @@ class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.learner_answer_details.state_reference,
             'exp_id_1.state_name_1')
-
-
-class LearnerAnswerDetailsValidationTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(LearnerAnswerDetailsValidationTests, self).setUp()
-        self.learner_answer_details = stats_domain.LearnerAnswerDetails(
-            'exp_id.state_name', feconf.ENTITY_TYPE_EXPLORATION,
-            'TextInput', [stats_domain.LearnerAnswerInfo(
-                'id_1', 'This is my answer', 'This is my answer details',
-                datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))], 4000)
-        self.learner_answer_details.validate()
 
     def test_state_reference_must_be_string(self):
         self.learner_answer_details.state_reference = 0
@@ -1505,11 +1498,11 @@ class LearnerAnswerDetailsValidationTests(test_utils.GenericTestBase):
             self.learner_answer_details,
             'Expected entity_type to be a string')
 
-    def test_entity_type_must_be_exploration_or_question(self,):
+    def test_entity_type_must_be_valid(self,):
         self.learner_answer_details.entity_type = 'topic'
         self._assert_validation_error(
             self.learner_answer_details,
-            'The entity type should be either exploration or question')
+            'Invalid entity type received topic')
 
     def test_state_reference_must_be_valid_for_exploration(self):
         self.learner_answer_details.state_reference = 'expidstatename'
@@ -1564,10 +1557,10 @@ class LearnerAnswerDetailsValidationTests(test_utils.GenericTestBase):
             'Expected accumulated_answer_info_json_size_bytes to be an int')
 
 
-class LearnerAnswerInfoDomainTests(test_utils.GenericTestBase):
+class LearnerAnswerInfoTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(LearnerAnswerInfoDomainTests, self).setUp()
+        super(LearnerAnswerInfoTests, self).setUp()
         self.learner_answer_info = stats_domain.LearnerAnswerInfo(
             'id_1', 'This is my answer', 'This is my answer details',
             datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
@@ -1613,16 +1606,6 @@ class LearnerAnswerInfoDomainTests(test_utils.GenericTestBase):
                 'id.name', 'exploration'))
         self.assertRegexpMatches(learner_answer_info_id, 'id.name.exploration')
 
-
-class LearnerAnswerInfoValidationTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(LearnerAnswerInfoValidationTests, self).setUp()
-        self.learner_answer_info = stats_domain.LearnerAnswerInfo(
-            'id_1', 'This is my answer', 'This is my answer details',
-            datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))
-        self.learner_answer_info.validate()
-
     def test_id_must_be_string(self):
         self.learner_answer_info.id = 123
         self._assert_validation_error(
@@ -1634,11 +1617,23 @@ class LearnerAnswerInfoValidationTests(test_utils.GenericTestBase):
             self.learner_answer_info,
             'The answer submitted by the learner cannot be empty')
 
+    def test_answer_must_not_be_empty_dict(self):
+        self.learner_answer_info.answer = {}
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer submitted cannot be an empty dict')
+
+    def test_answer_must_not_be_empty_string(self):
+        self.learner_answer_info.answer = ''
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer submitted cannot be an empty string')
+
     def test_answer_details_must_not_be_none(self):
         self.learner_answer_info.answer_details = None
         self._assert_validation_error(
             self.learner_answer_info,
-            'LearnerAnswerInfo must have a provided answer details')
+            'Expected answer_details to be a string')
 
     def test_answer_details_must_be_string(self):
         self.learner_answer_info.answer_details = 1

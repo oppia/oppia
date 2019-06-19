@@ -500,11 +500,9 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             state_reference, entity_type, interaction_id,
             learner_answer_info_list, schema_version,
             accumulated_answer_info_json_size_bytes)
-        model_instances = (
+        model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_EXPLORATION, state_reference))
-        self.assertEqual(len(model_instances), 1)
-        model_instance = model_instances[0]
         self.assertEqual(model_instance.state_reference, state_reference)
         self.assertEqual(
             model_instance.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
@@ -521,11 +519,16 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             state_reference, entity_type, interaction_id,
             learner_answer_info_list, schema_version,
             accumulated_answer_info_json_size_bytes)
-        model_instances = (
+        model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_QUESTION, state_reference))
-        model_instance = model_instances[0]
         self.assertEqual(model_instance.state_reference, state_reference)
         self.assertEqual(
             model_instance.entity_type, feconf.ENTITY_TYPE_QUESTION)
         self.assertEqual(model_instance.learner_answer_info_list, [])
+
+    def test_get_model_instance_returns_none(self):
+        model_instance = (
+            stats_models.LearnerAnswerDetailsModel.get_model_instance(
+                feconf.ENTITY_TYPE_QUESTION, 'expID.stateName'))
+        self.assertEqual(model_instance, None)

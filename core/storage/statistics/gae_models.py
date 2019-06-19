@@ -1247,11 +1247,17 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 form 'question_id'.
 
         Returns:
-            list(LearnerAnswerDetailsModel). List of answer details associated
-                with the entity. Doesn't include deleted entries.
+            LearnerAnswerDetailsModel. The answer details model associated
+                with the given entity type and state reference. Doesn't include
+                deleted entries.
         """
-        return cls.get_all().filter(cls.entity_type == entity_type).filter(
-            cls.state_reference == state_reference).fetch()
+        model_instance_list = cls.get_all().filter(
+            cls.entity_type == entity_type).filter(
+                cls.state_reference == state_reference).fetch()
+        if model_instance_list:
+            return model_instance_list[0]
+        else:
+            return None
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
