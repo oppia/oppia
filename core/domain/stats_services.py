@@ -1120,17 +1120,23 @@ def get_learner_answer_details(state_reference, entity_type):
         return None
 
 
-def save_learner_answer_details(learner_answer_details, state_reference, entity_type):
+def save_learner_answer_details(
+        learner_answer_details, state_reference, entity_type):
     """Saves the LearnerAnswerDetails domain object in the datatstore.
 
     Args:
         learner_answer_details: LearnerAnswerDetails. The  learner answer
             details domain object which is to be saved.
+        state_reference: str. This is used to refer to a state
+            in an exploration or question. Like for an exploration the
+            value will be equal to 'exp_id.state_name' & for question
+            this will be equal to 'question_id' only.
+        entity_type: str. The type of entity i.e 'exploration' or 'question '.
     """
     learner_answer_details.validate()
     learner_answer_details_model_list = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
-            entity_type,state_reference))
+            entity_type, state_reference))
     if learner_answer_details_model_list:
         learner_answer_details_model = learner_answer_details_model_list[0]
         learner_answer_details_model.state_reference = (
@@ -1141,7 +1147,7 @@ def save_learner_answer_details(learner_answer_details, state_reference, entity_
             learner_answer_details.interaction_id)
         learner_answer_details_model.learner_answer_info_list = (
             [learner_answer_info.to_dict() for learner_answer_info
-            in learner_answer_details.learner_answer_info_list])
+             in learner_answer_details.learner_answer_info_list])
         learner_answer_details_model.schema_version = (
             learner_answer_details.schema_version)
         learner_answer_details_model.accumulated_answer_info_json_size_bytes = (
@@ -1153,7 +1159,7 @@ def save_learner_answer_details(learner_answer_details, state_reference, entity_
             learner_answer_details.entity_type,
             learner_answer_details.interaction_id,
             [learner_answer_info.to_dict() for learner_answer_info
-            in learner_answer_details.learner_answer_info_list],
+             in learner_answer_details.learner_answer_info_list],
             learner_answer_details.schema_version,
             learner_answer_details.accumulated_answer_info_json_size_bytes)
 
@@ -1189,7 +1195,7 @@ def delete_learner_answer_details_model_for_exploration_state(
         state_name: str. The name of the state.
     """
     state_reference = (
-        stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(
+        stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
             exp_id, state_name))
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
