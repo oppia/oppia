@@ -1371,7 +1371,7 @@ class LearnerAnswerDetailsChange(object):
     """Domain object for changes made in LearnerAnswerDetails."""
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'new_value', 'old_value', 'answer', 'answer_details', 'learner_answer_info_id']
+        'new_value', 'answer', 'answer_details', 'learner_answer_info_id']
 
     def __init__(self, change_dict):
         """Intialize a domain object for LearnerAnswerDetails from a dict.
@@ -1401,7 +1401,6 @@ class LearnerAnswerDetailsChange(object):
             self.learner_answer_info_id = change_dict['learner_answer_info_id']
         elif self.cmd == CMD_UPDATE_STATE_REFERENCE:
             self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
         else:
             raise Exception('Invalid change dict for learner answer '
                             'details %s' % change_dict)
@@ -1647,7 +1646,7 @@ class LearnerAnswerInfo(object):
             'id': self.id,
             'answer': self.answer,
             'answer_details': self.answer_details,
-            'created_on': self.created_on
+            'created_on': str(self.created_on)
         }
         return learner_answer_info_dict
 
@@ -1663,7 +1662,8 @@ class LearnerAnswerInfo(object):
             learner_answer_info_dict['id'],
             learner_answer_info_dict['answer'],
             learner_answer_info_dict['answer_details'],
-            learner_answer_info_dict['created_on']
+            datetime.datetime.strptime(
+                learner_answer_info_dict['created_on'], '%Y-%m-%d %H:%M:%S.%f')
         )
 
     @classmethod

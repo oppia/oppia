@@ -1048,21 +1048,21 @@ def change_learner_answer_details(
      """
     learner_answer_details = get_learner_answer_details(
         state_reference, entity_type)
-    if not learner_answer_details:
-        learner_answer_details = stats_domain.LearnerAnswerDetails(
-            state_reference, entity_type, interaction_id, [], 0)
     if change.cmd == stats_domain.CMD_RECORD_LEARNER_ANSWER_INFO:
+        if not learner_answer_details:
+            learner_answer_details = stats_domain.LearnerAnswerDetails(
+                state_reference, entity_type, interaction_id, [], 0)
         learner_answer_info_id = (
             stats_domain.LearnerAnswerInfo.get_learner_answer_info_id(
                 state_reference, entity_type))
         learner_answer_info = stats_domain.LearnerAnswerInfo(
             learner_answer_info_id, change.answer,
             change.answer_details, datetime.datetime.utcnow())
-        learner_answer_details.update_learner_answer_info(learner_answer_info)
-    elif change.cmd == stats_domain.DELETE_LEARNER_ANSWER_INFO:
-        learner_answer_details.update_learner_answer_info(
+        learner_answer_details.add_learner_answer_info(learner_answer_info)
+    elif change.cmd == stats_domain.CMD_DELETE_LEARNER_ANSWER_INFO:
+        learner_answer_details.delete_learner_answer_info(
             change.learner_answer_info_id)
-    elif change.cmd == stats_domain.UPDATE_STATE_REFERENCE:
+    elif change.cmd == stats_domain.CMD_UPDATE_STATE_REFERENCE:
         learner_answer_details.update_state_reference(change.new_value)
     else:
         raise Exception('Invalid change dict for learner answer details.')
@@ -1114,13 +1114,13 @@ def get_learner_answer_details(state_reference, entity_type):
             entity_type, state_reference))
     if learner_answer_details_model:
         learner_answer_details = get_learner_answer_details_from_model(
-            learner_answer_details_model)
+            learner_answer_details_model[0])
         return learner_answer_details
     else:
         return None
 
 
-def save_learner_answer_details(learner_answer_details):
+def save_learner_answer_details(learner_answer_details, state_reference, entity_type):
     """Saves the LearnerAnswerDetails domain object in the datatstore.
 
     Args:
@@ -1128,11 +1128,11 @@ def save_learner_answer_details(learner_answer_details):
             details domain object which is to be saved.
     """
     learner_answer_details.validate()
-    learner_answer_details_model = (
+    learner_answer_details_model_list = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
-            feconf.ENTITY_TYPE_EXPLORATION,
-            learner_answer_details.state_reference))
-    if learner_answer_details_model:
+            entity_type,state_reference))
+    if learner_answer_details_model_list:
+        learner_answer_details_model = learner_answer_details_model_list[0]
         learner_answer_details_model.state_reference = (
             learner_answer_details.state_reference)
         learner_answer_details_model.entity_type = (
@@ -1140,7 +1140,8 @@ def save_learner_answer_details(learner_answer_details):
         learner_answer_details_model.interaction_id = (
             learner_answer_details.interaction_id)
         learner_answer_details_model.learner_answer_info_list = (
-            learner_answer_details.learner_answer_info_list)
+            [learner_answer_info.to_dict() for learner_answer_info
+            in learner_answer_details.learner_answer_info_list])
         learner_answer_details_model.schema_version = (
             learner_answer_details.schema_version)
         learner_answer_details_model.accumulated_answer_info_json_size_bytes = (
@@ -1151,7 +1152,8 @@ def save_learner_answer_details(learner_answer_details):
             learner_answer_details.state_reference,
             learner_answer_details.entity_type,
             learner_answer_details.interaction_id,
-            learner_answer_details.learner_answer_info_list,
+            [learner_answer_info.to_dict() for learner_answer_info
+            in learner_answer_details.learner_answer_info_list],
             learner_answer_details.schema_version,
             learner_answer_details.accumulated_answer_info_json_size_bytes)
 
@@ -1172,7 +1174,8 @@ def update_learner_answer_details(
     """
     learner_answer_details = change_learner_answer_details(
         state_reference, entity_type, interaction_id, change)
-    save_learner_answer_details(learner_answer_details)
+    save_learner_answer_details(
+        learner_answer_details, state_reference, entity_type)
 
 
 def delete_learner_answer_details_model_for_exploration_state(

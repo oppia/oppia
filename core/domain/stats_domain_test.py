@@ -1356,8 +1356,7 @@ class LearnerAnswerDetailsChangeDomainTests(test_utils.GenericTestBase):
             self.learner_answer_details_change_2.to_dict())
         expected_learner_answer_details_change_3_dict = {
             'cmd': stats_domain.CMD_UPDATE_STATE_REFERENCE,
-            'new_value': 'exp_id_1.state_name_1',
-            'old_value': 'exp_id.state_name'}
+            'new_value': 'exp_id_1.state_name_1'}
         self.assertEqual(
             expected_learner_answer_details_change_3_dict,
             self.learner_answer_details_change_3.to_dict())
