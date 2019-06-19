@@ -498,6 +498,8 @@ var constants = {
     ]
   }],
 
+  "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ['EndExploration', 'Continue'],
+
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,

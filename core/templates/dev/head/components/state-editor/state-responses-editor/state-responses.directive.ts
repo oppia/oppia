@@ -254,8 +254,9 @@ oppia.directive('stateResponses', [
 
           $scope.isCurrentInteractionTrivial = function() {
             var interactionId = $scope.getCurrentInteractionId();
-            if (interactionId === 'Continue' ||
-            interactionId === 'EndExploration') {
+            if (
+              constants.INTERACTION_IDS_WITHOUT_AMSWER_DETAILS.includes(
+                interactionId)) {
               return true;
             } else {
               return false;
