@@ -156,10 +156,11 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
 
 class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
 
-    def test_get_fails_when_new_structures_not_enabled(self):
-        response = self.get_html_response(
-            '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
-        csrf_token = self.get_csrf_token_from_response(response)
+    def test_post_fails_when_new_structures_not_enabled(self):
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            response = self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+            csrf_token = self.get_csrf_token_from_response(response)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', False):
             self.post_json(
@@ -168,7 +169,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
                     'node_1'),
                 {}, csrf_token=csrf_token, expected_status_int=404)
 
-    def test_get_succeeds_when_story_and_node_exist(self):
+    def test_post_succeeds_when_story_and_node_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.get_html_response(
                 '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
@@ -183,7 +184,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
             self.viewer_id, self.STORY_ID_1)
         self.assertEqual(completed_nodes[1], self.NODE_ID_1)
 
-    def test_get_fails_when_story_does_not_exist(self):
+    def test_post_fails_when_story_does_not_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.get_html_response(
                 '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
@@ -195,7 +196,7 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
                     self.NODE_ID_1),
                 {}, csrf_token=csrf_token, expected_status_int=404)
 
-    def test_get_fails_when_node_does_not_exist(self):
+    def test_post_fails_when_node_does_not_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             response = self.get_html_response(
                 '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
@@ -204,5 +205,22 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
             self.post_json(
                 '%s/%s/%s' % (
                     feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID_1,
+                    'node_4'),
+                {}, csrf_token=csrf_token, expected_status_int=404)
+
+    def test_post_fails_when_story_is_not_published(self):
+        new_story_id = 'new_story_id'
+        story = story_domain.Story.create_default_story(
+            new_story_id, 'Title', 'topic_id')
+        story_services.save_new_story(self.admin_id, story)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            response = self.get_html_response(
+                '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.STORY_NODE_COMPLETION_URL_PREFIX, new_story_id,
                     'node_4'),
                 {}, csrf_token=csrf_token, expected_status_int=404)
