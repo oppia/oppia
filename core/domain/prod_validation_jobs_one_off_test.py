@@ -1671,7 +1671,6 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
 
         self.model_instance_0 = (
             collection_models.CollectionSummaryModel.get_by_id('0'))
-        self.model_instance_0.ratings = {'1': 2, '2': 0, '3': 4, '4': 0, '5': 0}
         self.model_instance_0.put()
 
         self.model_instance_1 = (
@@ -1726,8 +1725,11 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
     def test_missing_collection_model_failure(self):
-        collection_models.CollectionModel.get_by_id('0').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
+        collection_model = collection_models.CollectionModel.get_by_id('0')
+        collection_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+        self.model_instance_0.collection_model_last_updated = (
+            collection_model.last_updated)
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for collection_ids '
@@ -2444,7 +2446,7 @@ class BulkEmailModelValidatorTests(test_utils.GenericTestBase):
 
     def test_model_with_invalid_id(self):
         model_instance_with_invalid_id = email_models.BulkEmailModel(
-            id='invalid-id', recipient_ids=self.recipient_ids,
+            id='invalid:id', recipient_ids=self.recipient_ids,
             sender_id=self.sender_id, sender_email=self.sender_email,
             intent=feconf.BULK_EMAIL_INTENT_MARKETING,
             subject='Email Subject', html_body='Email Body',
@@ -6079,8 +6081,11 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
     def test_missing_story_model_failure(self):
-        story_models.StoryModel.get_by_id('0').delete(
-            feconf.SYSTEM_COMMITTER_ID, '', [])
+        story_model = story_models.StoryModel.get_by_id('0')
+        story_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+        self.model_instance_0.story_model_last_updated = (
+            story_model.last_updated)
+        self.model_instance_0.put()
         expected_output = [
             (
                 u'[u\'failed validation check for story_ids '
