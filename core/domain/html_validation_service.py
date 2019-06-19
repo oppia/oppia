@@ -833,71 +833,52 @@ def get_filename_with_dimensions(old_filename, exp_id):
     return new_filename
 
 
-def add_image_id_in_image_tag(html, image_counter):
-    """Adds id-with-value in image tag.
+def add_image_id_and_remove_filepath_from_image_tag(
+        html, image_info_dict_1, image_info_dict_2):
+    """Adds image_id-with-value in image tag.
 
     Args:
         html: str. HTML of content in which image tag present.
-        image_counter: int. Counter for an image id.
+        image_info_dict_1: dict. Dict contaning image id with source, image ids
+            that needs to be added in image tag.
+        image_info_dict_2: dict. Dict contaning image ids with source, image ids
+            that has already been added in image tags.
 
     Returns:
-        (new_content_html, image_counter): Tuple. Tuple contains new html
-            of content and image_id counter.
+        html: str. HTML contains image tag with image id and without filepath.
     """
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        image_counter += 1
-        image_id = 'image_id_' + str(image_counter)
-        image['id-with-value'] = escape_html(json.dumps(image_id))
+        filepath = json.loads(unescape_html(image['filepath-with-value']))
+        for _id in image_info_dict_1:
+            if filepath == image_info_dict_1[_id]:
+                image['id-with-value'] = escape_html(json.dumps(_id))
+                image_info_dict_2[_id] = filepath
+                del image_info_dict_1[_id]
+                break
 
-    new_content_html = unicode(soup).replace('<br/>', '<br>')
+        del image['filepath-with-value']
 
-    return (new_content_html, image_counter)
+    return unicode(soup).replace('<br/>', '<br>')
 
 
-def get_image_info_from_html(html):
-    """Extracts info about each image present in the HTML.
+def get_image_src_from_html(html):
+    """Extracts source of each image present in the HTML.
 
     Args:
         html: str. the HTML in which the images are present.
 
     Returns:
-        image_info_list: list. List contaning an image info object.
+        image_info_list: list. List contaning an image object.
     """
-    image_info_list = []
+    image_src_list = []
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        image_id = json.loads(unescape_html(image['id-with-value']))
         filepath = json.loads(unescape_html(image['filepath-with-value']))
 
-        image_info = {
-            'id': image_id,
-            'info': {
-                'src': filepath,
-                'placeholder': False,
-                'instructions': ''
-            }
-        }
-        image_info_list.append(image_info)
+        image_src_list.append(filepath)
 
-    return image_info_list
-
-
-def remove_filepath_from_image_tag(html):
-    """Removes filepath attribute from image tag.
-
-    Args:
-        html: str. The HTML in which the image tag presents.
-
-    Returns:
-        html: str. the HTML in which image tag presents without filepath
-            attribute.
-    """
-    soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
-    for image in soup.findAll(name='oppia-noninteractive-image'):
-        del image['filepath-with-value']
-
-    return unicode(soup).replace('<br/>', '<br>')
+    return image_src_list
 
 
 def get_image_ids_from_image_tag(html):
@@ -912,7 +893,7 @@ def get_image_ids_from_image_tag(html):
     image_ids = []
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        image_id = image['id-with-value']
+        image_id = image['image_id-with-value']
         image_ids.append(image_id)
 
     return image_ids
