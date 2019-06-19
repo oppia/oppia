@@ -194,6 +194,9 @@ oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
         ctrl.saveSolicitAnswerDetails = function(displayedValue) {
           ExplorationStatesService.saveSolicitAnswerDetails(
             ctrl.stateName, angular.copy(displayedValue));
+
+          StateEditorService.setSolicitAnswerDetails(
+            angular.copy(displayedValue));
         };
 
         ctrl.showMarkAllAudioAsNeedingUpdateModalIfRequired = function(

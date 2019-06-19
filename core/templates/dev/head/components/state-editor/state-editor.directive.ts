@@ -67,16 +67,16 @@ oppia.directive('stateEditor', [
         '/components/state-editor/state-editor.directive.html'),
       controller: [
         '$rootScope', '$scope', 'StateContentService',
-        'StateCustomizationArgsService',
-        'StateEditorService', 'StateHintsService',
-        'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
-        'StateSolutionService', 'INTERACTION_SPECS',
+        'StateCustomizationArgsService', 'StateEditorService',
+        'StateHintsService', 'StateInteractionIdService',
+        'StateSolicitAnswerDetailsService', 'StateSolutionService',
+        'INTERACTION_SPECS',
         function(
             $rootScope, $scope, StateContentService,
-            StateCustomizationArgsService,
-            StateEditorService, StateHintsService,
-            StateInteractionIdService, StateSolicitAnswerDetailsService,
-            StateSolutionService, INTERACTION_SPECS) {
+            StateCustomizationArgsService, StateEditorService,
+            StateHintsService, StateInteractionIdService,
+            StateSolicitAnswerDetailsService, StateSolutionService,
+            INTERACTION_SPECS) {
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           $scope.currentStateIsTerminal = false;
