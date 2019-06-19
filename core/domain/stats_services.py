@@ -18,6 +18,7 @@
 
 import collections
 import copy
+import datetime
 import itertools
 
 from core.domain import interaction_registry
@@ -1026,7 +1027,8 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
         return None
 
 
-def change_learner_answer_details(state_reference, entity_type, interaction_id, change):
+def change_learner_answer_details(
+        state_reference, entity_type, interaction_id, change):
     """Changes the learner answer details object, as per the changes received
     and then returns it.
 
@@ -1045,17 +1047,21 @@ def change_learner_answer_details(state_reference, entity_type, interaction_id, 
             after applying the change.
      """
     learner_answer_details = get_learner_answer_details(
-            state_reference, entity_type, interaction_id)
+        state_reference, entity_type)
+    if not learner_answer_details:
+        learner_answer_details = stats_domain.LearnerAnswerDetails(
+            state_reference, entity_type, interaction_id, [], 0)
     if change.cmd == stats_domain.CMD_RECORD_LEARNER_ANSWER_INFO:
         learner_answer_info_id = (
             stats_domain.LearnerAnswerInfo.get_learner_answer_info_id(
                 state_reference, entity_type))
         learner_answer_info = stats_domain.LearnerAnswerInfo(
             learner_answer_info_id, change.answer,
-            change.answer_details, datetime.utcnow())
+            change.answer_details, datetime.datetime.utcnow())
         learner_answer_details.update_learner_answer_info(learner_answer_info)
     elif change.cmd == stats_domain.DELETE_LEARNER_ANSWER_INFO:
-        learner_answer_details.update_learner_answer_info(change.learner_answer_info_id)
+        learner_answer_details.update_learner_answer_info(
+            change.learner_answer_info_id)
     elif change.cmd == stats_domain.UPDATE_STATE_REFERENCE:
         learner_answer_details.update_state_reference(change.new_value)
     else:
@@ -1068,8 +1074,8 @@ def get_learner_answer_details_from_model(learner_answer_details_model):
     LearnerAnswerDetailsModel loaded from the datastore.
 
     Args:
-        LearnerAnswerDetailsModel. The learner answer details model loaded from
-            the datastore.
+        learner_answer_details_model: LearnerAnswerDetailsModel. The learner
+            answer details model loaded from the datastore.
 
     Returns:
         LearnerAnswerDetails. A LearnerAnswerDetails domain object
@@ -1080,12 +1086,13 @@ def get_learner_answer_details_from_model(learner_answer_details_model):
         learner_answer_details_model.entity_type,
         learner_answer_details_model.interaction_id,
         [stats_domain.LearnerAnswerInfo.from_dict(learner_answer_info_dict)
-        for learner_answer_info_dict in learner_answer_details_model.learner_answer_info_list],
+         for learner_answer_info_dict
+         in learner_answer_details_model.learner_answer_info_list],
         learner_answer_details_model.schema_version,
         learner_answer_details_model.accumulated_answer_info_json_size_bytes)
 
 
-def get_learner_answer_details(state_reference, entity_type, interaction_id):
+def get_learner_answer_details(state_reference, entity_type):
     """Returns a LearnerAnswerDetails domain object, with given
     state_reference, entity_type & interaction_id. This function checks
     in the datastore if the corresponding LearnerAnswerDetailsModel exists,
@@ -1097,33 +1104,34 @@ def get_learner_answer_details(state_reference, entity_type, interaction_id):
             value will be equal to 'exp_id.state_name' & for question
             this will be equal to 'question_id' only.
         entity_type: str. The type of entity i.e 'exploration' or 'question '.
-        interaction_id: str. The ID of the interaction.
 
     Returns:
-        LearnerAnswerDetails. The learner answer domain object.
+        LearnerAnswerDetails or None. The learner answer domain object
+            or None if the model does not exist.
     """
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
-            feconf.ENTITY_TYPE_EXPLORATION, state_reference))
+            entity_type, state_reference))
     if learner_answer_details_model:
-        learner_answer_details = get_learner_answer_details_from_model(learner_answer_details_model)
+        learner_answer_details = get_learner_answer_details_from_model(
+            learner_answer_details_model)
         return learner_answer_details
     else:
-        return stats_domain.LearnerAnswerDetails(
-            state_reference, entity_type, interaction_id, [], 0)
+        return None
 
 
 def save_learner_answer_details(learner_answer_details):
     """Saves the LearnerAnswerDetails domain object in the datatstore.
 
     Args:
-        learner_answer_details. LearnerAnswerDetails. The  learner answer
+        learner_answer_details: LearnerAnswerDetails. The  learner answer
             details domain object which is to be saved.
     """
     learner_answer_details.validate()
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
-            feconf.ENTITY_TYPE_EXPLORATION, learner_answer_details.state_reference))
+            feconf.ENTITY_TYPE_EXPLORATION,
+            learner_answer_details.state_reference))
     if learner_answer_details_model:
         learner_answer_details_model.state_reference = (
             learner_answer_details.state_reference)
@@ -1148,7 +1156,8 @@ def save_learner_answer_details(learner_answer_details):
             learner_answer_details.accumulated_answer_info_json_size_bytes)
 
 
-def update_learner_answer_details(state_reference, entity_type, interaction_id, change):
+def update_learner_answer_details(
+        state_reference, entity_type, interaction_id, change):
     """Updates the LearnerAnswerDetails object.
 
     Args:
@@ -1159,13 +1168,15 @@ def update_learner_answer_details(state_reference, entity_type, interaction_id, 
         entity_type: str. The type of entity i.e 'exploration' or 'question'.
         interaction_id: str. The ID of the interaction.
         change: LearnerAnswerDetailsChange. The change to be applied
-            to the LearnerAnswerDetails object. 
+            to the LearnerAnswerDetails object.
     """
-    learner_answer_details = change_learner_answer_details(state_reference, entity_type, change_list)
+    learner_answer_details = change_learner_answer_details(
+        state_reference, entity_type, interaction_id, change)
     save_learner_answer_details(learner_answer_details)
 
 
-def delete_learner_answer_details_model_for_exploration_state(exp_id, state_name):
+def delete_learner_answer_details_model_for_exploration_state(
+        exp_id, state_name):
     """Delete the LearnerAnswerDetailsModel instance of entity type
     'exploration'provided state_reference, which is generated by the
     given exp_id and state_name.
@@ -1194,7 +1205,7 @@ def delete_learner_answer_details_model_for_question(question_id):
     """
     state_reference = (
         stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(
-            exp_id, state_name))
+            question_id))
     learner_answer_details_model = (
         stats_models.LearnerAnswerDetailsModel.get_model_instance(
             feconf.ENTITY_TYPE_QUESTION, state_reference))
