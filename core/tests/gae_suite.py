@@ -80,18 +80,6 @@ def create_test_suites(test_target=None):
 
 def main():
     """Runs the tests."""
-
-    def _iterate(test_suite_or_case):
-        """Iterate through all the test cases in `test_suite_or_case`."""
-        try:
-            suite = iter(test_suite_or_case)
-        except TypeError:
-            yield test_suite_or_case
-        else:
-            for test in suite:
-                for subtest in _iterate(test):
-                    yield subtest
-
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
@@ -106,16 +94,11 @@ def main():
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]
 
-    tests_run = 0
     for result in results:
-        tests_run += result.testsRun
         if result.errors or result.failures:
             raise Exception(
                 'Test suite failed: %s tests run, %s errors, %s failures.' % (
                     result.testsRun, len(result.errors), len(result.failures)))
-
-    if tests_run == 0:
-        raise Exception('No tests were run.')
 
 
 if __name__ == '__main__':

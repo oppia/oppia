@@ -796,6 +796,152 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_rights[0].id, self.TOPIC_ID)
         self.assertEqual(topic_rights[0].manager_ids, [self.user_id_a])
 
+    def test_cannot_save_new_topic_with_existing_name(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Topic with name \'Name\' already exists'):
+            self.save_new_topic(
+                'topic_2', self.user_id, 'Name', 'Description 2',
+                [], [], [], [], 1)
+
+    def test_update_topic_language_code(self):
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.language_code, 'en')
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE,
+            'old_value': 'en',
+            'new_value': 'bn'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, self.TOPIC_ID, changelist, 'Change language code')
+
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.language_code, 'bn')
+
+    def test_update_topic_additional_story_ids(self):
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.additional_story_ids, [self.story_id_3])
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
+            'old_value': [self.story_id_3],
+            'new_value': ['new_story_id']
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, self.TOPIC_ID, changelist,
+            'Change additional story ids')
+
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.additional_story_ids, ['new_story_id'])
+
+    def test_cannot_update_topic_and_subtopic_pages_with_empty_changelist(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unexpected error: received an invalid change list when trying to '
+            'save topic'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, self.TOPIC_ID, [], 'commit message')
+
+    def test_cannot_update_topic_and_subtopic_pages_with_mismatch_of_versions(
+            self):
+        topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
+        topic_model.version = 0
+        topic_model.commit(self.user_id, 'changed version', [])
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE,
+            'old_value': 'en',
+            'new_value': 'bn'
+        })]
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Unexpected error: trying to update version 1 of topic '
+            'from version 2. Please reload the page and try again.'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, self.TOPIC_ID, changelist, 'change language_code')
+
+        topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
+        topic_model.version = 100
+        topic_model.commit(self.user_id, 'changed version', [])
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Trying to update version 101 of topic from version 2, '
+            'which is too old. Please reload the page and try again.'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, self.TOPIC_ID, changelist, 'change language_code')
+
+    def test_cannot_update_topic_and_subtopic_pages_with_empty_commit_message(
+            self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected a commit message, received none.'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, self.TOPIC_ID, [], None)
+
+    def test_cannot_publish_topic_with_no_topic_rights(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The given topic does not exist'):
+            topic_services.publish_topic('invalid_topic_id', self.user_id_admin)
+
+    def test_cannot_publish_a_published_topic(self):
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        self.assertFalse(topic_rights.topic_is_published)
+
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        self.assertTrue(topic_rights.topic_is_published)
+
+        with self.assertRaisesRegexp(
+            Exception, 'The topic is already published.'):
+            topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+
+    def test_cannot_unpublish_topic_with_no_topic_rights(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The given topic does not exist'):
+            topic_services.unpublish_topic(
+                'invalid_topic_id', self.user_id_admin)
+
+    def test_cannot_unpublish_an_unpublished_topic(self):
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        self.assertFalse(topic_rights.topic_is_published)
+
+        with self.assertRaisesRegexp(
+            Exception, 'The topic is already unpublished.'):
+            topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_admin)
+
+    def test_cannot_edit_topic_with_no_topic_rights(self):
+        self.assertFalse(topic_services.check_can_edit_topic(self.user_a, None))
+
+    def test_cannot_assign_role_with_invalid_role(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid role'):
+            topic_services.assign_role(
+                self.user_admin, self.user_a, 'invalid_role', self.TOPIC_ID)
+
+    def test_get_topic_by_version(self):
+        topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id, self.user_id, 'topic name', 'Description',
+            [], [], [], [], 1)
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE,
+            'old_value': 'en',
+            'new_value': 'bn'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id, topic_id, changelist, 'Change language code')
+
+        topic_v0 = topic_services.get_topic_by_id(topic_id, version=0)
+        topic_v1 = topic_services.get_topic_by_id(topic_id, version=1)
+
+        self.assertEqual(topic_v1.language_code, 'en')
+        self.assertEqual(topic_v0.language_code, 'bn')
+
     def test_deassign_user_from_all_topics(self):
         self.save_new_topic(
             'topic_2', self.user_id, 'Name 2', 'Description 2',

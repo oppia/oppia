@@ -401,8 +401,6 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 subtopic_page_id = (
@@ -426,14 +424,10 @@ def apply_change_list(topic_id, change_list):
                     modified_subtopic_pages[
                         subtopic_page_id].update_page_contents_audio(
                             change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
                     topic.update_subtopic_title(change.id, change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif (
                     change.cmd ==
                     topic_domain.CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION):
@@ -442,8 +436,6 @@ def apply_change_list(topic_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # topic is sufficient to apply the schema migration.
                 continue
-            else:
-                raise Exception('Invalid change dict.')
         return (
             topic, modified_subtopic_pages, deleted_subtopic_ids,
             newly_created_subtopic_ids)
@@ -479,19 +471,19 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic.validate()
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
-    if topic_model is None:
-        topic_model = topic_models.TopicModel(id=topic.id)
-    else:
-        if topic.version > topic_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of topic '
-                'from version %s. Please reload the page and try again.'
-                % (topic_model.version, topic.version))
-        elif topic.version < topic_model.version:
-            raise Exception(
-                'Trying to update version %s of topic from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (topic_model.version, topic.version))
+
+    # Topic model cannot be None as topic is passed as parameter here and that
+    # is only possible if a topic model with that topic id exists.
+    if topic.version > topic_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of topic '
+            'from version %s. Please reload the page and try again.'
+            % (topic_model.version, topic.version))
+    elif topic.version < topic_model.version:
+        raise Exception(
+            'Trying to update version %s of topic from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (topic_model.version, topic.version))
 
     topic_model.description = topic.description
     topic_model.name = topic.name
