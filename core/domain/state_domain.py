@@ -227,11 +227,6 @@ class Image(object):
             ValidationError: One or more attributes of the ImageAssets are not
             valid.
         """
-        if self.src != '':
-            src_re = r'^[A-Za-z0-9+/]*(_height_)[0-9]*(_width_)[0-9]*\.((png)|(jpeg)|(gif)|(jpg))$'
-            if not re.match(src_re, self.src):
-                raise utils.ValidationError(
-                    'Invalid image_src, received %s' % self.src)
         if not isinstance(self.placeholder, bool):
             raise utils.ValidationError(
                 'Expected placeholder to be bool, received %s' %
