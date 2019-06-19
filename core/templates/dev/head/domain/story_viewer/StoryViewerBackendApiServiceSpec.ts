@@ -73,7 +73,7 @@ describe('Story viewer backend API service', function() {
       'POST', '/story_node_completion_handler/0/1').respond(200);
     StoryViewerBackendApiService.recordStoryNodeCompletion('0', '1').then(
       successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalled();
     expect(failHandler).not.toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe('Story viewer backend API service', function() {
       'POST', '/story_node_completion_handler/0/1').respond(404);
     StoryViewerBackendApiService.recordStoryNodeCompletion('0', '1').then(
       successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.flush();
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();

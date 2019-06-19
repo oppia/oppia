@@ -739,10 +739,10 @@ oppia.directive('conversationSkin', [
 
               if (ExplorationPlayerStateService.isInStoryViewerMode() &&
                 $scope.nextCard.isTerminal()) {
-                  var storyId = UrlService.getUrlParams().story_id;
-                  var nodeId = UrlService.getUrlParams().node_id;
-                  StoryViewerBackendApiService.recordStoryNodeCompletion(
-                    storyId, nodeId);
+                var storyId = UrlService.getUrlParams().story_id;
+                var nodeId = UrlService.getUrlParams().node_id;
+                StoryViewerBackendApiService.recordStoryNodeCompletion(
+                  storyId, nodeId);
               }
 
               // For single state explorations, when the exploration reaches the

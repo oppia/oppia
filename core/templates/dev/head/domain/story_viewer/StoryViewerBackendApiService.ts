@@ -50,23 +50,23 @@ oppia.factory('StoryViewerBackendApiService', [
     };
 
     var _recordStoryNodeCompletion = function(
-      storyId, nodeId, successCallback, errorCallback) {
-        var storyNodeCompletionUrl = UrlInterpolationService.interpolateUrl(
-          STORY_NODE_COMPLETION_URL_TEMPLATE, {
-            story_id: storyId,
-            node_id: nodeId
-          });
-
-        $http.post(storyNodeCompletionUrl).then(function(response) {
-          if (successCallback) {
-            successCallback();
-          }
-        }, function(errorResponse) {
-          if (errorCallback) {
-            errorCallback(errorResponse.data);
-          }
+        storyId, nodeId, successCallback, errorCallback) {
+      var storyNodeCompletionUrl = UrlInterpolationService.interpolateUrl(
+        STORY_NODE_COMPLETION_URL_TEMPLATE, {
+          story_id: storyId,
+          node_id: nodeId
         });
-      }
+
+      $http.post(storyNodeCompletionUrl).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
 
     return {
       fetchStoryData: function(storyId) {
@@ -74,7 +74,7 @@ oppia.factory('StoryViewerBackendApiService', [
           _fetchStoryData(storyId, resolve, reject);
         });
       },
-      
+
       recordStoryNodeCompletion: function(storyId, nodeId) {
         return $q(function(resolve, reject) {
           _recordStoryNodeCompletion(storyId, nodeId, resolve, reject);

@@ -167,8 +167,8 @@ oppia.factory('ExplorationPlayerStateService', [
           initializeExplorationServices(explorationData, true, callback);
           initializePretestServices(pretestQuestionsData, callback);
         } else if (
-            UrlService.getUrlParams().hasOwnProperty('story_id') &&
-            UrlService.getUrlParams().hasOwnProperty('node_id')) {
+          UrlService.getUrlParams().hasOwnProperty('story_id') &&
+          UrlService.getUrlParams().hasOwnProperty('node_id')) {
           setStoryViewerMode();
           initializeExplorationServices(explorationData, false, callback);
         } else {
