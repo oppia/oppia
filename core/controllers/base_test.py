@@ -671,7 +671,7 @@ class CheckAllHandlersHaveDecoratorTests(test_utils.GenericTestBase):
             # Following handler are present in base.py where acl_decorators
             # cannot be imported.
             if (handler.__name__ in (
-                'CsrfTokenHandler', 'Error404Handler', 'LogoutPage')):
+                ('CsrfTokenHandler', 'Error404Handler', 'LogoutPage'))):
                 continue
 
             if handler.get != base.BaseHandler.get:

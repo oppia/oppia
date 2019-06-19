@@ -188,28 +188,35 @@ class SignupTests(test_utils.GenericTestBase):
 
     def test_user_settings_of_non_existing_user(self):
         self.login(self.OWNER_EMAIL)
-        values_dict = {
-            u'can_send_emails': False,
-            u'has_agreed_to_latest_terms': False,
-            u'has_ever_registered': False,
-            u'username': None,
-        }
+        can_send_emails = False,
+        has_agreed_to_latest_terms = False,
+        has_ever_registered = False,
+        username = None,
+        
         response = self.get_json(feconf.SIGNUP_DATA_URL)
-        self.assertDictContainsSubset(response, values_dict)
+        self.assertEqual(can_send_emails, response['can_send_email'])
+        self.assertEqual(has_agreed_to_latest_terms,
+                response['has_agreed_to_latest_terms'])
+        self.assertEqual(has_ever_registered,
+                response['has_ever_registered'])
+        self.assertEqual(username, response['username'])
         self.logout()
 
     def test_user_settings_of_existing_user(self):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.login(self.OWNER_EMAIL)
-        values_dict = {
-            u'can_send_emails': True,
-            u'has_agreed_to_latest_terms': True,
-            u'has_ever_registered': True,
-            u'username': 'owner',
-        }
+        can_send_emails = True,
+        has_agreed_to_latest_terms = True,
+        has_ever_registered = True,
+        username = 'owner',
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             response = self.get_json(feconf.SIGNUP_DATA_URL)
-            self.assertDictContainsSubset(response, values_dict)
+            self.assertEqual(can_send_emails, response['can_send_email'])
+            self.assertEqual(has_agreed_to_latest_terms,
+                response['has_agreed_to_latest_terms'])
+            self.assertEqual(has_ever_registered,
+                response['has_ever_registered'])
+            self.assertEqual(username, response['username'])
 
         self.logout()
 
