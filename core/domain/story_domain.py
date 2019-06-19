@@ -504,8 +504,8 @@ class StoryContents(object):
             node_id: str. ID of the story node.
 
         Returns:
-            StoryNode or None. The domain object representing a story node with the
-            given node ID, or None if there is no such node.
+            StoryNode or None. The domain object representing a story node with
+            the given node ID, or None if there is no such node.
         """
         for node in self.nodes:
             if node.id == node_id:

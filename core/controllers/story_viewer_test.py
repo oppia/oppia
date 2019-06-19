@@ -153,6 +153,7 @@ class StoryPageDataHandlerTests(BaseStoryViewerControllerTests):
                 '%s/%s' % (feconf.STORY_DATA_HANDLER, 'story_id_1'),
                 expected_status_int=404)
 
+
 class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
 
     def test_get_fails_when_new_structures_not_enabled(self):
@@ -173,7 +174,8 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
                 '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
             csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json('%s/%s/%s' % (
+            self.post_json(
+                '%s/%s/%s' % (
                     feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID_1,
                     self.NODE_ID_1),
                 {}, csrf_token=csrf_token, expected_status_int=200)
@@ -187,7 +189,8 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
                 '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
             csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json('%s/%s/%s' % (
+            self.post_json(
+                '%s/%s/%s' % (
                     feconf.STORY_NODE_COMPLETION_URL_PREFIX, 'story_id_2',
                     self.NODE_ID_1),
                 {}, csrf_token=csrf_token, expected_status_int=404)
@@ -198,8 +201,8 @@ class StoryNodeCompletionHandlerTests(BaseStoryViewerControllerTests):
                 '%s/%s' % (feconf.STORY_VIEWER_URL_PREFIX, self.STORY_ID_1))
             csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json('%s/%s/%s' % (
+            self.post_json(
+                '%s/%s/%s' % (
                     feconf.STORY_NODE_COMPLETION_URL_PREFIX, self.STORY_ID_1,
                     'node_4'),
                 {}, csrf_token=csrf_token, expected_status_int=404)
-    

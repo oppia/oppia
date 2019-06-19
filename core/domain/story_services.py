@@ -582,7 +582,7 @@ def get_story_node_by_story_id_and_node_id(story_id, node_id):
     story_node = story.story_contents.get_node_by_node_id(node_id)
     if story_node is None:
         raise Exception('Story node with id %s does not exist '
-                    'in this story.' % node_id)
+                        'in this story.' % node_id)
     return story_node
 
 
