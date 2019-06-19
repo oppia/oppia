@@ -27,10 +27,10 @@ class SplashPage(base.BaseHandler):
         """Handles GET requests."""
         c_value = self.request.get('c')
         if not c_value:
-            self.render_template('dist/splash-page.mainpage.html')
+            self.render_static_template('dist/splash-page.mainpage.html')
         else:
             try:
-                self.render_template('dist/splash_%s.html' % c_value)
+                self.render_static_template('dist/splash_%s.html' % c_value)
             except Exception:
                 # Old c values may have been deprecated, in which case we
                 # revert to the default splash page URL. When redirecting,
@@ -62,7 +62,7 @@ class GetStartedPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/get-started-page.mainpage.html')
+        self.render_static_template('dist/get-started-page.mainpage.html')
 
 
 class TeachPage(base.BaseHandler):
@@ -71,7 +71,7 @@ class TeachPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('dist/teach-page.mainpage.html')
+        self.render_static_template('dist/teach-page.mainpage.html')
 
 
 class ContactPage(base.BaseHandler):
