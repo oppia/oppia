@@ -1325,9 +1325,6 @@ def update_exploration(
     # Removing images from image assets, which gets deleted.
     exploration = (
         clean_image_assets(exploration_before_change, exploration_after_change))
-    print("         "*100)
-    print(exploration.to_dict())
-    print("         "*100)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)

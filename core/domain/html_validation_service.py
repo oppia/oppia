@@ -834,7 +834,7 @@ def get_filename_with_dimensions(old_filename, exp_id):
 
 
 def add_image_id_in_image_tag(html, image_counter):
-    """Adds image_id-with-value in image tag.
+    """Adds id-with-value in image tag.
 
     Args:
         html: str. HTML of content in which image tag present.
@@ -848,7 +848,7 @@ def add_image_id_in_image_tag(html, image_counter):
     for image in soup.findAll(name='oppia-noninteractive-image'):
         image_counter += 1
         image_id = 'image_id_' + str(image_counter)
-        image['image_id-with-value'] = escape_html(json.dumps(image_id))
+        image['id-with-value'] = escape_html(json.dumps(image_id))
 
     new_content_html = unicode(soup).replace('<br/>', '<br>')
 
@@ -867,7 +867,7 @@ def get_image_info_from_html(html):
     image_info_list = []
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        image_id = json.loads(unescape_html(image['image_id-with-value']))
+        image_id = json.loads(unescape_html(image['id-with-value']))
         filepath = json.loads(unescape_html(image['filepath-with-value']))
 
         image_info = {
@@ -912,7 +912,7 @@ def get_image_ids_from_image_tag(html):
     image_ids = []
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        image_id = image['image_id-with-value']
+        image_id = image['id-with-value']
         image_ids.append(image_id)
 
     return image_ids

@@ -1713,7 +1713,7 @@ class ExplorationContentValidationJobForCKEditorTests(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image image_id-with-value="&amp;quot;image_id_1&amp;quot;">'
+                '<p><oppia-noninteractive-image id-with-value="&amp;quot;image_id_1&amp;quot;">'
                 '</oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             )
@@ -1792,7 +1792,7 @@ class ExplorationContentValidationJobForCKEditorTests(
                 '</oppia-noninteractive-image>'
                 ' in </b>progress</pre>\', '
                 'u\'<ol><ol><li>Item1</li></ol><li>Item2</li></ol>\', '
-                'u\'<p><oppia-noninteractive-image image_id-with-value='
+                'u\'<p><oppia-noninteractive-image id-with-value='
                 '"&amp;quot;image_id_1&amp;quot;"></oppia-noninteractive-image>'
                 'Hello this is test case to check '
                 'image tag inside p tag</p>\', '
@@ -1895,7 +1895,7 @@ class InteractionCustomizationArgsValidationJobTests(
                 '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
                 'circle divided into equal fifths.&amp;quot;" '
                 'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'image_id-with-value="&amp;quot;invalid&amp;quot;">'
+                'id-with-value="&amp;quot;invalid&amp;quot;">'
                 '</oppia-noninteractive-image>'
             )
         }
@@ -1921,7 +1921,7 @@ class InteractionCustomizationArgsValidationJobTests(
             '[u\'Invalid image_id, received invalid\', '
             '[u\'<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" caption-with-value'
-            '="&amp;quot;Hello&amp;quot;" image_id-with-value="&amp;quot;invalid'
+            '="&amp;quot;Hello&amp;quot;" id-with-value="&amp;quot;invalid'
             '&amp;quot;"></oppia-noninteractive-image>\']]'
         ),(
             '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''

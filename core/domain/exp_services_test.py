@@ -111,7 +111,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'image_id-with-value="image_id_1"></oppia-noninteractive-image>')
+                    'id-with-value="image_id_1"></oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -208,7 +208,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'image_id-with-value="image_id_1"></oppia-noninteractive-image>')
+                    'id-with-value="image_id_1"></oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -321,16 +321,16 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html_before_deleting_image = ('''<p>ssssssssssssssss</p>
-            <oppia-noninteractive-image image_id-with-value="image_id_1">
+            <oppia-noninteractive-image id-with-value="image_id_1">
             </oppia-noninteractive-image> hjkhjkhkjh
-            <oppia-noninteractive-image image_id-with-value="image_id_2">
+            <oppia-noninteractive-image id-with-value="image_id_2">
             </oppia-noninteractive-image> dgfsdgfd ggggggggggg
-            <oppia-noninteractive-image image_id-with-value="image_id_3">\
+            <oppia-noninteractive-image id-with-value="image_id_3">\
             </oppia-noninteractive-image>ffffff ''')
 
         new_html_after_deleting_image = ('''
-            <p>ssssssssssssssss</p><oppia-noninteractive-image image_id-with-value="image_id_1">
-            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image image_id-with-value="image_id_2">
+            <p>ssssssssssssssss</p><oppia-noninteractive-image id-with-value="image_id_1">
+            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image id-with-value="image_id_2">
             </oppia-noninteractive-image>dgfsdgfd
             ''')
 
@@ -441,8 +441,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'content': {
                 'content_id': u'content',
                 'html': u'''
-            <p>ssssssssssssssss</p><oppia-noninteractive-image image_id-with-value="image_id_1">
-            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image image_id-with-value="image_id_2">
+            <p>ssssssssssssssss</p><oppia-noninteractive-image id-with-value="image_id_1">
+            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image id-with-value="image_id_2">
             </oppia-noninteractive-image>dgfsdgfd
             '''
             },
@@ -502,7 +502,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'image_id-with-value="image_id_1"></oppia-noninteractive-image>')
+                    'id-with-value="image_id_1"></oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -1462,7 +1462,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 '<blockquote>Hello, this is state1</blockquote><p>'
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
-                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;" image_id-with-value="1">'
+                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;" id-with-value="1">'
                 '</oppia-noninteractive-image></p>')
         }
         content2_dict = {
@@ -1506,14 +1506,14 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" image_id-with-value="2"></oppia-noninteractive-image></p>'
+                    '"&amp;quot;&amp;quot;" id-with-value="2"></oppia-noninteractive-image></p>'
                 ),
                 (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" image_id-with-value="3"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;" id-with-value="3"></oppia-noninteractive-image>'
                     '</p></p>')
             ]}
         }
@@ -1524,21 +1524,21 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" image_id-with-value="4"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;" id-with-value="4"></oppia-noninteractive-image>'
                     '</p>'),
                 (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" image_id-with-value="5"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;" id-with-value="5"></oppia-noninteractive-image>'
                     '</p>'),
                 (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" image_id-with-value="6"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;" id-with-value="6"></oppia-noninteractive-image>'
                     '</p>')
             ]}
         }
@@ -1567,7 +1567,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
                     '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" image_id-with-value="7"></oppia-noninteractive-image>'
+                    '"&amp;quot;&amp;quot;" id-with-value="7"></oppia-noninteractive-image>'
                     '</p>')
             }
         }, {
@@ -1595,7 +1595,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
-                        ' alt-with-value="&amp;quot;&amp;quot;" image_id-with-value="8">'
+                        ' alt-with-value="&amp;quot;&amp;quot;" id-with-value="8">'
                         '</oppia-noninteractive-image></p>')
                 },
                 'param_changes': [],
@@ -1633,7 +1633,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice1.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;" image_id-with-value="9">'
+                        'alt-with-value="&amp;quot;&amp;quot;" id-with-value="9">'
                         '</oppia-noninteractive-image></p>')
                 ]}
             }, {
@@ -1644,7 +1644,7 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice3.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;" image_id-with-value="10">'
+                        'alt-with-value="&amp;quot;&amp;quot;" id-with-value="10">'
                         '</oppia-noninteractive-image></p>')
                 ]}
             }],

@@ -56,7 +56,7 @@ class BaseRteComponent(object):
             cls.__name__]['customization_arg_specs']
 
         # RTC of image has changed. filepath-with-value is removed from
-        # <oppia-noninteractive-image> tag and image_id-with-value is added.
+        # <oppia-noninteractive-image> tag and id-with-value is added.
         # Schema form stills contain filepath. So to validate image the below
         # if condition is added for image, since validation of image is
         # different from other rtc.
@@ -66,7 +66,7 @@ class BaseRteComponent(object):
             image_id_arg_spec = {
                 u'default_value': u'',
                 u'schema' : {u'type': u'unicode'},
-                u'name': u'image_id',
+                u'name': u'id',
                 u'description': u'The id of an image'
             }
             customization_arg_specs.append(image_id_arg_spec)
@@ -122,7 +122,7 @@ class Image(BaseRteComponent):
     def validate(cls, value_dict):
         """Validates Image component."""
         super(Image, cls).validate(value_dict)
-        image_id = value_dict['image_id-with-value']
+        image_id = value_dict['id-with-value']
         image_re = r'(image_id_)+[0-9]'
         if not re.match(image_re, image_id):
             raise Exception('Invalid image_id, received %s' %

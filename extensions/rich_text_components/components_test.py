@@ -81,18 +81,18 @@ class ComponentValidationUnitTests(test_utils.GenericTestBase):
         valid_items = [{
             'alt-with-value': '1234',
             'caption-with-value': 'hello',
-            'image_id-with-value': 'image_id_1'
+            'id-with-value': 'image_id_1'
         }, {
             'alt-with-value': 'hello',
-            'image_id-with-value': 'image_id_2'
+            'id-with-value': 'image_id_2'
         }]
         invalid_items = [{
             'caption-with-value': 'abc',
-            'image_id-with-value': 'invalid_1'
+            'id-with-value': 'invalid_1'
         }, {
             'alt-with-value': 'hello',
             'caption-with-value': 'abc',
-            'image_id-with-value': 'invalid_2'
+            'id-with-value': 'invalid_2'
         }]
 
         self.check_validation(

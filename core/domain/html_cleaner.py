@@ -91,10 +91,10 @@ def clean(user_submitted_html):
     oppia_custom_tags = (
         rte_component_registry.Registry.get_tag_list_with_attrs())
 
-    # Add 'image_id-with-value' in oppia custom tags.
+    # Add 'id-with-value' in oppia custom tags.
     (
         oppia_custom_tags[u'oppia-noninteractive-image'].
-        append(u'image_id-with-value'))
+        append(u'id-with-value'))
 
     core_tags = ATTRS_WHITELIST.copy()
     core_tags.update(oppia_custom_tags)

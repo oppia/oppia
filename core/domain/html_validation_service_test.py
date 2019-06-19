@@ -650,7 +650,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-collapsible>'
         ), (
             '<oppia-noninteractive-image caption-with-value="&amp;quot;'
-            'abc&amp;quot;" image_id-with-value="&amp;quot;image_id_1&amp;quot;"'
+            'abc&amp;quot;" id-with-value="&amp;quot;image_id_1&amp;quot;"'
             '></oppia-noninteractive-image>'
         ), (
             '<p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
@@ -760,31 +760,31 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="&amp;quot;&amp;quot;" '
-            'image_id-with-value="&amp;quot;image_id_2&amp;quot;" >'
+            'id-with-value="&amp;quot;image_id_2&amp;quot;" >'
             '</oppia-noninteractive-image>'
         ), (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="&amp;quot;Hello&amp;quot;" '
-            'image_id-with-value="&amp;quot;image_id_3&amp;quot;" >'
+            'id-with-value="&amp;quot;image_id_3&amp;quot;" >'
             '</oppia-noninteractive-image>'
         ), (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="34454" '
-            'image_id-with-value="&amp;quot;image_id_4&amp;quot;" >'
+            'id-with-value="&amp;quot;image_id_4&amp;quot;" >'
             '</oppia-noninteractive-image>'
         ), (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="&amp;quot;5454&amp;quot;" '
-            'image_id-with-value="&amp;quot;image_id_5&amp;quot;">'
+            'id-with-value="&amp;quot;image_id_5&amp;quot;">'
             '</oppia-noninteractive-image>'
         ), (
             '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
             'circle divided into equal fifths.&amp;quot;" '
             'caption-with-value="&amp;quot;Hello&amp;quot;" '
-            'image_id-with-value="&amp;quot;random&amp;quot;" >'
+            'id-with-value="&amp;quot;random&amp;quot;" >'
             '</oppia-noninteractive-image>'
         )]
 
@@ -796,7 +796,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
                 'circle divided into equal fifths.&amp;quot;" '
                 'caption-with-value="&amp;quot;Hello&amp;quot;" '
-                'image_id-with-value="&amp;quot;random&amp;quot;" >'
+                'id-with-value="&amp;quot;random&amp;quot;" >'
                 '</oppia-noninteractive-image>'
                 )
             ],
@@ -884,7 +884,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
                 'circle divided into equal fifths.&amp;quot;" '
                 'caption-with-value="34454" '
-                'image_id-with-value="&amp;quot;image_id_4&amp;quot;" >'
+                'id-with-value="&amp;quot;image_id_4&amp;quot;" >'
                 '</oppia-noninteractive-image>'
             )],
             'Expected unicode string, received 3456': [(
@@ -918,7 +918,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'Missing attributes: [u\'alt-with-value\'], Extra attributes: []':
             [(
                 '<oppia-noninteractive-image caption-with-value="&amp;quot;abc'
-                '&amp;quot;" image_id-with-value="&amp;quot;image_id_1&amp;quot;"'
+                '&amp;quot;" id-with-value="&amp;quot;image_id_1&amp;quot;"'
                 '></oppia-noninteractive-image>'
             )],
             'Video id length is not 11': [(
@@ -927,7 +927,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;quot;lorem&amp;quot;"></oppia-noninteractive-video>'
             )]}
 
-        # self.assertEqual(set(actual_output.keys()), "keshav")
         self.assertEqual(set(actual_output.keys()), set(expected_output.keys()))
         for key in expected_output:
             self.assertEqual(set(actual_output[key]), set(expected_output[key]))
@@ -949,7 +948,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'tag_name': 'oppia-noninteractive-link'
         }, {
             'html_string': (
-                '<oppia-noninteractive-image image_id-with-value="&amp;quot;image_id_1&amp;quot;" caption-with-value="&amp;quot;'
+                '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_1&amp;quot;" caption-with-value="&amp;quot;'
                 'abc&amp;quot;">'
                 '</oppia-noninteractive-image>'
             ),
