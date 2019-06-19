@@ -42,12 +42,12 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
     controllerAs: '$ctrl',
     controller: [
       '$http', '$log', '$rootScope', '$scope',
-      '$uibModal', 'CompareVersionsService',
+      '$uibModal', '$window', 'CompareVersionsService',
       'DateTimeFormatService', 'EditabilityService', 'ExplorationDataService',
       'UrlInterpolationService', 'VersionTreeService',
       function(
           $http, $log, $rootScope, $scope,
-          $uibModal, CompareVersionsService,
+          $uibModal, $window, CompareVersionsService,
           DateTimeFormatService, EditabilityService, ExplorationDataService,
           UrlInterpolationService, VersionTreeService) {
         var ctrl = this;
@@ -295,7 +295,7 @@ oppia.directive('historyTab', ['UrlInterpolationService', function(
               current_version: ExplorationDataService.data.version,
               revert_to_version: version
             }).then(function() {
-              location.reload();
+              $window.location.reload();
             });
           });
         };
