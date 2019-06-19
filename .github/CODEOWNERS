@@ -278,7 +278,9 @@
 /core/storage/story/ @aks681
 /core/templates/dev/head/components/entity-creation-services/story-creation.service.ts @aks681
 /core/templates/dev/head/domain/story/ @aks681
+/core/templates/dev/head/domain/story_viewer/ @aks681
 /core/templates/dev/head/pages/story-editor-page/ @aks681
+/core/templates/dev/head/pages/story-viewer-page/ @aks681
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
