@@ -344,6 +344,9 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
             item: ndb.Model. BaseSnapshotContentModel to validate.
         """
 
+        if cls.related_model_name == '':
+            raise Exception('Related model name should be specified')
+
         name_split_by_space = cls.related_model_name.split(' ')
         key_to_fetch = ('_').join(name_split_by_space)
         capitalized_related_model_name = ('').join([

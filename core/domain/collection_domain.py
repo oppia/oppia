@@ -1084,14 +1084,14 @@ class CollectionSummary(object):
                 'Expected objective to be a string, received %s' %
                 self.objective)
 
+        if not self.language_code:
+            raise utils.ValidationError(
+                'A language must be specified (in the \'Settings\' tab).')
+
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
                 self.language_code)
-
-        if not self.language_code:
-            raise utils.ValidationError(
-                'A language must be specified (in the \'Settings\' tab).')
 
         if not utils.is_valid_language_code(self.language_code):
             raise utils.ValidationError(

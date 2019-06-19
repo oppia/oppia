@@ -920,11 +920,18 @@ class CollectionSummaryTests(test_utils.GenericTestBase):
             'Expected objective to be a string, received 0'):
             self.collection_summary.validate()
 
-    def test_validation_fails_with_invalid_language_code(self):
-        self.collection_summary.language_code = 0
+    def test_validation_fails_with_missing_language_code(self):
+        self.collection_summary.language_code = None
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected language code to be a string, received 0'):
+            'A language must be specified \\(in the \'Settings\' tab\\).'):
+            self.collection_summary.validate()
+
+    def test_validation_fails_with_invalid_language_code(self):
+        self.collection_summary.language_code = 1
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected language code to be a string, received 1'):
             self.collection_summary.validate()
 
     def test_validation_fails_with_unallowed_language_code(self):

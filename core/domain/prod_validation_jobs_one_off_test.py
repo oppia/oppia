@@ -24,6 +24,7 @@ import time
 import types
 
 from constants import constants
+from core import jobs_registry
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -139,6 +140,81 @@ def update_datastore_types_for_mock_datetime():
     datastore_types._PROPERTY_MEANINGS[MockDatetime13Hours] = (
         datastore_types.entity_pb.Property.GD_WHEN)
     # pylint: enable=protected-access
+
+
+class MockModel(base_models.BaseModel):
+    pass
+
+
+class MockSnapshotModel(base_models.BaseModel):
+    commit_type = 'edit'
+    commit_cmds = []
+
+
+class MockBaseModelValidator(prod_validation_jobs_one_off.BaseModelValidator):
+    pass
+
+
+class MockSummaryModelValidator(
+        prod_validation_jobs_one_off.BaseSummaryModelValidator):
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {}
+
+
+class MockSnapshotContentModelValidator(
+        prod_validation_jobs_one_off.BaseSnapshotContentModelValidator):
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {}
+
+
+class MockSnapshotMetadataModelValidator(
+        prod_validation_jobs_one_off.BaseSnapshotMetadataModelValidator):
+
+    related_model_name = 'related model'
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'related_model_ids': (MockModel, [])
+        }
+
+
+class NotImplementedErrorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(NotImplementedErrorTests, self).setUp()
+        self.item = MockModel(id='mockmodel')
+        self.item.put()
+
+    def test_error_is_raised_if_fetch_external_properties_is_undefined(self):
+        with self.assertRaises(NotImplementedError):
+            MockBaseModelValidator().validate(self.item)
+
+    def test_error_is_get_related_model_properties_is_undefined(self):
+        with self.assertRaises(NotImplementedError):
+            MockSummaryModelValidator().validate(self.item)
+
+    def test_error_is_raised_if_related_model_name_is_undefined(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Related model name should be specified'):
+            MockSnapshotContentModelValidator().validate(self.item)
+
+    def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
+        with self.assertRaises(NotImplementedError):
+            snapshot_model = MockSnapshotModel(id='mockmodel')
+            snapshot_model.put()
+            MockSnapshotMetadataModelValidator().validate(snapshot_model)
+
+    def test_error_is_raised_if_entity_classes_to_map_over_is_undefined(self):
+        job_class = prod_validation_jobs_one_off.ProdValidationAuditOneOffJob
+        with self.assertRaises(NotImplementedError), self.swap(
+            jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
+            job_id = job_class.create_new()
+            job_class.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
 
 class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
