@@ -2105,6 +2105,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             {'answer': 2, 'frequency': 1},
         ])
 
+
 class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
     """Test for services related to learner answer details."""
 
@@ -2115,10 +2116,10 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         self.question_id = 'q_id_1'
         self.interaction_id = 'TextInput'
         self.state_reference_exploration = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
                 self.exp_id, self.state_name))
         self.state_reference_question = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question( #pylint: disable=line-too-long
                 self.question_id))
         self.learner_answer_details_model_exploration = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(
@@ -2137,7 +2138,8 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             'answer': 'This is my answer',
             'answer_details': 'This is my answer details'
         }
-        learner_answer_details_change = stats_domain.LearnerAnswerDetailsChange(change_dict)
+        learner_answer_details_change = (
+            stats_domain.LearnerAnswerDetailsChange(change_dict))
         learner_answer_details = stats_services.get_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
         self.assertEqual(
@@ -2145,37 +2147,25 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
         stats_services.update_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
             self.interaction_id, learner_answer_details_change)
-        # learner_answer_details = stats_services.change_learner_answer_details(
-        #     self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
-        #     self.interaction_id, learner_answer_details_change)
-        # self.assertEqual(
-        #     len(learner_answer_details.learner_answer_info_list), 1)
-        # stats_services.save_learner_answer_details(
-        #     learner_answer_details, self.state_reference_exploration,
-        #     feconf.ENTITY_TYPE_EXPLORATION)
         learner_answer_details = stats_services.get_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
-        self.assertEqual(len(learner_answer_details.learner_answer_info_list), 1)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
 
         change_dict = {
             'cmd': stats_domain.CMD_RECORD_LEARNER_ANSWER_INFO,
             'answer': 'My answer',
             'answer_details': 'My answer details'
         }
-        learner_answer_details_change = stats_domain.LearnerAnswerDetailsChange(change_dict)
+        learner_answer_details_change = (
+            stats_domain.LearnerAnswerDetailsChange(change_dict))
         stats_services.update_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
             self.interaction_id, learner_answer_details_change)
-        # learner_answer_details = stats_services.change_learner_answer_details(
-        #     self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
-        #     self.interaction_id, learner_answer_details_change)
-        # self.assertEqual(len(learner_answer_details.learner_answer_info_list), 2)
-        # stats_services.save_learner_answer_details(
-        #     learner_answer_details, self.state_reference_exploration,
-        #     feconf.ENTITY_TYPE_EXPLORATION)
         learner_answer_details = stats_services.get_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
-        self.assertEqual(len(learner_answer_details.learner_answer_info_list), 2)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 2)
 
         learner_answer_info_id = (
             learner_answer_details.learner_answer_info_list[0].id)
@@ -2183,47 +2173,77 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             'cmd': stats_domain.CMD_DELETE_LEARNER_ANSWER_INFO,
             'learner_answer_info_id': learner_answer_info_id
         }
-        learner_answer_details_change = stats_domain.LearnerAnswerDetailsChange(change_dict)
-        self.assertEqual(len(learner_answer_details.learner_answer_info_list), 2)
+        learner_answer_details_change = (
+            stats_domain.LearnerAnswerDetailsChange(change_dict))
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 2)
         stats_services.update_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
             self.interaction_id, learner_answer_details_change)
-        # learner_answer_details = stats_services.change_learner_answer_details(
-        #     self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
-        #     self.interaction_id, learner_answer_details_change)
-        # self.assertEqual(len(learner_answer_details.learner_answer_info_list), 1)
-        # stats_services.save_learner_answer_details(
-        #     learner_answer_details, self.state_reference_exploration,
-        #     feconf.ENTITY_TYPE_EXPLORATION)
         learner_answer_details = stats_services.get_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
-        self.assertEqual(len(learner_answer_details.learner_answer_info_list), 1)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
 
         new_state_reference = 'exp_id_2.state_name_2'
         change_dict = {
             'cmd': stats_domain.CMD_UPDATE_STATE_REFERENCE,
             'new_value': new_state_reference}
-        learner_answer_details_change = stats_domain.LearnerAnswerDetailsChange(change_dict)
+        learner_answer_details_change = (
+            stats_domain.LearnerAnswerDetailsChange(change_dict))
         self.assertEqual(
-            learner_answer_details.state_reference, self.state_reference_exploration)
+            learner_answer_details.state_reference,
+            self.state_reference_exploration)
         stats_services.update_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
             self.interaction_id, learner_answer_details_change)
-        # learner_answer_details = stats_services.change_learner_answer_details(
-        #     self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
-        #     self.interaction_id, learner_answer_details_change)
-        # self.assertEqual(
-        #     learner_answer_details.state_reference, new_state_reference)
-        # stats_services.save_learner_answer_details(
-        #     learner_answer_details, self.state_reference_exploration,
-        #     feconf.ENTITY_TYPE_EXPLORATION)
         learner_answer_details = stats_services.get_learner_answer_details(
             new_state_reference, feconf.ENTITY_TYPE_EXPLORATION)
-        self.assertEqual(learner_answer_details.state_reference, new_state_reference)
-        self.assertEqual(len(learner_answer_details.learner_answer_info_list), 1)
+        self.assertEqual(
+            learner_answer_details.state_reference, new_state_reference)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
         learner_answer_details = stats_services.get_learner_answer_details(
             self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
         self.assertEqual(learner_answer_details, None)
-        
-        
-        
+
+    def test_change_dict_must_be_valid(self):
+        change_dict = {
+            'cmd': stats_domain.CMD_RECORD_LEARNER_ANSWER_INFO,
+            'answer': 'My answer',
+            'answer_details': 'My answer details'
+        }
+        learner_answer_details_change = (
+            stats_domain.LearnerAnswerDetailsChange(change_dict))
+        learner_answer_details_change.cmd = 'learner_answer_info'
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid change dict for learner answer details'):
+            stats_services.update_learner_answer_details(
+                self.state_reference_exploration,
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.interaction_id, learner_answer_details_change)
+
+    def test_new_learner_answer_details_is_created(self):
+        change_dict = {
+            'cmd': stats_domain.CMD_RECORD_LEARNER_ANSWER_INFO,
+            'answer': 'My answer',
+            'answer_details': 'My answer details'
+        }
+        learner_answer_details_change = (
+            stats_domain.LearnerAnswerDetailsChange(change_dict))
+        state_reference = 'exp_id_2.state_name_2'
+        interaction_id = 'GraphInput'
+        learner_answer_details = stats_services.get_learner_answer_details(
+            state_reference, feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertEqual(learner_answer_details, None)
+        stats_services.update_learner_answer_details(
+            state_reference, feconf.ENTITY_TYPE_EXPLORATION,
+            interaction_id, learner_answer_details_change)
+        learner_answer_details = stats_services.get_learner_answer_details(
+            state_reference, feconf.ENTITY_TYPE_EXPLORATION)
+        self.assertNotEqual(learner_answer_details, None)
+        self.assertEqual(
+            learner_answer_details.state_reference, state_reference)
+        self.assertEqual(learner_answer_details.interaction_id, interaction_id)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)

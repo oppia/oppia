@@ -1386,7 +1386,7 @@ class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
             'exp_id.state_name', feconf.ENTITY_TYPE_EXPLORATION,
             'TextInput', [stats_domain.LearnerAnswerInfo(
                 'id_1', 'This is my answer', 'This is my answer details',
-                datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))], 4000)
+                datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))], 4000)
         self.learner_answer_details.validate()
 
     def test_to_dict(self):
@@ -1398,8 +1398,7 @@ class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
                 'id': 'id_1',
                 'answer': 'This is my answer',
                 'answer_details': 'This is my answer details',
-                'created_on': datetime.datetime.strptime(
-                    '26 Sep 2012', '%d %b %Y')
+                'created_on': '2019-06-19 13:59:29.153073'
             }],
             'accumulated_answer_info_json_size_bytes': 4000,
             'schema_version': 1}
@@ -1416,8 +1415,7 @@ class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
                 'id': 'id_1',
                 'answer': 'This is my answer',
                 'answer_details': 'This is my answer details',
-                'created_on': datetime.datetime.strptime(
-                    '26 Sep 2012', '%d %b %Y')
+                'created_on': '2019-06-19 13:59:29.153073'
             }],
             'accumulated_answer_info_json_size_bytes': 4000,
             'schema_version': 1}
@@ -1439,7 +1437,7 @@ class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
             'This is my answer details')
         self.assertEqual(
             learner_answer_details.learner_answer_info_list[0].created_on,
-            datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))
+            datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
         self.assertEqual(
             learner_answer_details.accumulated_answer_info_json_size_bytes,
             4000)
@@ -1492,7 +1490,7 @@ class LearnerAnswerDetailsValidationTests(test_utils.GenericTestBase):
             'exp_id.state_name', feconf.ENTITY_TYPE_EXPLORATION,
             'TextInput', [stats_domain.LearnerAnswerInfo(
                 'id_1', 'This is my answer', 'This is my answer details',
-                datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))], 4000)
+                datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))], 4000)
         self.learner_answer_details.validate()
 
     def test_state_reference_must_be_string(self):
@@ -1572,7 +1570,7 @@ class LearnerAnswerInfoDomainTests(test_utils.GenericTestBase):
         super(LearnerAnswerInfoDomainTests, self).setUp()
         self.learner_answer_info = stats_domain.LearnerAnswerInfo(
             'id_1', 'This is my answer', 'This is my answer details',
-            datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))
+            datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
         self.learner_answer_info.validate()
 
     def test_to_dict(self):
@@ -1580,7 +1578,7 @@ class LearnerAnswerInfoDomainTests(test_utils.GenericTestBase):
             'id': 'id_1',
             'answer': 'This is my answer',
             'answer_details': 'This is my answer details',
-            'created_on': datetime.datetime.strptime('26 Sep 2012', '%d %b %Y')
+            'created_on': '2019-06-19 13:59:29.153073'
         }
         self.assertEqual(
             expected_learner_answer_info_dict,
@@ -1591,7 +1589,7 @@ class LearnerAnswerInfoDomainTests(test_utils.GenericTestBase):
             'id': 'id_1',
             'answer': 'This is my answer',
             'answer_details': 'This is my answer details',
-            'created_on': datetime.datetime.strptime('26 Sep 2012', '%d %b %Y')
+            'created_on': '2019-06-19 13:59:29.153073'
         }
         learner_answer_info = stats_domain.LearnerAnswerInfo.from_dict(
             learner_answer_info_dict)
@@ -1601,7 +1599,7 @@ class LearnerAnswerInfoDomainTests(test_utils.GenericTestBase):
             learner_answer_info.answer_details, 'This is my answer details')
         self.assertEqual(
             learner_answer_info.created_on,
-            datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))
+            datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
 
     def test_get_learner_answer_info_dict_size(self):
         learner_answer_info_dict_size = (
