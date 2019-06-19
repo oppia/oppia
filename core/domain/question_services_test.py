@@ -122,6 +122,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
             question_services.get_questions_by_skill_ids(
                 25, ['skill_1', 'skill_2'])
+
     def test_create_multi_question_skill_links_for_question(self):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
