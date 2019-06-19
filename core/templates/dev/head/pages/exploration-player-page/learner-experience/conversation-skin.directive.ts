@@ -1023,7 +1023,7 @@ oppia.directive('conversationSkin', [
             if ($scope.questionSessionCompleted) {
               $rootScope.$broadcast(
                 'questionSessionCompleted',
-                QuestionPlayerStateService.getQuestionStateData());
+                QuestionPlayerStateService.getQuestionPlayerStateData());
               return;
             }
             if ($scope.moveToExploration) {

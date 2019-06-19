@@ -19,41 +19,41 @@
 
 oppia.factory('QuestionPlayerStateService', [
   function() {
-    var questionState = {};
+    var questionPlayerState = {};
 
     var getCurrentTime = function() {
       return new Date().getTime();
     };
 
-    var createNewQuestionState = function(questionId) {
-      questionState[questionId] = {answers: [], usedHints: []};
+    var createNewQuestionPlayerState = function(questionId) {
+      questionPlayerState[questionId] = {answers: [], usedHints: []};
     };
 
     var _hintUsed = function(questionId) {
-      if (!questionState[questionId]) {
-        createNewQuestionState(questionId);
+      if (!questionPlayerState[questionId]) {
+        createNewQuestionPlayerState(questionId);
       }
-      questionState[questionId].usedHints.push({timestamp: getCurrentTime()});
+      questionPlayerState[questionId].usedHints.push({timestamp: getCurrentTime()});
     };
 
     var _solutionViewed = function(questionId) {
-      if (!questionState[questionId]) {
-        createNewQuestionState(questionId);
+      if (!questionPlayerState[questionId]) {
+        createNewQuestionPlayerState(questionId);
       }
-      questionState[questionId].viewedSolution = {
+      questionPlayerState[questionId].viewedSolution = {
         timestamp: getCurrentTime()};
     };
 
     var _answerSubmitted = function(questionId, isCorrect) {
-      if (!questionState[questionId]) {
-        createNewQuestionState(questionId);
+      if (!questionPlayerState[questionId]) {
+        createNewQuestionPlayerState(questionId);
       }
       // Don't store a correct answer in the case where
       // the learner viewed the solution for this question.
-      if (isCorrect && questionState[questionId].viewedSolution) {
+      if (isCorrect && questionPlayerState[questionId].viewedSolution) {
         return;
       }
-      questionState[questionId].answers.push(
+      questionPlayerState[questionId].answers.push(
         {isCorrect: isCorrect,
           timestamp: getCurrentTime()
         });
@@ -70,8 +70,8 @@ oppia.factory('QuestionPlayerStateService', [
       answerSubmitted: function(questionId, isCorrect) {
         _answerSubmitted(questionId, isCorrect);
       },
-      getQuestionStateData: function() {
-        return questionState;
+      getQuestionPlayerStateData: function() {
+        return questionPlayerState;
       }
     };
   }]);

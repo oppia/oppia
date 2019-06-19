@@ -31,12 +31,12 @@ describe('Question player state service', function() {
   }));
 
   it('should return an empty question state dictionary', function() {
-    expect(qpservice.getQuestionStateData()).toEqual({});
+    expect(qpservice.getQuestionPlayerStateData()).toEqual({});
   });
 
   it('should add a hint to the question state data', function() {
     qpservice.hintUsed(questionId);
-    var stateData = qpservice.getQuestionStateData();
+    var stateData = qpservice.getQuestionPlayerStateData();
     expect(stateData[questionId]).toBeTruthy();
     expect(stateData[questionId].usedHints).toBeDefined();
     expect(stateData[questionId].usedHints.length).toEqual(1);
@@ -47,7 +47,7 @@ describe('Question player state service', function() {
   it('should record a wrong answer was submitted to the question state data',
     function() {
       qpservice.answerSubmitted(questionId, false);
-      var stateData = qpservice.getQuestionStateData();
+      var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].answers).toBeDefined();
       expect(stateData[questionId].answers.length).toEqual(1);
@@ -58,7 +58,7 @@ describe('Question player state service', function() {
   it('should record a right answer was submitted to the question state data',
     function() {
       qpservice.answerSubmitted(questionId, true);
-      var stateData = qpservice.getQuestionStateData();
+      var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].answers).toBeDefined();
       expect(stateData[questionId].answers.length).toEqual(1);
@@ -69,7 +69,7 @@ describe('Question player state service', function() {
   it('should record that a solution was viewed',
     function() {
       qpservice.solutionViewed(questionId);
-      var stateData = qpservice.getQuestionStateData();
+      var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].viewedSolution).toBeDefined();
       expect(stateData[questionId].viewedSolution.timestamp).toBeDefined();
@@ -80,7 +80,7 @@ describe('Question player state service', function() {
   it('should shouldn\'t record a correct answer if a solution was viewed',
     function() {
       qpservice.solutionViewed(questionId);
-      var stateData = qpservice.getQuestionStateData();
+      var stateData = qpservice.getQuestionPlayerStateData();
       expect(stateData[questionId]).toBeTruthy();
       expect(stateData[questionId].viewedSolution).toBeDefined();
       expect(stateData[questionId].viewedSolution.timestamp).toBeDefined();
