@@ -30,7 +30,7 @@ oppia.factory('PretestQuestionBackendApiService', [
 
     var _fetchPretestQuestions = function(
         explorationId, storyId, successCallback, errorCallback) {
-      if (!storyId) {
+      if (!storyId || !storyId.match(/^[a-zA-Z0-9]+$/i)) {
         successCallback([]);
         return;
       }

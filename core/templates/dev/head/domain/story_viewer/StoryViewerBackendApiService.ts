@@ -21,9 +21,15 @@ require('domain/utilities/UrlInterpolationService.ts');
 oppia.constant(
   'STORY_DATA_URL_TEMPLATE', '/story_data_handler/<story_id>');
 
+oppia.constant(
+  'STORY_NODE_COMPLETION_URL_TEMPLATE',
+  '/story_node_completion_handler/<story_id>/<node_id>');
+
 oppia.factory('StoryViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'STORY_DATA_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, STORY_DATA_URL_TEMPLATE) {
+  'STORY_NODE_COMPLETION_URL_TEMPLATE',
+  function($http, $q, UrlInterpolationService, STORY_DATA_URL_TEMPLATE,
+      STORY_NODE_COMPLETION_URL_TEMPLATE) {
     var storyDataDict = null;
     var _fetchStoryData = function(storyId, successCallback, errorCallback) {
       var storyDataUrl = UrlInterpolationService.interpolateUrl(
@@ -43,10 +49,35 @@ oppia.factory('StoryViewerBackendApiService', [
       });
     };
 
+    var _recordStoryNodeCompletion = function(
+      storyId, nodeId, successCallback, errorCallback) {
+        var storyNodeCompletionUrl = UrlInterpolationService.interpolateUrl(
+          STORY_NODE_COMPLETION_URL_TEMPLATE, {
+            story_id: storyId,
+            node_id: nodeId
+          });
+
+        $http.post(storyNodeCompletionUrl).then(function(response) {
+          if (successCallback) {
+            successCallback();
+          }
+        }, function(errorResponse) {
+          if (errorCallback) {
+            errorCallback(errorResponse.data);
+          }
+        });
+      }
+
     return {
       fetchStoryData: function(storyId) {
         return $q(function(resolve, reject) {
           _fetchStoryData(storyId, resolve, reject);
+        });
+      },
+      
+      recordStoryNodeCompletion: function(storyId, nodeId) {
+        return $q(function(resolve, reject) {
+          _recordStoryNodeCompletion(storyId, nodeId, resolve, reject);
         });
       }
     };

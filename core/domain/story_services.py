@@ -559,6 +559,33 @@ def save_story_summary(story_summary):
     story_summary_model.put()
 
 
+def get_story_node_by_story_id_and_node_id(story_id, node_id):
+    """Returns a domain object representing a story node.
+
+    Args:
+        story_id: str. ID of the story.
+        node_id: str. ID of the story node.
+
+    Returns:
+        StoryNode. The domain object representing a story node with the
+        given story ID and node ID.
+
+    Raises:
+        Exception. The given story does not exist.
+        Exception. The given node does not exist in the story.
+    """
+    try:
+        story = get_story_by_id(story_id)
+    except Exception:
+        raise Exception('Story with id %s does not exist.' % story_id)
+
+    story_node = story.story_contents.get_node_by_node_id(node_id)
+    if story_node is None:
+        raise Exception('Story node with id %s does not exist '
+                    'in this story.' % node_id)
+    return story_node
+
+
 def get_completed_node_ids(user_id, story_id):
     """Returns the ids of the nodes completed in the story.
 

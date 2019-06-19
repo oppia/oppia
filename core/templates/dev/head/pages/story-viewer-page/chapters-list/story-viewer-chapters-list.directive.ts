@@ -25,6 +25,7 @@ require('domain/story_viewer/StoryPlaythroughObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
+require('services/contextual/UrlService.ts');
 
 oppia.animation('.oppia-story-animate-slide', function() {
   return {
@@ -52,11 +53,11 @@ oppia.directive('storyViewerChaptersList', ['UrlInterpolationService',
       controller: [
         '$anchorScroll', '$http', '$location', 'AlertsService',
         'PageTitleService', 'StoryPlaythroughObjectFactory',
-        'UrlInterpolationService',
+        'UrlInterpolationService', 'UrlService',
         function(
             $anchorScroll, $http, $location, AlertsService,
             PageTitleService, StoryPlaythroughObjectFactory,
-            UrlInterpolationService) {
+            UrlInterpolationService, UrlService) {
           var ctrl = this;
           ctrl.storyPlaythroughObject = ctrl.getPlaythroughObject();
           ctrl.isLoggedIn = GLOBALS.isLoggedIn;
@@ -99,6 +100,7 @@ oppia.directive('storyViewerChaptersList', ['UrlInterpolationService',
             ctrl.isNextPendingNode = (
               ctrl.storyPlaythroughObject.getNextPendingNodeId() ===
               storyNode.getId());
+            ctrl.currentNodeId = storyNode.getId();
           };
 
           // Calculates the SVG parameters required to draw the curved path.
@@ -200,7 +202,12 @@ oppia.directive('storyViewerChaptersList', ['UrlInterpolationService',
             if (!ctrl.isNextPendingNode) {
               return null;
             }
-            return ('/explore/' + node.getExplorationId());
+            var result = '/explore/' + node.getExplorationId();
+            result = UrlService.addField(
+              result, 'story_id', UrlService.getStoryIdFromViewerUrl());
+            result = UrlService.addField(
+              result, 'node_id', ctrl.currentNodeId);
+            return result;
           };
 
           ctrl.scrollToLocation = function(id) {

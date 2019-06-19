@@ -111,6 +111,13 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(self.story.has_exploration('exp_id'))
         self.assertFalse(self.story.has_exploration('exp_id_2'))
 
+    def test_get_node_by_node_id(self):
+        self.assertEqual(
+            self.story.story_contents.get_node_by_node_id(self.NODE_ID_1),
+            self.story.story_contents.nodes[0])
+        self.assertIsNone(
+            self.story.story_contents.get_node_by_node_id('node_3'))
+
     def test_title_validation(self):
         self.story.title = 1
         self._assert_validation_error(
