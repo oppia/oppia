@@ -16,8 +16,8 @@
 
 import unittest
 
-from core.tests import test_utils
 from core.tests import gae_suite
+from core.tests import test_utils
 
 
 class GaeSuiteTests(test_utils.GenericTestBase):
@@ -25,10 +25,11 @@ class GaeSuiteTests(test_utils.GenericTestBase):
     def test_cannot_create_test_suites_with_invalid_test_target_format(self):
         with self.assertRaisesRegexp(
             Exception, 'The delimiter in test_target should be a dot (.)'):
-            gae_suite.create_test_suites('core/controllers')
+            gae_suite.create_test_suites(test_target='core/controllers')
 
     def test_create_test_suites(self):
-        test_suite = gae_suite.create_test_suites('core.controllers.admin_test')
+        test_suite = gae_suite.create_test_suites(
+            test_target='core.controllers.admin_test')
         self.assertEqual(len(test_suite), 1)
         self.assertEqual(type(test_suite[0]), unittest.suite.TestSuite)
 
