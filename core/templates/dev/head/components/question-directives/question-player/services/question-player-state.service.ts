@@ -33,7 +33,8 @@ oppia.factory('QuestionPlayerStateService', [
       if (!questionPlayerState[questionId]) {
         createNewQuestionPlayerState(questionId);
       }
-      questionPlayerState[questionId].usedHints.push({timestamp: getCurrentTime()});
+      questionPlayerState[questionId].usedHints.push(
+        {timestamp: getCurrentTime()});
     };
 
     var _solutionViewed = function(questionId) {
