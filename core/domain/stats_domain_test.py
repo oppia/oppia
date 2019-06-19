@@ -16,6 +16,8 @@
 
 """Tests for core.domain.stats_domain."""
 
+import datetime
+
 from core.domain import exp_domain
 from core.domain import stats_domain
 from core.tests import test_utils
@@ -1317,9 +1319,285 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             self.state_answers_calc_output,
             'calculation_output is too big to be stored')
 
+
 class LearnerAnswerDetailsDomainTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(LearnerAnswerDetailsDomainTests, self).setUp()
-        self.learner_answer_details = stats_domain.LearnerAnswerDetails()
+        self.learner_answer_details = stats_domain.LearnerAnswerDetails(
+            'exp_id.state_name', feconf.ENTITY_TYPE_EXPLORATION,
+            'TextInput', [stats_domain.LearnerAnswerInfo(
+                'id_1', 'This is my answer', 'This is my answer details',
+                datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))], 4000)
+        self.learner_answer_details.validate()
 
+    def test_to_dict(self):
+        expected_learner_answer_details_dict = {
+            'state_reference': 'exp_id.state_name',
+            'entity_type': 'exploration',
+            'interaction_id': 'TextInput',
+            'learner_answer_info_list': [{
+                'id': 'id_1',
+                'answer': 'This is my answer',
+                'answer_details': 'This is my answer details',
+                'created_on': datetime.datetime.strptime(
+                    '26 Sep 2012', '%d %b %Y')
+            }],
+            'accumulated_answer_info_json_size_bytes': 4000,
+            'schema_version': 1}
+        learner_answer_details_dict = self.learner_answer_details.to_dict()
+        self.assertEqual(
+            learner_answer_details_dict, expected_learner_answer_details_dict)
+
+    def test_from_dict(self):
+        learner_answer_details_dict = {
+            'state_reference': 'exp_id.state_name',
+            'entity_type': 'exploration',
+            'interaction_id': 'TextInput',
+            'learner_answer_info_list': [{
+                'id': 'id_1',
+                'answer': 'This is my answer',
+                'answer_details': 'This is my answer details',
+                'created_on': datetime.datetime.strptime(
+                    '26 Sep 2012', '%d %b %Y')
+            }],
+            'accumulated_answer_info_json_size_bytes': 4000,
+            'schema_version': 1}
+        learner_answer_details = stats_domain.LearnerAnswerDetails.from_dict(
+            learner_answer_details_dict)
+        self.assertEqual(
+            learner_answer_details.state_reference, 'exp_id.state_name')
+        self.assertEqual(
+            learner_answer_details.entity_type, 'exploration')
+        self.assertEqual(
+            learner_answer_details.interaction_id, 'TextInput')
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_list[0].answer,
+            'This is my answer')
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_list[0].answer_details,
+            'This is my answer details')
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_list[0].created_on,
+            datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))
+        self.assertEqual(
+            learner_answer_details.accumulated_answer_info_json_size_bytes,
+            4000)
+        self.assertEqual(
+            learner_answer_details.schema_version, 1)
+
+    def test_add_learner_answer_info(self):
+        learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id_2', 'This answer', 'This details',
+            datetime.datetime.strptime('27 Sep 2012', '%d %b %Y'))
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+        self.learner_answer_details.add_learner_answer_info(
+            learner_answer_info)
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 2)
+
+    def test_delete_learner_answer_info(self):
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+        learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id_2', 'This answer', 'This details',
+            datetime.datetime.strptime('27 Sep 2012', '%d %b %Y'))
+        self.learner_answer_details.add_learner_answer_info(
+            learner_answer_info)
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 2)
+        self.learner_answer_details.delete_learner_answer_info('id_1')
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+        self.assertNotEqual(
+            self.learner_answer_details.accumulated_answer_info_json_size_bytes,
+            0)
+
+    def test_update_state_reference(self):
+        self.assertEqual(
+            self.learner_answer_details.state_reference, 'exp_id.state_name')
+        self.learner_answer_details.update_state_reference(
+            'exp_id_1.state_name_1')
+        self.assertEqual(
+            self.learner_answer_details.state_reference,
+            'exp_id_1.state_name_1')
+
+
+class LearnerAnswerDetailsValidationTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LearnerAnswerDetailsValidationTests, self).setUp()
+        self.learner_answer_details = stats_domain.LearnerAnswerDetails(
+            'exp_id.state_name', feconf.ENTITY_TYPE_EXPLORATION,
+            'TextInput', [stats_domain.LearnerAnswerInfo(
+                'id_1', 'This is my answer', 'This is my answer details',
+                datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))], 4000)
+        self.learner_answer_details.validate()
+
+    def test_state_reference_must_be_string(self):
+        self.learner_answer_details.state_reference = 0
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected state_reference to be a string')
+
+    def test_entity_type_must_be_string(self):
+        self.learner_answer_details.entity_type = 0
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected entity_type to be a string')
+
+    def test_entity_type_must_be_exploration_or_question(self,):
+        self.learner_answer_details.entity_type = 'topic'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'The entity type should be either exploration or question')
+
+    def test_state_reference_must_be_valid_for_exploration(self):
+        self.learner_answer_details.state_reference = 'expidstatename'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'For entity type exploration, the state reference should')
+
+    def test_state_reference_must_be_valid_for_question(self):
+        self.learner_answer_details.entity_type = 'question'
+        self.learner_answer_details.state_reference = 'expid.statename'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'For entity type question, the state reference should')
+
+    def test_interaction_id_must_be_string(self):
+        self.learner_answer_details.interaction_id = 0
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected interaction_id to be a string')
+
+    def test_continue_interaction_cannot_solicit_answer_details(self):
+        self.learner_answer_details.interaction_id = 'Continue'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'The Continue interaction does not support '
+            'soliciting answer details')
+
+    def test_end_exploration_interaction_cannot_solicit_answer_details(self):
+        self.learner_answer_details.interaction_id = 'EndExploration'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'The EndExploration interaction does not support '
+            'soliciting answer details')
+
+    def test_learner_answer_info_must_be_list(self):
+        self.learner_answer_details.learner_answer_info_list = 'list'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected learner_answer_info_list to be a list')
+
+    def test_schema_version_must_be_int(self):
+        self.learner_answer_details.schema_version = 'version'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected schema_version to be an int')
+
+    def test_accumulated_answer_info_json_size_bytes_must_be_int(self):
+        self.learner_answer_details.accumulated_answer_info_json_size_bytes = (
+            'size')
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Expected accumulated_answer_info_json_size_bytes to be an int')
+
+
+class LearnerAnswerInfoDomainTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LearnerAnswerInfoDomainTests, self).setUp()
+        self.learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id_1', 'This is my answer', 'This is my answer details',
+            datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))
+        self.learner_answer_info.validate()
+
+    def test_to_dict(self):
+        expected_learner_answer_info_dict = {
+            'id': 'id_1',
+            'answer': 'This is my answer',
+            'answer_details': 'This is my answer details',
+            'created_on': datetime.datetime.strptime('26 Sep 2012', '%d %b %Y')
+        }
+        self.assertEqual(
+            expected_learner_answer_info_dict,
+            self.learner_answer_info.to_dict())
+
+    def test_from_dict(self):
+        learner_answer_info_dict = {
+            'id': 'id_1',
+            'answer': 'This is my answer',
+            'answer_details': 'This is my answer details',
+            'created_on': datetime.datetime.strptime('26 Sep 2012', '%d %b %Y')
+        }
+        learner_answer_info = stats_domain.LearnerAnswerInfo.from_dict(
+            learner_answer_info_dict)
+        self.assertEqual(learner_answer_info.id, 'id_1')
+        self.assertEqual(learner_answer_info.answer, 'This is my answer')
+        self.assertEqual(
+            learner_answer_info.answer_details, 'This is my answer details')
+        self.assertEqual(
+            learner_answer_info.created_on,
+            datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))
+
+    def test_get_learner_answer_info_dict_size(self):
+        learner_answer_info_dict_size = (
+            self.learner_answer_info.get_learner_answer_info_dict_size())
+        self.assertNotEqual(learner_answer_info_dict_size, 0)
+        self.assertTrue(learner_answer_info_dict_size > 0)
+
+    def test_get_learner_answer_info_id(self):
+        learner_answer_info_id = (
+            stats_domain.LearnerAnswerInfo.get_learner_answer_info_id(
+                'id.name', 'exploration'))
+        self.assertRegexpMatches(learner_answer_info_id, 'id.name.exploration')
+
+
+class LearnerAnswerInfoValidationTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(LearnerAnswerInfoValidationTests, self).setUp()
+        self.learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id_1', 'This is my answer', 'This is my answer details',
+            datetime.datetime.strptime('26 Sep 2012', '%d %b %Y'))
+        self.learner_answer_info.validate()
+
+    def test_id_must_be_string(self):
+        self.learner_answer_info.id = 123
+        self._assert_validation_error(
+            self.learner_answer_info, 'Expected id to be a string')
+
+    def test_answer_must_not_be_none(self):
+        self.learner_answer_info.answer = None
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer submitted by the learner cannot be empty')
+
+    def test_answer_details_must_not_be_none(self):
+        self.learner_answer_info.answer_details = None
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'LearnerAnswerInfo must have a provided answer details')
+
+    def test_answer_details_must_be_string(self):
+        self.learner_answer_info.answer_details = 1
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'Expected answer_details to be a string')
+
+    def test_large_answer_details_must_not_be_stored(self):
+        self.learner_answer_info.answer_details = 'abcdef' * 2000
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer details size is to large to be stored')
+
+    def test_created_on_must_be_datetime_type(self):
+        self.learner_answer_info.created_on = '19 June 2019'
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'Expected created_on to be a datetime')

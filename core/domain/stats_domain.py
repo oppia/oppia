@@ -1546,7 +1546,7 @@ class LearnerAnswerDetails(object):
         if self.interaction_id in feconf.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS:
             raise utils.ValidationError(
                 'The %s interaction does not support soliciting '
-                'answer details from learners.' % (self.interaction.id))
+                'answer details from learners.' % (self.interaction_id))
 
         if not isinstance(self.learner_answer_info_list, list):
             raise utils.ValidationError(
@@ -1594,14 +1594,13 @@ class LearnerAnswerDetails(object):
         deleted_learner_answer_info_id = (
             learner_answer_info_id)
         new_learner_answer_info_list = []
-        new_accumulated_answer_info_json_size_bytes = 0
         for learner_answer_info in self.learner_answer_info_list:
             if learner_answer_info.id != deleted_learner_answer_info_id:
                 new_learner_answer_info_list.append(learner_answer_info)
-                new_accumulated_answer_info_json_size_bytes += (
-                    learner_answer_info.accumulated_answer_info_json_size_bytes)
-        self.accumulated_answer_info_json_size_bytes = (
-            new_accumulated_answer_info_json_size_bytes)
+            else:
+                self.accumulated_answer_info_json_size_bytes -= (
+                    learner_answer_info.get_learner_answer_info_dict_size())
+        self.learner_answer_info_list = new_learner_answer_info_list
 
     def update_state_reference(self, new_state_reference):
         """Updates the state_reference of the LearnerAnswerDetails object.
@@ -1645,7 +1644,7 @@ class LearnerAnswerInfo(object):
             dict. The learner_answer_info dict.
         """
         learner_answer_info_dict = {
-            'id': self.learner_answer_info_id,
+            'id': self.id,
             'answer': self.answer,
             'answer_details': self.answer_details,
             'created_on': self.created_on
@@ -1695,7 +1694,7 @@ class LearnerAnswerInfo(object):
 
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self.id)
+                'Expected id to be a string, received %s' % self.id)
         if self.answer is None:
             raise utils.ValidationError(
                 'The answer submitted by the learner cannot be empty')
@@ -1707,11 +1706,11 @@ class LearnerAnswerInfo(object):
                                         'to be stored')
         if not isinstance(self.answer_details, basestring):
             raise utils.ValidationError(
-                'Expected answer details to be a string, received %s' % str(
+                'Expected answer_details to be a string, received %s' % str(
                     self.answer_details))
         if not isinstance(self.created_on, datetime.datetime):
-            raise utils.ValdationError(
-                'Expected created on to be a datetime, received %s' % str(
+            raise utils.ValidationError(
+                'Expected created_on to be a datetime, received %s' % str(
                     self.created_on))
 
     def get_learner_answer_info_dict_size(self):
@@ -1722,4 +1721,4 @@ class LearnerAnswerInfo(object):
             int. Size of the learner_answer_info_dict in bytes.
         """
         learner_answer_info_dict = self.to_dict()
-        return sys.getsizeof(json.dumps(learner_answer_info_dict))
+        return sys.getsizeof(json.dumps(learner_answer_info_dict, default=str))
