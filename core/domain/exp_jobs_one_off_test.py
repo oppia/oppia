@@ -1996,9 +1996,9 @@ class InteractionCustomizationArgsValidationJobTests(
             exp_jobs_one_off
             .InteractionCustomizationArgsValidationJob.get_output(job_id))
         expected_output = [
-            u'[u\'Error Sorry, we can only process v1-v29 and unversioned '
+            u'[u\'Error Sorry, we can only process v1-v%s and unversioned '
             'exploration state schemas at present. when loading exploration\', '
-            '[u\'exp_id0\']]']
+            '[u\'exp_id0\']]' % feconf.CURRENT_STATE_SCHEMA_VERSION]
 
         self.assertEqual(actual_output, expected_output)
 
