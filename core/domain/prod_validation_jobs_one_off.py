@@ -86,7 +86,7 @@ class BaseModelValidator(object):
         Returns:
             str. A regex pattern to be followed by the model id.
         """
-        return '^[A-Za-z0-9]{1,%s}$' % base_models.ID_LENGTH
+        return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
 
     @classmethod
     def _validate_model_id(cls, item):
@@ -801,6 +801,18 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
                         item.id, item.node_count, len(nodes)))
 
     @classmethod
+    def _validate_ratings_is_empty(cls, item):
+        """Validate that ratings for the entity is empty.
+
+        Args:
+            item: ndb.Model. CollectionSummaryModel to validate.
+        """
+        if item.ratings:
+            cls.errors['ratings check'].append(
+                'Entity id %s: Expected ratings for the entity to be '
+                'empty but received %s' % (item.id, item.ratings))
+
+    @classmethod
     def _get_related_model_properties(cls):
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
@@ -814,6 +826,7 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
             'language_code': 'language_code',
             'tags': 'tags',
             'collection_model_created_on': 'created_on',
+            'collection_model_last_updated': 'last_updated'
         }
 
         collection_rights_model_properties_dict = {
@@ -838,6 +851,7 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_node_count,
+            cls._validate_ratings_is_empty,
             cls._validate_contributors_summary,
             ]
 
@@ -1817,6 +1831,7 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
             'language_code': 'language_code',
             'description': 'description',
             'story_model_created_on': 'created_on',
+            'story_model_last_updated': 'last_updated'
         }
 
         return [(

@@ -1747,6 +1747,19 @@ class CollectionSummaryModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated CollectionSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_model_with_invalid_ratings(self):
+        self.model_instance_0.ratings = {'1': 0, '2': 1}
+        self.model_instance_0.put()
+        self.model_instance_1.ratings = {}
+        self.model_instance_1.put()
+        expected_output = [(
+            u'[u\'failed validation check for ratings check of '
+            'CollectionSummaryModel\', '
+            '[u"Entity id 0: Expected ratings for the entity to be empty '
+            'but received {u\'1\': 0, u\'2\': 1}"]]'
+        ), u'[u\'fully-validated CollectionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
     def test_model_with_invalid_collection_related_property(self):
         self.model_instance_0.title = 'invalid'
         self.model_instance_0.put()
