@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the review tests page.
+ * @fileoverview Directive for the review tests page.
  */
 
 require(
