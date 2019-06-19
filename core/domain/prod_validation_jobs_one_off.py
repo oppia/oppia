@@ -426,8 +426,9 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             except Exception as e:
                 cmd_name = commit_cmd_dict.get('cmd')
                 cls.errors['commit cmd %s check' % cmd_name].append((
-                    'Entity id %s: Commit command domain validation failed '
-                    'with error: %s') % (item.id, e))
+                    'Entity id %s: Commit command domain validation for '
+                    'command: %s failed with error: %s') % (
+                        item.id, commit_cmd_dict, e))
 
     @classmethod
     def validate(cls, item):
