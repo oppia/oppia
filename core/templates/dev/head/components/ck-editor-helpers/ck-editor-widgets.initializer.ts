@@ -17,15 +17,17 @@
  * text components.
  */
 
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('components/state-editor/state-editor.directive.ts');
 require('rich_text_components/richTextComponentsRequires.ts');
 require('services/HtmlEscaperService.ts');
 require('services/RteHelperService.ts');
 
 oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
-  'HtmlEscaperService',
+  'HtmlEscaperService', 'ExplorationStatesService', 'StateEditorService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
-      HtmlEscaperService) {
+      HtmlEscaperService, ExplorationStatesService, StateEditorService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
@@ -83,23 +85,19 @@ oppia.run([
                     var imageSrc = customizationArgsDict.filepath;
 
                     // TODO: Generate image id.
-                    // var imageId = ExplorationObjectFactory.getImageId()
-
-                    // Add image id in.
-                    customizationArgsDict.imageId = 0;
-                    var imageId = {
-                      name: 'imageid',
-                      description: 'Id for an image',
-                      default_value: ''
-                    }
-                    customizationArgSpecs.push(imageId)
-                    // delete customizationArgSpecs[0];
-                    delete customizationArgsDict.filpath;
-                    console.log(customizationArgsDict)
-
-
-                    // TODO: store in image tag and add image in image assets.
-                  }
+                    var imageId = 'image_id_' + 0;
+                    var image = {
+                      'image_id': imageId,
+                      'image_info': {
+                        'src': imageSrc,
+                        'placeholder': false,
+                        'instructions': ''
+                      }
+                    };
+                    var stateName = StateEditorService.getActiveStateName();
+                    ExplorationStatesService.saveImage(stateName, image)
+                    customizationArgsDict['image_id'] =  0;
+                  };
 
                   for (var arg in customizationArgsDict) {
                     if (customizationArgsDict.hasOwnProperty(arg)) {
@@ -175,8 +173,6 @@ oppia.run([
             },
             data: function() {
               var that = this;
-              console.log(customizationArgSpecs)
-              console.log("keshav")
               // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
                 that.element.getChild(0).setAttribute(

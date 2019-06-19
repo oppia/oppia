@@ -22,7 +22,7 @@ require('domain/exploration/ImageObjectFactory.ts');
 oppia.factory('ImageAssetsObjectFactory', [
   'ImageObjectFactory', function(ImageObjectFactory) {
     var ImageAssets = function(imageMapping) {
-      this.imageMapping = imageMapping;
+      this.image_mapping = imageMapping;
     };
 
     ImageAssets.prototype.toBackendDict = function() {
@@ -35,18 +35,6 @@ oppia.factory('ImageAssetsObjectFactory', [
       return {
         image_mapping: imageMapping
       };
-    };
-
-    ImageAssets.prototype.addImage = function(imageId, imageInfo) {
-      var src = imageInfo.src;
-      var placeholder = imageInfo.placeholder;
-      var authorId = imageInfo.authorId;
-      var instrutions = imageInfo.instructions;
-
-      var imageObject = (
-        ImageObjectFactory.createNew(src, placeholder, authorId, instrutions));
-
-      this.imageMapping[imageId] = imageObject;
     };
 
     /* eslint-disable dot-notation */
@@ -65,6 +53,7 @@ oppia.factory('ImageAssetsObjectFactory', [
           createFromBackendDict(imageDict));
         imageMapping[imageId] = imageObject;
       }
+
       return new ImageAssets(imageMapping);
     };
 

@@ -233,6 +233,16 @@ oppia.factory('ChangeListService', [
         var lastChange = explorationChangeList.pop();
         undoneChangeStack.push(lastChange);
         autosaveChangeListOnChange(explorationChangeList);
+      },
+      addImage: function(stateName, image) {
+        addChange({
+          action: 'add_image',
+          cmd: CMD_EDIT_STATE_PROPERTY,
+          image_id: image.image_id,
+          image_info: image.image_info,
+          property_name: 'image_assets',
+          state_name: stateName
+        });
       }
     };
   }

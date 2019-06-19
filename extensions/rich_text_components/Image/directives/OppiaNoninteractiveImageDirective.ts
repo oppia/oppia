@@ -21,6 +21,7 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('services/AssetsBackendApiService.ts');
 require('services/ContextService.ts');
@@ -28,11 +29,11 @@ require('services/HtmlEscaperService.ts');
 
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
-  'HtmlEscaperService', 'ImagePreloaderService',
+  'HtmlEscaperService', 'ImagePreloaderService', 'ExplorationStatesService',
   'UrlInterpolationService', 'LOADING_INDICATOR_URL',
   function(
       $rootScope, $sce, AssetsBackendApiService, ContextService,
-      HtmlEscaperService, ImagePreloaderService,
+      HtmlEscaperService, ImagePreloaderService, ExplorationStatesService,
       UrlInterpolationService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
@@ -42,12 +43,6 @@ oppia.directive('oppiaNoninteractiveImage', [
         '/rich_text_components/Image/directives/image_directive.html'),
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
-
-        console.log('attrs')
-        console.log($attrs)
-        console.log('attrs')
-
-
         var ctrl = this;
         ctrl.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
@@ -58,6 +53,10 @@ oppia.directive('oppiaNoninteractiveImage', [
           LOADING_INDICATOR_URL);
         ctrl.isLoadingIndicatorShown = false;
         ctrl.isTryAgainShown = false;
+
+
+        // TODO: Find image source.
+        // ctrl.filepath = ExplorationStatesService.getImagesource(stateName, imageId)
 
         if (ImagePreloaderService.inExplorationPlayer()) {
           ctrl.isLoadingIndicatorShown = true;

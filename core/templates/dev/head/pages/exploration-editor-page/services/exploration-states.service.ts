@@ -83,6 +83,9 @@ oppia.factory('ExplorationStatesService', [
           return hint.toBackendDict();
         });
       },
+      imageAssets: function(image_assets) {
+        return image_assets.toBackendDict();
+      },
       param_changes: function(paramChanges) {
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
@@ -111,6 +114,7 @@ oppia.factory('ExplorationStatesService', [
       content: ['content'],
       recorded_voiceovers: ['recordedVoiceovers'],
       default_outcome: ['interaction', 'defaultOutcome'],
+      image_assets: ['image_assets'],
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
@@ -184,6 +188,20 @@ oppia.factory('ExplorationStatesService', [
       }
 
       return angular.copy(propertyRef);
+    };
+
+    var getImageFilepathFromImageAssets = function(stateName, imageId) {
+      var state = _states.getState(stateName);
+      return state.image_assets.image_mapping[imageId]['src']
+    };
+
+    var addImageInState = function(stateName, image) {
+      var state = _states.getState(stateName);
+      var imageId = image.image_id;
+      var imageInfo = image.image_info
+      state.image_assets.image_mapping[imageId] = imageInfo;
+      _setState(stateName, angular.copy(state), true);
+      ChangeListService.addImage(stateName, image);
     };
 
     var saveStateProperty = function(stateName, backendName, newValue) {
@@ -374,6 +392,12 @@ oppia.factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'written_translations', newWrittenTranslations);
       },
+      saveImage: function(stateName, image) {
+        addImageInState(stateName, image);
+      },
+      getImagesource: function(stateName, imageId){
+        return getImageFilepathFromImageAssets(stateName, imageId);
+      },
       isInitialized: function() {
         return _states !== null;
       },
@@ -496,7 +520,7 @@ oppia.factory('ExplorationStatesService', [
       },
       registerOnStateInteractionSavedCallback: function(callback) {
         stateInteractionSavedCallbacks.push(callback);
-      }
+      },
     };
   }
 ]);
