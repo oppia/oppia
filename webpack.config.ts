@@ -90,6 +90,8 @@ module.exports = {
       'stewards-landing-page.scripts.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.scripts.ts',
+    story_viewer:
+      commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
@@ -392,6 +394,15 @@ module.exports = {
       template:
         commonPrefix + '/pages/story-editor-page/' +
         'story-editor-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['story_viewer'],
+      filename: 'story-viewer-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/story-viewer-page/' +
+        'story-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

@@ -80,6 +80,7 @@ require(
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');
+require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
