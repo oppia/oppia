@@ -184,7 +184,7 @@ class MergeSkillHandler(base.BaseHandler):
         if old_skill is None:
             raise self.PageNotFoundException(
                 Exception('The old skill with the given id doesn\'t exist.'))
-        question_services.update_skill_ids_of_questions(
+        question_services.replace_skill_id_for_all_questions(
             old_skill_id, old_skill.description, new_skill_id)
         changelist = [
             skill_domain.SkillChange({

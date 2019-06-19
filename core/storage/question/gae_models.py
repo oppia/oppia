@@ -54,6 +54,9 @@ class QuestionModel(base_models.VersionedModel):
         required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The skill ids linked to this question.
+    linked_skill_ids = ndb.StringProperty(
+        indexed=True, repeated=True)
 
     @classmethod
     def _get_new_id(cls):
@@ -116,7 +119,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, question_state_data, language_code, version):
+            cls, question_state_data, language_code, version, linked_skill_ids):
         """Creates a new QuestionModel entry.
 
         Args:
@@ -125,6 +128,7 @@ class QuestionModel(base_models.VersionedModel):
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
             version: str. The version of the question.
+            linked_skill_ids: list(str). The skill ids linked to the question.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.
@@ -137,9 +141,20 @@ class QuestionModel(base_models.VersionedModel):
             id=instance_id,
             question_state_data=question_state_data,
             language_code=language_code,
-            version=version)
+            version=version,
+            linked_skill_ids=linked_skill_ids)
 
         return question_model_instance
+
+    @classmethod
+    def put_multi_questions(cls, questions):
+        """Puts multiple question models into the datastore.
+
+        Args:
+            questions: list(Question). The list of question objects
+            to put into the datastore.
+        """
+        cls.put_multi(questions)
 
 
 class QuestionSkillLinkModel(base_models.BaseModel):
@@ -235,10 +250,10 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             ).order(-cls.last_updated, cls.key).fetch_page(
                 question_count
             )
-
         skill_ids = [model.skill_id for model in question_skill_link_models]
         skills = skill_models.SkillModel.get_multi(skill_ids)
-        skill_descriptions = [skill.description for skill in skills]
+        skill_descriptions = (
+            [skill.description if skill else None for skill in skills])
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )

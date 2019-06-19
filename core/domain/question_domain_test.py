@@ -121,7 +121,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
             'question_id', question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, 'en', 1, ['skill1'])
 
     def test_to_and_from_dict(self):
         """Test to verify to_dict and from_dict methods
@@ -135,7 +135,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             'question_state_data_schema_version': (
                 feconf.CURRENT_STATE_SCHEMA_VERSION),
             'language_code': 'en',
-            'version': 1
+            'version': 1,
+            'linked_skill_ids': ['skill1']
         }
 
         observed_object = question_domain.Question.from_dict(question_dict)
@@ -222,6 +223,26 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected schema version to be an integer')
 
+        self.question.linked_skill_ids = 'Test'
+        self._assert_validation_error(
+            'Expected linked_skill_ids to be a list of strings')
+
+        self.question.linked_skill_ids = None
+        self._assert_validation_error(
+            'inked_skill_ids is either null or an empty list')
+
+        self.question.linked_skill_ids = []
+        self._assert_validation_error(
+            'linked_skill_ids is either null or an empty list')
+
+        self.question.linked_skill_ids = ['Test', 1]
+        self._assert_validation_error(
+            'Expected linked_skill_ids to be a list of strings')
+
+        self.question.linked_skill_ids = ['skill1', 'skill1']
+        self._assert_validation_error(
+            'linked_skill_ids has duplicate skill ids')
+
         self.question.language_code = 1
         self._assert_validation_error('Expected language_code to be a string')
 
@@ -236,8 +257,9 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         object.
         """
         question_id = 'col1.random'
+        skill_ids = ['test_skill1', 'test_skill2']
         question = question_domain.Question.create_default_question(
-            question_id)
+            question_id, skill_ids)
         default_question_data = (
             question_domain.Question.create_default_question_state().to_dict())
 
@@ -246,6 +268,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             question.question_state_data.to_dict(), default_question_data)
         self.assertEqual(question.language_code, 'en')
         self.assertEqual(question.version, 0)
+        self.assertEqual(question.linked_skill_ids, skill_ids)
 
     def test_update_language_code(self):
         """Test to verify update_language_code method of the Question domain
@@ -254,6 +277,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         self.question.update_language_code('pl')
 
         self.assertEqual('pl', self.question.language_code)
+
+    def test_update_linked_skill_ids(self):
+        """Test to verify update_linked_skill_ids method of the Question domain
+        object.
+        """
+        self.question.update_linked_skill_ids(['skill_id1'])
+
+        self.assertEqual(['skill_id1'], self.question.linked_skill_ids)
 
     def test_update_question_state_data(self):
         """Test to verify update_question_state_data method of the Question
@@ -323,8 +354,9 @@ class QuestionRightsDomainTest(test_utils.GenericTestBase):
         super(QuestionRightsDomainTest, self).setUp()
         self.question_id = 'question_id'
         self.signup('user@example.com', 'User')
+        self.skill_ids = ['skill_1']
         self.question = question_domain.Question.create_default_question(
-            self.question_id)
+            self.question_id, self.skill_ids)
 
         self.user_id = self.get_user_id_from_email('user@example.com')
 
