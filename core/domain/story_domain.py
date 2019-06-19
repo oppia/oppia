@@ -487,6 +487,25 @@ class StoryContents(object):
                 return ind
         return None
 
+    def get_ordered_nodes(self):
+        """Returns a list of nodes ordered by how they would appear sequentially
+        to a learner.
+
+        NOTE: Currently, this function assumes only a linear arrangement of
+        nodes.
+
+        Returns:
+            list(StoryNode). The ordered list of nodes.
+        """
+        initial_index = self.get_node_index(self.initial_node_id)
+        current_node = self.nodes[initial_index]
+        ordered_nodes_list = [current_node]
+        while current_node.destination_node_ids:
+            next_node_id = current_node.destination_node_ids[0]
+            current_node = self.nodes[self.get_node_index(next_node_id)]
+            ordered_nodes_list.append(current_node)
+        return ordered_nodes_list
+
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
 
