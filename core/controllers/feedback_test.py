@@ -752,12 +752,15 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
         feedback_services.create_thread(
             'exploration', self.exp_id, self.owner_id, 'subject', 'text')
 
-        with self.swap(
+        feedback_analytics_aggregator_swap = self.swap(
             feedback_jobs_continuous, 'FeedbackAnalyticsAggregator',
-            MockFeedbackAnalyticsAggregator):
+            MockFeedbackAnalyticsAggregator)
+
+        with feedback_analytics_aggregator_swap:
             (
                 feedback_jobs_continuous.FeedbackAnalyticsAggregator
-                .start_computation())
+                .start_computation()
+            )
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
