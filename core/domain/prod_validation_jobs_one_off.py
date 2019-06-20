@@ -694,7 +694,7 @@ class CollectionRightsSnapshotMetadataModelValidator(
     related_model_name = 'collection rights'
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return rights_manager.CollectionRightsChange
 
     @classmethod
@@ -1800,7 +1800,7 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return story_domain.StoryChange
 
     @classmethod
