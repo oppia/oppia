@@ -21,6 +21,7 @@ from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 import feconf
+import utils
 
 
 class StoryEditorPage(base.BaseHandler):
@@ -109,8 +110,11 @@ class EditableStoryDataHandler(base.BaseHandler):
             story_domain.StoryChange(change_dict)
             for change_dict in change_dicts
         ]
-        story_services.update_story(
-            self.user_id, story_id, change_list, commit_message)
+        try:
+            story_services.update_story(
+                self.user_id, story_id, change_list, commit_message)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         story_dict = story_services.get_story_by_id(story_id).to_dict()
 

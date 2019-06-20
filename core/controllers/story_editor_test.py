@@ -92,7 +92,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.logout()
 
-    def test_put_can_not_access_story_handler_with_invalid_story_id(self):
+    def test_can_not_put_access_story_handler_with_invalid_story_id(self):
         self.login(self.ADMIN_EMAIL)
 
         change_cmd = {
@@ -360,3 +360,31 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             'which is too old. Please reload the page and try again.')
 
         self.logout()
+
+    def test_handler_raises_validation_error_with_invalid_new_description(self):
+        change_cmd = {
+            'version': 1,
+            'commit_message': 'changed description',
+            'change_dicts': [{
+                'cmd': 'update_story_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 0
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
+                self.story_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        json_response = self.put_json(
+            '%s/%s/%s' % (
+                feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
+                self.story_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Expected description to be a string, received 0')

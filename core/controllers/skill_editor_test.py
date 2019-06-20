@@ -301,17 +301,18 @@ class SkillEditorQuestionHandlerTests(BaseSkillEditorControllerTests):
         question_id = question_services.get_new_question_id()
         self.save_new_question(
             question_id, self.admin_id,
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
-            question_id, self.skill_id, constants.DEFAULT_SKILL_DIFFICULTY)
+            self.admin_id, question_id, self.skill_id,
+            constants.DEFAULT_SKILL_DIFFICULTY)
 
         response = self.get_json(
             '%s/%s' % (feconf.SKILL_EDITOR_QUESTION_URL, self.skill_id))
-        question_summary_dicts = response['question_summary_dicts'][0]
+        question_summary_dict = response['question_summary_dicts'][0]
 
         self.assertEqual(
-            question_summary_dicts['skill_description'], 'Description')
+            question_summary_dict['skill_description'], 'Description')
         self.assertEqual(
-            question_summary_dicts['summary']['id'], question_id)
+            question_summary_dict['summary']['id'], question_id)
 
         self.logout()
