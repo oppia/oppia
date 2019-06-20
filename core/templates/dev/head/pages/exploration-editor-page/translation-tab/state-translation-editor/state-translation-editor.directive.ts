@@ -56,8 +56,8 @@ oppia.directive('stateTranslationEditor', [
               }
               $uibModal.open({
                 templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                  '/components/forms/' +
-                  'mark_audio_as_needing_update_modal_directive.html'),
+                  '/components/forms/forms-templates/' +
+                  'mark-audio-as-needing-update-modal.template.html'),
                 backdrop: true,
                 controller: ['$scope', '$uibModalInstance', function(
                     $scope, $uibModalInstance) {
