@@ -1199,6 +1199,25 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         return question_id
 
     @classmethod
+    def get_instance_id(cls, entity_type, state_reference):
+        """Generates the id for the newly created model instance.
+
+        Args:
+            entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
+                or ENTITY_TYPE_QUESTION which are declared in feconf.py.
+            state_reference: str. The reference to the state for which model
+                instance is being created. For exploration state it will be of
+                the form 'exp_id.state_name', and for question it will be of
+                the form 'question_id'.
+
+        Returns:
+            instance_id: str. The  generated id of the instance.
+        """
+        instance_id = (
+            '%s.%s' % (entity_type, state_reference))
+        return instance_id
+
+    @classmethod
     def create_model_instance(
             cls, state_reference, entity_type, interaction_id,
             learner_answer_info_list, schema_version,
@@ -1209,10 +1228,10 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         Args:
             state_reference: str. The reference to the state for which model
                 instance is being created. For exploration state it will be of
-                the form 'exp_id.state_name', & for question it will be of the
-                form 'question_id'.
-            entity_type: str. The type of entity i.e "exploration" or
-                "question".
+                the form 'exp_id.state_name', and for question it will be of
+                the form 'question_id'.
+            entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
+                or ENTITY_TYPE_QUESTION which are declared in feconf.py.
             interaction_id: str.  The ID of the interaction for which the
                 answer details are received.
             learner_answer_info_list: list. The list of LearnerAnswerInfo
@@ -1222,7 +1241,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             accumulated_answer_info_json_size_bytes: int. The size of the
                 learner_answer_info_list in bytes.
         """
+        instance_id = cls.get_instance_id(entity_type, state_reference)
         answer_details_instance = cls(
+            id=instance_id,
             state_reference=state_reference,
             entity_type=entity_type,
             interaction_id=interaction_id,
@@ -1239,8 +1260,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         state reference.
 
         Args:
-            entity_type: str. The type of the entity i.e "exploration" or
-                "question".
+            entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
+                or ENTITY_TYPE_QUESTION which are declared in feconf.py.
             state_reference: str. The reference to a state, for which the model
                 is to be fetched. Foe exploration state it will be of the form
                 'exp_id.state_name', and for question state it will be of the
@@ -1251,11 +1272,10 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 with the given entity type and state reference. Doesn't include
                 deleted entries.
         """
-        model_instance_list = cls.get_all().filter(
-            cls.entity_type == entity_type).filter(
-                cls.state_reference == state_reference).fetch()
-        if model_instance_list:
-            return model_instance_list[0]
+        instance_id = cls.get_instance_id(entity_type, state_reference)
+        model_instance = cls.get(instance_id, strict=False)
+        if model_instance:
+            return model_instance
         else:
             return None
 

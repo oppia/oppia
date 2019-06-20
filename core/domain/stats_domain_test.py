@@ -1320,64 +1320,6 @@ class StateAnswersCalcOutputValidationTests(test_utils.GenericTestBase):
             'calculation_output is too big to be stored')
 
 
-class LearnerAnswerDetailsChangeDomainTests(test_utils.GenericTestBase):
-
-    def setUp(self):
-        super(LearnerAnswerDetailsChangeDomainTests, self).setUp()
-        self.learner_answer_details_change_1 = (
-            stats_domain.LearnerAnswerDetailsChange({
-                'cmd': stats_domain.CMD_RECORD_LEARNER_ANSWER_INFO,
-                'answer': 'This is my answer',
-                'answer_details': 'This is my answer details'}))
-        self.learner_answer_details_change_2 = (
-            stats_domain.LearnerAnswerDetailsChange({
-                'cmd': stats_domain.CMD_DELETE_LEARNER_ANSWER_INFO,
-                'learner_answer_info_id': 'id_1'}))
-        self.learner_answer_details_change_3 = (
-            stats_domain.LearnerAnswerDetailsChange({
-                'cmd': stats_domain.CMD_UPDATE_STATE_REFERENCE,
-                'new_value': 'exp_id_1.state_name_1',
-                'old_value': 'exp_id.state_name'
-                }))
-
-    def test_to_dict(self):
-        expected_learner_answer_details_change_1_dict = {
-            'cmd': stats_domain.CMD_RECORD_LEARNER_ANSWER_INFO,
-            'answer': 'This is my answer',
-            'answer_details': 'This is my answer details'}
-        self.assertEqual(
-            expected_learner_answer_details_change_1_dict,
-            self.learner_answer_details_change_1.to_dict())
-        expected_learner_answer_details_change_2_dict = {
-            'cmd': stats_domain.CMD_DELETE_LEARNER_ANSWER_INFO,
-            'learner_answer_info_id': 'id_1'}
-        self.assertEqual(
-            expected_learner_answer_details_change_2_dict,
-            self.learner_answer_details_change_2.to_dict())
-        expected_learner_answer_details_change_3_dict = {
-            'cmd': stats_domain.CMD_UPDATE_STATE_REFERENCE,
-            'new_value': 'exp_id_1.state_name_1'}
-        self.assertEqual(
-            expected_learner_answer_details_change_3_dict,
-            self.learner_answer_details_change_3.to_dict())
-
-    def test_invalid_change_dict(self):
-        learner_answer_details_change_dict = {
-            'cmd': 'add_learner_info',
-            'answer': 'This is my answer',
-            'answer_details': 'This is my answer details'}
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid change dict for learner answer details'):
-            stats_domain.LearnerAnswerDetailsChange(
-                learner_answer_details_change_dict)
-        learner_answer_details_change_dict = {
-            'answer': 'This is my answer'}
-        with self.assertRaisesRegexp(
-            Exception, 'Invalid change dict for learner answer details'):
-            stats_domain.LearnerAnswerDetailsChange(
-                learner_answer_details_change_dict)
-
-
 class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def setUp(self):
@@ -1517,6 +1459,12 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             self.learner_answer_details,
             'For entity type question, the state reference should')
 
+    def test_interaction_id_must_be_valid(self):
+        self.learner_answer_details.interaction_id = 'MyInteraction'
+        self._assert_validation_error(
+            self.learner_answer_details,
+            'Unknown interaction_id: MyInteraction')
+
     def test_interaction_id_must_be_string(self):
         self.learner_answer_details.interaction_id = 0
         self._assert_validation_error(
@@ -1640,6 +1588,12 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             self.learner_answer_info,
             'Expected answer_details to be a string')
+
+    def test_answer_details_must_not_be_empty_string(self):
+        self.learner_answer_info.answer_details = ''
+        self._assert_validation_error(
+            self.learner_answer_info,
+            'The answer details submitted cannot be an empty string')
 
     def test_large_answer_details_must_not_be_stored(self):
         self.learner_answer_info.answer_details = 'abcdef' * 2000

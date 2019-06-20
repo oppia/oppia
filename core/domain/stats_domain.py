@@ -1367,61 +1367,6 @@ class StateAnswersCalcOutput(object):
                     sys.getsizeof(output_data), str(output_data)))
 
 
-class LearnerAnswerDetailsChange(object):
-    """Domain object for changes made in LearnerAnswerDetails."""
-
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'new_value', 'answer', 'answer_details', 'learner_answer_info_id']
-
-    def __init__(self, change_dict):
-        """Intialize a domain object for LearnerAnswerDetails from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'record_learner_answer_info' (with answer, answer_details)
-                - 'delete_learner_answer_info' (with learner_answer_info_id)
-                - 'update_state_reference' (with new_value, old_value)
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change dict for learner answer '
-                            'details %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_RECORD_LEARNER_ANSWER_INFO:
-            self.answer = change_dict['answer']
-            self.answer_details = change_dict['answer_details']
-        elif self.cmd == CMD_DELETE_LEARNER_ANSWER_INFO:
-            self.learner_answer_info_id = change_dict['learner_answer_info_id']
-        elif self.cmd == CMD_UPDATE_STATE_REFERENCE:
-            self.new_value = change_dict['new_value']
-        else:
-            raise Exception('Invalid change dict for learner answer '
-                            'details %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the LearnerAnswerDetailsChange domain
-         object.
-
-        Returns:
-            A dict, mapping all fields of LearnerAnswerDetails instance.
-        """
-        learner_answer_details_change_dict = {}
-        learner_answer_details_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                learner_answer_details_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return learner_answer_details_change_dict
-
-
 class LearnerAnswerDetails(object):
     """Domain object that represents the answer details submitted by the
     learner.
@@ -1436,11 +1381,11 @@ class LearnerAnswerDetails(object):
 
         Args:
             state_reference: str. This field is used to refer to a state
-                in an exploration or question. Like for an exploration the
-                value will be equal to 'exp_id.state_name' & for question
-                this will be equal to 'question_id' only.
+                in an exploration or question. For an exploration the value
+                will be equal to 'exp_id.state_name' & for question this will
+                be equal to 'question_id' only.
             entity_type: str. The type of entity, for which the domain
-                object is being created, and the value must be one of
+                object is being created. The value must be one of
                 ENTITY_TYPE_EXPLORATION or ENTITY_TYPE_QUESTION.
             interaction_id: str. The ID of the interaction, but this value
                 should not be equal to EndExploration and
@@ -1540,6 +1485,11 @@ class LearnerAnswerDetails(object):
                 'Expected interaction_id to be a string, received %s' % str(
                     self.interaction_id))
 
+        if (self.interaction_id not in
+                interaction_registry.Registry.get_all_interaction_ids()):
+            raise utils.ValidationError(
+                'Unknown interaction_id: %s' % self.interaction_id)
+
         if self.interaction_id in feconf.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS:
             raise utils.ValidationError(
                 'The %s interaction does not support soliciting '
@@ -1624,10 +1574,10 @@ class LearnerAnswerInfo(object):
 
         Args:
             learner_answer_info_id: str. The id of the LearnerAnswerInfo object.
-            answer: dict or str. The answer which is submitted by the learner.
-                Actually type of the answer is interaction dependent but mostly
-                it will be of dict type for most interactions, but it can be
-                string for TextInput interaction.
+            answer: dict or list or str or int or bool. The answer which is
+                submitted by the learner. Actually type of the answer is
+                interaction dependent, like TextInput interactions have
+                string type answer, NumericInput have int type answers etc.
             answer_details: str. The details the learner will submit when the
                 learner will be asked questions like 'Hey how did you land on
                 this answer', 'Why did you pick that answer' etc.
@@ -1649,7 +1599,7 @@ class LearnerAnswerInfo(object):
             'id': self.id,
             'answer': self.answer,
             'answer_details': self.answer_details,
-            'created_on': str(self.created_on)
+            'created_on': self.created_on.strftime('%Y-%m-%d %H:%M:%S.%f')
         }
         return learner_answer_info_dict
 
@@ -1675,11 +1625,11 @@ class LearnerAnswerInfo(object):
 
         Args:
             state_reference: str. This is used to refer to a state
-                in an exploration or question. Like for an exploration the
+                in an exploration or question. For an exploration the
                 value will be equal to 'exp_id.state_name' & for question
                 this will be equal to 'question_id' only.
-            entity_type: str. The type of entity i.e 'exploration' or
-                'question '.
+            entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION or
+                ENTITY_TYPE_EXPLORATION which are declared in feconf.py.
 
         Return:
             learner_answer_info_id: str. The id generated by the function.
@@ -1709,8 +1659,11 @@ class LearnerAnswerInfo(object):
                     'The answer submitted cannot be an empty string')
         if not isinstance(self.answer_details, basestring):
             raise utils.ValidationError(
-                'Expected answer_details to be a string, received %s' % str(
+                'Expected answer_details to be a string, received %s' % type(
                     self.answer_details))
+        if self.answer_details == '':
+            raise utils.ValidationError(
+                'The answer details submitted cannot be an empty string.')
         if sys.getsizeof(self.answer_details) > MAX_ANSWER_DETAILS_BYTE_SIZE:
             raise utils.ValidationError('The answer details size is to large '
                                         'to be stored')

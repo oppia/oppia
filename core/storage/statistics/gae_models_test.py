@@ -488,6 +488,14 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(question_id_2)) #pylint: disable=line-too-long
         self.assertEqual(state_reference_2, 'first.question')
 
+    def test_get_instance_id(self):
+        state_reference = 'exp_id.state_name'
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        expected_instance_id = 'exploration.exp_id.state_name'
+        instance_id = stats_models.LearnerAnswerDetailsModel.get_instance_id(
+            entity_type, state_reference)
+        self.assertEqual(instance_id, expected_instance_id)
+
     def test_create_model_instance(self):
         # Test to create model instance for exploration state.
         state_reference = 'exp_id.state_name'
