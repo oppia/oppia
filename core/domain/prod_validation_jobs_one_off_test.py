@@ -1424,8 +1424,15 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
 
-        collection_models.CollectionRightsModel.get_by_id('1').commit(
-            self.owner_id, 'test commit', [])
+        self.rights_model_instance = (
+            collection_models.CollectionCommitLogEntryModel(
+                id='rights-1-1', user_id=self.owner_id,
+                username=self.OWNER_USERNAME, collection_id='1',
+                commit_type='edit', commit_message='', commit_cmds=[],
+                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+                post_commit_community_owned=False,
+                post_commit_is_private=False))
+        self.rights_model_instance.put()
 
         self.model_instance_0 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
@@ -1436,9 +1443,6 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_2 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-2-1'))
-        self.rights_model_instance = (
-            collection_models.CollectionCommitLogEntryModel.get_by_id(
-                'rights-1-2'))
 
         self.job_class = prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
 
@@ -1508,7 +1512,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for collection_rights_ids '
                 'field check of CollectionCommitLogEntryModel\', '
-                '[u"Entity id rights-1-2: based on field '
+                '[u"Entity id rights-1-1: based on field '
                 'collection_rights_ids having value 1, expect model '
                 'CollectionRightsModel with id 1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
@@ -3490,8 +3494,15 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
-        exp_models.ExplorationRightsModel.get_by_id('1').commit(
-            self.owner_id, 'test commit', [])
+        self.rights_model_instance = (
+            exp_models.ExplorationCommitLogEntryModel(
+                id='rights-1-1', user_id=self.owner_id,
+                username=self.OWNER_USERNAME, exploration_id='1',
+                commit_type='edit', commit_message='', commit_cmds=[],
+                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+                post_commit_community_owned=False,
+                post_commit_is_private=False))
+        self.rights_model_instance.put()
 
         self.model_instance_0 = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
@@ -3502,9 +3513,6 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_2 = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-2-1'))
-        self.rights_model_instance = (
-            exp_models.ExplorationCommitLogEntryModel.get_by_id(
-                'rights-1-2'))
 
         self.job_class = prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
 
@@ -3574,7 +3582,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for exploration_rights_ids '
                 'field check of ExplorationCommitLogEntryModel\', '
-                '[u"Entity id rights-1-2: based on field '
+                '[u"Entity id rights-1-1: based on field '
                 'exploration_rights_ids having value 1, expect model '
                 'ExplorationRightsModel with id 1 but it doesn\'t exist"]]'
             ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
