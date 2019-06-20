@@ -476,6 +476,7 @@ def get_thread_summaries(user_id, thread_ids):
         last_two_messages_ids)
 
     last_two_messages = [messages[i:i + 2] for i in range(0, len(messages), 2)]
+    last_message_read = False
 
     thread_summaries = []
     number_of_unread_threads = 0
@@ -486,8 +487,6 @@ def get_thread_summaries(user_id, thread_ids):
             last_message_read = (
                 last_two_messages[index][0].message_id
                 in feedback_thread_user_models[index].message_ids_read_by_user)
-        else:
-            last_message_read = False
 
         if last_two_messages[index][0].author_id is None:
             author_last_message = None
@@ -495,7 +494,7 @@ def get_thread_summaries(user_id, thread_ids):
             author_last_message = user_services.get_username(
                 last_two_messages[index][0].author_id)
 
-        second_last_message_read = None
+        second_last_message_read = False
         author_second_last_message = None
 
         does_second_message_exist = (last_two_messages[index][1] is not None)
@@ -504,25 +503,14 @@ def get_thread_summaries(user_id, thread_ids):
                 second_last_message_read = (
                     last_two_messages[index][1].message_id
                     in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
-            else:
-                second_last_message_read = False
 
-            if last_two_messages[index][1].author_id is None:
-                author_second_last_message = None
-            else:
+            if last_two_messages[index][1].author_id is not None:
                 author_second_last_message = user_services.get_username(
                     last_two_messages[index][1].author_id)
         if not last_message_read:
             number_of_unread_threads += 1
 
-        if thread.message_count:
-            total_message_count = thread.message_count
-        # TODO(Arunabh): Remove else clause after each thread has a message
-        # count.
-        else:
-            total_message_count = (
-                feedback_models.GeneralFeedbackMessageModel
-                .get_message_count(thread_ids[index]))
+        total_message_count = thread.message_count
 
         thread_summary = {
             'status': thread.status,
