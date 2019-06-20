@@ -199,7 +199,7 @@
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
 /extensions/dependencies/ @seanlip
 /extensions/domain*.py @seanlip
-/extensions/interactions/ @kevinlee12
+/extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @seanlip
 /extensions/__init__.py @kevinlee12
