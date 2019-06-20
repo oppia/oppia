@@ -15,10 +15,8 @@
  * @fileoverview Service to receive questions for practice given a set of
  * skill_ids.
  */
-oppia.constant(
-  'QUESTION_PLAYER_URL_TEMPLATE',
-  '/question_player_handler?skill_ids=<skill_ids>&question_count' +
-  '=<question_count>');
+
+require('domain/question/question-domain.constants.ts');
 
 oppia.factory('QuestionPlayerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
