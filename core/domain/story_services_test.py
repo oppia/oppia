@@ -585,10 +585,12 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 pending_node.to_dict(), self.nodes[1].to_dict())
 
     def get_node_index_by_story_id_and_node_id(self):
+        # Tests correct node index should be returned when story and node exist.
         node_index = story_services.get_node_index_by_story_id_and_node_id(
             self.STORY_1_ID, self.NODE_ID_1)
         self.assertEqual(node_index, 0)
 
+        # Tests error should be raised if story or node doesn't exist.
         with self.assertRaisesRegexp(
             Exception,
             'Story node with id node_4 does not exist in this story.'):
