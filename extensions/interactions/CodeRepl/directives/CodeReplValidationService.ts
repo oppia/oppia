@@ -16,6 +16,8 @@
  * @fileoverview Validator service for the interaction.
  */
 
+require('interactions/baseInteractionValidationService.ts');
+
 oppia.factory('CodeReplValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {

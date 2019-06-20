@@ -99,9 +99,7 @@ oppia.factory('HintsAndSolutionManagerService', [
       if (tooltipTimeout) {
         $timeout.cancel(tooltipTimeout);
       }
-
       $rootScope.$broadcast('hintConsumed');
-
       numHintsConsumed++;
       wrongAnswersSinceLastHintConsumed = 0;
 

@@ -226,7 +226,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.NEW_QUESTION_URL,
+        r'%s/<comma_separated_skill_ids>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
     get_redirect_route(
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
@@ -237,6 +237,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
+        story_viewer.StoryPage),
     get_redirect_route(
         r'%s/<topic_id>/<subtopic_id>' %
         feconf.SUBTOPIC_DATA_HANDLER,
