@@ -254,7 +254,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
             } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
               return '30px';
             } else if ((index + 1) % 4 === 0) {
-              return '-35px';
+              return '-40px';
             }
           };
 
