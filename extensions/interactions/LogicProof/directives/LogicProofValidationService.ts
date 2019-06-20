@@ -16,6 +16,8 @@
  * @fileoverview Validator service for the interaction.
  */
 
+require('interactions/baseInteractionValidationService.ts');
+
 oppia.factory('LogicProofValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {
