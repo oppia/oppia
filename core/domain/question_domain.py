@@ -32,6 +32,7 @@ import utils
 # compatibility with previous change dicts.
 QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 QUESTION_PROPERTY_QUESTION_STATE_DATA = 'question_state_data'
+QUESTION_PROPERTY_LINKED_SKILL_IDS = 'linked_skill_ids'
 
 # This takes additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -52,7 +53,8 @@ class QuestionChange(object):
     """Domain object for changes made to question object."""
     QUESTION_PROPERTIES = (
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
-        QUESTION_PROPERTY_LANGUAGE_CODE)
+        QUESTION_PROPERTY_LANGUAGE_CODE,
+        QUESTION_PROPERTY_LINKED_SKILL_IDS)
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'question_dict',
@@ -122,7 +124,7 @@ class Question(object):
     def __init__(
             self, question_id, question_state_data,
             question_state_data_schema_version, language_code, version,
-            created_on=None, last_updated=None):
+            linked_skill_ids, created_on=None, last_updated=None):
         """Constructs a Question domain object.
 
         Args:
@@ -135,6 +137,8 @@ class Question(object):
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
             version: int. The version of the question.
+            linked_skill_ids: list(str). Skill ids linked to the question.
+                Note: Do not update this field manually.
             created_on: datetime.datetime. Date and time when the question was
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -146,6 +150,7 @@ class Question(object):
         self.question_state_data_schema_version = (
             question_state_data_schema_version)
         self.version = version
+        self.linked_skill_ids = linked_skill_ids
         self.created_on = created_on
         self.last_updated = last_updated
 
@@ -161,7 +166,8 @@ class Question(object):
             'question_state_data_schema_version': (
                 self.question_state_data_schema_version),
             'language_code': self.language_code,
-            'version': self.version
+            'version': self.version,
+            'linked_skill_ids': self.linked_skill_ids
         }
 
     @classmethod
@@ -409,6 +415,21 @@ class Question(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
 
+        if not self.linked_skill_ids:
+            raise utils.ValidationError(
+                'linked_skill_ids is either null or an empty list')
+
+        if not (isinstance(self.linked_skill_ids, list) and (
+                all(isinstance(
+                    elem, basestring) for elem in self.linked_skill_ids))):
+            raise utils.ValidationError(
+                'Expected linked_skill_ids to be a list of strings, '
+                'received %s' % self.linked_skill_ids)
+
+        if len(set(self.linked_skill_ids)) != len(self.linked_skill_ids):
+            raise utils.ValidationError(
+                'linked_skill_ids has duplicate skill ids')
+
         if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s' %
@@ -487,16 +508,18 @@ class Question(object):
             question_dict['id'],
             state_domain.State.from_dict(question_dict['question_state_data']),
             question_dict['question_state_data_schema_version'],
-            question_dict['language_code'], question_dict['version'])
+            question_dict['language_code'], question_dict['version'],
+            question_dict['linked_skill_ids'])
 
         return question
 
     @classmethod
-    def create_default_question(cls, question_id):
+    def create_default_question(cls, question_id, skill_ids):
         """Returns a Question domain object with default values.
 
         Args:
             question_id: str. The unique ID of the question.
+            skill_ids: list(str). List of skill IDs attached to this question.
 
         Returns:
             Question. A Question domain object with default values.
@@ -506,7 +529,7 @@ class Question(object):
         return cls(
             question_id, default_question_state_data,
             feconf.CURRENT_STATE_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE, 0, skill_ids)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -516,6 +539,14 @@ class Question(object):
                 question is written in.
         """
         self.language_code = language_code
+
+    def update_linked_skill_ids(self, linked_skill_ids):
+        """Updates the linked skill ids of the question.
+
+        Args:
+            linked_skill_ids: list(str). The skill ids linked to the question.
+        """
+        self.linked_skill_ids = list(set(linked_skill_ids))
 
     def update_question_state_data(self, question_state_data_dict):
         """Updates the question data of the question.

@@ -18,7 +18,6 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
