@@ -14,6 +14,8 @@
 
 """Models for storing the question data models."""
 
+import math
+
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
@@ -258,6 +260,38 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
         return question_skill_link_models, skill_descriptions, next_cursor_str
+
+    @classmethod
+    def get_question_skill_links_equidistributed_by_skill(
+            cls, total_question_count, skill_ids):
+        """Fetches the list of constant number of QuestionSkillLinkModels
+        linked to the skills.
+
+        Args:
+            total_question_count: int. The number of questions expected.
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+
+        Returns:
+            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
+                corresponding to given skill_ids, with
+                total_question_count/len(skill_ids) number of questions for
+                each skill. If not evenly divisible, it will be rounded up.
+                If not enough questions for a skill, just return all questions
+                it links to. The order of questions will follow the order of
+                given skill ids, but the order of questions for the same skill
+                is random.
+        """
+        question_count_per_skill = int(
+            math.ceil(float(total_question_count) / float(len(skill_ids))))
+        question_skill_link_models = []
+        for skill_id in skill_ids:
+            question_skill_link_models.extend(
+                cls.query(cls.skill_id == skill_id).fetch(
+                    question_count_per_skill
+                )
+            )
+        return question_skill_link_models
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):
