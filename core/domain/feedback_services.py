@@ -167,7 +167,7 @@ def create_message(
     msg.put()
 
     # Update the message count in the thread.
-    if thread.message_count is not None:
+    if thread.message_count:
         thread.message_count += 1
     else:
         thread.message_count = (
@@ -400,7 +400,7 @@ def _get_thread_from_model(thread_model):
     Returns:
         FeedbackThread. The corresponding FeedbackThread domain object.
     """
-    if thread_model.message_count is None:
+    if not thread_model.message_count:
         message_count = (
             feedback_models.GeneralFeedbackMessageModel.get_message_count(
                 thread_model.id))
@@ -543,32 +543,6 @@ def get_thread_summaries(user_id, thread_ids):
     return thread_summaries, number_of_unread_threads
 
 
-def get_most_recent_messages(entity_type, entity_id):
-    """Fetch the most recently updated feedback threads for a given entity,
-    and then get the latest feedback message out of each thread.
-
-    Args:
-        entity_type: str. The type of entity.
-        entity_id: str. The ID of the entity.
-
-    Returns:
-       A list of FeedbackMessage.
-    """
-    thread_models = (
-        feedback_models.GeneralFeedbackThreadModel.get_threads(
-            entity_type, entity_id, limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
-
-    message_models = []
-    for thread_model in thread_models:
-        message_models.append(
-            feedback_models.GeneralFeedbackMessageModel.get_most_recent_message(
-                thread_model.thread_id))
-
-    return [
-        _get_message_from_model(message_model)
-        for message_model in message_models]
-
-
 def get_threads(entity_type, entity_id):
     """Fetches all the threads for the given entity id.
 
@@ -606,28 +580,6 @@ def get_thread_subject(thread_id):
         str. The subject of the thread.
     """
     return get_thread(thread_id).subject
-
-
-def get_open_threads(entity_type, entity_id, has_suggestion):
-    """Fetches all open threads for the given entity id.
-
-    Args:
-        entity_type: str. The type of entity the feedback thread is linked to.
-        entity_id: str. The id of the entity.
-        has_suggestion: bool. If it's True, return a list of all open threads
-            that have a suggestion, otherwise return a list of all open threads
-            that do not have a suggestion.
-
-    Returns:
-        list of FeedbackThread. The resulting FeedbackThread domain objects.
-    """
-    threads = get_threads(entity_type, entity_id)
-    open_threads = []
-    for thread in threads:
-        if (thread.has_suggestion == has_suggestion and
-                thread.status == feedback_models.STATUS_CHOICES_OPEN):
-            open_threads.append(thread)
-    return open_threads
 
 
 def get_closed_threads(entity_type, entity_id, has_suggestion):
@@ -734,23 +686,6 @@ def _enqueue_feedback_thread_status_change_email_task(
     }
     taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_FEEDBACK_STATUS_EMAILS, payload, 0)
-
-
-def _enqueue_suggestion_email_task(exploration_id, thread_id):
-    """Adds a 'send suggestion email' task into the task queue.
-
-    Args:
-        exploration_id: str.
-        thread_id: str.
-    """
-
-    payload = {
-        'exploration_id': exploration_id,
-        'thread_id': thread_id
-    }
-    # Suggestion emails are sent immediately.
-    taskqueue_services.enqueue_email_task(
-        feconf.TASK_URL_SUGGESTION_EMAILS, payload, 0)
 
 
 def get_feedback_message_references(user_id):
