@@ -17,7 +17,7 @@
  *     Action domain objects.
  */
 
-oppia.constant('LEARNER_ACTION_SCHEMA_LATEST_VERSION', 1);
+require('domain/statistics/statistics-domain.constants.ts');
 
 oppia.factory('LearnerActionObjectFactory', [
   'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
