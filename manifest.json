@@ -302,10 +302,9 @@
         }
       },
       "diff-match-patch": {
-        "version": "1.0.0",
+        "version": "a6367d",
         "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/google/diff-match-patch/master/javascript/",
-        "rootDirPrefix": "diff-match-patch-",
+        "url": "https://raw.githubusercontent.com/google/diff-match-patch/a6367d7866833ac037fbdefcdbcbee4def86e326/javascript/diff_match_patch.js",
         "targetDirPrefix": "diff-match-patch-",
         "files": ["diff_match_patch.js"]
       },
