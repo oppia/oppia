@@ -301,6 +301,14 @@
           "js": ["d3.min.js"]
         }
       },
+      "diff-match-patch": {
+        "version": "1.0.0",
+        "downloadFormat": "files",
+        "url": "https://raw.githubusercontent.com/google/diff-match-patch/master/javascript/",
+        "rootDirPrefix": "diff-match-patch-",
+        "targetDirPrefix": "diff-match-patch-",
+        "files": ["diff_match_patch.js"]
+      },
       "fontAwesome": {
         "version": "4.7.0",
         "downloadFormat": "zip",
