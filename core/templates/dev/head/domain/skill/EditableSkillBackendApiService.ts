@@ -18,13 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'EDITABLE_SKILL_DATA_URL_TEMPLATE',
-  '/skill_editor_handler/data/<skill_id>');
-
-oppia.constant(
-  'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
-  '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
+require('domain/skill/skill-domain.constants.ts');
 
 oppia.factory('EditableSkillBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

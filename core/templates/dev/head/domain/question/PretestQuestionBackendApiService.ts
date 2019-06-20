@@ -18,9 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'PRETEST_QUESTIONS_URL_TEMPLATE',
-  '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>');
+require('domain/question/question-domain.constants.ts');
 
 oppia.factory('PretestQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'PRETEST_QUESTIONS_URL_TEMPLATE',
