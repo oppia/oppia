@@ -3893,13 +3893,15 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             self.model_instance_0.contributors_summary.keys())
         self.model_instance_0.contributors_summary = {'invalid': 1}
         self.model_instance_0.put()
-        expected_output = [(
-            u'[u\'failed validation check for contributors summary '
-            'check of ExpSummaryModel\', '
-            '[u"Entity id 0: Contributor ids: [u\'%s\', u\'%s\'] '
-            'do not match the contributor ids obtained using '
-            'contributors summary: [u\'invalid\']"]]') % (
-                sorted_contributor_ids[0], sorted_contributor_ids[1])]
+        expected_output = [
+            (
+                u'[u\'failed validation check for contributors summary '
+                'check of ExpSummaryModel\', '
+                '[u"Entity id 0: Contributor ids: [u\'%s\', u\'%s\'] '
+                'do not match the contributor ids obtained using '
+                'contributors summary: [u\'invalid\']"]]') % (
+                    sorted_contributor_ids[0], sorted_contributor_ids[1]
+            ), u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_exploration_related_property(self):
