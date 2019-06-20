@@ -392,9 +392,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                     state_dict, add_dimensions_to_image_tags),
                 state_dict_with_image_dimensions)
 
-    def test_subtitled_html_validation(self):
-        """Test validation of subtitled HTML."""
-        subtitled_html = state_domain.SubtitledHtml('content_id', 'some html')
+    def test_subtitled_html_validation_with_invalid_html_type(self):
+        """Test validation of subtitled HTML with invalid html type."""
+        subtitled_html = state_domain.SubtitledHtml(
+            'content_id', '<p>some html</p>')
         subtitled_html.validate()
 
         with self.assertRaisesRegexp(
@@ -403,6 +404,42 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(subtitled_html, 'html', 20):
                 subtitled_html.validate()
 
+    def test_subtitled_html_validation_with_invalid_html_for_rte(self):
+        """Test validation of subtitled HTML with invalid html for rte."""
+        subtitled_html = state_domain.SubtitledHtml(
+            'content_id', '<p>some html</p>')
+        subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Invalid html: <a>Test</a> for rte with invalid tags '
+                'and strings: .+')
+            ):
+            with self.swap(subtitled_html, 'html', '<a>Test</a>'):
+                subtitled_html.validate()
+
+    def test_subtitled_html_validation_with_invalid_customization_args(self):
+        """Test validation of subtitled HTML with invalid customization args."""
+        subtitled_html = state_domain.SubtitledHtml(
+            'content_id', '<p>some html</p>')
+        subtitled_html.validate()
+
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Invalid html: <oppia-noninteractive-image>'
+                '</oppia-noninteractive-image> due to errors in '
+                'customization_args: .+')
+            ):
+            with self.swap(
+                subtitled_html, 'html',
+                '<oppia-noninteractive-image></oppia-noninteractive-image>'):
+                subtitled_html.validate()
+
+    def test_subtitled_html_validation_with_invalid_content(self):
+        """Test validation of subtitled HTML with invalid content."""
+        subtitled_html = state_domain.SubtitledHtml(
+            'content_id', '<p>some html</p>')
+        subtitled_html.validate()
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected content id to be a string, ' +
             'received 20'):
@@ -480,7 +517,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_1',
-                'html': 'hint one'
+                'html': '<p>hint one</p>'
             },
         })
         init_state.update_interaction_hints(hints_list)
@@ -490,7 +527,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             },
         }
 
@@ -500,19 +537,19 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_2',
-                'html': 'new hint'
+                'html': '<p>new hint</p>'
             }
         })
         init_state.update_interaction_hints(hints_list)
 
         self.assertEqual(
             init_state.interaction.hints[1].hint_content.html,
-            'new hint')
+            '<p>new hint</p>')
 
         hints_list.append({
             'hint_content': {
                 'content_id': 'hint_3',
-                'html': 'hint three'
+                'html': '<p>hint three</p>'
             }
         })
         init_state.update_interaction_hints(hints_list)
@@ -562,7 +599,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             }
         }
         init_state.update_interaction_solution(solution)
