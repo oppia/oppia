@@ -48,14 +48,8 @@
          ng-href="<[$ctrl.getExplorationUrl(node.getExplorationId())]>"
          ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
 
-        <div ng-style="{width: '160px',
-              position: 'absolute',
-              color: '#006553',
-              'font-family' : 'Capriola, Roboto, Arial, sans-serif',
-              'font-size': '18px',
-              bottom: '70%',
-              left: '<[$ctrl.getExplorationTitleStylePosition($index)]>'
-                }">
+        <div style="width: 160px;position: absolute;left: <[$ctrl.getExplorationTitlePosition($index)]>;color: #006553;font-family : Capriola, Roboto, Arial,sans-serif;font-size: 18px;bottom: 65%;
+        ">
           {{node._explorationSummaryObject.title}}
         </div>
 
@@ -65,7 +59,7 @@
              xmlns="http://www.w3.org/2000/svg"
              xmlns:xlink="http://www.w3.org/1999/xlink"
              version="1.1"
-             ng-style="{position:'relative',top:'20px'}">
+             style="position:relative;top:20px">
           <defs>
             <pattern id="image<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
               <circle cx="50"

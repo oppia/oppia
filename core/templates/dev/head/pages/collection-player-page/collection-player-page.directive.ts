@@ -250,9 +250,9 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
 
           ctrl.getExplorationTitlePosition = function(index) {
             if (index % 2 === 0 ) {
-              return '0px';
+              return '8px';
             } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
-              return '20px';
+              return '30px';
             } else if ((index + 1) % 4 === 0) {
               return '-35px';
             }
