@@ -42,6 +42,7 @@ from core.controllers import question_editor
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import review_tests
 from core.controllers import skill_editor
 from core.controllers import story_editor
 from core.controllers import story_viewer
@@ -234,6 +235,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
+        review_tests.ReviewTestsPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.REVIEW_TEST_URL_PREFIX,
+        review_tests.ReviewTestsPage),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),

@@ -75,8 +75,7 @@ describe('Question Player backend Api service', function() {
         },
         language_code: 'en',
         version: 1
-      }],
-      next_start_cursor: null
+      }]
     };
   }));
 
@@ -90,11 +89,10 @@ describe('Question Player backend Api service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
-      'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
-      'start_cursor=').respond(
+      'GET', '/question_player_handler?skill_ids=1&question_count=1').respond(
       sampleDataResults);
     QuestionPlayerBackendApiService.fetchQuestions(
-      ['1'], 1, true).then(successHandler, failHandler);
+      ['1'], 1).then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(
@@ -111,11 +109,10 @@ describe('Question Player backend Api service', function() {
       sampleDataResultsWithCursor.next_start_cursor = '1';
 
       $httpBackend.expect(
-        'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
-        'start_cursor=').respond(
+        'GET', '/question_player_handler?skill_ids=1&question_count=1').respond(
         sampleDataResultsWithCursor);
       QuestionPlayerBackendApiService.fetchQuestions(
-        ['1'], 1, true).then(successHandler, failHandler);
+        ['1'], 1).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
@@ -123,13 +120,12 @@ describe('Question Player backend Api service', function() {
       expect(failHandler).not.toHaveBeenCalled();
 
       $httpBackend.expect(
-        'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
-        'start_cursor=1').respond(
+        'GET', '/question_player_handler?skill_ids=1&question_count=1').respond(
         sampleDataResults);
 
       // Here we don't want to reset history, thus we pass false
       QuestionPlayerBackendApiService.fetchQuestions(
-        ['1'], 1, false).then(successHandler, failHandler);
+        ['1'], 1).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(
@@ -147,11 +143,10 @@ describe('Question Player backend Api service', function() {
     sampleDataResultsWithCursor.next_start_cursor = '1';
 
     $httpBackend.expect(
-      'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
-      'start_cursor=').respond(
+      'GET', '/question_player_handler?skill_ids=1&question_count=1').respond(
       sampleDataResultsWithCursor);
     QuestionPlayerBackendApiService.fetchQuestions(
-      ['1'], 1, true).then(successHandler, failHandler);
+      ['1'], 1).then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(
@@ -159,13 +154,12 @@ describe('Question Player backend Api service', function() {
     expect(failHandler).not.toHaveBeenCalled();
 
     $httpBackend.expect(
-      'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
-      'start_cursor=').respond(
+      'GET', '/question_player_handler?skill_ids=1&question_count=1').respond(
       sampleDataResults);
 
     // Here we want to reset history, thus we pass true
     QuestionPlayerBackendApiService.fetchQuestions(
-      ['1'], 1, true).then(successHandler, failHandler);
+      ['1'], 1).then(successHandler, failHandler);
     $httpBackend.flush();
 
     expect(successHandler).toHaveBeenCalledWith(
@@ -179,11 +173,10 @@ describe('Question Player backend Api service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       $httpBackend.expect(
-        'GET', '/question_player_handler?skill_ids=1&question_count=1&' +
-        'start_cursor=').respond(
+        'GET', '/question_player_handler?skill_ids=1&question_count=1').respond(
         500, 'Error loading questions.');
       QuestionPlayerBackendApiService.fetchQuestions(
-        ['1'], 1, true).then(successHandler, failHandler);
+        ['1'], 1).then(successHandler, failHandler);
       $httpBackend.flush();
 
       expect(successHandler).not.toHaveBeenCalled();
@@ -197,7 +190,7 @@ describe('Question Player backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        ['1'], 'abc', true).then(successHandler, failHandler);
+        ['1'], 'abc').then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
@@ -210,7 +203,7 @@ describe('Question Player backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        ['1'], -1, true).then(successHandler, failHandler);
+        ['1'], -1).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
@@ -223,7 +216,7 @@ describe('Question Player backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        ['1'], 1.5, true).then(successHandler, failHandler);
+        ['1'], 1.5).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
@@ -236,7 +229,7 @@ describe('Question Player backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        'x', 1, true).then(successHandler, failHandler);
+        'x', 1).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
@@ -249,7 +242,7 @@ describe('Question Player backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        [1, 2], 1, true).then(successHandler, failHandler);
+        [1, 2], 1).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
@@ -262,7 +255,7 @@ describe('Question Player backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        null, 1, true).then(successHandler, failHandler);
+        null, 1).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Skill ids should be a list of' +
@@ -275,7 +268,7 @@ describe('Question Player backend Api service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
       QuestionPlayerBackendApiService.fetchQuestions(
-        ['1'], null, true).then(successHandler, failHandler);
+        ['1'], null).then(successHandler, failHandler);
       $rootScope.$digest();
       expect(successHandler).not.toHaveBeenCalled();
       expect(failHandler).toHaveBeenCalledWith('Question count has to be a ' +
