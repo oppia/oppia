@@ -460,6 +460,17 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
     model_name = 'commit log entry'
 
     @classmethod
+    def _set_related_model_name(cls, item):
+        """Updates related model name to [model name] [rights]
+        if the commit log model is for a rights model.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        if item.id.startswith('rights'):
+            cls.related_model_name = cls.related_model_name + ' rights'
+
+    @classmethod
     def _validate_post_commit_status(cls, item):
         """Validates that post_commit_status is either public or private.
 
@@ -500,6 +511,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         Args:
             item: ndb.Model. Entity to validate.
         """
+        cls._set_related_model_name(item)
         super(BaseCommitLogEntryModelValidator, cls).validate(item)
 
         cls._validate_post_commit_status(item)
