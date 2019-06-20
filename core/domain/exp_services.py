@@ -1329,6 +1329,9 @@ def update_exploration(
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
+    print("        "*100)
+    print(exploration.to_dict())
+    print("        "*100)
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_edited_an_exploration(committer_id)

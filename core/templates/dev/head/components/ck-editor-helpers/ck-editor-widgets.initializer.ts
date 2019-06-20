@@ -85,7 +85,7 @@ oppia.run([
                     var imageSrc = customizationArgsDict.filepath;
 
                     // TODO: Generate image id.
-                    var imageId = 'image_id_' + 0;
+                    var imageId = 'image_id_' + 1;
                     var image = {
                       'image_id': imageId,
                       'image_info': {
@@ -96,7 +96,6 @@ oppia.run([
                     };
                     var stateName = StateEditorService.getActiveStateName();
                     ExplorationStatesService.saveImage(stateName, image)
-                    customizationArgsDict['image_id'] =  0;
                   };
 
                   for (var arg in customizationArgsDict) {
@@ -175,6 +174,15 @@ oppia.run([
               var that = this;
               // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
+
+                // Replacing filepath with image id.
+                if (ckName === 'oppiaimage' && spec.name === 'filepath') {
+                  that.element.getChild(0).setAttribute(
+                    'id-with-value',
+                    HtmlEscaperService.objToEscapedJson(
+                     'image_id_1' || ''));
+                   return
+                };
                 that.element.getChild(0).setAttribute(
                   spec.name + '-with-value',
                   HtmlEscaperService.objToEscapedJson(

@@ -20,6 +20,7 @@
  * followed by the name of the arg.
  */
 
+require('components/state-editor/state-editor.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
@@ -30,11 +31,11 @@ require('services/HtmlEscaperService.ts');
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
   'HtmlEscaperService', 'ImagePreloaderService', 'ExplorationStatesService',
-  'UrlInterpolationService', 'LOADING_INDICATOR_URL',
+  'UrlInterpolationService', 'LOADING_INDICATOR_URL', 'StateEditorService',
   function(
       $rootScope, $sce, AssetsBackendApiService, ContextService,
       HtmlEscaperService, ImagePreloaderService, ExplorationStatesService,
-      UrlInterpolationService, LOADING_INDICATOR_URL) {
+      UrlInterpolationService, LOADING_INDICATOR_URL, StateEditorService) {
     return {
       restrict: 'E',
       scope: {},
@@ -44,19 +45,16 @@ oppia.directive('oppiaNoninteractiveImage', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.filepath = HtmlEscaperService.escapedJsonToObj(
-          $attrs.filepathWithValue);
         ctrl.imageUrl = '';
-        ctrl.imageid = HtmlEscaperService.escapedJsonToObj(
-          $attrs.imageidWithValue);
+        var imageId = HtmlEscaperService.escapedJsonToObj(
+          $attrs.idWithValue);
         ctrl.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
           LOADING_INDICATOR_URL);
         ctrl.isLoadingIndicatorShown = false;
         ctrl.isTryAgainShown = false;
 
-
-        // TODO: Find image source.
-        // ctrl.filepath = ExplorationStatesService.getImagesource(stateName, imageId)
+        var stateName = StateEditorService.getActiveStateName();
+        ctrl.filepath = ExplorationStatesService.getImagesource(stateName, imageId)
 
         if (ImagePreloaderService.inExplorationPlayer()) {
           ctrl.isLoadingIndicatorShown = true;
