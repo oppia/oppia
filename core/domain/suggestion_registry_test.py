@@ -194,3 +194,315 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         self.assertEqual(suggestion.get_score_type(), 'question')
         self.assertEqual(suggestion.get_score_sub_type(), 'topic_1')
+
+    def test_validate_score_type(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.score_category = 'content.score_sub_type'
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected the first part of score_category to be "question"'):
+            suggestion.validate()
+
+    def test_validate_change_type(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change = 'invalid_change'
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected change to be an instance of QuestionChange'):
+            suggestion.validate()
+
+    def test_validate_change_cmd(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.cmd = None
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected change to contain cmd'):
+            suggestion.validate()
+
+    def test_validate_change_cmd_type(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.cmd = 'invalid_cmd'
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected cmd to be create_new_fully_specified_question'):
+            suggestion.validate()
+
+    def test_validate_change_question_dict(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.question_dict = None
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected change to contain question_dict'):
+            suggestion.validate()
+
+    def test_validate_change_question_state_data_schema_version(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.validate()
+
+        suggestion.change.question_dict[
+            'question_state_data_schema_version'] = 0
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Expected question state schema version to be between 1 and '
+            '%s' % feconf.CURRENT_STATE_SCHEMA_VERSION):
+            suggestion.validate()
+
+    def test_pre_accept_validate_change_skill_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, 'description')
+        suggestion.change.skill_id = skill_id
+
+        suggestion.pre_accept_validate()
+
+        suggestion.change.skill_id = None
+
+        with self.assertRaisesRegexp(
+            Exception, 'Expected change to contain skill_id'):
+            suggestion.pre_accept_validate()
+
+    def test_pre_accept_validate_change_question_state_data_schema_version(
+            self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, 'description')
+        suggestion.change.skill_id = skill_id
+
+        suggestion.pre_accept_validate()
+
+        suggestion.change.question_dict[
+            'question_state_data_schema_version'] = 1
+
+        with self.assertRaisesRegexp(
+            Exception, 'Question state schema version is not up to date.'):
+            suggestion.pre_accept_validate()
+
+    def test_pre_accept_validate_change_invalid_skill_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.author_id, 'description')
+        suggestion.change.skill_id = skill_id
+
+        suggestion.pre_accept_validate()
+
+        suggestion.change.skill_id = skill_services.get_new_skill_id()
+
+        with self.assertRaisesRegexp(
+            Exception, 'The skill with the given id doesn\'t exist.'):
+            suggestion.pre_accept_validate()
+
+    def test_get_change_list_for_accepting_suggestion(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        self.assertIsNone(suggestion.get_change_list_for_accepting_suggestion())
+
+    def test_populate_old_value_of_change(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        self.assertIsNone(suggestion.populate_old_value_of_change())
+
+    def test_cannot_accept_suggestion_with_invalid_skill_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        suggestion.change.skill_id = skill_services.get_new_skill_id()
+
+        with self.assertRaisesRegexp(
+            Exception, 'The skill with the given id doesn\'t exist.'):
+            suggestion.accept('commit message')
+
+    def test_pre_update_validate_change_cmd(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        change = {
+            'cmd': question_domain.CMD_UPDATE_QUESTION_PROPERTY,
+            'property_name': question_domain.QUESTION_PROPERTY_LANGUAGE_CODE,
+            'new_value': 'bn',
+            'old_value': 'en'
+        }
+        with self.assertRaisesRegexp(
+            Exception,
+            'The new change cmd must be equal to '
+            'create_new_fully_specified_question'):
+            suggestion.pre_update_validate(
+                question_domain.QuestionChange(change))
+
+    def test_pre_update_validate_change_skill_id(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.reviewer_id, expected_suggestion_dict['change'],
+            expected_suggestion_dict['score_category'], self.fake_date)
+
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_2'
+        }
+
+        with self.assertRaisesRegexp(
+            Exception, 'The new change skill_id must be equal to skill_1'):
+            suggestion.pre_update_validate(
+                question_domain.QuestionChange(change))
+
+    def test_pre_update_validate_change_question_dict(self):
+        change = {
+            'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+            'question_dict': {
+                'question_state_data': self._create_valid_question_data(
+                    'default_state').to_dict(),
+                'language_code': 'en',
+                'question_state_data_schema_version': (
+                    feconf.CURRENT_STATE_SCHEMA_VERSION)
+            },
+            'skill_id': 'skill_1'
+        }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', self.fake_date)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The new change question_dict must not be equal to the '
+            'old question_dict'):
+            suggestion.pre_update_validate(
+                question_domain.QuestionChange(change))
