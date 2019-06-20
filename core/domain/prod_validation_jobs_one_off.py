@@ -399,10 +399,13 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
                     item.id, item.commit_type))
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         """Returns a Change domain class.
 
         This should be implemented by subclasses.
+
+        Args:
+            unused_item: ndb.Model. Entity to validate.
 
         Returns:
             change_domain.BaseChange: A domain object class for the
@@ -417,7 +420,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        change_domain_object = cls._get_change_domain_class()
+        change_domain_object = cls._get_change_domain_class(item)
         for commit_cmd_dict in item.commit_cmds:
             if not commit_cmd_dict:
                 continue
@@ -447,6 +450,17 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
     """Base class for validating commit log entry models."""
 
     model_name = 'commit log entry'
+
+    @classmethod
+    def _set_related_model_name(cls, item):
+        """Updates related model name to [model name] [rights]
+        if the commit log model is for a rights model.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        if item.id.startswith('rights'):
+            cls.related_model_name = cls.related_model_name + ' rights'
 
     @classmethod
     def _validate_post_commit_status(cls, item):
@@ -489,6 +503,7 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         Args:
             item: ndb.Model. Entity to validate.
         """
+        cls._set_related_model_name(item)
         super(BaseCommitLogEntryModelValidator, cls).validate(item)
 
         cls._validate_post_commit_status(item)
@@ -601,7 +616,7 @@ class CollectionSnapshotMetadataModelValidator(
     related_model_name = 'collection'
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return collection_domain.CollectionChange
 
     @classmethod
@@ -730,15 +745,22 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return collection_domain.CollectionChange
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('rights'):
+            return rights_manager.CollectionRightsChange
+        else:
+            return collection_domain.CollectionChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
+        external_id_relationships = {
             'collection_ids': (
                 collection_models.CollectionModel, [item.collection_id]),
         }
+        if item.id.startswith('rights'):
+            external_id_relationships['collection_rights_ids'] = (
+                collection_models.CollectionRightsModel, [item.collection_id])
+        return external_id_relationships
 
 
 class CollectionSummaryModelValidator(BaseSummaryModelValidator):
@@ -892,7 +914,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
         return '^.*-\\d*$'
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return config_domain.ConfigPropertyChange
 
     @classmethod
@@ -1144,7 +1166,7 @@ class ExplorationSnapshotMetadataModelValidator(
     related_model_name = 'exploration'
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return exp_domain.ExplorationChange
 
     @classmethod
@@ -1234,7 +1256,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(
     related_model_name = 'exploration rights'
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return rights_manager.ExplorationRightsChange
 
     @classmethod
@@ -1277,15 +1299,22 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_change_domain_class(cls):
-        return exp_domain.ExplorationChange
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('rights'):
+            return rights_manager.ExplorationRightsChange
+        else:
+            return exp_domain.ExplorationChange
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        return {
+        external_id_relationships = {
             'exploration_ids': (
                 exp_models.ExplorationModel, [item.exploration_id]),
         }
+        if item.id.startswith('rights'):
+            external_id_relationships['exploration_rights_ids'] = (
+                exp_models.ExplorationRightsModel, [item.exploration_id])
+        return external_id_relationships
 
 
 class ExpSummaryModelValidator(BaseSummaryModelValidator):
@@ -1462,7 +1491,7 @@ class FileMetadataSnapshotMetadataModelValidator(
         return '%s-\\d*$' % FILE_MODELS_REGEX
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return fs_domain.FileMetadataChange
 
     @classmethod
@@ -1537,7 +1566,7 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
         return '%s-\\d*$' % FILE_MODELS_REGEX
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return fs_domain.FileChange
 
     @classmethod
@@ -1681,7 +1710,7 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     related_model_name = 'story'
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return story_domain.StoryChange
 
     @classmethod
@@ -1736,7 +1765,7 @@ class StoryRightsSnapshotMetadataModelValidator(
     related_model_name = 'story rights'
 
     @classmethod
-    def _get_change_domain_class(cls):
+    def _get_change_domain_class(cls, unused_item):
         return story_domain.StoryRightsChange
 
     @classmethod
@@ -1772,8 +1801,8 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, item):
-        # Valid id: [story/rights]-[story_id]-[story_version].
-        regex_string = '^(story|rights)-%s-\\d*$' % (
+        # Valid id: [story]-[story_id]-[story_version].
+        regex_string = '^(story)-%s-\\d*$' % (
             item.story_id)
 
         return regex_string
