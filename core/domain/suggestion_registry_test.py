@@ -934,7 +934,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 question_domain.QuestionChange(change))
 
     def test_pre_update_validate_change_question_dict(self):
-        expected_suggestion_dict = self.suggestion_dict
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -948,12 +947,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
         }
 
         suggestion = suggestion_registry.SuggestionAddQuestion(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
             self.reviewer_id, change,
-            expected_suggestion_dict['score_category'], self.fake_date)
+            'question.topic_1', self.fake_date)
 
         with self.assertRaisesRegexp(
             Exception,
