@@ -19,9 +19,7 @@ require('domain/question/question-domain.constants.ts');
 
 oppia.factory('QuestionPlayerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
-  'SKILLS_FOR_QUESTION_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE,
-      SKILLS_FOR_QUESTION_URL_TEMPLATE) {
+  function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE) {
     var _startCursor = '';
     var _fetchQuestions = function(
         skillIds, questionCount, resetHistory, successCallback, errorCallback) {
