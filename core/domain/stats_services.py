@@ -1047,7 +1047,7 @@ def get_learner_answer_details_from_model(learner_answer_details_model):
         [stats_domain.LearnerAnswerInfo.from_dict(learner_answer_info_dict)
          for learner_answer_info_dict
          in learner_answer_details_model.learner_answer_info_list],
-        learner_answer_details_model.schema_version,
+        learner_answer_details_model.learner_answer_info_schema_version,
         learner_answer_details_model.accumulated_answer_info_json_size_bytes)
 
 
@@ -1112,8 +1112,8 @@ def save_learner_answer_details(
             learner_answer_details_model.learner_answer_info_list = (
                 [learner_answer_info.to_dict() for learner_answer_info
                  in learner_answer_details.learner_answer_info_list])
-            learner_answer_details_model.schema_version = (
-                learner_answer_details.schema_version)
+            learner_answer_details_model.learner_answer_info_schema_version = (
+                learner_answer_details.learner_answer_info_schema_version)
             learner_answer_details_model.accumulated_answer_info_json_size_bytes = ( #pylint: disable=line-too-long
                 learner_answer_details.accumulated_answer_info_json_size_bytes)
             learner_answer_details_model.put()
@@ -1125,7 +1125,7 @@ def save_learner_answer_details(
                 learner_answer_details.interaction_id,
                 [learner_answer_info.to_dict() for learner_answer_info
                  in learner_answer_details.learner_answer_info_list],
-                learner_answer_details.schema_version,
+                learner_answer_details.learner_answer_info_schema_version,
                 learner_answer_details.accumulated_answer_info_json_size_bytes)
     else:
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
@@ -1134,7 +1134,7 @@ def save_learner_answer_details(
             learner_answer_details.interaction_id,
             [learner_answer_info.to_dict() for learner_answer_info
              in learner_answer_details.learner_answer_info_list],
-            learner_answer_details.schema_version,
+            learner_answer_details.learner_answer_info_schema_version,
             learner_answer_details.accumulated_answer_info_json_size_bytes)
 
 

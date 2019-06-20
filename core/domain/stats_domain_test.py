@@ -1343,7 +1343,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
                 'created_on': '2019-06-19 13:59:29.153073'
             }],
             'accumulated_answer_info_json_size_bytes': 4000,
-            'schema_version': 1}
+            'learner_answer_info_schema_version': 1}
         learner_answer_details_dict = self.learner_answer_details.to_dict()
         self.assertEqual(
             learner_answer_details_dict, expected_learner_answer_details_dict)
@@ -1360,7 +1360,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
                 'created_on': '2019-06-19 13:59:29.153073'
             }],
             'accumulated_answer_info_json_size_bytes': 4000,
-            'schema_version': 1}
+            'learner_answer_info_schema_version': 1}
         learner_answer_details = stats_domain.LearnerAnswerDetails.from_dict(
             learner_answer_details_dict)
         self.assertEqual(
@@ -1384,7 +1384,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             learner_answer_details.accumulated_answer_info_json_size_bytes,
             4000)
         self.assertEqual(
-            learner_answer_details.schema_version, 1)
+            learner_answer_details.learner_answer_info_schema_version, 1)
 
     def test_add_learner_answer_info(self):
         learner_answer_info = stats_domain.LearnerAnswerInfo(
@@ -1491,11 +1491,11 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
             self.learner_answer_details,
             'Expected learner_answer_info_list to be a list')
 
-    def test_schema_version_must_be_int(self):
-        self.learner_answer_details.schema_version = 'version'
+    def test_learner_answer_info_schema_version_must_be_int(self):
+        self.learner_answer_details.learner_answer_info_schema_version = 'v'
         self._assert_validation_error(
             self.learner_answer_details,
-            'Expected schema_version to be an int')
+            'Expected learner_answer_info_schema_version to be an int')
 
     def test_accumulated_answer_info_json_size_bytes_must_be_int(self):
         self.learner_answer_details.accumulated_answer_info_json_size_bytes = (
@@ -1541,6 +1541,25 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self.assertEqual(
             learner_answer_info.created_on,
             datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
+
+    def test_from_dict_to_dict(self):
+        learner_answer_info_dict = {
+            'id': 'id_1',
+            'answer': 'This is my answer',
+            'answer_details': 'This is my answer details',
+            'created_on': '2019-06-19 13:59:29.153073'
+        }
+        learner_answer_info = stats_domain.LearnerAnswerInfo.from_dict(
+            learner_answer_info_dict)
+        self.assertEqual(learner_answer_info.id, 'id_1')
+        self.assertEqual(learner_answer_info.answer, 'This is my answer')
+        self.assertEqual(
+            learner_answer_info.answer_details, 'This is my answer details')
+        self.assertEqual(
+            learner_answer_info.created_on,
+            datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))
+        self.assertEqual(
+            learner_answer_info.to_dict(), learner_answer_info_dict)
 
     def test_get_learner_answer_info_dict_size(self):
         learner_answer_info_dict_size = (

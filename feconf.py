@@ -189,6 +189,7 @@ CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 
 # This value should be updated in the event of any
 # LearnerAnswerDetailsModel.learner_answer_info_list schema change.
+CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION = 1
 CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search

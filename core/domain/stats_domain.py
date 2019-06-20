@@ -1375,8 +1375,8 @@ class LearnerAnswerDetails(object):
     def __init__(
             self, state_reference, entity_type, interaction_id,
             learner_answer_info_list, accumulated_answer_info_json_size_bytes,
-            schema_version=(
-                feconf.CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION)):
+            learner_answer_info_schema_version=(
+                feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION)):
         """Constructs a LearnerAnswerDetail domain object.
 
         Args:
@@ -1395,7 +1395,7 @@ class LearnerAnswerDetails(object):
                 LearnerAnswerInfo objects.
             accumulated_answer_info_json_size_bytes: int. The size of
                 learner_answer_info_list in bytes.
-            schema_version: int. The schema version of the
+            learner_answer_info_schema_version: int. The schema version of the
                 LearnerAnswerInfo class.
         """
 
@@ -1405,7 +1405,8 @@ class LearnerAnswerDetails(object):
         self.learner_answer_info_list = learner_answer_info_list
         self.accumulated_answer_info_json_size_bytes = (
             accumulated_answer_info_json_size_bytes)
-        self.schema_version = schema_version
+        self.learner_answer_info_schema_version = (
+            learner_answer_info_schema_version)
 
     def to_dict(self):
         """Returns a dict representing LearnerAnswerDetails domain object.
@@ -1423,7 +1424,8 @@ class LearnerAnswerDetails(object):
             ],
             'accumulated_answer_info_json_size_bytes': (
                 self.accumulated_answer_info_json_size_bytes),
-            'schema_version': self.schema_version
+            'learner_answer_info_schema_version': (
+                self.learner_answer_info_schema_version)
         }
 
     @classmethod
@@ -1447,7 +1449,7 @@ class LearnerAnswerDetails(object):
                  'learner_answer_info_list']],
             learner_answer_details_dict[
                 'accumulated_answer_info_json_size_bytes'],
-            learner_answer_details_dict['schema_version']
+            learner_answer_details_dict['learner_answer_info_schema_version']
         )
 
     def validate(self):
@@ -1503,10 +1505,10 @@ class LearnerAnswerDetails(object):
         for learner_answer_info in self.learner_answer_info_list:
             learner_answer_info.validate()
 
-        if not isinstance(self.schema_version, int):
+        if not isinstance(self.learner_answer_info_schema_version, int):
             raise utils.ValidationError(
-                'Expected schema_version to be an int, '
-                'received %s' % self.schema_version)
+                'Expected learner_answer_info_schema_version to be an int, '
+                'received %s' % self.learner_answer_info_schema_version)
 
         if not isinstance(self.accumulated_answer_info_json_size_bytes, int):
             raise utils.ValidationError(

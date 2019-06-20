@@ -1161,12 +1161,11 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # stats_domain.py, each dict corresponds to a single answer info of
     # learner.
     learner_answer_info_list = ndb.JsonProperty(repeated=True, indexed=False)
-    # The version of the learner_answer_info_list currently supported by Oppia.
-    # If the internal JSON structure of learner_answer_info_list changes,
-    # CURRENT_SCHEMA_VERSION in this class needs to be incremented.
-    schema_version = ndb.IntegerProperty(
+    # The schema version of the LearnerAnswerInfo dict. If the
+    # LearnerAnswerInfo schema changes in future this needs to be incremented.
+    learner_answer_info_schema_version = ndb.IntegerProperty(
         indexed=True, default=(
-            feconf.CURRENT_LEARNER_ANSWERS_DETAILS_SCHEMA_VERSION))
+            feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION))
     # The total number of bytes needed to store all of the answers in the
     # learner_answer_info_list. This value is found by summing the JSON
     # sizes of all answer info dicts stored inside learner_answer_info_list.
@@ -1220,7 +1219,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     @classmethod
     def create_model_instance(
             cls, state_reference, entity_type, interaction_id,
-            learner_answer_info_list, schema_version,
+            learner_answer_info_list, learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes):
         """Creates a new LearnerAnswerDetailsModel for the given entity type
         then writes it to the datastore.
@@ -1236,8 +1235,9 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 answer details are received.
             learner_answer_info_list: list. The list of LearnerAnswerInfo
                 objects in dict format, which is defined in the stats_domain.
-            schema_version: int. The version of LearnerAnswerInfo dict, which
-                is currently supported by the Oppia.
+            learner_answer_info_schema_version: int. The version of
+                LearnerAnswerInfo dict, which is currently supported by
+                the Oppia.
             accumulated_answer_info_json_size_bytes: int. The size of the
                 learner_answer_info_list in bytes.
         """
@@ -1248,7 +1248,8 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
             entity_type=entity_type,
             interaction_id=interaction_id,
             learner_answer_info_list=learner_answer_info_list,
-            schema_version=schema_version,
+            learner_answer_info_schema_version=(
+                learner_answer_info_schema_version),
             accumulated_answer_info_json_size_bytes=(
                 accumulated_answer_info_json_size_bytes))
         answer_details_instance.put()
