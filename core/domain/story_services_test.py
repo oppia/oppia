@@ -584,7 +584,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             self.assertEqual(
                 pending_node.to_dict(), self.nodes[1].to_dict())
 
-    def get_node_index_by_story_id_and_node_id(self):
+    def test_get_node_index_by_story_id_and_node_id(self):
         # Tests correct node index should be returned when story and node exist.
         node_index = story_services.get_node_index_by_story_id_and_node_id(
             self.STORY_1_ID, self.NODE_ID_1)
