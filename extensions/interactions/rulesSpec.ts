@@ -16,6 +16,8 @@
  * @fileoverview Unit tests to check that all the relevant rules exist.
  */
 
+require('interactions/EndExploration/directives/EndExplorationRulesService.ts');
+
 describe('Rule spec services', function() {
   var rulesServices = {};
   var ruleTemplates;

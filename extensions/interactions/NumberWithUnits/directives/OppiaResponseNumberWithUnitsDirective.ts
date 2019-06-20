@@ -16,6 +16,10 @@
  * @fileoverview Directive for the NumberWithUnits response.
  */
 
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('oppiaResponseNumberWithUnits', [
   'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
   'UrlInterpolationService', function(HtmlEscaperService,
