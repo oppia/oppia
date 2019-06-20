@@ -93,7 +93,7 @@ class StoryNodeCompletionHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         try:
-            story_services.get_story_node_by_story_id_and_node_id(
+            story_services.get_node_index_by_story_id_and_node_id(
                 story_id, node_id)
         except Exception, e:
             raise self.PageNotFoundException(e)

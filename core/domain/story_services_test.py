@@ -584,20 +584,20 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
             self.assertEqual(
                 pending_node.to_dict(), self.nodes[1].to_dict())
 
-    def test_get_story_node_by_story_id_and_node_id(self):
-        node_1 = story_services.get_story_node_by_story_id_and_node_id(
+    def get_node_index_by_story_id_and_node_id(self):
+        node_index = story_services.get_node_index_by_story_id_and_node_id(
             self.STORY_1_ID, self.NODE_ID_1)
-        self.assertEqual(node_1.to_dict(), self.nodes[0].to_dict())
+        self.assertEqual(node_index, 0)
 
         with self.assertRaisesRegexp(
             Exception,
             'Story node with id node_4 does not exist in this story.'):
-            story_services.get_story_node_by_story_id_and_node_id(
+            story_services.get_node_index_by_story_id_and_node_id(
                 self.STORY_1_ID, 'node_4')
 
         with self.assertRaisesRegexp(
             Exception, 'Story with id story_id_2 does not exist.'):
-            story_services.get_story_node_by_story_id_and_node_id(
+            story_services.get_node_index_by_story_id_and_node_id(
                 'story_id_2', self.NODE_ID_1)
 
     def test_record_completed_node_in_story_context(self):

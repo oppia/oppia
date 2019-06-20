@@ -497,21 +497,6 @@ class StoryContents(object):
                         'The node with id %s is disconnected from the '
                         'story graph.' % self.nodes[index].id)
 
-    def get_node_by_node_id(self, node_id):
-        """Returns a domain object representing a story node.
-
-        Args:
-            node_id: str. ID of the story node.
-
-        Returns:
-            StoryNode or None. The domain object representing a story node with
-            the given node ID, or None if there is no such node.
-        """
-        for node in self.nodes:
-            if node.id == node_id:
-                return node
-        return None
-
     def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.
