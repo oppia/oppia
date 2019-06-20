@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Interactive Map rules.
  */
 
+require('interactions/InteractiveMap/directives/InteractiveMapRulesService.ts');
+
 describe('Numeric Input service', function() {
   beforeEach(angular.mock.module('oppia'));
 

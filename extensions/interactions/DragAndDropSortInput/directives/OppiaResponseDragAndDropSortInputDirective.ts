@@ -16,6 +16,9 @@
  * @fileoverview Directive for the DragAndDropSortInput response.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('oppiaResponseDragAndDropSortInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

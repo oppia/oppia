@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for item selection input validation service.
  */
 
+require(
+  'interactions/ItemSelectionInput/directives/' +
+  'ItemSelectionInputValidationService.ts');
+
 describe('ItemSelectionInputValidationService', function() {
   var WARNING_TYPES, validatorService;
 

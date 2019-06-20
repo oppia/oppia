@@ -16,6 +16,9 @@
  * @fileoverview Rules service for the interaction.
  */
 
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+
 // Rules service for number with units interaction.
 oppia.factory('NumberWithUnitsRulesService', [
   'FractionObjectFactory', 'NumberWithUnitsObjectFactory',

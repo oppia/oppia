@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for multiple choice input validation service.
  */
 
+require(
+  'interactions/MultipleChoiceInput/directives/' +
+  'MultipleChoiceInputValidationService.ts');
+
 describe('MultipleChoiceInputValidationService', function() {
   var WARNING_TYPES;
 

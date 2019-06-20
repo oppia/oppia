@@ -136,8 +136,6 @@ require(
 require(
   'pages/exploration-editor-page/suggestion-modal-for-editor-view/' +
   'suggestion-modal-for-exploration-editor.service.ts');
-require('services/AutoplayedVideosService.ts');
-require('services/CodeNormalizerService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
@@ -197,6 +195,7 @@ require(
   'exploration-footer.directive.ts');
 require('value_generators/valueGeneratorsRequires.ts');
 
+require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
 require('domain/exploration/ParamChangesObjectFactory.ts');

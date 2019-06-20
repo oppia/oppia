@@ -16,6 +16,8 @@
  * @fileoverview Rules service for the interaction.
  */
 
+require('domain/objects/FractionObjectFactory.ts');
+
 oppia.factory('FractionInputRulesService', [
   'FractionObjectFactory',
   function(FractionObjectFactory) {

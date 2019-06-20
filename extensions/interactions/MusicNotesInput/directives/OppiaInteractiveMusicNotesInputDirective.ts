@@ -20,6 +20,17 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require(
+  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+require(
+  'interactions/MusicNotesInput/directives/' +
+  'MusicPhrasePlayerService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/HtmlEscaperService.ts');
+
 // Gives the staff-lines human readable values.
 oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
   A5: 81,

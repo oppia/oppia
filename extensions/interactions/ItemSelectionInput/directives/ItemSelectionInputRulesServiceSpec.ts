@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for Item Selection rules.
  */
 
+require(
+  'interactions/ItemSelectionInput/directives/' +
+  'ItemSelectionInputRulesService.ts');
+
 describe('Item Selection rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 

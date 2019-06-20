@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for multiple choice input rules.
  */
 
+require(
+  'interactions/MultipleChoiceInput/directives/' +
+  'MultipleChoiceInputRulesService.ts');
+
 describe('Multiple choice input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 

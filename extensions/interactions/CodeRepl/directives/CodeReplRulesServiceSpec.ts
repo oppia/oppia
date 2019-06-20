@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Code REPL rules.
  */
 
+require('interactions/CodeRepl/directives/CodeReplRulesService.ts');
+
 describe('Code REPL rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 

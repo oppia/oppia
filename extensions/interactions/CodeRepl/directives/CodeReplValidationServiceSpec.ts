@@ -16,6 +16,7 @@
  * @fileoverview Unit tests for code repl input validation service.
  */
 
+require('interactions/CodeRepl/directives/CodeReplValidationService.ts');
 describe('CodeReplValidationService', function() {
   var WARNING_TYPES, validatorService;
   var currentState, customizationArguments;

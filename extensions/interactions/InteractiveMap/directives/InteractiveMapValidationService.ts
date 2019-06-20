@@ -16,6 +16,8 @@
  * @fileoverview Validation service for the interaction.
  */
 
+require('interactions/baseInteractionValidationService.ts');
+
 oppia.factory('InteractiveMapValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {

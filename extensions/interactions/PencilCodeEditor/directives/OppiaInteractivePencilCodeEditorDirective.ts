@@ -20,6 +20,15 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require(
+  'interactions/PencilCodeEditor/directives/PencilCodeEditorRulesService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/HtmlEscaperService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 oppia.directive('oppiaInteractivePencilCodeEditor', [
   'HtmlEscaperService', 'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
   function(

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Set Input rules.
  */
 
+require('interactions/SetInput/directives/SetInputRulesService.ts');
+
 describe('Set Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 

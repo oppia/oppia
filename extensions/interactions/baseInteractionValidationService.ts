@@ -16,6 +16,8 @@
  * @fileoverview Base validation service for interactions.
  */
 
+require('interactions/baseInteractionValidationService.ts');
+
 oppia.factory('baseInteractionValidationService', [
   '$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
     return {
