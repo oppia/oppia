@@ -20,7 +20,6 @@ import ast
 import itertools
 import logging
 import re
-import traceback
 
 from constants import constants
 from core import jobs
@@ -356,40 +355,6 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class ExplorationConversionErrorIdentificationJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """Job that outputs the list of explorations that currently consist of
-    redundant features and result in an ExplorationConversionError when
-    retrieved.
-    """
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationModel]
-
-    @staticmethod
-    def map(item):
-        try:
-            exploration = exp_services.get_exploration_by_id(item.id)
-        # Handle case where the exploration is deleted.
-        except Exception as e:
-            return
-
-        latest_exp_version = exploration.version
-        version_numbers = range(1, latest_exp_version + 1)
-
-        try:
-            exp_services.get_multiple_explorations_by_version(
-                item.id, version_numbers)
-        except Exception as e:
-            yield (item.id, e)
-            return
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, values)
-
-
 class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that tabulates the number of hints used by each state of an
     exploration.
@@ -473,15 +438,8 @@ class InteractionCustomizationArgsValidationJob(
             return
 
         html_list = exploration.get_all_html_content_strings()
-        try:
-            err_dict = html_validation_service.validate_customization_args(
-                html_list)
-        except Exception as e:
-            yield (
-                'Error in validating customization args for exploration %s' % (
-                    item.id),
-                [traceback.format_exc()])
-            return
+        err_dict = html_validation_service.validate_customization_args(
+            html_list)
 
         for key in err_dict:
             if err_dict[key]:
@@ -551,7 +509,3 @@ class DeleteStateIdMappingModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         item.delete()
-
-    @staticmethod
-    def reduce(key, values):
-        pass
