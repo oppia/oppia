@@ -46,11 +46,14 @@ def _migrate_to_latest_issue_schema(exp_issue_dict):
         Exception. The issue_schema_version is invalid.
     """
     issue_schema_version = exp_issue_dict['schema_version']
-    if not (1 <= issue_schema_version
+    if issue_schema_version is None or issue_schema_version < 1:
+        issue_schema_version = 0
+
+    if not (0 <= issue_schema_version
             <= stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
         raise Exception(
-            'Sorry, we can only process v1-v%d and unversioned issue schemas at'
-            ' present.' %
+            'Sorry, we can only process v1-v%d and unversioned issue schemas '
+            'at present.' %
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     while issue_schema_version < stats_models.CURRENT_ISSUE_SCHEMA_VERSION:
@@ -73,7 +76,10 @@ def _migrate_to_latest_action_schema(learner_action_dict):
         Exception. The action_schema_version is invalid.
     """
     action_schema_version = learner_action_dict['schema_version']
-    if not (1 <= action_schema_version
+    if action_schema_version is None or action_schema_version < 1:
+        action_schema_version = 0
+
+    if not (0 <= action_schema_version
             <= stats_models.CURRENT_ACTION_SCHEMA_VERSION):
         raise Exception(
             'Sorry, we can only process v1-v%d and unversioned action schemas '
