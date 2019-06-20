@@ -213,7 +213,6 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         )
         return question_skill_link_model_instance
 
-
     @classmethod
     def get_question_skill_links_and_skill_descriptions(
             cls, question_count, skill_ids, start_cursor):
