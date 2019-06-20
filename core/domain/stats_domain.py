@@ -1473,7 +1473,7 @@ class LearnerAnswerDetails(object):
                     'should be of the form \'exp_id.state_name\', but '
                     'received %s' % (self.state_reference))
         elif self.entity_type == feconf.ENTITY_TYPE_QUESTION:
-            if len(split_state_reference) > 1:
+            if len(split_state_reference) != 1:
                 raise utils.ValidationError(
                     'For entity type question, the state reference should '
                     'be of the form \'question_id\', but received %s' % (

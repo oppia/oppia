@@ -1277,8 +1277,6 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
         model_instance = cls.get(instance_id, strict=False)
         if model_instance:
             return model_instance
-        else:
-            return None
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):

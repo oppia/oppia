@@ -1066,7 +1066,7 @@ def get_learner_answer_details(state_reference, entity_type):
             or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
 
     Returns:
-        LearnerAnswerDetails or None. The learner answer domain object
+        LearnerAnswerDetails. The learner answer domain object
             or None if the model does not exist.
     """
     learner_answer_details_model = (
@@ -1076,8 +1076,6 @@ def get_learner_answer_details(state_reference, entity_type):
         learner_answer_details = get_learner_answer_details_from_model(
             learner_answer_details_model)
         return learner_answer_details
-    else:
-        return None
 
 
 def save_learner_answer_details(
