@@ -48,20 +48,8 @@ class MockFeedbackAnalyticsAggregator(
     job when the previous one has finished.
     """
     @classmethod
-    def _get_batch_job_manager_class(cls):
-        return MockFeedbackAnalyticsMRJobManager
-
-    @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
-
-
-class MockFeedbackAnalyticsMRJobManager(
-        feedback_jobs_continuous.FeedbackAnalyticsMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return MockFeedbackAnalyticsAggregator
 
 
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
@@ -764,16 +752,21 @@ class FeedbackStatsHandlerTests(test_utils.GenericTestBase):
         feedback_services.create_thread(
             'exploration', self.exp_id, self.owner_id, 'subject', 'text')
 
-        MockFeedbackAnalyticsAggregator.start_computation()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
+        with self.swap(
+            feedback_jobs_continuous, 'FeedbackAnalyticsAggregator',
+            MockFeedbackAnalyticsAggregator):
+            (
+                feedback_jobs_continuous.FeedbackAnalyticsAggregator
+                .start_computation())
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
+            self.process_and_flush_pending_tasks()
 
-        response = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
+            response = self.get_json(
+                '%s/%s' % (feconf.FEEDBACK_STATS_URL_PREFIX, self.exp_id))
 
-        self.assertEqual(response['num_total_threads'], 1)
-        self.assertEqual(response['num_open_threads'], 1)
+            self.assertEqual(response['num_total_threads'], 2)
+            self.assertEqual(response['num_open_threads'], 2)
 
-        self.logout()
+            self.logout()
