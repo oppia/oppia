@@ -780,9 +780,8 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
             cls.errors['contributors summary check'].append((
                 'Entity id %s: Contributor ids: %s do not match the '
                 'contributor ids obtained using contributors summary: %s') % (
-                    item.id, (',').join(sorted(item.contributor_ids)),
-                    (',').join(
-                        sorted(contributor_ids_from_contributors_summary))))
+                    item.id, sorted(item.contributor_ids),
+                    sorted(contributor_ids_from_contributors_summary)))
 
     @classmethod
     def _validate_node_count(cls, item):
@@ -802,7 +801,7 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
                 cls.errors['node count check'].append((
                     'Entity id %s: Node count: %s does not match the number of '
                     'nodes in collection_contents dict: %s') % (
-                        item.id, item.node_count, len(nodes)))
+                        item.id, item.node_count, nodes))
 
     @classmethod
     def _validate_ratings_is_empty(cls, item):
@@ -976,8 +975,9 @@ class SentEmailModelValidator(BaseModelValidator):
                     cls.errors['sender email check'].append((
                         'Entity id %s: Sender email %s in entity does not '
                         'match with email %s of user obtained through '
-                        'sender id') % (
-                            item.id, item.sender_email, sender_model.email))
+                        'sender id %s') % (
+                            item.id, item.sender_email, sender_model.email,
+                            item.sender_id))
 
     @classmethod
     def _validate_recipient_email(cls, item):
@@ -997,9 +997,9 @@ class SentEmailModelValidator(BaseModelValidator):
                     cls.errors['recipient email check'].append((
                         'Entity id %s: Recipient email %s in entity does '
                         'not match with email %s of user obtained through '
-                        'recipient id') % (
+                        'recipient id %s') % (
                             item.id, item.recipient_email,
-                            recipient_model.email))
+                            recipient_model.email, item.recipient_id))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -1052,8 +1052,9 @@ class BulkEmailModelValidator(BaseModelValidator):
                     cls.errors['sender email check'].append((
                         'Entity id %s: Sender email %s in entity does not '
                         'match with email %s of user obtained through '
-                        'sender id') % (
-                            item.id, item.sender_email, sender_model.email))
+                        'sender id %s') % (
+                            item.id, item.sender_email, sender_model.email,
+                            item.sender_id))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -1326,9 +1327,8 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
             cls.errors['contributors summary check'].append((
                 'Entity id %s: Contributor ids: %s do not match the '
                 'contributor ids obtained using contributors summary: %s') % (
-                    item.id, (',').join(sorted(item.contributor_ids)),
-                    (',').join(
-                        sorted(contributor_ids_from_contributors_summary))))
+                    item.id, sorted(item.contributor_ids),
+                    sorted(contributor_ids_from_contributors_summary)))
 
     @classmethod
     def _validate_first_published_msec(cls, item):
@@ -1633,8 +1633,8 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
             recommendations_services.validate_topic_similarities(data)
         except Exception as e:
             cls.errors['topic similarity check'].append(
-                'Entity id %s: Topic similarity validation fails '
-                'with error: %s' % (item.id, e))
+                'Entity id %s: Topic similarity validation for content: %s '
+                'fails with error: %s' % (item.id, item.content, e))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -1823,7 +1823,7 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
                 cls.errors['node count check'].append((
                     'Entity id %s: Node count: %s does not match the '
                     'number of nodes in story_contents dict: %s') % (
-                        item.id, item.node_count, len(nodes)))
+                        item.id, item.node_count, nodes))
 
     @classmethod
     def _get_related_model_properties(cls):
