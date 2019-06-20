@@ -38,6 +38,9 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
+# backend_prod_files contain processed JS and HTML files that are served by
+# Jinja, we are moving away from Jinja so this folder might not be needed later
+# (#6964)
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
@@ -45,7 +48,7 @@ ACTIONS_DIR = (
 ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+    os.path.join('extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
