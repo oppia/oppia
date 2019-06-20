@@ -147,7 +147,7 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
-BAD_PATTERNS_JS_REGEXP = [
+BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
         'message': 'In tests, please do not use browser.explore().',
@@ -182,6 +182,13 @@ BAD_PATTERNS_JS_REGEXP = [
     {
         'regexp': r'\b(iit|fit)\(',
         'message': 'In tests, please use \'it\' instead of \'iit\' or \'fit\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r'\b(beforeEach\(inject\(function)\(',
+        'message': 'In tests, please use \'angular.mock.inject\' instead of '
+                   '\'inject\'',
         'excluded_files': (),
         'excluded_dirs': ()
     },
@@ -340,6 +347,20 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party.sh',
     '/.github/']
 
+# This list contains the directories and files that do not follow the new
+# constant declaration rules.
+# TODO(YashJipkate) Bring these directories and files under the new constant
+# declaration rules and empty the list.
+OLD_CONVENTION_PATHS = [
+    'core/templates/dev/head/services',
+    'core/templates/dev/head/base_components',
+    'core/templates/dev/head/directives',
+    'core/templates/dev/head/domain',
+    'core/templates/dev/head/expressions',
+    'core/templates/dev/head/tests',
+    'core/templates/dev/head/App.ts',
+    'extensions/']
+
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -367,13 +388,13 @@ _PATHS_TO_INSERT = [
     os.path.join(
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-2.0.33'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'esprima-4.0.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.2.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.5'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
@@ -2159,7 +2180,7 @@ class LintChecksManager(object):
                         total_error_count += 1
 
                 if filepath.endswith(('.js', '.ts')):
-                    for regexp in BAD_PATTERNS_JS_REGEXP:
+                    for regexp in BAD_PATTERNS_JS_AND_TS_REGEXP:
                         if _check_bad_pattern_in_file(
                                 filepath, file_content, regexp):
                             failed = True
@@ -2414,6 +2435,79 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_constants_declaration(self):
+        """Checks the declaration of constants in the TS files to ensure that
+        the constants are not declared in files other than *.constants.ts and
+        that the constants are declared only single time.
+        """
+
+        if self.verbose_mode_enabled:
+            print 'Starting constants declaration check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            all_ts_files = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.ts'))]
+            ts_files_to_check = [
+                filepath for filepath in all_ts_files if not any(
+                    filepath.startswith(pattern) for pattern in (
+                        OLD_CONVENTION_PATHS))]
+            constants_to_source_filepaths_dict = {}
+            for filepath in ts_files_to_check:
+                # Check that the constants are declared only in a *.constants.ts
+                # file.
+                if not filepath.endswith('.constants.ts'):
+                    for line_num, line in enumerate(FileCache.readlines(
+                            filepath)):
+                        if 'oppia.constant(' in line:
+                            failed = True
+                            print ('%s --> Constant declaration found at line '
+                                   '%s. Please declare the constants in a '
+                                   'separate constants file.' % (
+                                       filepath, line_num))
+
+                # Check if the constant has multiple declarations which is
+                # prohibited.
+                parsed_script = self.parsed_js_and_ts_files[filepath]
+                parsed_nodes = parsed_script.body
+                components_to_check = ['constant']
+                for parsed_node in parsed_nodes:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
+                        continue
+                    else:
+                        constant_name = expression.arguments[0].raw
+                        if constant_name in constants_to_source_filepaths_dict:
+                            failed = True
+                            print ('%s --> The constant %s is already declared '
+                                   'in %s. Please import the file where the '
+                                   'constant is declared or rename the constant'
+                                   '.' % (
+                                       filepath, constant_name,
+                                       constants_to_source_filepaths_dict[
+                                           constant_name]))
+                        else:
+                            constants_to_source_filepaths_dict[
+                                constant_name] = filepath
+
+
+            if failed:
+                summary_message = '%s  Constants declaration check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Constants declaration check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+
+        return summary_messages
+
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2442,6 +2536,7 @@ class LintChecksManager(object):
         html_linter_messages = self._lint_html_files()
         pattern_messages = self._check_bad_patterns()
         codeowner_messages = self._check_codeowner_file()
+        constants_messages = self._check_constants_declaration()
         all_messages = (
             extra_js_files_messages + js_and_ts_component_messages +
             directive_scope_messages + sorted_dependencies_messages +
@@ -2449,7 +2544,7 @@ class LintChecksManager(object):
             mandatory_patterns_messages + docstring_messages +
             comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
-            codeowner_messages)
+            codeowner_messages + constants_messages)
         return all_messages
 
 

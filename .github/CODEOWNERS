@@ -199,7 +199,7 @@
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
 /extensions/dependencies/ @seanlip
 /extensions/domain*.py @seanlip
-/extensions/interactions/ @kevinlee12
+/extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @seanlip
 /extensions/__init__.py @kevinlee12
@@ -277,7 +277,9 @@
 /core/storage/story/ @aks681
 /core/templates/dev/head/components/entity-creation-services/story-creation.service.ts @aks681
 /core/templates/dev/head/domain/story/ @aks681
+/core/templates/dev/head/domain/story_viewer/ @aks681
 /core/templates/dev/head/pages/story-editor-page/ @aks681
+/core/templates/dev/head/pages/story-viewer-page/ @aks681
 
 # Topic project.
 # Instead of * we have used _* to avoid topics_and_skills_dashboard related files.
@@ -314,6 +316,8 @@
 /core/jobs*.py @seanlip
 /core/platform/ @seanlip
 /core/templates/dev/head/App*.ts @ankita240796
+/core/templates/dev/head/app.constants.ts @ankita240796
+/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek
 /core/templates/dev/head/I18nFooter.ts @seanlip
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @seanlip
 
@@ -364,7 +368,7 @@
 /core/domain/suggestion*.py @nithusha21
 /core/storage/suggestion/ @nithusha21
 /core/templates/dev/head/domain/suggestion/ @nithusha21
-/core/templates/dev/head/pages/suggestion_editor/ @nithusha21
+/core/templates/dev/head/services/SuggestionModalService.ts @nithusha21
 
 # Feedback project.
 /core/controllers/feedback*.py @nithusha21
