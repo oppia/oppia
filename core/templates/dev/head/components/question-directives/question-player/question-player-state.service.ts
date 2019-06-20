@@ -17,13 +17,6 @@
  * in the test session.
  */
 
-oppia.constant('EXPLORATION_MODE', {
-  EXPLORATION: 'exploration',
-  PRETEST: 'pretest',
-  QUESTION_PLAYER: 'question_player',
-  OTHER: 'other'
-});
-
 oppia.factory('QuestionPlayerStateService', [
   '$log', '$q', '$rootScope',
   function(
