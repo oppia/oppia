@@ -560,7 +560,8 @@ def save_story_summary(story_summary):
 
 
 def get_node_index_by_story_id_and_node_id(story_id, node_id):
-    """Returns a domain object representing a story node.
+    """Returns the index of the story node with the given story id
+    and node id.
 
     Args:
         story_id: str. ID of the story.
