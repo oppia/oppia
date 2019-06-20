@@ -43,12 +43,14 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
     controller: [
       '$http', '$rootScope', 'AlertsService',
       'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL', 'PRACTICE_SESSIONS_URL',
+      'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL',
+      'PRACTICE_SESSIONS_URL',
       'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
       function(
           $http, $rootScope, AlertsService,
           UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL, PRACTICE_SESSIONS_URL,
+          FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL,
+          PRACTICE_SESSIONS_URL,
           TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS
       ) {
         var ctrl = this;
