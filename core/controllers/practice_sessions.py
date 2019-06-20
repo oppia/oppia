@@ -79,13 +79,11 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_services.get_topic_by_name(topic_name)
-<<<<<<< HEAD
         skills = skill_services.get_skill_descriptions_by_ids(
             topic.id, topic.get_all_skill_ids())
         skill_with_description = {}
         for skill in skills:
             skill_with_description[skill.id] = skill.description
-=======
         try:
             skills = skill_services.get_multi_skills(topic.get_all_skill_ids())
         except Exception, e:
@@ -94,15 +92,10 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         for skill in skills:
             skills_with_description[skill.id] = skill.description
 
->>>>>>> upstream/develop
         topic_name = topic.name
 
         self.values.update({
             'topic_name': topic.name,
-<<<<<<< HEAD
             'skills_with_description': skill_with_description
-=======
-            'skills_with_description': skills_with_description
->>>>>>> upstream/develop
         })
         self.render_json(self.values)
