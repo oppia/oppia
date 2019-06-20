@@ -530,10 +530,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.QUESTIONS_URL_PREFIX,
         reader.QuestionPlayerHandler),
     get_redirect_route(
-        r'%s' % feconf.QUESTION_SKILLS_URL_PREFIX,
-        reader.QuestionSkillFetchHandler
-        ),
-    get_redirect_route(
         r'%s/exploration/<target_id>/<suggestion_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX,
         suggestion.SuggestionToExplorationActionHandler),

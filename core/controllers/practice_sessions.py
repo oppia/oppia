@@ -96,6 +96,6 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
 
         self.values.update({
             'topic_name': topic.name,
-            'skills_with_description': skill_with_description
+            'skills_with_description': skills_with_description
         })
         self.render_json(self.values)

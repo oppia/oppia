@@ -160,12 +160,6 @@ indexes:
 
 - kind: QuestionSkillLinkModel
   properties:
-  - name: question_id
-  - name: last_updated
-    direction: desc
-
-- kind: QuestionSkillLinkModel
-  properties:
   - name: skill_id
   - name: created_on
 

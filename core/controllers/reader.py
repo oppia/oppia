@@ -1011,26 +1011,6 @@ class FlagExplorationHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class QuestionSkillFetchHandler(base.BaseHandler):
-    """Returns skill ids for given question ids."""
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET request."""
-        question_ids = self.request.get('question_ids').split(',')
-
-        skill_description_and_questions = (
-            question_services.get_questions_and_skill_descriptions_for_question_ids( #pylint: disable=line-too-long
-                question_ids))
-        self.values.update({
-            'skill_description_and_questions': skill_description_and_questions,
-            })
-        self.render_json(self.values)
-
-
-
 class QuestionPlayerHandler(base.BaseHandler):
     """Provides questions with given skill ids."""
 

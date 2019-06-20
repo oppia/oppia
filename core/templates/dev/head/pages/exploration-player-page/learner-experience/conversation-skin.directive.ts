@@ -331,7 +331,7 @@ oppia.directive('conversationSkin', [
         'ExplorationEngineService', 'UrlService', 'FocusManagerService',
         'LearnerViewRatingService', 'WindowDimensionsService',
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
-        'LearnerParamsService',
+        'QuestionPlayerStateService','LearnerParamsService',
         'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
@@ -351,8 +351,7 @@ oppia.directive('conversationSkin', [
         'StateClassifierMappingService', 'ImagePreloaderService',
         'PlaythroughService', 'QuestionPlayerEngineService',
         'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
-        'ExplorationPlayerStateService', 'QuestionPlayerStateService',
-        'INTERACTION_DISPLAY_MODE_INLINE',
+        'ExplorationPlayerStateService', 'INTERACTION_DISPLAY_MODE_INLINE',
         'CurrentInteractionService', 'UserService',
         function(
             $scope, $timeout, $rootScope, $window, $translate, $http,
@@ -360,7 +359,7 @@ oppia.directive('conversationSkin', [
             ExplorationEngineService, UrlService, FocusManagerService,
             LearnerViewRatingService, WindowDimensionsService,
             EditableExplorationBackendApiService, PlayerTranscriptService,
-            LearnerParamsService,
+            QuestionPlayerStateService, LearnerParamsService,
             ExplorationRecommendationsService,
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
@@ -380,8 +379,7 @@ oppia.directive('conversationSkin', [
             StateClassifierMappingService, ImagePreloaderService,
             PlaythroughService, QuestionPlayerEngineService,
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
-            ExplorationPlayerStateService, QuestionPlayerStateService,
-            INTERACTION_DISPLAY_MODE_INLINE,
+            ExplorationPlayerStateService, INTERACTION_DISPLAY_MODE_INLINE,
             CurrentInteractionService, UserService) {
           $scope.CONTINUE_BUTTON_FOCUS_LABEL = CONTINUE_BUTTON_FOCUS_LABEL;
           // The minimum width, in pixels, needed to be able to show two cards
@@ -598,6 +596,7 @@ oppia.directive('conversationSkin', [
               }
             }, TIME_NUM_CARDS_CHANGE_MSEC);
           };
+
           if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
             $rootScope.$on('hintConsumed', function(evt) {
               QuestionPlayerStateService.hintUsed(
@@ -609,6 +608,7 @@ oppia.directive('conversationSkin', [
                 QuestionPlayerEngineService.getCurrentQuestionId());
             });
           }
+
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getDisplayedCardIndex());
