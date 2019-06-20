@@ -331,7 +331,7 @@ oppia.directive('conversationSkin', [
         'ExplorationEngineService', 'UrlService', 'FocusManagerService',
         'LearnerViewRatingService', 'WindowDimensionsService',
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
-        'QuestionPlayerStateService','LearnerParamsService',
+        'QuestionPlayerStateService', 'LearnerParamsService',
         'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
