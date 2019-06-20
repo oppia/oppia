@@ -34,6 +34,7 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 import feconf
+import utils
 
 import jinja2
 
@@ -243,10 +244,12 @@ class EditableTopicDataHandler(base.BaseHandler):
             else:
                 topic_and_subtopic_page_change_list.append(
                     topic_domain.TopicChange(change))
-
-        topic_services.update_topic_and_subtopic_pages(
-            self.user_id, topic_id, topic_and_subtopic_page_change_list,
-            commit_message)
+        try:
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, topic_and_subtopic_page_change_list,
+                commit_message)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         skill_ids = topic.get_all_skill_ids()
@@ -362,9 +365,12 @@ class TopicPublishHandler(base.BaseHandler):
             raise self.InvalidInputException(
                 'Publish status should only be true or false.')
 
-        if publish_status:
-            topic_services.publish_topic(topic_id, self.user_id)
-        else:
-            topic_services.unpublish_topic(topic_id, self.user_id)
+        try:
+            if publish_status:
+                topic_services.publish_topic(topic_id, self.user_id)
+            else:
+                topic_services.unpublish_topic(topic_id, self.user_id)
+        except Exception as e:
+            raise self.UnauthorizedUserException(e)
 
         self.render_json(self.values)

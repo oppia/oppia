@@ -357,6 +357,30 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
 
         self.logout()
 
+    def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Changed name',
+            'topic_and_subtopic_page_change_dicts': [{
+                'change_affects_subtopic_page': False,
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 0
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(json_response['error'], 'Name should be a string.')
+
     def test_editable_topic_handler_put(self):
         # Check that admins can edit a topic.
         change_cmd = {
@@ -804,3 +828,37 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_STATUS_URL_PREFIX, new_topic_id),
             {'publish_status': True}, csrf_token=csrf_token,
             expected_status_int=404)
+
+    def test_cannot_publish_a_published_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': True}, csrf_token=csrf_token)
+        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        self.assertTrue(topic_rights.topic_is_published)
+
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': True}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(response['error'], 'The topic is already published.')
+
+    def test_cannot_unpublish_an_unpublished_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        self.assertFalse(topic_rights.topic_is_published)
+
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': False}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(response['error'], 'The topic is already unpublished.')
