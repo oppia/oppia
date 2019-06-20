@@ -127,6 +127,7 @@ def run_job_and_check_output(
         self.assertEqual(actual_output, expected_output)
 
 
+
 def update_datastore_types_for_mock_datetime():
     """Updates datastore types for MockDatetime13Hours to ensure that validation
     of ndb datetime properties does not fail.
@@ -1423,6 +1424,9 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             collection.add_node('%s' % (index * 2 + 1))
             collection_services.save_new_collection(self.owner_id, collection)
 
+        collection_models.CollectionRightsModel.get_by_id('1').commit(
+            self.owner_id, 'test commit', [])
+
         self.model_instance_0 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-0-1'))
@@ -1432,6 +1436,9 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_2 = (
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-2-1'))
+        self.rights_model_instance = (
+            collection_models.CollectionCommitLogEntryModel.get_by_id(
+                'rights-1-2'))
 
         self.job_class = prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
 
@@ -1443,7 +1450,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'new_value': 'New title'
             }], 'Changes.')
         expected_output = [
-            u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]']
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 5]']
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_created_on_greater_than_last_updated(self):
@@ -1459,12 +1466,13 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.id,
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
-            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
         self.model_instance_2.delete()
+        self.rights_model_instance.delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'CollectionCommitLogEntryModel\', '
@@ -1489,9 +1497,23 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'but it doesn\'t exist", u"Entity id collection-0-2: based '
                 'on field collection_ids having value 0, expect model '
                 'CollectionModel with id 0 but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(
             self, expected_output, literal_eval=True)
+
+    def test_missing_collection_rights_model_failure(self):
+        collection_models.CollectionRightsModel.get_by_id('1').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for collection_rights_ids '
+                'field check of CollectionCommitLogEntryModel\', '
+                '[u"Entity id rights-1-2: based on field '
+                'collection_rights_ids having value 1, expect model '
+                'CollectionRightsModel with id 1 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
+        run_job_and_check_output(
+            self, expected_output, sort=True)
 
     def test_invalid_collection_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -1509,7 +1531,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'to id 0 has a version 1 which is less than '
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
-            u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_id(self):
@@ -1528,7 +1550,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'CollectionCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
             ) % (model_with_invalid_id.id),
-            u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_type(self):
@@ -1540,7 +1562,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'CollectionCommitLogEntryModel\', '
                 '[u\'Entity id collection-0-1: Commit type invalid is '
                 'not allowed\']]'
-            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_post_commit_status(self):
@@ -1552,7 +1574,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'of CollectionCommitLogEntryModel\', '
                 '[u\'Entity id collection-0-1: Post commit status invalid '
                 'is invalid\']]'
-            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
@@ -1568,7 +1590,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id %s: Post commit status is '
                 '%s but post_commit_is_private is True\']]'
             ) % (self.model_instance_0.id, feconf.POST_COMMIT_STATUS_PUBLIC),
-            u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
@@ -1584,7 +1606,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id %s: Post commit status is '
                 '%s but post_commit_is_private is False\']]'
             ) % (self.model_instance_0.id, feconf.POST_COMMIT_STATUS_PRIVATE),
-            u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
@@ -1613,7 +1635,7 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'for command: {u\'cmd\': u\'add_collection_node\'} '
                 'failed with error: The following required attributes '
                 'are missing: exploration_id"]]'),
-            u'[u\'fully-validated CollectionCommitLogEntryModel\', 2]']
+            u'[u\'fully-validated CollectionCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -3468,6 +3490,9 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         for exp in explorations:
             exp_services.save_new_exploration(self.owner_id, exp)
 
+        exp_models.ExplorationRightsModel.get_by_id('1').commit(
+            self.owner_id, 'test commit', [])
+
         self.model_instance_0 = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-0-1'))
@@ -3477,6 +3502,9 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_2 = (
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-2-1'))
+        self.rights_model_instance = (
+            exp_models.ExplorationCommitLogEntryModel.get_by_id(
+                'rights-1-2'))
 
         self.job_class = prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
 
@@ -3488,7 +3516,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'new_value': 'New title'
             })], 'Changes.')
         expected_output = [
-            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]']
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 5]']
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_created_on_greater_than_last_updated(self):
@@ -3504,12 +3532,13 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 self.model_instance_0.id,
                 self.model_instance_0.created_on,
                 self.model_instance_0.last_updated
-            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_last_updated_greater_than_current_time(self):
         self.model_instance_1.delete()
         self.model_instance_2.delete()
+        self.rights_model_instance.delete()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'ExplorationCommitLogEntryModel\', '
@@ -3535,8 +3564,22 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'but it doesn\'t exist", u"Entity id exploration-0-2: based '
                 'on field exploration_ids having value 0, expect model '
                 'ExplorationModel with id 0 but it doesn\'t exist"]]'
-            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_rights_model_failure(self):
+        exp_models.ExplorationRightsModel.get_by_id('1').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_rights_ids '
+                'field check of ExplorationCommitLogEntryModel\', '
+                '[u"Entity id rights-1-2: based on field '
+                'exploration_rights_ids having value 1, expect model '
+                'ExplorationRightsModel with id 1 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
+        run_job_and_check_output(
+            self, expected_output, sort=True)
 
     def test_invalid_exploration_version_in_model_id(self):
         model_with_invalid_version_in_id = (
@@ -3554,7 +3597,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'to id 0 has a version 1 which is less than '
                 'the version 3 in commit log entry model id\']]'
             ) % (model_with_invalid_version_in_id.id),
-            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_id(self):
@@ -3573,7 +3616,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
             ) % (model_with_invalid_id.id),
-            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_type(self):
@@ -3585,7 +3628,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id exploration-0-1: Commit type invalid is '
                 'not allowed\']]'
-            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_post_commit_status(self):
@@ -3597,7 +3640,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'of ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id exploration-0-1: Post commit status invalid '
                 'is invalid\']]'
-            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_true_post_commit_is_private(self):
@@ -3612,7 +3655,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id %s: Post commit status is '
                 'public but post_commit_is_private is True\']]'
             ) % self.model_instance_0.id,
-            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_false_post_commit_is_private(self):
@@ -3627,7 +3670,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u\'Entity id %s: Post commit status is '
                 'private but post_commit_is_private is False\']]'
             ) % self.model_instance_0.id,
-            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
+            u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_commit_cmd_schmea(self):
@@ -3658,7 +3701,7 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 'validation for command: {u\'cmd\': u\'add_state\'} '
                 'failed with error: The following required attributes '
                 'are missing: state_name"]]'
-            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 2]']
+            ), u'[u\'fully-validated ExplorationCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -3901,7 +3944,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
                 'do not match the contributor ids obtained using '
                 'contributors summary: [u\'invalid\']"]]') % (
                     sorted_contributor_ids[0], sorted_contributor_ids[1]
-            ), u'[u\'fully-validated ExpSummaryModel\', 2]']
+                ),
+            u'[u\'fully-validated ExpSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
     def test_model_with_invalid_exploration_related_property(self):

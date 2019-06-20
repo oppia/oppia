@@ -347,7 +347,11 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         if cls.related_model_name == '':
             raise Exception('Related model name should be specified')
 
-        name_split_by_space = cls.related_model_name.split(' ')
+        related_model_name = cls.related_model_name
+        if item.id.startswith('rights'):
+            related_model_name = related_model_name + ' rights'
+
+        name_split_by_space = related_model_name.split(' ')
         key_to_fetch = ('_').join(name_split_by_space)
         capitalized_related_model_name = ('').join([
             val.capitalize() for val in name_split_by_space])
@@ -452,17 +456,6 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
     model_name = 'commit log entry'
 
     @classmethod
-    def _set_related_model_name(cls, item):
-        """Updates related model name to [model name] [rights]
-        if the commit log model is for a rights model.
-
-        Args:
-            item: ndb.Model. Entity to validate.
-        """
-        if item.id.startswith('rights'):
-            cls.related_model_name = cls.related_model_name + ' rights'
-
-    @classmethod
     def _validate_post_commit_status(cls, item):
         """Validates that post_commit_status is either public or private.
 
@@ -503,7 +496,6 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        cls._set_related_model_name(item)
         super(BaseCommitLogEntryModelValidator, cls).validate(item)
 
         cls._validate_post_commit_status(item)
