@@ -20,6 +20,17 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require(
+  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+require(
+  'interactions/MusicNotesInput/directives/' +
+  'MusicPhrasePlayerService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/HtmlEscaperService.ts');
+
 // Gives the staff-lines human readable values.
 oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
   A5: 81,
@@ -63,7 +74,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           return scope;
         };
 
-        scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
+        scope.SOUNDFONT_URL =
+        '/third_party/static/midi-js-a8a842/examples/soundfont/';
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
 
