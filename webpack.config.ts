@@ -81,6 +81,8 @@ module.exports = {
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
+    review_test:
+      commonPrefix + '/pages/review-test-page/review-test-page.scripts.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
@@ -90,6 +92,8 @@ module.exports = {
       'stewards-landing-page.scripts.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
+    story_viewer:
+      commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
@@ -365,6 +369,14 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['review_test'],
+      filename: 'review-test-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['app', 'signup'],
       filename: 'signup-page.mainpage.html',
       meta: {
@@ -444,6 +456,15 @@ module.exports = {
       template:
         commonPrefix + '/pages/story-editor-page/' +
         'story-editor-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['story_viewer'],
+      filename: 'story-viewer-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/story-viewer-page/' +
+        'story-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

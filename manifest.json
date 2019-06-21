@@ -56,9 +56,9 @@
         "targetDirPrefix": "html5lib-python-"
       },
       "requests": {
-        "version": "2.10.0",
+        "version": "2.22.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/49/6f/183063f01aae1e025cf0130772b55848750a2f3a89bfa11b385b35d7329d/requests-2.10.0.tar.gz#md5=a36f7a64600f1bfec4d55ae021d232ae",
+        "url": "https://files.pythonhosted.org/packages/01/62/ddcf76d1d19885e8579acb1b1df26a852b03472c0e46d2b959a714c90608/requests-2.22.0.tar.gz",
         "tarRootDirPrefix": "requests-",
         "rootDirPrefix": "requests-",
         "targetDirPrefix": "requests-"
@@ -104,9 +104,9 @@
         "targetDirPrefix": "beautifulsoup4-"
       },
       "mutagen": {
-        "version": "1.38",
+        "version": "1.42.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/57/ec/d7534cdb2766f1fee534a3aabdbdfbf05d6cf77cde617d77b526336a1a72/mutagen-1.38.tar.gz#md5=c54443dfb8d4ac088eb2a0c4fd569772",
+        "url": "https://files.pythonhosted.org/packages/30/4c/5ad1a6e1ccbcfaf6462db727989c302d9d721beedd9b09c11e6f0c7065b0/mutagen-1.42.0.tar.gz",
         "tarRootDirPrefix": "mutagen-",
         "rootDirPrefix": "mutagen-",
         "targetDirPrefix": "mutagen-"
@@ -143,11 +143,11 @@
         }
       },
       "angularAudio": {
-        "version": "f403ea9e86de141278d410bade8ef1f43e6d188c",
+        "version": "1.7.4",
         "downloadFormat": "zip",
-        "url": "https://github.com/danielstern/ngAudio/archive/f403ea9e86de141278d410bade8ef1f43e6d188c.zip",
+        "url": "https://github.com/danielstern/ngAudio/archive/1.7.4.zip",
         "rootDirPrefix": "ngAudio-",
-        "targetDir": "angular-audio-f403ea",
+        "targetDirPrefix": "angular-audio-",
         "bundle": {
           "js": ["app/angular.audio.js"]
         }
@@ -419,11 +419,11 @@
         }
       },
       "midiJs": {
-        "version": "2ef687b47e5f478f1506b47238f3785d9ea8bd25",
+        "version": "a8a84257afa70721ae462448048a87301fc1554a",
         "downloadFormat": "zip",
-        "url": "https://github.com/mudcube/MIDI.js/archive/2ef687b47e5f478f1506b47238f3785d9ea8bd25.zip",
+        "url": "https://github.com/mudcube/MIDI.js/archive/a8a84257afa70721ae462448048a87301fc1554a.zip",
         "rootDirPrefix": "MIDI.js-",
-        "targetDir": "midi-js-2ef687"
+        "targetDir": "midi-js-a8a842"
       },
       "ngJoyride": {
         "version": "5b25d076405c9a787db602d2a8ff49919228f4fc",
