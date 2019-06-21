@@ -43,6 +43,12 @@ describe('Editor state service', function() {
       expect(ecs.getActiveStateName()).toBeNull();
     });
 
+    it('should correctly set and get solicitAnswerDetails', function() {
+      expect(ecs.getSolicitAnswerDetails()).toEqual(false);
+      ecs.setSolicitAnswerDetails(true);
+      expect(ecs.getSolicitAnswerDetails()).toEqual(true);
+    });
+
     it('should correctly return answer choices for interaction', function() {
       var customizationArgsForMultipleChoiceInput = {
         choices: {
