@@ -82,7 +82,7 @@ class StoryPageDataHandler(base.BaseHandler):
 
 
 class StoryNodeCompletionHandler(base.BaseHandler):
-    """Marks a story node as completed after completing. """
+    """Marks a story node as completed after completing."""
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_access_story_viewer_page
