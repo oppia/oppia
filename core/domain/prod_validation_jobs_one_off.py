@@ -32,6 +32,8 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import skill_domain
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -45,14 +47,16 @@ import feconf
     activity_models, audit_models, base_models,
     collection_models, config_models, email_models,
     exp_models, feedback_models, file_models,
-    recommendations_models, skill_models,
-    story_models, topic_models, user_models,) = (
+    question_models, recommendations_models,
+    skill_models, story_models, topic_models,
+    user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.collection, models.NAMES.config, models.NAMES.email,
             models.NAMES.exploration, models.NAMES.feedback, models.NAMES.file,
-            models.NAMES.recommendations, models.NAMES.skill,
-            models.NAMES.story, models.NAMES.topic, models.NAMES.user]))
+            models.NAMES.question, models.NAMES.recommendations,
+            models.NAMES.skill, models.NAMES.story, models.NAMES.topic,
+            models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
@@ -1666,6 +1670,275 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
         return [cls._validate_topic_similarities]
 
 
+class SkillModelValidator(BaseModelValidator):
+    """Class for validating SkillModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return skill_services.get_skill_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        superseding_skill_ids = []
+        if item.superseding_skill_id:
+            superseding_skill_ids = [item.superseding_skill_id]
+        return {
+            'skill_commit_log_entry_ids': (
+                skill_models.SkillCommitLogEntryModel,
+                ['skill-%s-%s' % (item.id, version) for version in range(
+                    1, item.version + 1)]),
+            'skill_summary_ids': (
+                skill_models.SkillSummaryModel, [item.id]),
+            'skill_rights_ids': (
+                skill_models.SkillRightsModel, [item.id]),
+            'superseding_skill_ids': (
+                skill_models.SkillModel, superseding_skill_ids),
+            'snapshot_metadata_ids': (
+                skill_models.SkillSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_ids': (
+                skill_models.SkillSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+    @classmethod
+    def _validate_all_questions_merged(cls, item):
+        """Validate that all_questions_merged is True only if
+        superseding_skill_id is not None and there are no
+        questions linked with the skill. The superseding skill
+        id check is already performed in domain object validation,
+        so it is not repeated here.
+
+        Args:
+            item: ndb.Model. SkillModel to validate.
+        """
+        questions_ids_linked_with_skill = (
+            question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
+                item.id))
+        if item.all_questions_merged and questions_ids_linked_with_skill:
+            cls.errors['all questions merged check'].append(
+                'Entity id %s: all_questions_merged is True but there '
+                'are following question ids still linked to the skill: %s' % (
+                    item.id, questions_ids_linked_with_skill))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_all_questions_merged]
+
+
+class SkillSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating SkillSnapshotMetadataModel."""
+
+    related_model_name = 'skill'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return skill_domain.SkillChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_ids': (
+                skill_models.SkillModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_ids': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+
+class SkillSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating SkillSnapshotContentModel."""
+
+    related_model_name = 'skill'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_ids': (
+                skill_models.SkillModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+
+class SkillRightsModelValidator(BaseModelValidator):
+    """Class for validating SkillRightsModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'skill_ids': (
+                skill_models.SkillModel, [item.id]),
+            'creator_user_ids': (
+                user_models.UserSettingsModel, [item.creator_id]),
+            'snapshot_metadata_ids': (
+                skill_models.SkillRightsSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_ids': (
+                skill_models.SkillRightsSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+
+class SkillRightsSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating SkillRightsSnapshotMetadataModel."""
+
+    related_model_name = 'skill rights'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return skill_domain.SkillRightsChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_rights_ids': (
+                skill_models.SkillRightsModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_ids': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+
+class SkillRightsSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating SkillRightsSnapshotContentModel."""
+
+    related_model_name = 'skill rights'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_rights_ids': (
+                skill_models.SkillRightsModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+
+class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
+    """Class for validating SkillCommitLogEntryModel."""
+
+    related_model_name = 'skill'
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [skill/rights]-[skill_id]-[skill_version].
+        regex_string = '^(skill|rights)-%s-\\d*$' % (
+            item.skill_id)
+
+        return regex_string
+
+    @classmethod
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('rights'):
+            return skill_domain.SkillRightsChange
+        else:
+            return skill_domain.SkillChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        external_id_relationships = {
+            'skill_ids': (
+                skill_models.SkillModel, [item.skill_id]),
+        }
+        if item.id.startswith('rights'):
+            external_id_relationships['skill_rights_ids'] = (
+                skill_models.SkillRightsModel, [item.skill_id])
+        return external_id_relationships
+
+
+class SkillSummaryModelValidator(BaseSummaryModelValidator):
+    """Class for validating SkillSummaryModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return skill_services.get_skill_summary_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_ids': (
+                skill_models.SkillModel, [item.id]),
+            'skill_rights_ids': (
+                skill_models.SkillRightsModel, [item.id])
+        }
+
+    @classmethod
+    def _validate_misconception_count(cls, item):
+        """Validate that misconception_count of model is equal to
+        number of misconceptions in SkillModel.misconceptions.
+
+        Args:
+            item: ndb.Model. SkillSummaryModel to validate.
+        """
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        for (_, _, skill_model) in (
+                skill_model_class_model_id_model_tuples):
+            if item.misconception_count != len(skill_model.misconceptions):
+                cls.errors['misconception count check'].append((
+                    'Entity id %s: Misconception count: %s does not match '
+                    'the number of misconceptions in skill model: %s') % (
+                        item.id, item.misconception_count,
+                        skill_model.misconceptions))
+
+    @classmethod
+    def _validate_worked_examples_count(cls, item):
+        """Validate that worked examples count of model is equal to
+        number of misconceptions in SkillModel.skill_contents.worked_examples.
+
+        Args:
+            item: ndb.Model. SkillSummaryModel to validate.
+        """
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        for (_, _, skill_model) in (
+                skill_model_class_model_id_model_tuples):
+            if item.worked_examples_count != len(
+                    skill_model.skill_contents['worked_examples']):
+                cls.errors['worked examples count check'].append((
+                    'Entity id %s: Worked examples count: %s does not match '
+                    'the number of worked examples in skill_contents '
+                    'in skill model: %s') % (
+                        item.id, item.worked_examples_count,
+                        skill_model.skill_contents['worked_examples']))
+
+    @classmethod
+    def _get_related_model_properties(cls):
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        skill_model_properties_dict = {
+            'description': 'description',
+            'language_code': 'language_code',
+            'skill_model_created_on': 'created_on',
+            'skill_model_last_updated': 'last_updated'
+        }
+
+        return [(
+            'skill',
+            skill_model_class_model_id_model_tuples,
+            skill_model_properties_dict
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_misconception_count,
+            cls._validate_worked_examples_count
+            ]
+
+
 class StoryModelValidator(BaseModelValidator):
     """Class for validating StoryModel."""
 
@@ -2403,6 +2676,19 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ExplorationRecommendationsModelValidator),
     recommendations_models.TopicSimilaritiesModel: (
         TopicSimilaritiesModelValidator),
+    skill_models.SkillModel: SkillModelValidator,
+    skill_models.SkillSnapshotMetadataModel: (
+        SkillSnapshotMetadataModelValidator),
+    skill_models.SkillSnapshotContentModel: (
+        SkillSnapshotContentModelValidator),
+    skill_models.SkillRightsModel: SkillRightsModelValidator,
+    skill_models.SkillRightsSnapshotMetadataModel: (
+        SkillRightsSnapshotMetadataModelValidator),
+    skill_models.SkillRightsSnapshotContentModel: (
+        SkillRightsSnapshotContentModelValidator),
+    skill_models.SkillCommitLogEntryModel: (
+        SkillCommitLogEntryModelValidator),
+    skill_models.SkillSummaryModel: SkillSummaryModelValidator,
     story_models.StoryModel: StoryModelValidator,
     story_models.StorySnapshotMetadataModel: (
         StorySnapshotMetadataModelValidator),
@@ -2745,6 +3031,75 @@ class TopicSimilaritiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [recommendations_models.TopicSimilaritiesModel]
+
+
+class SkillModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillModel]
+
+
+class SkillSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillSnapshotMetadataModel]
+
+
+class SkillSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillSnapshotContentModel]
+
+
+class SkillRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillRightsModel]
+
+
+class SkillRightsSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillRightsSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillRightsSnapshotMetadataModel]
+
+
+class SkillRightsSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillRightsSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillRightsSnapshotContentModel]
+
+
+class SkillCommitLogEntryModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillCommitLogEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillCommitLogEntryModel]
+
+
+class SkillSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillSummaryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillSummaryModel]
 
 
 class StoryModelAuditOneOffJob(ProdValidationAuditOneOffJob):

@@ -434,21 +434,21 @@ def apply_change_list(skill_id, change_list, committer_id):
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 skill.add_misconception(change.new_value)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
-                skill.delete_misconception(change.misconception_id)
+                skill.delete_misconception(change.id)
             elif (change.cmd ==
                   skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
                 if (change.property_name ==
                         skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
                     skill.update_misconception_name(
-                        change.misconception_id, change.new_value)
+                        change.id, change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
                     skill.update_misconception_notes(
-                        change.misconception_id, change.new_value)
+                        change.id, change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
-                        change.misconception_id, change.new_value)
+                        change.id, change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
             elif (change.cmd ==
