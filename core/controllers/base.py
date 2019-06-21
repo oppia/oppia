@@ -37,6 +37,7 @@ import jinja_utils
 import utils
 
 from google.appengine.api import users
+from google.appengine.ext.webapp import template
 import webapp2
 
 app_identity_services = models.Registry.import_app_identity_services()
@@ -282,10 +283,9 @@ class BaseHandler(webapp2.RequestHandler):
             'attachment; filename=%s' % filename)
         self.response.write(values)
 
-    def render_static_template(self, filepath, iframe_restriction='DENY'):
-        """Prepares a Jinja-less HTML response to be sent to the client.
-           Args:
-            filepath: str. The template filepath.
+    def prepare_headers(self, iframe_restriction):
+        """Prepares the headers for a HTML response.
+        Args:
             iframe_restriction: str or None. Possible values are
                 'DENY' and 'SAMEORIGIN':
 
@@ -293,7 +293,6 @@ class BaseHandler(webapp2.RequestHandler):
                 SAMEORIGIN: The template can only be displayed in a frame
                     on the same origin as the page itself.
         """
-
         self.response.cache_control.no_cache = True
         self.response.cache_control.must_revalidate = True
         self.response.headers['Strict-Transport-Security'] = (
@@ -311,9 +310,23 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-        template = open(os.path.join(
-            feconf.FRONTEND_TEMPLATES_DIR, filepath), 'r')
-        self.response.write(template.read())
+
+    def render_static_template(self, filepath, iframe_restriction='DENY'):
+        """Prepares a Jinja-less HTML response to be sent to the client.
+        Args:
+            filepath: str. The template filepath.
+            iframe_restriction: str or None. Possible values are
+                'DENY' and 'SAMEORIGIN':
+
+                DENY: Strictly prevents the template to load in an iframe.
+                SAMEORIGIN: The template can only be displayed in a frame
+                    on the same origin as the page itself.
+        """
+        self.prepare_headers(iframe_restriction)
+
+        path = os.path.join(
+            feconf.FRONTEND_TEMPLATES_DIR, filepath)
+        self.response.out.write(template.render(path, None))
 
     def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
@@ -364,22 +377,7 @@ class BaseHandler(webapp2.RequestHandler):
             values['csrf_token'] = CsrfTokenManager.create_csrf_token(
                 self.user_id)
 
-        self.response.cache_control.no_cache = True
-        self.response.cache_control.must_revalidate = True
-        self.response.headers['Strict-Transport-Security'] = (
-            'max-age=31536000; includeSubDomains')
-        self.response.headers['X-Content-Type-Options'] = 'nosniff'
-        self.response.headers['X-Xss-Protection'] = '1; mode=block'
-
-        if iframe_restriction is not None:
-            if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = iframe_restriction
-            else:
-                raise Exception(
-                    'Invalid X-Frame-Options: %s' % iframe_restriction)
-
-        self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
-        self.response.pragma = 'no-cache'
+        self.prepare_headers(iframe_restriction)
 
         self.response.write(
             self.jinja2_env.get_template(filepath).render(**values))
