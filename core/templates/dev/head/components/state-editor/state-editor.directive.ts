@@ -20,9 +20,6 @@ require(
   'components/state-editor/state-content-editor/' +
   'state-content-editor.directive.ts');
 require(
-  'components/state-editor/state-editor-properties-services/' +
-  'state-solicit-answer-details.service.ts');
-require(
   'components/state-editor/state-hints-editor/state-hints-editor.directive.ts');
 require(
   'components/state-editor/state-interaction-editor/' +
@@ -41,6 +38,9 @@ require(
 require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts');
 
 oppia.directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

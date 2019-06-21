@@ -149,17 +149,12 @@ describe('ExplorationStatesService', function() {
     });
   });
 
-
-  it('solicit answer details value should be false', function() {
+  it('should save the solicitAnswerDetails correctly', function() {
     expect(
       ExplorationStatesService.getSolicitAnswerDetailsMemento(
         'Hola', 'solicit_answer_details')).toEqual(false);
-  });
-
-  it('save solicit answer details to true', function() {
     spyOn(ChangeListService, 'editStateProperty');
-    ExplorationStatesService.saveSolicitAnswerDetails(
-      'Hola', true);
+    ExplorationStatesService.saveSolicitAnswerDetails('Hola', true);
     expect(ChangeListService.editStateProperty).toHaveBeenCalledWith(
       'Hola', 'solicit_answer_details', true, false);
     expect(ExplorationStatesService.getSolicitAnswerDetailsMemento(

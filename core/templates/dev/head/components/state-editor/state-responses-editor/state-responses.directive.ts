@@ -90,16 +90,18 @@ oppia.directive('stateResponses', [
         'EditabilityService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
-        'UrlInterpolationService', 'INTERACTION_SPECS',
-        'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+        'UrlInterpolationService', 'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
+        'INTERACTION_SPECS', 'PLACEHOLDER_OUTCOME_DEST',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
             $filter, $rootScope, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
             EditabilityService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateSolicitAnswerDetailsService,
-            UrlInterpolationService, INTERACTION_SPECS,
-            PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
+            UrlInterpolationService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
+            INTERACTION_SPECS, PLACEHOLDER_OUTCOME_DEST,
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
@@ -208,8 +210,6 @@ oppia.directive('stateResponses', [
           $scope.onChangeSolicitAnswerDetails = function() {
             $scope.onSaveSolicitAnswerDetails(
               $scope.stateSolicitAnswerDetailsService.displayed);
-            StateSolicitAnswerDetailsService.displayed = (
-              $scope.stateSolicitAnswerDetailsService.displayed);
             StateSolicitAnswerDetailsService.saveDisplayedValue();
           };
 
@@ -255,7 +255,7 @@ oppia.directive('stateResponses', [
           $scope.isCurrentInteractionTrivial = function() {
             var interactionId = $scope.getCurrentInteractionId();
             if (
-              constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
+              INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
                 interactionId) >= 0) {
               return true;
             } else {

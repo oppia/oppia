@@ -1472,7 +1472,7 @@ class State(object):
                 'received %s' % self.solicit_answer_details)
         if self.solicit_answer_details:
             if self.interaction.id in (
-                    feconf.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
+                    constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
                 raise utils.ValidationError(
                     'The %s interaction does not support soliciting '
                     'answer details from learners.' % (self.interaction.id))
