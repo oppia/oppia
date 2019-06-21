@@ -816,32 +816,32 @@ def apply_change_list(exploration_id, change_list):
                         # Increment image_counter.
                         image_counter = exploration.image_counter
                         image_counter += 1
-                        if exploration.get_all_html_content_strings()[0] != '':
-                            # Find image_ids of newly added images.
-                            image_ids = (
-                                get_images_ids_of_exploration(exploration))
 
-                            # Adds a new image.
-                            image_re = r'(image_id_)+[0-9]'
-                            if not re.match(image_re, change.image_id):
-                                raise utils.ValidationError(
-                                    'Invalid image_id, received %s' % 
-                                    change.image_id)
-                            if not isinstance(change.image_info, dict):
-                                raise Exception(
-                                    'Expected image_info to be dict, '
-                                    'received %s' % change.image_info)
-                            if change.image_id not in image_ids:
-                                raise Exception(
-                                    'Image Id does not exist in exploration, '
-                                    'received image_id is %s' % change.image_id)
-                            expected_image_id = int(change.image_id.strip(
-                                'image_id_'))
-                            if expected_image_id > image_counter:
-                                raise Exception(
-                                    'Image Id is greater then image_id counter'
-                                    'not possible, received image_id is %s' %
-                                    change.image_id)
+                        # Find image_ids of newly added images.
+                        image_ids = (
+                            get_images_ids_of_exploration(exploration))
+
+                        # Adds a new image.
+                        image_re = r'(image_id_)+[0-9]'
+                        if not re.match(image_re, change.image_id):
+                            raise utils.ValidationError(
+                                'Invalid image_id, received %s' %
+                                change.image_id)
+                        if not isinstance(change.image_info, dict):
+                            raise Exception(
+                                'Expected image_info to be dict, '
+                                'received %s' % change.image_info)
+                        if change.image_id not in image_ids:
+                            raise Exception(
+                                'Image Id does not exist in exploration, '
+                                'received image_id is %s' % change.image_id)
+                        expected_image_id = int(change.image_id.strip(
+                            'image_id_'))
+                        if expected_image_id > image_counter:
+                            raise Exception(
+                                'Image Id is greater then image_id counter'
+                                'not possible, received image_id is %s' %
+                                change.image_id)
 
                         state.image_assets.add_image(
                             change.image_id, change.image_info)
@@ -1224,7 +1224,7 @@ def delete_image_from_exploration(exploration, image_id):
     """Deletes image from image assets.
 
     Args:
-        Exploration. The exploration domain object. results after
+        exploration: The exploration domain object. results after
             deleting an image.
         image_id: The id of an image to delete.
 
@@ -1250,7 +1250,7 @@ def clean_image_assets(exploration_before_change, exploration_after_change):
 
     Returns:
         exploration: the exploration that results after removing all images
-            from image assets
+            from image assets.
     """
     image_ids_before_change = (
         get_images_ids_of_exploration(exploration_before_change))
@@ -1329,9 +1329,6 @@ def update_exploration(
 
     discard_draft(exploration_id, committer_id)
     # Update summary of changed exploration.
-    print("        "*100)
-    print(exploration.to_dict())
-    print("        "*100)
     update_exploration_summary(exploration.id, committer_id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_edited_an_exploration(committer_id)
@@ -2048,6 +2045,7 @@ def get_user_exploration_data(
             exploration.correctness_feedback_enabled),
         'draft_change_list_id': draft_change_list_id,
         'exploration_id': exploration_id,
+        'image_counter': exploration.image_counter,
         'init_state_name': exploration.init_state_name,
         'language_code': exploration.language_code,
         'objective': exploration.objective,

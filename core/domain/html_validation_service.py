@@ -893,7 +893,7 @@ def get_image_ids_from_image_tag(html):
     image_ids = []
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
-        image_id = image['id-with-value']
+        image_id = json.loads(unescape_html(image['id-with-value']))
         image_ids.append(image_id)
 
     return image_ids

@@ -117,9 +117,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      * @param {string} strHtml - The string from which the object of
      *                           filepath should be extracted.
      */
-    var _extractFilepathValueFromOppiaNonInteractiveImageTag = function(
+    var _extractImageIdValueFromOppiaNonInteractiveImageTag = function(
         strHtml) {
-      var filenames = [];
+      var imageIds = [];
       var dummyElement = document.createElement('div');
       dummyElement.innerHTML = (
         HtmlEscaperService.escapedStrToUnescapedStr(strHtml));
@@ -131,11 +131,11 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         // But it actually contains the filename only. We use the variable
         // filename instead of filepath since in the end we are retrieving the
         // filenames in the exploration.
-        var filename = JSON.parse(
-          imageTagList[i].getAttribute('filepath-with-value'));
-        filenames.push(filename);
+        var imageId = JSON.parse(
+          imageTagList[i].getAttribute('id-with-value'));
+        imageIds.push(imageId);
       }
-      return filenames;
+      return imageIds;
     };
 
     /**
@@ -144,7 +144,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      *                         should be extracted.
      */
     var _getImageFilenamesInState = function(state) {
-      var filenamesInState = [];
+      var imageIdsInState = [];
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
@@ -155,8 +155,13 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       }
       var allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
-        filenamesInState = filenamesInState.concat(
-          _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+        imageIdsInState = imageIdsInState.concat(
+          _extractImageIdValueFromOppiaNonInteractiveImageTag(htmlStr));
+      });
+
+      var filenamesInState = [];
+      imageIdsInState.forEach(function(imageId) {
+        filenamesInState.push(state.image_assets.image_mapping[imageId]['src'])
       });
       return filenamesInState;
     };

@@ -167,12 +167,6 @@ class ExplorationHandler(EditorHandler):
                 self.user_id and not has_seen_editor_tutorial)
             exploration_data['show_state_translation_tutorial_on_load'] = (
                 self.user_id and not has_seen_translation_tutorial)
-
-            print("             "*100)
-            print(exploration_data)
-            print("keshav")
-            print("             "*100)
-
         except:
             raise self.PageNotFoundException
 

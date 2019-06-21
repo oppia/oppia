@@ -17,7 +17,6 @@
  * text components.
  */
 
-require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('components/state-editor/state-editor.directive.ts');
 require('rich_text_components/richTextComponentsRequires.ts');
 require('services/HtmlEscaperService.ts');
@@ -79,7 +78,6 @@ oppia.run([
                 customizationArgSpecs,
                 customizationArgs,
                 function(customizationArgsDict) {
-
                   // Adding imageId and removing filepath.
                   if (ckName === 'oppiaimage') {
                     var imageSrc = customizationArgsDict.filepath;
@@ -87,16 +85,16 @@ oppia.run([
                     // TODO: Generate image id.
                     var imageId = 'image_id_' + 1;
                     var image = {
-                      'image_id': imageId,
-                      'image_info': {
-                        'src': imageSrc,
-                        'placeholder': false,
-                        'instructions': ''
+                      image_id: imageId,
+                      image_info: {
+                        src: imageSrc,
+                        placeholder: false,
+                        instructions: ''
                       }
                     };
                     var stateName = StateEditorService.getActiveStateName();
-                    ExplorationStatesService.saveImage(stateName, image)
-                  };
+                    ExplorationStatesService.saveImage(stateName, image);
+                  }
 
                   for (var arg in customizationArgsDict) {
                     if (customizationArgsDict.hasOwnProperty(arg)) {
@@ -174,15 +172,14 @@ oppia.run([
               var that = this;
               // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
-
                 // Replacing filepath with image id.
                 if (ckName === 'oppiaimage' && spec.name === 'filepath') {
                   that.element.getChild(0).setAttribute(
                     'id-with-value',
                     HtmlEscaperService.objToEscapedJson(
-                     'image_id_1' || ''));
-                   return
-                };
+                      'image_id_1' || ''));
+                  return;
+                }
                 that.element.getChild(0).setAttribute(
                   spec.name + '-with-value',
                   HtmlEscaperService.objToEscapedJson(

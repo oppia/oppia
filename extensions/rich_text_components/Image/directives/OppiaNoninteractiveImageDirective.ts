@@ -30,12 +30,12 @@ require('services/HtmlEscaperService.ts');
 
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
-  'HtmlEscaperService', 'ImagePreloaderService', 'ExplorationStatesService',
-  'UrlInterpolationService', 'LOADING_INDICATOR_URL', 'StateEditorService',
+  'ExplorationStatesService', 'HtmlEscaperService', 'ImagePreloaderService',
+  'StateEditorService', 'UrlInterpolationService', 'LOADING_INDICATOR_URL',
   function(
       $rootScope, $sce, AssetsBackendApiService, ContextService,
-      HtmlEscaperService, ImagePreloaderService, ExplorationStatesService,
-      UrlInterpolationService, LOADING_INDICATOR_URL, StateEditorService) {
+      ExplorationStatesService, HtmlEscaperService, ImagePreloaderService,
+      StateEditorService, UrlInterpolationService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -46,15 +46,12 @@ oppia.directive('oppiaNoninteractiveImage', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.imageUrl = '';
-        var imageId = HtmlEscaperService.escapedJsonToObj(
+        ctrl.imageId = HtmlEscaperService.escapedJsonToObj(
           $attrs.idWithValue);
         ctrl.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
           LOADING_INDICATOR_URL);
         ctrl.isLoadingIndicatorShown = false;
         ctrl.isTryAgainShown = false;
-
-        var stateName = StateEditorService.getActiveStateName();
-        ctrl.filepath = ExplorationStatesService.getImagesource(stateName, imageId)
 
         if (ImagePreloaderService.inExplorationPlayer()) {
           ctrl.isLoadingIndicatorShown = true;
@@ -90,13 +87,12 @@ oppia.directive('oppiaNoninteractiveImage', [
           // preview mode. We don't have loading indicator or try again for
           // showing images in the exploration editor or in preview mode. So
           // we directly assign the url to the imageUrl.
+          var stateName = StateEditorService.getActiveStateName();
+          ctrl.filepath = (
+            ExplorationStatesService.getImagesource(stateName, ctrl.imageId));
           ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
             ContextService.getExplorationId(), ctrl.filepath);
         }
-
-        // Get filepath with the help of imageid.
-        // TODO: Get imgage filepath from image assets.
-
 
         ctrl.imageCaption = '';
         if ($attrs.captionWithValue) {

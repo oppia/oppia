@@ -139,7 +139,7 @@ class ExplorationChange(object):
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'state_name', 'old_state_name', 'new_state_name',
         'property_name', 'new_value', 'old_value', 'name', 'from_version',
-        'to_version', 'title', 'category'
+        'to_version', 'title', 'category', 'image_id', 'image_info', 'action'
     ]
 
     def __init__(self, change_dict):

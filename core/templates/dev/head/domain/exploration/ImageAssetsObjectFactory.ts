@@ -47,13 +47,12 @@ oppia.factory('ImageAssetsObjectFactory', [
     ImageAssets['createFromBackendDict'] = function(imageAssetsDict) {
     /* eslint-enable dot-notation */
       var imageMapping = {};
-      for (var imageId in imageAssetsDict.imageMapping) {
-        var imageDict = imageAssetsDict.imageMapping[imageId];
+      for (var imageId in imageAssetsDict.image_mapping) {
+        var imageDict = imageAssetsDict.image_mapping[imageId];
         var imageObject = (ImageObjectFactory.
           createFromBackendDict(imageDict));
         imageMapping[imageId] = imageObject;
       }
-
       return new ImageAssets(imageMapping);
     };
 

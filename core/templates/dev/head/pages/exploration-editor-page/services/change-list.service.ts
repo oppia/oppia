@@ -35,6 +35,7 @@ oppia.factory('ChangeListService', [
 
     // Temporary buffer for changes made to the exploration.
     var explorationChangeList = [];
+    var explorationChangeListForImages = [];
     // Stack for storing undone changes. The last element is the most recently
     // undone change.
     var undoneChangeStack = [];
@@ -113,6 +114,15 @@ oppia.factory('ChangeListService', [
       }
       explorationChangeList.push(changeDict);
       undoneChangeStack = [];
+
+      /**
+       * Adding image change objects in change list, after adding state
+       * change object. If we add image change object befre adding state
+       * change object, then it leads to validation error.
+       */
+      explorationChangeList = (
+        explorationChangeList.concat(explorationChangeListForImages));
+
       autosaveChangeListOnChange(explorationChangeList);
     };
 
@@ -235,14 +245,15 @@ oppia.factory('ChangeListService', [
         autosaveChangeListOnChange(explorationChangeList);
       },
       addImage: function(stateName, image) {
-        addChange({
+        var changeDict = {
           action: 'add_image',
           cmd: CMD_EDIT_STATE_PROPERTY,
           image_id: image.image_id,
           image_info: image.image_info,
           property_name: 'image_assets',
           state_name: stateName
-        });
+        };
+        explorationChangeListForImages.push(changeDict);
       }
     };
   }
