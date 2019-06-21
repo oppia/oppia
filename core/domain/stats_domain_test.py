@@ -1569,9 +1569,9 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
 
     def test_get_learner_answer_info_id(self):
         learner_answer_info_id = (
-            stats_domain.LearnerAnswerInfo.get_learner_answer_info_id(
-                'id.name', 'exploration'))
-        self.assertRegexpMatches(learner_answer_info_id, 'exploration.id.name')
+            stats_domain.LearnerAnswerInfo.get_learner_answer_info_id())
+        self.assertNotEqual(learner_answer_info_id, None)
+        self.assertEqual(isinstance(learner_answer_info_id, str), True)
 
     def test_id_must_be_string(self):
         self.learner_answer_info.id = 123

@@ -1163,8 +1163,7 @@ def record_learner_answer_info(
         learner_answer_details = stats_domain.LearnerAnswerDetails(
             state_reference, entity_type, interaction_id, [], 0)
     learner_answer_info_id = (
-        stats_domain.LearnerAnswerInfo.get_learner_answer_info_id(
-            state_reference, entity_type))
+        stats_domain.LearnerAnswerInfo.get_learner_answer_info_id())
     learner_answer_info = stats_domain.LearnerAnswerInfo(
         learner_answer_info_id, answer, answer_details,
         datetime.datetime.utcnow())
