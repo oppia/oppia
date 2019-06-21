@@ -30,9 +30,6 @@ import jinja_utils
 import utils
 
 
-def is_image_id_validated_correct(image_id):
-    pass
-
 class AnswerGroup(object):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These

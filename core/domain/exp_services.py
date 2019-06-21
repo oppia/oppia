@@ -846,7 +846,8 @@ def apply_change_list(exploration_id, change_list):
                             change.image_info['src'],
                             change.image_info['placeholder'],
                             change.image_info['instructions'])
-                        state.image_assets.add_image(image_object)
+                        state.image_assets.add_image(
+                            change.image_id, image_object)
                         exploration.update_image_counter(image_counter)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
