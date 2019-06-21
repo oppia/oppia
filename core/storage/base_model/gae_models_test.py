@@ -44,7 +44,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         self.assertIsNone(
             base_models.BaseModel.get('Invalid id', strict=False))
-    
+
     def test_base_model_export_data_raises_not_implemented_error(self):
         with self.assertRaises(NotImplementedError):
             base_models.BaseModel.export_data('user_id')
