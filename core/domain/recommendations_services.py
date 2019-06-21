@@ -191,7 +191,7 @@ def get_topic_similarities_as_csv():
     return output.getvalue()
 
 
-def _validate_topic_similarities(data):
+def validate_topic_similarities(data):
     """Validates topic similarities given by data, which should be a string
     of comma-separated values.
 
@@ -210,7 +210,9 @@ def _validate_topic_similarities(data):
 
     if len(topic_similarities_values) != topics_length:
         raise Exception(
-            'Length of topic similarities columns does not match topic list.')
+            'Length of topic similarities columns: %s '
+            'does not match length of topic list: %s.' % (
+                len(topic_similarities_values), topics_length))
 
     for topic in topics_list:
         if topic not in RECOMMENDATION_CATEGORIES:
@@ -219,7 +221,9 @@ def _validate_topic_similarities(data):
     for index, topic in enumerate(topics_list):
         if len(topic_similarities_values[index]) != topics_length:
             raise Exception(
-                'Length of topic similarities rows does not match topic list.')
+                'Length of topic similarities rows: %s '
+                'does not match length of topic list: %s.' % (
+                    len(topic_similarities_values[index]), topics_length))
 
     for row_ind in range(topics_length):
         for col_ind in range(topics_length):
@@ -254,7 +258,7 @@ def update_topic_similarities(data):
     similarities remain as the previous value or the default.
     """
 
-    _validate_topic_similarities(data)
+    validate_topic_similarities(data)
 
     data = data.splitlines()
     data = list(csv.reader(data))
