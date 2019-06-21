@@ -105,9 +105,9 @@ require(
   'components/state-directives/solution-editor/' +
   'solution-explanation-editor.directive.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');

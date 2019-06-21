@@ -16,6 +16,11 @@
  * @fileoverview Directive for the LogicProof short response.
  */
 
+require('filters/string-utility-filters/truncate-at-first-line.filter.ts');
+
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('oppiaShortResponseLogicProof', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for Image Click Input rules.
  */
 
+require(
+  'interactions/ImageClickInput/directives/ImageClickInputRulesService.ts');
+
 describe('Image Click Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 
