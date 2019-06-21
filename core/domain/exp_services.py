@@ -41,7 +41,6 @@ from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import fs_services
 from core.domain import html_cleaner
-from core.domain import html_validation_service
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -569,22 +568,6 @@ def get_top_rated_exploration_summaries(limit):
         exp_models.ExpSummaryModel.get_top_rated(limit))
 
 
-def get_images_ids_of_exploration(exploration):
-    """Returns a list of image_ids of newly images.
-
-    Args:
-        exploration: An exploration object..
-
-    Returns:
-        image_ids. List of ids, of all images present in an exploration.
-    """
-    exploration_html = exploration.get_all_html_content_strings()[0]
-    image_ids = (html_validation_service.get_image_ids_from_image_tag(
-        exploration_html))
-
-    return image_ids
-
-
 def get_deleted_images_ids(image_ids_after_change, image_ids_before_change):
     """Returns a list of image_ids of all deleted images.
 
@@ -819,7 +802,7 @@ def apply_change_list(exploration_id, change_list):
 
                         # Find image_ids of newly added images.
                         image_ids = (
-                            get_images_ids_of_exploration(exploration))
+                            exploration.get_images_ids_of_exploration())
 
                         # Adds a new image.
                         image_re = r'image_id_[0-9]{1,}$'
@@ -1223,54 +1206,6 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
             contributor, contribution_time_msec)
 
 
-def delete_image_from_exploration(exploration, image_id):
-    """Deletes image from image assets.
-
-    Args:
-        exploration: The exploration domain object. results after
-            deleting an image.
-        image_id: The id of an image to delete.
-
-    Returns:
-        Exploration. The exploration domain object.
-    """
-    for state in exploration.states.itervalues():
-        if image_id in state.image_assets.image_mapping:
-            state.image_assets.delete_image(image_id)
-            break
-
-    return exploration
-
-
-def clean_image_assets(exploration_before_change, exploration_after_change):
-    """Rempve all deleted images from image assests.
-
-    Args:
-        exploration_before_change: The exploration domain object that results
-            before applying any change command.
-        exploration_after_change: The exploration domain object that results
-            after applying any change command.
-
-    Returns:
-        exploration: the exploration that results after removing all images
-            from image assets.
-    """
-    image_ids_before_change = (
-        get_images_ids_of_exploration(exploration_before_change))
-    image_ids_after_change = (
-        get_images_ids_of_exploration(exploration_after_change))
-
-    deleted_image_ids = get_deleted_images_ids(
-        image_ids_after_change, image_ids_before_change)
-
-    exploration = copy.deepcopy(exploration_after_change)
-    if deleted_image_ids != []:
-        for image_id in deleted_image_ids:
-            delete_image_from_exploration(exploration, image_id)
-
-    return exploration
-
-
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
         is_suggestion=False, is_by_voice_artist=False):
@@ -1322,12 +1257,10 @@ def update_exploration(
             'Commit messages for non-suggestions may not start with \'%s\'' %
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
-    exploration_before_change = get_exploration_by_id(exploration_id)
-    exploration_after_change = apply_change_list(exploration_id, change_list)
+    exploration = apply_change_list(exploration_id, change_list)
 
     # Removing images from image assets, which gets deleted.
-    exploration = (
-        clean_image_assets(exploration_before_change, exploration_after_change))
+    exploration.clean_image_assets()
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)

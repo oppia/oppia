@@ -537,7 +537,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             self.editor_id, self.EXP_ID, change_list, 'one commit')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        image_ids = exp_services.get_images_ids_of_exploration(exploration)
+        image_ids = exploration.get_images_ids_of_exploration()
         expected_image_ids_list = ['image_id_1']
         self.assertEqual(expected_image_ids_list, image_ids)
 

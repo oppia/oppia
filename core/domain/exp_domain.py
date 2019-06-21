@@ -2250,11 +2250,15 @@ class Exploration(object):
         in state model. This funtion is extracting HTMl of state and do 3
         operations on each HTML content. The 3 operations and their sequence
         were.
-        1) Add image_id in each image tag present in the HTML.
-        2) Extract image info of each image from HTML.
-        3) Remove filepath of each image present in the HTML.
+        1) Gets image src of all images present in a state.
+        2) Assign each image source an image id or say maps each image id with
+           the image source in image info dict.
+        3) Give each image tag an image id with the help of image source, and
+           removes filepath from it.
+        After the above 3 operations each image info present in image dict is
+        added to image assets.
 
-         Args:
+        Args:
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
@@ -2269,10 +2273,20 @@ class Exploration(object):
             image_info_dict_1 = {}
             image_info_dict_2 = {}
             image_src_list = []
+            # After extracting image source of each image, we assign image id
+            # to image tag present in html in image_info_dict_1. And we find
+            # image id of image tag with the help of image source. But there is
+            # chance that we have same image source for more then one image id,
+            # which can leads to return same and one image id for same source.
+            # So to overcome this, after assigning image id to image tag, we
+            # remove image id from image_info_dict_1 and add it to
+            # image_info_dict_2 so that we can add image info in image assets
+            # and image_info_dict_1 doesn't return same and one image_id for
+            # same image src.
 
 
-            # Adding image_id, getting image info and removing filepath from
-            # image tag present in state content.
+            # Gets image source, maps image source with image id in image info
+            # dict and give each image id to each image present in content html.
             content_html = state_dict['content']['html']
             image_src_list = image_src_list + (
                 html_validation_service.get_image_src_from_html(
@@ -2290,8 +2304,9 @@ class Exploration(object):
                     content_html, image_info_dict_1, image_info_dict_2))
 
 
-            # Adding image_id, getting image info and removing filepath from
-            # image tag present in state interaction.
+            # Gets image source, maps image source with image id in image info
+            # dict and give each image id to each image present in default
+            # interaction html.
             if state_dict['interaction']['default_outcome']:
                 interaction_feedback_html = state_dict[
                     'interaction']['default_outcome']['feedback']['html']
@@ -2314,8 +2329,9 @@ class Exploration(object):
                             image_info_dict_2))
 
 
-            # Adding image_id, getting image info and removing filepath from
-            # image tag present in state interaction answer_groups.
+            # Gets image source, maps image source with image id in image info
+            # dict and give each image id to each image present in answer
+            # interaction html.
             for answer_group_index, answer_group in enumerate(
                     state_dict['interaction']['answer_groups']):
                 answer_group_html = answer_group['outcome']['feedback']['html']
@@ -2359,8 +2375,9 @@ class Exploration(object):
                                             x, image_info_dict_1, image_info_dict_2))
 
 
-            # Adding image_id, getting image info and removing filepath from
-            # image tag present in hint interaction.
+            # Gets image source, maps image source with image id in image info
+            # dict and give each image id to each image present in hints
+            # interaction html.
             for hint_index, hint in enumerate(
                     state_dict['interaction']['hints']):
                 # Adding image.
@@ -2382,8 +2399,9 @@ class Exploration(object):
                             hint_html, image_info_dict_1, image_info_dict_2))
 
 
-            # Adding image_id, getting image info and removing filepath from
-            # image tag present in solution interaction.
+            # Gets image source, maps image source with image id in image info
+            # dict and give each image id to each image present in solution
+            # interaction html.
             if state_dict['interaction']['solution']:
                 solution_html = state_dict[
                     'interaction']['solution']['explanation']['html']
@@ -2404,8 +2422,9 @@ class Exploration(object):
                         solution_html, image_info_dict_1, image_info_dict_2))
 
 
-            # Adding image_id, getting image info and removing filepath from
-            # image tag present in following given below interactions.
+            # Gets image source, maps image source with image id in image info
+            # dict and give each image id to each image present in respective
+            # given below interactions html.
             if state_dict['interaction']['id'] in (
                     'MultipleChoiceInput', 'DragAndDropSortInput'):
                 for value_index, value in enumerate(
@@ -2429,9 +2448,9 @@ class Exploration(object):
                                 value, image_info_dict_1, image_info_dict_2))
 
             # Add image info in image assets.
-            for _id in image_info_dict_2:
-                filepath = image_info_dict_2[_id]
-                image_mapping[_id] = {
+            for image_id in image_info_dict_2:
+                filepath = image_info_dict_2[image_id]
+                image_mapping[image_id] = {
                     'instructions': '',
                     'placeholder': False,
                     'src': filepath,
@@ -3519,6 +3538,31 @@ class Exploration(object):
             image_src_list_counter += 1
 
         return image_info_dict_1
+
+    def get_images_ids_of_exploration(self):
+        """Returns a list off ids, of all images present in an exploration.
+
+        Returns:
+            image_ids. List of ids, of all images present in an exploration.
+        """
+        exploration_html = self.get_all_html_content_strings()[0]
+        image_ids = (
+            html_validation_service.get_image_ids_from_image_tag(
+                exploration_html))
+
+        return image_ids
+
+    def clean_image_assets(self):
+        """Remove all deleted images from image assests."""
+        image_ids_in_html = self.get_images_ids_of_exploration()
+
+        for state in self.states.values():
+            image_ids = state.image_assets.image_mapping.keys()
+            for image_id in image_ids:
+                if image_id not in image_ids_in_html:
+                    del state.image_assets.image_mapping[image_id]
+
+        return
 
 
 class ExplorationSummary(object):
