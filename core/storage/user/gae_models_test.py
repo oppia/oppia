@@ -18,7 +18,6 @@
 
 import datetime
 
-from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -120,10 +119,10 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_data['last_started_state_translation_tutorial'])
         self.assertEqual(self.generic_date, user_data['last_logged_in'])
         self.assertEqual(
-            self.generic_date, 
+            self.generic_date,
             user_data['last_edited_an_exploration'])
         self.assertEqual(
-            self.generic_image_url, 
+            self.generic_image_url,
             user_data['profile_picture_data_url'])
         self.assertEqual('learner', user_data['default_dashboard'])
         self.assertEqual(
@@ -131,17 +130,17 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_data['creator_dashboard_display_pref'])
         self.assertEqual(self.generic_user_bio, user_data['user_bio'])
         self.assertEqual(
-            self.generic_subject_interests, 
+            self.generic_subject_interests,
             user_data['subject_interests'])
         self.assertEqual(1, user_data['first_contribution_msec'])
         self.assertEqual(
-            self.generic_language_codes, 
+            self.generic_language_codes,
             user_data['preferred_language_codes'])
         self.assertEqual(
-            self.generic_language_codes[0], 
+            self.generic_language_codes[0],
             user_data['preferred_site_language_code'])
         self.assertEqual(
-            self.generic_language_codes[0], 
+            self.generic_language_codes[0],
             user_data['preferred_audio_language_code'])
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
