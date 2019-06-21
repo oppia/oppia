@@ -48,8 +48,7 @@
          ng-href="<[$ctrl.getExplorationUrl(node.getExplorationId())]>"
          ng-style="{position: 'absolute', left: '<[$ctrl.pathIconParameters[$index].left]>', top: '<[$ctrl.pathIconParameters[$index].top]>'}">
 
-        <div style="width: 160px;position: absolute;left: <[$ctrl.getExplorationTitlePosition($index)]>;color: #006553;font-family : Capriola, Roboto, Arial,sans-serif;font-size: 18px;bottom: 65%;
-        ">
+        <div ng-style="{width: '160px',position: 'absolute',left: '<[$ctrl.getExplorationTitlePosition($index)]>',color: '#006553','font-family': 'Capriola, Roboto, Arial,sans-serif','font-size': '18px',bottom: '65%'}">
           {{node._explorationSummaryObject.title}}
         </div>
 
@@ -119,7 +118,7 @@
       <img ng-src="<[$ctrl.getStaticImageUrl('/general/collection_mascot.svg')]>" class="mobile-lesson-icon">
       <div class="mobile-path-segment" ng-repeat="node in $ctrl.collection.getCollectionNodes()" id="mobile-path-anchor-<[$index]>">
         <a href="" style="position: absolute; left: 50%; transform: translate(-50%, 195px); z-index: 1;text-align: center">
-          <div ng-style="{color:'#006553','font-size':'20px'}">{{node._explorationSummaryObject.title}}</div>
+          <div style="color:'#006553';'font-size':'20px';">{{node._explorationSummaryObject.title}}</div>
           <svg class="protractor-mobile-test-collection-exploration"
                width="100"
                height="150"
