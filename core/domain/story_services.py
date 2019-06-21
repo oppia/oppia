@@ -285,6 +285,8 @@ def apply_change_list(story_id, change_list):
     story = get_story_by_id(story_id)
     try:
         for change in change_list:
+            if not isinstance(change, story_domain.StoryChange):
+                raise Exception('Expected change to be of type StoryChange')
             if change.cmd == story_domain.CMD_ADD_STORY_NODE:
                 story.add_node(change.node_id, change.title)
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
@@ -318,8 +320,6 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
                     story.update_node_exploration_id(
                         change.node_id, change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
@@ -333,14 +333,10 @@ def apply_change_list(story_id, change_list):
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_LANGUAGE_CODE):
                     story.update_language_code(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
                     story.update_initial_node(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -349,8 +345,6 @@ def apply_change_list(story_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # story is sufficient to apply the schema migration.
                 continue
-            else:
-                raise Exception('Invalid change dict.')
         return story
 
     except Exception as e:
@@ -402,20 +396,19 @@ def _save_story(committer_id, story, commit_message, change_list):
                 'but found an exploration with ID: %s (was it deleted?)' %
                 node.exploration_id)
 
-    story_model = story_models.StoryModel.get(story.id, strict=False)
-    if story_model is None:
-        story_model = story_models.StoryModel(id=story.id)
-    else:
-        if story.version > story_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of story '
-                'from version %s. Please reload the page and try again.'
-                % (story_model.version, story.version))
-        elif story.version < story_model.version:
-            raise Exception(
-                'Trying to update version %s of story from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (story_model.version, story.version))
+    # Story model cannot be None as story is passed as parameter here and that
+    # is only possible if a story model with that story id exists.
+    story_model = story_models.StoryModel.get(story.id)
+    if story.version > story_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of story '
+            'from version %s. Please reload the page and try again.'
+            % (story_model.version, story.version))
+    elif story.version < story_model.version:
+        raise Exception(
+            'Trying to update version %s of story from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (story_model.version, story.version))
 
     topic = topic_services.get_topic_by_id(
         story.corresponding_topic_id, strict=False)
@@ -604,30 +597,6 @@ def get_latest_completed_node_ids(user_id, story_id):
     return ordered_completed_node_ids[-num_of_nodes:]
 
 
-def get_node_ids_completed_in_stories(user_id, story_ids):
-    """Returns the ids of the nodes completed in each of the stories.
-
-    Args:
-        user_id: str. ID of the given user.
-        story_ids: list(str). IDs of the stories.
-
-    Returns:
-        dict(str, list(str)). Dict of the story id and the node ids completed
-            in each story as key-value pairs.
-    """
-    progress_models = user_models.StoryProgressModel.get_multi(
-        user_id, story_ids)
-
-    node_ids_completed_in_stories = {}
-
-    for progress_model in progress_models:
-        if progress_model is not None:
-            node_ids_completed_in_stories[progress_model.story_id] = (
-                progress_model.completed_node_ids)
-
-    return node_ids_completed_in_stories
-
-
 def get_completed_nodes_in_story(user_id, story_id):
     """Returns nodes that are completed in a story
 
@@ -736,11 +705,13 @@ def publish_story(story_id, committer_id):
                     'Story node with id %s does not contain an '
                     'exploration id.' % node.id)
             exploration_id_list.append(node.exploration_id)
-        for exploration in exp_services.get_multiple_explorations_by_id(
-                exploration_id_list):
+        for index, exploration in enumerate(
+                exp_services.get_multiple_explorations_by_id(
+                    exploration_id_list, strict=False)):
             if exploration is None:
                 raise Exception(
-                    'Exploration id %s doesn\'t exist.' % exploration.id)
+                    'Exploration id %s doesn\'t exist.'
+                    % exploration_id_list[index])
         multiple_exploration_rights = (
             rights_manager.get_multiple_exploration_rights_by_ids(
                 exploration_id_list))
