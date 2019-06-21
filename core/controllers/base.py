@@ -302,7 +302,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = iframe_restriction
+                self.response.headers['X-Frame-Options'] = str(
+                    iframe_restriction)
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
