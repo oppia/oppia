@@ -326,7 +326,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         path = os.path.join(
             feconf.FRONTEND_TEMPLATES_DIR, filepath)
-        self.response.out.write(template.render(path, None))
+        self.response.write(template.render(path, None))
 
     def render_template(self, filepath, iframe_restriction='DENY'):
         """Prepares an HTML response to be sent to the client.
