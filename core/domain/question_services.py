@@ -61,7 +61,7 @@ def _migrate_state_schema(versioned_question_state):
         state_schema_version += 1
 
 
-def _create_new_question(committer_id, question, commit_message):
+def create_new_question(committer_id, question, commit_message):
     """Creates a new question.
 
     Args:
@@ -275,7 +275,7 @@ def add_question(committer_id, question):
         question: Question. Question to be saved.
     """
     commit_message = 'New question created'
-    _create_new_question(committer_id, question, commit_message)
+    create_new_question(committer_id, question, commit_message)
 
 
 def delete_question(
@@ -295,6 +295,13 @@ def delete_question(
     question_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
         force_deletion=force_deletion)
+    question_rights_model = question_models.QuestionRightsModel.get(
+        question_id)
+    question_rights_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
+        force_deletion=force_deletion)
+
+    question_models.QuestionSummaryModel.get(question_id).delete()
 
 
 def get_question_from_model(question_model):

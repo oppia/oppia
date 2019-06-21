@@ -17,7 +17,9 @@
 """Domain objects relating to questions."""
 
 from constants import constants
+from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import state_domain
 from core.platform import models
@@ -48,73 +50,58 @@ CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 CMD_CREATE_NEW = 'create_new'
 
 
-class QuestionChange(object):
-    """Domain object for changes made to question object."""
+class QuestionChange(change_domain.BaseChange):
+    """Domain object for changes made to question object.
+
+    The allowed commands, together with the attributes:
+        - 'create_new'
+        - 'update question property' (with property_name, new_value
+        and old_value)
+        - 'create_new_fully_specified_question' (with question_dict,
+        skill_id)
+        - 'migrate_state_schema_to_latest_version' (with from_version
+        and to_version)
+    """
+
+    # The allowed list of question properties which can be used in
+    # update_question_property command.
     QUESTION_PROPERTIES = (
         QUESTION_PROPERTY_QUESTION_STATE_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE,
         QUESTION_PROPERTY_LINKED_SKILL_IDS)
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'question_dict',
-        'skill_id', 'from_version', 'to_version'
-    ]
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_UPDATE_QUESTION_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': QUESTION_PROPERTIES}
+    }, {
+        'name': CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
+        'required_attribute_names': ['question_dict', 'skill_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }]
 
-    def __init__(self, change_dict):
-        """Initialize a QuestionChange object from a dict.
 
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'update question property' (with property_name, new_value
-                and old_value)
-                - 'create_new_fully_specified_question' (with question_dict,
-                skill_id)
-                - 'migrate_state_schema_to_latest_version' (with from_version
-                and to_version)
+class QuestionRightsChange(change_domain.BaseChange):
+    """Domain object for changes made to question rights object.
 
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
+    The allowed commands, together with the attributes:
+        - 'create_new'.
+    """
 
-        if self.cmd == CMD_UPDATE_QUESTION_PROPERTY:
-            if (change_dict['property_name'] in
-                    self.QUESTION_PROPERTIES):
-                self.property_name = change_dict['property_name']
-                self.new_value = change_dict['new_value']
-                self.old_value = change_dict['old_value']
-            else:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-        elif self.cmd == CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION:
-            self.question_dict = change_dict['question_dict']
-            # Note that change_dict['skill_id'] may be None if this change is
-            # being done in the context of a suggestion.
-            self.skill_id = change_dict['skill_id']
-        elif self.cmd == CMD_MIGRATE_STATE_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the QuestionChange domain object.
-
-        Returns:
-            A dict, mapping all fields of QuestionChange instance.
-        """
-        question_change_dict = {}
-        question_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                question_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return question_change_dict
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }]
 
 
 class Question(object):
@@ -432,6 +419,28 @@ class QuestionSummary(object):
             'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
             'created_on_msec': utils.get_time_in_millisecs(self.created_on)
         }
+
+    def validate(self):
+        """Validates the Question summary domain object before it is saved.
+
+        Raises:
+            ValidationError: One or more attributes of question summary are
+                invalid.
+        """
+        err_dict = html_validation_service.validate_rte_format(
+            [self.question_content], feconf.RTE_FORMAT_CKEDITOR)
+        for key in err_dict:
+            if err_dict[key]:
+                raise utils.ValidationError(
+                    'Invalid html: %s for rte with invalid tags and '
+                    'strings: %s' % (self.question_content, err_dict))
+
+        err_dict = html_validation_service.validate_customization_args([
+            self.question_content])
+        if err_dict:
+            raise utils.ValidationError(
+                'Invalid html: %s due to errors in customization_args: %s' % (
+                    self.question_content, err_dict))
 
 
 class QuestionSkillLink(object):

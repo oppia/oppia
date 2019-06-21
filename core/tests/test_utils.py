@@ -1855,7 +1855,7 @@ class AppEngineTestBase(TestBase):
             'correct_answer': 'Solution',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'This is a solution.'
+                'html': '<p>This is a solution.</p>'
             }
         }
         hints_list = [{
