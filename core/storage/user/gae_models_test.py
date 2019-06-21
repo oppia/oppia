@@ -143,6 +143,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             self.generic_language_codes[0],
             user_data['preferred_audio_language_code'])
 
+
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     """Tests for ExpUserLastPlaythroughModel class."""
 
