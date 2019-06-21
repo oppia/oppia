@@ -824,13 +824,12 @@ tags: []
 
     def get_csrf_token(self):
         """Generates CSRF token for test."""
-        return self.get_csrf_token_for_id(
+        if self.get_current_logged_in_user_id() == '':
+            return base.CsrfTokenManager.create_csrf_token(
+                ('non_logged_in_user'))
+
+        return base.CsrfTokenManager.create_csrf_token(
             self.get_current_logged_in_user_id())
-
-    def get_csrf_token_for_id(self, id):
-        """Generates CSRF token for specific id."""
-        return base.CsrfTokenManager.create_csrf_token(id)
-
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.

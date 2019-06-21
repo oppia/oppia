@@ -95,8 +95,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_post_with_incorrect_list_of_skill_ids_returns_400(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
         incorrect_skill_id = [1, 2]
         self.post_json(
             '%s/%s' % (feconf.NEW_QUESTION_URL, incorrect_skill_id),
@@ -105,8 +104,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_post_with_incorrect_type_of_skill_ids_returns_400(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token()
         incorrect_skill_id = 1
         self.post_json(
             '%s/%s' % (feconf.NEW_QUESTION_URL, incorrect_skill_id),
