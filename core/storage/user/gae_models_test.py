@@ -50,25 +50,26 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             email=self.user2_email, role=self.user2_role).put()
         user_models.UserSettingsModel(
             email=self.user3_email, role=self.user3_role).put()
-        user_models.UserSettingsModel(id=self.user3_id,
-                                      email=self.user3_email,
-                                      role=self.user3_role,
-                                      username=self.generic_username,
-                                      normalized_username=self.generic_username,
-                                      last_agreed_to_terms=self.generic_date,
-                                      last_started_state_editor_tutorial=self.generic_date,
-                                      last_started_state_translation_tutorial=self.generic_date,
-                                      last_logged_in=self.generic_date,
-                                      last_created_an_exploration=self.generic_date,
-                                      last_edited_an_exploration=self.generic_date,
-                                      profile_picture_data_url=self.generic_image_url,
-                                      default_dashboard='learner', creator_dashboard_display_pref='card',
-                                      user_bio=self.generic_user_bio,
-                                      subject_interests=self.generic_subject_interests,
-                                      first_contribution_msec=1, 
-                                      preferred_language_codes=self.generic_language_codes,
-                                      preferred_site_language_code=(self.generic_language_codes[0]),
-                                      preferred_audio_language_code=(self.generic_language_codes[0])
+        user_models.UserSettingsModel(
+            id=self.user3_id,
+            email=self.user3_email,
+            role=self.user3_role,
+            username=self.generic_username,
+            normalized_username=self.generic_username,
+            last_agreed_to_terms=self.generic_date,
+            last_started_state_editor_tutorial=self.generic_date,
+            last_started_state_translation_tutorial=self.generic_date,
+            last_logged_in=self.generic_date,
+            last_created_an_exploration=self.generic_date,
+            last_edited_an_exploration=self.generic_date,
+            profile_picture_data_url=self.generic_image_url,
+            default_dashboard='learner', creator_dashboard_display_pref='card',
+            user_bio=self.generic_user_bio,
+            subject_interests=self.generic_subject_interests,
+            first_contribution_msec=1, 
+            preferred_language_codes=self.generic_language_codes,
+            preferred_site_language_code=(self.generic_language_codes[0]),
+            preferred_audio_language_code=(self.generic_language_codes[0])
         ).put()
 
     def test_get_by_role(self):
