@@ -20,40 +20,12 @@ require('domain/utilities/StopwatchObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('services/ContextService.ts');
 require('services/MessengerService.ts');
 require('services/PlaythroughService.ts');
 require('services/SiteAnalyticsService.ts');
 
-oppia.constant('STATS_EVENT_TYPES', {
-  EVENT_TYPE_START_EXPLORATION: 'start',
-  EVENT_TYPE_ACTUAL_START_EXPLORATION: 'actual_start',
-  EVENT_TYPE_COMPLETE_EXPLORATION: 'complete',
-  EVENT_TYPE_STATE_HIT: 'state_hit',
-  EVENT_TYPE_STATE_COMPLETED: 'state_complete',
-  EVENT_TYPE_ANSWER_SUBMITTED: 'answer_submitted',
-  EVENT_TYPE_SOLUTION_HIT: 'solution_hit',
-  EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP: 'leave_for_refresher_exp',
-});
-
-oppia.constant('STATS_REPORTING_URLS', {
-  ANSWER_SUBMITTED: '/explorehandler/answer_submitted_event/<exploration_id>',
-  EXPLORATION_COMPLETED: (
-    '/explorehandler/exploration_complete_event/<exploration_id>'),
-  EXPLORATION_MAYBE_LEFT: (
-    '/explorehandler/exploration_maybe_leave_event/<exploration_id>'),
-  EXPLORATION_STARTED: (
-    '/explorehandler/exploration_start_event/<exploration_id>'),
-  STATE_HIT: '/explorehandler/state_hit_event/<exploration_id>',
-  STATE_COMPLETED: '/explorehandler/state_complete_event/<exploration_id>',
-  EXPLORATION_ACTUALLY_STARTED: (
-    '/explorehandler/exploration_actual_start_event/<exploration_id>'),
-  SOLUTION_HIT: '/explorehandler/solution_hit_event/<exploration_id>',
-  LEAVE_FOR_REFRESHER_EXP: (
-    '/explorehandler/leave_for_refresher_exp_event/<exploration_id>'),
-  STATS_EVENTS: '/explorehandler/stats_events/<exploration_id>'
-});
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
@@ -76,6 +48,10 @@ oppia.factory('StatsReportingService', [
     var explorationStarted = false;
     var explorationActuallyStarted = false;
     var explorationIsComplete = false;
+    var currentStateName = null;
+    var nextExpId = null;
+    var previousStateName = null;
+    var nextStateName = null;
 
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var _questionPlayerMode = ContextService.isInQuestionPlayerMode();
@@ -111,10 +87,29 @@ oppia.factory('StatsReportingService', [
     };
 
     var getFullStatsUrl = function(urlIdentifier) {
-      return UrlInterpolationService.interpolateUrl(
-        STATS_REPORTING_URLS[urlIdentifier], {
-          exploration_id: explorationId
-        });
+      try {
+        return UrlInterpolationService.interpolateUrl(
+          STATS_REPORTING_URLS[urlIdentifier], {
+            exploration_id: explorationId
+          });
+      } catch (e) {
+        var additionalInfo = ('\nUndefined exploration id error debug logs:' +
+          '\nThe event being recorded: ' + urlIdentifier +
+          '\nExploration ID: ' + ContextService.getExplorationId()
+        );
+        if (currentStateName) {
+          additionalInfo += ('\nCurrent State name: ' + currentStateName);
+        }
+        if (nextExpId) {
+          additionalInfo += ('\nRefresher exp id: ' + nextExpId);
+        }
+        if (previousStateName && nextStateName) {
+          additionalInfo += ('\nOld State name: ' + previousStateName +
+            '\nNew State name: ' + nextStateName);
+        }
+        e.message += additionalInfo;
+        throw e;
+      }
     };
 
     if (!_editorPreviewMode && !_questionPlayerMode ) {
@@ -162,6 +157,7 @@ oppia.factory('StatsReportingService', [
 
         postStatsToBackend();
 
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
           params: params,
           session_id: sessionId,
@@ -194,6 +190,7 @@ oppia.factory('StatsReportingService', [
           return;
         }
         aggregatedStats.num_actual_starts += 1;
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('EXPLORATION_ACTUALLY_STARTED'), {
           exploration_version: explorationVersion,
           state_name: stateName,
@@ -209,7 +206,7 @@ oppia.factory('StatsReportingService', [
         }
         aggregatedStats.state_stats_mapping[
           stateName].num_times_solution_viewed += 1;
-
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('SOLUTION_HIT'), {
           exploration_version: explorationVersion,
           state_name: stateName,
@@ -218,6 +215,8 @@ oppia.factory('StatsReportingService', [
         });
       },
       recordLeaveForRefresherExp: function(stateName, refresherExpId) {
+        currentStateName = stateName;
+        nextExpId = refresherExpId;
         $http.post(getFullStatsUrl('LEAVE_FOR_REFRESHER_EXP'), {
           exploration_version: explorationVersion,
           refresher_exp_id: refresherExpId,
@@ -238,6 +237,8 @@ oppia.factory('StatsReportingService', [
             newStateName].first_hit_count += 1;
         }
 
+        previousStateName = oldStateName;
+        nextStateName = newStateName;
         $http.post(getFullStatsUrl('STATE_HIT'), {
           // This is the time spent since the last submission.
           client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
@@ -270,6 +271,7 @@ oppia.factory('StatsReportingService', [
         }
         aggregatedStats.state_stats_mapping[stateName].num_completions += 1;
 
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('STATE_COMPLETED'), {
           exp_version: explorationVersion,
           state_name: stateName,
@@ -279,6 +281,7 @@ oppia.factory('StatsReportingService', [
       },
       recordExplorationCompleted: function(stateName, params) {
         aggregatedStats.num_completions += 1;
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('EXPLORATION_COMPLETED'), {
           client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
           collection_id: optionalCollectionId,
@@ -313,6 +316,7 @@ oppia.factory('StatsReportingService', [
           aggregatedStats.state_stats_mapping[
             stateName].useful_feedback_count += 1;
         }
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('ANSWER_SUBMITTED'), {
           answer: answer,
           params: params,
@@ -326,6 +330,7 @@ oppia.factory('StatsReportingService', [
         });
       },
       recordMaybeLeaveEvent: function(stateName, params) {
+        currentStateName = stateName;
         $http.post(getFullStatsUrl('EXPLORATION_MAYBE_LEFT'), {
           client_time_spent_in_secs: stateStopwatch.getTimeInSecs(),
           collection_id: optionalCollectionId,

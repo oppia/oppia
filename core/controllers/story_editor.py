@@ -134,15 +134,6 @@ class EditableStoryDataHandler(base.BaseHandler):
         if story is None:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException
-
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
-
         story_services.delete_story(self.user_id, story_id)
 
         self.render_json(self.values)

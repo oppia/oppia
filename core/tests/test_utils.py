@@ -366,6 +366,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -396,6 +397,7 @@ states:
       voiceovers_mapping:
         content: {}
         default_outcome: {}
+    solicit_answer_details: false
     written_translations:
       translations_mapping:
         content: {}
@@ -1269,8 +1271,8 @@ tags: []
         rights_manager.publish_collection(committer, collection_id)
 
     def save_new_story(
-            self, story_id, owner_id, title,
-            description, notes,
+            self, story_id, owner_id, title, description, notes,
+            corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
@@ -1281,13 +1283,16 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
 
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story.create_default_story(story_id, title)
+        story = story_domain.Story.create_default_story(
+            story_id, title, corresponding_topic_id)
         story.title = title
         story.description = description
         story.notes = notes
@@ -1297,6 +1302,7 @@ tags: []
 
     def save_new_story_with_story_contents_schema_v1(
             self, story_id, owner_id, title, description, notes,
+            corresponding_topic_id,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new skill with a default version 1 story contents
         data dictionary.
@@ -1317,6 +1323,8 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
+            corresponding_topic_id: str. The id of the topic to which the story
+                belongs.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
         """
@@ -1327,6 +1335,7 @@ tags: []
             language_code=language_code,
             story_contents_schema_version=1,
             notes=notes,
+            corresponding_topic_id=corresponding_topic_id,
             story_contents=self.VERSION_1_STORY_CONTENTS_DICT
         )
         commit_message = (
@@ -1438,6 +1447,7 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -1445,6 +1455,8 @@ tags: []
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             question_state_data: State. The state data for the question.
+            linked_skill_ids: list(str). List of skill IDs linked to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -1453,12 +1465,14 @@ tags: []
         """
         question = question_domain.Question(
             question_id, question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
+            linked_skill_ids)
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1475,6 +1489,7 @@ tags: []
         Args:
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
+            linked_skill_ids: list(str). The skill IDs linked to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
@@ -1484,7 +1499,8 @@ tags: []
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_data_schema_version=27
+            question_state_data_schema_version=27,
+            linked_skill_ids=linked_skill_ids
         )
         question_model.commit(
             owner_id, 'New question created',

@@ -340,7 +340,8 @@ class BaseHandler(webapp2.RequestHandler):
 
         if iframe_restriction is not None:
             if iframe_restriction in ['SAMEORIGIN', 'DENY']:
-                self.response.headers['X-Frame-Options'] = iframe_restriction
+                self.response.headers['X-Frame-Options'] = str(
+                    iframe_restriction)
             else:
                 raise Exception(
                     'Invalid X-Frame-Options: %s' % iframe_restriction)
@@ -423,7 +424,10 @@ class BaseHandler(webapp2.RequestHandler):
                     self.GET_HANDLER_ERROR_RETURN_TYPE ==
                     feconf.HANDLER_TYPE_JSON):
                 self.error(401)
-                self._render_exception(401, {'error': unicode(exception)})
+                self._render_exception(
+                    401, {
+                        'error': (
+                            'You must be logged in to access this resource.')})
             else:
                 self.redirect(
                     current_user_services.create_login_url(self.request.uri))

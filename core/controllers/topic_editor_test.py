@@ -88,9 +88,9 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data('ABC'))
+                self._create_valid_question_data('ABC'), [self.skill_id])
             question_services.create_new_question_skill_link(
-                question_id, self.skill_id, 0.5)
+                self.admin_id, question_id, self.skill_id, 0.5)
 
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
@@ -490,6 +490,15 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         self.assertEqual('A new name', json_response['topic_dict']['name'])
         self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
         self.logout()
+
+    def test_guest_can_not_delete_topic(self):
+        response = self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            expected_status_int=401)
+        self.assertEqual(
+            response['error'],
+            'You must be logged in to access this resource.')
 
     def test_editable_topic_handler_delete(self):
         # Check that admins can delete a topic.

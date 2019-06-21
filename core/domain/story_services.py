@@ -27,6 +27,7 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import story_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -117,7 +118,7 @@ def get_story_from_model(story_model):
         story_domain.StoryContents.from_dict(
             versioned_story_contents['story_contents']),
         versioned_story_contents['schema_version'],
-        story_model.language_code,
+        story_model.language_code, story_model.corresponding_topic_id,
         story_model.version, story_model.created_on,
         story_model.last_updated)
 
@@ -244,7 +245,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         language_code=story.language_code,
         story_contents_schema_version=story.story_contents_schema_version,
         notes=story.notes,
-        story_contents=story.story_contents.to_dict()
+        story_contents=story.story_contents.to_dict(),
+        corresponding_topic_id=story.corresponding_topic_id
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -415,6 +417,19 @@ def _save_story(committer_id, story, commit_message, change_list):
                 'which is too old. Please reload the page and try again.'
                 % (story_model.version, story.version))
 
+    topic = topic_services.get_topic_by_id(
+        story.corresponding_topic_id, strict=False)
+    if topic is None:
+        raise utils.ValidationError(
+            'Expected story to only belong to a valid topic, but found an '
+            'topic with ID: %s' % story.corresponding_topic_id)
+
+    if story.id not in topic.canonical_story_ids + topic.additional_story_ids:
+        raise Exception(
+            'Expected story to belong to the topic %s, but it is '
+            'neither a part of the canonical stories or the additional stories '
+            'of the topic.' % story.corresponding_topic_id)
+
     story_model.description = story.description
     story_model.title = story.title
     story_model.notes = story.notes
@@ -422,6 +437,7 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.story_contents_schema_version = (
         story.story_contents_schema_version)
     story_model.story_contents = story.story_contents.to_dict()
+    story_model.corresponding_topic_id = story.corresponding_topic_id
     story_model.version = story.version
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)
@@ -557,6 +573,35 @@ def get_completed_node_ids(user_id, story_id):
         user_id, story_id, strict=False)
 
     return progress_model.completed_node_ids if progress_model else []
+
+
+def get_latest_completed_node_ids(user_id, story_id):
+    """Returns the ids of the completed nodes that come latest in the story.
+
+    Args:
+        user_id: str. ID of the given user.
+        story_id: str. ID of the story.
+
+    Returns:
+        list(str). List of the completed node ids that come latest in the story.
+            If length is larger than 3, return the last three of them.
+            If length is smaller or equal to 3, return all of them.
+    """
+    progress_model = user_models.StoryProgressModel.get(
+        user_id, story_id, strict=False)
+
+    if not progress_model:
+        return []
+
+    num_of_nodes = min(len(progress_model.completed_node_ids), 3)
+    story = get_story_by_id(story_id)
+    ordered_node_ids = (
+        [node.id for node in story.story_contents.get_ordered_nodes()])
+    ordered_completed_node_ids = (
+        [node_id for node_id in ordered_node_ids
+         if node_id in progress_model.completed_node_ids]
+    )
+    return ordered_completed_node_ids[-num_of_nodes:]
 
 
 def get_node_ids_completed_in_stories(user_id, story_ids):

@@ -27,6 +27,7 @@ import re
 import string
 
 from constants import constants
+from core.domain import change_domain
 from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
@@ -45,6 +46,7 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
+STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
@@ -94,7 +96,7 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
 
-class ExplorationChange(object):
+class ExplorationChange(change_domain.BaseChange):
     """Domain object class for an exploration change.
 
     IMPORTANT: Ensure that all changes to this class (and how these cmds are
@@ -107,11 +109,27 @@ class ExplorationChange(object):
     accidentally stored the old_value using a ruleSpecs key instead of a
     rule_specs key. So, if you are making use of this data, make sure to
     verify the format of the old_value before doing any processing.
+
+    The allowed commands, together with the attributes:
+        - 'add_state' (with state_name)
+        - 'rename_state' (with old_state_name and new_state_name)
+        - 'delete_state' (with state_name)
+        - 'edit_state_property' (with state_name, property_name,
+            new_value and, optionally, old_value)
+        - 'edit_exploration_property' (with property_name,
+            new_value and, optionally, old_value)
+        - 'migrate_states_schema' (with from_version, to_version)
+    For a state, property_name must be one of STATE_PROPERTIES.
+    For an exploration, property_name must be one of
+    EXPLORATION_PROPERTIES.
     """
 
+    # The allowed list of state properties which can be used in
+    # edit_state_property command.
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
+        STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
@@ -124,91 +142,49 @@ class ExplorationChange(object):
         STATE_PROPERTY_INTERACTION_SOLUTION,
         STATE_PROPERTY_UNCLASSIFIED_ANSWERS)
 
+    # The allowed list of exploration properties which can be used in
+    # edit_exploration_property command.
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'state_name', 'old_state_name', 'new_state_name',
-        'property_name', 'new_value', 'old_value', 'name', 'from_version',
-        'to_version', 'title', 'category'
-    ]
-
-    def __init__(self, change_dict):
-        """Initializes an ExplorationChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd' key
-                and one or more other keys. The keys depend on what the value
-                for 'cmd' is. The possible values for 'cmd' are listed below,
-                together with the other keys in the dict:
-                    - 'add_state' (with state_name)
-                    - 'rename_state' (with old_state_name and new_state_name)
-                    - 'delete_state' (with state_name)
-                    - 'edit_state_property' (with state_name, property_name,
-                        new_value and, optionally, old_value)
-                    - 'edit_exploration_property' (with property_name,
-                        new_value and, optionally, old_value)
-                    - 'migrate_states_schema' (with from_version, to_version)
-                For a state, property_name must be one of STATE_PROPERTIES.
-                For an exploration, property_name must be one of
-                EXPLORATION_PROPERTIES.
-
-        Raises:
-            Exception: The given change_dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_ADD_STATE:
-            self.state_name = change_dict['state_name']
-        elif self.cmd == CMD_RENAME_STATE:
-            self.old_state_name = change_dict['old_state_name']
-            self.new_state_name = change_dict['new_state_name']
-        elif self.cmd == CMD_DELETE_STATE:
-            self.state_name = change_dict['state_name']
-        elif self.cmd == CMD_EDIT_STATE_PROPERTY:
-            if change_dict['property_name'] not in self.STATE_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.state_name = change_dict['state_name']
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_EDIT_EXPLORATION_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.EXPLORATION_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
-        elif self.cmd == CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        elif self.cmd == CMD_CREATE_NEW:
-            self.title = change_dict['title']
-            self.category = change_dict['category']
-        elif self.cmd == exp_models.ExplorationModel.CMD_REVERT_COMMIT:
-            # If commit is an exploration version revert commit.
-            self.version_number = change_dict['version_number']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the ExplorationChange domain object.
-
-        Returns:
-            A dict, mapping all fields of ExplorationChange instance.
-        """
-        exploration_change_dict = {}
-        exploration_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                exploration_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return exploration_change_dict
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['category', 'title'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_STATE,
+        'required_attribute_names': ['state_name'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_STATE,
+        'required_attribute_names': ['state_name'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_RENAME_STATE,
+        'required_attribute_names': ['new_state_name', 'old_state_name'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_EDIT_STATE_PROPERTY,
+        'required_attribute_names': [
+            'property_name', 'state_name', 'new_value'],
+        'optional_attribute_names': ['old_value'],
+        'allowed_values': {'property_name': STATE_PROPERTIES}
+    }, {
+        'name': CMD_EDIT_EXPLORATION_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value'],
+        'optional_attribute_names': ['old_value'],
+        'allowed_values': {'property_name': EXPLORATION_PROPERTIES}
+    }, {
+        'name': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }, {
+        'name': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+        'required_attribute_names': ['version_number'],
+        'optional_attribute_names': []
+    }]
 
 
 class ExplorationCommitLogEntry(object):
@@ -584,6 +560,8 @@ class Exploration(object):
             state.written_translations = (
                 state_domain.WrittenTranslations.from_dict(
                     sdict['written_translations']))
+
+            state.solicit_answer_details = sdict['solicit_answer_details']
 
             exploration.states[state_name] = state
 
@@ -2183,6 +2161,25 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v28_dict_to_v29_dict(cls, states_dict):
+        """Converts from version 28 to 29. Version 29 adds
+        solicit_answer_details boolean variable to the state, which
+        allows the creator to ask for answer details from the learner
+        about why they landed on a particular answer.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initalize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.itervalues():
+            state_dict['solicit_answer_details'] = False
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version,
             exploration_id):
@@ -2217,7 +2214,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 33
+    CURRENT_EXP_SCHEMA_VERSION = 34
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -2810,6 +2807,28 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v33_dict_to_v34_dict(cls, exploration_dict):
+        """Converts a v33 exploration dict into a v34 exploration dict.
+
+        Adds solicit_answer_details in state to ask learners for the
+        answer details.
+        Args:
+            exploration_dict: dict. The dict representation of an exploration
+                with schema version v33.
+
+        Returns:
+            dict. The dict representation of the Exploration domain object,
+            following schema version v34.
+        """
+        exploration_dict['schema_version'] = 34
+
+        exploration_dict['states'] = cls._convert_states_v28_dict_to_v29_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 29
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3006,6 +3025,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v32_dict_to_v33_dict(
                 exploration_dict)
             exploration_schema_version = 33
+
+        if exploration_schema_version == 33:
+            exploration_dict = cls._convert_v33_dict_to_v34_dict(
+                exploration_dict)
+            exploration_schema_version = 34
 
         return (exploration_dict, initial_schema_version)
 
@@ -3241,6 +3265,155 @@ class ExplorationSummary(object):
         self.exploration_model_created_on = exploration_model_created_on
         self.exploration_model_last_updated = exploration_model_last_updated
         self.first_published_msec = first_published_msec
+
+    def validate(self):
+        """Validates various properties of the ExplorationSummary.
+
+        Raises:
+            ValidationError: One or more attributes of the ExplorationSummary
+                are invalid.
+        """
+        if not isinstance(self.title, basestring):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' % self.title)
+        utils.require_valid_name(
+            self.title, 'the exploration title', allow_empty=True)
+
+        if not isinstance(self.category, basestring):
+            raise utils.ValidationError(
+                'Expected category to be a string, received %s'
+                % self.category)
+        utils.require_valid_name(
+            self.category, 'the exploration category', allow_empty=True)
+
+        if not isinstance(self.objective, basestring):
+            raise utils.ValidationError(
+                'Expected objective to be a string, received %s' %
+                self.objective)
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language_code to be a string, received %s' %
+                self.language_code)
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language_code: %s' % self.language_code)
+
+        if not isinstance(self.tags, list):
+            raise utils.ValidationError(
+                'Expected \'tags\' to be a list, received %s' % self.tags)
+        for tag in self.tags:
+            if not isinstance(tag, basestring):
+                raise utils.ValidationError(
+                    'Expected each tag in \'tags\' to be a string, received '
+                    '\'%s\'' % tag)
+
+            if not tag:
+                raise utils.ValidationError('Tags should be non-empty.')
+
+            if not re.match(feconf.TAG_REGEX, tag):
+                raise utils.ValidationError(
+                    'Tags should only contain lowercase letters and spaces, '
+                    'received \'%s\'' % tag)
+
+            if (tag[0] not in string.ascii_lowercase or
+                    tag[-1] not in string.ascii_lowercase):
+                raise utils.ValidationError(
+                    'Tags should not start or end with whitespace, received '
+                    '\'%s\'' % tag)
+
+            if re.search(r'\s\s+', tag):
+                raise utils.ValidationError(
+                    'Adjacent whitespace in tags should be collapsed, '
+                    'received \'%s\'' % tag)
+        if len(set(self.tags)) != len(self.tags):
+            raise utils.ValidationError('Some tags duplicate each other')
+
+        if not isinstance(self.ratings, dict):
+            raise utils.ValidationError(
+                'Expected ratings to be a dict, received %s' % self.ratings)
+
+        valid_rating_keys = ['1', '2', '3', '4', '5']
+        actual_rating_keys = sorted(self.ratings.keys())
+        if valid_rating_keys != actual_rating_keys:
+            raise utils.ValidationError(
+                'Expected ratings to have keys: %s, received %s' % (
+                    (', ').join(valid_rating_keys),
+                    (', ').join(actual_rating_keys)))
+        for value in self.ratings.values():
+            if not isinstance(value, int):
+                raise utils.ValidationError(
+                    'Expected value to be int, received %s' % value)
+            if value < 0:
+                raise utils.ValidationError(
+                    'Expected value to be non-negative, received %s' % (
+                        value))
+
+        if not isinstance(self.scaled_average_rating, float):
+            raise utils.ValidationError(
+                'Expected scaled_average_rating to be float, received %s' % (
+                    self.scaled_average_rating))
+
+        if not isinstance(self.status, basestring):
+            raise utils.ValidationError(
+                'Expected status to be string, received %s' % self.status)
+
+        if not isinstance(self.community_owned, bool):
+            raise utils.ValidationError(
+                'Expected community_owned to be bool, received %s' % (
+                    self.community_owned))
+
+        if not isinstance(self.owner_ids, list):
+            raise utils.ValidationError(
+                'Expected owner_ids to be list, received %s' % self.owner_ids)
+        for owner_id in self.owner_ids:
+            if not isinstance(owner_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each id in owner_ids to '
+                    'be string, received %s' % owner_id)
+
+        if not isinstance(self.editor_ids, list):
+            raise utils.ValidationError(
+                'Expected editor_ids to be list, received %s' % self.editor_ids)
+        for editor_id in self.editor_ids:
+            if not isinstance(editor_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each id in editor_ids to '
+                    'be string, received %s' % editor_id)
+
+        if not isinstance(self.voice_artist_ids, list):
+            raise utils.ValidationError(
+                'Expected voice_artist_ids to be list, received %s' % (
+                    self.voice_artist_ids))
+        for voice_artist_id in self.voice_artist_ids:
+            if not isinstance(voice_artist_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each id in voice_artist_ids to '
+                    'be string, received %s' % voice_artist_id)
+
+        if not isinstance(self.viewer_ids, list):
+            raise utils.ValidationError(
+                'Expected viewer_ids to be list, received %s' % self.viewer_ids)
+        for viewer_id in self.viewer_ids:
+            if not isinstance(viewer_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each id in viewer_ids to '
+                    'be string, received %s' % viewer_id)
+
+        if not isinstance(self.contributor_ids, list):
+            raise utils.ValidationError(
+                'Expected contributor_ids to be list, received %s' % (
+                    self.contributor_ids))
+        for contributor_id in self.contributor_ids:
+            if not isinstance(contributor_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each id in contributor_ids to '
+                    'be string, received %s' % contributor_id)
+
+        if not isinstance(self.contributors_summary, dict):
+            raise utils.ValidationError(
+                'Expected contributors_summary to be dict, received %s' % (
+                    self.contributors_summary))
 
     def to_metadata_dict(self):
         """Given an exploration summary, this method returns a dict containing

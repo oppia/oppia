@@ -31,26 +31,27 @@ var commonPrefix = './core/templates/dev/head';
 
 module.exports = {
   entries: {
-    about: commonPrefix + '/pages/about-page/about-page.controller.ts',
+    about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
-      commonPrefix + '/pages/collection_editor/CollectionEditor.ts',
+      commonPrefix + '/pages/collection-editor-page/' +
+      'collection-editor-page.scripts.ts',
     collection_player:
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
-      'creator-dashboard-page.controller.ts',
-    donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
+      'creator-dashboard-page.scripts.ts',
+    donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-page.controller.ts',
+      '/pages/email-dashboard-pages/email-dashboard-page.scripts.ts',
     email_dashboard_result:
       commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-result.controller.ts',
-    error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
+      '/pages/email-dashboard-pages/email-dashboard-result.scripts.ts',
+    error: commonPrefix + '/pages/error-pages/error-page.scripts.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
       'exploration-editor-page.controller.ts',
@@ -61,7 +62,7 @@ module.exports = {
       commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
       commonPrefix + '/pages/landing-pages/topic-landing-page/' +
-      'topic-landing-page.controller.ts',
+      'topic-landing-page.scripts.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.controller.ts',
@@ -69,28 +70,35 @@ module.exports = {
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
     moderator:
-      commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
+      commonPrefix + '/pages/moderator-page/moderator-page.scripts.ts',
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
-      'notifications-dashboard-page.controller.ts',
+      'notifications-dashboard-page.scripts.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
-      'practice-session-page.controller.ts',
+        'practice-session-page.scripts.ts',
+    privacy: commonPrefix + '/pages/privacy-page/privacy-page.controller.ts',
     preferences:
-      commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
+      commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
     profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
+    review_test:
+      commonPrefix + '/pages/review-test-page/review-test-page.scripts.ts',
     signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
     skill_editor:
       commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
-    splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
+    splash: commonPrefix + '/pages/splash-page/splash-page.scripts.ts',
     stewards:
       commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
-      'stewards-landing-page.controller.ts',
+      'stewards-landing-page.scripts.ts',
     story_editor:
       commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
+    story_viewer:
+      commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
     teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
+    terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
-    topic_editor: commonPrefix + '/pages/topic_editor/TopicEditor.ts',
+    topic_editor:
+      commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
@@ -115,17 +123,24 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['about'],
+      chunks: ['app', 'about'],
       filename: 'about-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is an open source learning platform that ' +
+        'connects a community of teachers and learners. You can use this ' +
+        'site to create 1-1 learning scenarios for others.'
+      },
       template: commonPrefix + '/pages/about-page/about-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
       chunks: ['collection_editor'],
-      filename: 'collection_editor.html',
+      filename: 'collection-editor-page.mainpage.html',
       template:
-        commonPrefix + '/pages/collection_editor/collection_editor.html',
+        commonPrefix + '/pages/collection-editor-page/' +
+        'collection-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
@@ -264,7 +279,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['app', 'privacy'],
       filename: 'privacy-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. Join ' +
+          'the community to create or try an exploration today!'
+      },
       template: commonPrefix + '/pages/privacy-page/privacy-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -305,6 +326,14 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['review_test'],
+      filename: 'review-test-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['signup'],
       filename: 'signup-page.mainpage.html',
       template: commonPrefix + '/pages/signup-page/signup-page.mainpage.html',
@@ -321,15 +350,27 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['splash'],
+      chunks: ['app', 'splash'],
       filename: 'splash-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash-page/splash-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['splash'],
+      chunks: ['app', 'splash'],
       filename: 'splash_at0.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash-page/splash_at0.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -337,6 +378,12 @@ module.exports = {
     new HtmlWebpackPlugin({
       chunks: ['splash'],
       filename: 'splash_at1.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free site for sharing knowledge via ' +
+          'interactive lessons called \'explorations\'. Learn from ' +
+          'user-created explorations, or teach and create your own.'
+      },
       template: commonPrefix + '/pages/splash-page/splash_at1.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -361,14 +408,36 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['teach'],
+      chunks: ['story_viewer'],
+      filename: 'story-viewer-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/story-viewer-page/' +
+        'story-viewer-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['app', 'teach'],
       filename: 'teach-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'The Oppia library is full of user-created lessons ' +
+        'called \'explorations\'. Read about how to participate in the ' +
+        'community and begin creating explorations.'
+      },
       template: commonPrefix + '/pages/teach-page/teach-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['app', 'terms'],
       filename: 'terms-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a 501(c)(3) registered non-profit open-source' +
+        ' e-learning platform. Learn about our terms and conditions for ' +
+        'creating and distributing learning material.'
+      },
       template: commonPrefix + '/pages/terms-page/terms-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
@@ -382,8 +451,10 @@ module.exports = {
     }),
     new HtmlWebpackPlugin({
       chunks: ['topic_editor'],
-      filename: 'topic_editor.html',
-      template: commonPrefix + '/pages/topic_editor/topic_editor.html',
+      filename: 'topic-editor-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/topic-editor-page/' +
+        'topic-editor-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

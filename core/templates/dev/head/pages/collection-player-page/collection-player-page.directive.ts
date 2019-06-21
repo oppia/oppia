@@ -39,9 +39,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
-
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
     enter: function(element) {
