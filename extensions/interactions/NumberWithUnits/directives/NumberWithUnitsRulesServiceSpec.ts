@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for Number with Units rules.
  */
 
+require(
+  'interactions/NumberWithUnits/directives/NumberWithUnitsRulesService.ts');
+
 describe('Number with Units rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 
