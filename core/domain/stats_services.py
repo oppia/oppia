@@ -1076,6 +1076,7 @@ def get_learner_answer_details(state_reference, entity_type):
         learner_answer_details = get_learner_answer_details_from_model(
             learner_answer_details_model)
         return learner_answer_details
+    return None
 
 
 def save_learner_answer_details(

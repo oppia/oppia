@@ -1269,14 +1269,16 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
                 form 'question_id'.
 
         Returns:
-            LearnerAnswerDetailsModel. The answer details model associated
-                with the given entity type and state reference. Doesn't include
-                deleted entries.
+            LearnerAnswerDetailsModel or None. The answer details model
+                associated with the given entity type and state reference or
+                None if the instance is not found. Doesn't include deleted
+                entries.
         """
         instance_id = cls.get_instance_id(entity_type, state_reference)
         model_instance = cls.get(instance_id, strict=False)
         if model_instance:
             return model_instance
+        return None
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):

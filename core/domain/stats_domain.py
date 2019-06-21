@@ -1396,7 +1396,7 @@ class LearnerAnswerDetails(object):
             accumulated_answer_info_json_size_bytes: int. The size of
                 learner_answer_info_list in bytes.
             learner_answer_info_schema_version: int. The schema version of the
-                LearnerAnswerInfo class.
+                LearnerAnswerInfo dict.
         """
 
         self.state_reference = state_reference
