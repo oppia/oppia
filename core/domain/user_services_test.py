@@ -1234,10 +1234,10 @@ class UserSettingsTests(test_utils.GenericTestBase):
             observed_log_messages.append(msg % args)
 
         logging_swap = self.swap(logging, 'error', _mock_logging_function)
-        assert_raises_regexp_exception = self.assertRaisesRegexp(
+        assert_raises_user_not_found = self.assertRaisesRegexp(
             Exception, 'User not found.')
 
-        with logging_swap, assert_raises_regexp_exception:
+        with logging_swap, assert_raises_user_not_found:
             user_services.get_human_readable_user_ids(['invalid_user_id'])
 
         self.assertEqual(
