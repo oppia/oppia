@@ -96,7 +96,7 @@ THIRD_PARTY_LIBS = [
     os.path.join(ROOT_PATH, 'third_party', 'gae-pipeline-1.9.22.1'),
     os.path.join(ROOT_PATH, 'third_party', 'graphy-1.0.0'),
     os.path.join(ROOT_PATH, 'third_party', 'html5lib-python-1.0.1'),
-    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.38'),
+    os.path.join(ROOT_PATH, 'third_party', 'mutagen-1.42.0'),
     os.path.join(ROOT_PATH, 'third_party', 'requests-2.22.0'),
     os.path.join(ROOT_PATH, 'third_party', 'simplejson-3.16.0'),
     os.path.join(ROOT_PATH, 'third_party', 'six-1.12.0'),
