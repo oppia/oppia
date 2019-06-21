@@ -192,10 +192,10 @@ class UserStatsModelTest(test_utils.GenericTestBase):
         test_data = None
         self.assertEqual(user_data, test_data)
 
-    def test_export_data_stats_list_is_well_formed(self):
+    def test_weekly_creator_stats_list_is_fully_exported(self):
         """Test if weekly creator stats list has only the expected elements."""
-        user_data = user_models.UserStatsModel.export_data(self.USER_ID_1)
-        for weekly_stat in user_data['weekly_creator_stats_list']:
+        user_data = user_models.UserStatsModel.get(self.USER_ID_1)
+        for weekly_stat in user_data.weekly_creator_stats_list:
             self.assertEqual(dict, type(weekly_stat))
             self.assertEqual(1, len(weekly_stat))
             key_obj = list(weekly_stat.keys())[0]

@@ -401,7 +401,17 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             return None
 
         weekly_stats = user_model.weekly_creator_stats_list
-        weekly_stats_constructed = [weekly_stat for weekly_stat in weekly_stats]
+        weekly_stats_constructed = []
+        for weekly_stat in weekly_stats:
+            date_key = weekly_stat.keys()[0]
+            stat_dict = weekly_stat[date_key]
+            constructed_stat = {
+                (date_key): {
+                    'average_ratings': stat_dict['average_ratings'],
+                    'total_plays': stat_dict['total_plays']
+                }
+            }
+            weekly_stats_constructed.append(constructed_stat)
 
         user_data = {
             'impact_score': user_model.impact_score,
