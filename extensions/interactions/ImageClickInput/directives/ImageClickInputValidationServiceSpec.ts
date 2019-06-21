@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for image click input validation service.
  */
 
+require(
+  'interactions/ImageClickInput/directives/' +
+  'ImageClickInputValidationService.ts');
+
 describe('ImageClickInputValidationService', function() {
   var WARNING_TYPES, validatorService;
 
