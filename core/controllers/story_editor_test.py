@@ -92,7 +92,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
 
         self.logout()
 
-    def test_can_not_put_access_story_handler_with_invalid_story_id(self):
+    def test_put_can_not_access_story_handler_with_invalid_story_id(self):
         self.login(self.ADMIN_EMAIL)
 
         change_cmd = {
