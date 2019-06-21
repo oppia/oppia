@@ -126,7 +126,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             user_data['profile_picture_data_url'])
         self.assertEqual('learner', user_data['default_dashboard'])
         self.assertEqual(
-            'card', 
+            'card',
             user_data['creator_dashboard_display_pref'])
         self.assertEqual(self.generic_user_bio, user_data['user_bio'])
         self.assertEqual(
