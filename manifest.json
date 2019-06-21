@@ -540,14 +540,14 @@
         }
       },
       "waveSurferJs": {
-        "version": "1.4.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/katspaugh/wavesurfer.js/archive/1.4.0.zip",
-        "rootDirPrefix": "wavesurfer.js-",
+        "version": "2.2.1",
+        "downloadFormat": "files",
+        "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist/",
+        "rootDirPrefix": "waveSurfer-js-",
         "targetDirPrefix": "wave-surfer-js-",
-        "files": ["src/wavesurfer.js"],
+        "files": ["wavesurfer.min.js"],
         "bundle": {
-          "js": ["src/wavesurfer.js"]
+          "js": ["wavesurfer.min.js"]
         }
       }
     },
