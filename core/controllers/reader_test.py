@@ -320,23 +320,14 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_questions_are_returned_successfully(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id)
         json_response_1 = self.get_json(url)
-        next_cursor = json_response_1['next_start_cursor']
         self.assertEqual(len(json_response_1['question_dicts']), 1)
-        json_response_2 = self.get_json(
-            '%s?question_count=%s&skill_ids=%s&start_cursor=%s' % (
-                feconf.QUESTIONS_URL_PREFIX, '1', self.skill_id,
-                next_cursor))
-        self.assertEqual(len(json_response_2['question_dicts']), 1)
-        self.assertNotEqual(
-            json_response_1['question_dicts'][0]['id'],
-            json_response_2['question_dicts'][0]['id'])
 
     def test_question_count_more_than_available_returns_all_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '5', self.skill_id)
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 2)
@@ -351,7 +342,7 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'), [self.skill_id])
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, skill_id_2, 0.5)
-        url = '%s?question_count=%s&skill_ids=%s,%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s,%s' % (
             feconf.QUESTIONS_URL_PREFIX, '3', self.skill_id, skill_id_2)
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 3)
@@ -361,14 +352,14 @@ class QuestionsUnitTest(test_utils.GenericTestBase):
 
     def test_invalid_skill_id_returns_no_questions(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '1', 'invalid_skill_id')
         json_response = self.get_json(url)
         self.assertEqual(len(json_response['question_dicts']), 0)
 
     def test_question_count_zero_raises_invalid_input_exception(self):
         # Call the handler.
-        url = '%s?question_count=%s&skill_ids=%s&start_cursor=' % (
+        url = '%s?question_count=%s&skill_ids=%s' % (
             feconf.QUESTIONS_URL_PREFIX, '0', self.skill_id)
         self.get_json(url, expected_status_int=400)
 
