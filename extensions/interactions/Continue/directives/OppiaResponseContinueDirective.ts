@@ -20,6 +20,9 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('oppiaResponseContinue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
