@@ -612,10 +612,30 @@ class ImageDomainUnitTests(test_utils.GenericTestBase):
         image_object = state_domain.Image.from_dict(image_dict)
         self.assertEqual(image_object.to_dict(), image_dict)
 
+    def test_invalid_instructions(self):
+        image_dict = {
+            'src': '',
+            'placeholder': True,
+            'instructions': 5555
+        }
+        with self.assertRaises(Exception):
+            state_domain.Image.from_dict(image_dict)
+
+    def test_invalid_placeholder(self):
+        image_dict = {
+            'src': '',
+            'placeholder': 'invalid',
+            'instructions': 'no instructions'
+        }
+        with self.assertRaises(Exception):
+            state_domain.Image.from_dict(image_dict)
+
 class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on Image Assets."""
-    def test_from_and_to_dict_works_correctly(self):
-        image_assets_dict = {
+
+    def setUp(self):
+        super(ImageAssetsDomainUnitTests, self).setUp()
+        self.image_assets_dict = {
             'image_mapping': {
                 'image_id_1': {
                     'src': '',
@@ -630,25 +650,29 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        image_assets = state_domain.ImageAssets.from_dict(image_assets_dict)
-        self.assertEqual(image_assets.to_dict(), image_assets_dict)
+        self.image_dict = {
+            'src': '',
+            'placeholder': False,
+            'instructions': 'no instructions'
+        }
+
+        self.image_object = state_domain.Image.from_dict(self.image_dict)
+
+    def test_from_and_to_dict_works_correctly(self):
+        image_assets = (
+            state_domain.ImageAssets.from_dict(self.image_assets_dict))
+        self.assertEqual(image_assets.to_dict(), self.image_assets_dict)
+
+    def test_invalid_image_id(self):
+
+        image_mapping = {
+            'image_id_invalid': self.image_object
+        }
+
+        with self.assertRaises(Exception):
+            state_domain.ImageAssets(image_mapping)
 
     def test_delete_image(self):
-        image_assets_dict = {
-            'image_mapping': {
-                'image_id_1': {
-                    'src': '',
-                    'placeholder': True,
-                    'instructions': 'no instructions'
-                },
-                'image_id_2': {
-                    'src': '',
-                    'placeholder': False,
-                    'instructions': 'no instructions'
-                }
-            }
-        }
-
         expected_image_assets_dict = {
             'image_mapping': {
                 'image_id_1': {
@@ -659,24 +683,21 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
             }
         }
 
-        image_assets = state_domain.ImageAssets.from_dict(image_assets_dict)
+        image_assets = (
+            state_domain.ImageAssets.from_dict(self.image_assets_dict))
         image_assets.delete_image('image_id_2')
         self.assertEqual(image_assets.to_dict(), expected_image_assets_dict)
 
+        # Test for deleting image, whose image id doesnot exist.
+        with self.assertRaises(Exception):
+            image_assets.delete_image('image_id_8')
+
     def test_add_image(self):
-        image_assets_dict = {
-            'image_mapping': {
-                'image_id_1': {
-                    'src': '',
-                    'placeholder': True,
-                    'instructions': 'no instructions'
-                },
-                'image_id_2': {
-                    'src': '',
-                    'placeholder': False,
-                    'instructions': 'no instructions'
-                }
-            }
+
+        image_3_dict = {
+            'src': '',
+            'placeholder': True,
+            'instructions': 'no instructions'
         }
 
         expected_image_assets_dict = {
@@ -698,31 +719,25 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
                 }
             }
         }
-        image_assets = state_domain.ImageAssets.from_dict(image_assets_dict)
-        image_info = {
-            'src': '',
-            'placeholder': True,
-            'instructions': 'no instructions'
-        }
-        image_assets.add_image('image_id_3', image_info)
+
+        image_assets = (
+            state_domain.ImageAssets.from_dict(self.image_assets_dict))
+        image_3_object = state_domain.Image.from_dict(image_3_dict)
+        image_assets.add_image('image_id_3', image_3_object)
+
         self.assertEqual(image_assets.to_dict(), expected_image_assets_dict)
 
+        # Test for adding image, whose image id already exist.
+        with self.assertRaises(Exception):
+            image_assets.add_image('image_id_1', self.image_object)
+
+        # Test for adding invalid image id.
+        with self.assertRaises(Exception):
+            image_assets.add_image('image_id_1_invalid', self.image_object)
+
     def test_get_all_image_ids(self):
-        image_assets_dict = {
-            'image_mapping': {
-                'image_id_1': {
-                    'src': '',
-                    'placeholder': True,
-                    'instructions': 'no instructions'
-                },
-                'image_id_2': {
-                    'src': '',
-                    'placeholder': False,
-                    'instructions': 'no instructions'
-                }
-            }
-        }
-        image_assets = state_domain.ImageAssets.from_dict(image_assets_dict)
+        image_assets = (
+            state_domain.ImageAssets.from_dict(self.image_assets_dict))
         image_ids = image_assets.get_all_image_ids()
         expected_image_ids = [u'image_id_2', u'image_id_1']
         self.assertEqual(image_ids, expected_image_ids)

@@ -822,7 +822,7 @@ def apply_change_list(exploration_id, change_list):
                             get_images_ids_of_exploration(exploration))
 
                         # Adds a new image.
-                        image_re = r'(image_id_)+[0-9]'
+                        image_re = r'image_id_[0-9]{1,}$'
                         if not re.match(image_re, change.image_id):
                             raise utils.ValidationError(
                                 'Invalid image_id, received %s' %
@@ -842,9 +842,11 @@ def apply_change_list(exploration_id, change_list):
                                 'Image Id is greater then image_id counter'
                                 'not possible, received image_id is %s' %
                                 change.image_id)
-
-                        state.image_assets.add_image(
-                            change.image_id, change.image_info)
+                        image_object = state_domain.Image(
+                            change.image_info['src'],
+                            change.image_info['placeholder'],
+                            change.image_info['instructions'])
+                        state.image_assets.add_image(image_object)
                         exploration.update_image_counter(image_counter)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':

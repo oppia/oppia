@@ -30,6 +30,9 @@ import jinja_utils
 import utils
 
 
+def is_image_id_validated_correct(image_id):
+    pass
+
 class AnswerGroup(object):
     """Value object for an answer group. Answer groups represent a set of rules
     dictating whether a shared feedback should be shared with the user. These
@@ -181,7 +184,7 @@ class Image(object):
 
         Args:
             src: str. The source of an image.
-            placeholder: bool. Is image a placeholder.
+            placeholder: bool. Whether the image is a placeholder.
             instructions: str. Instructions for the image which needs in place
                 of a placeholder.
         """
@@ -204,15 +207,13 @@ class Image(object):
 
     @classmethod
     def from_dict(cls, image_info):
-        """Return an Imagedomain object from a dict.
+        """Return an Image object from a dict.
 
         Args:
-            image_info: dict. The dict representation of
-                Image object.
+            image_info: dict. The dict representation of Image object.
 
         Returns:
-            Image. The corresponding ImageAssets domain
-            object.
+            Image. The corresponding ImageAssets domain object.
         """
         src = image_info['src']
         placeholder = image_info['placeholder']
@@ -221,10 +222,10 @@ class Image(object):
         return cls(src, placeholder, instructions)
 
     def validate(self):
-        """Validates all properties of an Image.
+        """Validates all properties of an Image object.
 
         Raises:
-            ValidationError: One or more attributes of the ImageAssets are not
+            ValidationError: One or more attributes of the Image are not
             valid.
         """
         if not isinstance(self.placeholder, bool):
@@ -233,8 +234,8 @@ class Image(object):
                 self.placeholder)
         if not isinstance(self.instructions, basestring):
             raise utils.ValidationError(
-                'Expected instructions to be string,' +
-                'received %s' %self.instructions)
+                'Expected instructions to be string, received %s' %
+                self.instructions)
 
 
 class ImageAssets(object):
@@ -243,8 +244,8 @@ class ImageAssets(object):
         """Constructs a ImageAssets domain object.
 
         Args:
-            image_mapping: dict. The dict representation of
-                ImageAssets mapping.
+            image_mapping: dict. The dict representation of ImageAssets
+                mapping.
         """
         self.image_mapping = image_mapping
         self.validate()
@@ -256,11 +257,13 @@ class ImageAssets(object):
             ValidationError: One or more attributes of the ImageAssets are not
             valid.
         """
-        for image_id in self.image_mapping:
-            image_re = r'(image_id_)+[0-9]'
+        image_ids = self.image_mapping.keys()
+        for image_id in image_ids:
+            image_re = r'image_id_[0-9]{1,}$'
             if not re.match(image_re, image_id):
                 raise utils.ValidationError(
-                    'Invalid image_id')
+                    'Invalid image_id received %s' % image_id)
+
             image = self.image_mapping[image_id]
             image.validate()
 
@@ -285,55 +288,51 @@ class ImageAssets(object):
         """Return a ImageAssets domain object from a dict.
 
         Args:
-            image_assets_dict: dict. The dict representation of
-                ImageAssets object.
+            image_assets_dict: dict. The dict representation of ImageAssets
+                object.
 
         Returns:
-            ImageAssets. The corresponding ImageAssets domain
-            object.
+            ImageAssets. The corresponding ImageAssets domain object.
         """
         image_mapping = {}
-        for image_id in image_assets_dict['image_mapping'].iterkeys():
-            image_info = image_assets_dict['image_mapping'][image_id]
+        for image_id, image_info in (
+                image_assets_dict['image_mapping'].iteritems()):
             image_mapping[image_id] = Image.from_dict(image_info)
 
         return cls(image_mapping)
 
-    def add_image(self, image_id, image_info):
-        """Adds default image object in state.
+    def add_image(self, image_id, image_object):
+        """Adds image object in image assets.
 
         Args:
             image_id: int. The image_id of an image.
-            image_info: dict. The dicts representation of image info.
+            image_object: dict. The image object.
         """
-        image_re = r'(image_id_)+[0-9]'
+        image_re = r'image_id_[0-9]{1,}$'
         if not re.match(image_re, image_id):
-            raise utils.ValidationError(
-                'Invalid image_id')
+            raise utils.ValidationError('Incorrect image_id')
         if image_id in self.image_mapping:
             raise utils.ValidationError(
-                'Image Id already exist. %s' % image_id)
+                'Image Id already exist: %s' % image_id)
 
-        src = image_info['src']
-        placeholder = image_info['placeholder']
-        instructions = image_info['instructions']
-
-        image = Image(src, placeholder, instructions)
-        self.image_mapping[image_id] = image
+        self.image_mapping[image_id] = image_object
 
     def delete_image(self, image_id):
-        """Deletes an image from the state.
+        """Deletes an image from the image assets.
 
         Args:
             image_id: str. ID of an image.
         """
+        if image_id not in self.image_mapping:
+            raise utils.ValidationError('ImageId does not exist')
+
         del self.image_mapping[image_id]
 
     def get_all_image_ids(self):
-        """Returns all image ids of images in the state.
+        """Returns all image ids of images in the image assets.
 
         Returns:
-            set. Set of image ids of all the images present in the state.
+            set. A set of image ids of all the images present in image assets.
         """
         return self.image_mapping.keys()
 
@@ -1640,30 +1639,6 @@ class State(object):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
 
-        # Validation for image ids.
-        # Things validated are.
-        #   1) Format of image id.
-        #   2) ImageID should be less then image counter.
-        #   3) Is more then one image id exist or not.
-        image_ids = self.image_assets.get_all_image_ids()
-        copied_image_ids = copy.deepcopy(image_ids)
-        for image_id in image_ids:
-            validated_image_id = int(image_id.strip('image_id'))
-            image_re = r'(image_id_)+[0-9]'
-            if not re.match(image_re, image_id):
-                raise utils.ValidationError(
-                    'Invalid image_id received %s' % image_id)
-            if validated_image_id > image_counter:
-                utils.ValidationError(
-                    'Found image id to be greater then image counter %s' %
-                    validated_image_id)
-            copied_image_ids.remove(image_id)
-            if image_id in copied_image_ids:
-                raise utils.ValidationError(
-                    'Found a duplicate image id %s' % image_id)
-
-        self.image_assets.validate()
-
         if not isinstance(self.solicit_answer_details, bool):
             raise utils.ValidationError(
                 'Expected solicit_answer_details to be a boolean, '
@@ -1674,7 +1649,15 @@ class State(object):
                 raise utils.ValidationError(
                     'The %s interaction does not support soliciting '
                     'answer details from learners.' % (self.interaction.id))
+        image_ids = self.image_assets.get_all_image_ids()
+        for image_id in image_ids:
+            expected_image_id = int(image_id.strip('image_id'))
+            if expected_image_id > image_counter:
+                utils.ValidationError(
+                    'Found image id to be greater then image counter %s' %
+                    expected_image_id)
 
+        self.image_assets.validate()
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
 
