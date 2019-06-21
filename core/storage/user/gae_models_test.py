@@ -44,7 +44,8 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
         user_models.UserSettingsModel(
-            email=self.user_email, role=self.user_role).put()
+            email=self.user_email, role=self.user_role
+        ).put()
         user_models.UserSettingsModel(
             email=self.user2_email, role=self.user2_role).put()
         user_models.UserSettingsModel(
