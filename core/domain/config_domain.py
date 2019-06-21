@@ -16,6 +16,7 @@
 
 """Domain objects for configuration properties."""
 
+from core.domain import change_domain
 from core.platform import models
 import feconf
 import schema_utils
@@ -64,6 +65,20 @@ UNICODE_SCHEMA = {
 FLOAT_SCHEMA = {
     'type': schema_utils.SCHEMA_TYPE_FLOAT
 }
+
+
+class ConfigPropertyChange(change_domain.BaseChange):
+    """Domain object for changes made to a config property object.
+
+    The allowed commands, together with the attributes:
+        - 'change_property_value' (with new_value)
+    """
+
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CHANGE_PROPERTY_VALUE,
+        'required_attribute_names': ['new_value'],
+        'optional_attribute_names': []
+    }]
 
 
 class ConfigProperty(object):

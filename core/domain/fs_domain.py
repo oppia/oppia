@@ -18,6 +18,7 @@
 
 import logging
 
+from core.domain import change_domain
 from core.platform import models
 import feconf
 import utils
@@ -38,6 +39,16 @@ ENTITY_TYPE_QUESTION = 'question'
 ALLOWED_ENTITY_NAMES = [
     ENTITY_TYPE_EXPLORATION, ENTITY_TYPE_TOPIC, ENTITY_TYPE_SKILL,
     ENTITY_TYPE_STORY, ENTITY_TYPE_QUESTION]
+
+
+class FileMetadataChange(change_domain.BaseChange):
+    """Domain object for changes made to a file metadata object."""
+    pass
+
+
+class FileChange(change_domain.BaseChange):
+    """Domain object for changes made to a file object."""
+    pass
 
 
 class FileMetadata(object):

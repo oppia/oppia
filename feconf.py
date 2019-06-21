@@ -22,6 +22,15 @@ import os
 
 from constants import constants  # pylint: disable=relative-import
 
+# The datastore model ID for the list of featured activity references. This
+# value should not be changed.
+ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
+ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
+
+# The values which a post_commit_status can have: public, private.
+POST_COMMIT_STATUS_PUBLIC = 'public'
+POST_COMMIT_STATUS_PRIVATE = 'private'
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 

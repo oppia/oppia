@@ -21,6 +21,186 @@ from core.domain import rights_manager
 from core.domain import user_services
 from core.tests import test_utils
 
+import utils
+
+
+class ActivityRightsChangeTests(test_utils.GenericTestBase):
+
+    def test_activity_rights_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            rights_manager.ActivityRightsChange({'invalid': 'data'})
+
+    def test_activity_rights_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            rights_manager.ActivityRightsChange({'cmd': 'invalid'})
+
+    def test_activity_rights_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_role, old_role')):
+            rights_manager.ActivityRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+            })
+
+    def test_activity_rights_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            rights_manager.ActivityRightsChange({
+                'cmd': 'change_private_viewability',
+                'old_viewable_if_private': 'old_viewable_if_private',
+                'new_viewable_if_private': 'new_viewable_if_private',
+                'invalid': 'invalid'
+            })
+
+    def test_activity_rights_change_object_with_invalid_role(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for new_role in cmd change_role: '
+                'invalid is not allowed')):
+            rights_manager.ActivityRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': rights_manager.ROLE_OWNER,
+                'new_role': 'invalid',
+            })
+
+    def test_exploration_rights_change_object_with_invalid_status(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for new_status in cmd change_exploration_status: '
+                'invalid is not allowed')):
+            rights_manager.ExplorationRightsChange({
+                'cmd': 'change_exploration_status',
+                'old_status': rights_manager.ACTIVITY_STATUS_PRIVATE,
+                'new_status': 'invalid'
+            })
+
+    def test_collection_rights_change_object_with_invalid_status(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for old_status in cmd change_collection_status: '
+                'invalid is not allowed')):
+            rights_manager.CollectionRightsChange({
+                'cmd': 'change_collection_status',
+                'old_status': 'invalid',
+                'new_status': rights_manager.ACTIVITY_STATUS_PRIVATE,
+            })
+
+    def test_activity_rights_change_object_with_create_new(self):
+        activity_rights_change_object = rights_manager.ActivityRightsChange({
+            'cmd': 'create_new'
+        })
+
+        self.assertEqual(activity_rights_change_object.cmd, 'create_new')
+
+    def test_activity_rights_change_object_with_change_role(self):
+        activity_rights_change_object = rights_manager.ActivityRightsChange({
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+            'old_role': rights_manager.ROLE_OWNER,
+            'new_role': rights_manager.ROLE_VIEWER
+        })
+
+        self.assertEqual(activity_rights_change_object.cmd, 'change_role')
+        self.assertEqual(
+            activity_rights_change_object.assignee_id, 'assignee_id')
+        self.assertEqual(
+            activity_rights_change_object.old_role, rights_manager.ROLE_OWNER)
+        self.assertEqual(
+            activity_rights_change_object.new_role, rights_manager.ROLE_VIEWER)
+
+    def test_activity_rights_change_object_with_release_ownership(self):
+        activity_rights_change_object = rights_manager.ActivityRightsChange({
+            'cmd': 'release_ownership'
+        })
+
+        self.assertEqual(activity_rights_change_object.cmd, 'release_ownership')
+
+    def test_activity_rights_change_object_with_change_private_viewability(
+            self):
+        activity_rights_change_object = rights_manager.ActivityRightsChange({
+            'cmd': 'change_private_viewability',
+            'old_viewable_if_private': 'old_viewable_if_private',
+            'new_viewable_if_private': 'new_viewable_if_private'
+        })
+
+        self.assertEqual(
+            activity_rights_change_object.cmd, 'change_private_viewability')
+        self.assertEqual(
+            activity_rights_change_object.old_viewable_if_private,
+            'old_viewable_if_private')
+        self.assertEqual(
+            activity_rights_change_object.new_viewable_if_private,
+            'new_viewable_if_private')
+
+    def test_activity_rights_change_object_with_update_first_published_msec(
+            self):
+        activity_rights_change_object = rights_manager.ActivityRightsChange({
+            'cmd': 'update_first_published_msec',
+            'old_first_published_msec': 'old_first_published_msec',
+            'new_first_published_msec': 'new_first_published_msec'
+        })
+
+        self.assertEqual(
+            activity_rights_change_object.cmd, 'update_first_published_msec')
+        self.assertEqual(
+            activity_rights_change_object.old_first_published_msec,
+            'old_first_published_msec')
+        self.assertEqual(
+            activity_rights_change_object.new_first_published_msec,
+            'new_first_published_msec')
+
+    def test_exploration_rights_change_object_with_change_exploration_status(
+            self):
+        exp_rights_change_object = rights_manager.ExplorationRightsChange({
+            'cmd': 'change_exploration_status',
+            'old_status': rights_manager.ACTIVITY_STATUS_PRIVATE,
+            'new_status': rights_manager.ACTIVITY_STATUS_PUBLIC
+        })
+
+        self.assertEqual(
+            exp_rights_change_object.cmd, 'change_exploration_status')
+        self.assertEqual(
+            exp_rights_change_object.old_status,
+            rights_manager.ACTIVITY_STATUS_PRIVATE)
+        self.assertEqual(
+            exp_rights_change_object.new_status,
+            rights_manager.ACTIVITY_STATUS_PUBLIC)
+
+    def test_exploration_rights_change_object_with_change_collection_status(
+            self):
+        col_rights_change_object = rights_manager.CollectionRightsChange({
+            'cmd': 'change_collection_status',
+            'old_status': rights_manager.ACTIVITY_STATUS_PUBLIC,
+            'new_status': rights_manager.ACTIVITY_STATUS_PRIVATE
+        })
+
+        self.assertEqual(
+            col_rights_change_object.cmd, 'change_collection_status')
+        self.assertEqual(
+            col_rights_change_object.old_status,
+            rights_manager.ACTIVITY_STATUS_PUBLIC)
+        self.assertEqual(
+            col_rights_change_object.new_status,
+            rights_manager.ACTIVITY_STATUS_PRIVATE)
+
+    def test_to_dict(self):
+        activity_rights_change_dict = {
+            'cmd': 'change_private_viewability',
+            'old_viewable_if_private': 'old_viewable_if_private',
+            'new_viewable_if_private': 'new_viewable_if_private'
+        }
+        activity_rights_change_object = rights_manager.ActivityRightsChange(
+            activity_rights_change_dict)
+        self.assertEqual(
+            activity_rights_change_object.to_dict(),
+            activity_rights_change_dict)
+
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
     """Test that rights for actions on explorations work as expected."""

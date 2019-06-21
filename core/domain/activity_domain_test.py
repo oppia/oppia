@@ -29,20 +29,29 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
             'exploration', '1234')
         self.collection_activity_reference = activity_domain.ActivityReference(
             'collection', '1234')
-        self.invalid_activity_reference = activity_domain.ActivityReference(
-            'invalid_activity_type', '1234')
+        self.invalid_activity_reference_with_invalid_type = (
+            activity_domain.ActivityReference('invalid_activity_type', '1234'))
+        self.invalid_activity_reference_with_invalid_id = (
+            activity_domain.ActivityReference('exploration', 1234))
 
     def test_that_hashes_for_different_object_types_are_distinct(self):
         exp_hash = self.exp_activity_reference.get_hash()
         collection_hash = self.collection_activity_reference.get_hash()
-        invalid_activity_hash = self.invalid_activity_reference.get_hash()
+        invalid_activity_hash = (
+            self.invalid_activity_reference_with_invalid_type.get_hash())
         self.assertNotEqual(exp_hash, collection_hash)
         self.assertNotEqual(exp_hash, invalid_activity_hash)
         self.assertNotEqual(collection_hash, invalid_activity_hash)
 
-    def test_validate(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid activity type: .+'):
-            self.invalid_activity_reference.validate()
+    def test_validate_with_invalid_type(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid activity type: invalid_activity_type'):
+            self.invalid_activity_reference_with_invalid_type.validate()
+
+    def test_validate_with_invalid_id(self):
+        with self.assertRaisesRegexp(
+            Exception, ('Expected id to be a string but found 1234')):
+            self.invalid_activity_reference_with_invalid_id.validate()
 
     def test_to_dict(self):
         exp_dict = self.exp_activity_reference.to_dict()
@@ -61,3 +70,31 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
                 'id': '1234'
             }
         )
+
+
+class ActivityReferencesDomainUnitTests(test_utils.GenericTestBase):
+    """Tests for ActivityReferences domain class."""
+
+    def setUp(self):
+        super(ActivityReferencesDomainUnitTests, self).setUp()
+        exp_activity_reference = activity_domain.ActivityReference(
+            'exploration', '1234')
+        collection_activity_reference = activity_domain.ActivityReference(
+            'collection', '1234')
+        invalid_activity_reference = (
+            activity_domain.ActivityReference(
+                'invalid_activity_type', '1234'))
+        self.valid_activity_references = (
+            activity_domain.ActivityReferences([
+                exp_activity_reference, collection_activity_reference]))
+        self.invalid_activity_references = (
+            activity_domain.ActivityReferences([
+                exp_activity_reference, invalid_activity_reference]))
+
+    def test_validate_passes_with_valid_activity_reference_list(self):
+        self.valid_activity_references.validate()
+
+    def test_validate_fails_with_invalid_type_in_activity_reference_list(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid activity type: invalid_activity_type'):
+            self.invalid_activity_references.validate()

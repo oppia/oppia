@@ -417,7 +417,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(len(observed_log_messages), 1)
         self.assertEqual(
             observed_log_messages[0],
-            'Exception Invalid change_dict: {\'cmd\': \'invalid command\'} '
+            'ValidationError Command invalid command is not allowed '
             'collection_id [{\'cmd\': \'invalid command\'}]')
 
 
