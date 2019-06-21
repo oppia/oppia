@@ -96,7 +96,7 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
     # pylint: enable=line-too-long
 
     def test_validate_default_similarities(self):
-        recommendations_services._validate_topic_similarities(  # pylint: disable=protected-access
+        recommendations_services.validate_topic_similarities(
             recommendations_services.DEFAULT_TOPIC_SIMILARITIES_STRING)
 
     def test_update_topic_similarities(self):
@@ -107,8 +107,9 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
             '0.1,0.8,1.0')
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Length of topic similarities columns does not match topic list.'
+            Exception, (
+                'Length of topic similarities columns: 2 does not match '
+                'length of topic list: 3.')
             ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
@@ -116,8 +117,9 @@ class TopicSimilarityUnitTests(test_utils.GenericTestBase):
                 '0.2,1.0,0.8')
 
         with self.assertRaisesRegexp(
-            Exception,
-            'Length of topic similarities rows does not match topic list.'
+            Exception, (
+                'Length of topic similarities rows: 2 does not match '
+                'length of topic list: 3.')
             ):
             recommendations_services.update_topic_similarities(
                 'Art,Biology,Chemistry\n'
