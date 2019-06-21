@@ -495,8 +495,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegexp(
-            Exception,
-            'The new change cmd must be equal to edit_state_property'):
+            Exception, (
+                'The following extra attributes are present: new_value, '
+                'old_value, property_name')):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_change_property_name(self):
