@@ -34,7 +34,7 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
         OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine'),
-    os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2'),
+    os.path.join(OPPIA_TOOLS_DIR, 'webtest-2.0.33'),
     os.path.join(
         OPPIA_TOOLS_DIR, 'google_appengine_1.9.67', 'google_appengine',
         'lib', 'webob_0_9'),
@@ -51,8 +51,8 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.17.0'),
     os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
     os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
-    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.38'),
-    os.path.join(THIRD_PARTY_DIR, 'requests-2.10.0'),
+    os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
+    os.path.join(THIRD_PARTY_DIR, 'requests-2.22.0'),
     os.path.join(THIRD_PARTY_DIR, 'simplejson-3.16.0'),
     os.path.join(THIRD_PARTY_DIR, 'six-1.12.0'),
     os.path.join(THIRD_PARTY_DIR, 'soupsieve-1.9.1'),

@@ -20,6 +20,12 @@
  * followed by the name of the arg.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('interactions/SetInput/directives/SetInputRulesService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require('services/contextual/WindowDimensionsService.ts');
+
 oppia.directive('oppiaInteractiveSetInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -19,6 +19,8 @@ require('services/CsrfService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 
+require('app.constants.ts');
+
 /**
  * @fileoverview Oppia's base controller.
  */

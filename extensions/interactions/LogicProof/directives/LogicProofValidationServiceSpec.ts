@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for logic proof validation service.
  */
 
+require('interactions/LogicProof/directives/LogicProofValidationService.ts');
+
 describe('LogicProofValidationService', function() {
   var validatorService, WARNING_TYPES;
 

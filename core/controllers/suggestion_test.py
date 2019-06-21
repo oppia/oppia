@@ -616,7 +616,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'default_state').to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
-                feconf.CURRENT_STATE_SCHEMA_VERSION)
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': [self.SKILL_ID]
         }
         self.login(self.AUTHOR_EMAIL)
         csrf_token = self.get_csrf_token()
@@ -726,7 +727,8 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
                 'default_state').to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
-                feconf.CURRENT_STATE_SCHEMA_VERSION)
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': [self.skill_id]
         }
 
         self.login(self.AUTHOR_EMAIL)

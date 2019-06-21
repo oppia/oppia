@@ -18,26 +18,8 @@
  */
 
 oppia.constant(
-  'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
-
-oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');
-oppia.constant(
-  'EXPLORATION_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>');
-oppia.constant(
-  'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
-  '/explorehandler/init/<exploration_id>?v=<version>');
-oppia.constant(
-  'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/data/<exploration_id>');
-oppia.constant(
-  'VOICEOVER_EXPLORATION_DATA_URL_TEMPLATE',
-  '/createhandler/voiceover/<exploration_id>');
-oppia.constant(
-  'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
-  '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
 oppia.constant(
   'EVENT_EXPLORATION_PROPERTY_CHANGED', 'explorationPropertyChanged');
@@ -67,3 +49,14 @@ oppia.constant(
   'IMPROVE_TYPE_INCOMPLETE', 'incomplete');
 
 oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
+
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+  'The solution is now valid!');
+
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  'The current solution is no longer valid.');
+
+oppia.constant('ACTION_ACCEPT_SUGGESTION', 'accept');
+oppia.constant('ACTION_REJECT_SUGGESTION', 'reject');
+
+oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');

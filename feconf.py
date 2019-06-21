@@ -38,6 +38,9 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
+# backend_prod_files contain processed JS and HTML files that are served by
+# Jinja, we are moving away from Jinja so this folder might not be needed later
+# (#6964)
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
@@ -45,7 +48,7 @@ ACTIONS_DIR = (
 ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+    os.path.join('extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
@@ -465,6 +468,9 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
 
+# The maximum number of questions to be fetched at one time.
+MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
+
 # The minimum score required for a user to review suggestions of a particular
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
@@ -648,6 +654,8 @@ QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
+REVIEW_TEST_URL_PREFIX = '/review_test'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
@@ -661,6 +669,7 @@ SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
