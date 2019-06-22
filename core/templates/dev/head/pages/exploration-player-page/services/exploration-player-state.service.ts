@@ -111,8 +111,8 @@ oppia.factory('ExplorationPlayerStateService', [
       currentEngineService = QuestionPlayerEngineService;
     };
 
-    var setStoryViewerMode = function() {
-      explorationMode = EXPLORATION_MODE.STORY_VIEWER;
+    var setStoryChapterMode = function() {
+      explorationMode = EXPLORATION_MODE.STORY_CHAPTER;
       currentEngineService = ExplorationEngineService;
     };
 
@@ -169,7 +169,7 @@ oppia.factory('ExplorationPlayerStateService', [
         } else if (
           UrlService.getUrlParams().hasOwnProperty('story_id') &&
           UrlService.getUrlParams().hasOwnProperty('node_id')) {
-          setStoryViewerMode();
+          setStoryChapterMode();
           initializeExplorationServices(explorationData, false, callback);
         } else {
           setExplorationMode();
@@ -204,8 +204,8 @@ oppia.factory('ExplorationPlayerStateService', [
       isInQuestionPlayerMode: function() {
         return explorationMode === EXPLORATION_MODE.QUESTION_PLAYER;
       },
-      isInStoryViewerMode: function() {
-        return explorationMode === EXPLORATION_MODE.STORY_VIEWER;
+      isInStoryChapterMode: function() {
+        return explorationMode === EXPLORATION_MODE.STORY_CHAPTER;
       },
       getPretestQuestionCount: function() {
         return QuestionPlayerEngineService.getPretestQuestionCount();
