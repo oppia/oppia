@@ -13,8 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Directive scipts for the exploration editor page and the editor
+ *               help tab in the navbar.
  */
 
-require('pages/OppiaFooterDirective.ts');
-require('base_components/BaseContentDirective.ts');
+require(
+  'pages/exploration-editor-page/editor-navigation/' +
+  'editor-navbar-breadcrumb.directive.ts');
+require(
+  'pages/exploration-editor-page/editor-navigation/' +
+  'editor-navigation.directive.ts');
+require(
+  'pages/exploration-editor-page/exploration-save-and-publish-buttons/' +
+  'exploration-save-and-publish-buttons.directive.ts');
+require('pages/exploration-editor-page/exploration-editor-page.controller.ts');
