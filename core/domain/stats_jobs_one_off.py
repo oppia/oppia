@@ -1293,41 +1293,52 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
         all_models = (
             stats_models.ExplorationStatsModel.get_multi_stats_models(
                 [exp_domain.ExpVersionReference(exp.id, version)
-                 for version in range(1, exp.version + 1, 1)]))
+                 for version in range(1, exp.version + 1)]))
         first_missing_version = -1
-        for i, model in enumerate(all_models):
+        for version, model in enumerate(all_models):
             if model is None:
-                first_missing_version = i + 1
+                first_missing_version = version + 1
 
         if first_missing_version == -1:
             yield ('No change', exp.id)
+            return
 
-        for i in range(first_missing_version - 1, exp.version + 1, 1):
+        if first_missing_version == 1:
+            yield ('Missing model at version 1', exp.id)
+            return
+
+        for version in range(first_missing_version - 1, exp.version + 1):
             commit_log = exp_models.ExplorationCommitLogEntryModel.get_commit(
-                exp.id, i)
-            exp_at_version_i = exp_models.ExplorationModel.get_version(
-                exp.id, i)
+                exp.id, version)
+            exp_at_version = exp_models.ExplorationModel.get_version(
+                exp.id, version)
             # Delete all old models.
-            if all_models[i - 1] is None:
+            if all_models[version - 1] is None:
                 if commit_log.commit_type != 'revert':
                     yield ('Missing model without revert commit', exp.id)
 
                 # Is a revert commit.
                 revert_to_version = commit_log.commit_cmds[0]['version_number']
                 stats_services.handle_stats_creation_for_new_exp_version(
-                    exp.id, i, exp_at_version_i.states, None, revert_to_version)
+                    exp.id, version, exp_at_version.states, None,
+                    revert_to_version)
                 yield ('Success (revert case)', exp.id)
             else:
-                all_models[i - 1].delete()
+                all_models[version - 1].delete()
                 change_list = (
                     [exp_domain.ExplorationChange(commit_cmd)
                      for commit_cmd in commit_log.commit_cmds])
                 exp_versions_diff = exp_domain.ExplorationVersionsDiff(
                     change_list)
                 stats_services.handle_stats_creation_for_new_exp_version(
-                    exp.id, i, exp_at_version_i.states, exp_versions_diff, None)
+                    exp.id, version, exp_at_version.states, exp_versions_diff,
+                    None)
+
                 yield ('Success (not revert case)', exp.id)
 
     @staticmethod
     def reduce(key, items):
-        yield (key, items)
+        if key in ('Success (revert case)', 'Success (not revert case)'):
+            yield (key, len(items))
+        else:
+            yield (key, len(items))
