@@ -1298,6 +1298,7 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
         for version, model in enumerate(all_models):
             if model is None:
                 first_missing_version = version + 1
+                break
 
         if first_missing_version == -1:
             yield ('No change', exp.id)
@@ -1316,13 +1317,13 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
             if all_models[version - 1] is None:
                 if commit_log.commit_type != 'revert':
                     yield ('Missing model without revert commit', exp.id)
+                    return
 
                 # Is a revert commit.
                 revert_to_version = commit_log.commit_cmds[0]['version_number']
                 stats_services.handle_stats_creation_for_new_exp_version(
                     exp.id, version, exp_at_version.states, None,
                     revert_to_version)
-                yield ('Success (revert case)', exp.id)
             else:
                 all_models[version - 1].delete()
                 change_list = (
@@ -1334,11 +1335,11 @@ class RegenerateMissingStatsModels(jobs.BaseMapReduceOneOffJobManager):
                     exp.id, version, exp_at_version.states, exp_versions_diff,
                     None)
 
-                yield ('Success (not revert case)', exp.id)
+        yield ('Success', exp.id)
 
     @staticmethod
     def reduce(key, items):
-        if key in ('Success (revert case)', 'Success (not revert case)'):
+        if key in ('Success', 'No change'):
             yield (key, len(items))
         else:
-            yield (key, len(items))
+            yield (key, items)
