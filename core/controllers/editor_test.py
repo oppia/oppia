@@ -2039,7 +2039,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             'is_valid': True
         }
 
-        self.login(self.MODERATOR_EMAIL)
+        with self.login_context(self.MODERATOR_EMAIL)
         self.csrf_token = self.get_new_csrf_token()
 
     def test_resolve_issue_handler(self):
