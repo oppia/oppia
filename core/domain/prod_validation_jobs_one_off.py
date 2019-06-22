@@ -24,6 +24,8 @@ import re
 from constants import constants
 from core import jobs
 from core.domain import activity_domain
+from core.domain import classifier_domain
+from core.domain import classifier_services
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import config_domain
@@ -39,14 +41,16 @@ import feconf
 
 (
     activity_models, audit_models, base_models,
-    collection_models, config_models, email_models,
-    exp_models, feedback_models, file_models,
+    classifier_models, collection_models,
+    config_models, email_models, exp_models,
+    feedback_models, file_models,
     recommendations_models, story_models,
     user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
-            models.NAMES.collection, models.NAMES.config, models.NAMES.email,
-            models.NAMES.exploration, models.NAMES.feedback, models.NAMES.file,
+            models.NAMES.classifier, models.NAMES.collection,
+            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+            models.NAMES.feedback, models.NAMES.file,
             models.NAMES.recommendations, models.NAMES.story,
             models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
@@ -565,6 +569,139 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {'user_ids': (user_models.UserSettingsModel, [item.user_id])}
+
+
+class ClassifierTrainingJobModelValidator(BaseModelValidator):
+    """Class for validating ClassifierTrainingJobModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [exp_id].[random_hash]
+        regex_string = '^%s\\.[A-Za-z0-9-_]{1,%s}$' % (
+            item.exp_id, base_models.ID_LENGTH)
+        return regex_string
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return classifier_services.get_classifier_training_job_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {'exploration_ids': (exp_models.ExplorationModel, [item.exp_id])}
+
+    @classmethod
+    def _validate_exp_version(cls, item):
+        """Validate that exp version is less than or equal to the version
+        of exploration corresponding to exp_id.
+
+        Args:
+            item: ndb.Model. ClassifierTrainingJobModel to validate.
+        """
+        exp_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+
+        for (_, _, exp_model) in (
+                exp_model_class_model_id_model_tuples):
+            if item.exp_version > exp_model.version:
+                cls.errors['exp version check'].append((
+                    'Entity id %s: Exploration version %s in entity is greater '
+                    'than the version %s of exploration corresponding to '
+                    'exp_id %s') % (
+                        item.id, item.exp_version, exp_model.version,
+                        item.exp_id))
+
+    @classmethod
+    def _validate_state_name(cls, item):
+        """Validate that state name is a valid state in the
+        exploration corresponding to exp_id.
+
+        Args:
+            item: ndb.Model. ClassifierTrainingJobModel to validate.
+        """
+        exp_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+
+        for (_, _, exp_model) in (
+                exp_model_class_model_id_model_tuples):
+            if item.state_name not in exp_model.states.keys():
+                cls.errors['state name check'].append((
+                    'Entity id %s: State name %s in entity is not present '
+                    'in states of exploration corresponding to '
+                    'exp_id %s') % (
+                        item.id, item.state_name, item.exp_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_exp_version,
+            cls._validate_state_name]
+
+
+class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
+    """Class for validating TrainingJobExplorationMappingModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [exp_id].[exp_version].[state_name]
+        regex_string = '^%s\\.%s\\.%s$' % (
+            item.exp_id, item.exp_version, item.state_name)
+        return regex_string
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return classifier_domain.TrainingJobExplorationMapping(
+            item.exp_id, item.exp_version, item.state_name, item.job_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {'exploration_ids': (exp_models.ExplorationModel, [item.exp_id])}
+
+    @classmethod
+    def _validate_exp_version(cls, item):
+        """Validate that exp version is less than or equal to the version
+        of exploration corresponding to exp_id.
+
+        Args:
+            item: ndb.Model. TrainingJobExplorationMappingModel to validate.
+        """
+        exp_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+
+        for (_, _, exp_model) in (
+                exp_model_class_model_id_model_tuples):
+            if item.exp_version > exp_model.version:
+                cls.errors['exp version check'].append((
+                    'Entity id %s: Exploration version %s in entity is greater '
+                    'than the version %s of exploration corresponding to '
+                    'exp_id %s') % (
+                        item.id, item.exp_version, exp_model.version,
+                        item.exp_id))
+
+    @classmethod
+    def _validate_state_name(cls, item):
+        """Validate that state name is a valid state in the
+        exploration corresponding to exp_id.
+
+        Args:
+            item: ndb.Model. TrainingJobExplorationMappingbModel to validate.
+        """
+        exp_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+
+        for (_, _, exp_model) in (
+                exp_model_class_model_id_model_tuples):
+            if item.state_name not in exp_model.states.keys():
+                cls.errors['state name check'].append((
+                    'Entity id %s: State name %s in entity is not present '
+                    'in states of exploration corresponding to '
+                    'exp_id %s') % (
+                        item.id, item.state_name, item.exp_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_exp_version,
+            cls._validate_state_name]
 
 
 class CollectionModelValidator(BaseModelValidator):
@@ -1895,6 +2032,10 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
 MODEL_TO_VALIDATOR_MAPPING = {
     activity_models.ActivityReferencesModel: ActivityReferencesModelValidator,
     audit_models.RoleQueryAuditModel: RoleQueryAuditModelValidator,
+    classifier_models.ClassifierTrainingJobModel: (
+        ClassifierTrainingJobModelValidator),
+    classifier_models.TrainingJobExplorationMappingModel: (
+        TrainingJobExplorationMappingModelValidator),
     collection_models.CollectionModel: CollectionModelValidator,
     collection_models.CollectionSnapshotMetadataModel: (
         CollectionSnapshotMetadataModelValidator),
@@ -2006,6 +2147,23 @@ class RoleQueryAuditModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [audit_models.RoleQueryAuditModel]
+
+
+class ClassifierTrainingJobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ClassifierTrainingJobModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [classifier_models.ClassifierTrainingJobModel]
+
+
+class TrainingJobExplorationMappingModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates TrainingJobExplorationMappingModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [classifier_models.TrainingJobExplorationMappingModel]
 
 
 class CollectionModelAuditOneOffJob(ProdValidationAuditOneOffJob):

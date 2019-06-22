@@ -56,14 +56,16 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
 
 (
     activity_models, audit_models, base_models,
-    collection_models, config_models, email_models,
-    exp_models, feedback_models, file_models,
+    classifier_models, collection_models,
+    config_models, email_models, exp_models,
+    feedback_models, file_models,
     recommendations_models, story_models,
     user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
-            models.NAMES.collection, models.NAMES.config, models.NAMES.email,
-            models.NAMES.exploration, models.NAMES.feedback, models.NAMES.file,
+            models.NAMES.classifier, models.NAMES.collection,
+            models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
+            models.NAMES.feedback, models.NAMES.file,
             models.NAMES.recommendations, models.NAMES.story,
             models.NAMES.user]))
 
@@ -125,7 +127,6 @@ def run_job_and_check_output(
         self.assertEqual(sorted(actual_output), sorted(expected_output))
     else:
         self.assertEqual(actual_output, expected_output)
-
 
 
 def update_datastore_types_for_mock_datetime():
@@ -421,6 +422,247 @@ class RoleQueryAuditModelValidatorTests(test_utils.GenericTestBase):
             'RoleQueryAuditModel\', '
             '[u\'Entity id %s: Entity id does not match regex pattern\']]'
         ) % model_invalid_id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ClassifierTrainingJobModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(2)]
+
+        for exp in explorations:
+            exp.add_states(['StateTest%s' % exp.id])
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        next_scheduled_check_time = datetime.datetime.utcnow()
+        id0 = classifier_models.ClassifierTrainingJobModel.create(
+            'TextClassifier', 'TextInput', '0', 1,
+            next_scheduled_check_time,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'StateTest0', feconf.TRAINING_JOB_STATUS_NEW,
+            None, 1)
+        self.model_instance_0 = (
+            classifier_models.ClassifierTrainingJobModel.get_by_id(id0))
+        id1 = classifier_models.ClassifierTrainingJobModel.create(
+            'CodeClassifier', 'CodeRepl', '1', 1,
+            next_scheduled_check_time,
+            [{'answer_group_index': 1, 'answers': ['a1', 'a2']}],
+            'StateTest1', feconf.TRAINING_JOB_STATUS_NEW,
+            None, 1)
+        self.model_instance_1 = (
+            classifier_models.ClassifierTrainingJobModel.get_by_id(id1))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob) # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ClassifierTrainingJobModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of ClassifierTrainingJobModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ClassifierTrainingJobModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_ids field '
+                'check of ClassifierTrainingJobModel\', '
+                '[u"Entity id %s: based on field exploration_ids having value '
+                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                'exist"]]') % self.model_instance_0.id,
+            u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_exp_version(self):
+        self.model_instance_0.exp_version = 5
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for exp version check '
+                'of ClassifierTrainingJobModel\', [u\'Entity id %s: '
+                'Exploration version 5 in entity is greater than the '
+                'version 1 of exploration corresponding to exp_id 0\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_state_name(self):
+        self.model_instance_0.state_name = 'invalid'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for state name check '
+                'of ClassifierTrainingJobModel\', [u\'Entity id %s: '
+                'State name invalid in entity is not present in '
+                'states of exploration corresponding to exp_id 0\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_schema(self):
+        self.model_instance_0.interaction_id = 'invalid'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check '
+                'of ClassifierTrainingJobModel\', [u\'Entity id %s: Entity '
+                'fails domain validation with the error Invalid '
+                'interaction id: invalid\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated ClassifierTrainingJobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class TrainingJobExplorationMappingModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(TrainingJobExplorationMappingModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        explorations = [exp_domain.Exploration.create_default_exploration(
+            '%s' % i,
+            title='title %d' % i,
+            category='category%d' % i,
+        ) for i in xrange(2)]
+
+        for exp in explorations:
+            exp.add_states(['StateTest%s' % exp.id])
+            exp_services.save_new_exploration(self.owner_id, exp)
+
+        id0 = classifier_models.TrainingJobExplorationMappingModel.create(
+            '0', 1, 'StateTest0', 'job0')
+        self.model_instance_0 = (
+            classifier_models.TrainingJobExplorationMappingModel.get_by_id(id0))
+        id1 = classifier_models.TrainingJobExplorationMappingModel.create(
+            '1', 1, 'StateTest1', 'job1')
+        self.model_instance_1 = (
+            classifier_models.TrainingJobExplorationMappingModel.get_by_id(id1))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.TrainingJobExplorationMappingModelAuditOneOffJob) # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of TrainingJobExplorationMappingModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'TrainingJobExplorationMappingModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_ids field '
+                'check of TrainingJobExplorationMappingModel\', '
+                '[u"Entity id %s: based on field exploration_ids having value '
+                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                'exist"]]') % self.model_instance_0.id,
+            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_exp_version(self):
+        model_instance_with_invalid_exp_version = (
+            classifier_models.TrainingJobExplorationMappingModel(
+                id='0.5.StateTest0', exp_id='0', exp_version=5,
+                state_name='StateTest0', job_id='job_id'))
+        model_instance_with_invalid_exp_version.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for exp version check '
+                'of TrainingJobExplorationMappingModel\', [u\'Entity id %s: '
+                'Exploration version 5 in entity is greater than the '
+                'version 1 of exploration corresponding to exp_id 0\']]'
+            ) % model_instance_with_invalid_exp_version.id,
+            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_state_name(self):
+        model_instance_with_invalid_state_name = (
+            classifier_models.TrainingJobExplorationMappingModel(
+                id='0.1.invalid', exp_id='0', exp_version=1,
+                state_name='invalid', job_id='job_id'))
+        model_instance_with_invalid_state_name.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for state name check '
+                'of TrainingJobExplorationMappingModel\', [u\'Entity id %s: '
+                'State name invalid in entity is not present in '
+                'states of exploration corresponding to exp_id 0\']]'
+            ) % model_instance_with_invalid_state_name.id,
+            u'[u\'fully-validated TrainingJobExplorationMappingModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
@@ -1005,7 +1247,8 @@ class CollectionRightsModelValidatorTests(test_utils.GenericTestBase):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_first_published_datetime_than_current_time(self):
+    def test_model_with_first_published_datetime_greater_than_current_time(
+            self):
         rights_manager.publish_collection(self.owner, '0')
         rights_manager.publish_collection(self.owner, '1')
         self.model_instance_0.first_published_msec = (
@@ -3101,7 +3344,8 @@ class ExplorationRightsModelValidatorTests(test_utils.GenericTestBase):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_first_published_datetime_than_current_time(self):
+    def test_model_with_first_published_datetime_greater_than_current_time(
+            self):
         rights_manager.publish_exploration(self.owner, '0')
         rights_manager.publish_exploration(self.owner, '1')
         self.model_instance_0.first_published_msec = (
@@ -3818,7 +4062,8 @@ class ExpSummaryModelValidatorTests(test_utils.GenericTestBase):
             update_datastore_types_for_mock_datetime()
             run_job_and_check_output(self, expected_output, sort=True)
 
-    def test_model_with_first_published_datetime_than_current_time(self):
+    def test_model_with_first_published_datetime_greater_than_current_time(
+            self):
         rights_manager.publish_exploration(self.owner, '0')
         rights_manager.publish_exploration(self.owner, '1')
         self.model_instance_0 = exp_models.ExpSummaryModel.get_by_id('0')

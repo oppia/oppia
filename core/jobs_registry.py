@@ -53,6 +53,8 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob,
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TrainingJobExplorationMappingModelAuditOneOffJob, # pylint: disable=line-too-long
     prod_validation_jobs_one_off.CollectionModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob,
