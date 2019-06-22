@@ -257,11 +257,11 @@ class ImageAssets(object):
             image_re = r'image_id_[0-9]{1,}$'
             if not re.match(image_re, image_id):
                 raise utils.ValidationError(
-                    'Invalid image_id received %s' % image_id)
+                    'Invalid image_id received: %s' % image_id)
             numeric_part_of_image_id = int(image_id.strip('image_id_'))
             if numeric_part_of_image_id > image_counter:
                 raise Exception(
-                    'Image Id is greater then image_id counter'
+                    'Image Id is greater then image_id counter '
                     'not possible, received image_id is %s' %
                     image_id)
             image = self.image_mapping[image_id]
@@ -308,9 +308,6 @@ class ImageAssets(object):
             image_id: int. The image_id of an image.
             image_object: dict. The image object.
         """
-        image_re = r'image_id_[0-9]{1,}$'
-        if not re.match(image_re, image_id):
-            raise utils.ValidationError('Incorrect image_id')
         if image_id in self.image_mapping:
             raise utils.ValidationError(
                 'Image Id already exist: %s' % image_id)
@@ -324,7 +321,8 @@ class ImageAssets(object):
             image_id: str. ID of an image.
         """
         if image_id not in self.image_mapping:
-            raise utils.ValidationError('ImageId does not exist')
+            raise utils.ValidationError(
+                'ImageId does not exist: %s' % image_id)
 
         del self.image_mapping[image_id]
 
