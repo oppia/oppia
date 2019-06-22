@@ -25,29 +25,39 @@ oppia.factory('QuestionPlayerStateService', [
       return new Date().getTime();
     };
 
-    var createNewQuestionPlayerState = function(questionId) {
-      questionPlayerState[questionId] = {answers: [], usedHints: []};
+    var createNewQuestionPlayerState = function(
+      questionId, linkedSkillIds) {
+      questionPlayerState[questionId] = {
+        linkedSkillIds: linkedSkillIds,
+        answers: [],
+        usedHints: []};
     };
 
-    var _hintUsed = function(questionId) {
+    var _hintUsed = function(question) {
+      var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(questionId);
+        createNewQuestionPlayerState(questionId,
+          question.getLinkedSkillIds());
       }
       questionPlayerState[questionId].usedHints.push(
         {timestamp: getCurrentTime()});
     };
 
     var _solutionViewed = function(questionId) {
+      var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(questionId);
+        createNewQuestionPlayerState(questionId,
+          question.getLinkedSkillIds());
       }
       questionPlayerState[questionId].viewedSolution = {
         timestamp: getCurrentTime()};
     };
 
     var _answerSubmitted = function(questionId, isCorrect) {
+      var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(questionId);
+        createNewQuestionPlayerState(questionId,
+          question.getLinkedSkillIds());
       }
       // Don't store a correct answer in the case where
       // the learner viewed the solution for this question.
