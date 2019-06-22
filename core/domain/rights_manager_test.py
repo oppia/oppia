@@ -615,7 +615,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(exp_rights.is_voice_artist(self.user_id_d))
         self.assertFalse(exp_rights.is_voice_artist(self.user_id_b))
 
-
     def test_get_multiple_exploration_rights(self):
         exp_ids = ['exp1', 'exp2', 'exp3', 'exp4']
 
@@ -631,8 +630,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.assertIsNotNone(rights_object)
         self.assertIsNone(exp_rights[3])
 
-
-    def test_owner_cannot_be_assigned_role_owner(self):
+    def test_owner_cannot_be_reassigned_as_owner(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -675,7 +673,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(exp_rights.is_owner(self.user_id_b))
 
-    def test_editor_cannot_be_assigned_role_editor(self):
+    def test_editor_cannot_be_reassigned_editor(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -689,7 +687,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_manager.ROLE_EDITOR)
 
-    def test_voice_artist_cannot_be_assigned_role_voice_artist(self):
+    def test_voice_artist_cannot_be_reassigned_voice_artist(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -703,7 +701,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_manager.ROLE_VOICE_ARTIST)
 
-    def test_viewer_cannot_be_assigned_role_viewer(self):
+    def test_viewer_cannot_be_reassigned_viewer(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -773,7 +771,6 @@ class CollectionRightsTests(test_utils.GenericTestBase):
         self.user_moderator = user_services.UserActionsInfo(
             self.user_id_moderator)
         self.system_user = user_services.get_system_user()
-
 
     def test_get_collection_rights_for_nonexistent_collection(self):
         non_col_id = 'this_collection_does_not_exist_id'

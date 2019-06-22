@@ -218,7 +218,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
-    def test_cannot_create_subtopic_page_change_with_invalid_change_dict(self):
+    def test_cannot_create_subtopic_page_change_with_empty_change_dict(self):
         with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
             subtopic_page_domain.SubtopicPageChange({})
 
