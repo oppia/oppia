@@ -17,6 +17,7 @@
 """Services for exploration-related statistics."""
 
 import collections
+import copy
 import itertools
 
 from core.domain import interaction_registry
@@ -542,9 +543,10 @@ def get_exp_issues_from_model(exp_issues_model):
     """
     unresolved_issues = []
     for unresolved_issue_dict in exp_issues_model.unresolved_issues:
-        _migrate_to_latest_issue_schema(unresolved_issue_dict)
+        unresolved_issue_dict_copy = copy.deepcopy(unresolved_issue_dict)
+        _migrate_to_latest_issue_schema(unresolved_issue_dict_copy)
         unresolved_issues.append(
-            stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict))
+            stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict_copy))
     return stats_domain.ExplorationIssues(
         exp_issues_model.exp_id, exp_issues_model.exp_version,
         unresolved_issues)
