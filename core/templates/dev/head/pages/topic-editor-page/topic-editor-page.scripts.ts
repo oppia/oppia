@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Directive scripts for the topic editor page.
  */
 
-require('pages/OppiaFooterDirective.ts');
-require('base_components/BaseContentDirective.ts');
+require(
+  'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');
+require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');
+require('pages/topic-editor-page/topic-editor-page.controller.ts');

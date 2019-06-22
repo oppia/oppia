@@ -13,8 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Directive scripts to be used in the learner view.
  */
 
-require('pages/OppiaFooterDirective.ts');
-require('base_components/BaseContentDirective.ts');
+require('pages/exploration-player-page/exploration-player-page.controller.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'exploration-footer.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'learner-local-nav.directive.ts');
+require(
+  'pages/exploration-player-page/layout-directives/' +
+  'learner-view-info.directive.ts');

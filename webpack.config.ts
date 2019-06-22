@@ -54,10 +54,10 @@ module.exports = {
     error: commonPrefix + '/pages/error-pages/error-page.scripts.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
-      'exploration-editor-page.controller.ts',
+      'exploration-editor-page.scripts.ts',
     exploration_player:
       commonPrefix + '/pages/exploration-player-page/' +
-      'exploration-player-page.controller.ts',
+      'exploration-player-page.scripts.ts',
     get_started:
       commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
@@ -80,32 +80,32 @@ module.exports = {
     privacy: commonPrefix + '/pages/privacy-page/privacy-page.controller.ts',
     preferences:
       commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
-    profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
+    profile: commonPrefix + '/pages/profile-page/profile-page.scripts.ts',
     review_test:
       commonPrefix + '/pages/review-test-page/review-test-page.scripts.ts',
-    signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
+    signup: commonPrefix + '/pages/signup-page/signup-page.scripts.ts',
     skill_editor:
-      commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
+      commonPrefix + '/pages/skill-editor-page/skill-editor-page.scripts.ts',
     splash: commonPrefix + '/pages/splash-page/splash-page.scripts.ts',
     stewards:
       commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
       'stewards-landing-page.scripts.ts',
     story_editor:
-      commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
+      commonPrefix + '/pages/story-editor-page/story-editor-page.scripts.ts',
     story_viewer:
       commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
-    teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
+    teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
     topic_editor:
-      commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
+      commonPrefix + '/pages/topic-editor-page/topic-editor-page.scripts.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
       'topics-and-skills-dashboard-page.controller.ts'
     ),
     topic_viewer:
-      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.controller.ts',
+      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
     new HtmlWebpackPlugin({

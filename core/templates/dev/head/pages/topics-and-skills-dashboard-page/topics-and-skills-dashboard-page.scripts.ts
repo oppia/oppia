@@ -13,8 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Directive scripts for the topics and skills dashboard.
  */
 
-require('pages/OppiaFooterDirective.ts');
-require('base_components/BaseContentDirective.ts');
+require(
+  'pages/topics-and-skills-dashboard-page/navbar/' +
+  'topics-and-skills-dashboard-navbar-breadcrumb.directive.ts'
+);
+require(
+  'pages/topics-and-skills-dashboard-page/navbar/' +
+  'topics-and-skills-dashboard-navbar.directive.ts'
+);
+require(
+  'pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.controller.ts');

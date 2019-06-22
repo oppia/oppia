@@ -107,9 +107,22 @@ require('pages/skill-editor-page/questions-tab/questions-tab.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
-oppia.controller('SkillEditor', [
-  'SkillEditorStateService', 'UrlService',
-  function(SkillEditorStateService, UrlService) {
-    SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
-  }
-]);
+oppia.directive('skillEditorPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/skill-editor-page/skill-editor-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      'SkillEditorRoutingService', 'SkillEditorStateService', 'UrlService',
+      function(SkillEditorRoutingService, SkillEditorStateService, UrlService) {
+        var ctrl = this;
+        ctrl.getActiveTabName = SkillEditorRoutingService.getActiveTabName;
+        SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
+      }
+    ]
+  };
+}]);

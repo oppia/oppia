@@ -86,15 +86,6 @@ require(
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
-require(
-  'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
-require(
-  'pages/exploration-player-page/layout-directives/' +
-  'learner-local-nav.directive.ts');
-require(
-  'pages/exploration-player-page/layout-directives/' +
-  'learner-view-info.directive.ts');
 
 require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
@@ -103,14 +94,30 @@ require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
 
-oppia.controller('ExplorationPlayer', [
-  'ContextService', 'PageTitleService', 'ReadOnlyExplorationBackendApiService',
-  function(
-      ContextService, PageTitleService, ReadOnlyExplorationBackendApiService) {
-    var explorationId = ContextService.getExplorationId();
-    ReadOnlyExplorationBackendApiService.fetchExploration(explorationId, null)
-      .then(function(response) {
-        PageTitleService.setPageTitle(response.exploration.title + ' - Oppia');
-      });
-  }
-]);
+oppia.directive('explorationPlayerPage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration-player-page/' +
+        'exploration-player-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        'ContextService', 'PageTitleService',
+        'ReadOnlyExplorationBackendApiService',
+        function(
+            ContextService, PageTitleService,
+            ReadOnlyExplorationBackendApiService) {
+          var explorationId = ContextService.getExplorationId();
+          ReadOnlyExplorationBackendApiService.fetchExploration(
+            explorationId, null)
+            .then(function(response) {
+              PageTitleService.setPageTitle(
+                response.exploration.title + ' - Oppia');
+            });
+        }
+      ]
+    };
+  }]);

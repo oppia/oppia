@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Contstans to be used in the learner view.
+ * @fileoverview Constants to be used in the learner view.
  */
 
 oppia.constant('CONTENT_FOCUS_LABEL_PREFIX', 'content-focus-label-');
