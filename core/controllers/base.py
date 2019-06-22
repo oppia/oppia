@@ -311,7 +311,6 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.expires = 'Mon, 01 Jan 1990 00:00:00 GMT'
         self.response.pragma = 'no-cache'
 
-
     def render_static_template(self, filepath, iframe_restriction='DENY'):
         """Prepares a Jinja-less HTML response to be sent to the client.
         Args:
