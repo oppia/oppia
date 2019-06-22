@@ -21,7 +21,8 @@
       <score-ring score="$ctrl.totalScore"></score-ring>
       <h4 class="learn-more"> Learn more about your score </h4>
     </div>
-    <div class="oppia-question-player-card question-player-results-footer">
+    <div class="oppia-question-player-card question-player-results-footer"
+         ng-if="$ctrl.showActionButtonsFooter()">
       <span data-ng-repeat="actionButton in $ctrl.getQuestionPlayerConfig().resultActionButtons"
             ng-click="$ctrl.performAction(actionButton)">
         <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">

@@ -63,6 +63,9 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'exploration_id': self.exp_id
         }
 
+        self.save_new_skill('skill_id_1', self.admin_id, 'Skill 1')
+        self.save_new_skill('skill_id_2', self.admin_id, 'Skill 2')
+
         self.story = story_domain.Story.create_default_story(
             self.story_id_1, 'Public Story Title', self.topic_id)
         self.story.story_contents.nodes = [
@@ -132,9 +135,13 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     self.story_id_1))
-            self.assertEqual(len(json_response['skill_ids']), 2)
-            self.assertEqual(json_response['skill_ids'][0], 'skill_id_1')
-            self.assertEqual(json_response['skill_ids'][1], 'skill_id_2')
+            self.assertEqual(len(json_response['skills_with_description']), 2)
+            self.assertEqual(
+                json_response['skills_with_description']['skill_id_1'],
+                'Skill 1')
+            self.assertEqual(
+                json_response['skills_with_description']['skill_id_2'],
+                'Skill 2')
 
     def test_no_user_can_access_unpublished_story_review_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):

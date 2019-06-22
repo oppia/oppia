@@ -182,6 +182,10 @@ oppia.directive('questionPlayer', [
             }
           };
 
+          ctrl.showActionButtonsFooter = function() {
+            return (questionPlayerConfig.resultActionButtons &&
+              questionPlayerConfig.resultActionButtons.length > 0);
+          };
 
           var boostScoreModal = function() {
             // Will open a boost score modal that explains the worst skill
