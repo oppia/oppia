@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Directive scripts for the story editor page.
  */
 
-require('pages/OppiaFooterDirective.ts');
-require('base_components/BaseContentDirective.ts');
+require(
+  'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
+require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');
+require('pages/story-editor-page/story-editor-page.controller.ts');
