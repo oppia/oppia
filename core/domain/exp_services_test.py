@@ -128,9 +128,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         # Invalid image_id (image_id > image_counter)
         change_dict_2 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'image_id_50',
             'image_info': {
@@ -149,9 +148,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         # Invalid image_id (image_id doesn't exist)
         change_dict_3 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'image_id_22',
             'image_info': {
@@ -169,9 +167,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         # Invalid image_id (image_id is not int)
         change_dict_3 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'image_id_invalid',
             'image_info': {
@@ -189,9 +186,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         # Invalid image_info (image_id is not dict)
         change_dict_3 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'invalid',
             'image_info': 'invalid'
@@ -224,9 +220,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             }
 
         change_dict_2 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'image_id_1',
             'image_info': {
@@ -349,9 +344,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
 
         change_dict_2 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'image_id_1',
             'image_info': {
@@ -362,9 +356,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         }
 
         change_dict_3 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'image_id_2',
             'image_info': {
@@ -375,9 +368,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         }
 
         change_dict_4 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'image_id_3',
             'image_info': {
@@ -518,9 +510,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             }
 
         change_dict_2 = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
-            'property_name': exp_domain.STATE_PROPERTY_IMAGE_ASSETS,
             'action': 'add_image',
             'image_id': 'image_id_1',
             'image_info': {

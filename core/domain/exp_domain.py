@@ -80,6 +80,7 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
 
+CMD_IMAGE_ASSETS = 'image_assets'
 # ImageAssets Actions.
 ACTION_ADD_IMAGE = 'add_image'
 
@@ -174,7 +175,7 @@ class ExplorationChange(change_domain.BaseChange):
         'name': CMD_EDIT_STATE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'state_name', 'new_value'],
-        'optional_attribute_names': ['old_value', 'image_id', 'image_info', 'action'],
+        'optional_attribute_names': ['old_value'],
         'allowed_values': {'property_name': STATE_PROPERTIES}
     }, {
         'name': CMD_EDIT_EXPLORATION_PROPERTY,
@@ -184,6 +185,11 @@ class ExplorationChange(change_domain.BaseChange):
     }, {
         'name': CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_IMAGE_ASSETS,
+        'required_attribute_names': [
+            'action', 'image_id', 'image_info', 'state_name'],
         'optional_attribute_names': []
     }, {
         'name': exp_models.ExplorationModel.CMD_REVERT_COMMIT,

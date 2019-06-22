@@ -765,26 +765,23 @@ def apply_change_list(exploration_id, change_list):
                         state_domain.WrittenTranslations.from_dict(
                             change.new_value))
                     state.update_written_translations(written_translations)
-                elif (
-                        change.property_name ==
-                        exp_domain.STATE_PROPERTY_IMAGE_ASSETS):
+            elif change.cmd == exp_domain.CMD_IMAGE_ASSETS:
+                if change.action == exp_domain.ACTION_ADD_IMAGE:
+                    # Increment image_counter.
+                    image_counter = exploration.image_counter
+                    image_counter += 1
 
-                    if change.action == exp_domain.ACTION_ADD_IMAGE:
-                        # Increment image_counter.
-                        image_counter = exploration.image_counter
-                        image_counter += 1
-
-                        if not isinstance(change.image_info, dict):
-                            raise Exception(
-                                'Expected image_info to be dict, '
-                                'received %s' % change.image_info)
-                        image_object = state_domain.Image(
-                            change.image_info['src'],
-                            change.image_info['placeholder'],
-                            change.image_info['instructions'])
-                        state.image_assets.add_image(
-                            change.image_id, image_object)
-                        exploration.update_image_counter(image_counter)
+                    if not isinstance(change.image_info, dict):
+                        raise Exception(
+                            'Expected image_info to be dict, '
+                            'received %s' % change.image_info)
+                    image_object = state_domain.Image(
+                        change.image_info['src'],
+                        change.image_info['placeholder'],
+                        change.image_info['instructions'])
+                    state.image_assets.add_image(
+                        change.image_id, image_object)
+                    exploration.update_image_counter(image_counter)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
