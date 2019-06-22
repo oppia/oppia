@@ -658,8 +658,8 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         self.image_object = state_domain.Image.from_dict(self.image_dict)
 
     def test_validate_image_assets_succesfully(self):
-        image_assets_object = (state_domain.ImageAssets.from_dict
-            (self.image_assets_dict))
+        image_assets_object = (
+            state_domain.ImageAssets.from_dict(self.image_assets_dict))
         image_assets_object.validate(2)
 
     def test_from_and_to_dict_works_correctly(self):
@@ -672,8 +672,8 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
             'image_id_invalid': self.image_object
         }
         state = state_domain.ImageAssets(image_mapping)
-        with self.assertRaisesRegexp(Exception,
-            'Invalid image_id received: image_id_invalid'):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid image_id received: image_id_invalid'):
             state.validate(1)
 
     def test_delete_image(self):
@@ -693,8 +693,8 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(image_assets.to_dict(), expected_image_assets_dict)
 
         # Test for deleting image, whose image id doesnot exist.
-        with self.assertRaisesRegexp(Exception, 
-            'ImageId does not exist: image_id_8'):
+        with self.assertRaisesRegexp(
+            Exception, 'ImageId does not exist: image_id_8'):
             image_assets.delete_image('image_id_8')
 
     def test_add_image(self):
@@ -730,21 +730,21 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(image_assets.to_dict(), expected_image_assets_dict)
 
         # Test for adding image, whose image id already exist.
-        with self.assertRaisesRegexp(Exception,
-            'Image Id already exist: image_id_1'):
+        with self.assertRaisesRegexp(
+            Exception, 'Image Id already exist: image_id_1'):
             image_assets.add_image('image_id_1', self.image_object)
 
         # Test for adding invalid image id.
         image_assets.add_image('image_id_1_invalid', self.image_object)
-        with self.assertRaisesRegexp(Exception, 
-            'Invalid image_id received: image_id_1_invalid'):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid image_id received: image_id_1_invalid'):
             image_assets.validate(3)
 
         # Test for adding image_id, which is greater then image counter.
         image_assets.add_image('image_id_10', self.image_object)
-        with self.assertRaisesRegexp(Exception, 
-            'Image Id is greater then image_id counter not possible, received '
-            'image_id is image_id_10'):
+        with self.assertRaisesRegexp(
+            Exception, 'Image Id is greater then image_id counter not possible,'
+            'received image_id is image_id_10'):
             image_assets.validate(3)
 
     def test_get_all_image_ids(self):
@@ -756,8 +756,8 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
 
     def test_clean_image_assets(self):
         image_ids_in_state = [u'image_id_1']
-        image_assets_object = (state_domain.ImageAssets.from_dict
-                    (self.image_assets_dict))
+        image_assets_object = (
+            state_domain.ImageAssets.from_dict(self.image_assets_dict))
         image_assets_object.clean_image_assets(image_ids_in_state)
 
 
