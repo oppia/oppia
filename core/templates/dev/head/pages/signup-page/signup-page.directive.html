@@ -1,0 +1,86 @@
+<!-- NOTE: This page should not contain any direct anchors to internal links. If the user visits an internal
+link before completing the signup process, they will be logged out.
+-->
+
+<div class="oppia-page-cards-container">
+  <md-card class="oppia-page-card">
+    <h2 class="oppia-signup-page-title" translate="I18N_SIGNUP_COMPLETE_REGISTRATION"></h2>
+
+    <form>
+      <div ng-show="!$ctrl.hasUsername" role="form" class="form-horizontal">
+        <div class="form-group">
+          <label for="username" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_USERNAME"></label>
+
+          <div class="col-lg-9 col-md-9 col-sm-9">
+            <input type="text" ng-model="$ctrl.username" id="username" class="form-control protractor-test-username-input" ng-blur="$ctrl.onUsernameInputFormBlur($ctrl.username)" ng-change="$ctrl.updateWarningText($ctrl.username)" ng-trim="false" focus-on="usernameInputField" style="width: 260px;" autofocus="true">
+            <span class="help-block" style="font-size: 0.8em;" translate="I18N_SIGNUP_USERNAME_EXPLANATION"></span>
+            <div style="height: 18px; width: 550px;">
+              <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce">
+                <[$ctrl.warningI18nCode | translate]>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div ng-show="$ctrl.showEmailPreferencesForm" class="form-group">
+          <label for="$ctrl.canReceiveEmailUpdates" class="col-lg-3 col-md-3 col-sm-3" translate="I18N_SIGNUP_EMAIL_PREFERENCES"></label>
+          <div class="col-lg-9 col-md-9 col-sm-9">
+            <div class="radio">
+              <label>
+                <input type="radio" ng-model="$ctrl.canReceiveEmailUpdates" value="yes" name="canReceiveEmailUpdates" ng-change="$ctrl.onSelectEmailPreference()">
+                <span translate="I18N_SIGNUP_SEND_ME_NEWS"></span>
+              </label>
+              <label>
+                <input type="radio" ng-model="$ctrl.canReceiveEmailUpdates" value="no" name="canReceiveEmailUpdates" ng-change="$ctrl.onSelectEmailPreference()">
+                <span translate="I18N_SIGNUP_DO_NOT_SEND_EMAILS"></span>
+              </label>
+              <span class="help-block" style="font-size: smaller" translate="I18N_SIGNUP_EMAIL_PREFERENCES_EXPLAIN">
+              </span>
+            </div>
+            <div style="height: 18px; width: 550px;">
+              <span style="color: red; font-size: 0.8em;" aria-live="assertive" ng-show="$ctrl.blurredAtLeastOnce" translate="<[$ctrl.emailPreferencesWarningText]>">
+              </span>
+            </div>
+          </div>
+        </div>
+        <hr>
+      </div>
+
+      <div class="oppia-long-text" ng-if="$ctrl.hasEverRegistered">
+        <p>
+          <em translate="I18N_SIGNUP_UPDATE_WARNING"></em>
+        </p>
+      </div>
+      <div class="oppia-long-text" ng-if="!$ctrl.hasEverRegistered">
+        <p style="font-size: 1em;" translate="I18N_SIGNUP_SITE_DESCRIPTION" translate-values="{siteName: $ctrl.siteName}">
+
+        </p>
+      </div>
+
+      <div>
+        <strong translate="I18N_SIGNUP_CC_TITLE"></strong>
+        <br>
+        <span translate="I18N_SIGNUP_LICENSE_NOTE" translate-compile></span>
+      </div>
+
+      <hr>
+
+      <div class="checkbox oppia-long-text">
+        <label>
+          <input type="checkbox" ng-model="$ctrl.hasAgreedToLatestTerms"
+                 class="protractor-test-agree-to-terms-checkbox">
+          <span translate="I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION" translate-value-sitename="<[$ctrl.siteName]>">
+          </span>
+        </label>
+      </div>
+
+      <br>
+
+      <button type="submit" class="btn btn-success protractor-test-register-user"
+              ng-disabled="$ctrl.warningI18nCode || !$ctrl.hasAgreedToLatestTerms || $ctrl.submissionInProcess"
+              ng-click="$ctrl.submitPrerequisitesForm($ctrl.hasAgreedToLatestTerms, $ctrl.username, $ctrl.canReceiveEmailUpdates)"
+              translate="I18N_SIGNUP_BUTTON_SUBMIT">
+      </button>
+    </form>
+  </md-card>
+</div>

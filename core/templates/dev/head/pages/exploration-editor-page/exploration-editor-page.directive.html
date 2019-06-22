@@ -1,0 +1,59 @@
+<div ng-cloak>
+  <div class="container-fluid oppia-editor-page-container" ng-joy-ride="$ctrl.tutorialInProgress" config="$ctrl.EDITOR_TUTORIAL_OPTIONS" on-finish="$ctrl.onFinishTutorial()" on-skip="$ctrl.onSkipTutorial()">
+    <div class="row" ng-if="$ctrl.ExplorationRightsService.isCloned()">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <div class="oppia-align-center uib-alert alert-warning" style="padding: 2px; width: 90%;">
+          <strong>Note:</strong> This is a private, unpublishable copy of a
+          <a ng-href="<[$ctrl.getExplorationUrl($ctrl.ExplorationRightsService.clonedFrom())]>" target="_blank" rel="noopener">public exploration</a>.
+        </div>
+      </div>
+    </div>
+
+    <exploration-editor-tab ng-show="$ctrl.getActiveTabName() === 'main'">
+    </exploration-editor-tab>
+
+    <translation-tab ng-if="$ctrl.getActiveTabName() === 'translation'">
+    </translation-tab>
+    <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
+    <preview-tab ng-if="$ctrl.getActiveTabName() === 'preview'">
+    </preview-tab>
+
+    <statistics-tab ng-show="$ctrl.getActiveTabName() === 'stats'">
+    </statistics-tab>
+
+    <improvements-tab ng-if="$ctrl.getActiveTabName() === 'improvements'">
+    </improvements-tab>
+
+    <settings-tab ng-show="$ctrl.getActiveTabName() === 'settings'" current-user-is-admin="$ctrl.currentUserIsAdmin" current-user-is-moderator="$ctrl.currentUserIsModerator">
+    </settings-tab>
+
+    <history-tab ng-show="$ctrl.getActiveTabName() === 'history'">
+    </history-tab>
+
+    <feedback-tab ng-show="$ctrl.getActiveTabName() === 'feedback'">
+    </feedback-tab>
+  </div>
+</div>
+
+<!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
+<svg width="0" height="0">
+  <defs>
+    <marker id="arrowhead" viewBox="0 0 18 18" refX="10" refY="3"
+            markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 4 L 0 8 z" fill="grey"></path>
+    </marker>
+    <marker id="arrowhead-green" viewBox="0 0 18 18" refX="10" refY="3"
+            markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 4 L 0 8 z" fill="#1F7D1F"></path>
+    </marker>
+    <marker id="arrowhead-red" viewBox="0 0 18 18" refX="10" refY="3"
+            markerWidth="10" markerHeight="6" orient="auto">
+      <path d="M 0 0 L 10 4 L 0 8 z" fill="#B22222"></path>
+    </marker>
+    <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%" style="stop-opacity: 1; stop-color: darkseagreen;"></stop>
+      <stop offset="100%" style="stop-opacity: 0.1; stop-color: darkseagreen;"></stop>
+    </linearGradient>
+  </defs>
+</svg>
+

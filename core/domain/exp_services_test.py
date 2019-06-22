@@ -2839,9 +2839,9 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
 
         self.assertLess(
             original_timestamp,
-            exp_services._get_last_updated_by_human_ms(self.EXP_ID))
+            exp_services.get_last_updated_by_human_ms(self.EXP_ID))
         self.assertLess(
-            exp_services._get_last_updated_by_human_ms(self.EXP_ID),
+            exp_services.get_last_updated_by_human_ms(self.EXP_ID),
             timestamp_after_first_edit)
 
     def test_get_exploration_snapshots_metadata(self):

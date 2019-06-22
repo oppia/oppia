@@ -1,0 +1,13 @@
+<div>
+  <div ng-if="$ctrl.getActiveTabName() === 'main'">
+    <topic-editor-tab></topic-editor-tab>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'subtopics'">
+    <subtopics-list-tab></subtopics-list-tab>
+  </div>
+
+  <div ng-if="$ctrl.getActiveTabName() === 'questions'">
+    <questions-tab></questions-tab>
+  </div>
+</div>

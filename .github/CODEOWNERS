@@ -199,7 +199,7 @@
 /core/templates/dev/head/services/CodeNormalizerService*.ts @kevinlee12
 /extensions/dependencies/ @seanlip
 /extensions/domain*.py @seanlip
-/extensions/interactions/ @kevinlee12
+/extensions/interactions/ @kevinlee12 @vojtechjelinek
 /extensions/objects/ @aks681
 /extensions/value_generators/ @seanlip
 /extensions/__init__.py @kevinlee12
@@ -251,12 +251,14 @@
 # Question project.
 /core/controllers/practice_sessions*.py @vinitamurthi
 /core/controllers/question*.py @aks681
+/core/controllers/review_tests*.py @sophiewu6
 /core/domain/question*.py @aks681
 /core/storage/question/ @aks681
 /core/templates/dev/head/components/entity-creation-services/question-creation.service.ts @aks681
 /core/templates/dev/head/components/score-ring/ @vinitamurthi
 /core/templates/dev/head/domain/question/ @aks681
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
+/core/templates/dev/head/pages/review-test-page/ @sophiewu6
 /core/templates/dev/head/components/question-directives/question-editor/ @aks681
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681
 /core/templates/dev/head/components/question-directives/modal-templates/ @aks681
@@ -328,6 +330,7 @@
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
+/core/domain/change_domain.py @seanlip
 /core/templates/dev/head/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
 /schema_utils*.py @seanlip

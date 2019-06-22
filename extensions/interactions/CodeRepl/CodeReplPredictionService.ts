@@ -21,6 +21,11 @@
  * function on Oppia-ml.
  */
 
+require('classifiers/CountVectorizerService.ts');
+require('classifiers/PythonProgramTokenizer.ts');
+require('classifiers/SVMPredictionService.ts');
+require('classifiers/WinnowingPreprocessingService.ts');
+
 // Minimum confidence required for a predicted answer group to be shown to user.
 // Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
 // however value need not be in those bounds.

@@ -1111,7 +1111,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
         exploration_id, version_nums, allow_deleted=allow_deleted)
 
 
-def _get_last_updated_by_human_ms(exp_id):
+def get_last_updated_by_human_ms(exp_id):
     """Return the last time, in milliseconds, when the given exploration was
     updated by a human.
 
@@ -1316,7 +1316,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
                 contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        _get_last_updated_by_human_ms(exploration.id) / 1000.0)
+        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(

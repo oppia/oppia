@@ -37,6 +37,167 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
         filename, 490, 120)
 
 
+class ExplorationChangeTests(test_utils.GenericTestBase):
+
+    def test_exp_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            exp_domain.ExplorationChange({'invalid': 'data'})
+
+    def test_exp_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            exp_domain.ExplorationChange({'cmd': 'invalid'})
+
+    def test_exp_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_value')):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'property_name': 'content',
+                'old_value': 'old_value'
+            })
+
+    def test_exp_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            exp_domain.ExplorationChange({
+                'cmd': 'rename_state',
+                'old_state_name': 'old_state_name',
+                'new_state_name': 'new_state_name',
+                'invalid': 'invalid'
+            })
+
+    def test_exp_change_object_with_invalid_exploration_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd edit_exploration_property: '
+                'invalid is not allowed')):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_exp_change_object_with_invalid_state_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd edit_state_property: '
+                'invalid is not allowed')):
+            exp_domain.ExplorationChange({
+                'cmd': 'edit_state_property',
+                'state_name': 'state_name',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_exp_change_object_with_create_new(self):
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'create_new',
+            'category': 'category',
+            'title': 'title'
+        })
+
+        self.assertEqual(exp_change_object.cmd, 'create_new')
+        self.assertEqual(exp_change_object.category, 'category')
+        self.assertEqual(exp_change_object.title, 'title')
+
+    def test_exp_change_object_with_add_state(self):
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'state_name',
+        })
+
+        self.assertEqual(exp_change_object.cmd, 'add_state')
+        self.assertEqual(exp_change_object.state_name, 'state_name')
+
+    def test_exp_change_object_with_rename_state(self):
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'rename_state',
+            'old_state_name': 'old_state_name',
+            'new_state_name': 'new_state_name'
+        })
+
+        self.assertEqual(exp_change_object.cmd, 'rename_state')
+        self.assertEqual(exp_change_object.old_state_name, 'old_state_name')
+        self.assertEqual(exp_change_object.new_state_name, 'new_state_name')
+
+    def test_exp_change_object_with_delete_state(self):
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'delete_state',
+            'state_name': 'state_name',
+        })
+
+        self.assertEqual(exp_change_object.cmd, 'delete_state')
+        self.assertEqual(exp_change_object.state_name, 'state_name')
+
+    def test_exp_change_object_with_edit_state_property(self):
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'state_name',
+            'property_name': 'content',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(exp_change_object.cmd, 'edit_state_property')
+        self.assertEqual(exp_change_object.state_name, 'state_name')
+        self.assertEqual(exp_change_object.property_name, 'content')
+        self.assertEqual(exp_change_object.new_value, 'new_value')
+        self.assertEqual(exp_change_object.old_value, 'old_value')
+
+    def test_exp_change_object_with_edit_exploration_property(self):
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'edit_exploration_property',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(exp_change_object.cmd, 'edit_exploration_property')
+        self.assertEqual(exp_change_object.property_name, 'title')
+        self.assertEqual(exp_change_object.new_value, 'new_value')
+        self.assertEqual(exp_change_object.old_value, 'old_value')
+
+    def test_exp_change_object_with_migrate_states_schema_to_latest_version(
+            self):
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': 'migrate_states_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
+
+        self.assertEqual(
+            exp_change_object.cmd, 'migrate_states_schema_to_latest_version')
+        self.assertEqual(exp_change_object.from_version, 'from_version')
+        self.assertEqual(exp_change_object.to_version, 'to_version')
+
+    def test_exp_change_object_with_revert_commit(self):
+        exp_change_object = exp_domain.ExplorationChange({
+            'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+            'version_number': 'version_number'
+        })
+
+        self.assertEqual(
+            exp_change_object.cmd,
+            exp_models.ExplorationModel.CMD_REVERT_COMMIT)
+        self.assertEqual(exp_change_object.version_number, 'version_number')
+
+    def test_to_dict(self):
+        exp_change_dict = {
+            'cmd': 'create_new',
+            'title': 'title',
+            'category': 'category'
+        }
+        exp_change_object = exp_domain.ExplorationChange(exp_change_dict)
+        self.assertEqual(exp_change_object.to_dict(), exp_change_dict)
+
+
 class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration versions difference domain object."""
 
@@ -740,6 +901,234 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected image_counter to be an integer, received '
             'invalid_image_counter'):
             exploration.validate()
+
+
+class ExplorationSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ExplorationSummaryTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exp_services.save_new_exploration(owner_id, exploration)
+        self.exp_summary = exp_services.get_exploration_summary_by_id('eid')
+
+    def test_validation_passes_with_valid_properties(self):
+        self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_title(self):
+        self.exp_summary.title = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected title to be a string, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_category(self):
+        self.exp_summary.category = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected category to be a string, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_objective(self):
+        self.exp_summary.objective = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected objective to be a string, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_language_code(self):
+        self.exp_summary.language_code = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected language_code to be a string, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_unallowed_language_code(self):
+        self.exp_summary.language_code = 'invalid'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language_code: invalid'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_tags(self):
+        self.exp_summary.tags = 'tags'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected \'tags\' to be a list, received tags'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_tag_in_tags(self):
+        self.exp_summary.tags = ['tag', 2]
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each tag in \'tags\' to be a string, received \'2\''):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_empty_tag_in_tags(self):
+        self.exp_summary.tags = ['', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Tags should be non-empty'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_unallowed_characters_in_tag(self):
+        self.exp_summary.tags = ['123', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Tags should only contain lowercase '
+                'letters and spaces, received \'123\'')):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_whitespace_in_tag_start(self):
+        self.exp_summary.tags = [' ab', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, received \' ab\''):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_whitespace_in_tag_end(self):
+        self.exp_summary.tags = ['ab ', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Tags should not start or end with whitespace, received \'ab \''):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_adjacent_whitespace_in_tag(self):
+        self.exp_summary.tags = ['a   b', 'abc']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Adjacent whitespace in tags should '
+                'be collapsed, received \'a   b\'')):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_duplicate_tags(self):
+        self.exp_summary.tags = ['abc', 'abc', 'ab']
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Some tags duplicate each other'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_rating_type(self):
+        self.exp_summary.ratings = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected ratings to be a dict, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_rating_keys(self):
+        self.exp_summary.ratings = {'1': 0, '10': 1}
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected ratings to have keys: 1, 2, 3, 4, 5, received 1, 10'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_value_type_for_ratings(self):
+        self.exp_summary.ratings = {'1': 0, '2': 'one', '3': 0, '4': 0, '5': 0}
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected value to be int, received one'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_value_for_ratings(self):
+        self.exp_summary.ratings = {'1': 0, '2': -1, '3': 0, '4': 0, '5': 0}
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected value to be non-negative, received -1'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_scaled_average_rating(self):
+        self.exp_summary.scaled_average_rating = 'one'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected scaled_average_rating to be float, received one'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_status(self):
+        self.exp_summary.status = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected status to be string, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_community_owned(self):
+        self.exp_summary.community_owned = '1'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected community_owned to be bool, received 1'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_contributors_summary(self):
+        self.exp_summary.contributors_summary = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected contributors_summary to be dict, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_owner_ids_type(self):
+        self.exp_summary.owner_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Expected owner_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_owner_id_in_owner_ids(self):
+        self.exp_summary.owner_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in owner_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_editor_ids_type(self):
+        self.exp_summary.editor_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected editor_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_editor_id_in_editor_ids(self):
+        self.exp_summary.editor_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in editor_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_voice_artist_ids_type(self):
+        self.exp_summary.voice_artist_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected voice_artist_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_voice_artist_id_in_voice_artists_ids(
+            self):
+        self.exp_summary.voice_artist_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in voice_artist_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_viewer_ids_type(self):
+        self.exp_summary.viewer_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected viewer_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_viewer_id_in_viewer_ids(self):
+        self.exp_summary.viewer_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in viewer_ids to be string, received 2'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_contributor_ids_type(self):
+        self.exp_summary.contributor_ids = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected contributor_ids to be list, received 0'):
+            self.exp_summary.validate()
+
+    def test_validation_fails_with_invalid_contributor_id_in_contributor_ids(
+            self):
+        self.exp_summary.contributor_ids = ['1', 2, '3']
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected each id in contributor_ids to be string, received 2'):
+            self.exp_summary.validate()
 
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
