@@ -479,6 +479,11 @@ def convert_to_ckeditor(html_data):
             br.insert_after('\n')
             br.unwrap()
 
+    # Ensure that any html string is always wrapped in a tag.
+    for content in soup.contents:
+        if not content.name:
+            content.wrap(soup.new_tag('p'))
+
     return unicode(soup).replace('<br/>', '<br>')
 
 
