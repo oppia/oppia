@@ -1325,7 +1325,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
     def setUp(self):
         super(LearnerAnswerDetailsTests, self).setUp()
         self.learner_answer_details = stats_domain.LearnerAnswerDetails(
-            'exp_id.state_name', feconf.ENTITY_TYPE_EXPLORATION,
+            'exp_id:state_name', feconf.ENTITY_TYPE_EXPLORATION,
             'TextInput', [stats_domain.LearnerAnswerInfo(
                 'id_1', 'This is my answer', 'This is my answer details',
                 datetime.datetime(2019, 6, 19, 13, 59, 29, 153073))], 4000)
@@ -1333,7 +1333,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         expected_learner_answer_details_dict = {
-            'state_reference': 'exp_id.state_name',
+            'state_reference': 'exp_id:state_name',
             'entity_type': 'exploration',
             'interaction_id': 'TextInput',
             'learner_answer_info_list': [{
@@ -1350,7 +1350,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def test_from_dict(self):
         learner_answer_details_dict = {
-            'state_reference': 'exp_id.state_name',
+            'state_reference': 'exp_id:state_name',
             'entity_type': 'exploration',
             'interaction_id': 'TextInput',
             'learner_answer_info_list': [{
@@ -1364,7 +1364,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         learner_answer_details = stats_domain.LearnerAnswerDetails.from_dict(
             learner_answer_details_dict)
         self.assertEqual(
-            learner_answer_details.state_reference, 'exp_id.state_name')
+            learner_answer_details.state_reference, 'exp_id:state_name')
         self.assertEqual(
             learner_answer_details.entity_type, 'exploration')
         self.assertEqual(
@@ -1397,6 +1397,29 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
         self.assertEqual(
             len(self.learner_answer_details.learner_answer_info_list), 2)
 
+    def test_learner_answer_info_with_big_size_must_not_be_added(self):
+        answer = 'This is answer abc' * 900
+        answer_details = 'This is answer details' * 400
+        created_on = datetime.datetime.strptime('27 Sep 2012', '%d %b %Y')
+        id_base = 'id:'
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 1)
+        for i in range(36):
+            learner_answer_info = stats_domain.LearnerAnswerInfo(
+                id_base + str(i), answer, answer_details, created_on)
+            self.learner_answer_details.add_learner_answer_info(
+                learner_answer_info)
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 36)
+        learner_answer_info = stats_domain.LearnerAnswerInfo(
+            'id:40', answer, answer_details, created_on)
+        self.learner_answer_details.add_learner_answer_info(
+            learner_answer_info)
+        # Due to overflow of the size of learner_answer_info_list, this learner
+        # answer info was not added in the list.
+        self.assertEqual(
+            len(self.learner_answer_details.learner_answer_info_list), 36)
+
     def test_delete_learner_answer_info(self):
         self.assertEqual(
             len(self.learner_answer_details.learner_answer_info_list), 1)
@@ -1421,12 +1444,12 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def test_update_state_reference(self):
         self.assertEqual(
-            self.learner_answer_details.state_reference, 'exp_id.state_name')
+            self.learner_answer_details.state_reference, 'exp_id:state_name')
         self.learner_answer_details.update_state_reference(
-            'exp_id_1.state_name_1')
+            'exp_id_1:state_name_1')
         self.assertEqual(
             self.learner_answer_details.state_reference,
-            'exp_id_1.state_name_1')
+            'exp_id_1:state_name_1')
 
     def test_state_reference_must_be_string(self):
         self.learner_answer_details.state_reference = 0
@@ -1454,7 +1477,7 @@ class LearnerAnswerDetailsTests(test_utils.GenericTestBase):
 
     def test_state_reference_must_be_valid_for_question(self):
         self.learner_answer_details.entity_type = 'question'
-        self.learner_answer_details.state_reference = 'expid.statename'
+        self.learner_answer_details.state_reference = 'expid:statename'
         self._assert_validation_error(
             self.learner_answer_details,
             'For entity type question, the state reference should')
@@ -1567,9 +1590,9 @@ class LearnerAnswerInfoTests(test_utils.GenericTestBase):
         self.assertNotEqual(learner_answer_info_dict_size, 0)
         self.assertTrue(learner_answer_info_dict_size > 0)
 
-    def test_get_learner_answer_info_id(self):
+    def test_get_new_learner_answer_info_id(self):
         learner_answer_info_id = (
-            stats_domain.LearnerAnswerInfo.get_learner_answer_info_id())
+            stats_domain.LearnerAnswerInfo.get_new_learner_answer_info_id())
         self.assertNotEqual(learner_answer_info_id, None)
         self.assertEqual(isinstance(learner_answer_info_id, str), True)
 

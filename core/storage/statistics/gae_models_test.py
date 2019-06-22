@@ -465,30 +465,30 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         state_name_1 = 'intro'
         state_reference_1 = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_1, state_name_1)) #pylint: disable=line-too-long
-        self.assertEqual(state_reference_1, 'expid1.intro')
+        self.assertEqual(state_reference_1, 'expid1:intro')
         exp_id_2 = 'exp_id_2'
         state_name_2 = 'first state'
         state_reference_2 = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_2, state_name_2)) #pylint: disable=line-too-long
-        self.assertEqual(state_reference_2, 'exp_id_2.first state')
+        self.assertEqual(state_reference_2, 'exp_id_2:first state')
         exp_id_3 = 'exp id 1.2.3'
         state_name_3 = 'this_is first_state version 1.1'
         state_reference_3 = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_3, state_name_3)) #pylint: disable=line-too-long
         self.assertEqual(
-            state_reference_3, 'exp id 1.2.3.this_is first_state version 1.1')
+            state_reference_3, 'exp id 1.2.3:this_is first_state version 1.1')
         exp_id_4 = '123'
         state_name_4 = u'टेक्स्ट'
         state_reference_4 = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_4, state_name_4)) #pylint: disable=line-too-long
         self.assertEqual(
-            state_reference_4, '123.%s' % (state_name_4))
+            state_reference_4, '123:%s' % (state_name_4))
         exp_id_5 = '1234'
         state_name_5 = u'Klüft'
         state_reference_5 = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id_5, state_name_5)) #pylint: disable=line-too-long
         self.assertEqual(
-            state_reference_5, '1234.%s' % (state_name_5))
+            state_reference_5, '1234:%s' % (state_name_5))
 
 
     def test_get_state_reference_for_question(self):
@@ -502,16 +502,16 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(state_reference_2, 'first.question')
 
     def test_get_instance_id(self):
-        state_reference = 'exp_id.state_name'
+        state_reference = 'exp_id:state_name'
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
-        expected_instance_id = 'exploration.exp_id.state_name'
+        expected_instance_id = 'exploration:exp_id:state_name'
         instance_id = stats_models.LearnerAnswerDetailsModel.get_instance_id(
             entity_type, state_reference)
         self.assertEqual(instance_id, expected_instance_id)
 
     def test_create_model_instance(self):
         # Test to create model instance for exploration state.
-        state_reference = 'exp_id.state_name'
+        state_reference = 'exp_id:state_name'
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         interaction_id = 'TextInput'
         learner_answer_info_list = []
@@ -519,12 +519,13 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
-            state_reference, entity_type, interaction_id,
+            entity_type, state_reference, interaction_id,
             learner_answer_info_list, learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes)
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
                 feconf.ENTITY_TYPE_EXPLORATION, state_reference))
+        self.assertEqual(model_instance.id, 'exploration:exp_id:state_name')
         self.assertEqual(model_instance.state_reference, state_reference)
         self.assertEqual(
             model_instance.entity_type, feconf.ENTITY_TYPE_EXPLORATION)
@@ -539,7 +540,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
-            state_reference, entity_type, interaction_id,
+            entity_type, state_reference, interaction_id,
             learner_answer_info_list, learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes)
         model_instance = (
@@ -553,7 +554,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
     def test_get_model_instance_returns_none(self):
         model_instance = (
             stats_models.LearnerAnswerDetailsModel.get_model_instance(
-                feconf.ENTITY_TYPE_QUESTION, 'expID.stateName'))
+                feconf.ENTITY_TYPE_QUESTION, 'expID:stateName'))
         self.assertEqual(model_instance, None)
 
     def test_save_and_get_model_instance_for_unicode_state_names(self):
@@ -562,7 +563,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         state_reference = (
             stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) #pylint: disable=line-too-long
         self.assertEqual(
-            state_reference, '123.%s' % (state_name))
+            state_reference, '123:%s' % (state_name))
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         interaction_id = 'TextInput'
         learner_answer_info_list = []
@@ -570,7 +571,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
             feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
-            state_reference, entity_type, interaction_id,
+            entity_type, state_reference, interaction_id,
             learner_answer_info_list, learner_answer_info_schema_version,
             accumulated_answer_info_json_size_bytes)
         model_instance = (
@@ -578,4 +579,4 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
                 feconf.ENTITY_TYPE_EXPLORATION, state_reference))
         self.assertNotEqual(model_instance, None)
         self.assertEqual(
-            model_instance.state_reference, '123.%s' % (state_name))
+            model_instance.state_reference, '123:%s' % (state_name))

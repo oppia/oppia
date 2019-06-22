@@ -51,10 +51,6 @@ CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST = 'AnswerFrequencyList'
 CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS = (
     'CategorizedAnswerFrequencyLists')
 
-CMD_RECORD_LEARNER_ANSWER_INFO = 'record_learner_answer_info'
-CMD_DELETE_LEARNER_ANSWER_INFO = 'delete_learner_answer_info'
-CMD_UPDATE_STATE_REFERENCE = 'update_state_reference'
-
 # The maximum size in bytes the learner_answer_info_list can take
 # in LearnerAnswerDetails.
 MAX_LEARNER_ANSWER_INFO_LIST_BYTE_SIZE = 900000
@@ -1382,7 +1378,7 @@ class LearnerAnswerDetails(object):
         Args:
             state_reference: str. This field is used to refer to a state
                 in an exploration or question. For an exploration the value
-                will be equal to 'exp_id.state_name' & for question this will
+                will be equal to 'exp_id:state_name' & for question this will
                 be equal to 'question_id' only.
             entity_type: str. The type of entity, for which the domain
                 object is being created. The value must be one of
@@ -1465,12 +1461,12 @@ class LearnerAnswerDetails(object):
                 'Expected entity_type to be a string, received %s' % str(
                     self.entity_type))
 
-        split_state_reference = self.state_reference.split('.')
+        split_state_reference = self.state_reference.split(':')
         if self.entity_type == feconf.ENTITY_TYPE_EXPLORATION:
-            if len(split_state_reference) < 2:
+            if len(split_state_reference) != 2:
                 raise utils.ValidationError(
                     'For entity type exploration, the state reference '
-                    'should be of the form \'exp_id.state_name\', but '
+                    'should be of the form \'exp_id:state_name\', but '
                     'received %s' % (self.state_reference))
         elif self.entity_type == feconf.ENTITY_TYPE_QUESTION:
             if len(split_state_reference) != 1:
@@ -1622,7 +1618,7 @@ class LearnerAnswerInfo(object):
         )
 
     @classmethod
-    def get_learner_answer_info_id(cls):
+    def get_new_learner_answer_info_id(cls):
         """Generates the learner answer info domain object id.
 
         Return:

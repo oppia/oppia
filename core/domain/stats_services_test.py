@@ -2123,61 +2123,61 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
                 self.question_id))
         self.learner_answer_details_model_exploration = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(
-                self.state_reference_exploration,
-                feconf.ENTITY_TYPE_EXPLORATION, self.interaction_id, [],
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.state_reference_exploration, self.interaction_id, [],
                 feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION, 0))
         self.learner_answer_details_model_question = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(
-                self.state_reference_question,
-                feconf.ENTITY_TYPE_QUESTION, self.interaction_id, [],
+                feconf.ENTITY_TYPE_QUESTION,
+                self.state_reference_question, self.interaction_id, [],
                 feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION, 0))
 
     def test_update_learner_answer_details(self):
-        answer = 'This is my answer',
+        answer = 'This is my answer'
         answer_details = 'This is my answer details'
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 0)
         stats_services.record_learner_answer_info(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration,
             self.interaction_id, answer, answer_details)
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 1)
 
-        answer = 'My answer',
+        answer = 'My answer'
         answer_details = 'My answer details'
         stats_services.record_learner_answer_info(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration,
             self.interaction_id, answer, answer_details)
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 2)
 
     def test_delete_learner_answer_info(self):
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 0)
-        answer = 'This is my answer',
+        answer = 'This is my answer'
         answer_details = 'This is my answer details'
         stats_services.record_learner_answer_info(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration,
             self.interaction_id, answer, answer_details)
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 1)
         learner_answer_info_id = (
             learner_answer_details.learner_answer_info_list[0].id)
         stats_services.delete_learner_answer_info(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration,
             learner_answer_info_id)
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 0)
 
@@ -2186,57 +2186,57 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             utils.InvalidInputException,
             'No learner answer details found with the given state reference'):
             stats_services.delete_learner_answer_info(
-                'expID.stateName', feconf.ENTITY_TYPE_EXPLORATION, 'id_1')
+                feconf.ENTITY_TYPE_EXPLORATION, 'expID:stateName', 'id_1')
 
     def test_delete_learner_answer_info_with_unknown_learner_answer_info_id(
             self):
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 0)
-        answer = 'This is my answer',
+        answer = 'This is my answer'
         answer_details = 'This is my answer details'
         stats_services.record_learner_answer_info(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration,
             self.interaction_id, answer, answer_details)
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(
             len(learner_answer_details.learner_answer_info_list), 1)
         learner_answer_info_id = 'id_1'
         with self.assertRaisesRegexp(
             Exception, 'Learner answer info with the given id not found'):
             stats_services.delete_learner_answer_info(
-                self.state_reference_exploration,
-                feconf.ENTITY_TYPE_EXPLORATION, learner_answer_info_id)
+                feconf.ENTITY_TYPE_EXPLORATION,
+                self.state_reference_exploration, learner_answer_info_id)
 
     def test_update_state_reference(self):
-        new_state_reference = 'exp_id_2.state_name_2'
+        new_state_reference = 'exp_id_2:state_name_2'
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertNotEqual(
             learner_answer_details.state_reference, new_state_reference)
         stats_services.update_state_reference(
-            new_state_reference, self.state_reference_exploration,
-            feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration,
+            new_state_reference)
         learner_answer_details = stats_services.get_learner_answer_details(
-            new_state_reference, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, new_state_reference)
         self.assertEqual(
             learner_answer_details.state_reference, new_state_reference)
 
     def test_new_learner_answer_details_is_created(self):
-        state_reference = 'exp_id_2.state_name_2'
+        state_reference = 'exp_id_2:state_name_2'
         interaction_id = 'GraphInput'
         answer = 'Hello World'
         answer_details = 'Hello Programmer'
         learner_answer_details = stats_services.get_learner_answer_details(
-            state_reference, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, state_reference)
         self.assertEqual(learner_answer_details, None)
         stats_services.record_learner_answer_info(
-            state_reference, feconf.ENTITY_TYPE_EXPLORATION,
+            feconf.ENTITY_TYPE_EXPLORATION, state_reference,
             interaction_id, answer, answer_details)
         learner_answer_details = stats_services.get_learner_answer_details(
-            state_reference, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, state_reference)
         self.assertNotEqual(learner_answer_details, None)
         self.assertEqual(
             learner_answer_details.state_reference, state_reference)
@@ -2249,25 +2249,25 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             utils.InvalidInputException,
             'No learner answer details found with the given state reference'):
             stats_services.update_state_reference(
-                'newexp.statename', 'expID.stateName',
-                feconf.ENTITY_TYPE_EXPLORATION)
+                feconf.ENTITY_TYPE_EXPLORATION, 'expID:stateName',
+                'newexp:statename')
 
     def test_delete_learner_answer_details_for_exploration_state(self):
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertNotEqual(learner_answer_details, None)
         stats_services.delete_learner_answer_details_for_exploration_state(
             self.exp_id, self.state_name)
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_exploration, feconf.ENTITY_TYPE_EXPLORATION)
+            feconf.ENTITY_TYPE_EXPLORATION, self.state_reference_exploration)
         self.assertEqual(learner_answer_details, None)
 
     def test_delete_learner_answer_details_for_question_state(self):
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_question, feconf.ENTITY_TYPE_QUESTION)
+            feconf.ENTITY_TYPE_QUESTION, self.state_reference_question)
         self.assertNotEqual(learner_answer_details, None)
         stats_services.delete_learner_answer_details_for_question_state(
             self.question_id)
         learner_answer_details = stats_services.get_learner_answer_details(
-            self.state_reference_question, feconf.ENTITY_TYPE_QUESTION)
+            feconf.ENTITY_TYPE_QUESTION, self.state_reference_question)
         self.assertEqual(learner_answer_details, None)
