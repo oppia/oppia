@@ -29,6 +29,8 @@ from core.tests import test_utils
 import feconf
 
 from google.appengine.ext import ndb
+from mapreduce import input_readers
+
 
 (base_models, exp_models, stats_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
@@ -84,6 +86,29 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         self.assertFalse(MockJobManagerOne.is_active(job_id))
         self.assertFalse(MockJobManagerOne.has_finished(job_id))
+
+    def test_base_job_manager_enqueue_raises_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseJobManager should implement _real_enqueue().'):
+            jobs.BaseJobManager._real_enqueue(  # pylint: disable=protected-access
+                'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None)
+
+    def test_failing_jobs(self):
+
+        def _mock_input_reader(unused_output):
+            raise Exception
+
+        input_reader_swap = self.swap(
+            input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
+        assert_raises_context_manager = self.assertRaises(Exception)
+
+        job_id = MockJobManagerOne.create_new()
+        store_map_reduce_results = jobs.StoreMapReduceResults()
+
+        with assert_raises_context_manager, input_reader_swap:
+            store_map_reduce_results.run(
+                job_id, 'core.jobs_test.MockJobManagerOne', 'output')
 
     def test_enqueue_job(self):
         """Test the enqueueing of a job."""
@@ -614,6 +639,38 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
+
+    def test_base_map_reduce_job_manager_entity_classes_to_map_over_raise_error(
+            self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Classes derived from BaseMapReduceJobManager must implement '
+            'entity_classes_to_map_over()'):
+            jobs.BaseMapReduceJobManager.entity_classes_to_map_over()
+
+    def test_base_map_reduce_job_manager_map_raise_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Classes derived from BaseMapReduceJobManager must implement '
+            'map as a @staticmethod.'):
+            jobs.BaseMapReduceJobManager.map('item')
+
+    def test_base_map_reduce_job_manager_reduce_raise_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Classes derived from BaseMapReduceJobManager must implement '
+            'reduce as a @staticmethod'):
+            jobs.BaseMapReduceJobManager.reduce('key', [])
+
+    def test_raises_error_with_existing_mapper_param(self):
+        job_id = SampleMapReduceJobManager.create_new()
+        with self.assertRaisesRegexp(
+            Exception,
+            'Additional job param entity_kinds shadows an existing mapper'
+            ' param'):
+            SampleMapReduceJobManager.enqueue(
+                job_id, taskqueue_services.QUEUE_NAME_DEFAULT,
+                additional_job_params={'entity_kinds': ''})
 
 
 class JobRegistryTests(test_utils.GenericTestBase):
