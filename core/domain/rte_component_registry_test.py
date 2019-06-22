@@ -229,6 +229,9 @@ class RteComponentRegistryUnitTests(test_utils.GenericTestBase):
                 '%s-with-value' % attr['name'] for attr in component_spec[
                     'customization_arg_specs']]
             actual_tag_list_with_attrs[tag_name] = attr_names
+        (
+            actual_tag_list_with_attrs[u'oppia-noninteractive-image'].
+            append(u'id-with-value'))
         self.assertEqual(
             set(obtained_tag_list_with_attrs.keys()),
             set(actual_tag_list_with_attrs.keys()))

@@ -670,7 +670,8 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         }
 
         with self.assertRaises(Exception):
-            state_domain.ImageAssets(image_mapping)
+            state = state_domain.ImageAssets(image_mapping)
+            state.validate()
 
     def test_delete_image(self):
         expected_image_assets_dict = {

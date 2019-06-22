@@ -29,7 +29,6 @@ import logging
 import math
 import os
 import pprint
-import re
 import traceback
 import zipfile
 
@@ -800,31 +799,10 @@ def apply_change_list(exploration_id, change_list):
                         image_counter = exploration.image_counter
                         image_counter += 1
 
-                        # Find image_ids of newly added images.
-                        image_ids = (
-                            exploration.get_images_ids_of_exploration())
-
-                        # Adds a new image.
-                        image_re = r'image_id_[0-9]{1,}$'
-                        if not re.match(image_re, change.image_id):
-                            raise utils.ValidationError(
-                                'Invalid image_id, received %s' %
-                                change.image_id)
                         if not isinstance(change.image_info, dict):
                             raise Exception(
                                 'Expected image_info to be dict, '
                                 'received %s' % change.image_info)
-                        if change.image_id not in image_ids:
-                            raise Exception(
-                                'Image Id does not exist in exploration, '
-                                'received image_id is %s' % change.image_id)
-                        expected_image_id = int(change.image_id.strip(
-                            'image_id_'))
-                        if expected_image_id > image_counter:
-                            raise Exception(
-                                'Image Id is greater then image_id counter'
-                                'not possible, received image_id is %s' %
-                                change.image_id)
                         image_object = state_domain.Image(
                             change.image_info['src'],
                             change.image_info['placeholder'],

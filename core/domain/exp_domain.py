@@ -3554,15 +3554,9 @@ class Exploration(object):
 
     def clean_image_assets(self):
         """Remove all deleted images from image assests."""
-        image_ids_in_html = self.get_images_ids_of_exploration()
-
         for state in self.states.values():
-            image_ids = state.image_assets.image_mapping.keys()
-            for image_id in image_ids:
-                if image_id not in image_ids_in_html:
-                    del state.image_assets.image_mapping[image_id]
-
-        return
+            image_ids_in_state = state.get_image_ids_of_state()
+            state.image_assets.clean_image_assets(image_ids_in_state)
 
 
 class ExplorationSummary(object):

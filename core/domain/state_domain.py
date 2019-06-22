@@ -23,6 +23,7 @@ import re
 from constants import constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
@@ -245,9 +246,8 @@ class ImageAssets(object):
                 mapping.
         """
         self.image_mapping = image_mapping
-        self.validate()
 
-    def validate(self):
+    def validate(self, image_counter):
         """Validates all properties of ImageAssets.
 
         Raises:
@@ -260,7 +260,12 @@ class ImageAssets(object):
             if not re.match(image_re, image_id):
                 raise utils.ValidationError(
                     'Invalid image_id received %s' % image_id)
-
+            expected_image_id = int(image_id.strip('image_id_'))
+            if expected_image_id > image_counter:
+                raise Exception(
+                    'Image Id is greater then image_id counter'
+                    'not possible, received image_id is %s' %
+                    image_id)
             image = self.image_mapping[image_id]
             image.validate()
 
@@ -332,6 +337,17 @@ class ImageAssets(object):
             set. A set of image ids of all the images present in image assets.
         """
         return self.image_mapping.keys()
+
+    def clean_image_assets(self, image_ids_in_state):
+        """Deletes all image ids, which are no more present un HTML.
+
+        Args:
+            image_ids_in_state: list. List of all image ids pesent in a
+                state.
+        """
+        for image_id in self.image_mapping.keys():
+            if image_id not in image_ids_in_state:
+                del self.image_mapping[image_id]
 
 
 class Solution(object):
@@ -1646,15 +1662,15 @@ class State(object):
                 raise utils.ValidationError(
                     'The %s interaction does not support soliciting '
                     'answer details from learners.' % (self.interaction.id))
-        image_ids = self.image_assets.get_all_image_ids()
-        for image_id in image_ids:
-            expected_image_id = int(image_id.strip('image_id'))
-            if expected_image_id > image_counter:
-                utils.ValidationError(
-                    'Found image id to be greater then image counter %s' %
-                    expected_image_id)
 
-        self.image_assets.validate()
+        # image_ids_in_state = self.get_image_ids_of_state()
+        # for image_id in self.image_assets.image_mapping.keys():
+        #     if image_id not in image_ids_in_state:
+        #         raise utils.ValidationError(
+        #             'Image Id not exist in state html, received: %s' %
+        #             image_id)
+
+        self.image_assets.validate(image_counter)
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
 
@@ -2072,6 +2088,21 @@ class State(object):
             WrittenTranslations.from_dict(
                 copy.deepcopy(feconf.DEFAULT_WRITTEN_TRANSLATIONS)),
             False)
+
+    def get_image_ids_of_state(self):
+        """Returns list of image ids present in state HTML"""
+        content_html = self.content.html
+        interaction_html = ''
+        interaction_html_list = self.interaction.get_all_html_content_strings()
+
+        if interaction_html_list != []:
+            interaction_html = interaction_html_list[0]
+
+        state_html = content_html + interaction_html
+        image_ids_in_state = (
+            html_validation_service.get_image_ids_from_image_tag(state_html))
+
+        return image_ids_in_state
 
     @classmethod
     def convert_html_fields_in_state(cls, state_dict, conversion_fn):
