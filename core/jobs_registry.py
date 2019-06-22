@@ -119,7 +119,8 @@ ONE_OFF_JOB_MANAGERS = [
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
-# it should be registered here.
+# it should be registered here. This should also be updated in
+# prod_validation_jobs_one_off.ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
     stats_jobs_continuous.InteractionAnswerSummariesAggregator,

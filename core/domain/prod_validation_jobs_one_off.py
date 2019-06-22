@@ -38,19 +38,20 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.platform import models
 import feconf
+import utils
 
 (
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, file_models,
+    feedback_models, file_models, job_models,
     recommendations_models, story_models,
     user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.file,
+            models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
             models.NAMES.recommendations, models.NAMES.story,
             models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
@@ -66,6 +67,11 @@ AUDIO_PATH_REGEX = (
     '%saudio/[A-Za-z0-9_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
 FILE_MODELS_REGEX = '(%s|%s)' % (IMAGE_PATH_REGEX, AUDIO_PATH_REGEX)
+ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
+    'FeedbackAnalyticsAggregator',
+    'InteractionAnswerSummariesAggregator',
+    'DashboardRecentUpdatesAggregator',
+    'UserStatsAggregator']
 
 
 class BaseModelValidator(object):
@@ -810,10 +816,8 @@ class CollectionRightsModelValidator(BaseModelValidator):
         if not item.first_published_msec:
             return
 
-        epoch = datetime.datetime.utcfromtimestamp(0)
-        current_msec = (
-            datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
-        if item.first_published_msec > current_msec:
+        current_time_msec = utils.get_current_time_in_millisecs()
+        if item.first_published_msec > current_time_msec:
             cls.errors['first published msec check'].append((
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run'
@@ -1364,10 +1368,8 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         if not item.first_published_msec:
             return
 
-        epoch = datetime.datetime.utcfromtimestamp(0)
-        current_msec = (
-            datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
-        if item.first_published_msec > current_msec:
+        current_time_msec = utils.get_current_time_in_millisecs()
+        if item.first_published_msec > current_time_msec:
             cls.errors['first published msec check'].append((
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run'
@@ -1499,10 +1501,8 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
         if not item.first_published_msec:
             return
 
-        epoch = datetime.datetime.utcfromtimestamp(0)
-        current_msec = (
-            datetime.datetime.utcnow() - epoch).total_seconds() * 1000.0
-        if item.first_published_msec > current_msec:
+        current_time_msec = utils.get_current_time_in_millisecs()
+        if item.first_published_msec > current_time_msec:
             cls.errors['first published msec check'].append((
                 'Entity id %s: The first_published_msec field has a value %s '
                 'which is greater than the time when the job was run'
@@ -1725,6 +1725,142 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
                 file_models.FileModel,
                 [item.id[:item.id.find('-')]]),
         }
+
+
+class JobModelValidator(BaseModelValidator):
+    """Class for validating JobModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [job_type].[current time].[random int]
+        regex_string = '^%s-\\d*-\\d*$' % item.job_type
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {}
+
+    @classmethod
+    def _validate_time_fields(cls, item):
+        """Validate the time fields in entity.
+
+        Args:
+            item: ndb.Model. JobModel to validate.
+        """
+        if item.time_started_msec and (
+                item.time_queued_msec > item.time_started_msec):
+            cls.errors['time queued check'].append(
+                'Entity id %s: time queued %s is greater '
+                'than time started %s' % (
+                    item.id, item.time_queued_msec, item.time_started_msec))
+
+        if item.time_finished_msec and (
+                item.time_started_msec > item.time_finished_msec):
+            cls.errors['time started check'].append(
+                'Entity id %s: time started %s is greater '
+                'than time finished %s' % (
+                    item.id, item.time_started_msec, item.time_finished_msec))
+
+        current_time_msec = utils.get_current_time_in_millisecs()
+        if item.time_finished_msec > current_time_msec:
+            cls.errors['time finished check'].append(
+                'Entity id %s: time finished %s is greater '
+                'than the current time' % (
+                    item.id, item.time_finished_msec))
+
+    @classmethod
+    def _validate_error(cls, item):
+        """Validate error is not None only if status is not canceled
+        or failed.
+
+        Args:
+            item: ndb.Model. JobModel to validate.
+        """
+        if item.error and item.status_code not in [
+                job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
+            cls.errors['error check'].append(
+                'Entity id %s: error: %s for job is not empty but '
+                'job status is %s' % (item.id, item.error, item.status_code))
+
+        if not item.error and item.status_code in [
+                job_models.STATUS_CODE_FAILED, job_models.STATUS_CODE_CANCELED]:
+            cls.errors['error check'].append(
+                'Entity id %s: error for job is empty but '
+                'job status is %s' % (item.id, item.status_code))
+
+
+    @classmethod
+    def _validate_output(cls, item):
+        """Validate output for entity is present only if status is
+        completed.
+
+        Args:
+            item: ndb.Model. JobModel to validate.
+        """
+        if item.output and item.status_code != job_models.STATUS_CODE_COMPLETED:
+            cls.errors['output check'].append(
+                'Entity id %s: output: %s for job is not empty but '
+                'job status is %s' % (item.id, item.output, item.status_code))
+
+        if item.output is None and (
+                item.status_code == job_models.STATUS_CODE_COMPLETED):
+            cls.errors['output check'].append(
+                'Entity id %s: output for job is empty but '
+                'job status is %s' % (item.id, item.status_code))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_time_fields,
+            cls._validate_error,
+            cls._validate_output]
+
+
+class ContinuousComputationModelValidator(BaseModelValidator):
+    """Class for validating ContinuousComputationModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Valid id: Name of continuous computation manager class.
+        regex_string = '^(%s)$' % ('|').join(
+            ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES)
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {}
+
+    @classmethod
+    def _validate_time_fields(cls, item):
+        """Validate the time fields in entity.
+
+        Args:
+            item: ndb.Model. ContinuousComputationModel to validate.
+        """
+        if item.last_started_msec > item.last_finished_msec and (
+                item.last_started_msec > item.last_stopped_msec):
+            cls.errors['last started check'].append(
+                'Entity id %s: last started %s is greater '
+                'than both last finished %s and last stopped %s' % (
+                    item.id, item.last_started_msec, item.last_finished_msec,
+                    item.last_stopped_msec))
+
+        current_time_msec = utils.get_current_time_in_millisecs()
+        if item.last_finished_msec > current_time_msec:
+            cls.errors['last finished check'].append(
+                'Entity id %s: last finished %s is greater '
+                'than the current time' % (
+                    item.id, item.last_finished_msec))
+
+        if item.last_stopped_msec > current_time_msec:
+            cls.errors['last stopped check'].append(
+                'Entity id %s: last stopped %s is greater '
+                'than the current time' % (
+                    item.id, item.last_stopped_msec))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_time_fields]
 
 
 class ExplorationRecommendationsModelValidator(BaseModelValidator):
@@ -2079,6 +2215,8 @@ MODEL_TO_VALIDATOR_MAPPING = {
     file_models.FileModel: FileModelValidator,
     file_models.FileSnapshotMetadataModel: FileSnapshotMetadataModelValidator,
     file_models.FileSnapshotContentModel: FileSnapshotContentModelValidator,
+    job_models.JobModel: JobModelValidator,
+    job_models.ContinuousComputationModel: ContinuousComputationModelValidator,
     recommendations_models.ExplorationRecommendationsModel: (
         ExplorationRecommendationsModelValidator),
     recommendations_models.TopicSimilaritiesModel: (
@@ -2405,6 +2543,22 @@ class FileMetadataSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [file_models.FileMetadataSnapshotContentModel]
+
+
+class JobModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates JobModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [job_models.JobModel]
+
+
+class ContinuousComputationModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ContinuousComputationModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [job_models.ContinuousComputationModel]
 
 
 class ExplorationRecommendationsModelAuditOneOffJob(

@@ -44,6 +44,7 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+import utils
 
 from google.appengine.api import datastore_types
 from google.appengine.ext import db
@@ -58,14 +59,14 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     activity_models, audit_models, base_models,
     classifier_models, collection_models,
     config_models, email_models, exp_models,
-    feedback_models, file_models,
+    feedback_models, file_models, job_models,
     recommendations_models, story_models,
     user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
-            models.NAMES.feedback, models.NAMES.file,
+            models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
             models.NAMES.recommendations, models.NAMES.story,
             models.NAMES.user]))
 
@@ -4935,6 +4936,249 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.id_0, self.id_0), (
                 u'[u\'fully-validated FileSnapshotContentModel\', '
                 '2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class JobModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(JobModelValidatorTests, self).setUp()
+
+        current_time_str = str(int(utils.get_current_time_in_millisecs()))
+        random_int = random.randint(0, 1000)
+        self.model_instance = job_models.JobModel(
+            id='test-%s-%s' % (current_time_str, random_int),
+            status_code=job_models.STATUS_CODE_NEW, job_type='test',
+            time_queued_msec=1, time_started_msec=10, time_finished_msec=20)
+        self.model_instance.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.JobModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated JobModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of JobModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id,
+                self.model_instance.created_on,
+                self.model_instance.last_updated
+            ), u'[u\'fully-validated JobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [
+            (
+                u'[u\'failed validation check for current time check of '
+                'JobModel\', '
+                '[u\'Entity id %s: The last_updated field has a '
+                'value %s which is greater than the time when the job '
+                'was run\']]'
+            ) % (self.model_instance.id, self.model_instance.last_updated),
+            u'[u\'fully-validated JobModel\', 1]']
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_empty_error(self):
+        self.model_instance.status_code = job_models.STATUS_CODE_FAILED
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for error check '
+                'of JobModel\', [u\'Entity id %s: '
+                'error for job is empty but job status is %s\']]'
+            ) % (self.model_instance.id, self.model_instance.status_code),
+            u'[u\'fully-validated JobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_non_empty_error(self):
+        self.model_instance.error = 'invalid'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for error check '
+                'of JobModel\', [u\'Entity id %s: '
+                'error: invalid for job is not empty but job status is %s\']]'
+            ) % (self.model_instance.id, self.model_instance.status_code),
+            u'[u\'fully-validated JobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_empty_output(self):
+        self.model_instance.status_code = job_models.STATUS_CODE_COMPLETED
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for output check '
+                'of JobModel\', [u\'Entity id %s: '
+                'output for job is empty but job status is %s\']]'
+            ) % (self.model_instance.id, self.model_instance.status_code),
+            u'[u\'fully-validated JobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_non_empty_output(self):
+        self.model_instance.output = 'invalid'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for output check '
+                'of JobModel\', [u\'Entity id %s: '
+                'output: invalid for job is not empty but job status is %s\']]'
+            ) % (self.model_instance.id, self.model_instance.status_code),
+            u'[u\'fully-validated JobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_time_queued_msec(self):
+        self.model_instance.time_queued_msec = 15
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time queued check '
+                'of JobModel\', [u\'Entity id %s: '
+                'time queued 15.0 is greater than time started 10.0\']]'
+            ) % self.model_instance.id,
+            u'[u\'fully-validated JobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_time_started_msec(self):
+        self.model_instance.time_started_msec = 25
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time started check '
+                'of JobModel\', [u\'Entity id %s: '
+                'time started 25.0 is greater than time finished 20.0\']]'
+            ) % self.model_instance.id,
+            u'[u\'fully-validated JobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_time_finished_msec(self):
+        current_time_msec = utils.get_current_time_in_millisecs()
+        self.model_instance.time_finished_msec = current_time_msec * 10.0
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time finished '
+                'check of JobModel\', [u\'Entity id %s: time '
+                'finished %s is greater than the current time\']]'
+            ) % (
+                self.model_instance.id,
+                self.model_instance.time_finished_msec),
+            u'[u\'fully-validated JobModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ContinuousComputationModelValidatorTests, self).setUp()
+
+        self.model_instance = job_models.ContinuousComputationModel(
+            id='FeedbackAnalyticsAggregator',
+            status_code=job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING,
+            last_started_msec=1, last_stopped_msec=10, last_finished_msec=20)
+        self.model_instance.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob) # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ContinuousComputationModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of ContinuousComputationModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id,
+                self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ContinuousComputationModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output)
+
+    def test_invalid_last_started_msec(self):
+        self.model_instance.last_started_msec = 25
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for last started check '
+                'of ContinuousComputationModel\', [u\'Entity id %s: '
+                'last started 25.0 is greater than both last finished 20.0 '
+                'and last stopped 10.0\']]'
+            ) % self.model_instance.id]
+        run_job_and_check_output(self, expected_output)
+
+    def test_invalid_last_stopped_msec(self):
+        current_time_msec = utils.get_current_time_in_millisecs()
+        self.model_instance.last_stopped_msec = current_time_msec * 10.0
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for last stopped check '
+                'of ContinuousComputationModel\', [u\'Entity id %s: '
+                'last stopped %s is greater than the current time\']]'
+            ) % (self.model_instance.id, self.model_instance.last_stopped_msec)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_invalid_last_finished_msec(self):
+        current_time_msec = utils.get_current_time_in_millisecs()
+        self.model_instance.last_finished_msec = current_time_msec * 10.0
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for last finished check '
+                'of ContinuousComputationModel\', [u\'Entity id %s: '
+                'last finished %s is greater than the current time\']]'
+            ) % (
+                self.model_instance.id,
+                self.model_instance.last_finished_msec)]
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_invalid_id(self):
+        model_with_invalid_id = job_models.ContinuousComputationModel(
+            id='invalid',
+            status_code=job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING,
+            last_started_msec=1, last_stopped_msec=10, last_finished_msec=20)
+        model_with_invalid_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for model id check of '
+                'ContinuousComputationModel\', '
+                '[u\'Entity id invalid: Entity id does not match '
+                'regex pattern\']]'
+            ), u'[u\'fully-validated ContinuousComputationModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
