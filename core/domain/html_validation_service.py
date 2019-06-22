@@ -834,27 +834,23 @@ def get_filename_with_dimensions(old_filename, exp_id):
 
 
 def add_image_id_and_remove_filepath_from_image_tag(
-        html, image_info_dict_1, image_info_dict_2):
+        image_id_to_src_dict, html):
     """Adds image_id-with-value in image tag.
 
     Args:
         html: str. HTML of content in which image tag present.
-        image_info_dict_1: dict. Dict contaning image id with source, image ids
-            that needs to be added in image tag.
-        image_info_dict_2: dict. Dict contaning image ids with source, image ids
-            that has already been added in image tags.
-
+        image_id_to_src_dict: dict. Dict contaning image id with source, image
+            ids that needs to be added in image tag.
     Returns:
         html: str. HTML contains image tag with image id and without filepath.
     """
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
         filepath = json.loads(unescape_html(image['filepath-with-value']))
-        for _id in image_info_dict_1:
-            if filepath == image_info_dict_1[_id]:
+        for _id in image_id_to_src_dict:
+            if filepath == image_id_to_src_dict[_id]:
                 image['id-with-value'] = escape_html(json.dumps(_id))
-                image_info_dict_2[_id] = filepath
-                del image_info_dict_1[_id]
+                del image_id_to_src_dict[_id]
                 break
 
         del image['filepath-with-value']
