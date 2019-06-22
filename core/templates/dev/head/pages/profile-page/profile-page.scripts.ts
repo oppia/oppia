@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Directive scripts for the Oppia profile page.
  */
 
 require('pages/OppiaFooterDirective.ts');
-require('base_components/BaseContentDirective.ts');
+require('pages/profile-page/profile-page.controller.ts');
