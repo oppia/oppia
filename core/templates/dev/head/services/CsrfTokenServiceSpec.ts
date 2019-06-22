@@ -16,20 +16,20 @@
  * @fileoverview Unit tests for the csrf service
  */
 
-require('services/CsrfService.ts');
+require('services/CsrfTokenService.ts');
 
-describe('Csrf Service', function() {
-  var CsrfService, $httpBackend;
+describe('Csrf Token Service', function() {
+  var CsrfTokenService, $httpBackend;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
-    CsrfService = $injector.get('CsrfService');
+    CsrfTokenService = $injector.get('CsrfTokenService');
     $httpBackend = $injector.get('$httpBackend');
   }));
 
   it('should correctly set the csrf token', function() {
-    CsrfService.setToken('sample csrf token');
+    CsrfTokenService.setToken('sample csrf token');
 
-    expect(CsrfService.getToken()).toBe('sample csrf token');
+    expect(CsrfTokenService.getToken()).toBe('sample csrf token');
   });
 });

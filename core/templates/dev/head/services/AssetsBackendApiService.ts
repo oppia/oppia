@@ -21,14 +21,14 @@ require('domain/utilities/AudioFileObjectFactory.ts');
 require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/CsrfService.ts');
+require('services/CsrfTokenService.ts');
 
 oppia.factory('AssetsBackendApiService', [
-  '$http', '$q', 'AudioFileObjectFactory', 'CsrfService',
+  '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',
   'FileDownloadRequestObjectFactory', 'ImageFileObjectFactory',
   'UrlInterpolationService', 'DEV_MODE',
   function(
-      $http, $q, AudioFileObjectFactory, CsrfService,
+      $http, $q, AudioFileObjectFactory, CsrfTokenService,
       FileDownloadRequestObjectFactory, ImageFileObjectFactory,
       UrlInterpolationService, DEV_MODE) {
     if (!DEV_MODE && !GLOBALS.GCS_RESOURCE_BUCKET_NAME) {
@@ -155,7 +155,7 @@ oppia.factory('AssetsBackendApiService', [
       form.append('payload', JSON.stringify({
         filename: filename
       }));
-      form.append('csrf_token', CsrfService.getToken());
+      form.append('csrf_token', CsrfTokenService.getToken());
 
       $.ajax({
         url: _getAudioUploadUrl(explorationId),

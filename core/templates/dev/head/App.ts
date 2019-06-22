@@ -22,7 +22,7 @@ require('pages/Base.ts');
 
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
-require('services/CsrfService.ts');
+require('services/CsrfTokenService.ts');
 require('services/NavigationService.ts');
 require('services/UtilsService.ts');
 require('services/DebouncerService.ts');
@@ -104,13 +104,13 @@ oppia.config([
     // Add an interceptor to convert requests to strings and to log and show
     // warnings for error responses.
     $httpProvider.interceptors.push([
-      '$q', '$log', 'AlertsService', 'CsrfService',
-      function($q, $log, AlertsService, CsrfService) {
+      '$q', '$log', 'AlertsService', 'CsrfTokenService',
+      function($q, $log, AlertsService, CsrfTokenService) {
         return {
           request: function(config) {
             if (config.data) {
               config.data = $.param({
-                csrf_token: CsrfService.getToken(),
+                csrf_token: CsrfTokenService.getToken(),
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -183,8 +183,8 @@ oppia.config(['toastrConfig', function(toastrConfig) {
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
-oppia.factory('$exceptionHandler', ['$log', 'CsrfService',
-  function($log, CsrfService) {
+oppia.factory('$exceptionHandler', ['$log', 'CsrfTokenService',
+  function($log, CsrfTokenService) {
     var MIN_TIME_BETWEEN_ERRORS_MSEC = 5000;
     var timeOfLastPostedError = Date.now() - MIN_TIME_BETWEEN_ERRORS_MSEC;
 
@@ -208,7 +208,7 @@ oppia.factory('$exceptionHandler', ['$log', 'CsrfService',
             type: 'POST',
             url: '/frontend_errors',
             data: $.param({
-              csrf_token: CsrfService.getToken(),
+              csrf_token: CsrfTokenService.getToken(),
               payload: JSON.stringify({
                 error: messageAndSourceAndStackTrace
               }),

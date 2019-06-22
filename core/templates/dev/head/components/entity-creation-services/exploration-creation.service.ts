@@ -19,16 +19,16 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
-require('services/CsrfService.ts');
+require('services/CsrfTokenService.ts');
 require('services/SiteAnalyticsService.ts');
 
 oppia.factory('ExplorationCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window',
-  'AlertsService', 'CsrfService', 'SiteAnalyticsService',
+  'AlertsService', 'CsrfTokenService', 'SiteAnalyticsService',
   'UrlInterpolationService',
   function(
       $http, $rootScope, $timeout, $uibModal, $window,
-      AlertsService, CsrfService, SiteAnalyticsService,
+      AlertsService, CsrfTokenService, SiteAnalyticsService,
       UrlInterpolationService) {
     var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/create/<exploration_id>';
 
@@ -101,7 +101,7 @@ oppia.factory('ExplorationCreationService', [
           var form = new FormData();
           form.append('yaml_file', yamlFile);
           form.append('payload', JSON.stringify({}));
-          form.append('csrf_token', CsrfService.getToken());
+          form.append('csrf_token', CsrfTokenService.getToken());
 
           $.ajax({
             contentType: false,

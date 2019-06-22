@@ -66,7 +66,7 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
         json_response = self.post_json(
             '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
             {'title': 'Story title'},
@@ -336,7 +336,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s' % (
@@ -474,7 +474,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             self.topic_id)
 
         self.login(self.TOPIC_MANAGER_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
         # Check that the topic manager can edit the topic now.
         json_response = self.put_json(
             '%s/%s' % (
@@ -517,7 +517,7 @@ class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
     def test_assign_topic_manager_role(self):
         """Test the assign topic manager role for a topic functionality."""
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
 
         # Test for when assignee does not have sufficient rights to become a
         # manager for a topic.
@@ -548,7 +548,7 @@ class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
 
     def test_send_mail(self):
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             self.put_json(
                 '%s/%s' % (
@@ -593,7 +593,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
         # Test whether admin can publish and unpublish a topic.
         self.put_json(
             '%s/%s' % (

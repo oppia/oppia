@@ -25,7 +25,6 @@ import os
 import unittest
 
 from constants import constants
-from core.controllers import base
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
@@ -822,14 +821,10 @@ tags: []
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(json_response, expect_errors)
 
-    def get_csrf_token(self):
+    def get_new_csrf_token(self):
         """Generates CSRF token for test."""
-        if self.get_current_logged_in_user_id() == '':
-            return base.CsrfTokenManager.create_csrf_token(
-                ('non_logged_in_user'))
-
-        return base.CsrfTokenManager.create_csrf_token(
-            self.get_current_logged_in_user_id())
+        response = self.get_json('/csrfhandler')
+        return response['token']
 
     def signup(self, email, username):
         """Complete the signup process for the user with the given username.
@@ -847,7 +842,7 @@ tags: []
         with self.urlfetch_mock():
             response = self.get_html_response(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
-            csrf_token = self.get_csrf_token()
+            csrf_token = self.get_new_csrf_token()
             response = self.testapp.post(
                 feconf.SIGNUP_DATA_URL, params={
                     'csrf_token': csrf_token,
@@ -865,7 +860,7 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            csrf_token = self.get_csrf_token()
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminhandler', {
                     'action': 'save_config_properties',
@@ -883,7 +878,7 @@ tags: []
         """
         with self.login_context('tmpsuperadmin@example.com',
                                 is_super_admin=True):
-            csrf_token = self.get_csrf_token()
+            csrf_token = self.get_new_csrf_token()
             self.post_json(
                 '/adminrolehandler', {
                     'username': username,

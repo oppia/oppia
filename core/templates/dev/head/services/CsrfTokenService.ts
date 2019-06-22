@@ -16,14 +16,12 @@
  * @fileoverview Service for managing csrf tokens
  */
 
-oppia.factory('CsrfService', [function() {
+oppia.factory('CsrfTokenService', [function() {
   var token = null;
-  var setToken = function(csrfToken) {
-    token = csrfToken;
-  };
-
   return {
-    setToken: setToken,
+    setToken: function (csrfToken) {
+      token = csrfToken;
+    },
     getToken: function() {
       return token;
     }

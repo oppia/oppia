@@ -107,7 +107,7 @@ class StoryEditorTests(BaseStoryEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s/%s' % (

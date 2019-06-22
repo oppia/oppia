@@ -284,6 +284,9 @@ class SignupHandler(base.BaseHandler):
             'has_ever_registered': bool(
                 user_settings.username and user_settings.last_agreed_to_terms),
             'username': user_settings.username,
+
+            # Send CSRF token here because any
+            # request from signup page invalidates the session.
             'csrf_token': base.CsrfTokenManager.create_csrf_token(
                 self.user_id),
         })

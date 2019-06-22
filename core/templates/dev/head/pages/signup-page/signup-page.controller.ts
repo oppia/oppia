@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
-require('services/CsrfService.ts');
+require('services/CsrfTokenService.ts');
 require('services/IdGenerationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
@@ -27,12 +27,12 @@ require('services/stateful/FocusManagerService.ts');
 
 oppia.controller('Signup', [
   '$http', '$rootScope', '$scope', '$uibModal', 'AlertsService',
-  'CsrfService', 'FocusManagerService', 'SiteAnalyticsService',
+  'CsrfTokenService', 'FocusManagerService', 'SiteAnalyticsService',
   'UrlInterpolationService', 'UrlService',
   'SITE_NAME',
   function(
       $http, $rootScope, $scope, $uibModal, AlertsService,
-      CsrfService, FocusManagerService, SiteAnalyticsService,
+      CsrfTokenService, FocusManagerService, SiteAnalyticsService,
       UrlInterpolationService, UrlService,
       SITE_NAME) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
@@ -50,7 +50,7 @@ oppia.controller('Signup', [
       $scope.showEmailPreferencesForm = data.can_send_emails;
       $scope.hasUsername = Boolean($scope.username);
       FocusManagerService.setFocus('usernameInputField');
-      CsrfService.setToken(data.csrf_token);
+      CsrfTokenService.setToken(data.csrf_token);
     });
 
     $scope.blurredAtLeastOnce = false;

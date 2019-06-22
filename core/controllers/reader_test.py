@@ -435,7 +435,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         self.signup('user@example.com', 'user')
         self.login('user@example.com')
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
 
         # User checks rating.
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
@@ -476,7 +476,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         self.signup('user@example.com', 'user')
         self.login('user@example.com')
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
         self.logout()
 
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
@@ -498,7 +498,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'b')
 
         self.login('a@example.com')
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 4
@@ -507,7 +507,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
         self.login('b@example.com')
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
         self.put_json(
@@ -1012,7 +1012,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         # Login and flag exploration.
         self.login(self.NEW_USER_EMAIL)
 
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
 
         self.post_json(
             '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
@@ -1066,7 +1066,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         """Check that non-logged in users cannot report."""
 
         self.login(self.NEW_USER_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
         self.logout()
 
         # Create report for exploration.
@@ -1151,7 +1151,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """
 
         self.login(self.USER_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -1188,7 +1188,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """
 
         self.login(self.USER_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -1232,7 +1232,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         """Test handler for leaving an exploration incomplete."""
 
         self.login(self.USER_EMAIL)
-        csrf_token = self.get_csrf_token()
+        csrf_token = self.get_new_csrf_token()
 
         payload = {
             'client_time_spent_in_secs': 0,
@@ -1426,7 +1426,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }]
         }
 
-        self.csrf_token = self.get_csrf_token()
+        self.csrf_token = self.get_new_csrf_token()
 
     def test_new_playthrough_gets_stored(self):
         """Test that a new playthrough gets created and is added to an existing

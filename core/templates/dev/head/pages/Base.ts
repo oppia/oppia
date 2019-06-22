@@ -15,7 +15,7 @@
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
-require('services/CsrfService.ts');
+require('services/CsrfTokenService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 
@@ -26,12 +26,12 @@ require('app.constants.ts');
  */
 
 oppia.controller('Base', [
-  '$document', '$rootScope', '$http', '$scope', 'AlertsService',
-  'BackgroundMaskService', 'CsrfService', 'SidebarStatusService',
+  '$document', '$http', '$rootScope', '$scope', 'AlertsService',
+  'BackgroundMaskService', 'CsrfTokenService', 'SidebarStatusService',
   'UrlInterpolationService', 'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL',
   'SITE_NAME',
-  function($document, $rootScope, $http, $scope, AlertsService,
-      BackgroundMaskService, CsrfService, SidebarStatusService,
+  function($document, $http, $rootScope, $scope, AlertsService,
+      BackgroundMaskService, CsrfTokenService, SidebarStatusService,
       UrlInterpolationService, UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL,
       SITE_NAME) {
     $scope.siteName = SITE_NAME;
@@ -59,8 +59,10 @@ oppia.controller('Base', [
     });
 
     if (UrlService.getPathname() !== '/signup') {
-      $http.get('/csrf').then(function(response) {
-        CsrfService.setToken(response.data.token);
+      // This is done outside the service to prevent
+      // circular dependency issues.
+      $http.get('/csrfhandler').then(function(response) {
+        CsrfTokenService.setToken(response.data.token);
       });
     }
     // TODO(sll): use 'touchstart' for mobile.
