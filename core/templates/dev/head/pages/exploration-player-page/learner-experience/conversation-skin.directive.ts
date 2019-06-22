@@ -772,8 +772,8 @@ oppia.directive('conversationSkin', [
                         completedStoryNodes.push(storyNode);
                       }
                     });
-                    if (completedStoryNodes.length % 3 ===
-                      NUM_EXPLORATIONS_PER_REVIEW_TEST ||
+                    if (completedStoryNodes.length %
+                      NUM_EXPLORATIONS_PER_REVIEW_TEST === 0 ||
                       completedStoryNodes.length === storyNodes.length) {
                       var REVIEW_TEST_URL_TEMPLATE = (
                         '/review_test/<story_id>');
