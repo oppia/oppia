@@ -44,6 +44,8 @@ describe('Editor state service', function() {
     });
 
     it('should correctly set and get solicitAnswerDetails', function() {
+      expect(ecs.getSolicitAnswerDetails()).toBeNull();
+      ecs.setSolicitAnswerDetails(false);
       expect(ecs.getSolicitAnswerDetails()).toEqual(false);
       ecs.setSolicitAnswerDetails(true);
       expect(ecs.getSolicitAnswerDetails()).toEqual(true);

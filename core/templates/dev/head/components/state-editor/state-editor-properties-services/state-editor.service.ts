@@ -36,7 +36,7 @@ oppia.factory('StateEditorService', [
     var interaction = null;
     var misconceptions = [];
     var explorationIsWhitelisted = false;
-    var solicitAnswerDetails = false;
+    var solicitAnswerDetails = null;
 
     return {
       getActiveStateName: function() {

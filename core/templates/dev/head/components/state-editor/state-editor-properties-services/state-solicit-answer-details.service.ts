@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the solicit answer details
- * value.
+ * @fileoverview A data service that stores the solicit answer details value.
  */
 
 require(
