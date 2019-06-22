@@ -1215,7 +1215,7 @@ def update_state_reference(
         old_state_reference: str. The old state reference which needs to be
             changed.
         new_state_reference: str. The new state reference which needs to be
-            updated..
+            updated.
     """
     learner_answer_details = get_learner_answer_details(
         entity_type, old_state_reference)
@@ -1225,7 +1225,7 @@ def update_state_reference(
             'reference and entity')
     learner_answer_details.update_state_reference(new_state_reference)
     save_learner_answer_details(
-        entity_type, old_state_reference, learner_answer_details,)
+        entity_type, old_state_reference, learner_answer_details)
 
 
 def delete_learner_answer_details_for_exploration_state(
