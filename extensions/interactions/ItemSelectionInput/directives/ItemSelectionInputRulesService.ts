@@ -16,6 +16,8 @@
  * @fileoverview Rules service for the interaction.
  */
 
+require('filters/remove-duplicates-in-array.filter.ts');
+
 oppia.factory('ItemSelectionInputRulesService', ['$filter', function($filter) {
   return {
     Equals: function(answer, inputs) {

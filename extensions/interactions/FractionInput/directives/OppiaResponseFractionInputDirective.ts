@@ -16,6 +16,10 @@
  * @fileoverview Directive for the FractionInput response.
  */
 
+require('domain/objects/FractionObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/HtmlEscaperService.ts');
+
 oppia.directive('oppiaResponseFractionInput', [
   'FractionObjectFactory', 'HtmlEscaperService', 'UrlInterpolationService',
   function(
