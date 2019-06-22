@@ -552,7 +552,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
         new_content = state_domain.SubtitledHtml(
-            'content', 'new suggestion html').to_dict()
+            'content', '<p>new suggestion html</p>').to_dict()
 
         suggestion.change.new_value = new_content
 
@@ -759,7 +759,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change.question_dict[
+        suggestion.change.question_dict[ # pylint: disable=unsupported-assignment-operation
             'question_state_data_schema_version'] = 0
 
         with self.assertRaisesRegexp(
@@ -809,7 +809,7 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.question_dict[
+        suggestion.change.question_dict[ # pylint: disable=unsupported-assignment-operation
             'question_state_data_schema_version'] = 1
 
         with self.assertRaisesRegexp(

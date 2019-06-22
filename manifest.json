@@ -291,9 +291,9 @@
         }
       },
       "d3": {
-        "version": "3.4.11",
+        "version": "5.9.2",
         "downloadFormat": "files",
-        "url": "https://raw.github.com/mbostock/d3/v3.4.11",
+        "url": "https://unpkg.com/d3@5.9.2/dist/",
         "rootDirPrefix": "d3js-",
         "targetDirPrefix": "d3js-",
         "files": ["d3.min.js"],
@@ -344,9 +344,9 @@
         "targetDir": "guppy-b5055b"
       },
       "hammerJs": {
-        "version": "2.0.4",
+        "version": "2.0.8",
         "downloadFormat": "zip",
-        "url": "https://github.com/hammerjs/hammer.js/archive/2.0.4.zip",
+        "url": "https://github.com/hammerjs/hammer.js/archive/v2.0.8.zip",
         "rootDirPrefix": "hammer.js-",
         "targetDirPrefix": "hammer-js-",
         "bundle": {
@@ -540,9 +540,9 @@
         }
       },
       "waveSurferJs": {
-        "version": "1.0.46",
+        "version": "2.2.1",
         "downloadFormat": "files",
-        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
+        "url": "https://unpkg.com/wavesurfer.js@2.2.1/dist/",
         "rootDirPrefix": "waveSurfer-js-",
         "targetDirPrefix": "wave-surfer-js-",
         "files": ["wavesurfer.min.js"],
