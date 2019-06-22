@@ -2125,12 +2125,12 @@ class LearnerAnswerDetailsServicesTest(test_utils.GenericTestBase):
             stats_models.LearnerAnswerDetailsModel.create_model_instance(
                 feconf.ENTITY_TYPE_EXPLORATION,
                 self.state_reference_exploration, self.interaction_id, [],
-                feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION, 0))
+                feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION, 0))
         self.learner_answer_details_model_question = (
             stats_models.LearnerAnswerDetailsModel.create_model_instance(
                 feconf.ENTITY_TYPE_QUESTION,
                 self.state_reference_question, self.interaction_id, [],
-                feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION, 0))
+                feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION, 0))
 
     def test_update_learner_answer_details(self):
         answer = 'This is my answer'

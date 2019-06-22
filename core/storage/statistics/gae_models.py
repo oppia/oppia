@@ -1165,7 +1165,7 @@ class LearnerAnswerDetailsModel(base_models.BaseModel):
     # LearnerAnswerInfo schema changes in future this needs to be incremented.
     learner_answer_info_schema_version = ndb.IntegerProperty(
         indexed=True, default=(
-            feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION))
+            feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION))
     # The total number of bytes needed to store all of the answers in the
     # learner_answer_info_list. This value is found by summing the JSON
     # sizes of all answer info dicts stored inside learner_answer_info_list.

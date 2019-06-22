@@ -201,7 +201,7 @@ CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
 
 # This value should be updated if the schema of LearnerAnswerInfo
 # dict schema changes.
-CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION = 1
+CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.

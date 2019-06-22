@@ -1372,7 +1372,7 @@ class LearnerAnswerDetails(object):
             self, state_reference, entity_type, interaction_id,
             learner_answer_info_list, accumulated_answer_info_json_size_bytes,
             learner_answer_info_schema_version=(
-                feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION)):
+                feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)):
         """Constructs a LearnerAnswerDetail domain object.
 
         Args:

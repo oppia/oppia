@@ -516,7 +516,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         learner_answer_info_list = []
         learner_answer_info_schema_version = (
-            feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION)
+            feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type, state_reference, interaction_id,
@@ -537,7 +537,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         learner_answer_info_list = []
         learner_answer_info_schema_version = (
-            feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION)
+            feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type, state_reference, interaction_id,
@@ -568,7 +568,7 @@ class LearnerAnswerDetailsModelUnitTests(test_utils.GenericTestBase):
         interaction_id = 'TextInput'
         learner_answer_info_list = []
         learner_answer_info_schema_version = (
-            feconf.CURRENT_LEARNER_ANSWERS_INFO_SCHEMA_VERSION)
+            feconf.CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION)
         accumulated_answer_info_json_size_bytes = 40000
         stats_models.LearnerAnswerDetailsModel.create_model_instance(
             entity_type, state_reference, interaction_id,
