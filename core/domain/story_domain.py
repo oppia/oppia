@@ -84,6 +84,7 @@ class StoryChange(change_domain.BaseChange):
         to_version)
         - 'create_new' (with title)
     """
+
     # The allowed list of story properties which can be used in
     # update_story_property command.
     STORY_PROPERTIES = (

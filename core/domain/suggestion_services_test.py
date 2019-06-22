@@ -256,7 +256,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.author_id, self.target_id, change_list, 'Add state.')
 
         new_suggestion_content = state_domain.SubtitledHtml(
-            'content', 'new suggestion content html').to_dict()
+            'content', '<p>new suggestion content html</p>').to_dict()
         change_dict = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -833,7 +833,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
-            'content', 'old content').to_dict()
+            'content', '<p>old content</p>').to_dict()
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
                 'content': {
@@ -860,7 +860,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
 
         self.new_content = state_domain.SubtitledHtml(
-            'content', 'new content').to_dict()
+            'content', '<p>new content</p>').to_dict()
 
         self.change = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
@@ -891,7 +891,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exploration.states['State 1'].content.html,
-            'new content')
+            '<p>new content</p>')
 
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
@@ -918,7 +918,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             last_message.text, 'Reject message')
         self.assertEqual(
             exploration.states['State 1'].content.html,
-            'old content')
+            '<p>old content</p>')
 
         self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
 
@@ -947,7 +947,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             exploration.states['State 1'].content.html,
-            'new content')
+            '<p>new content</p>')
 
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
 

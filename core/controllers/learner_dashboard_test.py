@@ -395,7 +395,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
         self.assertFalse(messages_summary.get('description'))
 
         new_content = state_domain.SubtitledHtml(
-            'content', 'new content html').to_dict()
+            'content', '<p>new content html</p>').to_dict()
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -424,7 +424,7 @@ class LearnerDashboardFeedbackThreadHandlerTests(test_utils.GenericTestBase):
             messages_summary['author_picture_data_url'].startswith(
                 'data:image/png;'))
         self.assertEqual(
-            messages_summary['suggestion_html'], 'new content html')
+            messages_summary['suggestion_html'], '<p>new content html</p>')
         self.assertEqual(
             messages_summary['current_content_html'], current_content_html)
         self.assertEqual(

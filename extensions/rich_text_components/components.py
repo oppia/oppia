@@ -106,7 +106,7 @@ class Image(BaseRteComponent):
     def validate(cls, value_dict):
         """Validates Image component."""
         super(Image, cls).validate(value_dict)
-        filename_re = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$'
+        filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
         filepath = value_dict['filepath-with-value']
         if not re.match(filename_re, filepath):
             raise Exception('Invalid filepath')

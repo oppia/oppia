@@ -36,12 +36,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', 'Explanation'), [
-                state_domain.SubtitledHtml('2', 'Example 1')],
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
             {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
-            self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
+            self.MISCONCEPTION_ID_1, 'name', '<p>description</p>',
+            '<p>default_feedback</p>')]
         self.SKILL_ID = skill_services.get_new_skill_id()
 
         self.signup('a@example.com', 'A')
@@ -104,15 +105,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             'skill_2', self.USER_ID, 'Description 2', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')],
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
             'skill_3', self.USER_ID, 'Description 3', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')],
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
 
@@ -170,8 +171,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'new_misconception_dict': {
                     'id': self.skill.next_misconception_id,
                     'name': 'test name',
-                    'notes': 'test notes',
-                    'feedback': 'test feedback'
+                    'notes': '<p>test notes</p>',
+                    'feedback': '<p>test feedback</p>'
                 }
             }),
             skill_domain.SkillChange({
@@ -199,7 +200,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-                'id': 0,
                 'old_value': '',
                 'new_value': 'TestSkillId'
             }),
@@ -207,7 +207,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
-                'id': 0,
                 'old_value': None,
                 'new_value': False
             })
@@ -233,7 +232,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
-                'id': 0,
                 'old_value': False,
                 'new_value': True
             })
@@ -254,7 +252,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
-                'id': 0,
                 'old_value': '',
                 'new_value': 'TestSkillId'
             })
@@ -278,15 +275,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')],
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')],
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
 
@@ -305,15 +302,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')],
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         self.save_new_skill(
             'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
             skill_contents=skill_domain.SkillContents(
-                state_domain.SubtitledHtml('1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')],
+                state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
                 {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                     {'translations_mapping': {'1': {}, '2': {}}})))
         try:

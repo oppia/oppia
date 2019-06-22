@@ -1885,7 +1885,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer B')
 
             # Change the exploration version and submit a new answer.
-            self._change_state_content('New content')
+            self._change_state_content('<p>New content</p>')
             self._record_answer('Answer A')
 
             self._run_answer_summaries_aggregator()

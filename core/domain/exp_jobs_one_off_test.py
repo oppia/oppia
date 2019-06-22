@@ -25,7 +25,9 @@ from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
+from core.domain import html_validation_service
 from core.domain import rights_manager
+from core.domain import state_domain
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -39,6 +41,14 @@ import utils
 memcache_services = models.Registry.import_memcache_services()
 search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
+
+
+def mock_validate_rte_format(unused_html_list, unused_rte_format):
+    return {}
+
+
+def mock_validate_customization_args(unused_html_list):
+    return {}
 
 
 def run_job_for_deleted_exp(
@@ -1740,9 +1750,6 @@ class ExplorationContentValidationJobForCKEditorTests(
                 '</oppia-noninteractive-collapsible>'
             )
         }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
 
         default_outcome_dict1 = {
             'dest': 'State2',
@@ -1775,9 +1782,17 @@ class ExplorationContentValidationJobForCKEditorTests(
             'missing_prerequisite_skill_id': None
         }
 
-        state1.update_interaction_default_outcome(default_outcome_dict1)
-        state2.update_interaction_default_outcome(default_outcome_dict2)
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        with self.swap(
+            html_validation_service, 'validate_customization_args',
+            mock_validate_customization_args), self.swap(
+                html_validation_service, 'validate_rte_format',
+                mock_validate_rte_format):
+            state1.update_content(content1_dict)
+            state2.update_content(content2_dict)
+            state3.update_content(content3_dict)
+            state1.update_interaction_default_outcome(default_outcome_dict1)
+            state2.update_interaction_default_outcome(default_outcome_dict2)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         job_id = (
             exp_jobs_one_off
@@ -1833,9 +1848,11 @@ class ExplorationContentValidationJobForCKEditorTests(
 
         state1 = exploration.states['State1']
 
-        state1.update_content(content_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        with self.swap(
+            html_validation_service, 'validate_rte_format',
+            mock_validate_rte_format):
+            state1.update_content(content_dict)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 
@@ -1865,6 +1882,10 @@ class InteractionCustomizationArgsValidationJobTests(
 
     def test_for_customization_arg_validation_job(self):
         """Validates customization args for rich text components."""
+
+        def mock_validate(unused_self):
+            pass
+
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exploration.add_states(['State1', 'State2', 'State3'])
@@ -1910,19 +1931,23 @@ class InteractionCustomizationArgsValidationJobTests(
                 '</oppia-noninteractive-image>'
             )
         }
-        state1.update_content(content1_dict)
-        state2.update_interaction_default_outcome(default_outcome_dict2)
-        state3.update_content(content3_dict)
 
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        with self.swap(
+            html_validation_service, 'validate_customization_args',
+            mock_validate_customization_args):
+            state1.update_content(content1_dict)
+            state2.update_interaction_default_outcome(default_outcome_dict2)
+            state3.update_content(content3_dict)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start CustomizationArgsValidation job on sample exploration.
-        job_id = (
-            exp_jobs_one_off
-            .InteractionCustomizationArgsValidationJob.create_new())
-        exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            job_id = (
+                exp_jobs_one_off
+                .InteractionCustomizationArgsValidationJob.create_new())
+            exp_jobs_one_off.InteractionCustomizationArgsValidationJob.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -1964,9 +1989,11 @@ class InteractionCustomizationArgsValidationJobTests(
 
         state1 = exploration.states['State1']
 
-        state1.update_content(content_dict)
-
-        exp_services.save_new_exploration(self.albert_id, exploration)
+        with self.swap(
+            html_validation_service, 'validate_customization_args',
+            mock_validate_customization_args):
+            state1.update_content(content_dict)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
         exp_services.delete_exploration(self.albert_id, self.VALID_EXP_ID)
 

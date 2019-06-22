@@ -1103,7 +1103,7 @@ class VersioningIntegrationTest(BaseEditorControllerTests):
                 'state_name': exploration.init_state_name,
                 'new_value': {
                     'content_id': 'content',
-                    'html': 'ABC'
+                    'html': '<p>ABC</p>'
                 },
             })], 'Change objective and init state content')
 

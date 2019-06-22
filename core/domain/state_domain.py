@@ -22,6 +22,7 @@ import logging
 from constants import constants
 from core.domain import customization_args_util
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import interaction_registry
 from core.domain import param_domain
 import feconf
@@ -1328,11 +1329,24 @@ class SubtitledHtml(object):
                 'Expected content id to be a string, received %s' %
                 self.content_id)
 
-        # TODO(sll): Add HTML sanitization checking.
-        # TODO(sll): Validate customization args for rich-text components.
         if not isinstance(self.html, basestring):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
+
+        err_dict = html_validation_service.validate_rte_format(
+            [self.html], feconf.RTE_FORMAT_CKEDITOR)
+        for key in err_dict:
+            if err_dict[key]:
+                raise utils.ValidationError(
+                    'Invalid html: %s for rte with invalid tags and '
+                    'strings: %s' % (self.html, err_dict))
+
+        err_dict = html_validation_service.validate_customization_args([
+            self.html])
+        if err_dict:
+            raise utils.ValidationError(
+                'Invalid html: %s due to errors in customization_args: %s' % (
+                    self.html, err_dict))
 
     def to_html(self, params):
         """Exports this SubtitledHTML object to an HTML string. The HTML is

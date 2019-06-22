@@ -37,6 +37,14 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
         filename, 490, 120)
 
 
+def mock_validate_rte_format(unused_html_list, unused_rte_format):
+    return {}
+
+
+def mock_validate_customization_args(unused_html_list):
+    return {}
+
+
 class ExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_exp_change_object_with_missing_cmd(self):
@@ -414,7 +422,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Feedback'
+                    'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -5160,7 +5168,11 @@ title: Title
         """Test direct loading from a v26 yaml file."""
         with self.swap(
             html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
+            mock_get_filename_with_dimensions), self.swap(
+                html_validation_service, 'validate_rte_format',
+                mock_validate_rte_format), self.swap(
+                    html_validation_service, 'validate_customization_args',
+                    mock_validate_customization_args):
 
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
@@ -5171,7 +5183,9 @@ title: Title
         """Test direct loading from a v27 yaml file."""
         with self.swap(
             html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
+            mock_get_filename_with_dimensions), self.swap(
+                html_validation_service, 'validate_customization_args',
+                mock_validate_customization_args):
 
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)

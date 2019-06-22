@@ -14,6 +14,8 @@
 
 """Tests for skill domain objects and methods defined on them."""
 
+import datetime
+
 from constants import constants
 from core.domain import skill_domain
 from core.domain import state_domain
@@ -32,12 +34,13 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         super(SkillDomainUnitTests, self).setUp()
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', 'Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1')],
+                '1', '<p>Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
             {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         misconceptions = [skill_domain.Misconception(
-            self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback')]
+            self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
+            '<p>default_feedback</p>')]
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
@@ -111,6 +114,29 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.misconceptions = ''
         self._assert_validation_error('Expected misconceptions to be a list')
 
+    def test_misconception_validation_with_invalid_html_in_notes(self):
+        self.skill.misconceptions[0].notes = '<a>Test</a>'
+        self._assert_validation_error(
+            'Invalid html: <a>Test</a> for rte with '
+            'invalid tags and strings: .+')
+
+    def test_misconception_validation_with_invalid_customization_args_in_notes(
+            self):
+        self.skill.misconceptions[0].notes = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            'Invalid html: <oppia-noninteractive-image>'
+            '</oppia-noninteractive-image> due to errors in '
+            'customization_args: .+')
+
+    def test_misconception_validation_with_invalid_customization_args_in_feedback(self): # pylint: disable=line-too-long
+        self.skill.misconceptions[0].feedback = (
+            '<oppia-noninteractive-image></oppia-noninteractive-image>')
+        self._assert_validation_error(
+            'Invalid html: <oppia-noninteractive-image>'
+            '</oppia-noninteractive-image> due to errors in '
+            'customization_args: .+')
+
     def test_skill_contents_validation(self):
         self.skill.skill_contents.worked_examples = ''
         self._assert_validation_error('Expected worked examples to be a list')
@@ -155,9 +181,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_misconception_id_validation(self):
         self.skill.misconceptions = [
             skill_domain.Misconception(
-                self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback'),
+                self.MISCONCEPTION_ID, 'name', '<p>notes</p>',
+                '<p>default_feedback</p>'),
             skill_domain.Misconception(
-                self.MISCONCEPTION_ID, 'name 2', 'notes 2', 'default_feedback')]
+                self.MISCONCEPTION_ID, 'name 2', '<p>notes 2</p>',
+                '<p>default_feedback</p>')]
         self._assert_validation_error('Duplicate misconception ID found')
 
     def test_skill_migration_validation(self):
@@ -214,8 +242,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_contents and misconception object.
         """
         skill_contents = skill_domain.SkillContents(
-            state_domain.SubtitledHtml('1', 'Explanation'), [
-                state_domain.SubtitledHtml('2', 'Example 1')],
+            state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
+                state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
             {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         skill_contents_dict = skill_contents.to_dict()
@@ -223,7 +251,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents_dict)
 
         misconceptions = skill_domain.Misconception(
-            self.MISCONCEPTION_ID, 'Tag Name', 'Description', 'Feedback')
+            self.MISCONCEPTION_ID, 'Tag Name', '<p>Description</p>',
+            '<p>Feedback</p>')
         misconceptions_dict = misconceptions.to_dict()
         misconceptions_from_dict = skill_domain.Misconception.from_dict(
             misconceptions_dict)
@@ -257,3 +286,305 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')
         self.assertTrue(skill_rights.is_creator('user'))
         self.assertFalse(skill_rights.is_creator('fakeuser'))
+
+
+class SkillChangeTests(test_utils.GenericTestBase):
+
+    def test_skill_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            skill_domain.SkillChange({'invalid': 'data'})
+
+    def test_skill_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            skill_domain.SkillChange({'cmd': 'invalid'})
+
+    def test_skill_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_value, old_value')):
+            skill_domain.SkillChange({
+                'cmd': 'update_skill_property',
+                'property_name': 'name',
+            })
+
+    def test_skill_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            skill_domain.SkillChange({
+                'cmd': 'add_skill_misconception',
+                'new_misconception_dict': {
+                    'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+                    'feedback': '<p>default_feedback</p>'},
+                'invalid': 'invalid'
+            })
+
+    def test_skill_change_object_with_invalid_skill_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_skill_property: '
+                'invalid is not allowed')):
+            skill_domain.SkillChange({
+                'cmd': 'update_skill_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_skill_change_object_with_invalid_skill_misconception_property(
+            self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd '
+                'update_skill_misconceptions_property: invalid is not '
+                'allowed')):
+            skill_domain.SkillChange({
+                'cmd': 'update_skill_misconceptions_property',
+                'id': 'id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_skill_change_object_with_invalid_skill_contents_property(
+            self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd '
+                'update_skill_contents_property: invalid is not allowed')):
+            skill_domain.SkillChange({
+                'cmd': 'update_skill_contents_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_skill_change_object_with_add_skill_misconception(self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'add_skill_misconception',
+            'new_misconception_dict': {
+                'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+                'feedback': '<p>default_feedback</p>'},
+        })
+
+        self.assertEqual(skill_change_object.cmd, 'add_skill_misconception')
+        self.assertEqual(
+            skill_change_object.new_misconception_dict, {
+                'id': 0, 'name': 'name', 'notes': '<p>notes</p>',
+                'feedback': '<p>default_feedback</p>'})
+
+    def test_skill_change_object_with_delete_skill_misconception(self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'delete_skill_misconception',
+            'id': 'id'
+        })
+
+        self.assertEqual(
+            skill_change_object.cmd, 'delete_skill_misconception')
+        self.assertEqual(skill_change_object.id, 'id')
+
+    def test_skill_change_object_with_update_skill_misconceptions_property(
+            self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'update_skill_misconceptions_property',
+            'id': 'id',
+            'property_name': 'name',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(
+            skill_change_object.cmd, 'update_skill_misconceptions_property')
+        self.assertEqual(skill_change_object.id, 'id')
+        self.assertEqual(skill_change_object.property_name, 'name')
+        self.assertEqual(skill_change_object.new_value, 'new_value')
+        self.assertEqual(skill_change_object.old_value, 'old_value')
+
+    def test_skill_change_object_with_update_skill_property(
+            self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'update_skill_property',
+            'property_name': 'description',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(skill_change_object.cmd, 'update_skill_property')
+        self.assertEqual(skill_change_object.property_name, 'description')
+        self.assertEqual(skill_change_object.new_value, 'new_value')
+        self.assertEqual(skill_change_object.old_value, 'old_value')
+
+    def test_skill_change_object_with_update_skill_contents_property(
+            self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'update_skill_contents_property',
+            'property_name': 'explanation',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(
+            skill_change_object.cmd, 'update_skill_contents_property')
+        self.assertEqual(skill_change_object.property_name, 'explanation')
+        self.assertEqual(skill_change_object.new_value, 'new_value')
+        self.assertEqual(skill_change_object.old_value, 'old_value')
+
+    def test_skill_change_object_with_create_new(self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'create_new'
+        })
+
+        self.assertEqual(skill_change_object.cmd, 'create_new')
+
+    def test_skill_change_object_with_migrate_contents_schema_to_latest_version(
+            self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'migrate_contents_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
+
+        self.assertEqual(
+            skill_change_object.cmd,
+            'migrate_contents_schema_to_latest_version')
+        self.assertEqual(skill_change_object.from_version, 'from_version')
+        self.assertEqual(skill_change_object.to_version, 'to_version')
+
+    def test_skill_change_object_with_migrate_misconceptions_schema_to_latest_version( # pylint: disable=line-too-long
+            self):
+        skill_change_object = skill_domain.SkillChange({
+            'cmd': 'migrate_misconceptions_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version'
+        })
+
+        self.assertEqual(
+            skill_change_object.cmd,
+            'migrate_misconceptions_schema_to_latest_version')
+        self.assertEqual(skill_change_object.from_version, 'from_version')
+        self.assertEqual(skill_change_object.to_version, 'to_version')
+
+    def test_to_dict(self):
+        skill_change_dict = {
+            'cmd': 'migrate_misconceptions_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version'
+        }
+        skill_change_object = skill_domain.SkillChange(skill_change_dict)
+        self.assertEqual(skill_change_object.to_dict(), skill_change_dict)
+
+
+class SkillRightsChangeTests(test_utils.GenericTestBase):
+
+    def test_skill_rights_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            skill_domain.SkillRightsChange({'invalid': 'data'})
+
+    def test_skill_change_rights_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            skill_domain.SkillRightsChange({'cmd': 'invalid'})
+
+    def test_skill_rights_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            skill_domain.SkillRightsChange({
+                'cmd': 'publish_skill',
+                'invalid': 'invalid'
+            })
+
+    def test_skill_rights_change_object_with_create_new(self):
+        skill_rights_change_object = skill_domain.SkillRightsChange({
+            'cmd': 'create_new'
+        })
+
+        self.assertEqual(skill_rights_change_object.cmd, 'create_new')
+
+    def test_skill_rights_change_object_with_publish_skill(self):
+        skill_rights_change_object = skill_domain.SkillRightsChange({
+            'cmd': 'publish_skill'
+        })
+
+        self.assertEqual(skill_rights_change_object.cmd, 'publish_skill')
+
+    def test_to_dict(self):
+        skill_rights_change_dict = {
+            'cmd': 'publish_skill'
+        }
+        skill_rights_change_object = skill_domain.SkillRightsChange(
+            skill_rights_change_dict)
+        self.assertEqual(
+            skill_rights_change_object.to_dict(), skill_rights_change_dict)
+
+
+class SkillSummaryTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(SkillSummaryTests, self).setUp()
+        current_time = datetime.datetime.utcnow()
+        time_in_millisecs = utils.get_time_in_millisecs(current_time)
+        self.skill_summary_dict = {
+            'id': 'skill_id',
+            'description': 'description',
+            'language_code': 'en',
+            'version': 1,
+            'misconception_count': 1,
+            'worked_examples_count': 1,
+            'skill_model_created_on': time_in_millisecs,
+            'skill_model_last_updated': time_in_millisecs
+        }
+
+        self.skill_summary = skill_domain.SkillSummary(
+            'skill_id', 'description', 'en', 1, 1, 1,
+            current_time, current_time)
+
+    def test_skill_summary_gets_created(self):
+        self.assertEqual(
+            self.skill_summary.to_dict(), self.skill_summary_dict)
+
+    def test_validation_passes_with_valid_properties(self):
+        self.skill_summary.validate()
+
+    def test_validation_fails_with_invalid_description(self):
+        self.skill_summary.description = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Description should be a string.'):
+            self.skill_summary.validate()
+
+    def test_validation_fails_with_empty_description(self):
+        self.skill_summary.description = ''
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Description field should not be empty'):
+            self.skill_summary.validate()
+
+    def test_validation_fails_with_invalid_language_code(self):
+        self.skill_summary.language_code = 0
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected language code to be a string, received 0'):
+            self.skill_summary.validate()
+
+    def test_validation_fails_with_unallowed_language_code(self):
+        self.skill_summary.language_code = 'invalid'
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Invalid language code: invalid'):
+            self.skill_summary.validate()
+
+    def test_validation_fails_with_invalid_misconception_count(self):
+        self.skill_summary.misconception_count = '10'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected misconception_count to be a int, received \'10\''):
+            self.skill_summary.validate()
+
+    def test_validation_fails_with_invalid_worked_examples_count(self):
+        self.skill_summary.worked_examples_count = '10'
+        with self.assertRaisesRegexp(
+            utils.ValidationError,
+            'Expected worked_examples_count to be a int, received \'10\''):
+            self.skill_summary.validate()

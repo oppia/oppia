@@ -64,11 +64,11 @@ class BaseSubtopicViewerControllerTests(test_utils.GenericTestBase):
             'content_ids_to_audio_translations':
                 self.content_ids_to_audio_translations_dict,
             'subtitled_html': {
-                'content_id': 'content', 'html': 'hello world'
+                'content_id': 'content', 'html': '<p>hello world</p>'
             }
         }
         self.subtopic_page.update_page_contents_html({
-            'html': 'hello world',
+            'html': '<p>hello world</p>',
             'content_id': 'content'
         })
         self.subtopic_page.update_page_contents_audio(
@@ -96,7 +96,7 @@ class SubtopicPageDataHandlerTests(BaseSubtopicViewerControllerTests):
                     self.content_ids_to_audio_translations_dict,
                 'subtitled_html': {
                     'content_id': 'content',
-                    'html': 'hello world'
+                    'html': '<p>hello world</p>'
                 },
                 'written_translations': self.written_translations_dict
             }
