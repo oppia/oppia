@@ -59,12 +59,12 @@ datastore_services = models.Registry.import_datastore_services()
 ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
 ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
-ASSETS_PATH_REGEX = '/exploration/[A-Za-z0-9]{1,12}/assets/'
+ASSETS_PATH_REGEX = '/exploration/[A-Za-z0-9-_]{1,12}/assets/'
 IMAGE_PATH_REGEX = (
-    '%simage/[A-Za-z0-9_]{1,}\\.(%s)' % (
+    '%simage/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_IMAGE_EXTENSIONS)))
 AUDIO_PATH_REGEX = (
-    '%saudio/[A-Za-z0-9_]{1,}\\.(%s)' % (
+    '%saudio/[A-Za-z0-9-_]{1,}\\.(%s)' % (
         ASSETS_PATH_REGEX, ('|').join(ALLOWED_AUDIO_EXTENSIONS)))
 FILE_MODELS_REGEX = '(%s|%s)' % (IMAGE_PATH_REGEX, AUDIO_PATH_REGEX)
 ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
@@ -343,7 +343,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9]{1,%s}-\\d*$' % base_models.ID_LENGTH
+        return '^[A-Za-z0-9-_]{1,%s}-\\d*$' % base_models.ID_LENGTH
 
     @classmethod
     def _validate_base_model_version_from_item_id(cls, item):
@@ -1086,7 +1086,7 @@ class SentEmailModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [intent].[random hash]
-        regex_string = '^%s\\.\\.[A-Za-z0-9]{1,%s}$' % (
+        regex_string = '^%s\\.\\.[A-Za-z0-9-_]{1,%s}$' % (
             item.intent, base_models.ID_LENGTH)
         return regex_string
 
@@ -1224,8 +1224,8 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return (
-            '^\\d*\\.(exploration|topic)\\.[A-Za-z0-9]{1,12}\\.'
-            '[A-Za-z0-9=+/]{1,}')
+            '^\\d*\\.(exploration|topic)\\.[A-Za-z0-9-_]{1,%s}\\.'
+            '[A-Za-z0-9=+/]{1,}') % base_models.ID_LENGTH
 
     @classmethod
     def _get_external_id_relationships(cls, item):
