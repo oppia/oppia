@@ -33,10 +33,7 @@ class QuestionsListHandler(base.BaseHandler):
     def get(self, comma_separated_skill_ids):
         """Handles GET requests."""
         start_cursor = self.request.get('cursor')
-        try:
-            skill_ids = comma_separated_skill_ids.split(',')
-        except Exception:
-            raise self.PageNotFoundException
+        skill_ids = comma_separated_skill_ids.split(',')
 
         for skill_id in skill_ids:
             try:

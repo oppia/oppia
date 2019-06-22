@@ -212,10 +212,7 @@ class SkillDataHandler(base.BaseHandler):
     def get(self, comma_separated_skill_ids):
         """Populates the data on skill pages of the skill ids."""
 
-        try:
-            skill_ids = comma_separated_skill_ids.split(',')
-        except Exception:
-            raise self.PageNotFoundException
+        skill_ids = comma_separated_skill_ids.split(',')
 
         try:
             for skill_id in skill_ids:

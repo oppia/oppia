@@ -20,13 +20,13 @@
       <p> Skill Description </p>
     </th>
   </tr>
-  <tr ng-repeat="question in $ctrl.questionSummaries"
+  <tr ng-repeat="questionSummary in $ctrl.questionSummaries"
       class="list-item protractor-test-question-list-item"
       style="height: 4em;"
-      ng-click="$ctrl.editQuestion(question.summary)">
+      ng-click="$ctrl.editQuestion(questionSummary.summary)">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
     <td> <[$ctrl.truncatedQuestionSummaries[$index]]> </td>
-    <td ng-if="$ctrl.getTopicId()"> <[$ctrl.getSkillDescription(question.skill_descriptions)]> </td>
+    <td ng-if="$ctrl.getTopicId()"> <[$ctrl.getSkillDescription(questionSummary.skill_descriptions)]> </td>
   </tr>
 </table>
 <h4 ng-if="$ctrl.questionSummaries.length === 0" style="color: gray;">

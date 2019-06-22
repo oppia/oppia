@@ -91,6 +91,22 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
 
+    def test_get_questions_with_multi_skill_ids(self):
+        question_id_1 = question_services.get_new_question_id()
+        question_1 = self.save_new_question(
+            question_id_1, self.editor_id,
+            self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_1, 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_1, 'skill_2', 0.5)
+        questions, _, _ = (
+            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+                2, ['skill_1', 'skill_2'], ''))
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(
+            questions[0].to_dict(), question_1.to_dict())
+
     def test_create_multi_question_skill_links_for_question(self):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
@@ -152,7 +168,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
-            self.editor_id, question_id_2, 'skill_1', 0.3)
+            self.editor_id, self.question_id, 'skill_3', 0.8)
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_2, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
