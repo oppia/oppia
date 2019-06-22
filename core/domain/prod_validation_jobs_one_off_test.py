@@ -31,9 +31,13 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import prod_validation_jobs_one_off
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import skill_domain
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
@@ -60,15 +64,15 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, file_models, job_models,
-    recommendations_models, story_models,
-    user_models,) = (
+    question_models, recommendations_models,
+    story_models, suggestion_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
-            models.NAMES.recommendations, models.NAMES.story,
-            models.NAMES.user]))
+            models.NAMES.question, models.NAMES.recommendations,
+            models.NAMES.story, models.NAMES.suggestion, models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
 
@@ -6695,6 +6699,296 @@ class StorySummaryModelValidatorTests(test_utils.GenericTestBase):
                 'match corresponding story title field: title 0\']]'
             ) % self.model_instance_0.id,
             u'[u\'fully-validated StorySummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class GeneralSuggestionModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(GeneralSuggestionModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+
+        exp = exp_domain.Exploration.create_default_exploration(
+            '0',
+            title='title 0',
+            category='Art',
+        )
+        exp_services.save_new_exploration(self.owner_id, exp)
+
+        change = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'state_1',
+            'new_value': 'new suggestion content'
+        }
+
+        self.thread_id = feedback_services.create_thread(
+            'exploration', '0', self.owner_id, 'description',
+            'suggestion', has_suggestion=True)
+
+        score_category = (
+            suggestion_models.SCORE_TYPE_CONTENT +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + exp.category)
+
+        suggestion_models.GeneralSuggestionModel.create(
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, '0',
+            1, suggestion_models.STATUS_ACCEPTED, self.owner_id,
+            self.admin_id, change, score_category, self.thread_id)
+        self.model_instance = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(self.thread_id))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated GeneralSuggestionModel\', 1]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance.created_on = (
+            self.model_instance.last_updated + datetime.timedelta(days=1))
+        self.model_instance.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of GeneralSuggestionModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance.id,
+                self.model_instance.created_on,
+                self.model_instance.last_updated
+            )]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'GeneralSuggestionModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance.id, self.model_instance.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_exploration_model_failure(self):
+        exp_models.ExplorationModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for exploration_ids field '
+                'check of GeneralSuggestionModel\', '
+                '[u"Entity id %s: based on field exploration_ids having value '
+                '0, expect model ExplorationModel with id 0 but it doesn\'t '
+                'exist"]]') % self.model_instance.id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_feedback_thread_model_failure(self):
+        feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            self.thread_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for feedback_thread_ids field '
+                'check of GeneralSuggestionModel\', '
+                '[u"Entity id %s: based on field feedback_thread_ids having '
+                'value %s, expect model GeneralFeedbackThreadModel with id %s '
+                'but it doesn\'t exist"]]') % (
+                    self.model_instance.id, self.thread_id, self.thread_id)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_author_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for author_ids field '
+                'check of GeneralSuggestionModel\', '
+                '[u"Entity id %s: based on field author_ids having value '
+                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
+                'exist"]]') % (
+                    self.model_instance.id, self.owner_id, self.owner_id)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_reviewer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.admin_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for reviewer_ids field '
+                'check of GeneralSuggestionModel\', '
+                '[u"Entity id %s: based on field reviewer_ids having value '
+                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
+                'exist"]]') % (
+                    self.model_instance.id, self.admin_id, self.admin_id)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_target_version(self):
+        self.model_instance.target_version_at_submission = 5
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for target version at submission'
+                ' check of GeneralSuggestionModel\', [u\'Entity id %s: '
+                'target version 5 in entity is greater than the '
+                'version 1 of exploration corresponding to id 0\']]'
+            ) % self.model_instance.id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_empty_final_reviewer_id(self):
+        self.model_instance.final_reviewer_id = None
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final reviewer '
+                'check of GeneralSuggestionModel\', [u\'Entity id %s: '
+                'Final reviewer id is empty but suggestion is accepted\']]'
+            ) % self.model_instance.id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_non_empty_final_reviewer_id(self):
+        self.model_instance.status = suggestion_models.STATUS_IN_REVIEW
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for final reviewer '
+                'check of GeneralSuggestionModel\', [u\'Entity id %s: '
+                'Final reviewer id %s is not empty but '
+                'suggestion is in review\']]'
+            ) % (self.model_instance.id, self.admin_id)]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_schema(self):
+        self.model_instance.score_category = 'invalid.invalid'
+        self.model_instance.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check '
+                'of GeneralSuggestionModel\', [u\'Entity id %s: Entity '
+                'fails domain validation with the error Expected the first '
+                'part of score_category to be among allowed choices, '
+                'received invalid\']]'
+            ) % self.model_instance.id]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class ReviewerRotationTrackingModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(ReviewerRotationTrackingModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        score_category = (
+            suggestion_models.SCORE_TYPE_CONTENT +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + 'Art')
+        suggestion_models.ReviewerRotationTrackingModel.create(
+            score_category, self.owner_id)
+        self.model_instance_0 = (
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                score_category))
+
+        skill = skill_domain.Skill.create_default_skill(
+            '0', description='description0')
+        skill_services.save_new_skill(self.owner_id, skill)
+        question = question_domain.Question.create_default_question(
+            '0', skill_ids=['0'])
+        question.question_state_data = self._create_valid_question_data('Test')
+        question_services.create_new_question(
+            self.owner_id, question, 'test question')
+        score_category = (
+            suggestion_models.SCORE_TYPE_QUESTION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + '0')
+        suggestion_models.ReviewerRotationTrackingModel.create(
+            score_category, self.user_id)
+        self.model_instance_1 = (
+            suggestion_models.ReviewerRotationTrackingModel.get_by_id(
+                score_category))
+
+        self.job_class = (
+            prod_validation_jobs_one_off.ReviewerRotationTrackingModelAuditOneOffJob) # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated ReviewerRotationTrackingModel\', 2]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of ReviewerRotationTrackingModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated ReviewerRotationTrackingModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'ReviewerRotationTrackingModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_missing_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.owner_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for user_ids field '
+                'check of ReviewerRotationTrackingModel\', '
+                '[u"Entity id %s: based on field user_ids having value '
+                '%s, expect model UserSettingsModel with id %s but it doesn\'t '
+                'exist"]]') % (
+                    self.model_instance_0.id, self.owner_id, self.owner_id),
+            u'[u\'fully-validated ReviewerRotationTrackingModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_missing_question_model_failure(self):
+        question_models.QuestionModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_ids field '
+                'check of ReviewerRotationTrackingModel\', '
+                '[u"Entity id %s: based on field question_ids having value '
+                '0, expect model QuestionModel with id 0 but it doesn\'t '
+                'exist"]]') % self.model_instance_1.id,
+            u'[u\'fully-validated ReviewerRotationTrackingModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_id(self):
+        suggestion_models.ReviewerRotationTrackingModel.create(
+            'invalid', self.user_id)
+        expected_output = [
+            (
+                u'[u\'failed validation check for model id check of '
+                'ReviewerRotationTrackingModel\', [u\'Entity id invalid: '
+                'Entity id does not match regex pattern\']]'
+            ), u'[u\'fully-validated ReviewerRotationTrackingModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 

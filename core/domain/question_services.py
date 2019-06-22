@@ -61,7 +61,7 @@ def _migrate_state_schema(versioned_question_state):
         state_schema_version += 1
 
 
-def _create_new_question(committer_id, question, commit_message):
+def create_new_question(committer_id, question, commit_message):
     """Creates a new question.
 
     Args:
@@ -275,7 +275,7 @@ def add_question(committer_id, question):
         question: Question. Question to be saved.
     """
     commit_message = 'New question created'
-    _create_new_question(committer_id, question, commit_message)
+    create_new_question(committer_id, question, commit_message)
 
 
 def delete_question(

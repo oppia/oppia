@@ -36,6 +36,7 @@ from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import suggestion_services
 from core.platform import models
 import feconf
 import utils
@@ -45,15 +46,17 @@ import utils
     classifier_models, collection_models,
     config_models, email_models, exp_models,
     feedback_models, file_models, job_models,
-    recommendations_models, story_models,
-    user_models,) = (
+    question_models, recommendations_models,
+    skill_models, story_models, suggestion_models,
+    topic_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.classifier, models.NAMES.collection,
             models.NAMES.config, models.NAMES.email, models.NAMES.exploration,
             models.NAMES.feedback, models.NAMES.file, models.NAMES.job,
-            models.NAMES.recommendations, models.NAMES.story,
-            models.NAMES.user]))
+            models.NAMES.question, models.NAMES.recommendations,
+            models.NAMES.skill, models.NAMES.story, models.NAMES.suggestion,
+            models.NAMES.topic, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
@@ -72,6 +75,26 @@ ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES = [
     'InteractionAnswerSummariesAggregator',
     'DashboardRecentUpdatesAggregator',
     'UserStatsAggregator']
+TARGET_TYPE_TO_TARGET_MODEL = {
+    suggestion_models.TARGET_TYPE_EXPLORATION: (
+        exp_models.ExplorationModel),
+    suggestion_models.TARGET_TYPE_QUESTION: (
+        question_models.QuestionModel),
+    suggestion_models.TARGET_TYPE_SKILL: (
+        skill_models.SkillModel),
+    suggestion_models.TARGET_TYPE_TOPIC: (
+        topic_models.TopicModel)
+}
+VALID_SCORE_CATEGORIES_FOR_TYPE_CONTENT = [
+    '%s\\.%s' % (
+        suggestion_models.SCORE_TYPE_CONTENT, category) for category in (
+            constants.ALL_CATEGORIES)]
+VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION = [
+    '%s\\.[A-Za-z0-9-_]{1,%s}' % (
+        suggestion_models.SCORE_TYPE_QUESTION, base_models.ID_LENGTH)]
+ALLOWED_SCORE_CATEGORIES = (
+    VALID_SCORE_CATEGORIES_FOR_TYPE_CONTENT +
+    VALID_SCORE_CATEGORIES_FOR_TYPE_QUESTION)
 
 
 class BaseModelValidator(object):
@@ -1224,8 +1247,10 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return (
-            '^\\d*\\.(exploration|topic)\\.[A-Za-z0-9-_]{1,%s}\\.'
-            '[A-Za-z0-9=+/]{1,}') % base_models.ID_LENGTH
+            '^\\d*\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
+            '[A-Za-z0-9=+/]{1,}') % (
+                ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
+                base_models.ID_LENGTH)
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2143,6 +2168,111 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
         return [cls._validate_node_count]
 
 
+class GeneralSuggestionModelValidator(BaseModelValidator):
+    """Class for validating GeneralSuggestionModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: same as thread id:
+        # [target_type].[target_id].[GENERATED_STRING].
+        regex_string = '^%s\\.%s\\.[A-Za-z0-9=+/]{1,}$' % (
+            item.target_type, item.target_id)
+        return regex_string
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return suggestion_services.get_suggestion_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        reviewer_ids = []
+        if item.final_reviewer_id:
+            reviewer_ids = [item.final_reviewer_id]
+        return {
+            'feedback_thread_ids': (
+                feedback_models.GeneralFeedbackThreadModel, [item.id]),
+            '%s_ids' % item.target_type: (
+                TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
+                [item.target_id]),
+            'author_ids': (user_models.UserSettingsModel, [item.author_id]),
+            'reviewer_ids': (
+                user_models.UserSettingsModel, reviewer_ids)
+        }
+
+    @classmethod
+    def _validate_target_version_at_submission(cls, item):
+        """Validate the target version at submission is less than or
+        equal to the version of the target model.
+
+        Args:
+            item: ndb.Model. GeneralSuggestionModel to validate.
+        """
+        target_model_class_model_id_model_tuples = (
+            cls.external_instance_details['%s_ids' % item.target_type])
+
+        for (_, _, target_model) in (
+                target_model_class_model_id_model_tuples):
+            if item.target_version_at_submission > target_model.version:
+                cls.errors['target version at submission check'].append(
+                    'Entity id %s: target version %s in entity is greater '
+                    'than the version %s of %s corresponding to '
+                    'id %s' % (
+                        item.id, item.target_version_at_submission,
+                        target_model.version, item.target_type, item.target_id))
+
+    @classmethod
+    def _validate_final_reveiwer_id(cls, item):
+        """Validate that final reviewer id is None if suggestion is
+        under review.
+
+        Args:
+            item: ndb.Model. GeneralSuggestionModel to validate.
+        """
+        if item.final_reviewer_id is None and (
+                item.status != suggestion_models.STATUS_IN_REVIEW):
+            cls.errors['final reviewer check'].append(
+                'Entity id %s: Final reviewer id is empty but '
+                'suggestion is %s' % (item.id, item.status))
+
+        if item.final_reviewer_id and (
+                item.status == suggestion_models.STATUS_IN_REVIEW):
+            cls.errors['final reviewer check'].append(
+                'Entity id %s: Final reviewer id %s is not empty but '
+                'suggestion is in review' % (item.id, item.final_reviewer_id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_target_version_at_submission,
+            cls._validate_final_reveiwer_id]
+
+
+class ReviewerRotationTrackingModelValidator(BaseModelValidator):
+    """Class for validating ReviewerRotationTrackingModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Valid id: same as score category.
+        regex_string = '^(%s)$' % ('|').join(ALLOWED_SCORE_CATEGORIES)
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        question_ids = []
+        split_id = item.id.split(suggestion_models.SCORE_CATEGORY_DELIMITER)
+        if len(split_id) == 2 and (
+                split_id[0] == suggestion_models.SCORE_TYPE_QUESTION):
+            question_ids = [split_id[1]]
+        return {
+            'user_ids': (
+                user_models.UserSettingsModel,
+                [item.current_position_in_rotation]),
+            'question_ids': (
+                question_models.QuestionModel,
+                question_ids)
+        }
+
+
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
 
@@ -2234,6 +2364,9 @@ MODEL_TO_VALIDATOR_MAPPING = {
     story_models.StoryCommitLogEntryModel: (
         StoryCommitLogEntryModelValidator),
     story_models.StorySummaryModel: StorySummaryModelValidator,
+    suggestion_models.GeneralSuggestionModel: GeneralSuggestionModelValidator,
+    suggestion_models.ReviewerRotationTrackingModel: (
+        ReviewerRotationTrackingModelValidator),
     user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
 }
 
@@ -2645,6 +2778,22 @@ class StorySummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [story_models.StorySummaryModel]
+
+
+class GeneralSuggestionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralSuggestionModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.GeneralSuggestionModel]
+
+
+class ReviewerRotationTrackingModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ReviewerRotationTrackingModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [suggestion_models.ReviewerRotationTrackingModel]
 
 
 class UserSubscriptionsModelAuditOneOffJob(ProdValidationAuditOneOffJob):

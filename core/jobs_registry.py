@@ -93,6 +93,8 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.StoryRightsSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ReviewerRotationTrackingModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserSubscriptionsModelAuditOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
