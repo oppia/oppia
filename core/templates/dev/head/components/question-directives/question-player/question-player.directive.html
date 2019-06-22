@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="oppia-question-player-body">
-      <conversation-skin question-player-config="questionPlayerConfig"></conversation-skin>
+      <conversation-skin question-player-config="$ctrl.getQuestionPlayerConfig()"></conversation-skin>
       <attribution-guide></attribution-guide>
     </div>
   </div>
@@ -18,11 +18,11 @@
   <div class="oppia-question-player-results" ng-if="resultsLoaded">
     <div class="oppia-question-player-card question-player-results-header">
       <h3 class="oppia-question-player-header"> Test Complete. Well Done! </h3>
-      <score-ring score="totalScore"></score-ring>
+      <score-ring score="$ctrl.totalScore"></score-ring>
       <h4 class="learn-more"> Learn more about your score </h4>
     </div>
     <div class="oppia-question-player-card question-player-results-footer">
-      <span data-ng-repeat="actionButton in questionPlayerConfig.resultActionButtons"
+      <span data-ng-repeat="actionButton in $ctrl.getQuestionPlayerConfig().resultActionButtons"
             ng-click="$ctrl.performAction(actionButton)">
         <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
           <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">

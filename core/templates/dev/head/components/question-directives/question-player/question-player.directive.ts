@@ -129,11 +129,12 @@ oppia.directive('questionPlayer', [
             $sanitize, $window, HtmlEscaperService,
             QuestionPlayerBackendApiService) {
           var ctrl = this;
-          $scope.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          var questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.resultsLoaded = false;
           ctrl.currentQuestion = 0;
           ctrl.totalQuestions = 0;
           ctrl.currentProgress = 0;
+          ctrl.totalScore = 0.0;
 
           var VIEW_HINT_PENALTY = 0.1;
           var WRONG_ANSWER_PENALTY = 0.1;
@@ -227,40 +228,28 @@ oppia.directive('questionPlayer', [
             return ctrl.totalQuestions;
           };
 
-          var calculateScorePerSkill = function(questionSkillData,
-              questionScores) {
-            $scope.scorePerSkill = [];
-            $scope.totalScore = 0.0;
-            var minScore = Number.MAX_VALUE;
-            var totalScore = 0.0;
-            for (var skill in questionSkillData) {
-              var totalScorePerSkill = 0.0;
-              var questionIds = questionSkillData[skill].question_ids;
-              var description = questionSkillData[skill].skill_description;
-              for (var i = 0; i < questionIds.length; i += 1) {
-                totalScorePerSkill += questionScores[questionIds[i]];
-              }
-              if (totalScorePerSkill < minScore) {
-                minScore = totalScorePerSkill;
-                ctrl.worstSkill = {
-                  skill_id: skill,
-                  skill_description: description
+          var createScorePerSkillMapping = function() {
+            var scorePerSkillMapping = {};
+            if (questionPlayerConfig.skillList) {
+              for (var i = 0; i < questionPlayerConfig.skillList; i++) {
+                var skillId = questionPlayerConfig.skillList[i];
+                var skillDescription = questionPlayerConfig.skillDescriptions;
+                scorePerSkillMapping[skillId] = {
+                  description: skillDescription,
+                  score: 0.0
                 };
               }
-              $scope.scorePerSkill.push([description, totalScorePerSkill]);
-              totalScore += totalScorePerSkill;
             }
-            $scope.totalScore = (totalScore * 100) /
-            Object.keys(questionScores).length;
+            return scorePerSkillMapping;
           };
 
-
           var calculateScores = function(questionStateData) {
+            var scorePerSkillMapping = createScorePerSkillMapping();
             $scope.resultsLoaded = false;
-            var questionScores = {};
-            var questionIds = [];
+            var totalScore = 0.0;
+            var minScore = Number.MAX_VALUE;
+            var totalQuestions = Object.keys(questionStateData).length;
             for (var question in questionStateData) {
-              questionIds.push(question);
               var questionData = questionStateData[question];
               var totalHintsPenalty = 0.0;
               var wrongAnswerPenalty = 0.0;
@@ -272,19 +261,31 @@ oppia.directive('questionPlayer', [
                 totalHintsPenalty = (
                   questionData.usedHints.length * VIEW_HINT_PENALTY);
               }
-              var totalScore = 1.0;
+              var questionScore = 1.0;
               if (questionData.viewedSolution) {
-                totalScore = 0.0;
+                questionScore = 0.0;
               } else {
-                totalScore -= (totalHintsPenalty + wrongAnswerPenalty);
+                questionScore -= (totalHintsPenalty + wrongAnswerPenalty);
               }
-              questionScores[question] = totalScore;
+              // Calculate total score
+              ctrl.totalScore += questionScore;
+
+              // Calculate scores per skill
+              if (!(questionData.linkedSkillIds)) {
+                continue;
+              }
+              for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
+                var skillId = questionData.linkedSkillIds[i];
+                if (!(skillId in scorePerSkillMapping)) {
+                  continue;
+                }
+                var skillScore = scorePerSkillMapping[skillId];
+                skillScore.score += questionScore;
+              }
             }
-            QuestionPlayerBackendApiService.fetchSkillsForQuestions(
-              questionIds).then(function(result) {
-              calculateScorePerSkill(result, questionScores);
-              $scope.resultsLoaded = true;
-            });
+            ctrl.totalScore = Math.round(
+              ctrl.totalScore * 100 / totalQuestions);
+            $scope.resultsLoaded = true;
           };
 
           $rootScope.$on('currentQuestionChanged', function(event, result) {

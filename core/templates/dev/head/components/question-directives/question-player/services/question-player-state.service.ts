@@ -26,37 +26,41 @@ oppia.factory('QuestionPlayerStateService', [
     };
 
     var createNewQuestionPlayerState = function(
-      questionId, linkedSkillIds) {
+        questionId, linkedSkillIds) {
       questionPlayerState[questionId] = {
         linkedSkillIds: linkedSkillIds,
         answers: [],
-        usedHints: []};
+        usedHints: []
+      };
     };
 
     var _hintUsed = function(question) {
       var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(questionId,
+        createNewQuestionPlayerState(
+          questionId,
           question.getLinkedSkillIds());
       }
       questionPlayerState[questionId].usedHints.push(
         {timestamp: getCurrentTime()});
     };
 
-    var _solutionViewed = function(questionId) {
+    var _solutionViewed = function(question) {
       var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(questionId,
+        createNewQuestionPlayerState(
+          questionId,
           question.getLinkedSkillIds());
       }
       questionPlayerState[questionId].viewedSolution = {
         timestamp: getCurrentTime()};
     };
 
-    var _answerSubmitted = function(questionId, isCorrect) {
+    var _answerSubmitted = function(question, isCorrect) {
       var questionId = question.getId();
       if (!questionPlayerState[questionId]) {
-        createNewQuestionPlayerState(questionId,
+        createNewQuestionPlayerState(
+          questionId,
           question.getLinkedSkillIds());
       }
       // Don't store a correct answer in the case where
@@ -72,14 +76,14 @@ oppia.factory('QuestionPlayerStateService', [
 
 
     return {
-      hintUsed: function(questionId) {
-        _hintUsed(questionId);
+      hintUsed: function(question) {
+        _hintUsed(question);
       },
-      solutionViewed: function(questionId) {
-        _solutionViewed(questionId);
+      solutionViewed: function(question) {
+        _solutionViewed(question);
       },
-      answerSubmitted: function(questionId, isCorrect) {
-        _answerSubmitted(questionId, isCorrect);
+      answerSubmitted: function(question, isCorrect) {
+        _answerSubmitted(question, isCorrect);
       },
       getQuestionPlayerStateData: function() {
         return questionPlayerState;

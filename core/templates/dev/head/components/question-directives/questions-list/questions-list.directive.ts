@@ -156,9 +156,9 @@ oppia.directive('questionsList', [
             }
           };
 
-          ctrl.initializeNewQuestionCreation = function() {
+          ctrl.initializeNewQuestionCreation = function(skillIds) {
             ctrl.question =
-              QuestionObjectFactory.createDefaultQuestion();
+              QuestionObjectFactory.createDefaultQuestion(skillIds);
             ctrl.questionId = ctrl.question.getId();
             ctrl.questionStateData = ctrl.question.getStateData();
             ctrl.questionIsBeingUpdated = false;
@@ -167,7 +167,7 @@ oppia.directive('questionsList', [
 
           ctrl.createQuestion = function() {
             if (ctrl.getSkill()) {
-              ctrl.initializeNewQuestionCreation();
+              ctrl.initializeNewQuestionCreation([ctrl.getSkill()]);
               return;
             }
             var allSkillSummaries = ctrl.getAllSkillSummaries();

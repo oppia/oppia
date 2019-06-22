@@ -68,9 +68,7 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
             TOPIC_VIEWER_PAGE, {
               topic_name: ctrl.topicName
             });
-          console.log("Sending request");
           $http.get(practiceSessionsDataUrl).then(function(result) {
-            console.log("Got data");
             var skillList = [];
             var skillDescriptions = [];
             for (var skillId in result.data.skills_with_description) {
@@ -99,7 +97,6 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
               skillDescriptions: skillDescriptions,
               questionCount: TOTAL_QUESTIONS
             };
-            console.log("Question player config: " + JSON.stringify(questionPlayerConfig));
             ctrl.questionPlayerConfig = questionPlayerConfig;
           });
         };
