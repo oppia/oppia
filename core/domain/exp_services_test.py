@@ -541,31 +541,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         expected_image_ids_list = ['image_id_1']
         self.assertEqual(expected_image_ids_list, image_ids)
 
-    def test_get_deleted_images_ids(self):
-        """Test function get_deleted_images_ids()."""
-
-        # Test passing valid images_ids list.
-        image_ids_before_change = [1, 2, 3]
-        image_ids_after_change = [1, 2]
-        image_ids = exp_services.get_deleted_images_ids(
-            image_ids_after_change, image_ids_before_change)
-        expected_image_ids_list = [3]
-        self.assertEqual(expected_image_ids_list, image_ids)
-
-        # Test passing invalid image_ids_after_change
-        image_ids_before_change = [u'1', u'2']
-        image_ids_after_change = 'invalid'
-        with self.assertRaises(Exception):
-            exp_services.get_deleted_images_ids(
-                image_ids_after_change, image_ids_before_change)
-
-        # Test passing invalid image_ids_before_change
-        image_ids_after_change = [u'1', u'2']
-        image_ids_before_change = 'invalid'
-        with self.assertRaises(Exception):
-            exp_services.get_deleted_images_ids(
-                image_ids_after_change, image_ids_before_change)
-
 
 class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
     """Test that classifier models are correctly mapped when an exploration

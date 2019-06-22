@@ -223,8 +223,7 @@ class Image(object):
         """Validates all properties of an Image object.
 
         Raises:
-            ValidationError: One or more attributes of the Image are not
-            valid.
+            ValidationError: One or more attributes of the Image are not valid.
         """
         if not isinstance(self.placeholder, bool):
             raise utils.ValidationError(
@@ -242,8 +241,7 @@ class ImageAssets(object):
         """Constructs a ImageAssets domain object.
 
         Args:
-            image_mapping: dict. The dict representation of ImageAssets
-                mapping.
+            image_mapping: dict. The dict representation of ImageAssets mapping.
         """
         self.image_mapping = image_mapping
 
@@ -252,7 +250,7 @@ class ImageAssets(object):
 
         Raises:
             ValidationError: One or more attributes of the ImageAssets are not
-            valid.
+                valid.
         """
         image_ids = self.image_mapping.keys()
         for image_id in image_ids:
@@ -260,8 +258,8 @@ class ImageAssets(object):
             if not re.match(image_re, image_id):
                 raise utils.ValidationError(
                     'Invalid image_id received %s' % image_id)
-            expected_image_id = int(image_id.strip('image_id_'))
-            if expected_image_id > image_counter:
+            numeric_part_of_image_id = int(image_id.strip('image_id_'))
+            if numeric_part_of_image_id > image_counter:
                 raise Exception(
                     'Image Id is greater then image_id counter'
                     'not possible, received image_id is %s' %
@@ -2092,13 +2090,13 @@ class State(object):
     def get_image_ids_of_state(self):
         """Returns list of image ids present in state HTML"""
         content_html = self.content.html
-        interaction_html = ''
         interaction_html_list = self.interaction.get_all_html_content_strings()
 
         if interaction_html_list != []:
-            interaction_html = interaction_html_list[0]
+            state_html = content_html + interaction_html_list[0]
+        else:
+            state_html = content_html
 
-        state_html = content_html + interaction_html
         image_ids_in_state = (
             html_validation_service.get_image_ids_from_image_tag(state_html))
 

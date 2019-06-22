@@ -567,31 +567,6 @@ def get_top_rated_exploration_summaries(limit):
         exp_models.ExpSummaryModel.get_top_rated(limit))
 
 
-def get_deleted_images_ids(image_ids_after_change, image_ids_before_change):
-    """Returns a list of image_ids of all deleted images.
-
-    Args:
-        image_ids_after_change: list. List of all image ids present
-            in an exploration after change.
-        image_ids_before_change: list. List of all image ids present
-            in an exploration before change.
-
-    Returns:
-        list. List of ids, of all deleted images of an exploration.
-    """
-    if not isinstance(image_ids_after_change, list):
-        raise Exception(
-            'Expected image_ids_after_change to be a list, '
-            'received %s' % image_ids_after_change)
-    if not isinstance(image_ids_before_change, list):
-        raise Exception(
-            'Expected image_ids_before_change to be a list, '
-            'received %s' % image_ids_before_change)
-    deleted_image_ids = (
-        list(set(image_ids_before_change) - set(image_ids_after_change)))
-    return deleted_image_ids
-
-
 def get_recently_published_exp_summaries(limit):
     """Returns a dict with recently published ExplorationSummary model
     instances, keyed by their exploration id. At most 'limit' entries are
