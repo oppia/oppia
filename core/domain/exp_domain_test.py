@@ -337,30 +337,41 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.version += 1
 
     def test_cannot_create_exploration_change_with_invalid_change_dict(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception, 'Missing cmd key in change dict'):
             exp_domain.ExplorationChange({
                 'invalid_cmd': 'invalid'
             })
 
     def test_cannot_create_exploration_change_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception, 'Command invalid_cmd is not allowed'):
             exp_domain.ExplorationChange({
                 'cmd': 'invalid_cmd'
             })
 
     def test_cannot_create_exploration_change_with_invalid_state_property(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Value for property_name in cmd edit_state_property: '
+            'invalid_property is not allowed'):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'property_name': 'invalid_property'
+                'property_name': 'invalid_property',
+                'state_name': '',
+                'new_value': ''
             })
 
     def test_cannot_create_exploration_change_with_invalid_exploration_property(
             self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Value for property_name in cmd edit_exploration_property: '
+            'invalid_property is not allowed'):
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
-                'property_name': 'invalid_property'
+                'property_name': 'invalid_property',
+                'new_value': ''
             })
 
     def test_revert_exploration_commit(self):
