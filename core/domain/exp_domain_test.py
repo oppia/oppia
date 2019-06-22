@@ -728,6 +728,19 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = demo.states[feconf.DEFAULT_INIT_STATE_NAME]
         self.assertFalse(init_state.interaction.is_terminal)
 
+    def test_update_image_counter(self):
+        # Updating valid image counter
+        exploration = exp_domain.Exploration.create_default_exploration('0')
+        exploration.update_image_counter(10)
+        self.assertEqual(exploration.image_counter, 10)
+
+        # Updating invalid image counter.
+        exploration.update_image_counter('invalid_image_counter')
+        with self.assertRaisesRegexp(
+            Exception, 'Expected image_counter to be an integer, received '
+            'invalid_image_counter'):
+            exploration.validate()
+
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
