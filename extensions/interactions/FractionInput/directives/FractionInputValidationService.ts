@@ -16,6 +16,9 @@
  * @fileoverview Validator service for the fraction interaction.
  */
 
+require('domain/objects/FractionObjectFactory.ts');
+require('interactions/baseInteractionValidationService.ts');
+
 oppia.factory('FractionInputValidationService', [
   'FractionObjectFactory', 'baseInteractionValidationService',
   'WARNING_TYPES',
