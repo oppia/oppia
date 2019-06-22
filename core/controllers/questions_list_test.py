@@ -61,11 +61,12 @@ class QuestionsListHandlerTests(BaseQuestionsListControllerTests):
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,
-                self._create_valid_question_data('ABC'))
+                self._create_valid_question_data('ABC'),
+                [self.skill_id, self.skill_id_2])
             question_services.create_new_question_skill_link(
-                question_id, self.skill_id, 0.5)
+                self.admin_id, question_id, self.skill_id, 0.5)
             question_services.create_new_question_skill_link(
-                question_id, self.skill_id_2, 0.3)
+                self.admin_id, question_id, self.skill_id_2, 0.3)
 
         self.login(self.ADMIN_EMAIL)
         with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 2):
