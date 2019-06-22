@@ -261,9 +261,8 @@ class ImageAssets(object):
             numeric_part_of_image_id = int(image_id.strip('image_id_'))
             if numeric_part_of_image_id > image_counter:
                 raise Exception(
-                    'Image Id is greater then image_id counter '
-                    'not possible, received image_id is %s' %
-                    image_id)
+                    'Image Id is greater then image_id counter not possible,'
+                    ' received image_id is %s' % image_id)
             image = self.image_mapping[image_id]
             image.validate()
 
@@ -2089,12 +2088,10 @@ class State(object):
         """Returns list of image ids present in state HTML"""
         content_html = self.content.html
         interaction_html_list = self.interaction.get_all_html_content_strings()
-
         if interaction_html_list != []:
             state_html = content_html + interaction_html_list[0]
         else:
             state_html = content_html
-
         image_ids_in_state = (
             html_validation_service.get_image_ids_from_image_tag(state_html))
 

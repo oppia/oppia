@@ -744,7 +744,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         image_assets.add_image('image_id_10', self.image_object)
         with self.assertRaisesRegexp(
             Exception, 'Image Id is greater then image_id counter not possible,'
-            'received image_id is image_id_10'):
+            ' received image_id is image_id_10'):
             image_assets.validate(3)
 
     def test_get_all_image_ids(self):
@@ -759,7 +759,17 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         image_assets_object = (
             state_domain.ImageAssets.from_dict(self.image_assets_dict))
         image_assets_object.clean_image_assets(image_ids_in_state)
-
+        expected_image_assets_dict = {
+            'image_mapping': {
+                'image_id_1': {
+                    'src': '',
+                    'placeholder': True,
+                    'instructions': 'no instructions'
+                }
+            }
+        }
+        self.assertEqual(
+            image_assets_object.to_dict(), expected_image_assets_dict)
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""

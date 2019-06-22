@@ -2291,10 +2291,8 @@ class Exploration(object):
             image_src_list = image_src_list + (
                 html_validation_service.get_image_src_from_html(
                     content_html))
-
-            image_counter += len(image_src_list)
             image_info_dict_1 = (
-                cls.add_image_info_in_image_dict(
+                cls.generate_image_id_and_maps_image_id_with_image_src(
                     image_src_list, image_counter, image_info_dict_1))
             image_src_list = []
 
@@ -2313,10 +2311,8 @@ class Exploration(object):
                 image_src_list = image_src_list + (
                     html_validation_service.get_image_src_from_html(
                         interaction_feedback_html))
-
-                image_counter += len(image_src_list)
                 image_info_dict_1 = (
-                    cls.add_image_info_in_image_dict(
+                    cls.generate_image_id_and_maps_image_id_with_image_src(
                         image_src_list, image_counter, image_info_dict_1))
                 image_src_list = []
 
@@ -2338,10 +2334,8 @@ class Exploration(object):
                 image_src_list = image_src_list + (
                     html_validation_service.get_image_src_from_html(
                         answer_group_html))
-
-                image_counter += len(image_src_list)
                 image_info_dict_1 = (
-                    cls.add_image_info_in_image_dict(
+                    cls.generate_image_id_and_maps_image_id_with_image_src(
                         image_src_list, image_counter, image_info_dict_1))
                 image_src_list = []
 
@@ -2360,9 +2354,9 @@ class Exploration(object):
                                 html_validation_service.get_image_src_from_html(
                                     x))
 
-                            image_counter += len(image_src_list)
+       
                             image_info_dict_1 = (
-                                cls.add_image_info_in_image_dict(
+                                cls.generate_image_id_and_maps_image_id_with_image_src(
                                     image_src_list, image_counter,
                                     image_info_dict_1))
                             image_src_list = []
@@ -2385,10 +2379,8 @@ class Exploration(object):
                 image_src_list = image_src_list + (
                     html_validation_service.get_image_src_from_html(
                         hint_html))
-
-                image_counter += len(image_src_list)
                 image_info_dict_1 = (
-                    cls.add_image_info_in_image_dict(
+                    cls.generate_image_id_and_maps_image_id_with_image_src(
                         image_src_list, image_counter, image_info_dict_1))
                 image_src_list = []
 
@@ -2408,10 +2400,8 @@ class Exploration(object):
                 image_src_list = image_src_list + (
                     html_validation_service.get_image_src_from_html(
                         solution_html))
-
-                image_counter += len(image_src_list)
                 image_info_dict_1 = (
-                    cls.add_image_info_in_image_dict(
+                    cls.generate_image_id_and_maps_image_id_with_image_src(
                         image_src_list, image_counter, image_info_dict_1))
                 image_src_list = []
 
@@ -2434,9 +2424,8 @@ class Exploration(object):
                         html_validation_service.get_image_src_from_html(
                             value))
 
-                    image_counter += len(image_src_list)
                     image_info_dict_1 = (
-                        cls.add_image_info_in_image_dict(
+                        cls.generate_image_id_and_maps_image_id_with_image_src(
                             image_src_list, image_counter, image_info_dict_1))
                     image_src_list = []
 
@@ -3513,31 +3502,31 @@ class Exploration(object):
         return html_list
 
     @classmethod
-    def add_image_info_in_image_dict(
-            cls, image_src_list, image_counter, image_info_dict_1): #pylint: disable=too-many-function-args
+    def generate_image_id_and_maps_image_id_with_image_src(
+            cls, image_src_list, image_counter, image_info_dict): #pylint: disable=too-many-function-args
         """Maps image source with the image id. Creates image id with the
             help of image counter.
 
         Args:
             image_src_list: list. List contaning image sources.
             image_counter: int. Counter for an image.
-            image_info_dict_1: dict. Dict contaning image id with source,
+            image_info_dict: dict. Dict contaning image id with source,
                 image ids that needs to be added in image tag.
         Returns:
-            image_info_dict_1: dict. Dict contaning image id with source,
+            image_info_dict: dict. Dict contaning image id with source,
                 image ids that needs to be added in image tag.
         """
-        image_id_starting_range = image_counter - len(image_src_list) + 1
-        image_id_ending_range = image_counter + 1
+        image_id_starting_range = image_counter + 1
+        image_id_ending_range = image_counter + len(image_src_list)
         image_src_list_counter = 0
 
-        for _id in range(image_id_starting_range, image_id_ending_range):
+        for _id in range(image_id_starting_range, image_id_ending_range + 1):
             image_id = 'image_id_' + str(_id)
             filepath = image_src_list[image_src_list_counter]
-            image_info_dict_1[image_id] = filepath
+            image_info_dict[image_id] = filepath
             image_src_list_counter += 1
 
-        return image_info_dict_1
+        return image_info_dict
 
     def get_images_ids_of_exploration(self):
         """Returns a list off ids, of all images present in an exploration.
