@@ -47,6 +47,10 @@ MINIFIED_THIRD_PARTY_CSS_RELATIVE_FILEPATH = os.path.join(
     'css', 'third_party.min.css')
 
 FONTS_RELATIVE_DIRECTORY_PATH = os.path.join('fonts', '')
+# /webfonts is need for font-awesome-5, due to changes
+# in its directory structure hence, FAM-5 now dont use /fonts
+# but /fonts is need by BootStrap and will be removed later
+# if /fonts is not used by any other library.
 WEBFONTS_RELATIVE_DIRECTORY_PATH = os.path.join('webfonts', '')
 
 EXTENSIONS_DIRNAMES_TO_DIRPATHS = {
