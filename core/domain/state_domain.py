@@ -1289,7 +1289,8 @@ class SubtitledHtml(object):
                 a way as to contain a restricted set of HTML tags.
         """
         self.content_id = content_id
-        self.html = html_cleaner.clean(html)
+        self.html = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(html))
         self.validate()
 
     def to_dict(self):

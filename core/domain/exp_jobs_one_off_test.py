@@ -1696,6 +1696,10 @@ class ExplorationContentValidationJobForCKEditorTests(
         """Tests that the exploration validation job validates the content
         without skipping any tags.
         """
+
+        def mock_convert_to_ckeditor(html_data):
+            return html_data
+
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exploration.add_states(['State1', 'State2', 'State3'])
@@ -1790,7 +1794,9 @@ class ExplorationContentValidationJobForCKEditorTests(
             html_validation_service, 'validate_customization_args',
             mock_validate_customization_args), self.swap(
                 html_validation_service, 'validate_rte_format',
-                mock_validate_rte_format):
+                mock_validate_rte_format), self.swap(
+                    html_validation_service, 'convert_to_ckeditor',
+                    mock_convert_to_ckeditor):
             state1.update_content(content1_dict)
             state2.update_content(content2_dict)
             state3.update_content(content3_dict)
@@ -1798,7 +1804,10 @@ class ExplorationContentValidationJobForCKEditorTests(
             state2.update_interaction_default_outcome(default_outcome_dict2)
             exp_services.save_new_exploration(self.albert_id, exploration)
 
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+        with self.swap(
+            state_domain.SubtitledHtml, 'validate', mock_validate), self.swap(
+                html_validation_service, 'convert_to_ckeditor',
+                mock_convert_to_ckeditor):
             job_id = (
                 exp_jobs_one_off
                 .ExplorationContentValidationJobForCKEditor.create_new())

@@ -402,7 +402,8 @@ class QuestionSummary(object):
         """
         self.id = question_id
         self.creator_id = creator_id
-        self.question_content = html_cleaner.clean(question_content)
+        self.question_content = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(question_content))
         self.created_on = question_model_created_on
         self.last_updated = question_model_last_updated
 
