@@ -53,8 +53,8 @@ def _migrate_to_latest_issue_schema(exp_issue_dict):
     if not (0 <= issue_schema_version
             <= stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
         raise Exception(
-            'Sorry, we can only process v1-v%d and unversioned issue schemas at'
-            'present.' %
+            'Sorry, we can only process v1-v%d and unversioned issue schemas '
+            'at present.' %
             stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
     while issue_schema_version < stats_models.CURRENT_ISSUE_SCHEMA_VERSION:
@@ -543,9 +543,10 @@ def get_exp_issues_from_model(exp_issues_model):
     """
     unresolved_issues = []
     for unresolved_issue_dict in exp_issues_model.unresolved_issues:
-        _migrate_to_latest_issue_schema(copy.deepcopy(unresolved_issue_dict))
+        unresolved_issue_dict_copy = copy.deepcopy(unresolved_issue_dict)
+        _migrate_to_latest_issue_schema(unresolved_issue_dict_copy)
         unresolved_issues.append(
-            stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict))
+            stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict_copy))
     return stats_domain.ExplorationIssues(
         exp_issues_model.exp_id, exp_issues_model.exp_version,
         unresolved_issues)
@@ -1012,11 +1013,6 @@ def _get_calc_output(exploration_id, state_name, calculation_id):
                 stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
             calculation_output = (
                 stats_domain.AnswerFrequencyList.from_raw_type(
-                    calc_output_model.calculation_output))
-        elif (calc_output_model.calculation_output_type ==
-              stats_domain.CALC_OUTPUT_TYPE_CATEGORIZED_ANSWER_FREQUENCY_LISTS):
-            calculation_output = (
-                stats_domain.CategorizedAnswerFrequencyLists.from_raw_type(
                     calc_output_model.calculation_output))
         return stats_domain.StateAnswersCalcOutput(
             exploration_id, VERSION_ALL, state_name,
