@@ -769,22 +769,22 @@ oppia.directive('conversationSkin', [
                     var completedStoryNodes = [];
                     storyNodes.forEach(function(storyNode) {
                       if (storyNode.completed) {
-                        completedStoryNodes.push(storyNode)
+                        completedStoryNodes.push(storyNode);
                       }
                     });
                     if (completedStoryNodes.length % 3 ===
                       NUM_EXPLORATIONS_PER_REVIEW_TEST ||
                       completedStoryNodes.length === storyNodes.length) {
-                        var REVIEW_TEST_URL_TEMPLATE = (
-                          '/review_test/<story_id>');
-                        $window.location =
-                          UrlInterpolationService.interpolateUrl(
-                            REVIEW_TEST_URL_TEMPLATE, {
-                              story_id: storyId
-                            });
-                      }
+                      var REVIEW_TEST_URL_TEMPLATE = (
+                        '/review_test/<story_id>');
+                      $window.location =
+                        UrlInterpolationService.interpolateUrl(
+                          REVIEW_TEST_URL_TEMPLATE, {
+                            story_id: storyId
+                          });
+                    }
                   }
-                )
+                );
               }
 
               // For single state explorations, when the exploration reaches the
