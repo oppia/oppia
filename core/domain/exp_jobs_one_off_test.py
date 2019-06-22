@@ -51,6 +51,10 @@ def mock_validate_customization_args(unused_html_list):
     return {}
 
 
+def mock_validate(unused_self):
+    pass
+
+
 def run_job_for_deleted_exp(
         self, job_class, check_error=False,
         error_type=None, error_msg=None, function_to_be_called=None,
@@ -1794,12 +1798,13 @@ class ExplorationContentValidationJobForCKEditorTests(
             state2.update_interaction_default_outcome(default_outcome_dict2)
             exp_services.save_new_exploration(self.albert_id, exploration)
 
-        job_id = (
-            exp_jobs_one_off
-            .ExplorationContentValidationJobForCKEditor.create_new())
-        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
-            job_id)
-        self.process_and_flush_pending_tasks()
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            job_id = (
+                exp_jobs_one_off
+                .ExplorationContentValidationJobForCKEditor.create_new())
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+                job_id)
+            self.process_and_flush_pending_tasks()
 
         actual_output = (
             exp_jobs_one_off
@@ -1882,9 +1887,6 @@ class InteractionCustomizationArgsValidationJobTests(
 
     def test_for_customization_arg_validation_job(self):
         """Validates customization args for rich text components."""
-
-        def mock_validate(unused_self):
-            pass
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
