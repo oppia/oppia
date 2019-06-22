@@ -1602,6 +1602,158 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
             cls._validate_exploration_model_last_updated]
 
 
+class GeneralFeedbackThreadModelValidator(BaseModelValidator):
+    """Class for validating GeneralFeedbackThreadModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING].
+        regex_string = '%s\\.%s\\.[A-Za-z0-9=+/]{1,}$' % (
+            item.entity_type, item.entity_id)
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        author_ids = []
+        if item.original_author_id:
+            author_ids = [item.original_author_id]
+        suggestion_ids = []
+        if item.has_suggestion:
+            suggestion_ids = [item.id]
+        message_ids = ['%s.%s' % (item.id, i) for i in xrange(
+            item.message_count)]
+        return {
+            '%s_ids' % item.entity_type: (
+                TARGET_TYPE_TO_TARGET_MODEL[item.entity_type],
+                [item.entity_id]),
+            'author_ids': (user_models.UserSettingsModel, author_ids),
+            'suggestion_ids': (
+                suggestion_models.GeneralSuggestionModel, suggestion_ids),
+            'message_ids': (
+                feedback_models.GeneralFeedbackMessageModel, message_ids)
+        }
+
+    @classmethod
+    def _validate_entity_id(cls, item):
+        """Validate that entity id belongs to
+        suggestion_models.TARGET_TYPE_CHOICES
+
+        Args:
+            item: ndb.Model. GeneralFeedbackThreadModel to validate.
+        """
+        if item.entity_type not in suggestion_models.TARGET_TYPE_CHOICES:
+            cls.errors['entity type check'].append(
+                'Entity id %s: Entity type %s for feedback thread is '
+                'invalid' % (item.id, item.entity_type))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_entity_id]
+
+
+class GeneralFeedbackMessageModelValidator(BaseModelValidator):
+    """Class for validating GeneralFeedbackMessageModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [thread_id].[message_id]
+        regex_string = '^%s\\.%s$' % (item.thread_id, item.message_id)
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        author_ids = []
+        if item.author_id:
+            author_ids = [item.author_id]
+        return {
+            'author_ids': (user_models.UserSettingsModel, author_ids),
+            'feeback_thread_ids': (
+                feedback_models.GeneralFeedbackThreadModel, [item.thread_id])
+        }
+
+
+class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
+    """Class for validating GeneralFeedbackThreadUserModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        # Valid id: [user_id].[thread_id]
+        thread_id_string = '%s\\.[A-Za-z0-9-_]{1,%s}\\.[A-Za-z0-9-_=]{1,}' % (
+            ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
+            base_models.ID_LENGTH)
+        regex_string = '^\\d*\\.%s$' % thread_id_string
+        return regex_string
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        message_ids = []
+        split_id = item.id.split('.')
+        if len(split_id) == 2:
+            message_ids = ['%s.%s' % (
+                split_id[1], message_id) for message_id in (
+                    item.message_ids_read_by_user)]
+        return {
+            'message_ids': (
+                feedback_models.GeneralFeedbackMessageModel, message_ids)
+        }
+
+
+class FeedbackAnalyticsModelValidator(BaseModelValidator):
+    """Class for validating FeedbackAnalyticsModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'exploration_ids': (exp_models.ExplorationModel, [item.id])
+        }
+
+
+class UnsentFeedbackEmailModelValidator(BaseModelValidator):
+    """Class for validating UnsentFeedbackEmailModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        message_ids = []
+        for reference in item.feedback_message_references:
+            try:
+                message_ids.append('%s.%s' % (
+                    reference['thread_id'], reference['message_id']))
+            except Exception:
+                cls.errors['feedback reference check'].append(
+                    'Entity id %s: Invalid feedback reference: %s' % (
+                        item.id, reference))
+        return {
+            'user_ids': (user_models.UserSettingsModel, [item.id]),
+            'message_ids': (
+                feedback_models.GeneralFeedbackMessageModel, message_ids)
+        }
+
+    @classmethod
+    def _validate_entity_type_and_entity_id_feedback_reference(cls, item):
+        """Validate that entity_type and entity_type are same as corresponding
+        values in thread_id of feedback_reference.
+
+        Args:
+            item: ndb.Model. UnsentFeedbackEmailModel to validate.
+        """
+        for reference in item.feedback_message_references:
+            try:
+                split_thread_id = reference['thread_id'].split('.')
+                if split_thread_id[0] != reference['entity_type'] or (
+                        split_thread_id[1] != reference['entity_id']):
+                    cls.errors['feedback reference check'].append(
+                        'Entity id %s: Invalid feedback reference: %s' % (
+                            item.id, reference))
+            except Exception:
+                cls.errors['feedback reference check'].append(
+                    'Entity id %s: Invalid feedback reference: %s' % (
+                        item.id, reference))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_entity_type_and_entity_id_feedback_reference]
+
+
 class FileMetadataModelValidator(BaseModelValidator):
     """Class for validating FileMetadataModel."""
 
@@ -2337,6 +2489,14 @@ MODEL_TO_VALIDATOR_MAPPING = {
     exp_models.ExplorationCommitLogEntryModel: (
         ExplorationCommitLogEntryModelValidator),
     exp_models.ExpSummaryModel: ExpSummaryModelValidator,
+    feedback_models.GeneralFeedbackThreadModel: (
+        GeneralFeedbackThreadModelValidator),
+    feedback_models.GeneralFeedbackMessageModel: (
+        GeneralFeedbackMessageModelValidator),
+    feedback_models.GeneralFeedbackThreadUserModel: (
+        GeneralFeedbackThreadUserModelValidator),
+    feedback_models.FeedbackAnalyticsModel: FeedbackAnalyticsModelValidator,
+    feedback_models.UnsentFeedbackEmailModel: UnsentFeedbackEmailModelValidator,
     file_models.FileMetadataModel: FileMetadataModelValidator,
     file_models.FileMetadataSnapshotMetadataModel: (
         FileMetadataSnapshotMetadataModelValidator),
@@ -2624,6 +2784,47 @@ class ExpSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExpSummaryModel]
+
+
+class GeneralFeedbackThreadModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralFeedbackThreadModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.GeneralFeedbackThreadModel]
+
+
+class GeneralFeedbackMessageModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralFeedbackMessageModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.GeneralFeedbackMessageModel]
+
+
+class GeneralFeedbackThreadUserModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates GeneralFeedbackThreadUserModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.GeneralFeedbackThreadUserModel]
+
+
+class FeedbackAnalyticsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates FeedbackAnalyticsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.FeedbackAnalyticsModel]
+
+
+class UnsentFeedbackEmailModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UnsentFeedbackEmailModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.UnsentFeedbackEmailModel]
 
 
 class FileMetadataModelAuditOneOffJob(ProdValidationAuditOneOffJob):
