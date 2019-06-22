@@ -31,9 +31,13 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import prod_validation_jobs_one_off
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import skill_domain
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subscription_services
@@ -58,14 +62,14 @@ CURRENT_DATETIME = datetime.datetime.utcnow()
     activity_models, audit_models, base_models,
     collection_models, config_models, email_models,
     exp_models, feedback_models, file_models,
-    recommendations_models, story_models,
-    user_models,) = (
+    question_models, recommendations_models,
+    skill_models, story_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.collection, models.NAMES.config, models.NAMES.email,
             models.NAMES.exploration, models.NAMES.feedback, models.NAMES.file,
-            models.NAMES.recommendations, models.NAMES.story,
-            models.NAMES.user]))
+            models.NAMES.question, models.NAMES.recommendations,
+            models.NAMES.skill, models.NAMES.story, models.NAMES.user]))
 
 OriginalDatetimeType = datetime.datetime
 
@@ -125,7 +129,6 @@ def run_job_and_check_output(
         self.assertEqual(sorted(actual_output), sorted(expected_output))
     else:
         self.assertEqual(actual_output, expected_output)
-
 
 
 def update_datastore_types_for_mock_datetime():
@@ -4690,6 +4693,1384 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             ) % (self.id_0, self.id_0), (
                 u'[u\'fully-validated FileSnapshotContentModel\', '
                 '2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(6)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            question_services.create_new_question(
+                self.owner_id, question, 'test question')
+
+        self.model_instance_0 = question_models.QuestionModel.get_by_id('0')
+        self.model_instance_1 = question_models.QuestionModel.get_by_id('1')
+        self.model_instance_2 = question_models.QuestionModel.get_by_id('2')
+
+        self.job_class = (
+            prod_validation_jobs_one_off.QuestionModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'language_code',
+                'new_value': 'en',
+                'old_value': 'ar'
+            })], 'Changes.')
+
+        expected_output = [
+            u'[u\'fully-validated QuestionModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of QuestionModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id,
+                    self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated
+                ),
+            u'[u\'fully-validated QuestionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_question_schema(self):
+        expected_output = [
+            (
+                u'[u\'failed validation check for domain object check of '
+                'QuestionModel\', '
+                '[u\'Entity id %s: Entity fails domain validation with the '
+                'error Invalid language code: %s\']]'
+            ) % (self.model_instance_0.id, self.model_instance_0.language_code),
+            u'[u\'fully-validated QuestionModel\', 2]']
+        with self.swap(
+            constants, 'ALL_LANGUAGE_CODES', [{
+                'code': 'en', 'description': 'English'}]):
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_linked_skill_model_failure(self):
+        skill_models.SkillModel.get_by_id('1').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for linked_skill_ids field '
+                'check of QuestionModel\', '
+                '[u"Entity id 0: based on field linked_skill_ids '
+                'having value 1, expect model SkillModel with id 1 but it '
+                'doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_commit_log_entry_model_failure(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'language_code',
+                'new_value': 'en',
+                'old_value': 'ar'
+            })], 'Changes.')
+        question_models.QuestionCommitLogEntryModel.get_by_id(
+            'question-0-1').delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'question_commit_log_entry_ids field check of '
+                'QuestionModel\', '
+                '[u"Entity id 0: based on field '
+                'question_commit_log_entry_ids having value '
+                'question-0-1, expect model QuestionCommitLogEntryModel '
+                'with id question-0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_summary_model_failure(self):
+        question_models.QuestionSummaryModel.get_by_id('0').delete()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_summary_ids '
+                'field check of QuestionModel\', '
+                '[u"Entity id 0: based on field question_summary_ids having '
+                'value 0, expect model QuestionSummaryModel with id 0 '
+                'but it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_rights_model_failure(self):
+        question_models.QuestionRightsModel.get_by_id(
+            '0').delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_rights_ids '
+                'field check of QuestionModel\', '
+                '[u"Entity id 0: based on field question_rights_ids having '
+                'value 0, expect model QuestionRightsModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        question_models.QuestionSnapshotMetadataModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_ids '
+                'field check of QuestionModel\', '
+                '[u"Entity id 0: based on field snapshot_metadata_ids having '
+                'value 0-1, expect model QuestionSnapshotMetadataModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        question_models.QuestionSnapshotContentModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_ids '
+                'field check of QuestionModel\', '
+                '[u"Entity id 0: based on field snapshot_content_ids having '
+                'value 0-1, expect model QuestionSnapshotContentModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionSkillLinkModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(3)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % i]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            question_services.create_new_question(
+                self.owner_id, question, 'test question')
+
+        self.model_instance_0 = (
+            question_models.QuestionSkillLinkModel(
+                id='0:0', question_id='0', skill_id='0', skill_difficulty=0.5))
+        self.model_instance_0.put()
+        self.model_instance_1 = (
+            question_models.QuestionSkillLinkModel(
+                id='1:1', question_id='1', skill_id='1', skill_difficulty=0.5))
+        self.model_instance_1.put()
+        self.model_instance_2 = (
+            question_models.QuestionSkillLinkModel(
+                id='2:2', question_id='2', skill_id='2', skill_difficulty=0.5))
+        self.model_instance_2.put()
+
+        self.job_class = (
+            prod_validation_jobs_one_off.QuestionSkillLinkModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated QuestionSkillLinkModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for time field relation check '
+                'of QuestionSkillLinkModel\', '
+                '[u\'Entity id %s: The created_on field has a value '
+                '%s which is greater than the value '
+                '%s of last_updated field\']]') % (
+                    self.model_instance_0.id,
+                    self.model_instance_0.created_on,
+                    self.model_instance_0.last_updated
+                ),
+            u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionSkillLinkModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_skill_model_failure(self):
+        skill_models.SkillModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for skill_ids field '
+                'check of QuestionSkillLinkModel\', '
+                '[u"Entity id 0:0: based on field skill_ids '
+                'having value 0, expect model SkillModel with id 0 but it '
+                'doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_model_failure(self):
+        question_models.QuestionModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for '
+                'question_ids field check of QuestionSkillLinkModel\', '
+                '[u"Entity id 0:0: based on field '
+                'question_ids having value 0, expect model QuestionModel '
+                'with id 0 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_id_failure(self):
+        model_with_invalid_id = question_models.QuestionSkillLinkModel(
+            id='0:1', question_id='1', skill_id='2', skill_difficulty=0.5)
+        model_with_invalid_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for model id check of '
+                'QuestionSkillLinkModel\', [u\'Entity id 0:1: Entity id '
+                'does not match regex pattern\']]'
+            ), u'[u\'fully-validated QuestionSkillLinkModel\', 3]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionSnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionSnapshotMetadataModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(6)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            if index == 0:
+                question_services.create_new_question(
+                    self.user_id, question, 'test question')
+            else:
+                question_services.create_new_question(
+                    self.owner_id, question, 'test question')
+
+        self.model_instance_0 = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            question_models.QuestionSnapshotMetadataModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'language_code',
+                'new_value': 'en',
+                'old_value': 'ar'
+            })], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated QuestionSnapshotMetadataModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of QuestionSnapshotMetadataModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'QuestionSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionSnapshotMetadataModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_model_failure(self):
+        question_models.QuestionModel.get_by_id('0').delete(
+            self.user_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_ids '
+                'field check of QuestionSnapshotMetadataModel\', '
+                '[u"Entity id 0-1: based on field question_ids '
+                'having value 0, expect model QuestionModel with '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'question_ids having value 0, expect model '
+                'QuestionModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'QuestionSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(
+            self, expected_output, literal_eval=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_ids field '
+                'check of QuestionSnapshotMetadataModel\', '
+                '[u"Entity id 0-1: based on field committer_ids having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.user_id, self.user_id), (
+                u'[u\'fully-validated '
+                'QuestionSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_question_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            question_models.QuestionSnapshotMetadataModel(
+                id='0-3', committer_id=self.owner_id, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question model '
+                'version check of QuestionSnapshotMetadataModel\', '
+                '[u\'Entity id 0-3: Question model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot metadata model id\']]'
+            ), (
+                u'[u\'fully-validated QuestionSnapshotMetadataModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'update_question_property'
+        }, {
+            'cmd': 'create_new_fully_specified_question',
+            'invalid_attribute': 'invalid'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd '
+                'create_new_fully_specified_question check of '
+                'QuestionSnapshotMetadataModel\', '
+                '[u"Entity id 0-1: Commit command domain validation '
+                'for command: {u\'cmd\': '
+                'u\'create_new_fully_specified_question\', '
+                'u\'invalid_attribute\': u\'invalid\'} failed with error: '
+                'The following required attributes are missing: '
+                'question_dict, skill_id, The following extra attributes '
+                'are present: invalid_attribute"]]'
+            ), (
+                u'[u\'failed validation check for commit cmd '
+                'update_question_property check of '
+                'QuestionSnapshotMetadataModel\', '
+                '[u"Entity id 0-1: Commit command domain validation '
+                'for command: {u\'cmd\': u\'update_question_property\'} '
+                'failed with error: The following required attributes '
+                'are missing: new_value, old_value, property_name"]]'
+            ), u'[u\'fully-validated QuestionSnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionSnapshotContentModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(6)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            question_services.create_new_question(
+                self.owner_id, question, 'test question')
+
+        self.model_instance_0 = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            question_models.QuestionSnapshotContentModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.QuestionSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'language_code',
+                'new_value': 'en',
+                'old_value': 'ar'
+            })], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated QuestionSnapshotContentModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of QuestionSnapshotContentModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'QuestionSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionSnapshotContentModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_model_failure(self):
+        question_models.QuestionModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_ids '
+                'field check of QuestionSnapshotContentModel\', '
+                '[u"Entity id 0-1: based on field question_ids '
+                'having value 0, expect model QuestionModel with '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'question_ids having value 0, expect model '
+                'QuestionModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'QuestionSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_question_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            question_models.QuestionSnapshotContentModel(
+                id='0-3'))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question model '
+                'version check of QuestionSnapshotContentModel\', '
+                '[u\'Entity id 0-3: Question model corresponding to '
+                'id 0 has a version 1 which is less than '
+                'the version 3 in snapshot content model id\']]'
+            ), (
+                u'[u\'fully-validated QuestionSnapshotContentModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionRightsModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionRightsModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(6)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            if index == 0:
+                question_services.create_new_question(
+                    self.user_id, question, 'test question')
+            else:
+                question_services.create_new_question(
+                    self.owner_id, question, 'test question')
+
+        self.model_instance_0 = question_models.QuestionRightsModel.get_by_id(
+            '0')
+        self.model_instance_1 = question_models.QuestionRightsModel.get_by_id(
+            '1')
+        self.model_instance_2 = question_models.QuestionRightsModel.get_by_id(
+            '2')
+
+        self.job_class = (
+            prod_validation_jobs_one_off.QuestionRightsModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated QuestionRightsModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.commit(
+            feconf.SYSTEM_COMMITTER_ID, 'created_on test', [])
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of QuestionRightsModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated QuestionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        self.model_instance_2.delete(feconf.SYSTEM_COMMITTER_ID, 'delete')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionRightsModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_model_failure(self):
+        question_models.QuestionModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_ids '
+                'field check of QuestionRightsModel\', '
+                '[u"Entity id 0: based on field question_ids having '
+                'value 0, expect model QuestionModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_creator_user_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for creator_user_ids '
+                'field check of QuestionRightsModel\', '
+                '[u"Entity id 0: based on field creator_user_ids having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]') % (
+                    self.user_id, self.user_id),
+            u'[u\'fully-validated QuestionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_metadata_model_failure(self):
+        question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_metadata_ids '
+                'field check of QuestionRightsModel\', '
+                '[u"Entity id 0: based on field snapshot_metadata_ids having '
+                'value 0-1, expect model '
+                'QuestionRightsSnapshotMetadataModel '
+                'with id 0-1 but it doesn\'t exist"]]'
+            ),
+            u'[u\'fully-validated QuestionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_snapshot_content_model_failure(self):
+        question_models.QuestionRightsSnapshotContentModel.get_by_id(
+            '0-1').delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for snapshot_content_ids '
+                'field check of QuestionRightsModel\', '
+                '[u"Entity id 0: based on field snapshot_content_ids having '
+                'value 0-1, expect model QuestionRightsSnapshotContentModel '
+                'with id 0-1 but it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionRightsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionRightsSnapshotMetadataModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionRightsSnapshotMetadataModelValidatorTests, self).setUp(
+            )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        self.signup(USER_EMAIL, USER_NAME)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(6)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            if index == 0:
+                question_services.create_new_question(
+                    self.user_id, question, 'test question')
+            else:
+                question_services.create_new_question(
+                    self.owner_id, question, 'test question')
+
+        self.model_instance_0 = (
+            question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.QuestionRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated QuestionRightsSnapshotMetadataModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of QuestionRightsSnapshotMetadataModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'QuestionRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionRightsSnapshotMetadataModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_rights_model_failure(self):
+        question_models.QuestionRightsModel.get_by_id('0').delete(
+            self.user_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_rights_ids '
+                'field check of QuestionRightsSnapshotMetadataModel\', '
+                '[u"Entity id 0-1: based on field question_rights_ids '
+                'having value 0, expect model QuestionRightsModel with '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'question_rights_ids having value 0, expect model '
+                'QuestionRightsModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'QuestionRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_committer_model_failure(self):
+        user_models.UserSettingsModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for committer_ids field '
+                'check of QuestionRightsSnapshotMetadataModel\', '
+                '[u"Entity id 0-1: based on field committer_ids having '
+                'value %s, expect model UserSettingsModel with id %s '
+                'but it doesn\'t exist"]]'
+            ) % (self.user_id, self.user_id), (
+                u'[u\'fully-validated '
+                'QuestionRightsSnapshotMetadataModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_question_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            question_models.QuestionRightsSnapshotMetadataModel(
+                id='0-3', committer_id=self.owner_id, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}]))
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question rights model '
+                'version check of QuestionRightsSnapshotMetadataModel\', '
+                '[u\'Entity id 0-3: QuestionRights model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot metadata model id\']]'
+            ), (
+                u'[u\'fully-validated '
+                'QuestionRightsSnapshotMetadataModel\', 3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'create_new',
+            'invalid_attribute': 'invalid'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd '
+                'create_new check of '
+                'QuestionRightsSnapshotMetadataModel\', '
+                '[u"Entity id 0-1: Commit command domain validation '
+                'for command: {u\'cmd\': u\'create_new\', '
+                'u\'invalid_attribute\': u\'invalid\'} failed with error: '
+                'The following extra attributes are present: '
+                'invalid_attribute"]]'
+            ), u'[u\'fully-validated QuestionRightsSnapshotMetadataModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionRightsSnapshotContentModelValidatorTests(
+        test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionRightsSnapshotContentModelValidatorTests, self).setUp(
+            )
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(6)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            question_services.create_new_question(
+                self.owner_id, question, 'test question')
+
+        self.model_instance_0 = (
+            question_models.QuestionRightsSnapshotContentModel.get_by_id(
+                '0-1'))
+        self.model_instance_1 = (
+            question_models.QuestionRightsSnapshotContentModel.get_by_id(
+                '1-1'))
+        self.model_instance_2 = (
+            question_models.QuestionRightsSnapshotContentModel.get_by_id(
+                '2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.QuestionRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        expected_output = [
+            u'[u\'fully-validated QuestionRightsSnapshotContentModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of QuestionRightsSnapshotContentModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), (
+                u'[u\'fully-validated '
+                'QuestionRightsSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionRightsSnapshotContentModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_model_failure(self):
+        question_models.QuestionRightsModel.get_by_id('0').delete(
+            self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_rights_ids '
+                'field check of QuestionRightsSnapshotContentModel\', '
+                '[u"Entity id 0-1: based on field question_rights_ids '
+                'having value 0, expect model QuestionRightsModel with '
+                'id 0 but it doesn\'t exist", u"Entity id 0-2: based on field '
+                'question_rights_ids having value 0, expect model '
+                'QuestionRightsModel with id 0 but it doesn\'t exist"]]'
+            ), (
+                u'[u\'fully-validated '
+                'QuestionRightsSnapshotContentModel\', 2]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_question_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            question_models.QuestionRightsSnapshotContentModel(
+                id='0-3'))
+        model_with_invalid_version_in_id.content = {}
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question rights model '
+                'version check of QuestionRightsSnapshotContentModel\', '
+                '[u\'Entity id 0-3: QuestionRights model corresponding to '
+                'id 0 has a version 1 which is less than the version 3 in '
+                'snapshot content model id\']]'
+            ), (
+                u'[u\'fully-validated QuestionRightsSnapshotContentModel\', '
+                '3]')]
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionCommitLogEntryModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(6)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            question_services.create_new_question(
+                self.owner_id, question, 'test question')
+
+        self.model_instance_0 = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-0-1'))
+        self.model_instance_1 = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-1-1'))
+        self.model_instance_2 = (
+            question_models.QuestionCommitLogEntryModel.get_by_id(
+                'question-2-1'))
+
+        self.job_class = prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+
+    def test_standard_operation(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'language_code',
+                'new_value': 'en',
+                'old_value': 'ar'
+            })], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated QuestionCommitLogEntryModel\', 4]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of QuestionCommitLogEntryModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        self.model_instance_1.delete()
+        self.model_instance_2.delete()
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionCommitLogEntryModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_model_failure(self):
+        question_models.QuestionModel.get_by_id('0').delete(
+            feconf.SYSTEM_COMMITTER_ID, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_ids field '
+                'check of QuestionCommitLogEntryModel\', '
+                '[u"Entity id question-0-1: based on field question_ids '
+                'having value 0, expect model QuestionModel with id '
+                '0 but it doesn\'t exist", u"Entity id question-0-2: '
+                'based on field question_ids having value 0, expect '
+                'model QuestionModel with id 0 but it doesn\'t exist"]]'
+            ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
+    def test_invalid_question_version_in_model_id(self):
+        model_with_invalid_version_in_id = (
+            question_models.QuestionCommitLogEntryModel.create(
+                '0', 3, self.owner_id, self.OWNER_USERNAME, 'edit',
+                'msg', [{}],
+                constants.ACTIVITY_STATUS_PUBLIC, False))
+        model_with_invalid_version_in_id.question_id = '0'
+        model_with_invalid_version_in_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question model '
+                'version check of QuestionCommitLogEntryModel\', '
+                '[u\'Entity id %s: Question model corresponding '
+                'to id 0 has a version 1 which is less than '
+                'the version 3 in commit log entry model id\']]'
+            ) % (model_with_invalid_version_in_id.id),
+            u'[u\'fully-validated QuestionCommitLogEntryModel\', 3]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_id(self):
+        model_with_invalid_id = (
+            question_models.QuestionCommitLogEntryModel(
+                id='invalid-0-1', user_id=self.owner_id,
+                username=self.OWNER_USERNAME, commit_type='edit',
+                commit_message='msg', commit_cmds=[{}],
+                post_commit_status=constants.ACTIVITY_STATUS_PUBLIC,
+                post_commit_is_private=False))
+        model_with_invalid_id.question_id = '0'
+        model_with_invalid_id.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for model id check of '
+                'QuestionCommitLogEntryModel\', '
+                '[u\'Entity id %s: Entity id does not match regex pattern\']]'
+            ) % (model_with_invalid_id.id),
+            u'[u\'fully-validated QuestionCommitLogEntryModel\', 3]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_type(self):
+        self.model_instance_0.commit_type = 'invalid'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit type check of '
+                'QuestionCommitLogEntryModel\', '
+                '[u\'Entity id question-0-1: Commit type invalid is '
+                'not allowed\']]'
+            ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_post_commit_status(self):
+        self.model_instance_0.post_commit_status = 'invalid'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit status check '
+                'of QuestionCommitLogEntryModel\', '
+                '[u\'Entity id question-0-1: Post commit status invalid '
+                'is invalid\']]'
+            ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_true_post_commit_is_private(self):
+        self.model_instance_0.post_commit_status = 'public'
+        self.model_instance_0.post_commit_is_private = True
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit is private '
+                'check of QuestionCommitLogEntryModel\', '
+                '[u\'Entity id %s: Post commit status is '
+                'public but post_commit_is_private is True\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_false_post_commit_is_private(self):
+        self.model_instance_0.post_commit_status = 'private'
+        self.model_instance_0.post_commit_is_private = False
+        self.model_instance_0.put()
+
+        expected_output = [
+            (
+                u'[u\'failed validation check for post commit is private '
+                'check of QuestionCommitLogEntryModel\', '
+                '[u\'Entity id %s: Post commit status is '
+                'private but post_commit_is_private is False\']]'
+            ) % self.model_instance_0.id,
+            u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_commit_cmd_schmea(self):
+        self.model_instance_0.commit_cmds = [{
+            'cmd': 'update_question_property'
+        }, {
+            'cmd': 'create_new_fully_specified_question',
+            'invalid_attribute': 'invalid'
+        }]
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for commit cmd '
+                'create_new_fully_specified_question check of '
+                'QuestionCommitLogEntryModel\', '
+                '[u"Entity id question-0-1: Commit command domain '
+                'validation for command: {u\'cmd\': '
+                'u\'create_new_fully_specified_question\', '
+                'u\'invalid_attribute\': u\'invalid\'} failed with '
+                'error: The following required attributes are '
+                'missing: question_dict, skill_id, The following '
+                'extra attributes are present: invalid_attribute"]]'
+            ), (
+                u'[u\'failed validation check for commit cmd '
+                'update_question_property check of '
+                'QuestionCommitLogEntryModel\', [u"Entity id '
+                'question-0-1: Commit command domain validation '
+                'for command: {u\'cmd\': u\'update_question_property\'} '
+                'failed with error: The following required attributes '
+                'are missing: new_value, old_value, property_name"]]'
+            ), u'[u\'fully-validated QuestionCommitLogEntryModel\', 2]']
+
+        run_job_and_check_output(self, expected_output, sort=True)
+
+
+class QuestionSummaryModelValidatorTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(QuestionSummaryModelValidatorTests, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(USER_EMAIL, USER_NAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id = self.get_user_id_from_email(USER_EMAIL)
+
+        skills = [skill_domain.Skill.create_default_skill(
+            '%s' % i,
+            description='description %d' % i
+        ) for i in xrange(6)]
+        for skill in skills:
+            skill_services.save_new_skill(self.owner_id, skill)
+
+        language_codes = ['ar', 'en', 'en']
+        questions = [question_domain.Question.create_default_question(
+            '%s' % i,
+            skill_ids=['%s' % (i * 2), '%s' % (i * 2 + 1)]
+        ) for i in xrange(3)]
+
+        for index, question in enumerate(questions):
+            question.language_code = language_codes[index]
+            question.question_state_data = self._create_valid_question_data(
+                'Test')
+            question.question_state_data.content.html = '<p>Test</p>'
+            question_services.create_new_question(
+                self.owner_id, question, 'test question')
+
+        self.model_instance_0 = question_models.QuestionSummaryModel.get_by_id(
+            '0')
+        self.model_instance_1 = question_models.QuestionSummaryModel.get_by_id(
+            '1')
+        self.model_instance_2 = question_models.QuestionSummaryModel.get_by_id(
+            '2')
+
+        self.job_class = (
+            prod_validation_jobs_one_off.QuestionSummaryModelAuditOneOffJob)
+
+    def test_standard_operation(self):
+        question_services.update_question(
+            self.owner_id, '0', [question_domain.QuestionChange({
+                'cmd': 'update_question_property',
+                'property_name': 'language_code',
+                'new_value': 'en',
+                'old_value': 'ar'
+            })], 'Changes.')
+        expected_output = [
+            u'[u\'fully-validated QuestionSummaryModel\', 3]']
+        run_job_and_check_output(self, expected_output)
+
+    def test_model_with_created_on_greater_than_last_updated(self):
+        self.model_instance_0.created_on = (
+            self.model_instance_0.last_updated + datetime.timedelta(days=1))
+        self.model_instance_0.put()
+        expected_output = [(
+            u'[u\'failed validation check for time field relation check '
+            'of QuestionSummaryModel\', '
+            '[u\'Entity id %s: The created_on field has a value '
+            '%s which is greater than the value '
+            '%s of last_updated field\']]') % (
+                self.model_instance_0.id,
+                self.model_instance_0.created_on,
+                self.model_instance_0.last_updated
+            ), u'[u\'fully-validated QuestionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_last_updated_greater_than_current_time(self):
+        question_services.delete_question(self.owner_id, '1')
+        question_services.delete_question(self.owner_id, '2')
+        expected_output = [(
+            u'[u\'failed validation check for current time check of '
+            'QuestionSummaryModel\', '
+            '[u\'Entity id %s: The last_updated field has a '
+            'value %s which is greater than the time when the job was run\']]'
+        ) % (self.model_instance_0.id, self.model_instance_0.last_updated)]
+
+        with self.swap(datetime, 'datetime', MockDatetime13Hours), self.swap(
+            db.DateTimeProperty, 'data_type', MockDatetime13Hours):
+            update_datastore_types_for_mock_datetime()
+            run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_missing_question_model_failure(self):
+        question_model = question_models.QuestionModel.get_by_id('0')
+        question_model.delete(feconf.SYSTEM_COMMITTER_ID, '', [])
+        self.model_instance_0.question_model_last_updated = (
+            question_model.last_updated)
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_ids '
+                'field check of QuestionSummaryModel\', '
+                '[u"Entity id 0: based on field question_ids having '
+                'value 0, expect model QuestionModel with id 0 but '
+                'it doesn\'t exist"]]'),
+            u'[u\'fully-validated QuestionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_question_content(self):
+        self.model_instance_0.question_content = '<p>invalid</p>'
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question content check '
+                'of QuestionSummaryModel\', [u\'Entity id 0: Question '
+                'content: <p>invalid</p> does not match content html '
+                'in question state data in question model: <p>Test</p>\']]'
+            ), u'[u\'fully-validated QuestionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_question_related_property(self):
+        mock_time = datetime.datetime.utcnow() - datetime.timedelta(
+            days=2)
+        actual_time = self.model_instance_0.question_model_created_on
+        self.model_instance_0.question_model_created_on = mock_time
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for question_model_created_on '
+                'field check of QuestionSummaryModel\', '
+                '[u\'Entity id %s: question_model_created_on field in '
+                'entity: %s does not match corresponding question '
+                'created_on field: %s\']]'
+            ) % (self.model_instance_0.id, mock_time, actual_time),
+            u'[u\'fully-validated QuestionSummaryModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_model_with_invalid_question_rights_related_property(self):
+        self.model_instance_0.creator_id = self.user_id
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for creator_id field '
+                'check of QuestionSummaryModel\', [u\'Entity id 0: creator_id '
+                'field in entity: %s does not match corresponding '
+                'question rights creator_id field: %s\']]'
+            ) % (self.user_id, self.owner_id),
+            u'[u\'fully-validated QuestionSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
 
