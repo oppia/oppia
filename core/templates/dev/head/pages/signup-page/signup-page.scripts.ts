@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives required in privacy page.
+ * @fileoverview Directive scripts for the Oppia profile page.
  */
 
-require('pages/OppiaFooterDirective.ts');
-require('base_components/BaseContentDirective.ts');
+require('pages/signup-page/signup-page.controller.ts');
