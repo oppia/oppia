@@ -153,8 +153,10 @@ class Misconception(object):
         """
         self.id = misconception_id
         self.name = name
-        self.notes = html_cleaner.clean(notes)
-        self.feedback = html_cleaner.clean(feedback)
+        self.notes = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(notes))
+        self.feedback = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(feedback))
 
     def to_dict(self):
         """Returns a dict representing this Misconception domain object.
