@@ -759,8 +759,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change.question_dict[ # pylint: disable=unsupported-assignment-operation
-            'question_state_data_schema_version'] = 0
+        question_dict = suggestion.change.question_dict
+        question_dict['question_state_data_schema_version'] = 0
+        suggestion.change.question_dict = question_dict
 
         with self.assertRaisesRegexp(
             Exception,
@@ -809,8 +810,9 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.question_dict[ # pylint: disable=unsupported-assignment-operation
-            'question_state_data_schema_version'] = 1
+        question_dict = suggestion.change.question_dict
+        question_dict['question_state_data_schema_version'] = 1
+        suggestion.change.question_dict = question_dict
 
         with self.assertRaisesRegexp(
             Exception, 'Question state schema version is not up to date.'):
