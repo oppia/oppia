@@ -134,7 +134,7 @@ oppia.factory('QuestionPlayerEngineService', [
 
     return {
       /**
-       * Initializes the question player for an exploration, 
+       * Initializes the question player for an exploration,
        * passing the data for the first question to successCallback.
        *
        *
