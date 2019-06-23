@@ -137,6 +137,74 @@ handlers:
   login: admin
   script: main_mail.app
   secure: always
+  
+# Serve static pages.
+- url: /splash?c=at1
+  static_files: core/templates/dev/head/dist/splash_at1.html
+  upload: core/templates/dev/head/dist/splash_at1.html
+  http_headers:
+    Cache-Control: 'no-cache, must-revalidate'
+    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
+    Pragma: no-cache
+    Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: DENY
+    X-Xss-Protection: '1; mode=block'
+  secure: always
+  expiration: "0"
+- url: /splash?c=at0
+  static_files: core/templates/dev/head/dist/splash_at0.html
+  upload: core/templates/dev/head/dist/splash_at0.html
+  http_headers:
+    Cache-Control: 'no-cache, must-revalidate'
+    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
+    Pragma: no-cache
+    Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: DENY
+    X-Xss-Protection: '1; mode=block'
+  secure: always
+  expiration: "0"
+- url: /splash
+  static_files: core/templates/dev/head/dist/splash-page.mainpage.html
+  upload: core/templates/dev/head/dist/splash-page.mainpage.html
+  http_headers:
+    Cache-Control: 'no-cache, must-revalidate'
+    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
+    Pragma: no-cache
+    Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: DENY
+    X-Xss-Protection: '1; mode=block'
+  secure: always
+  expiration: "0"
+- url: /get_started
+  static_files: core/templates/dev/head/dist/get-started-page.mainpage.html
+  upload: core/templates/dev/head/dist/get-started-page.mainpage.html
+  http_headers:
+    Cache-Control: 'no-cache, must-revalidate'
+    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
+    Pragma: no-cache
+    Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: DENY
+    X-Xss-Protection: '1; mode=block'
+  secure: always
+  expiration: "0"
+- url: /teach
+  static_files: core/templates/dev/head/dist/teach-page.mainpage.html
+  upload: core/templates/dev/head/dist/teach-page.mainpage.html
+  http_headers:
+    Cache-Control: 'no-cache, must-revalidate'
+    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
+    Pragma: no-cache
+    Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: DENY
+    X-Xss-Protection: '1; mode=block'
+  secure: always
+  expiration: "0"
+
 - url: /.*
   script: main.app
   secure: always
