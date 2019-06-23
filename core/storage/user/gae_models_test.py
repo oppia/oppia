@@ -80,7 +80,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         user = user_models.UserSettingsModel.get_by_role(
             feconf.ROLE_ID_ADMIN)[0]
         user_data = user.export_data(user.id)
-        EXPECTED_USER_DATA = {
+        expected_user_data = {
             'email': 'user@example.com',
             'role': feconf.ROLE_ID_ADMIN,
             'username': None,
@@ -100,13 +100,13 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_site_language_code': None,
             'preferred_audio_language_code': None
         }
-        self.assertEqual(EXPECTED_USER_DATA, user_data)
-     
+        self.assertEqual(expected_user_data, user_data)
+
     def test_export_data_nontrivial(self):
         user = user_models.UserSettingsModel.get_by_role(
             feconf.ROLE_ID_ADMIN)[1]
         user_data = user.export_data(user.id)
-        EXPECTED_USER_DATA = {
+        expected_user_data = {
             'email': self.user3_email,
             'role': feconf.ROLE_ID_ADMIN,
             'username': self.generic_username,
@@ -126,7 +126,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
             'preferred_site_language_code': self.generic_language_codes[0],
             'preferred_audio_language_code': self.generic_language_codes[0]
         }
-        self.assertEqual(EXPECTED_USER_DATA, user_data)
+        self.assertEqual(expected_user_data, user_data)
 
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
@@ -257,80 +257,82 @@ class UserQueryModelTests(test_utils.GenericTestBase):
         self.assertEqual(
             query_model.edited_fewer_than_n_exps, edited_fewer_than_n_exps)
 
+
 def test_fetch_page(self):
 
-        submitter_id = 'submitter_1'
-        query_id = 'qid_1'
-        inactive_in_last_n_days = 5
-        created_at_least_n_exps = 1
-        created_fewer_than_n_exps = 3
-        edited_at_least_n_exps = 2
-        edited_fewer_than_n_exps = 5
-        has_not_logged_in_for_n_days = 10
-        user_models.UserQueryModel(
-            id=query_id,
-            inactive_in_last_n_days=inactive_in_last_n_days,
-            created_at_least_n_exps=created_at_least_n_exps,
-            created_fewer_than_n_exps=created_fewer_than_n_exps,
-            edited_at_least_n_exps=edited_at_least_n_exps,
-            edited_fewer_than_n_exps=edited_fewer_than_n_exps,
-            has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
-            submitter_id=submitter_id).put()
+    submitter_id = 'submitter_1'
+    query_id = 'qid_1'
+    inactive_in_last_n_days = 5
+    created_at_least_n_exps = 1
+    created_fewer_than_n_exps = 3
+    edited_at_least_n_exps = 2
+    edited_fewer_than_n_exps = 5
+    has_not_logged_in_for_n_days = 10
+    user_models.UserQueryModel(
+        id=query_id,
+        inactive_in_last_n_days=inactive_in_last_n_days,
+        created_at_least_n_exps=created_at_least_n_exps,
+        created_fewer_than_n_exps=created_fewer_than_n_exps,
+        edited_at_least_n_exps=edited_at_least_n_exps,
+        edited_fewer_than_n_exps=edited_fewer_than_n_exps,
+        has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
+        submitter_id=submitter_id).put()
 
-        submitter_id = 'submitter_2'
-        query_id = 'qid_2'
-        inactive_in_last_n_days = 6
-        created_at_least_n_exps = 7
-        created_fewer_than_n_exps = 4
-        edited_at_least_n_exps = 3
-        edited_fewer_than_n_exps = 6
-        has_not_logged_in_for_n_days = 11
-        user_models.UserQueryModel(
-            id=query_id,
-            inactive_in_last_n_days=inactive_in_last_n_days,
-            created_at_least_n_exps=created_at_least_n_exps,
-            created_fewer_than_n_exps=created_fewer_than_n_exps,
-            edited_at_least_n_exps=edited_at_least_n_exps,
-            edited_fewer_than_n_exps=edited_fewer_than_n_exps,
-            has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
-            submitter_id=submitter_id).put()
+    submitter_id = 'submitter_2'
+    query_id = 'qid_2'
+    inactive_in_last_n_days = 6
+    created_at_least_n_exps = 7
+    created_fewer_than_n_exps = 4
+    edited_at_least_n_exps = 3
+    edited_fewer_than_n_exps = 6
+    has_not_logged_in_for_n_days = 11
+    user_models.UserQueryModel(
+        id=query_id,
+        inactive_in_last_n_days=inactive_in_last_n_days,
+        created_at_least_n_exps=created_at_least_n_exps,
+        created_fewer_than_n_exps=created_fewer_than_n_exps,
+        edited_at_least_n_exps=edited_at_least_n_exps,
+        edited_fewer_than_n_exps=edited_fewer_than_n_exps,
+        has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
+        submitter_id=submitter_id).put()
 
-        # Fetch only one entity.
-        query_models, _, _ = user_models.UserQueryModel.fetch_page(
-            1, None)
-        self.assertEqual(len(query_models), 1)
+    # Fetch only one entity.
+    query_models, _, _ = user_models.UserQueryModel.fetch_page(
+        1, None)
+    self.assertEqual(len(query_models), 1)
 
-        self.assertEqual(query_models[0].submitter_id, 'submitter_2')
-        self.assertEqual(query_models[0].id, 'qid_2')
-        self.assertEqual(query_models[0].inactive_in_last_n_days, 6)
-        self.assertEqual(query_models[0].created_at_least_n_exps, 7)
-        self.assertEqual(query_models[0].created_fewer_than_n_exps, 4)
-        self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
-        self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
-        self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
+    self.assertEqual(query_models[0].submitter_id, 'submitter_2')
+    self.assertEqual(query_models[0].id, 'qid_2')
+    self.assertEqual(query_models[0].inactive_in_last_n_days, 6)
+    self.assertEqual(query_models[0].created_at_least_n_exps, 7)
+    self.assertEqual(query_models[0].created_fewer_than_n_exps, 4)
+    self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
+    self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
+    self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
 
-        # Fetch both entities.
-        query_models, _, _ = user_models.UserQueryModel.fetch_page(
-            2, None)
-        self.assertEqual(len(query_models), 2)
+    # Fetch both entities.
+    query_models, _, _ = user_models.UserQueryModel.fetch_page(
+        2, None)
+    self.assertEqual(len(query_models), 2)
 
-        self.assertEqual(query_models[0].submitter_id, 'submitter_2')
-        self.assertEqual(query_models[0].id, 'qid_2')
-        self.assertEqual(query_models[0].inactive_in_last_n_days, 6)
-        self.assertEqual(query_models[0].created_at_least_n_exps, 7)
-        self.assertEqual(query_models[0].created_fewer_than_n_exps, 4)
-        self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
-        self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
-        self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
+    self.assertEqual(query_models[0].submitter_id, 'submitter_2')
+    self.assertEqual(query_models[0].id, 'qid_2')
+    self.assertEqual(query_models[0].inactive_in_last_n_days, 6)
+    self.assertEqual(query_models[0].created_at_least_n_exps, 7)
+    self.assertEqual(query_models[0].created_fewer_than_n_exps, 4)
+    self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
+    self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
+    self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
 
-        self.assertEqual(query_models[1].submitter_id, 'submitter_1')
-        self.assertEqual(query_models[1].id, 'qid_1')
-        self.assertEqual(query_models[1].inactive_in_last_n_days, 5)
-        self.assertEqual(query_models[1].created_at_least_n_exps, 1)
-        self.assertEqual(query_models[1].created_fewer_than_n_exps, 3)
-        self.assertEqual(query_models[1].edited_at_least_n_exps, 2)
-        self.assertEqual(query_models[1].edited_fewer_than_n_exps, 5)
-        self.assertEqual(query_models[1].has_not_logged_in_for_n_days, 10)
+    self.assertEqual(query_models[1].submitter_id, 'submitter_1')
+    self.assertEqual(query_models[1].id, 'qid_1')
+    self.assertEqual(query_models[1].inactive_in_last_n_days, 5)
+    self.assertEqual(query_models[1].created_at_least_n_exps, 1)
+    self.assertEqual(query_models[1].created_fewer_than_n_exps, 3)
+    self.assertEqual(query_models[1].edited_at_least_n_exps, 2)
+    self.assertEqual(query_models[1].edited_fewer_than_n_exps, 5)
+    self.assertEqual(query_models[1].has_not_logged_in_for_n_days, 10)
+
 
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):
     """Tests for UserSkillMasteryModel."""
