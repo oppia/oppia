@@ -350,7 +350,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'splash'],
+      chunks: ['splash'],
       filename: 'splash-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',

@@ -50,3 +50,5 @@ var oppia = angular.module(
     downgradedModule
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
+
+exports.moduleName = oppia;
