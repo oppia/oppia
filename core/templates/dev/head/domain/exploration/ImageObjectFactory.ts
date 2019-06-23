@@ -35,7 +35,6 @@ oppia.factory('ImageObjectFactory', [function() {
   /* eslint-disable dot-notation */
   Image['createNew'] = function(src, placeholder, instructions) {
   /* eslint-enable dot-notation */
-    alert("Image")
     return new Image(src, placeholder, instructions);
   };
 

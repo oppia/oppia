@@ -106,12 +106,13 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
     """Tests for the image workflow like add,deletes image."""
 
     def test_invalid_image_id(self):
-        """Test various methods of invalid image_id"""
+        """Test various methods of invalid image_id."""
         self.login(self.OWNER_EMAIL)
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
-        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'id-with-value="image_id_1"></oppia-noninteractive-image>')
+        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image ' +
+                    'id-with-value="&amp;quot;image_id_50&amp;quot;">' +
+                    '</oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -142,26 +143,9 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_object_2 = exp_domain.ExplorationChange(change_dict_2)
 
         change_list = [change_object_1, change_object_2]
-        with self.assertRaises(Exception):
-            exp_services.update_exploration(
-                self.editor_id, self.EXP_ID, change_list, 'one commit')
-
-        # Invalid image_id (image_id doesn't exist)
-        change_dict_3 = {
-            'cmd': exp_domain.CMD_IMAGE_ASSETS,
-            'state_name': 'Introduction',
-            'action': 'add_image',
-            'image_id': 'image_id_22',
-            'image_info': {
-                'src': '',
-                'placeholder': True,
-                'instructions': 'no instructions'
-                }
-            }
-
-        change_object_3 = exp_domain.ExplorationChange(change_dict_3)
-        change_list = [change_object_1, change_object_2, change_object_3]
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Image Id is greater then image_id counter not possible,'
+            ' received image_id is image_id_50'):
             exp_services.update_exploration(
                 self.editor_id, self.EXP_ID, change_list, 'one commit')
 
@@ -180,11 +164,12 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         change_object_3 = exp_domain.ExplorationChange(change_dict_3)
         change_list = [change_object_1, change_object_2, change_object_3]
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid image_id received: image_id_invalid'):
             exp_services.update_exploration(
                 self.editor_id, self.EXP_ID, change_list, 'one commit')
 
-        # Invalid image_info (image_id is not dict)
+        # Invalid image_info (image_info is not dict)
         change_dict_3 = {
             'cmd': exp_domain.CMD_IMAGE_ASSETS,
             'state_name': 'Introduction',
@@ -195,7 +180,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         change_object_3 = exp_domain.ExplorationChange(change_dict_3)
         change_list = [change_object_1, change_object_2, change_object_3]
-        with self.assertRaises(Exception):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected image_info to be dict, received invalid'):
             exp_services.update_exploration(
                 self.editor_id, self.EXP_ID, change_list, 'one commit')
 
@@ -203,8 +189,9 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.login(self.OWNER_EMAIL)
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
-        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'id-with-value="&amp;quot;image_id_1&amp;quot;"></oppia-noninteractive-image>')
+        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image ' +
+                    'id-with-value="&amp;quot;image_id_1&amp;quot;">' +
+                    '</oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -238,98 +225,101 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             self.editor_id, self.EXP_ID, change_list, 'one commit')
 
         expected_exploration_dict = {
-    'category': u'A category',
-    'param_changes': [],
-    'auto_tts_enabled': True,
-    'tags': [],
-    'states_schema_version': 30,
-    'title': u'A title',
-    'id': 'An_exploration_id',
-    'states': {
-        u'Introduction': {
+            'category': u'A category',
             'param_changes': [],
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
+            'auto_tts_enabled': True,
+            'tags': [],
+            'states_schema_version': 30,
+            'title': u'A title',
+            'id': 'An_exploration_id',
+            'states': {
+                u'Introduction': {
                     'param_changes': [],
-                    'feedback': {
-                        'content_id': u'default_outcome',
-                        'html': u''
+                    'interaction': {
+                        'solution': None,
+                        'answer_groups': [],
+                        'default_outcome': {
+                            'param_changes': [],
+                            'feedback': {
+                                'content_id': u'default_outcome',
+                                'html': u''
+                            },
+                            'dest': u'Introduction',
+                            'refresher_exploration_id': None,
+                            'missing_prerequisite_skill_id': None,
+                            'labelled_as_correct': False
+                        },
+                        'customization_args': {},
+                        'confirmed_unclassified_answers': [],
+                        'id': None,
+                        'hints': []
                     },
-                    'dest': u'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': None,
-                'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    u'content': {},
-                    u'default_outcome': {}
+                    'recorded_voiceovers': {
+                        'voiceovers_mapping': {
+                            u'content': {},
+                            u'default_outcome': {}
+                        }
+                    },
+                    'classifier_model_id': None,
+                    'content': {
+                        'content_id': u'content',
+                        'html': new_html
+                    },
+                    'written_translations': {
+                        'translations_mapping': {
+                            u'content': {},
+                            u'default_outcome': {}
+                        }
+                    },
+                    'image_assets': {
+                        'image_mapping': {
+                            'image_id_1': {
+                                'src': u'',
+                                'placeholder': True,
+                                'instructions': u'no instructions'
+                            }
+                        }
+                    },
+                    'solicit_answer_details': False
                 }
             },
-            'classifier_model_id': None,
-            'content': {
-                'content_id': u'content',
-                'html': new_html
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    u'content': {},
-                    u'default_outcome': {}
-                }
-            },
-            'image_assets': {
-                'image_mapping': {
-                    'image_id_1': {
-                        'src': u'',
-                        'placeholder': True,
-                        'instructions': u'no instructions'
-                    }
-                }
-            },
-            'solicit_answer_details': False
+            'param_specs': {},
+            'language_code': u'en',
+            'objective': u'',
+            'author_notes': u'',
+            'correctness_feedback_enabled': False,
+            'init_state_name': u'Introduction',
+            'blurb': u'',
+            'image_counter': 1
         }
-    },
-    'param_specs': {},
-    'language_code': u'en',
-    'objective': u'',
-    'author_notes': u'',
-    'correctness_feedback_enabled': False,
-    'init_state_name': u'Introduction',
-    'blurb': u'',
-    'image_counter': 1
-}
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.to_dict(), expected_exploration_dict)
-        # self.assertEqual(exploration.to_dict(), "keshav")
-
 
     def test_delete_image(self):
         self.login(self.OWNER_EMAIL)
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
-        new_html_before_deleting_image = ('''<p>ssssssssssssssss</p>
-            <oppia-noninteractive-image id-with-value="&amp;quot;image_id_1&amp;quot;">
-            </oppia-noninteractive-image> hjkhjkhkjh
-            <oppia-noninteractive-image id-with-value="&amp;quot;image_id_2&amp;quot;">
-            </oppia-noninteractive-image> dgfsdgfd ggggggggggg
-            <oppia-noninteractive-image id-with-value="&amp;quot;image_id_3&amp;quot;">
-            </oppia-noninteractive-image>ffffff ''')
+        new_html_before_deleting_image = (
+            '<p>ssssssssssssssss</p><oppia-noninteractive-image'
+            'id-with-value="&amp;quot;image_id_1&amp;quot;">'
+            '</oppia-noninteractive-image> hjkhjkhkjh'
+            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_2'
+            '&amp;quot;"></oppia-noninteractive-image> dgfsdgfd ggggggggggg'
+            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_3'
+            '&amp;quot;"></oppia-noninteractive-image>ffffff ')
 
-        new_html_after_deleting_image = ('''
-            <p>ssssssssssssssss</p><oppia-noninteractive-image id-with-value="&amp;quot;image_id_1&amp;quot;">
-            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image id-with-value="&amp;quot;image_id_2&amp;quot;">
-            </oppia-noninteractive-image>dgfsdgfd
-            ''')
+        new_html_after_deleting_image = (
+            '<p>ssssssssssssssss</p><oppia-noninteractive-image'
+            'id-with-value="&amp;quot;image_id_1&amp;quot;">'
+            '</oppia-noninteractive-image> hjkhjkhkjh'
+            '<oppia-noninteractive-image'
+            'id-with-value="&amp;quot;image_id_2&amp;quot;">'
+            '</oppia-noninteractive-image>dgfsdgfd'
+            )
 
-        change_dict_1 = {'new_value': {
+        change_dict_1 = {
+            'new_value': {
                 'html': new_html_before_deleting_image,
                 'content_id': 'content'
                 },
@@ -341,7 +331,6 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                 },
             'property_name': 'content',
             }
-
 
         change_dict_2 = {
             'cmd': exp_domain.CMD_IMAGE_ASSETS,
@@ -387,89 +376,91 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
             'old_value': {
-                'html': '',
+                'html': new_html_before_deleting_image,
                 'content_id': 'content'
                 },
             'property_name': 'content',
         }
 
         expected_exploration_dict = {
-    'category': u'A category',
-    'param_changes': [],
-    'auto_tts_enabled': True,
-    'tags': [],
-    'states_schema_version': 30,
-    'title': u'A title',
-    'id': 'An_exploration_id',
-    'states': {
-        u'Introduction': {
+            'category': u'A category',
             'param_changes': [],
-            'interaction': {
-                'solution': None,
-                'answer_groups': [],
-                'default_outcome': {
+            'auto_tts_enabled': True,
+            'tags': [],
+            'states_schema_version': 30,
+            'title': u'A title',
+            'id': 'An_exploration_id',
+            'states': {
+                u'Introduction': {
                     'param_changes': [],
-                    'feedback': {
-                        'content_id': u'default_outcome',
-                        'html': u''
+                    'interaction': {
+                        'solution': None,
+                        'answer_groups': [],
+                        'default_outcome': {
+                            'param_changes': [],
+                            'feedback': {
+                                'content_id': u'default_outcome',
+                                'html': u''
+                            },
+                            'dest': u'Introduction',
+                            'refresher_exploration_id': None,
+                            'missing_prerequisite_skill_id': None,
+                            'labelled_as_correct': False
+                        },
+                        'customization_args': {},
+                        'confirmed_unclassified_answers': [],
+                        'id': None,
+                        'hints': []
                     },
-                    'dest': u'Introduction',
-                    'refresher_exploration_id': None,
-                    'missing_prerequisite_skill_id': None,
-                    'labelled_as_correct': False
-                },
-                'customization_args': {},
-                'confirmed_unclassified_answers': [],
-                'id': None,
-                'hints': []
-            },
-            'recorded_voiceovers': {
-                'voiceovers_mapping': {
-                    u'content': {},
-                    u'default_outcome': {}
-                }
-            },
-            'classifier_model_id': None,
-            'content': {
-                'content_id': u'content',
-                'html': u'''
-            <p>ssssssssssssssss</p><oppia-noninteractive-image id-with-value="&amp;quot;image_id_1&amp;quot;">
-            </oppia-noninteractive-image> hjkhjkhkjh<oppia-noninteractive-image id-with-value="&amp;quot;image_id_2&amp;quot;">
-            </oppia-noninteractive-image>dgfsdgfd
-            '''
-            },
-            'written_translations': {
-                'translations_mapping': {
-                    u'content': {},
-                    u'default_outcome': {}
-                }
-            },
-            'image_assets': {
-                'image_mapping': {
-                    u'image_id_1': {
-                        'src': u'',
-                        'placeholder': True,
-                        'instructions': u'no instructions'
+                    'recorded_voiceovers': {
+                        'voiceovers_mapping': {
+                            u'content': {},
+                            u'default_outcome': {}
+                        }
                     },
-                    u'image_id_2': {
-                        'src': u'',
-                        'placeholder': False,
-                        'instructions': u'no instructions'
-                    }
+                    'classifier_model_id': None,
+                    'content': {
+                        'content_id': u'content',
+                        'html': (
+                            '<p>ssssssssssssssss</p><oppia-noninteractive-image'
+                            'id-with-value="&amp;quot;image_id_1&amp;quot;">'
+                            '</oppia-noninteractive-image> hjkhjkhkjh'
+                            '<oppia-noninteractive-image id-with-value="&amp;'
+                            'quot;image_id_2&amp;quot;"></oppia-noninteractive'
+                            '-image>dgfsdgfd')
+                    },
+                    'written_translations': {
+                        'translations_mapping': {
+                            u'content': {},
+                            u'default_outcome': {}
+                        }
+                    },
+                    'image_assets': {
+                        'image_mapping': {
+                            u'image_id_1': {
+                                'src': u'',
+                                'placeholder': True,
+                                'instructions': u'no instructions'
+                            },
+                            u'image_id_2': {
+                                'src': u'',
+                                'placeholder': False,
+                                'instructions': u'no instructions'
+                            }
+                        }
+                    },
+                    'solicit_answer_details': False
                 }
             },
-            'solicit_answer_details': False
+            'param_specs': {},
+            'language_code': u'en',
+            'objective': u'',
+            'author_notes': u'',
+            'correctness_feedback_enabled': False,
+            'init_state_name': u'Introduction',
+            'blurb': u'',
+            'image_counter': 3
         }
-    },
-    'param_specs': {},
-    'language_code': u'en',
-    'objective': u'',
-    'author_notes': u'',
-    'correctness_feedback_enabled': False,
-    'init_state_name': u'Introduction',
-    'blurb': u'',
-    'image_counter': 3
-}
 
         change_object_1 = exp_domain.ExplorationChange(change_dict_1)
         change_object_2 = exp_domain.ExplorationChange(change_dict_2)
@@ -477,8 +468,9 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         change_object_4 = exp_domain.ExplorationChange(change_dict_4)
         change_object_5 = exp_domain.ExplorationChange(change_dict_5)
 
-        change_list = ([change_object_1, change_object_2, change_object_3,
-            change_object_4])
+        change_list = (
+            [change_object_1, change_object_2, change_object_3,
+             change_object_4])
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, change_list, 'one commit')
 
@@ -493,8 +485,9 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.login(self.OWNER_EMAIL)
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
-        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image '+
-                    'id-with-value="&amp;quot;image_id_1&amp;quot;"></oppia-noninteractive-image>')
+        new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image ' +
+                    'id-with-value="&amp;quot;image_id_1&amp;quot;">'
+                    '</oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
                 'html': new_html,
@@ -1428,7 +1421,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                 '<blockquote>Hello, this is state1</blockquote><p>'
                 '<oppia-noninteractive-image filepath-with-value='
                 '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
-                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_1&amp;quot;">'
+                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;"'
+                'id-with-value="&amp;quot;image_id_1&amp;quot;">'
                 '</oppia-noninteractive-image></p>')
         }
         content2_dict = {
@@ -1471,16 +1465,17 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<p>This is value1 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_2&amp;quot;"></oppia-noninteractive-image></p>'
+                    '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;'
+                    'quot;" id-with-value="&amp;quot;image_id_2&amp;quot;">'
+                    '</oppia-noninteractive-image></p>'
                 ),
                 (
                     '<p>This is value2 for MultipleChoice'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_3&amp;quot;"></oppia-noninteractive-image>'
-                    '</p></p>')
+                    '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;'
+                    'quot;" id-with-value="&amp;quot;image_id_3&amp;quot;">'
+                    '</oppia-noninteractive-image></p></p>')
             ]}
         }
         customization_args_dict3 = {
@@ -1489,23 +1484,23 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<p>This is value1 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_4&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
+                    '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;'
+                    'quot;" id-with-value="&amp;quot;image_id_4&amp;quot;">'
+                    '</oppia-noninteractive-image></p>'),
                 (
                     '<p>This is value2 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_5&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>'),
+                    '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;'
+                    'quot;" id-with-value="&amp;quot;image_id_5&amp;quot;">'
+                    '</oppia-noninteractive-image></p>'),
                 (
                     '<p>This is value3 for ItemSelection'
                     '<oppia-noninteractive-image filepath-with-value='
                     '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_6&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;'
+                    'quot;" id-with-value="&amp;quot;image_id_6&amp;quot;">'
+                    '</oppia-noninteractive-image></p>')
             ]}
         }
         state1.update_interaction_customization_args(customization_args_dict1)
@@ -1532,9 +1527,9 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                     '<p>Hello, this is html1 for state2'
                     '<oppia-noninteractive-image filepath-with-value="'
                     '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
-                    '"&amp;quot;&amp;quot;" alt-with-value='
-                    '"&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_7&amp;quot;"></oppia-noninteractive-image>'
-                    '</p>')
+                    '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;'
+                    'quot;" id-with-value="&amp;quot;image_id_7&amp;quot;">'
+                    '</oppia-noninteractive-image></p>')
             }
         }, {
             'hint_content': {
@@ -1561,7 +1556,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         ' filepath-with-value='
                         '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;"'
-                        ' alt-with-value="&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_8&amp;quot;">'
+                        ' alt-with-value="&amp;quot;&amp;quot;"'
+                        'id-with-value="&amp;quot;image_id_8&amp;quot;">'
                         '</oppia-noninteractive-image></p>')
                 },
                 'param_changes': [],
@@ -1599,7 +1595,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice1.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_9&amp;quot;">'
+                        'alt-with-value="&amp;quot;&amp;quot;"'
+                        'id-with-value="&amp;quot;image_id_9&amp;quot;">'
                         '</oppia-noninteractive-image></p>')
                 ]}
             }, {
@@ -1610,7 +1607,8 @@ class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
                         '<oppia-noninteractive-image filepath-with-value='
                         '"&amp;quot;s3Choice3.png&amp;quot;"'
                         ' caption-with-value="&amp;quot;&amp;quot;" '
-                        'alt-with-value="&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_10&amp;quot;">'
+                        'alt-with-value="&amp;quot;&amp;quot;"'
+                        'id-with-value="&amp;quot;image_id_10&amp;quot;">'
                         '</oppia-noninteractive-image></p>')
                 ]}
             }],

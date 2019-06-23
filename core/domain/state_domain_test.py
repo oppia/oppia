@@ -630,6 +630,7 @@ class ImageDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(Exception):
             state_domain.Image.from_dict(image_dict)
 
+
 class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on Image Assets."""
     def setUp(self):
@@ -735,10 +736,9 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
             image_assets.add_image('image_id_1', self.image_object)
 
         # Test for adding invalid image id.
-        image_assets.add_image('image_id_1_invalid', self.image_object)
         with self.assertRaisesRegexp(
             Exception, 'Invalid image_id received: image_id_1_invalid'):
-            image_assets.validate(3)
+            image_assets.add_image('image_id_1_invalid', self.image_object)
 
         # Test for adding image_id, which is greater then image counter.
         image_assets.add_image('image_id_10', self.image_object)
@@ -758,7 +758,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         image_ids_in_state = [u'image_id_1']
         image_assets_object = (
             state_domain.ImageAssets.from_dict(self.image_assets_dict))
-        image_assets_object.clean_image_assets(image_ids_in_state)
+        image_assets_object.clean(image_ids_in_state)
         expected_image_assets_dict = {
             'image_mapping': {
                 'image_id_1': {
@@ -770,6 +770,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             image_assets_object.to_dict(), expected_image_assets_dict)
+
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""

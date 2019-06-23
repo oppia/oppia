@@ -254,8 +254,7 @@ class ImageAssets(object):
         """
         image_ids = self.image_mapping.keys()
         for image_id in image_ids:
-            image_re = r'image_id_[0-9]{1,}$'
-            if not re.match(image_re, image_id):
+            if not self.is_image_have_valid_pattern(image_id):
                 raise utils.ValidationError(
                     'Invalid image_id received: %s' % image_id)
             numeric_part_of_image_id = int(image_id.strip('image_id_'))
@@ -307,6 +306,9 @@ class ImageAssets(object):
             image_id: int. The image_id of an image.
             image_object: dict. The image object.
         """
+        if not self.is_image_have_valid_pattern(image_id):
+            raise utils.ValidationError(
+                'Invalid image_id received: %s' % image_id)
         if image_id in self.image_mapping:
             raise utils.ValidationError(
                 'Image Id already exist: %s' % image_id)
@@ -325,6 +327,27 @@ class ImageAssets(object):
 
         del self.image_mapping[image_id]
 
+    def is_image_have_valid_pattern(self, image_id):
+        """Checks is image have valida pattern or not.
+        Valid image pattern is 'image_id_[digits]' eg. 'image_id_1' or
+        'image_id_50'
+        Invalid image pattern were :
+            1) 'image_id_random_text'
+            2) 'image_id_invalid55'
+            3) 'image_id_55invalid'
+            4) 'dd_image_id'
+
+        Args:
+            image_id: str. Id of an image.
+
+        Returns:
+            bool. True if image_id have have valid pattern.
+        """
+        image_re = r'image_id_[0-9]{1,}$'
+        if re.match(image_re, image_id):
+            return True
+        return False
+
     def get_all_image_ids(self):
         """Returns all image ids of images in the image assets.
 
@@ -333,15 +356,15 @@ class ImageAssets(object):
         """
         return self.image_mapping.keys()
 
-    def clean_image_assets(self, image_ids_in_state):
+    def clean(self, image_ids_in_state_html):
         """Deletes all image ids, which are no more present un HTML.
 
         Args:
-            image_ids_in_state: list. List of all image ids pesent in a
-                state.
+            image_ids_in_state_html: list. List of all image ids pesent in a
+                state HTML.
         """
         for image_id in self.image_mapping.keys():
-            if image_id not in image_ids_in_state:
+            if image_id not in image_ids_in_state_html:
                 del self.image_mapping[image_id]
 
 
@@ -1658,13 +1681,6 @@ class State(object):
                     'The %s interaction does not support soliciting '
                     'answer details from learners.' % (self.interaction.id))
 
-        # image_ids_in_state = self.get_image_ids_of_state()
-        # for image_id in self.image_assets.image_mapping.keys():
-        #     if image_id not in image_ids_in_state:
-        #         raise utils.ValidationError(
-        #             'Image Id not exist in state html, received: %s' %
-        #             image_id)
-
         self.image_assets.validate(image_counter)
         self.written_translations.validate(content_id_list)
         self.recorded_voiceovers.validate(content_id_list)
@@ -2085,7 +2101,7 @@ class State(object):
             False)
 
     def get_image_ids_of_state(self):
-        """Returns list of image ids present in state HTML"""
+        """Returns list of image ids present in state HTML."""
         content_html = self.content.html
         interaction_html_list = self.interaction.get_all_html_content_strings()
         if interaction_html_list != []:

@@ -49,7 +49,6 @@ STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_SOLICIT_ANSWER_DETAILS = 'solicit_answer_details'
 STATE_PROPERTY_RECORDED_VOICEOVERS = 'recorded_voiceovers'
 STATE_PROPERTY_WRITTEN_TRANSLATIONS = 'written_translations'
-STATE_PROPERTY_IMAGE_ASSETS = 'image_assets'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
@@ -79,7 +78,7 @@ CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property'
 # This takes additional 'from_version' and 'to_version' parameters for logging.
 CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION = (
     'migrate_states_schema_to_latest_version')
-
+# This takes addtional 'state_name', 'action', 'image_id', 'image_info' parameters.  #pylint: disable=line-too-long
 CMD_IMAGE_ASSETS = 'image_assets'
 # ImageAssets Actions.
 ACTION_ADD_IMAGE = 'add_image'
@@ -137,7 +136,6 @@ class ExplorationChange(change_domain.BaseChange):
         STATE_PROPERTY_SOLICIT_ANSWER_DETAILS,
         STATE_PROPERTY_RECORDED_VOICEOVERS,
         STATE_PROPERTY_WRITTEN_TRANSLATIONS,
-        STATE_PROPERTY_IMAGE_ASSETS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
@@ -2252,18 +2250,17 @@ class Exploration(object):
             interaction_html_list = (
                 state.interaction.get_all_html_content_strings())
 
+            state_html = content_html
             if interaction_html_list != []:
-                state_html = content_html + interaction_html_list[0]
-            else:
-                state_html = content_html
-            image_src_list = html_validation_service.get_image_src_from_html(
-                state_html)
+                state_html = state_html + interaction_html_list[0]
 
             # Gets image src of each image form HTML.
+            image_src_list = html_validation_service.get_image_src_from_html(
+                state_html)
+            # Maps image_id with the image source.
             image_id_to_src_dict = (
                 cls.generate_image_id_and_maps_image_id_with_image_src(
                     image_src_list, image_counter, image_id_to_src_dict))
-
             # Add image info in image assets.
             for image_id in image_id_to_src_dict:
                 filepath = image_id_to_src_dict[image_id]
@@ -2272,8 +2269,7 @@ class Exploration(object):
                     'placeholder': False,
                     'src': filepath,
                 }
-
-            # Add image id in image tag. 
+            # Add image id in image tag.
             add_image_id_and_remove_filepath_from_image_tag = functools.partial(
                 html_validation_service.add_image_id_and_remove_filepath_from_image_tag, # pylint: disable=line-too-long
                 image_id_to_src_dict)
@@ -3375,8 +3371,8 @@ class Exploration(object):
     def clean_image_assets(self):
         """Remove all deleted images from image assests."""
         for state in self.states.values():
-            image_ids_in_state = state.get_image_ids_of_state()
-            state.image_assets.clean_image_assets(image_ids_in_state)
+            image_ids_in_state_html = state.get_image_ids_of_state()
+            state.image_assets.clean(image_ids_in_state_html)
 
 
 class ExplorationSummary(object):

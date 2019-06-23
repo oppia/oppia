@@ -766,6 +766,7 @@ def apply_change_list(exploration_id, change_list):
                             change.new_value))
                     state.update_written_translations(written_translations)
             elif change.cmd == exp_domain.CMD_IMAGE_ASSETS:
+                state = exploration.states[change.state_name]
                 if change.action == exp_domain.ACTION_ADD_IMAGE:
                     # Increment image_counter.
                     image_counter = exploration.image_counter

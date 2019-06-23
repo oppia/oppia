@@ -792,14 +792,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             test_cases)
 
         expected_output = {
-            "Invalid image_id, received random": [(
+            'Invalid image_id, received random': [(
                 '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
                 'circle divided into equal fifths.&amp;quot;" '
                 'caption-with-value="&amp;quot;Hello&amp;quot;" '
                 'id-with-value="&amp;quot;random&amp;quot;" >'
                 '</oppia-noninteractive-image>'
-                )
-            ],
+                )],
             'Expected dict, received [1, 2, 3]': [(
                 '<oppia-noninteractive-tabs tab_contents-with-value='
                 '"[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
@@ -948,9 +947,9 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'tag_name': 'oppia-noninteractive-link'
         }, {
             'html_string': (
-                '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_1&amp;quot;" caption-with-value="&amp;quot;'
-                'abc&amp;quot;">'
-                '</oppia-noninteractive-image>'
+                '<oppia-noninteractive-image id-with-value="&amp;quot;'
+                'image_id_1&amp;quot;" caption-with-value="&amp;quot;'
+                'abc&amp;quot;"></oppia-noninteractive-image>'
             ),
             'tag_name': 'oppia-noninteractive-image'
         }]

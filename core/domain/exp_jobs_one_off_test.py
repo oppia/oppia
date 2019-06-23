@@ -1724,9 +1724,9 @@ class ExplorationContentValidationJobForCKEditorTests(
         content2_dict = {
             'content_id': 'content',
             'html': (
-                '<p><oppia-noninteractive-image id-with-value="&amp;quot;image_id_1&amp;quot;">'
-                '</oppia-noninteractive-image>Hello this '
-                'is test case to check image tag inside p tag</p>'
+                '<p><oppia-noninteractive-image id-with-value="&amp;quot;'
+                'image_id_1&amp;quot;"></oppia-noninteractive-image>'
+                'Hello this is test case to check image tag inside p tag</p>'
             )
         }
         content3_dict = {
@@ -1934,7 +1934,7 @@ class InteractionCustomizationArgsValidationJobTests(
             'circle divided into equal fifths.&amp;quot;" caption-with-value'
             '="&amp;quot;Hello&amp;quot;" id-with-value="&amp;quot;invalid'
             '&amp;quot;"></oppia-noninteractive-image>\']]'
-        ),(
+        ), (
             '[u"Invalid URL: Sanitized URL should start with \'http://\' or \''
             'https://\'; received htt://link.com", '
             '[u\'<p><oppia-noninteractive-link text-with-value="&amp;quot;What '
