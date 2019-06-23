@@ -117,8 +117,8 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
             number 1.
 
     Returns:
-        List (str). State names which don't have classifier model for previous version
-            of exploration.
+        list(str). State names which don't have classifier model for previous
+            version of exploration.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
