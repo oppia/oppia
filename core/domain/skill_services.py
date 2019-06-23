@@ -420,8 +420,6 @@ def apply_change_list(skill_id, change_list, committer_id):
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
                     skill.record_that_all_questions_are_merged(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
@@ -429,8 +427,6 @@ def apply_change_list(skill_id, change_list, committer_id):
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     skill.update_worked_examples(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 skill.add_misconception(change.new_value)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
@@ -449,8 +445,6 @@ def apply_change_list(skill_id, change_list, committer_id):
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
             elif (change.cmd ==
                   skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
                   or change.cmd ==
@@ -460,8 +454,7 @@ def apply_change_list(skill_id, change_list, committer_id):
                 # latest schema version. As a result, simply resaving the
                 # skill is sufficient to apply the schema migration.
                 continue
-            else:
-                raise Exception('Invalid change dict.')
+
         return skill
 
     except Exception as e:
@@ -494,21 +487,21 @@ def _save_skill(committer_id, skill, commit_message, change_list):
             'save skill %s: %s' % (skill.id, change_list))
     skill.validate()
 
+    # Skill model cannot be None as skill is passed as parameter here and that
+    # is only possible if a skill model with that skill id exists.
     skill_model = skill_models.SkillModel.get(
         skill.id, strict=False)
-    if skill_model is None:
-        skill_model = skill_models.SkillModel(id=skill.id)
-    else:
-        if skill.version > skill_model.version:
-            raise Exception(
-                'Unexpected error: trying to update version %s of skill '
-                'from version %s. Please reload the page and try again.'
-                % (skill_model.version, skill.version))
-        elif skill.version < skill_model.version:
-            raise Exception(
-                'Trying to update version %s of skill from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (skill_model.version, skill.version))
+
+    if skill.version > skill_model.version:
+        raise Exception(
+            'Unexpected error: trying to update version %s of skill '
+            'from version %s. Please reload the page and try again.'
+            % (skill_model.version, skill.version))
+    elif skill.version < skill_model.version:
+        raise Exception(
+            'Trying to update version %s of skill from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (skill_model.version, skill.version))
 
     skill_model.description = skill.description
     skill_model.language_code = skill.language_code

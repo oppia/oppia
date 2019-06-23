@@ -756,7 +756,7 @@ oppia.directive('conversationSkin', [
                     GLOBALS.collectionId, $scope.explorationId);
               }
 
-              if (ExplorationPlayerStateService.isInStoryViewerMode() &&
+              if (ExplorationPlayerStateService.isInStoryChapterMode() &&
                 $scope.nextCard.isTerminal()) {
                 var storyId = UrlService.getUrlParams().story_id;
                 var nodeId = UrlService.getUrlParams().node_id;

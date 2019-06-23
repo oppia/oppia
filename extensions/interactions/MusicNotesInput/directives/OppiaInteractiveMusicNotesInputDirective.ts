@@ -74,7 +74,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           return scope;
         };
 
-        scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
+        scope.SOUNDFONT_URL =
+        '/third_party/static/midi-js-a8a842/examples/soundfont/';
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
 
