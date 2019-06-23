@@ -405,7 +405,7 @@ class Exploration(object):
             correctness_feedback_enabled: bool. True if correctness feedback is
                 enabled.
             image_counter: int. The counter that is responsible for creating
-                image ids. Image Id is always <= image_counter.
+                image IDs. Image ID is always less than or equal to image_counter.
             created_on: datetime.datetime. Date and time when the exploration
                 is created.
             last_updated: datetime.datetime. Date and time when the exploration
