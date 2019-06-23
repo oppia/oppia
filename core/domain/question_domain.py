@@ -402,6 +402,11 @@ class QuestionSummary(object):
         """
         self.id = question_id
         self.creator_id = creator_id
+        # The initial clean up of html by converting it to ckeditor format
+        # is required since user may copy and paste some stuff in the rte
+        # which is not a valid ckeditor html string but can be converted
+        # to a valid ckeditor string without errors. This initial clean up
+        # ensures that validation will not fail in such cases.
         self.question_content = html_validation_service.convert_to_ckeditor(
             html_cleaner.clean(question_content))
         self.created_on = question_model_created_on

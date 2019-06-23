@@ -324,16 +324,16 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
     # The name of the model which is to be used in the error messages.
     # This can be overridden by subclasses, if needed.
-    model_name = 'snapshot content'
+    MODEL_NAME = 'snapshot content'
 
     # The name of the related model in lowercase which is used to obtain
     # the name of the key for the fetch of related model and the name
     # of the related model to be used in error messages.
     # For example, if related model is CollectionRights, then
-    # related_model_name = collection rights, key to fetch = collection_rights
+    # RELATED_MODEL_NAME = collection rights, key to fetch = collection_rights
     # Name of model to be used in error message = CollectionRights
     # This should be overridden by subclasses.
-    related_model_name = ''
+    RELATED_MODEL_NAME = ''
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -348,10 +348,10 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
             item: ndb.Model. BaseSnapshotContentModel to validate.
         """
 
-        if cls.related_model_name == '':
+        if cls.RELATED_MODEL_NAME == '':
             raise Exception('Related model name should be specified')
 
-        related_model_name = cls.related_model_name
+        related_model_name = cls.RELATED_MODEL_NAME
         if item.id.startswith('rights'):
             related_model_name = related_model_name + ' rights'
 
@@ -368,13 +368,13 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
                 related_model_class_model_id_model_tuples):
             if int(related_model.version) < int(version):
                 cls.errors[
-                    '%s model version check' % cls.related_model_name].append((
+                    '%s model version check' % cls.RELATED_MODEL_NAME].append((
                         'Entity id %s: %s model corresponding to '
                         'id %s has a version %s which is less than '
                         'the version %s in %s model id' % (
                             item.id, capitalized_related_model_name,
                             related_model.id, related_model.version, version,
-                            cls.model_name)))
+                            cls.MODEL_NAME)))
 
     @classmethod
     def validate(cls, item):
@@ -391,7 +391,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
     """Base class for validating snapshot metadata models."""
 
-    model_name = 'snapshot metadata'
+    MODEL_NAME = 'snapshot metadata'
 
     @classmethod
     def _validate_commit_type(cls, item):
@@ -457,7 +457,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
 class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
     """Base class for validating commit log entry models."""
 
-    model_name = 'commit log entry'
+    MODEL_NAME = 'commit log entry'
 
     @classmethod
     def _validate_post_commit_status(cls, item):
@@ -581,8 +581,8 @@ class CollectionModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'exploration_ids': (
                 exp_models.ExplorationModel,
@@ -609,7 +609,7 @@ class CollectionSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionSnapshotMetadataModel."""
 
-    related_model_name = 'collection'
+    RELATED_MODEL_NAME = 'collection'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -630,7 +630,7 @@ class CollectionSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating CollectionSnapshotContentModel."""
 
-    related_model_name = 'collection'
+    RELATED_MODEL_NAME = 'collection'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -647,8 +647,8 @@ class CollectionRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'collection_ids': (
                 collection_models.CollectionModel, [item.id]),
@@ -695,7 +695,7 @@ class CollectionRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionRightsSnapshotMetadataModel."""
 
-    related_model_name = 'collection rights'
+    RELATED_MODEL_NAME = 'collection rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -716,7 +716,7 @@ class CollectionRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating CollectionRightsSnapshotContentModel."""
 
-    related_model_name = 'collection rights'
+    RELATED_MODEL_NAME = 'collection rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -730,7 +730,7 @@ class CollectionRightsSnapshotContentModelValidator(
 class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating CollectionCommitLogEntryModel."""
 
-    related_model_name = 'collection'
+    RELATED_MODEL_NAME = 'collection'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -887,8 +887,8 @@ class ConfigPropertyModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'snapshot_metadata_ids': (
                 config_models.ConfigPropertySnapshotMetadataModel,
@@ -903,7 +903,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ConfigPropertySnapshotMetadataModel."""
 
-    related_model_name = 'config property'
+    RELATED_MODEL_NAME = 'config property'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -928,7 +928,7 @@ class ConfigPropertySnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating ConfigPropertySnapshotContentModel."""
 
-    related_model_name = 'config property'
+    RELATED_MODEL_NAME = 'config property'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1135,8 +1135,8 @@ class ExplorationModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'exploration_commit_log_entry_ids': (
                 exp_models.ExplorationCommitLogEntryModel,
@@ -1159,7 +1159,7 @@ class ExplorationSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationSnapshotMetadataModel."""
 
-    related_model_name = 'exploration'
+    RELATED_MODEL_NAME = 'exploration'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1179,7 +1179,7 @@ class ExplorationSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating ExplorationSnapshotContentModel."""
 
-    related_model_name = 'exploration'
+    RELATED_MODEL_NAME = 'exploration'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1198,8 +1198,8 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         if item.cloned_from:
             cloned_from_exploration_id.append(item.cloned_from)
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'exploration_ids': (
                 exp_models.ExplorationModel, [item.id]),
@@ -1249,7 +1249,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationRightsSnapshotMetadataModel."""
 
-    related_model_name = 'exploration rights'
+    RELATED_MODEL_NAME = 'exploration rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1270,7 +1270,7 @@ class ExplorationRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating ExplorationRightsSnapshotContentModel."""
 
-    related_model_name = 'exploration rights'
+    RELATED_MODEL_NAME = 'exploration rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1284,7 +1284,7 @@ class ExplorationRightsSnapshotContentModelValidator(
 class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating ExplorationCommitLogEntryModel."""
 
-    related_model_name = 'exploration'
+    RELATED_MODEL_NAME = 'exploration'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1454,8 +1454,8 @@ class FileMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
 
         # Item id is of the format:
         # /exploration/exp_id/assets/(image|audio)/filepath.
@@ -1480,7 +1480,7 @@ class FileMetadataSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating FileMetadataSnapshotMetadataModel."""
 
-    related_model_name = 'file metadata'
+    RELATED_MODEL_NAME = 'file metadata'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1505,7 +1505,7 @@ class FileMetadataSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating FileMetadataSnapshotContentModel."""
 
-    related_model_name = 'file metadata'
+    RELATED_MODEL_NAME = 'file metadata'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1530,8 +1530,8 @@ class FileModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
 
         # Item id is of the format:
         # /exploration/exp_id/assets/(image|audio)/filepath.
@@ -1555,7 +1555,7 @@ class FileModelValidator(BaseModelValidator):
 class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating FileSnapshotMetadataModel."""
 
-    related_model_name = 'file'
+    RELATED_MODEL_NAME = 'file'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1579,7 +1579,7 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating FileSnapshotContentModel."""
 
-    related_model_name = 'file'
+    RELATED_MODEL_NAME = 'file'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1676,8 +1676,8 @@ class StoryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'story_commit_log_entry_ids': (
                 story_models.StoryCommitLogEntryModel,
@@ -1703,7 +1703,7 @@ class StoryModelValidator(BaseModelValidator):
 class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating StorySnapshotMetadataModel."""
 
-    related_model_name = 'story'
+    RELATED_MODEL_NAME = 'story'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1722,7 +1722,7 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating StorySnapshotContentModel."""
 
-    related_model_name = 'story'
+    RELATED_MODEL_NAME = 'story'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1738,8 +1738,8 @@ class StoryRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'story_ids': (
                 story_models.StoryModel, [item.id]),
@@ -1758,7 +1758,7 @@ class StoryRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating StoryRightsSnapshotMetadataModel."""
 
-    related_model_name = 'story rights'
+    RELATED_MODEL_NAME = 'story rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1779,7 +1779,7 @@ class StoryRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating StoryRightsSnapshotContentModel."""
 
-    related_model_name = 'story rights'
+    RELATED_MODEL_NAME = 'story rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1793,7 +1793,7 @@ class StoryRightsSnapshotContentModelValidator(
 class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating StoryCommitLogEntryModel."""
 
-    related_model_name = 'story'
+    RELATED_MODEL_NAME = 'story'
 
     @classmethod
     def _get_model_id_regex(cls, item):
