@@ -118,12 +118,7 @@ oppia.factory('QuestionBackendApiService', [
      * of questions requested.
      */
     return {
-<<<<<<< HEAD:core/templates/dev/head/domain/question/QuestionBackendApiService.ts
-      fetchQuestions: function(
-          skillIds, questionCount, resetHistory) {
-=======
       fetchQuestions: function(skillIds, questionCount) {
->>>>>>> c37cb8a25a084cdc4b6239d4f49f6a63cf87b0e4:core/templates/dev/head/domain/question/QuestionPlayerBackendApiService.ts
         return $q(function(resolve, reject) {
           _fetchQuestions(
             skillIds, questionCount, resolve, reject);
