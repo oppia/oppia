@@ -211,22 +211,6 @@ class Misconception(object):
         return misconception
 
     @classmethod
-    def create_default_misconception(cls, misconception_id):
-        """Creates a Misconception object with default values.
-
-        Args:
-            misconception_id: int. ID of the new misconception.
-
-        Returns:
-            Misconception. A misconception object with given id and default
-                values for all other fields.
-        """
-        return cls(
-            misconception_id, feconf.DEFAULT_MISCONCEPTION_NAME,
-            feconf.DEFAULT_MISCONCEPTION_NOTES,
-            feconf.DEFAULT_MISCONCEPTION_FEEDBACK)
-
-    @classmethod
     def require_valid_misconception_id(cls, misconception_id):
         """Validates the misconception id for a Misconception object.
 
@@ -313,23 +297,12 @@ class SkillContents(object):
             available_content_ids.add(example.content_id)
             example.validate()
 
-        audio_content_ids = set(self.content_ids_to_audio_translations.keys())
-        if audio_content_ids != available_content_ids:
-            raise utils.ValidationError(
-                'Expected content_ids_to_audio_translations to contain only '
-                'content_ids in worked examples and explanation. '
-                'content_ids_to_audio_translations: %s. '
-                'content IDs found: %s' % (
-                    audio_content_ids, available_content_ids))
-
-        self.written_translations.validate(available_content_ids)
-
         # TODO(tjiang11): Extract content ids to audio translations out into
         # its own object to reuse throughout audio-capable structures.
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'
-                'received %s' % self.param_changes)
+                'received %s' % self.content_ids_to_audio_translations)
         for (content_id, audio_translations) in (
                 self.content_ids_to_audio_translations.iteritems()):
 
@@ -356,6 +329,17 @@ class SkillContents(object):
                         'Unrecognized language code: %s' % language_code)
 
                 translation.validate()
+
+        audio_content_ids = set(self.content_ids_to_audio_translations.keys())
+        if audio_content_ids != available_content_ids:
+            raise utils.ValidationError(
+                'Expected content_ids_to_audio_translations to contain only '
+                'content_ids in worked examples and explanation. '
+                'content_ids_to_audio_translations: %s. '
+                'content IDs found: %s' % (
+                    audio_content_ids, available_content_ids))
+
+        self.written_translations.validate(available_content_ids)
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
@@ -760,36 +744,14 @@ class Skill(object):
         written_translations = self.skill_contents.written_translations
         content_ids_to_audio_translations = (
             self.skill_contents.content_ids_to_audio_translations)
-        content_ids_for_text_translations = (
-            written_translations.get_content_ids_for_text_translation())
 
         for content_id in content_ids_to_delete:
-            if not content_id in content_ids_to_audio_translations:
-                raise Exception(
-                    'The content_id %s does not exist in '
-                    'content_ids_to_audio_translations.' % content_id)
-            elif not content_id in content_ids_for_text_translations:
-                raise Exception(
-                    'The content_id %s does not exist in written_translations.'
-                    % content_id)
-            else:
-                content_ids_to_audio_translations.pop(content_id)
-                written_translations.delete_content_id_for_translation(
-                    content_id)
+            content_ids_to_audio_translations.pop(content_id)
+            written_translations.delete_content_id_for_translation(content_id)
 
         for content_id in content_ids_to_add:
-            if content_id in content_ids_to_audio_translations:
-                raise Exception(
-                    'The content_id %s already exists in '
-                    'content_ids_to_audio_translations.' % content_id)
-            elif content_id in content_ids_for_text_translations:
-                raise Exception(
-                    'The content_id %s does not exist in written_translations.'
-                    % content_id)
-            else:
-                content_ids_to_audio_translations[content_id] = {}
-                written_translations.add_content_id_for_translation(
-                    content_id)
+            content_ids_to_audio_translations[content_id] = {}
+            written_translations.add_content_id_for_translation(content_id)
 
     def _find_misconception_index(self, misconception_id):
         """Returns the index of the misconception with the given misconception
