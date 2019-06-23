@@ -548,8 +548,7 @@ class TopicChangeTests(test_utils.GenericTestBase):
     def test_to_dict(self):
         topic_change_dict = {
             'cmd': 'create_new',
-            'name': 'name',
-            'change_affects_subtopic_page': None
+            'name': 'name'
         }
         topic_change_object = topic_domain.TopicChange(topic_change_dict)
         self.assertEqual(topic_change_object.to_dict(), topic_change_dict)

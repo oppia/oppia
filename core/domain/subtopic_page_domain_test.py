@@ -381,8 +381,7 @@ class SubtopicPageChangeTests(test_utils.GenericTestBase):
         subtopic_page_change_dict = {
             'cmd': 'create_new',
             'topic_id': 'topic_id',
-            'subtopic_id': 'subtopic_id',
-            'change_affects_subtopic_page': None
+            'subtopic_id': 'subtopic_id'
         }
         subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
             subtopic_page_change_dict)

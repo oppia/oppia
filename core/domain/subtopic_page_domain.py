@@ -54,12 +54,12 @@ class SubtopicPageChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['topic_id', 'subtopic_id'],
-        'optional_attribute_names': ['change_affects_subtopic_page']
+        'optional_attribute_names': []
     }, {
         'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
         'required_attribute_names': [
             'property_name', 'new_value', 'old_value', 'subtopic_id'],
-        'optional_attribute_names': ['change_affects_subtopic_page'],
+        'optional_attribute_names': [],
         'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES}
     }]
 
