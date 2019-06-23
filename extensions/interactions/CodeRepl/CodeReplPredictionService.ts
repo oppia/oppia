@@ -21,7 +21,10 @@
  * function on Oppia-ml.
  */
 
-require('interactions/interactions-extension.constants.ts');
+require('classifiers/CountVectorizerService.ts');
+require('classifiers/PythonProgramTokenizer.ts');
+require('classifiers/SVMPredictionService.ts');
+require('classifiers/WinnowingPreprocessingService.ts');
 
 oppia.factory('CodeReplPredictionService', [
   'CountVectorizerService', 'PythonProgramTokenType',

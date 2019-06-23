@@ -451,7 +451,8 @@ class SuggestionAddQuestion(BaseSuggestion):
             None, state_domain.State.from_dict(
                 self.change.question_dict['question_state_data']),
             self.change.question_dict['question_state_data_schema_version'],
-            self.change.question_dict['language_code'], None)
+            self.change.question_dict['language_code'], None,
+            self.change.question_dict['linked_skill_ids'])
         question.partial_validate()
         question_state_data_schema_version = (
             self.change.question_dict['question_state_data_schema_version'])
@@ -461,7 +462,7 @@ class SuggestionAddQuestion(BaseSuggestion):
                 feconf.CURRENT_STATE_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Expected question state schema version to be between 1 and '
-                '%s' % feconf.CURRENTSTATES_SCHEMA_VERSION)
+                '%s' % feconf.CURRENT_STATE_SCHEMA_VERSION)
 
     def pre_accept_validate(self):
         """Performs referential validation. This function needs to be called
@@ -500,6 +501,7 @@ class SuggestionAddQuestion(BaseSuggestion):
         question_dict['version'] = 1
         question_dict['id'] = (
             question_services.get_new_question_id())
+        question_dict['linked_skill_ids'] = [self.change.skill_id]
         question = question_domain.Question.from_dict(question_dict)
         question.validate()
         question_services.add_question(self.author_id, question)
@@ -509,7 +511,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
         question_services.create_new_question_skill_link(
-            question_dict['id'], self.change.skill_id,
+            self.author_id, question_dict['id'], self.change.skill_id,
             constants.DEFAULT_SKILL_DIFFICULTY)
 
     def populate_old_value_of_change(self):
@@ -535,7 +537,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             raise utils.ValidationError(
                 'The new change skill_id must be equal to %s' %
                 self.change.skill_id)
-        if self.change.question_domain == change.question_dict:
+        if self.change.question_dict == change.question_dict:
             raise utils.ValidationError(
                 'The new change question_dict must not be equal to the old '
                 'question_dict')

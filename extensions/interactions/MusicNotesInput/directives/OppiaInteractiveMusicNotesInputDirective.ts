@@ -20,7 +20,16 @@
  * followed by the name of the arg.
  */
 
-require('interactions/interactions-extension.constants.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-player-page/services/current-interaction.service.ts');
+require(
+  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+require(
+  'interactions/MusicNotesInput/directives/' +
+  'MusicPhrasePlayerService.ts');
+require('services/contextual/WindowDimensionsService.ts');
+require('services/HtmlEscaperService.ts');
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'CurrentInteractionService', 'HtmlEscaperService',
@@ -48,7 +57,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           return scope;
         };
 
-        scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
+        scope.SOUNDFONT_URL =
+        '/third_party/static/midi-js-a8a842/examples/soundfont/';
         scope.sequenceToGuess = HtmlEscaperService.escapedJsonToObj(
           attrs.sequenceToGuessWithValue);
 

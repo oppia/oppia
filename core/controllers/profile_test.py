@@ -660,8 +660,7 @@ class ProfilePageTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         response = self.get_html_response('/profile/%s' % self.OWNER_USERNAME)
         self.assertIn(
-            '<p class="oppia-profile-first-contributed" '
-            'ng-if="firstContributionMsec">', response.body)
+            '<profile-page></profile-page>', response.body)
 
 
 class ProfilePictureHandlerTests(test_utils.GenericTestBase):

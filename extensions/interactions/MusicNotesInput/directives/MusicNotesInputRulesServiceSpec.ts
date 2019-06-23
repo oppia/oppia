@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for Music Notes rules.
  */
 
+require(
+  'interactions/MusicNotesInput/directives/MusicNotesInputRulesService.ts');
+
 describe('Music Notes Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 
