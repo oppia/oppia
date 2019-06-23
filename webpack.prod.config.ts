@@ -28,7 +28,8 @@ module.exports = {
       path.resolve(__dirname, 'extensions')
     ],
     alias: {
-      "@angular/upgrade/static": "@angular/upgrade/bundles/upgrade-static.umd.js"
+      '@angular/upgrade/static': (
+        '@angular/upgrade/bundles/upgrade-static.umd.js')
     }
   },
   entry: commonWebpackConfig.entries,

@@ -16,6 +16,8 @@
  * @fileoverview Controllers for the form builder test page.
  */
 
+require('App.ts');
+
 var oppia = require('AppInit.ts').moduleName;
 
 oppia.controller('FormBuilderTestPage', [

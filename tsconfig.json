@@ -17,7 +17,6 @@
     "assets/rich_text_components_definitions.js",
     "core/tests/karma-globals.ts",
     "core/tests/karma.conf.ts",
-    "core/templates/dev/head/AppInit.ts",
     "core/templates/dev/head/mathjaxConfig.ts",
     "core/templates/dev/head/expressions/ExpressionParserService.js" 
   ],
