@@ -670,40 +670,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
         self.logout()
 
 
-class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
-
-    def test_assign_topic_manager_role(self):
-        """Test the assign topic manager role for a topic functionality."""
-        self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        # Test for when assignee does not have sufficient rights to become a
-        # manager for a topic.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.new_user_id),
-            {}, csrf_token=csrf_token, expected_status_int=401)
-
-        # Test for valid case.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.topic_manager_id),
-            {}, csrf_token=csrf_token)
-        self.logout()
-
-        # Test for when committer doesn't have sufficient rights to assign
-        # someone as manager.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.new_user_id),
-            {}, csrf_token=csrf_token, expected_status_int=401)
-
-
 class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
 
     def test_send_mail(self):

@@ -325,28 +325,6 @@ class TopicPublishSendMailHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicManagerRightsHandler(base.BaseHandler):
-    """A handler for assigning topic manager rights."""
-
-    @acl_decorators.can_manage_rights_for_topic
-    def put(self, topic_id, assignee_id):
-        """Assign topic manager role to a user for a particular topic, if the
-        user has general topic manager rights.
-        """
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        assignee_actions_info = user_services.UserActionsInfo(assignee_id)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        try:
-            topic_services.assign_role(
-                user_actions_info, assignee_actions_info,
-                topic_domain.ROLE_MANAGER, topic_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
-
-        self.render_json(self.values)
-
-
 class TopicPublishHandler(base.BaseHandler):
     """A handler for publishing and unpublishing topics."""
 
