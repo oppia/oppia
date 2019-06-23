@@ -20,7 +20,7 @@ require(
   'components/forms/custom-forms-directives/' +
   'apply-validation.directive.ts');
 
-describe('Testing apply-validation directive', function() {
+fdescribe('Testing apply-validation directive', function() {
   var $compile, element, scope, testInput;
 
   beforeEach(angular.mock.module('oppia'));
