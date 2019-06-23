@@ -219,20 +219,22 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
             question_count, skill_ids, start_cursor))
     question_ids = []
-    skill_descriptions = []
+    grouped_skill_ids = []
+    grouped_skill_descriptions = []
     for question_skill_link in question_skill_link_models:
         if question_skill_link.question_id not in question_ids:
             question_ids.append(question_skill_link.question_id)
-            skill_descriptions.append(
-                [skill_services.get_skill_descriptions_by_skill_id(
-                    question_skill_link.skill_id)])
+            grouped_skill_ids.append([question_skill_link.skill_id])
         else:
-            skill_descriptions[-1].append(
-                skill_services.get_skill_descriptions_by_skill_id(
-                    question_skill_link.skill_id)
-            )
+            grouped_skill_ids[-1].append(question_skill_link.skill_id)
+
+    for skill_ids in grouped_skill_ids:
+        skills = skill_models.SkillModel.get_multi(skill_ids)
+        grouped_skill_descriptions.append(
+            [skill.description if skill else None for skill in skills])
+
     questions = get_questions_by_ids(question_ids)
-    return questions, skill_descriptions, next_cursor
+    return questions, grouped_skill_descriptions, next_cursor
 
 
 def get_questions_by_skill_ids(total_question_count, skill_ids):
@@ -492,18 +494,19 @@ def get_question_summaries_and_skill_descriptions(
     # Deduplicate question_ids and group skill_descriptions that are linked to
     # the same question.
     question_ids = []
+    grouped_skill_ids = []
     grouped_skill_descriptions = []
     for question_skill_link in question_skill_link_models:
         if question_skill_link.question_id not in question_ids:
             question_ids.append(question_skill_link.question_id)
-            grouped_skill_descriptions.append(
-                [skill_services.get_skill_descriptions_by_skill_id(
-                    question_skill_link.skill_id)])
+            grouped_skill_ids.append([question_skill_link.skill_id])
         else:
-            grouped_skill_descriptions[-1].append(
-                skill_services.get_skill_descriptions_by_skill_id(
-                    question_skill_link.skill_id)
-            )
+            grouped_skill_ids[-1].append(question_skill_link.skill_id)
+
+    for skill_ids in grouped_skill_ids:
+        skills = skill_models.SkillModel.get_multi(skill_ids)
+        grouped_skill_descriptions.append(
+            [skill.description if skill else None for skill in skills])
 
     question_summaries = get_question_summaries_by_ids(question_ids)
     return question_summaries, grouped_skill_descriptions, next_cursor
