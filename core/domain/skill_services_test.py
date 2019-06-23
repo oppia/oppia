@@ -181,7 +181,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-                'id': self.skill.next_misconception_id,
+                'misconception_id': self.skill.next_misconception_id,
                 'old_value': 'test name',
                 'new_value': 'Name'
             })
@@ -496,17 +496,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
                 self.user_id_a, self.SKILL_ID, changelist,
                 'Change description.')
 
-    def test_cannot_update_skill_property_with_invalid_change_dict(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
-                'property_name': 'invalid property_name'
-            })
-
     def test_update_skill_explanation(self):
         skill = skill_services.get_skill_by_id(self.SKILL_ID)
-        old_explanation = {'content_id': '1', 'html': 'Explanation'}
-        new_explanation = {'content_id': '1', 'html': 'New explanation'}
+        old_explanation = {'content_id': '1', 'html': '<p>Explanation</p>'}
+        new_explanation = {'content_id': '1', 'html': '<p>New explanation</p>'}
 
         self.assertEqual(
             skill.skill_contents.explanation.to_dict(), old_explanation)
@@ -529,8 +522,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_skill_worked_examples(self):
         skill = skill_services.get_skill_by_id(self.SKILL_ID)
-        old_worked_examples = {'content_id': '2', 'html': 'Example 1'}
-        new_worked_examples = {'content_id': '2', 'html': 'Example 2'}
+        old_worked_examples = {'content_id': '2', 'html': '<p>Example 1</p>'}
+        new_worked_examples = {'content_id': '2', 'html': '<p>Example 2</p>'}
 
         self.assertEqual(len(skill.skill_contents.worked_examples), 1)
         self.assertEqual(
@@ -555,14 +548,6 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill.skill_contents.worked_examples[0].to_dict(),
             new_worked_examples)
 
-    def test_cannot_update_skill_contents_property_with_invalid_change_dict(
-            self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
-                'property_name': 'invalid property_name'
-            })
-
     def test_delete_skill_misconception(self):
         skill = skill_services.get_skill_by_id(self.SKILL_ID)
 
@@ -572,7 +557,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
-                'id': self.MISCONCEPTION_ID_1,
+                'misconception_id': self.MISCONCEPTION_ID_1,
             })
         ]
 
@@ -587,16 +572,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(skill.misconceptions), 1)
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
-        self.assertEqual(skill.misconceptions[0].notes, 'description')
+        self.assertEqual(skill.misconceptions[0].notes, '<p>description</p>')
 
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES),
-                'id': self.MISCONCEPTION_ID_1,
-                'old_value': 'description',
-                'new_value': 'new description'
+                'misconception_id': self.MISCONCEPTION_ID_1,
+                'old_value': '<p>description</p>',
+                'new_value': '<p>new description</p>'
             })
         ]
 
@@ -607,23 +592,25 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(skill.misconceptions), 1)
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
-        self.assertEqual(skill.misconceptions[0].notes, 'new description')
+        self.assertEqual(
+            skill.misconceptions[0].notes, '<p>new description</p>')
 
     def test_update_skill_misconception_feedback(self):
         skill = skill_services.get_skill_by_id(self.SKILL_ID)
 
         self.assertEqual(len(skill.misconceptions), 1)
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
-        self.assertEqual(skill.misconceptions[0].feedback, 'default_feedback')
+        self.assertEqual(
+            skill.misconceptions[0].feedback, '<p>default_feedback</p>')
 
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK),
-                'id': self.MISCONCEPTION_ID_1,
-                'old_value': 'default_feedback',
-                'new_value': 'new feedback'
+                'misconception_id': self.MISCONCEPTION_ID_1,
+                'old_value': '<p>default_feedback</p>',
+                'new_value': '<p>new feedback</p>'
             })
         ]
 
@@ -634,7 +621,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(len(skill.misconceptions), 1)
         self.assertEqual(skill.misconceptions[0].id, self.MISCONCEPTION_ID_1)
-        self.assertEqual(skill.misconceptions[0].feedback, 'new feedback')
+        self.assertEqual(
+            skill.misconceptions[0].feedback, '<p>new feedback</p>')
 
     def test_cannot_update_skill_with_invalid_change_list(self):
         observed_log_messages = []
@@ -656,16 +644,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             observed_log_messages[0], 'AttributeError \'str\' object has no '
             'attribute \'cmd\' %s invalid_change_list' % self.SKILL_ID)
 
-    def test_cannot_update_skill_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            skill_domain.SkillChange({'cmd': 'invalid_cmd'})
-
     def test_cannot_update_misconception_name_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'property_name': (
                 skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-            'id': 'invalid_id',
+            'misconception_id': 'invalid_id',
             'old_value': 'test name',
             'new_value': 'Name'
         })]
@@ -679,7 +663,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_cannot_delete_misconception_with_invalid_id(self):
         changelist = [skill_domain.SkillChange({
             'cmd': skill_domain.CMD_DELETE_SKILL_MISCONCEPTION,
-            'id': 'invalid_id'
+            'misconception_id': 'invalid_id'
         })]
 
         with self.assertRaisesRegexp(
@@ -692,7 +676,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'property_name': (
                 skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES),
-            'id': 'invalid_id',
+            'misconception_id': 'invalid_id',
             'old_value': 'description',
             'new_value': 'new description'
         })]
@@ -708,7 +692,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
             'property_name': (
                 skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK),
-            'id': 'invalid_id',
+            'misconception_id': 'invalid_id',
             'old_value': 'default_feedback',
             'new_value': 'new feedback'
         })]

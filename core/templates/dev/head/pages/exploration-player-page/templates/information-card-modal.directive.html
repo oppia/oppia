@@ -13,7 +13,7 @@
 
     <ul ng-if="!explorationIsPrivate" layout="row" class="card-metrics" layout-align="space-between center">
       <li class="protractor-test-info-card-rating">
-        <span class="fa fa-star fa-lg" uib-tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+        <span class="fas fa-star fa-lg" uib-tooltip="<['I18N_PLAYER_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_RATINGS_TOOLTIP' | translate]></span>
         </span>
         <span ng-if="!averageRating" translate="I18N_PLAYER_UNRATED">Unrated</span>
@@ -21,14 +21,14 @@
       </li>
 
       <li>
-        <span class="fa fa-eye fa-lg" uib-tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+        <span class="far fa-eye" uib-tooltip="<['I18N_PLAYER_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_VIEWS_TOOLTIP' | translate]></span>
         </span>
         <[numViews | summarizeNonnegativeNumber]>
       </li>
 
       <li>
-        <span class="fa fa-clock-o fa-lg" uib-tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="top">
+        <span class="far fa-clock" uib-tooltip="<['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]>" tooltip-placement="top">
           <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_LAST_UPDATED_TOOLTIP' | translate]></span>
         </span>
         <[lastUpdatedString]>
@@ -50,7 +50,7 @@
         <li ng-if="contributorNames.length === 0"
             tooltip="<['I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP' | translate]>"
             tooltip-placement="top">
-          <span class="fa fa-globe fa-lg oppia-info-card-community-editable-icon"></span>
+          <span class="far fa-globe fa-lg oppia-info-card-community-editable-icon"></span>
         </li>
       </ul>
     </ul>
@@ -59,7 +59,7 @@
       <div flex="40">
         <md-content layout="row">
           <div class="oppia-info-card-tag-icon">
-            <span class="fa fa-tags fa-lg" tooltip-append-to-body="true"
+            <span class="fas fa-tags" tooltip-append-to-body="true"
                   uib-tooltip="<['I18N_PLAYER_TAGS_TOOLTIP' | translate]>"
                   tooltip-placement="top">
               <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_TAGS_TOOLTIP' | translate]></span>

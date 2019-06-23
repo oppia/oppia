@@ -858,28 +858,59 @@ class TopicSummary(object):
 
         if not isinstance(self.canonical_story_count, int):
             raise utils.ValidationError(
-                'Expected canonical story count to be a integer, '
+                'Expected canonical story count to be an integer, '
+                'received \'%s\'' % self.canonical_story_count)
+
+        if self.canonical_story_count < 0:
+            raise utils.ValidationError(
+                'Expected canonical_story_count to be non-negative, '
                 'received \'%s\'' % self.canonical_story_count)
 
         if not isinstance(self.additional_story_count, int):
             raise utils.ValidationError(
-                'Expected additional story count to be a integer, '
+                'Expected additional story count to be an integer, '
+                'received \'%s\'' % self.additional_story_count)
+
+        if self.additional_story_count < 0:
+            raise utils.ValidationError(
+                'Expected additional_story_count to be non-negative, '
                 'received \'%s\'' % self.additional_story_count)
 
         if not isinstance(self.uncategorized_skill_count, int):
             raise utils.ValidationError(
-                'Expected uncategorized skill count to be a integer, '
+                'Expected uncategorized skill count to be an integer, '
+                'received \'%s\'' % self.uncategorized_skill_count)
+
+        if self.uncategorized_skill_count < 0:
+            raise utils.ValidationError(
+                'Expected uncategorized_skill_count to be non-negative, '
                 'received \'%s\'' % self.uncategorized_skill_count)
 
         if not isinstance(self.total_skill_count, int):
             raise utils.ValidationError(
-                'Expected total skill count to be a integer, received \'%s\''
+                'Expected total skill count to be an integer, received \'%s\''
                 % self.total_skill_count)
+
+        if self.total_skill_count < 0:
+            raise utils.ValidationError(
+                'Expected total_skill_count to be non-negative, '
+                'received \'%s\'' % self.total_skill_count)
+
+        if self.total_skill_count < self.uncategorized_skill_count:
+            raise utils.ValidationError(
+                'Expected total_skill_count to be greater than or equal to '
+                'uncategorized_skill_count %s, received \'%s\'' % (
+                    self.uncategorized_skill_count, self.total_skill_count))
 
         if not isinstance(self.subtopic_count, int):
             raise utils.ValidationError(
-                'Expected subtopic count to be a integer, received \'%s\''
+                'Expected subtopic count to be an integer, received \'%s\''
                 % self.subtopic_count)
+
+        if self.subtopic_count < 0:
+            raise utils.ValidationError(
+                'Expected subtopic_count to be non-negative, '
+                'received \'%s\'' % self.subtopic_count)
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.

@@ -719,34 +719,84 @@ class TopicSummaryTests(test_utils.GenericTestBase):
         self.topic_summary.canonical_story_count = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected canonical story count to be a integer, received \'10\''):
+            'Expected canonical story count to be an integer, received \'10\''):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_canonical_story_count(self):
+        self.topic_summary.canonical_story_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected canonical_story_count to be non-negative, '
+                'received \'-1\'')):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_additional_story_count(self):
         self.topic_summary.additional_story_count = '10'
         with self.assertRaisesRegexp(
-            utils.ValidationError,
-            'Expected additional story count to be a integer, received \'10\''):
+            utils.ValidationError, (
+                'Expected additional story count to be an '
+                'integer, received \'10\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_additional_story_count(self):
+        self.topic_summary.additional_story_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected additional_story_count to be non-negative, '
+                'received \'-1\'')):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_uncategorized_skill_count(self):
         self.topic_summary.uncategorized_skill_count = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError, (
-                'Expected uncategorized skill count to be a integer, '
+                'Expected uncategorized skill count to be an integer, '
                 'received \'10\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_uncategorized_skill_count(self):
+        self.topic_summary.uncategorized_skill_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected uncategorized_skill_count to be non-negative, '
+                'received \'-1\'')):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_total_skill_count(self):
         self.topic_summary.total_skill_count = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected total skill count to be a integer, received \'10\''):
+            'Expected total skill count to be an integer, received \'10\''):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_total_skill_count(self):
+        self.topic_summary.total_skill_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected total_skill_count to be non-negative, '
+                'received \'-1\'')):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_invalid_total_skill_count_value(self):
+        self.topic_summary.total_skill_count = 5
+        self.topic_summary.uncategorized_skill_count = 10
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected total_skill_count to be greater than or equal to '
+                'uncategorized_skill_count 10, received \'5\'')):
             self.topic_summary.validate()
 
     def test_validation_fails_with_invalid_subtopic_count(self):
         self.topic_summary.subtopic_count = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected subtopic count to be a integer, received \'10\''):
+            'Expected subtopic count to be an integer, received \'10\''):
+            self.topic_summary.validate()
+
+    def test_validation_fails_with_negative_subtopic_count(self):
+        self.topic_summary.subtopic_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected subtopic_count to be non-negative, '
+                'received \'-1\'')):
             self.topic_summary.validate()
