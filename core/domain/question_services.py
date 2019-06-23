@@ -228,8 +228,8 @@ def get_questions_and_skill_descriptions_by_skill_ids(
         else:
             grouped_skill_ids[-1].append(question_skill_link.skill_id)
 
-    for skill_ids in grouped_skill_ids:
-        skills = skill_models.SkillModel.get_multi(skill_ids)
+    for skill_ids_list in grouped_skill_ids:
+        skills = skill_models.SkillModel.get_multi(skill_ids_list)
         grouped_skill_descriptions.append(
             [skill.description if skill else None for skill in skills])
 
@@ -503,8 +503,8 @@ def get_question_summaries_and_skill_descriptions(
         else:
             grouped_skill_ids[-1].append(question_skill_link.skill_id)
 
-    for skill_ids in grouped_skill_ids:
-        skills = skill_models.SkillModel.get_multi(skill_ids)
+    for skill_ids_list in grouped_skill_ids:
+        skills = skill_models.SkillModel.get_multi(skill_ids_list)
         grouped_skill_descriptions.append(
             [skill.description if skill else None for skill in skills])
 

@@ -346,6 +346,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id3', 'skill_id2', 0.8)
             )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
             get_question_skill_links_equidistributed_by_skill(

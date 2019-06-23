@@ -41,7 +41,7 @@ import feconf
     [models.NAMES.classifier, models.NAMES.statistics])
 
 
-'''class ReaderPermissionsTest(test_utils.GenericTestBase):
+class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
 
     EXP_ID = 'eid'
@@ -192,7 +192,7 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             expected_state_classifier_mapping,
-            retrieved_state_classifier_mapping)'''
+            retrieved_state_classifier_mapping)
 
 
 class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
@@ -292,7 +292,7 @@ class ExplorationPretestsUnitTest(test_utils.GenericTestBase):
             expected_status_int=400)
 
 
-'''class QuestionsUnitTest(test_utils.GenericTestBase):
+class QuestionsUnitTest(test_utils.GenericTestBase):
     """Test the handler for fetching questions."""
 
     def setUp(self):
@@ -1882,4 +1882,4 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             submitted_answer.get_submitted_answer_dict_list()[0]['answer'],
             'This is an answer.'
         )
-        self.logout()'''
+        self.logout()

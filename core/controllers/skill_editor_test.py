@@ -14,8 +14,6 @@
 
 """Tests for the skill editor page."""
 
-from constants import constants
-from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import topic_services
