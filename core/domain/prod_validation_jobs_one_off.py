@@ -1641,7 +1641,7 @@ class QuestionSkillLinkModelValidator(BaseModelValidator):
             'question_ids': (
                 question_models.QuestionModel, [item.question_id]),
             'skill_ids': (
-                skill_models.SkillModel, [item.question_id])
+                skill_models.SkillModel, [item.skill_id])
         }
 
 

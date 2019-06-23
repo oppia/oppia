@@ -102,8 +102,12 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionRightsModelAuditOneOffJob,
-    prod_validation_jobs_one_off.QuestionRightsSnapshotMetadataModelAuditOneOffJob, # pylint: disable=line-too-long
-    prod_validation_jobs_one_off.QuestionRightsSnapshotContentModelAuditOneOffJob, # pylint: disable=line-too-long
+    (
+        prod_validation_jobs_one_off
+        .QuestionRightsSnapshotMetadataModelAuditOneOffJob),
+    (
+        prod_validation_jobs_one_off
+        .QuestionRightsSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,

@@ -4933,7 +4933,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
         language_codes = ['ar', 'en', 'en']
         questions = [question_domain.Question.create_default_question(
             '%s' % i,
-            skill_ids=['%s' % i]
+            skill_ids=['%s' % (2 - i)]
         ) for i in xrange(3)]
 
         for index, question in enumerate(questions):
@@ -4945,7 +4945,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
 
         self.model_instance_0 = (
             question_models.QuestionSkillLinkModel(
-                id='0:0', question_id='0', skill_id='0', skill_difficulty=0.5))
+                id='0:2', question_id='0', skill_id='2', skill_difficulty=0.5))
         self.model_instance_0.put()
         self.model_instance_1 = (
             question_models.QuestionSkillLinkModel(
@@ -4953,7 +4953,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance_1.put()
         self.model_instance_2 = (
             question_models.QuestionSkillLinkModel(
-                id='2:2', question_id='2', skill_id='2', skill_difficulty=0.5))
+                id='2:0', question_id='2', skill_id='0', skill_difficulty=0.5))
         self.model_instance_2.put()
 
         self.job_class = (
@@ -4998,14 +4998,14 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
             run_job_and_check_output(self, expected_output, sort=True)
 
     def test_missing_skill_model_failure(self):
-        skill_models.SkillModel.get_by_id('0').delete(
+        skill_models.SkillModel.get_by_id('2').delete(
             feconf.SYSTEM_COMMITTER_ID, '', [])
         expected_output = [
             (
                 u'[u\'failed validation check for skill_ids field '
                 'check of QuestionSkillLinkModel\', '
-                '[u"Entity id 0:0: based on field skill_ids '
-                'having value 0, expect model SkillModel with id 0 but it '
+                '[u"Entity id 0:2: based on field skill_ids '
+                'having value 2, expect model SkillModel with id 2 but it '
                 'doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
@@ -5017,7 +5017,7 @@ class QuestionSkillLinkModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for '
                 'question_ids field check of QuestionSkillLinkModel\', '
-                '[u"Entity id 0:0: based on field '
+                '[u"Entity id 0:2: based on field '
                 'question_ids having value 0, expect model QuestionModel '
                 'with id 0 but it doesn\'t exist"]]'),
             u'[u\'fully-validated QuestionSkillLinkModel\', 2]']
@@ -5082,7 +5082,9 @@ class QuestionSnapshotMetadataModelValidatorTests(
             question_models.QuestionSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .QuestionSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         question_services.update_question(
@@ -5249,7 +5251,9 @@ class QuestionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             question_models.QuestionSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.QuestionSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .QuestionSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         question_services.update_question(
@@ -5516,7 +5520,9 @@ class QuestionRightsSnapshotMetadataModelValidatorTests(
             question_models.QuestionRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.QuestionRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .QuestionRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5665,7 +5671,9 @@ class QuestionRightsSnapshotContentModelValidatorTests(
             question_models.QuestionRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.QuestionRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .QuestionRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5779,7 +5787,9 @@ class QuestionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             question_models.QuestionCommitLogEntryModel.get_by_id(
                 'question-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .QuestionCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         question_services.update_question(
