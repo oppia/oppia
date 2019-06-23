@@ -16,6 +16,8 @@
  * @fileoverview Directive for number with units editor.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('numberWithUnitsEditor', [
   'NumberWithUnitsObjectFactory', 'UrlInterpolationService',
   'OBJECT_EDITOR_URL_PREFIX',

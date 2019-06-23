@@ -30,6 +30,8 @@
  *   - Card.prototype.getActionButtons() -> ImprovementActionButton[]
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('ImprovementCardService', [
   'PlaythroughImprovementCardObjectFactory',
   function(PlaythroughImprovementCardObjectFactory) {

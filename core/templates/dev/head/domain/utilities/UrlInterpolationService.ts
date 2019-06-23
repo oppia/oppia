@@ -21,6 +21,8 @@ require('services/UtilsService.ts');
  * necessary to have a fully-qualified URL.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('UrlInterpolationService', [
   'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',
   function(AlertsService, UrlService, UtilsService, DEV_MODE) {

@@ -17,6 +17,8 @@
  * topic rights domain objects.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('TopicRightsObjectFactory', [
   function() {
     var TopicRights = function(published, canPublishTopic, canEditTopic) {

@@ -16,6 +16,8 @@
  * @fileoverview Constants for the practice session.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant('TOTAL_QUESTIONS', 20);
 
 oppia.constant(

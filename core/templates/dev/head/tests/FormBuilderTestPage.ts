@@ -16,6 +16,8 @@
  * @fileoverview Controllers for the form builder test page.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.controller('FormBuilderTestPage', [
   '$scope', function($scope) {
     $scope.testText = 'abc{{paramUnicode1}}';

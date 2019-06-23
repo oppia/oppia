@@ -25,6 +25,8 @@ require(
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/ImprovementCardService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

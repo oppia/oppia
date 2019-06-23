@@ -17,6 +17,8 @@
  * within a card.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('NumberAttemptsService', [
   function() {
     var numberAttempts = 0;

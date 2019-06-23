@@ -17,6 +17,8 @@
  * particular answer from some particular state.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('AnswerStatsObjectFactory', [function() {
   /**
    * @constructor

@@ -31,6 +31,8 @@ require(
 require('services/DateTimeFormatService.ts');
 require('services/EditabilityService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('historyTab', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

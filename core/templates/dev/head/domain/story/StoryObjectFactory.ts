@@ -19,6 +19,8 @@
 
 require('domain/story/StoryContentsObjectFactory.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
   function(StoryContentsObjectFactory) {
     var Story = function(

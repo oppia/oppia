@@ -17,6 +17,8 @@
  * resolve a particular improvement suggestion.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('ImprovementActionButtonObjectFactory', [function() {
   /**
    * @constructor

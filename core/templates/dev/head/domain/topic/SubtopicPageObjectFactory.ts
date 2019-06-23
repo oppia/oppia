@@ -19,6 +19,8 @@
 
 require('domain/topic/SubtopicPageContentsObjectFactory.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('SubtopicPageObjectFactory', [
   'SubtopicPageContentsObjectFactory',
   function(SubtopicPageContentsObjectFactory) {

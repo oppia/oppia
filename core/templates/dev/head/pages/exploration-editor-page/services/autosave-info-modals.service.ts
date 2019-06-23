@@ -24,6 +24,8 @@ require(
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/LocalStorageService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('AutosaveInfoModalsService', [
   '$log', '$timeout', '$uibModal', '$window',
   'ChangesInHumanReadableFormService', 'ExplorationDataService',

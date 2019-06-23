@@ -16,6 +16,8 @@
  * @fileoverview Constants for objects domain.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant('FRACTION_PARSING_ERRORS', {
   INVALID_CHARS:
     'Please only use numerical digits, spaces or forward slashes (/)',

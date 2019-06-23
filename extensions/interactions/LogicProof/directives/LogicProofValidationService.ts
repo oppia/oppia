@@ -18,6 +18,8 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('LogicProofValidationService', [
   'baseInteractionValidationService',
   function(baseInteractionValidationService) {

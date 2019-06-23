@@ -28,6 +28,8 @@ require(
   'MultipleChoiceInputRulesService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('oppiaInteractiveMultipleChoiceInput', [
   'HtmlEscaperService', 'MultipleChoiceInputRulesService',
   'UrlInterpolationService',

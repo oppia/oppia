@@ -34,6 +34,8 @@ require(
 require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('paramChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

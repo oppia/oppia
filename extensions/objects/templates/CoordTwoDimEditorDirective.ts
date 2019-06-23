@@ -16,6 +16,8 @@
  * @fileoverview Directive for coord two dim editor.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('coordTwoDimEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {

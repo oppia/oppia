@@ -18,6 +18,8 @@
 
 // The value for this editor is always editable.
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('booleanEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {

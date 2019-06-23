@@ -29,6 +29,8 @@ require('services/contextual/WindowDimensionsService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('supplementalCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

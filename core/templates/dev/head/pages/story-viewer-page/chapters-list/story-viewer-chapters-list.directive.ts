@@ -26,6 +26,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.animation('.oppia-story-animate-slide', function() {
   return {
     enter: function(element) {

@@ -16,6 +16,8 @@
  * @fileoverview UnderscoresToCamelCase filter for Oppia.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.filter('underscoresToCamelCase', [function() {
   return function(input) {
     return input.replace(/_+(.)/g, function(match, group1) {

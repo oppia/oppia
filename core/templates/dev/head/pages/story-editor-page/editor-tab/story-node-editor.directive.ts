@@ -23,6 +23,8 @@ require('services/AlertsService.ts');
 
 require('pages/story-editor-page/story-editor-page.constants.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('storyNodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

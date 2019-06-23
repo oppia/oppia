@@ -16,6 +16,8 @@
  * @fileoverview Rules service for the interaction.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('EndExplorationRulesService', [function() {
   return {};
 }]);

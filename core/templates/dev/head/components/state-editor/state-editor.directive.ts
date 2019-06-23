@@ -39,6 +39,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('stateEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

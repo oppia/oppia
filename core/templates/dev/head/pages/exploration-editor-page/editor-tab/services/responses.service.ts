@@ -38,6 +38,8 @@ require('services/ContextService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('ResponsesService', [
   '$rootScope', 'AlertsService', 'AnswerGroupsCacheService',
   'ContextService', 'OutcomeObjectFactory',

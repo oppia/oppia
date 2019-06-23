@@ -19,6 +19,8 @@ require('domain/statistics/PlaythroughObjectFactory.ts');
 require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant(
   'FETCH_ISSUES_URL', '/issuesdatahandler/<exploration_id>');
 

@@ -16,6 +16,8 @@
  * @fileoverview A helper service for the Rich text editor(RTE).
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 oppia.factory('RteHelperService', [
