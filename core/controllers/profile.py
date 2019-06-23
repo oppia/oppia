@@ -254,9 +254,6 @@ class SignupPage(base.BaseHandler):
             self.redirect(return_url)
             return
 
-        self.values.update({
-            'CAN_SEND_EMAILS': feconf.CAN_SEND_EMAILS,
-        })
         self.render_template('dist/signup-page.mainpage.html')
 
 

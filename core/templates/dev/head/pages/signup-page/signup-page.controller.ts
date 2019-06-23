@@ -170,7 +170,7 @@ oppia.directive('signupPage', ['UrlInterpolationService', function(
             requestParams.username = username;
           }
 
-          if (GLOBALS.CAN_SEND_EMAILS && !ctrl.hasUsername) {
+          if (ctrl.showEmailPreferencesForm && !ctrl.hasUsername) {
             if (canReceiveEmailUpdates === null) {
               ctrl.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
               return;
