@@ -887,7 +887,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
     @staticmethod
-    def _entity_created_before_job_queued(entity):
+    def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
 
@@ -1045,7 +1045,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
 
     @staticmethod
-    def _entity_created_before_job_queued(entity):
+    def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
 

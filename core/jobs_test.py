@@ -29,6 +29,7 @@ from core.tests import test_utils
 import feconf
 
 from google.appengine.ext import ndb
+from google.appengine.api import taskqueue
 from mapreduce import input_readers
 
 
@@ -607,7 +608,9 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        yield ('sum', 1)
+        current_class = SampleMapReduceJobManager
+        if current_class.entity_created_before_job_queued(item):
+            yield ('sum', 1)
 
     @staticmethod
     def reduce(key, values):
@@ -672,6 +675,15 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
                 job_id, taskqueue_services.QUEUE_NAME_DEFAULT,
                 additional_job_params={'entity_kinds': ''})
 
+    def test_raises_error_with_invalid_param_name(self):
+        job_id = SampleMapReduceJobManager.create_new()
+        SampleMapReduceJobManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.process_and_flush_pending_tasks()
+        with self.assertRaisesRegexp(
+            Exception, 'Could not find invalid_param_name'):
+            SampleMapReduceJobManager.get_mapper_param('invalid_param_name')
+
 
 class JobRegistryTests(test_utils.GenericTestBase):
     """Tests job registry."""
@@ -705,7 +717,7 @@ class JobRegistryTests(test_utils.GenericTestBase):
             # The list of allowed base classes. This can be extended as the
             # need arises, though we may also want to implement
             # _get_continuous_computation_class() and
-            # _entity_created_before_job_queued() for other base classes
+            # entity_created_before_job_queued() for other base classes
             # that are added to this list.
             allowed_base_batch_job_classes = [
                 jobs.BaseMapReduceJobManagerForContinuousComputations]
@@ -800,7 +812,7 @@ class MockStartExplorationMRJobManager(
     @staticmethod
     def map(item):
         current_class = MockStartExplorationMRJobManager
-        if current_class._entity_created_before_job_queued(item):  # pylint: disable=protected-access
+        if current_class.entity_created_before_job_queued(item):  # pylint: disable=protected-access
             yield (
                 item.exploration_id, {
                     'event_type': item.event_type,
