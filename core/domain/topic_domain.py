@@ -96,47 +96,47 @@ class TopicChange(change_domain.BaseChange):
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
         'required_attribute_names': ['name'],
-        'optional_attribute_names': ['change_affects_subtopic_page']
+        'optional_attribute_names': []
     }, {
         'name': CMD_ADD_SUBTOPIC,
         'required_attribute_names': ['title', 'subtopic_id'],
-        'optional_attribute_names': ['change_affects_subtopic_page']
+        'optional_attribute_names': []
     }, {
         'name': CMD_DELETE_SUBTOPIC,
         'required_attribute_names': ['subtopic_id'],
-        'optional_attribute_names': ['change_affects_subtopic_page']
+        'optional_attribute_names': []
     }, {
         'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
         'required_attribute_names': ['new_uncategorized_skill_id'],
-        'optional_attribute_names': ['change_affects_subtopic_page']
+        'optional_attribute_names': []
     }, {
         'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
         'required_attribute_names': ['uncategorized_skill_id'],
-        'optional_attribute_names': ['change_affects_subtopic_page'],
+        'optional_attribute_names': [],
     }, {
         'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
         'required_attribute_names': [
             'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
-        'optional_attribute_names': ['change_affects_subtopic_page'],
+        'optional_attribute_names': [],
     }, {
         'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
         'required_attribute_names': ['subtopic_id', 'skill_id'],
-        'optional_attribute_names': ['change_affects_subtopic_page'],
+        'optional_attribute_names': [],
     }, {
         'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
         'required_attribute_names': [
             'subtopic_id', 'property_name', 'new_value', 'old_value'],
-        'optional_attribute_names': ['change_affects_subtopic_page'],
+        'optional_attribute_names': [],
         'allowed_values': {'property_name': SUBTOPIC_PROPERTIES}
     }, {
         'name': CMD_UPDATE_TOPIC_PROPERTY,
         'required_attribute_names': ['property_name', 'new_value', 'old_value'],
-        'optional_attribute_names': ['change_affects_subtopic_page'],
+        'optional_attribute_names': [],
         'allowed_values': {'property_name': TOPIC_PROPERTIES}
     }, {
         'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
         'required_attribute_names': ['from_version', 'to_version'],
-        'optional_attribute_names': ['change_affects_subtopic_page']
+        'optional_attribute_names': []
     }]
 
 
