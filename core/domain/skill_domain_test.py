@@ -296,13 +296,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test that to_dict and from_dict preserve all data within a
         skill_contents and misconception object.
         """
-        audio_translation = {
-            'en': state_domain.AudioTranslation.from_dict({
-                'filename': 'file.mp3',
-                'file_size_bytes': 'size',
-                'needs_update': True
-            })
-        }
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', '<p>Explanation</p>'), [
                 state_domain.SubtitledHtml('2', '<p>Example 1</p>')],
@@ -358,36 +351,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.misconceptions[0].id = 5
         self._assert_validation_error(
             'The misconception with id 5 is out of bounds')
-
-    def test_cannot_create_skill_change_class_with_invalid_change_list(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            skill_domain.SkillChange({})
-
-    def test_cannot_update_skill_misconceptions(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            skill_domain.SkillChange({
-                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
-                'property_name': 'invalid_property'
-            })
-
-    def test_cannot_create_skill_rights_change_class_with_invalid_change_list(
-            self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            skill_domain.SkillRightsChange({})
-
-    def test_cannot_create_skill_rights_change_class_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            skill_domain.SkillRightsChange({
-                'cmd': 'invalid_cmd'
-            })
-
-    def test_create_skill_rights_change_class(self):
-        skill_rights = skill_domain.SkillRightsChange({
-            'cmd': skill_domain.CMD_CREATE_NEW
-        })
-
-        self.assertEqual(
-            skill_rights.to_dict(), {'cmd': skill_domain.CMD_CREATE_NEW})
 
 
 class SkillChangeTests(test_utils.GenericTestBase):
@@ -681,12 +644,28 @@ class SkillSummaryTests(test_utils.GenericTestBase):
         self.skill_summary.misconception_count = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected misconception_count to be a int, received \'10\''):
+            'Expected misconception_count to be an int, received \'10\''):
+            self.skill_summary.validate()
+
+    def test_validation_fails_with_negative_misconception_count(self):
+        self.skill_summary.misconception_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected misconception_count to be non-negative, '
+                'received \'-1\'')):
             self.skill_summary.validate()
 
     def test_validation_fails_with_invalid_worked_examples_count(self):
         self.skill_summary.worked_examples_count = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected worked_examples_count to be a int, received \'10\''):
+            'Expected worked_examples_count to be an int, received \'10\''):
+            self.skill_summary.validate()
+
+    def test_validation_fails_with_negative_worked_examples_count(self):
+        self.skill_summary.worked_examples_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected worked_examples_count to be non-negative, '
+                'received \'-1\'')):
             self.skill_summary.validate()

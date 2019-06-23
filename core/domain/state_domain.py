@@ -1289,6 +1289,11 @@ class SubtitledHtml(object):
                 a way as to contain a restricted set of HTML tags.
         """
         self.content_id = content_id
+        # The initial clean up of html by converting it to ckeditor format
+        # is required since user may copy and paste some stuff in the rte
+        # which is not a valid ckeditor html string but can be converted
+        # to a valid ckeditor string without errors. This initial clean up
+        # ensures that validation will not fail in such cases.
         self.html = html_validation_service.convert_to_ckeditor(
             html_cleaner.clean(html))
         self.validate()

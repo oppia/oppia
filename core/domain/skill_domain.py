@@ -153,6 +153,11 @@ class Misconception(object):
         """
         self.id = misconception_id
         self.name = name
+        # The initial clean up of html by converting it to ckeditor format
+        # is required since user may copy and paste some stuff in the rte
+        # which is not a valid ckeditor html string but can be converted
+        # to a valid ckeditor string without errors. This initial clean up
+        # ensures that validation will not fail in such cases.
         self.notes = html_validation_service.convert_to_ckeditor(
             html_cleaner.clean(notes))
         self.feedback = html_validation_service.convert_to_ckeditor(
@@ -926,12 +931,22 @@ class SkillSummary(object):
 
         if not isinstance(self.misconception_count, int):
             raise utils.ValidationError(
-                'Expected misconception_count to be a int, '
+                'Expected misconception_count to be an int, '
+                'received \'%s\'' % self.misconception_count)
+
+        if self.misconception_count < 0:
+            raise utils.ValidationError(
+                'Expected misconception_count to be non-negative, '
                 'received \'%s\'' % self.misconception_count)
 
         if not isinstance(self.worked_examples_count, int):
             raise utils.ValidationError(
-                'Expected worked_examples_count to be a int, '
+                'Expected worked_examples_count to be an int, '
+                'received \'%s\'' % self.worked_examples_count)
+
+        if self.worked_examples_count < 0:
+            raise utils.ValidationError(
+                'Expected worked_examples_count to be non-negative, '
                 'received \'%s\'' % self.worked_examples_count)
 
     def to_dict(self):

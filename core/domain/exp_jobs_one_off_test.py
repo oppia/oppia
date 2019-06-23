@@ -43,14 +43,16 @@ search_services = models.Registry.import_search_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-def mock_validate_rte_format(unused_html_list, unused_rte_format):
-    return {}
-
-
-def mock_validate_customization_args(unused_html_list):
-    return {}
-
-
+# This mock should be used only in ExplorationContentValidationJobForCKEditor
+# and InteractionCustomizationArgsValidationJob.
+# The first job validates the html strings and produces as output the invalid
+# strings. If we do not use mock validation for rte while updating
+# states and saving exploration, the validation for subtitled html
+# in state will fail, thereby resulting in failure of job.
+# The second job validates the customization args in html and if the
+# mock is not used while updating states and saving explorations,
+# the validation for subtitled html in state will fail, thereby
+# resulting in failure of job.
 def mock_validate(unused_self):
     pass
 
@@ -1697,6 +1699,12 @@ class ExplorationContentValidationJobForCKEditorTests(
         without skipping any tags.
         """
 
+        # This mock should only be used for
+        # ExplorationContentValidationJobForCKEditor.
+        # The job finds invalid strings in an exploration.
+        # If we do not use the mock, some of the strings will be converted
+        # to a valid format during initialization of subtitled html
+        # in state.
         def mock_convert_to_ckeditor(html_data):
             return html_data
 
@@ -1790,24 +1798,19 @@ class ExplorationContentValidationJobForCKEditorTests(
             'missing_prerequisite_skill_id': None
         }
 
-        with self.swap(
-            html_validation_service, 'validate_customization_args',
-            mock_validate_customization_args), self.swap(
-                html_validation_service, 'validate_rte_format',
-                mock_validate_rte_format), self.swap(
-                    html_validation_service, 'convert_to_ckeditor',
-                    mock_convert_to_ckeditor):
+        mock_convert_to_ckeditor_context = self.swap(
+            html_validation_service, 'convert_to_ckeditor',
+            mock_convert_to_ckeditor)
+        mock_validate_context = self.swap(
+            state_domain.SubtitledHtml, 'validate', mock_validate)
+
+        with mock_validate_context, mock_convert_to_ckeditor_context:
             state1.update_content(content1_dict)
             state2.update_content(content2_dict)
             state3.update_content(content3_dict)
             state1.update_interaction_default_outcome(default_outcome_dict1)
             state2.update_interaction_default_outcome(default_outcome_dict2)
             exp_services.save_new_exploration(self.albert_id, exploration)
-
-        with self.swap(
-            state_domain.SubtitledHtml, 'validate', mock_validate), self.swap(
-                html_validation_service, 'convert_to_ckeditor',
-                mock_convert_to_ckeditor):
             job_id = (
                 exp_jobs_one_off
                 .ExplorationContentValidationJobForCKEditor.create_new())
@@ -1863,8 +1866,7 @@ class ExplorationContentValidationJobForCKEditorTests(
         state1 = exploration.states['State1']
 
         with self.swap(
-            html_validation_service, 'validate_rte_format',
-            mock_validate_rte_format):
+            state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(content_dict)
             exp_services.save_new_exploration(self.albert_id, exploration)
 
@@ -1943,16 +1945,13 @@ class InteractionCustomizationArgsValidationJobTests(
             )
         }
 
-        with self.swap(
-            html_validation_service, 'validate_customization_args',
-            mock_validate_customization_args):
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(content1_dict)
             state2.update_interaction_default_outcome(default_outcome_dict2)
             state3.update_content(content3_dict)
             exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start CustomizationArgsValidation job on sample exploration.
-        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
+            # Start CustomizationArgsValidation job on sample exploration.
             job_id = (
                 exp_jobs_one_off
                 .InteractionCustomizationArgsValidationJob.create_new())
@@ -2000,9 +1999,7 @@ class InteractionCustomizationArgsValidationJobTests(
 
         state1 = exploration.states['State1']
 
-        with self.swap(
-            html_validation_service, 'validate_customization_args',
-            mock_validate_customization_args):
+        with self.swap(state_domain.SubtitledHtml, 'validate', mock_validate):
             state1.update_content(content_dict)
             exp_services.save_new_exploration(self.albert_id, exploration)
 

@@ -908,7 +908,15 @@ class StorySummaryTests(test_utils.GenericTestBase):
         self.story_summary.node_count = '10'
         with self.assertRaisesRegexp(
             utils.ValidationError,
-            'Expected node_count to be a int, received \'10\''):
+            'Expected node_count to be an int, received \'10\''):
+            self.story_summary.validate()
+
+    def test_validation_fails_with_negative_node_count(self):
+        self.story_summary.node_count = -1
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Expected node_count to be non-negative, '
+                'received \'-1\'')):
             self.story_summary.validate()
 
     def test_validation_fails_with_invalid_language_code(self):
