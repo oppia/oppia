@@ -43,7 +43,7 @@
       <ul ng-if="!isCollectionPreviewTile" layout="row" class="metrics" layout-align="space-between center">
         <li>
           <span class="protractor-test-exp-summary-tile-rating" ng-class="{'rating-disabled': !getAverageRating()}">
-            <span class="fa fa-star fa-lg" uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
+            <span class="fas fa-star" uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>" tooltip-placement="top">
               <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]></span>
             </span>
             <span ng-if="getAverageRating()">
@@ -54,7 +54,7 @@
           </span>
         </li>
         <li>
-          <span class="fa fa-eye fa-lg" uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
+          <span class="far fa-eye" uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>" tooltip-placement="top">
             <span class="oppia-icon-accessibility-label"><['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]></span>
           </span>
           <span ng-if="getNumViews()">
@@ -84,7 +84,7 @@
            ng-if="isRefresherExploration"
            ng-click="loadParentExploration()">
   <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
-  <i class="fa fa-arrow-right"
+  <i class="fas fa-arrow-right"
      style="font-size: 19px; padding-top: 1.5px;">
   </i>
 </md-button>
