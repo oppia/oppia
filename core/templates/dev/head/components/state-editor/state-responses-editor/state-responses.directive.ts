@@ -254,13 +254,8 @@ oppia.directive('stateResponses', [
 
           $scope.isCurrentInteractionTrivial = function() {
             var interactionId = $scope.getCurrentInteractionId();
-            if (
-              INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
-                interactionId) >= 0) {
-              return true;
-            } else {
-              return false;
-            }
+            return INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
+              interactionId) !== -1;
           };
 
           $scope.isLinearWithNoFeedback = function(outcome) {
