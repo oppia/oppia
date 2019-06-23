@@ -468,7 +468,8 @@ class ClassifierTrainingJobModelValidatorTests(test_utils.GenericTestBase):
             classifier_models.ClassifierTrainingJobModel.get_by_id(id1))
 
         self.job_class = (
-            prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob) # pylint: disable=line-too-long
+            prod_validation_jobs_one_off
+            .ClassifierTrainingJobModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -588,7 +589,8 @@ class TrainingJobExplorationMappingModelValidatorTests(
             classifier_models.TrainingJobExplorationMappingModel.get_by_id(id1))
 
         self.job_class = (
-            prod_validation_jobs_one_off.TrainingJobExplorationMappingModelAuditOneOffJob) # pylint: disable=line-too-long
+            prod_validation_jobs_one_off
+            .TrainingJobExplorationMappingModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -909,7 +911,9 @@ class CollectionSnapshotMetadataModelValidatorTests(
             collection_models.CollectionSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         collection_services.update_collection(
@@ -1074,7 +1078,9 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             collection_models.CollectionSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         collection_services.update_collection(
@@ -1401,7 +1407,9 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -1566,7 +1574,9 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             collection_models.CollectionRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -1692,7 +1702,9 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         collection_services.update_collection(
@@ -2252,7 +2264,9 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
                 'oppia_csrf_secret-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ConfigPropertySnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ConfigPropertySnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         self.config_model.commit(self.admin_id, [])
@@ -2385,7 +2399,9 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             config_models.ConfigPropertySnapshotContentModel.get_by_id(
                 'oppia_csrf_secret-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ConfigPropertySnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ConfigPropertySnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         self.config_model.commit(self.admin_id, [])
@@ -2760,7 +2776,9 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                 self.user_id, self.thread_id))
         self.model_instance.put()
 
-        self.job_class = prod_validation_jobs_one_off.GeneralFeedbackEmailReplyToIdModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [(
@@ -3033,7 +3051,9 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         exp_services.update_exploration(
@@ -3187,7 +3207,9 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             exp_models.ExplorationSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         exp_services.update_exploration(
@@ -3497,7 +3519,9 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -3649,7 +3673,9 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -3763,7 +3789,9 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         exp_services.update_exploration(
@@ -4279,7 +4307,8 @@ class GeneralFeedbackThreadModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
 
         self.job_class = (
-            prod_validation_jobs_one_off.GeneralFeedbackThreadModelAuditOneOffJob) # pylint: disable=line-too-long
+            prod_validation_jobs_one_off
+            .GeneralFeedbackThreadModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -4412,7 +4441,8 @@ class GeneralFeedbackMessageModelValidatorTests(test_utils.GenericTestBase):
                 '%s.0' % self.thread_id))
 
         self.job_class = (
-            prod_validation_jobs_one_off.GeneralFeedbackMessageModelAuditOneOffJob) # pylint: disable=line-too-long
+            prod_validation_jobs_one_off
+            .GeneralFeedbackMessageModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -4515,7 +4545,8 @@ class GeneralFeedbackThreadUserModelValidatorTests(test_utils.GenericTestBase):
                 '%s.%s' % (self.owner_id, self.thread_id)))
 
         self.job_class = (
-            prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob) # pylint: disable=line-too-long
+            prod_validation_jobs_one_off
+            .GeneralFeedbackThreadUserModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -4971,7 +5002,9 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
             file_models.FileMetadataSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.id_1))
 
-        self.job_class = prod_validation_jobs_one_off.FileMetadataSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .FileMetadataSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5100,7 +5133,9 @@ class FileMetadataSnapshotContentModelValidatorTests(
             file_models.FileMetadataSnapshotContentModel.get_by_id(
                 '%s-1' % self.id_1))
 
-        self.job_class = prod_validation_jobs_one_off.FileMetadataSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .FileMetadataSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5326,7 +5361,9 @@ class FileSnapshotMetadataModelValidatorTests(
             file_models.FileSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.id_1))
 
-        self.job_class = prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .FileSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5453,7 +5490,9 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             file_models.FileSnapshotContentModel.get_by_id(
                 '%s-1' % self.id_1))
 
-        self.job_class = prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .FileSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5682,7 +5721,8 @@ class ContinuousComputationModelValidatorTests(test_utils.GenericTestBase):
         self.model_instance.put()
 
         self.job_class = (
-            prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob) # pylint: disable=line-too-long
+            prod_validation_jobs_one_off
+            .ContinuousComputationModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5799,7 +5839,9 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
                 '1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationRecommendationsModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [(
@@ -6287,7 +6329,9 @@ class StorySnapshotMetadataModelValidatorTests(
             story_models.StorySnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StorySnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         story_services.update_story(
@@ -6448,7 +6492,9 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             story_models.StorySnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StorySnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StorySnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         story_services.update_story(
@@ -6720,7 +6766,9 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
             story_models.StoryRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StoryRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StoryRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -6877,7 +6925,9 @@ class StoryRightsSnapshotContentModelValidatorTests(
             story_models.StoryRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StoryRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StoryRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -6987,7 +7037,9 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             story_models.StoryCommitLogEntryModel.get_by_id(
                 'story-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StoryCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         story_services.update_story(
@@ -7514,7 +7566,8 @@ class ReviewerRotationTrackingModelValidatorTests(test_utils.GenericTestBase):
                 score_category))
 
         self.job_class = (
-            prod_validation_jobs_one_off.ReviewerRotationTrackingModelAuditOneOffJob) # pylint: disable=line-too-long
+            prod_validation_jobs_one_off
+            .ReviewerRotationTrackingModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
