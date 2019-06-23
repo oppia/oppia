@@ -189,9 +189,9 @@
         }
       },
       "angularCookiesRev": {
-        "version": "1.6.2",
+        "version": "1.5.8",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.6.2.zip",
+        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.5.8.zip",
         "rootDirPrefix": "bower-angular-cookies-",
         "targetDirPrefix": "bower-angular-cookies-",
         "bundle": {
