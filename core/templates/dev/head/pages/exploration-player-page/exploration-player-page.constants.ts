@@ -62,6 +62,7 @@ oppia.constant('EXPLORATION_MODE', {
   EXPLORATION: 'exploration',
   PRETEST: 'pretest',
   QUESTION_PLAYER: 'question_player',
+  STORY_CHAPTER: 'story_chapter',
   OTHER: 'other'
 });
 

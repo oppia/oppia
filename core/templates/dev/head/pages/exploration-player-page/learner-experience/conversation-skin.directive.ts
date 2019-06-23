@@ -41,6 +41,7 @@ require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/skill/ConceptCardBackendApiService.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/story_viewer/StoryViewerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/' +
@@ -336,6 +337,7 @@ oppia.directive('conversationSkin', [
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
+        'StoryViewerBackendApiService',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'FEEDBACK_POPOVER_PATH',
@@ -364,6 +366,7 @@ oppia.directive('conversationSkin', [
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
+            StoryViewerBackendApiService,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, FEEDBACK_POPOVER_PATH,
@@ -749,6 +752,14 @@ oppia.directive('conversationSkin', [
                 GuestCollectionProgressService.
                   recordExplorationCompletedInCollection(
                     GLOBALS.collectionId, $scope.explorationId);
+              }
+
+              if (ExplorationPlayerStateService.isInStoryChapterMode() &&
+                $scope.nextCard.isTerminal()) {
+                var storyId = UrlService.getUrlParams().story_id;
+                var nodeId = UrlService.getUrlParams().node_id;
+                StoryViewerBackendApiService.recordStoryNodeCompletion(
+                  storyId, nodeId);
               }
 
               // For single state explorations, when the exploration reaches the

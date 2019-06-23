@@ -79,3 +79,23 @@ class StoryPageDataHandler(base.BaseHandler):
             'story_nodes': ordered_node_dicts
         })
         self.render_json(self.values)
+
+
+class StoryNodeCompletionHandler(base.BaseHandler):
+    """Marks a story node as completed after completing."""
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_story_viewer_page
+    def post(self, story_id, node_id):
+        if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
+            raise self.PageNotFoundException
+
+        try:
+            story_services.get_node_index_by_story_id_and_node_id(
+                story_id, node_id)
+        except Exception, e:
+            raise self.PageNotFoundException(e)
+
+        story_services.record_completed_node_in_story_context(
+            self.user_id, story_id, node_id)
+        return self.render_json({})
