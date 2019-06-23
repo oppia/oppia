@@ -60,14 +60,14 @@ class SkillChange(change_domain.BaseChange):
 
     The allowed commands, together with the attributes:
         - 'add_skill_misconception' (with new_misconception_dict)
-        - 'delete_skill_misconception' (with id)
+        - 'delete_skill_misconception' (with misconception_id)
         - 'create_new'
         - 'update_skill_property' (with property_name, new_value
         and old_value)
         - 'update_skill_contents_property' (with property_name,
         new_value and old_value)
-        - 'update_skill_misconceptions_property' (with id, property_name,
-        new_value and old_value)
+        - 'update_skill_misconceptions_property' (
+            with misconception_id, property_name, new_value and old_value)
         - 'migrate_contents_schema_to_latest_version' (with
         from_version and to_version)
         - 'migrate_misconceptions_schema_to_latest_version' (with
@@ -105,12 +105,12 @@ class SkillChange(change_domain.BaseChange):
         'optional_attribute_names': []
     }, {
         'name': CMD_DELETE_SKILL_MISCONCEPTION,
-        'required_attribute_names': ['id'],
+        'required_attribute_names': ['misconception_id'],
         'optional_attribute_names': []
     }, {
         'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
         'required_attribute_names': [
-            'id', 'property_name', 'new_value', 'old_value'],
+            'misconception_id', 'property_name', 'new_value', 'old_value'],
         'optional_attribute_names': [],
         'allowed_values': {'property_name': SKILL_MISCONCEPTIONS_PROPERTIES}
     }, {

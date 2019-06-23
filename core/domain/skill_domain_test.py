@@ -408,7 +408,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
                 'allowed')):
             skill_domain.SkillChange({
                 'cmd': 'update_skill_misconceptions_property',
-                'id': 'id',
+                'misconception_id': 'id',
                 'property_name': 'invalid',
                 'old_value': 'old_value',
                 'new_value': 'new_value',
@@ -444,18 +444,18 @@ class SkillChangeTests(test_utils.GenericTestBase):
     def test_skill_change_object_with_delete_skill_misconception(self):
         skill_change_object = skill_domain.SkillChange({
             'cmd': 'delete_skill_misconception',
-            'id': 'id'
+            'misconception_id': 'id'
         })
 
         self.assertEqual(
             skill_change_object.cmd, 'delete_skill_misconception')
-        self.assertEqual(skill_change_object.id, 'id')
+        self.assertEqual(skill_change_object.misconception_id, 'id')
 
     def test_skill_change_object_with_update_skill_misconceptions_property(
             self):
         skill_change_object = skill_domain.SkillChange({
             'cmd': 'update_skill_misconceptions_property',
-            'id': 'id',
+            'misconception_id': 'id',
             'property_name': 'name',
             'new_value': 'new_value',
             'old_value': 'old_value'
@@ -463,7 +463,7 @@ class SkillChangeTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             skill_change_object.cmd, 'update_skill_misconceptions_property')
-        self.assertEqual(skill_change_object.id, 'id')
+        self.assertEqual(skill_change_object.misconception_id, 'id')
         self.assertEqual(skill_change_object.property_name, 'name')
         self.assertEqual(skill_change_object.new_value, 'new_value')
         self.assertEqual(skill_change_object.old_value, 'old_value')
