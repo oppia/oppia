@@ -127,7 +127,6 @@ require(
   'components/state-directives/solution-editor/' +
   'solution-explanation-editor.directive.ts');
 require('components/forms/custom-forms-directives/html-select.directive.ts');
-require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
@@ -141,6 +140,9 @@ require(
   'pages/exploration-editor-page/feedback-tab/thread-table/' +
   'thread-table.directive.ts');
 
+require('interactions/interactionsRequires.ts');
+require('objects/objectComponentsRequires.ts');
+
 require('components/entity-creation-services/exploration-creation.service.ts');
 require('components/ratings/rating-computation/rating-computation.service.ts');
 require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
@@ -149,18 +151,14 @@ require('domain/suggestion/SuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionThreadObjectFactory.ts');
 require(
   'domain/topics_and_skills_dashboard/' +
-  'TopicsAndSkillsDashboardBackendApiService.ts'
-);
-
-require('objects/objectComponentsRequires.ts');
-
-require(
-  'pages/exploration-editor-page/feedback-tab/services/' +
-  'thread-status-display.service.ts');
+  'TopicsAndSkillsDashboardBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/creator-dashboard-page/suggestion-modal-for-creator-view/' +
   'suggestion-modal-for-creator-view.service.ts');
-require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/feedback-tab/services/' +
+  'thread-status-display.service.ts');
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');

@@ -132,13 +132,17 @@ oppia.directive('audioTranslationBar', [
           $scope.timerInterval = null;
           $scope.unsavedAudioIsPlaying = false;
           $scope.waveSurfer = null;
+
           document.body.onkeyup = function(e) {
-            if (e.keyCode === 82 && !$scope.isAudioAvailable) {
-              // 82 belongs to the keycode for 'R'
+            if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
               // Used as shortcut key for recording
               toggleStartAndStopRecording();
             }
           };
+
+          $scope.$on('$destroy', function() {
+            document.body.onkeyup = null;
+          });
 
           var saveRecordedVoiceoversChanges = function() {
             StateRecordedVoiceoversService.saveDisplayedValue();

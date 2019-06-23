@@ -15,14 +15,8 @@
  * @fileoverview Service to receive questions for practice given a set of
  * skill_ids.
  */
-oppia.constant(
-  'QUESTION_PLAYER_URL_TEMPLATE',
-  '/question_player_handler?skill_ids=<skill_ids>&question_count' +
-  '=<question_count>&start_cursor=<start_cursor>');
 
-oppia.constant(
-  'QUESTIONS_LIST_URL_TEMPLATE',
-  '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>');
+require('domain/question/question-domain.constants.ts');
 
 oppia.factory('QuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTIONS_LIST_URL_TEMPLATE',
@@ -30,25 +24,19 @@ oppia.factory('QuestionBackendApiService', [
   function(
       $http, $q, UrlInterpolationService, QUESTIONS_LIST_URL_TEMPLATE,
       QUESTION_PLAYER_URL_TEMPLATE) {
-    var _startCursor = '';
     var _fetchQuestions = function(
-        skillIds, questionCount, resetHistory, successCallback, errorCallback) {
+        skillIds, questionCount, successCallback, errorCallback) {
       if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
         return;
-      }
-      if (resetHistory) {
-        _startCursor = '';
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
           skill_ids: skillIds.join(','),
-          question_count: questionCount.toString(),
-          start_cursor: _startCursor
+          question_count: questionCount.toString()
         });
 
       $http.get(questionDataUrl).then(function(response) {
         var questionDicts = angular.copy(response.data.question_dicts);
-        _startCursor = response.data.next_start_cursor;
         if (successCallback) {
           successCallback(questionDicts);
         }
@@ -130,11 +118,15 @@ oppia.factory('QuestionBackendApiService', [
      * of questions requested.
      */
     return {
+<<<<<<< HEAD:core/templates/dev/head/domain/question/QuestionBackendApiService.ts
       fetchQuestions: function(
           skillIds, questionCount, resetHistory) {
+=======
+      fetchQuestions: function(skillIds, questionCount) {
+>>>>>>> c37cb8a25a084cdc4b6239d4f49f6a63cf87b0e4:core/templates/dev/head/domain/question/QuestionPlayerBackendApiService.ts
         return $q(function(resolve, reject) {
           _fetchQuestions(
-            skillIds, questionCount, resetHistory, resolve, reject);
+            skillIds, questionCount, resolve, reject);
         });
       },
 

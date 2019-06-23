@@ -162,6 +162,11 @@ describe('Url Service', function() {
     expect(
       UrlService.getStoryIdFromUrl()
     ).toEqual('012345678901');
+
+    mockLocation.pathname = '/review_test/012345678901';
+    expect(
+      UrlService.getStoryIdFromUrl()
+    ).toEqual('012345678901');
   });
 
   it('should correctly retrieve story id from story viewer url', function() {
