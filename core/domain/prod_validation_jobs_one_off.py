@@ -321,6 +321,8 @@ class BaseSummaryModelValidator(BaseModelValidator):
 
             for (_, _, related_model) in (
                     related_model_class_model_id_model_tuples):
+                if related_model is None or related_model.deleted:
+                    continue
                 for (property_name, related_model_property_name) in (
                         related_model_properties_dict.iteritems()):
                     value_in_summary_model = getattr(item, property_name)
@@ -395,6 +397,8 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
         version = item.id[item.id.rfind('-') + 1:]
         for (_, _, related_model) in (
                 related_model_class_model_id_model_tuples):
+            if related_model is None or related_model.deleted:
+                continue
             if int(related_model.version) < int(version):
                 cls.errors[
                     '%s model version check' % cls.related_model_name].append((
@@ -631,6 +635,8 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
 
         for (_, _, exp_model) in (
                 exp_model_class_model_id_model_tuples):
+            if exp_model is None or exp_model.deleted:
+                continue
             if item.exp_version > exp_model.version:
                 cls.errors['exp version check'].append((
                     'Entity id %s: Exploration version %s in entity is greater '
@@ -652,6 +658,8 @@ class ClassifierTrainingJobModelValidator(BaseModelValidator):
 
         for (_, _, exp_model) in (
                 exp_model_class_model_id_model_tuples):
+            if exp_model is None or exp_model.deleted:
+                continue
             if item.state_name not in exp_model.states.keys():
                 cls.errors['state name check'].append((
                     'Entity id %s: State name %s in entity is not present '
@@ -698,6 +706,8 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
 
         for (_, _, exp_model) in (
                 exp_model_class_model_id_model_tuples):
+            if exp_model is None or exp_model.deleted:
+                continue
             if item.exp_version > exp_model.version:
                 cls.errors['exp version check'].append((
                     'Entity id %s: Exploration version %s in entity is greater '
@@ -719,6 +729,8 @@ class TrainingJobExplorationMappingModelValidator(BaseModelValidator):
 
         for (_, _, exp_model) in (
                 exp_model_class_model_id_model_tuples):
+            if exp_model is None or exp_model.deleted:
+                continue
             if item.state_name not in exp_model.states.keys():
                 cls.errors['state name check'].append((
                     'Entity id %s: State name %s in entity is not present '
@@ -974,6 +986,8 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, collection_model) in (
                 collection_model_class_model_id_model_tuples):
+            if collection_model is None or collection_model.deleted:
+                continue
             nodes = collection_model.collection_contents['nodes']
             if item.node_count != len(nodes):
                 cls.errors['node count check'].append((
@@ -1614,41 +1628,58 @@ class GeneralFeedbackThreadModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        author_ids = []
-        if item.original_author_id:
-            author_ids = [item.original_author_id]
-        suggestion_ids = []
-        if item.has_suggestion:
-            suggestion_ids = [item.id]
-        message_ids = ['%s.%s' % (item.id, i) for i in xrange(
-            item.message_count)]
-        return {
-            '%s_ids' % item.entity_type: (
-                TARGET_TYPE_TO_TARGET_MODEL[item.entity_type],
-                [item.entity_id]),
-            'author_ids': (user_models.UserSettingsModel, author_ids),
-            'suggestion_ids': (
-                suggestion_models.GeneralSuggestionModel, suggestion_ids),
+        external_instance_details = {
             'message_ids': (
-                feedback_models.GeneralFeedbackMessageModel, message_ids)
+                feedback_models.GeneralFeedbackMessageModel,
+                ['%s.%s' % (item.id, i) for i in xrange(
+                    item.message_count)])
         }
+        if item.original_author_id:
+            external_instance_details['author_ids'] = (
+                user_models.UserSettingsModel, [item.original_author_id])
+        if item.has_suggestion:
+            external_instance_details['suggestion_ids'] = (
+                suggestion_models.GeneralSuggestionModel, [item.id])
+        if item.entity_type in TARGET_TYPE_TO_TARGET_MODEL:
+            external_instance_details['%s_ids' % item.entity_type] = (
+                TARGET_TYPE_TO_TARGET_MODEL[item.entity_type],
+                [item.entity_id])
+        return external_instance_details
 
     @classmethod
-    def _validate_entity_id(cls, item):
-        """Validate that entity id belongs to
-        suggestion_models.TARGET_TYPE_CHOICES
+    def _validate_entity_type(cls, item):
+        """Validate the entity type is valid.
 
         Args:
             item: ndb.Model. GeneralFeedbackThreadModel to validate.
         """
-        if item.entity_type not in suggestion_models.TARGET_TYPE_CHOICES:
+        if item.entity_type not in TARGET_TYPE_TO_TARGET_MODEL:
             cls.errors['entity type check'].append(
-                'Entity id %s: Entity type %s for feedback thread is '
-                'invalid' % (item.id, item.entity_type))
+                'Entity id %s: Entity type %s is not allowed' % (
+                    item.id, item.entity_type))
+
+    @classmethod
+    def _validate_has_suggestion(cls, item):
+        """Validate that has_suggestion is False only if no suggestion
+        with id same as thread id exists.
+
+        Args:
+            item: ndb.Model. GeneralFeedbackThreadModel to validate.
+        """
+        if not item.has_suggestion:
+            suggestion_model = (
+                suggestion_models.GeneralSuggestionModel.get_by_id(item.id))
+            if suggestion_model is not None and not suggestion_model.deleted:
+                cls.errors['has suggestion check'].append(
+                    'Entity id %s: has suggestion for entity is false '
+                    'but a suggestion exists with id same as entity id' % (
+                        item.id))
 
     @classmethod
     def _get_custom_validation_functions(cls):
-        return [cls._validate_entity_id]
+        return [
+            cls._validate_entity_type,
+            cls._validate_has_suggestion]
 
 
 class GeneralFeedbackMessageModelValidator(BaseModelValidator):
@@ -1667,9 +1698,37 @@ class GeneralFeedbackMessageModelValidator(BaseModelValidator):
             author_ids = [item.author_id]
         return {
             'author_ids': (user_models.UserSettingsModel, author_ids),
-            'feeback_thread_ids': (
+            'feedback_thread_ids': (
                 feedback_models.GeneralFeedbackThreadModel, [item.thread_id])
         }
+
+    @classmethod
+    def _validate_message_id(cls, item):
+        """Validate that message_id is less than the message count for
+        feedback thread corresponding to the entity
+
+        Args:
+            item: ndb.Model. GeneralFeedbackMessageModel to validate.
+        """
+        feedback_thread_model_class_model_id_model_tuples = (
+            cls.external_instance_details['feedback_thread_ids'])
+
+        for (_, _, feedback_thread_model) in (
+                feedback_thread_model_class_model_id_model_tuples):
+            if feedback_thread_model is None or feedback_thread_model.deleted:
+                continue
+            if item.message_id >= feedback_thread_model.message_count:
+                cls.errors['message id check'].append(
+                    'Entity id %s: message id %s not less than total count '
+                    'of messages %s in feedback thread model with id %s '
+                    'corresponding to the entity' % (
+                        item.id, item.message_id,
+                        feedback_thread_model.message_count,
+                        feedback_thread_model.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_message_id]
 
 
 class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
@@ -1687,14 +1746,17 @@ class GeneralFeedbackThreadUserModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         message_ids = []
-        split_id = item.id.split('.')
-        if len(split_id) == 2:
+        user_ids = []
+        if '.' in item.id:
+            index = item.id.find('.')
+            user_ids = [item.id[:index]]
             message_ids = ['%s.%s' % (
-                split_id[1], message_id) for message_id in (
+                item.id[index + 1:], message_id) for message_id in (
                     item.message_ids_read_by_user)]
         return {
             'message_ids': (
-                feedback_models.GeneralFeedbackMessageModel, message_ids)
+                feedback_models.GeneralFeedbackMessageModel, message_ids),
+            'user_ids': (user_models.UserSettingsModel, user_ids)
         }
 
 
@@ -1712,6 +1774,10 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
     """Class for validating UnsentFeedbackEmailModels."""
 
     @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^\\d*$'
+
+    @classmethod
     def _get_external_id_relationships(cls, item):
         message_ids = []
         for reference in item.feedback_message_references:
@@ -1719,7 +1785,7 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
                 message_ids.append('%s.%s' % (
                     reference['thread_id'], reference['message_id']))
             except Exception:
-                cls.errors['feedback reference check'].append(
+                cls.errors['feedback message reference check'].append(
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
         return {
@@ -1741,11 +1807,11 @@ class UnsentFeedbackEmailModelValidator(BaseModelValidator):
                 split_thread_id = reference['thread_id'].split('.')
                 if split_thread_id[0] != reference['entity_type'] or (
                         split_thread_id[1] != reference['entity_id']):
-                    cls.errors['feedback reference check'].append(
+                    cls.errors['feedback message reference check'].append(
                         'Entity id %s: Invalid feedback reference: %s' % (
                             item.id, reference))
             except Exception:
-                cls.errors['feedback reference check'].append(
+                cls.errors['feedback message reference check'].append(
                     'Entity id %s: Invalid feedback reference: %s' % (
                         item.id, reference))
 
@@ -2289,6 +2355,8 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
             'story_ids']
 
         for (_, _, story_model) in story_model_class_model_id_model_tuples:
+            if story_model is None or story_model.deleted:
+                continue
             nodes = story_model.story_contents['nodes']
             if item.node_count != len(nodes):
                 cls.errors['node count check'].append((
@@ -2333,23 +2401,38 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_domain_object_instance(cls, item):
-        return suggestion_services.get_suggestion_from_model(item)
+        if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
+            return suggestion_services.get_suggestion_from_model(item)
+        else:
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
-        reviewer_ids = []
-        if item.final_reviewer_id:
-            reviewer_ids = [item.final_reviewer_id]
-        return {
+        external_instance_details = {
             'feedback_thread_ids': (
                 feedback_models.GeneralFeedbackThreadModel, [item.id]),
-            '%s_ids' % item.target_type: (
-                TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
-                [item.target_id]),
             'author_ids': (user_models.UserSettingsModel, [item.author_id]),
-            'reviewer_ids': (
-                user_models.UserSettingsModel, reviewer_ids)
         }
+        if item.target_type in TARGET_TYPE_TO_TARGET_MODEL:
+            external_instance_details['%s_ids' % item.target_type] = (
+                TARGET_TYPE_TO_TARGET_MODEL[item.target_type],
+                [item.target_id])
+        if item.final_reviewer_id:
+            external_instance_details['reviewer_ids'] = (
+                user_models.UserSettingsModel, [item.final_reviewer_id])
+        return external_instance_details
+
+    @classmethod
+    def _validate_target_type(cls, item):
+        """Validate the target type is valid.
+
+        Args:
+            item: ndb.Model. GeneralSuggestionModel to validate.
+        """
+        if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
+            cls.errors['target type check'].append(
+                'Entity id %s: Target type %s is not allowed' % (
+                    item.id, item.target_type))
 
     @classmethod
     def _validate_target_version_at_submission(cls, item):
@@ -2359,11 +2442,15 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
         Args:
             item: ndb.Model. GeneralSuggestionModel to validate.
         """
+        if item.target_type not in TARGET_TYPE_TO_TARGET_MODEL:
+            return
         target_model_class_model_id_model_tuples = (
             cls.external_instance_details['%s_ids' % item.target_type])
 
         for (_, _, target_model) in (
                 target_model_class_model_id_model_tuples):
+            if target_model is None or target_model.deleted:
+                continue
             if item.target_version_at_submission > target_model.version:
                 cls.errors['target version at submission check'].append(
                     'Entity id %s: target version %s in entity is greater '
@@ -2395,6 +2482,7 @@ class GeneralSuggestionModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
+            cls._validate_target_type,
             cls._validate_target_version_at_submission,
             cls._validate_final_reveiwer_id]
 
