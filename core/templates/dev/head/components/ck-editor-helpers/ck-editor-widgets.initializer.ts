@@ -92,6 +92,8 @@ oppia.run([
                     imageId = 'image_id_' + imageIdIntegerPart;
                     ExplorationImageCounterService.displayed = imageIdIntegerPart;
                     ExplorationImageCounterService.saveDisplayedValue();
+                    console.log(ExplorationImageCounterService.displayed)
+                    alert("cjeck")
                     var image = {
                       image_id: imageId,
                       image_info: {

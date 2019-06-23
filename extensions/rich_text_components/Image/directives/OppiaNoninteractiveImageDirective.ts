@@ -29,11 +29,11 @@ require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 
 oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
+  '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService', 'ExplorationEngineService',
   'ExplorationStatesService', 'HtmlEscaperService', 'ImagePreloaderService',
   'StateEditorService', 'UrlInterpolationService', 'LOADING_INDICATOR_URL',
   function(
-      $rootScope, $sce, AssetsBackendApiService, ContextService,
+      $rootScope, $sce, AssetsBackendApiService, ContextService, ExplorationEngineService,
       ExplorationStatesService, HtmlEscaperService, ImagePreloaderService,
       StateEditorService, UrlInterpolationService, LOADING_INDICATOR_URL) {
     return {
@@ -46,14 +46,17 @@ oppia.directive('oppiaNoninteractiveImage', [
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
         ctrl.imageUrl = '';
-        ctrl.imageId = HtmlEscaperService.escapedJsonToObj(
-          $attrs.idWithValue);
         ctrl.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
           LOADING_INDICATOR_URL);
         ctrl.isLoadingIndicatorShown = false;
         ctrl.isTryAgainShown = false;
+        var imageId = HtmlEscaperService.escapedJsonToObj(
+          $attrs.idWithValue);
 
         if (ImagePreloaderService.inExplorationPlayer()) {
+          var stateName = ExplorationEngineService.currentStateName();
+          ctrl.filepath = (
+            ExplorationEngineService.getImageFilePath(stateName, imageId));
           ctrl.isLoadingIndicatorShown = true;
           ctrl.dimensions = (
             ImagePreloaderService.getDimensionsOfImage(ctrl.filepath));
@@ -89,7 +92,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           // we directly assign the url to the imageUrl.
           var stateName = StateEditorService.getActiveStateName();
           ctrl.filepath = (
-            ExplorationStatesService.getImagesource(stateName, ctrl.imageId));
+            ExplorationStatesService.getImagesource(stateName, imageId));
           ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
             ContextService.getExplorationId(), ctrl.filepath);
         }

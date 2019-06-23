@@ -159,9 +159,11 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
           _extractImageIdValueFromOppiaNonInteractiveImageTag(htmlStr));
       });
 
-      var filenamesInState = [];
+      console.log(allHtmlOfState)
       imageIdsInState.forEach(function(imageId) {
-        filenamesInState.push(state.image_assets.image_mapping[imageId].src);
+        console.log(imageId);
+        console.log(state)
+        filenamesInState.push(state.image_assets.image_mapping.imageId.src);
       });
       return filenamesInState;
     };

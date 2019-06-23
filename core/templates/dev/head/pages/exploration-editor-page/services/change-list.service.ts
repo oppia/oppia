@@ -47,9 +47,12 @@ oppia.factory('ChangeListService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
+    var CMD_IMAGE_ASSETS = 'image_assets'
+    var IMAGE_ASSETS_ACTION = 'add_image'
 
     var ALLOWED_EXPLORATION_BACKEND_NAMES = {
       category: true,
+      image_counter: true,
       init_state_name: true,
       language_code: true,
       objective: true,
@@ -75,7 +78,8 @@ oppia.factory('ChangeListService', [
       state_name: true,
       widget_customization_args: true,
       widget_id: true,
-      written_translations: true
+      written_translations: true,
+      image_assets: true
     };
 
     var autosaveChangeListOnChange = function(explorationChangeList) {
@@ -114,14 +118,6 @@ oppia.factory('ChangeListService', [
       }
       explorationChangeList.push(changeDict);
       undoneChangeStack = [];
-
-      /**
-       * Adding image change objects in change list, after adding state
-       * change object. If we add image change object befre adding state
-       * change object, then it leads to validation error.
-       */
-      explorationChangeList = (
-        explorationChangeList.concat(explorationChangeListForImages));
 
       autosaveChangeListOnChange(explorationChangeList);
     };
@@ -246,14 +242,13 @@ oppia.factory('ChangeListService', [
       },
       addImage: function(stateName, image) {
         var changeDict = {
-          action: 'add_image',
-          cmd: CMD_EDIT_STATE_PROPERTY,
+          action: IMAGE_ASSETS_ACTION,
+          cmd: CMD_IMAGE_ASSETS,
           image_id: image.image_id,
           image_info: image.image_info,
-          property_name: 'image_assets',
           state_name: stateName
         };
-        explorationChangeListForImages.push(changeDict);
+        explorationChangeList.push(changeDict);
       }
     };
   }

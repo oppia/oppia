@@ -865,13 +865,13 @@ def get_image_src_from_html(html):
         html: str. the HTML in which the images are present.
 
     Returns:
-        image_info_list: list. List contaning an image object.
+        image_src_list: list. List contaning sources of all
+            images present in an HTML.
     """
     image_src_list = []
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')
     for image in soup.findAll(name='oppia-noninteractive-image'):
         filepath = json.loads(unescape_html(image['filepath-with-value']))
-
         image_src_list.append(filepath)
 
     return image_src_list
@@ -884,7 +884,7 @@ def get_image_ids_from_image_tag(html):
         html: str. the HTML from which image_ids are extracted.
 
     Returns:
-        image_ids. List of ids, of all images present in an exploration.
+        image_ids. List of all IDs of images present in the HTML.
     """
     image_ids = []
     soup = bs4.BeautifulSoup(html.encode('utf-8'), 'html.parser')

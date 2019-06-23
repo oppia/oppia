@@ -771,7 +771,6 @@ def apply_change_list(exploration_id, change_list):
                     # Increment image_counter.
                     image_counter = exploration.image_counter
                     image_counter += 1
-
                     if not isinstance(change.image_info, dict):
                         raise Exception(
                             'Expected image_info to be dict, '
@@ -783,6 +782,9 @@ def apply_change_list(exploration_id, change_list):
                     state.image_assets.add_image(
                         change.image_id, image_object)
                     exploration.update_image_counter(image_counter)
+                    print("             "*100)
+                    print(exploration.to_dict())
+                    print("             "*100)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -1209,9 +1211,17 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     exploration = apply_change_list(exploration_id, change_list)
+    print("                 "*100)
+    print(exploration.to_dict())
+    print("                 "*100)
+
 
     # Removing images from image assets, which gets deleted.
     exploration.clean_image_assets()
+    print("                 "*100)
+    print(exploration.to_dict())
+    print("                 "*100)
+
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)
@@ -1671,37 +1681,6 @@ def get_next_page_of_all_non_private_commits(
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
     ) for entry in results], new_urlsafe_start_cursor, more)
-
-
-def get_image_filenames_from_exploration(exploration):
-    """Get the image filenames from the exploration.
-
-    Args:
-        exploration: Exploration object. The exploration itself.
-
-    Returns:
-       list(str). List containing the name of the image files in exploration.
-    """
-    filenames = []
-    for state in exploration.states.itervalues():
-        if state.interaction.id == 'ImageClickInput':
-            filenames.append(state.interaction.customization_args[
-                'imageAndRegions']['value']['imagePath'])
-
-    html_list = exploration.get_all_html_content_strings()
-    rte_components_in_exp = []
-    for html_string in html_list:
-        rte_components_in_exp = (
-            rte_components_in_exp + html_cleaner.get_rte_components(
-                html_string))
-
-    for rte_comp in rte_components_in_exp:
-        if 'id' in rte_comp and (
-                str(rte_comp['id']) == 'oppia-noninteractive-image'):
-            filenames.append(
-                rte_comp['customization_args']['filepath-with-value'])
-    # This is done because the ItemSelectInput may repeat the image names.
-    return list(set(filenames))
 
 
 def save_original_and_compressed_versions_of_image(

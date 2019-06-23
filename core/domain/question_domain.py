@@ -221,24 +221,23 @@ class Question(object):
     @classmethod
     def _convert_state_v29_dict_to_v30_dict(cls, question_state_dict):
         """Converts from version 29 to 30. Version 30 added image assets field
-        in state model. This funtion is extracting HTMl of state and do 3
+        in state model. This funtion extracts HTML of the state and does 3
         operations on each HTML content. The 3 operations and their sequence
-        were.
-        1) Gets image src of all images present in a state.
-        2) Assign each image source an image id or say maps each image id with
-           the image source in image info dict.
-        3) Give each image tag an image id with the help of image source, and
-           removes filepath from it.
+        are.
+          1) Gets image src of all images present in a state.
+          2) Maps each image with an image ID.
+          3) Replaces filepath attribute in the image tag, and adds an image
+             id attribute to it.
         After the above 3 operations each image info present in image dict is
         added to image assets.
 
         Args:
             question_state_dict: dict. A dict where each key-value pair
-                represents respectively, a state name and a dict used to
+                represents, respectively, a state name and a dict used to
                 initialize a State domain object.
 
         Returns:
-            dict. The converted states_dict.
+            dict. The converted question_state_dict.
         """
         image_counter = 0
         image_id_to_src_dict = {}
@@ -467,17 +466,17 @@ class Question(object):
 
     @classmethod
     def generate_image_id_and_maps_image_id_with_image_src(
-            cls, image_src_list, image_counter, image_info_dict_1): #pylint: disable=too-many-function-args
+            cls, image_src_list, image_counter, image_info_dict): #pylint: disable=too-many-function-args
         """Maps image source with the image id. Creates image id with the
             help of image counter.
 
         Args:
             image_src_list: list. List contaning image sources.
             image_counter: int. Counter for an image.
-            image_info_dict_1: dict. Dict contaning image id with source,
+            image_info_dict: dict. Dict contaning image id with source,
                 image ids that needs to be added in image tag.
         Returns:
-            image_info_dict_1: dict. Dict contaning image id with source,
+            image_info_dict: dict. Dict contaning image id with source,
                 image ids that needs to be added in image tag.
         """
         image_id_starting_range = image_counter - len(image_src_list) + 1
@@ -487,10 +486,10 @@ class Question(object):
         for _id in range(image_id_starting_range, image_id_ending_range):
             image_id = 'image_id_' + str(_id)
             filepath = image_src_list[image_src_list_counter]
-            image_info_dict_1[image_id] = filepath
+            image_info_dict[image_id] = filepath
             image_src_list_counter += 1
 
-        return image_info_dict_1
+        return image_info_dict
 
 
 class QuestionSummary(object):

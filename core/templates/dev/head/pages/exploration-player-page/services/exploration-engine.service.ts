@@ -444,6 +444,13 @@ oppia.factory('ExplorationEngineService', [
       },
       isAnswerBeingProcessed: function() {
         return answerIsBeingProcessed;
+      },
+      currentStateName: function() {
+        return visitedStateNames[visitedStateNames.length - 1];
+      },
+      getImageFilePath: function(stateName, imageId) {
+        var state = exploration.getState(stateName);
+        return state.image_assets.image_mapping[imageId].src;
       }
     };
   }

@@ -151,7 +151,8 @@ class ExplorationChange(change_domain.BaseChange):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
+        'image_counter')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -455,7 +456,7 @@ class Exploration(object):
         empty list; 'states_schema_version' is taken from feconf; 'states_dict'
         is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
         'author_notes' are initialized to empty string; 'version' and
-        'image_counter' is initializated to 0.
+        'image_counter' is initialized to 0.
 
         Args:
             exploration_id: str. The id of the exploration.
@@ -1142,7 +1143,8 @@ class Exploration(object):
         """Update image counter.
 
         Args:
-            image_counter: int. Counter for an image_id.
+            image_counter: int. Counter to keep track of number of images in
+                the exploration. Used to generate image_ids.
         """
         self.image_counter = image_counter
 
@@ -2220,14 +2222,13 @@ class Exploration(object):
     @classmethod
     def _convert_states_v29_dict_to_v30_dict(cls, states_dict):
         """Converts from version 29 to 30. Version 30 added image assets field
-        in state model. This funtion is extracting HTMl of state and do 3
+        in state model. This funtion extracts HTML of the state and does 3
         operations on each HTML content. The 3 operations and their sequence
-        were.
-        1) Gets image src of all images present in a state.
-        2) Assign each image source an image id or say maps each image id with
-           the image source in image info dict.
-        3) Give each image tag an image id with the help of image source, and
-           removes filepath from it.
+        are.
+          1) Gets image src of all images present in a state.
+          2) Maps each image with an image ID.
+          3) Replaces filepath attribute in the image tag, and adds an image
+             id attribute to it.
         After the above 3 operations each image info present in image dict is
         added to image assets.
 
@@ -2936,7 +2937,7 @@ class Exploration(object):
                 with schema version v34.
 
         Returns:
-            dict. The dict representation of the Exploration domain object,
+            dict. The dict representation of the exploration domain object,
             following schema version v35.
         """
         exploration_dict['schema_version'] = 35
@@ -3331,8 +3332,8 @@ class Exploration(object):
     @classmethod
     def generate_image_id_and_maps_image_id_with_image_src(
             cls, image_src_list, image_counter, image_info_dict): #pylint: disable=too-many-function-args
-        """Maps image source with the image id. Creates image id with the
-            help of image counter.
+        """Maps image source to the image id. Creates image id with the help of
+        image counter.
 
         Args:
             image_src_list: list. List contaning image sources.
@@ -3355,8 +3356,8 @@ class Exploration(object):
 
         return image_info_dict
 
-    def get_images_ids_of_exploration(self):
-        """Returns a list off ids, of all images present in an exploration.
+    def get_all_images_ids_in_exploration(self):
+        """Returns a list of Ids, of all images present in an exploration.
 
         Returns:
             image_ids. List of ids, of all images present in an exploration.
@@ -3369,7 +3370,7 @@ class Exploration(object):
         return image_ids
 
     def clean_image_assets(self):
-        """Remove all deleted images from image assests."""
+        """Remove all deleted images from image assets."""
         for state in self.states.values():
             image_ids_in_state_html = state.get_image_ids_of_state()
             state.image_assets.clean(image_ids_in_state_html)

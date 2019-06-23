@@ -226,6 +226,8 @@ require(
   'exploration-param-changes.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
+require(
+  'pages/exploration-editor-page/services/exploration-image-counter.service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');
@@ -275,18 +277,19 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
       'ExplorationAutomaticTextToSpeechService', 'ExplorationCategoryService',
       'ExplorationCorrectnessFeedbackService', 'ExplorationDataService',
       'ExplorationFeaturesBackendApiService', 'ExplorationFeaturesService',
-      'ExplorationInitStateNameService', 'ExplorationLanguageCodeService',
-      'ExplorationObjectiveService', 'ExplorationParamChangesService',
-      'ExplorationParamSpecsService', 'ExplorationRightsService',
-      'ExplorationStatesService', 'ExplorationTagsService',
-      'ExplorationTitleService', 'ExplorationWarningsService',
-      'GraphDataService', 'PageTitleService', 'ParamChangesObjectFactory',
-      'ParamSpecsObjectFactory', 'PlaythroughIssuesService', 'RouterService',
-      'SiteAnalyticsService', 'StateClassifierMappingService',
-      'StateEditorService', 'StateTopAnswersStatsBackendApiService',
-      'StateTopAnswersStatsService', 'StateTutorialFirstTimeService',
-      'ThreadDataService', 'UrlInterpolationService',
-      'UserEmailPreferencesService', 'EVENT_EXPLORATION_PROPERTY_CHANGED',
+      'ExplorationImageCounterService', 'ExplorationInitStateNameService',
+      'ExplorationLanguageCodeService', 'ExplorationObjectiveService',
+      'ExplorationParamChangesService', 'ExplorationParamSpecsService',
+      'ExplorationRightsService', 'ExplorationStatesService',
+      'ExplorationTagsService', 'ExplorationTitleService',
+      'ExplorationWarningsService', 'GraphDataService', 'PageTitleService',
+      'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+      'PlaythroughIssuesService', 'RouterService', 'SiteAnalyticsService',
+      'StateClassifierMappingService', 'StateEditorService',
+      'StateTopAnswersStatsBackendApiService', 'StateTopAnswersStatsService',
+      'StateTutorialFirstTimeService', 'ThreadDataService',
+      'UrlInterpolationService', 'UserEmailPreferencesService',
+      'EVENT_EXPLORATION_PROPERTY_CHANGED',
       function(
           $http, $log, $q, $rootScope, $scope, $templateCache,
           $timeout, $uibModal, $window, AutosaveInfoModalsService,
@@ -294,13 +297,14 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
           ExplorationAutomaticTextToSpeechService, ExplorationCategoryService,
           ExplorationCorrectnessFeedbackService, ExplorationDataService,
           ExplorationFeaturesBackendApiService, ExplorationFeaturesService,
-          ExplorationInitStateNameService, ExplorationLanguageCodeService,
-          ExplorationObjectiveService, ExplorationParamChangesService,
-          ExplorationParamSpecsService, ExplorationRightsService,
-          ExplorationStatesService, ExplorationTagsService,
-          ExplorationTitleService, ExplorationWarningsService,
-          GraphDataService, PageTitleService, ParamChangesObjectFactory,
-          ParamSpecsObjectFactory, PlaythroughIssuesService, RouterService,
+          ExplorationImageCounterService, ExplorationInitStateNameService,
+          ExplorationLanguageCodeService, ExplorationObjectiveService,
+          ExplorationParamChangesService, ExplorationParamSpecsService,
+          ExplorationRightsService, ExplorationStatesService,
+          ExplorationTagsService, ExplorationTitleService,
+          ExplorationWarningsService, GraphDataService, PageTitleService,
+          ParamChangesObjectFactory, ParamSpecsObjectFactory,
+          PlaythroughIssuesService, RouterService,
           SiteAnalyticsService, StateClassifierMappingService,
           StateEditorService, StateTopAnswersStatsBackendApiService,
           StateTopAnswersStatsService, StateTutorialFirstTimeService,
@@ -378,6 +382,7 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
             ExplorationTitleService.init(explorationData.title);
             ExplorationCategoryService.init(explorationData.category);
             ExplorationObjectiveService.init(explorationData.objective);
+            ExplorationImageCounterService.init(explorationData.image_counter);
             ExplorationLanguageCodeService.init(explorationData.language_code);
             ExplorationInitStateNameService.init(
               explorationData.init_state_name);

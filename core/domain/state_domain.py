@@ -192,7 +192,7 @@ class Image(object):
         self.validate()
 
     def to_dict(self):
-        """Returns a dict representing this Image domain object.
+        """Returns a dict representing this image domain object.
 
         Returns:
             dict. A dict, mapping all fields of Image instance.
@@ -204,18 +204,18 @@ class Image(object):
         }
 
     @classmethod
-    def from_dict(cls, image_info):
+    def from_dict(cls, image_dict):
         """Return an Image object from a dict.
 
         Args:
-            image_info: dict. The dict representation of Image object.
+            image_dict: dict. The dict representation of image object.
 
         Returns:
-            Image. The corresponding ImageAssets domain object.
+            Image. The corresponding Image domain object.
         """
-        src = image_info['src']
-        placeholder = image_info['placeholder']
-        instructions = image_info['instructions']
+        src = image_dict['src']
+        placeholder = image_dict['placeholder']
+        instructions = image_dict['instructions']
 
         return cls(src, placeholder, instructions)
 
@@ -225,6 +225,10 @@ class Image(object):
         Raises:
             ValidationError: One or more attributes of the Image are not valid.
         """
+        if not isinstance(self.src, basestring):
+            raise utils,ValidationError(
+                'Expected image src to be string, received %s' %
+                self.src)
         if not isinstance(self.placeholder, bool):
             raise utils.ValidationError(
                 'Expected placeholder to be bool, received %s' %
@@ -252,15 +256,19 @@ class ImageAssets(object):
             ValidationError: One or more attributes of the ImageAssets are not
                 valid.
         """
+        if not isinstance(self.image_mapping, dict):
+            raise utils.ValidationError(
+                'Expected image_mapping to be dict, received %s' %
+                self.image_mapping)
         image_ids = self.image_mapping.keys()
         for image_id in image_ids:
-            if not self.is_image_have_valid_pattern(image_id):
+            if not self.does_image_id_have_valid_pattern(image_id):
                 raise utils.ValidationError(
                     'Invalid image_id received: %s' % image_id)
             numeric_part_of_image_id = int(image_id.strip('image_id_'))
             if numeric_part_of_image_id > image_counter:
                 raise Exception(
-                    'Image Id is greater then image_id counter not possible,'
+                    'Image ID cannot be greater than image_counter,'
                     ' received image_id is %s' % image_id)
             image = self.image_mapping[image_id]
             image.validate()
@@ -269,7 +277,7 @@ class ImageAssets(object):
         """Returns a dict representing this ImageAssets domain object.
 
         Returns:
-            dict. A dict, mapping all fields of ImageAssets instance.
+            dict. A dict representation of the ImageAssets instance.
         """
         image_assets = {}
         image_mapping = {}
@@ -306,7 +314,7 @@ class ImageAssets(object):
             image_id: int. The image_id of an image.
             image_object: dict. The image object.
         """
-        if not self.is_image_have_valid_pattern(image_id):
+        if not self.does_image_id_have_valid_pattern(image_id):
             raise utils.ValidationError(
                 'Invalid image_id received: %s' % image_id)
         if image_id in self.image_mapping:
@@ -323,12 +331,12 @@ class ImageAssets(object):
         """
         if image_id not in self.image_mapping:
             raise utils.ValidationError(
-                'ImageId does not exist: %s' % image_id)
+                'Image Id does not exist: %s' % image_id)
 
         del self.image_mapping[image_id]
 
-    def is_image_have_valid_pattern(self, image_id):
-        """Checks is image have valida pattern or not.
+    def does_image_id_have_valid_pattern(self, image_id):
+        """Checks if the image ID has a valid pattern.
         Valid image pattern is 'image_id_[digits]' eg. 'image_id_1' or
         'image_id_50'
         Invalid image pattern were :
@@ -338,10 +346,10 @@ class ImageAssets(object):
             4) 'dd_image_id'
 
         Args:
-            image_id: str. Id of an image.
+            image_id: str. ID of the image.
 
         Returns:
-            bool. True if image_id have have valid pattern.
+            bool. True if image_id follows the pattern.
         """
         image_re = r'image_id_[0-9]{1,}$'
         if re.match(image_re, image_id):
@@ -1618,7 +1626,7 @@ class State(object):
                 are ParamSpec value objects with an object type
                 property(obj_type). It is None if the state belongs to a
                 question.
-            image_counter: str. Counter for an image ids.
+            image_counter: str. Counter for image ids.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
 
@@ -2101,7 +2109,11 @@ class State(object):
             False)
 
     def get_image_ids_of_state(self):
-        """Returns list of image ids present in state HTML."""
+        """Returns list of image ids present in state HTML.
+
+        Returns:
+            image_ids_in_state: list. List of all Image ID's present in a state.
+        """
         content_html = self.content.html
         interaction_html_list = self.interaction.get_all_html_content_strings()
         if interaction_html_list != []:

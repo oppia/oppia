@@ -693,7 +693,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         image_assets.delete_image('image_id_2')
         self.assertEqual(image_assets.to_dict(), expected_image_assets_dict)
 
-        # Test for deleting image, whose image id doesnot exist.
+        # Test for deleting image, whose image id does not exist.
         with self.assertRaisesRegexp(
             Exception, 'ImageId does not exist: image_id_8'):
             image_assets.delete_image('image_id_8')

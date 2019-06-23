@@ -198,8 +198,9 @@ oppia.factory('ExplorationStatesService', [
     var addImageInState = function(stateName, image) {
       var state = _states.getState(stateName);
       var imageId = image.image_id;
-      var imageInfo = image.image_info
+      var imageInfo = image.image_info;
       state.image_assets.image_mapping[imageId] = imageInfo;
+
       _setState(stateName, angular.copy(state), true);
       ChangeListService.addImage(stateName, image);
     };
