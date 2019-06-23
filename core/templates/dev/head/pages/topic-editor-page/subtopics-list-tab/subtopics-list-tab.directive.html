@@ -61,7 +61,7 @@
            ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank" rel="noopener">
           <[skillSummary.getDescription()]>
         </a>
-        <span class="fa fa-trash delete-icon" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></span>
+        <span class="fas fa-trash-alt delete-icon" ng-click="deleteUncategorizedSkillFromTopic(skillSummary)"></span>
         <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
           Skill Deleted
         </span>

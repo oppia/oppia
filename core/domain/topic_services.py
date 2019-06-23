@@ -337,7 +337,7 @@ def apply_change_list(topic_id, change_list):
             The modified topic object, the modified subtopic pages dict keyed
             by subtopic page id containing the updated domain objects of
             each subtopic page, a list of ids of the deleted subtopics,
-            a list of ids of the newly created subtopics and a list pf changes
+            a list of ids of the newly created subtopics and a list of changes
             applied to modified subtopic pages.
     """
     topic = get_topic_by_id(topic_id)
@@ -380,7 +380,7 @@ def apply_change_list(topic_id, change_list):
                         'cmd': 'create_new',
                         'topic_id': topic_id,
                         'subtopic_id': change.subtopic_id
-                        }))
+                    }))
                 newly_created_subtopic_ids.append(change.subtopic_id)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 topic.delete_subtopic(change.subtopic_id)

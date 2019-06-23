@@ -1,4 +1,4 @@
-<i class="oppia-learner-dashboard-icon fa fa-clock-o"
+<i class="oppia-learner-dashboard-icon far fa-clock"
    ng-if="isAddToPlaylistIconShown()"
    ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId()) && !isContainerNarrow()"
    ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())"
@@ -13,9 +13,9 @@
       <a><['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]></a>
     </li>
   </ul>
-  <i class="fa fa-ellipsis-v dropdown-toggle" uib-dropdown-toggle></i>
+  <i class="fas fa-ellipsis-v dropdown-toggle" uib-dropdown-toggle></i>
 </div>
-<i class="oppia-learner-dashboard-icon fa fa-clock-o"
+<i class="oppia-learner-dashboard-icon far fa-clock"
    ng-if="belongsToLearnerPlaylist()"
    ng-click="removeFromLearnerPlaylist(getActivityId(), getActivityTitle(), getActivityType())"
    aria-hidden="true"
@@ -24,13 +24,13 @@
    uib-tooltip="<['I18N_LIBRARY_ACTIVITY_IN_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left">
 </i>
-<i class="oppia-learner-dashboard-icon fa fa-check-circle-o"
+<i class="oppia-learner-dashboard-icon far fa-check-circle"
    ng-if="belongsToCompletedActivities()"
    aria-hidden="true"
    uib-tooltip="<['I18N_LIBRARY_ACTIVITY_COMPLETED_ICON' | translate]>"
    tooltip-placement="left">
 </i>
-<i class="oppia-learner-dashboard-icon fa fa-spinner"
+<i class="oppia-learner-dashboard-icon fas fa-spinner"
    ng-if="belongsToIncompleteActivities()"
    aria-hidden="true"
    tooltip-append-to-body="true"
