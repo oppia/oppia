@@ -744,8 +744,10 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
             return rights_manager.CollectionRightsChange
-        else:
+        elif item.id.startswith('collection'):
             return collection_domain.CollectionChange
+        else:
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1298,8 +1300,10 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
             return rights_manager.ExplorationRightsChange
-        else:
+        elif item.id.startswith('exploration'):
             return exp_domain.ExplorationChange
+        else:
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
