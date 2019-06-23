@@ -75,7 +75,8 @@ def create_test_suites(test_target=None):
     return (
         [loader.loadTestsFromName(test_target)]
         if test_target else [loader.discover(
-            CURR_DIR, pattern='*_test.py', top_level_dir=CURR_DIR)])
+            CURR_DIR, pattern='[^core/tests/data]*_test.py',
+            top_level_dir=CURR_DIR)])
 
 
 def main():

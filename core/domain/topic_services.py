@@ -473,7 +473,9 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
 
     # Topic model cannot be None as topic is passed as parameter here and that
-    # is only possible if a topic model with that topic id exists.
+    # is only possible if a topic model with that topic id exists. Also this is
+    # a private function and so it cannot be called independently with any
+    # topic object.
     if topic.version > topic_model.version:
         raise Exception(
             'Unexpected error: trying to update version %s of topic '

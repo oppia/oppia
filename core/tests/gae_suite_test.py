@@ -40,3 +40,34 @@ class GaeSuiteTests(test_utils.GenericTestBase):
             Exception, 'Directory invalid_path does not exist.')
         with assert_raises_regexp_context_manager, dir_to_add_swap:
             gae_suite.main()
+
+    def test_failing_tests(self):
+
+        def _mock_create_test_suites(**unused_test_target):
+            """Mocks create_test_suites()."""
+            loader = unittest.TestLoader()
+            return [loader.loadTestsFromName('core.tests.data.failing_tests')]
+
+        create_test_suites_swap = self.swap(
+            gae_suite, 'create_test_suites', _mock_create_test_suites)
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception,
+            'Test suite failed: 1 tests run, 0 errors, 1 failures.')
+
+        with create_test_suites_swap, assert_raises_regexp_context_manager:
+            gae_suite.main()
+
+    def test_no_tests_run_with_invalid_filename(self):
+
+        def _mock_create_test_suites(**unused_test_target):
+            """Mocks create_test_suites()."""
+            loader = unittest.TestLoader()
+            return [loader.loadTestsFromName('invalid_test')]
+
+        create_test_suites_swap = self.swap(
+            gae_suite, 'create_test_suites', _mock_create_test_suites)
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'No module named invalid_test')
+
+        with create_test_suites_swap, assert_raises_regexp_context_manager:
+            gae_suite.main()
