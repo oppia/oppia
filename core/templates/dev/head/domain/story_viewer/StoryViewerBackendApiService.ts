@@ -20,10 +20,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/story_viewer/story-viewer-domain.constants.ts');
 
-oppia.constant(
-  'STORY_NODE_COMPLETION_URL_TEMPLATE',
-  '/story_node_completion_handler/<story_id>/<node_id>');
-
 oppia.factory('StoryViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'STORY_DATA_URL_TEMPLATE',
   'STORY_NODE_COMPLETION_URL_TEMPLATE',
