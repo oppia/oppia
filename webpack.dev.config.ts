@@ -24,8 +24,12 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
+      path.resolve(__dirname, 'node_modules'),
       path.resolve(__dirname, 'extensions')
     ],
+    alias: {
+      "@angular/upgrade/static": "@angular/upgrade/bundles/upgrade-static.umd.js"
+    }
   },
   entry: commonWebpackConfig.entries,
   plugins: commonWebpackConfig.plugins,
