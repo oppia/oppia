@@ -41,6 +41,7 @@ require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/skill/ConceptCardBackendApiService.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 require('domain/story_viewer/StoryViewerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
@@ -334,7 +335,8 @@ oppia.directive('conversationSkin', [
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
         'QuestionPlayerStateService', 'LearnerParamsService',
         'ExplorationRecommendationsService',
-        'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
+        'ReadOnlyExplorationBackendApiService',
+        'ReadOnlyStoryNodeObjectFactory', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'StoryViewerBackendApiService',
@@ -364,7 +366,8 @@ oppia.directive('conversationSkin', [
             EditableExplorationBackendApiService, PlayerTranscriptService,
             QuestionPlayerStateService, LearnerParamsService,
             ExplorationRecommendationsService,
-            ReadOnlyExplorationBackendApiService, PlayerPositionService,
+            ReadOnlyExplorationBackendApiService,
+            ReadOnlyStoryNodeObjectFactory, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
             StoryViewerBackendApiService,
@@ -765,10 +768,14 @@ oppia.directive('conversationSkin', [
 
                 StoryViewerBackendApiService.fetchStoryData(storyId).then(
                   function(storyDataDict) {
-                    var storyNodes = storyDataDict.story_nodes;
+                    var storyNodes = storyDataDict.story_nodes.map(
+                      function(storyNodeDict) {
+                        return ReadOnlyStoryNodeObjectFactory
+                          .createFromBackendDict(storyNodeDict);
+                    });
                     var completedStoryNodes = [];
                     storyNodes.forEach(function(storyNode) {
-                      if (storyNode.completed) {
+                      if (storyNode.isCompleted) {
                         completedStoryNodes.push(storyNode);
                       }
                     });
