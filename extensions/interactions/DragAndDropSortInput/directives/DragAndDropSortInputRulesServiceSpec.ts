@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for Drag and Drop Sorting rules.
  */
 
+require(
+  'interactions/DragAndDropSortInput/directives/' +
+  'DragAndDropSortInputRulesService.ts');
+
 describe('Drag and Drop Sort Input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 

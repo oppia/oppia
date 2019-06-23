@@ -15,33 +15,25 @@
  * @fileoverview Service to receive questions for practice given a set of
  * skill_ids.
  */
-oppia.constant(
-  'QUESTION_PLAYER_URL_TEMPLATE',
-  '/question_player_handler?skill_ids=<skill_ids>&question_count' +
-  '=<question_count>&start_cursor=<start_cursor>');
+
+require('domain/question/question-domain.constants.ts');
 
 oppia.factory('QuestionPlayerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
   function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE) {
-    var _startCursor = '';
     var _fetchQuestions = function(
-        skillIds, questionCount, resetHistory, successCallback, errorCallback) {
+        skillIds, questionCount, successCallback, errorCallback) {
       if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
         return;
-      }
-      if (resetHistory) {
-        _startCursor = '';
       }
       var questionDataUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_PLAYER_URL_TEMPLATE, {
           skill_ids: skillIds.join(','),
-          question_count: questionCount.toString(),
-          start_cursor: _startCursor
+          question_count: questionCount.toString()
         });
 
       $http.get(questionDataUrl).then(function(response) {
         var questionDicts = angular.copy(response.data.question_dicts);
-        _startCursor = response.data.next_start_cursor;
         if (successCallback) {
           successCallback(questionDicts);
         }
@@ -94,10 +86,10 @@ oppia.factory('QuestionPlayerBackendApiService', [
      * of questions requested.
      */
     return {
-      fetchQuestions: function(skillIds, questionCount, resetHistory) {
+      fetchQuestions: function(skillIds, questionCount) {
         return $q(function(resolve, reject) {
           _fetchQuestions(
-            skillIds, questionCount, resetHistory, resolve, reject);
+            skillIds, questionCount, resolve, reject);
         });
       }
     };
