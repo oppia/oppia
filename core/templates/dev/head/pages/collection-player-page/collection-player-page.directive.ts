@@ -248,6 +248,16 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
               ctrl.collectionId);
           };
 
+          ctrl.getExplorationTitlePosition = function(index) {
+            if (index % 2 === 0 ) {
+              return '8px';
+            } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
+              return '30px';
+            } else if ((index + 1) % 4 === 0) {
+              return '-40px';
+            }
+          };
+
           $http.get('/collectionsummarieshandler/data', {
             params: {
               stringified_collection_ids: JSON.stringify([ctrl.collectionId])
