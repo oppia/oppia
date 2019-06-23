@@ -435,8 +435,8 @@ def get_thread_summaries(user_id, thread_ids):
             - 'last_message_text': str. The text of the last message.
             - 'total_message_count': int. The total number of messages in the
                 thread.
-            - 'last_message_is_read': boolean. Whether the last message is read by
-                the user.
+            - 'last_message_is_read': boolean. Whether the last message is read
+                by the user.
             - 'second_last_message_is_read': boolean. Whether the second last
                 message is read by the user,
             - 'author_last_message': str. The name of the author of the last
