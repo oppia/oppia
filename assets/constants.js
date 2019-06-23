@@ -498,6 +498,9 @@ var constants = {
     ]
   }],
 
+  // Interaction IDs for which answer details cannot be solicited.
+  "INTERACTION_IDS_WITHOUT_ANSWER_DETAILS": ["EndExploration", "Continue"],
+
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
@@ -528,6 +531,8 @@ var constants = {
   "ENABLE_PREREQUISITE_SKILLS": false,
 
   "ENABLE_NEW_STRUCTURE_PLAYERS": false,
+
+  "ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE": false,
 
   "NUM_QUESTIONS_PER_PAGE": 10,
 

@@ -16,6 +16,8 @@
  * @fileoverview Tests for ExplorationStatesService.
  */
 
+require('components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 
 describe('ExplorationStatesService', function() {
@@ -25,17 +27,19 @@ describe('ExplorationStatesService', function() {
   var ChangeListService = null;
   var ContextService = null;
   var ExplorationStatesService = null;
+  var StateSolicitAnswerDetailsService = null;
 
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function(
       _$q_, _$rootScope_, _$uibModal_, _ChangeListService_, _ContextService_,
-      _ExplorationStatesService_) {
+      _ExplorationStatesService_, _StateSolicitAnswerDetailsService_) {
     $q = _$q_;
     $rootScope = _$rootScope_;
     $uibModal = _$uibModal_;
     ChangeListService = _ChangeListService_;
     ContextService = _ContextService_;
     ExplorationStatesService = _ExplorationStatesService_;
+    StateSolicitAnswerDetailsService = _StateSolicitAnswerDetailsService_;
   }));
 
   beforeEach(function() {
@@ -143,5 +147,17 @@ describe('ExplorationStatesService', function() {
         expect(spy).toHaveBeenCalledWith('Hola');
       });
     });
+  });
+
+  it('should save the solicitAnswerDetails correctly', function() {
+    expect(
+      ExplorationStatesService.getSolicitAnswerDetailsMemento(
+        'Hola', 'solicit_answer_details')).toEqual(false);
+    spyOn(ChangeListService, 'editStateProperty');
+    ExplorationStatesService.saveSolicitAnswerDetails('Hola', true);
+    expect(ChangeListService.editStateProperty).toHaveBeenCalledWith(
+      'Hola', 'solicit_answer_details', true, false);
+    expect(ExplorationStatesService.getSolicitAnswerDetailsMemento(
+      'Hola', 'solicit_answer_details')).toEqual(true);
   });
 });
