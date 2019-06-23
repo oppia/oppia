@@ -116,7 +116,9 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.TopicCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.SubtopicPageModelAuditOneOffJob,
-    prod_validation_jobs_one_off.SubtopicPageSnapshotMetadataModelAuditOneOffJob, # pylint: disable=line-too-long
+    (
+        prod_validation_jobs_one_off
+        .SubtopicPageSnapshotMetadataModelAuditOneOffJob),
     prod_validation_jobs_one_off.SubtopicPageSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.SubtopicPageCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserSubscriptionsModelAuditOneOffJob,

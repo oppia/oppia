@@ -6269,7 +6269,7 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         topics = [topic_domain.Topic.create_default_topic(
-            topic_id='%s' % i, name='topic%s' % i) for i in xrange(3)]
+            topic_id='%s' % i, name='Topic%s' % i) for i in xrange(3)]
 
         skills = [skill_domain.Skill.create_default_skill(
             skill_id='%s' % i, description='skill%s' % i) for i in xrange(9)]
@@ -6499,6 +6499,20 @@ class TopicModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'fully-validated TopicModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_model_with_repeated_name(self):
+        self.model_instance_0.name = 'Topic1'
+        self.model_instance_0.canonical_name = 'topic1'
+        self.model_instance_0.commit(self.owner_id, '', [])
+        expected_output = [
+            (
+                u'[u\'failed validation check for unique name check '
+                'of TopicModel\', [u"Entity id 0: canonical name topic1 '
+                'matches with canonical name of topic models with ids '
+                '[\'1\']", u"Entity id 1: canonical name topic1 matches '
+                'with canonical name of topic models with ids [\'0\']"]]'
+            ), u'[u\'fully-validated TopicModel\', 1]']
+        run_job_and_check_output(self, expected_output, literal_eval=True)
+
     def test_model_with_canonical_name_not_matching_name_in_lowercase(self):
         self.model_instance_0.name = 'invalid'
         self.model_instance_0.commit(self.owner_id, '', [])
@@ -6581,7 +6595,9 @@ class TopicSnapshotMetadataModelValidatorTests(
             topic_models.TopicSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.TopicSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .TopicSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -6759,7 +6775,9 @@ class TopicSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             topic_models.TopicSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.TopicSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .TopicSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -7093,7 +7111,9 @@ class TopicRightsSnapshotMetadataModelValidatorTests(
             topic_models.TopicRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.TopicRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .TopicRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -7284,7 +7304,9 @@ class TopicRightsSnapshotContentModelValidatorTests(
             topic_models.TopicRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.TopicRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .TopicRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -7427,7 +7449,9 @@ class TopicCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             topic_models.TopicCommitLogEntryModel.get_by_id(
                 'rights-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.TopicCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .TopicCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -8108,7 +8132,9 @@ class SubtopicPageSnapshotMetadataModelValidatorTests(
             topic_models.SubtopicPageSnapshotMetadataModel.get_by_id(
                 '2-1-1'))
 
-        self.job_class = prod_validation_jobs_one_off.SubtopicPageSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SubtopicPageSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -8299,7 +8325,9 @@ class SubtopicPageSnapshotContentModelValidatorTests(
             topic_models.SubtopicPageSnapshotContentModel.get_by_id(
                 '2-1-1'))
 
-        self.job_class = prod_validation_jobs_one_off.SubtopicPageSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SubtopicPageSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(
@@ -8460,7 +8488,9 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             topic_models.SubtopicPageCommitLogEntryModel.get_by_id(
                 'subtopicpage-2-1-1'))
 
-        self.job_class = prod_validation_jobs_one_off.SubtopicPageCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SubtopicPageCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         topic_services.update_topic_and_subtopic_pages(

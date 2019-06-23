@@ -1915,6 +1915,26 @@ class TopicModelValidator(BaseModelValidator):
         }
 
     @classmethod
+    def _validate_canonical_name_is_unique(cls, item):
+        """Validate that canonical name of the model unique.
+
+        Args:
+            item: ndb.Model. TopicModel to validate.
+        """
+        topic_models_list = topic_models.TopicModel.query().filter(
+            topic_models.TopicModel.canonical_name == (
+                item.canonical_name)).filter(
+                    not topic_models.TopicModel.deleted).fetch()
+        topic_model_ids = [
+            topic_model.id
+            for topic_model in topic_models_list if topic_model.id != item.id]
+        if topic_model_ids:
+            cls.errors['unique name check'].append(
+                'Entity id %s: canonical name %s matches with canonical '
+                'name of topic models with ids %s' % (
+                    item.id, item.canonical_name, topic_model_ids))
+
+    @classmethod
     def _validate_canonical_name_matches_name_in_lowercase(cls, item):
         """Validate that canonical name of the model is same as name of the
         model in lowercase.
@@ -1947,6 +1967,7 @@ class TopicModelValidator(BaseModelValidator):
     @classmethod
     def _get_custom_validation_functions(cls):
         return [
+            cls._validate_canonical_name_is_unique,
             cls._validate_canonical_name_matches_name_in_lowercase,
             cls._validate_uncategorized_skill_ids_not_in_subtopic_skill_ids]
 
@@ -1954,7 +1975,7 @@ class TopicModelValidator(BaseModelValidator):
 class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating TopicSnapshotMetadataModel."""
 
-    related_model_name = 'topic'
+    RELATED_MODEL_NAME = 'topic'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1973,7 +1994,7 @@ class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 class TopicSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating TopicSnapshotContentModel."""
 
-    related_model_name = 'topic'
+    RELATED_MODEL_NAME = 'topic'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2009,7 +2030,7 @@ class TopicRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating TopicRightsSnapshotMetadataModel."""
 
-    related_model_name = 'topic rights'
+    RELATED_MODEL_NAME = 'topic rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -2030,7 +2051,7 @@ class TopicRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating TopicRightsSnapshotContentModel."""
 
-    related_model_name = 'topic rights'
+    RELATED_MODEL_NAME = 'topic rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2044,7 +2065,7 @@ class TopicRightsSnapshotContentModelValidator(
 class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating TopicCommitLogEntryModel."""
 
-    related_model_name = 'topic'
+    RELATED_MODEL_NAME = 'topic'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2058,8 +2079,10 @@ class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
             return topic_domain.TopicRightsChange
-        else:
+        elif item.id.startswith('topic'):
             return topic_domain.TopicChange
+        else:
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2267,7 +2290,7 @@ class SubtopicPageSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
 
-    related_model_name = 'subtopic page'
+    RELATED_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -2291,7 +2314,7 @@ class SubtopicPageSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating SubtopicPageSnapshotContentModel."""
 
-    related_model_name = 'subtopic page'
+    RELATED_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -2309,7 +2332,7 @@ class SubtopicPageCommitLogEntryModelValidator(
         BaseCommitLogEntryModelValidator):
     """Class for validating SubtopicPageCommitLogEntryModel."""
 
-    related_model_name = 'subtopic page'
+    RELATED_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, item):
