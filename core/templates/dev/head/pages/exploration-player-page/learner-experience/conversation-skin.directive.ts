@@ -772,7 +772,7 @@ oppia.directive('conversationSkin', [
                       function(storyNodeDict) {
                         return ReadOnlyStoryNodeObjectFactory
                           .createFromBackendDict(storyNodeDict);
-                    });
+                      });
                     var completedStoryNodes = [];
                     storyNodes.forEach(function(storyNode) {
                       if (storyNode.isCompleted) {
