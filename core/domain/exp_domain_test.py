@@ -18,6 +18,7 @@
 
 import copy
 import os
+import re
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -518,6 +519,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             exploration, 'Expected outcome param_changes to be a list')
 
+        outcome.param_changes = [param_domain.ParamChange(
+            0, 'generator_id', {})]
+        self._assert_validation_error(
+            exploration, 'Expected param_change name to be a string')
+
         outcome.param_changes = []
         exploration.validate()
 
@@ -613,16 +619,37 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(default_outcome.to_dict())
         exploration.validate()
 
+        interaction.solution = state_domain.Solution.from_dict(
+            interaction.id, {
+                'answer_is_exclusive': True,
+                'correct_answer': 'hello_world!',
+                'explanation': {
+                    'content_id': 'solution',
+                    'html': 'hello_world is a string'
+                }
+            }
+        )
+        self._assert_validation_error(
+            exploration,
+            re.escape('Hint(s) must be specified if solution is specified'))
+
+        interaction.solution = None
         interaction.hints = {}
         self._assert_validation_error(
             exploration, 'Expected hints to be a list')
         interaction.hints = []
 
         # Validate AnswerGroup.
+        init_state.interaction.answer_groups[0].tagged_misconception_id = (
+            'invalid_tagged_misconception_id')
+        self._assert_validation_error(
+            exploration, 'Expected tagged misconception id to be an int')
+
         init_state.interaction.answer_groups[0].rule_specs = {}
         self._assert_validation_error(
             exploration, 'Expected answer group rules to be a list')
 
+        init_state.interaction.answer_groups[0].tagged_misconception_id = None
         init_state.interaction.answer_groups[0].rule_specs = []
         self._assert_validation_error(
             exploration,
@@ -5277,10 +5304,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
 
         exploration = exp_domain.Exploration.create_default_exploration(
             'eid', title='title', category='category')
-        exploration.add_states(['state1', 'state2', 'state3'])
+        exploration.add_states(['state1', 'state2', 'state3', 'state4'])
         state1 = exploration.states['state1']
         state2 = exploration.states['state2']
         state3 = exploration.states['state3']
+        state4 = exploration.states['state4']
         content1_dict = {
             'content_id': 'content',
             'html': '<blockquote>Hello, this is state1</blockquote>'
@@ -5293,13 +5321,19 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'content_id': 'content',
             'html': '<p>Hello, this is state3</p>'
         }
+        content4_dict = {
+            'content_id': 'content',
+            'html': '<p>Hello, this is state4</p>'
+        }
         state1.update_content(content1_dict)
         state2.update_content(content2_dict)
         state3.update_content(content3_dict)
+        state4.update_content(content4_dict)
 
         state1.update_interaction_id('TextInput')
         state2.update_interaction_id('MultipleChoiceInput')
         state3.update_interaction_id('ItemSelectionInput')
+        state4.update_interaction_id('DragAndDropSortInput')
 
         customization_args_dict1 = {
             'placeholder': {'value': ''},
@@ -5318,9 +5352,17 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 '<p>This is value3 for ItemSelection</p>'
             ]}
         }
+        customization_args_dict4 = {
+            'choices': {'value': [
+                '<p>This is value1 for DragAndDropSortInput</p>',
+                '<p>This is value2 for DragAndDropSortInput</p>',
+            ]}
+        }
+
         state1.update_interaction_customization_args(customization_args_dict1)
         state2.update_interaction_customization_args(customization_args_dict2)
         state3.update_interaction_customization_args(customization_args_dict3)
+        state4.update_interaction_customization_args(customization_args_dict4)
 
         default_outcome_dict1 = {
             'dest': 'state2',
@@ -5450,7 +5492,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             '',
             '<p>This is value1 for ItemSelection</p>',
             '<p>This is value2 for ItemSelection</p>',
-            '<p>This is value3 for ItemSelection</p>'
+            '<p>This is value3 for ItemSelection</p>',
+            '<p>Hello, this is state4</p>',
+            '',
+            '<p>This is value1 for DragAndDropSortInput</p>',
+            '<p>This is value2 for DragAndDropSortInput</p>'
         ]
 
         actual_outcome_list = exploration.get_all_html_content_strings()
