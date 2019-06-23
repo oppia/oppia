@@ -21,6 +21,7 @@ import json
 import numbers
 import sys
 
+from constants import constants
 from core.domain import action_registry
 from core.domain import customization_args_util
 from core.domain import exp_domain
@@ -1488,7 +1489,8 @@ class LearnerAnswerDetails(object):
             raise utils.ValidationError(
                 'Unknown interaction_id: %s' % self.interaction_id)
 
-        if self.interaction_id in feconf.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS:
+        if self.interaction_id in (
+                constants.INTERACTION_IDS_WITHOUT_ANSWER_DETAILS):
             raise utils.ValidationError(
                 'The %s interaction does not support soliciting '
                 'answer details from learners.' % (self.interaction_id))
