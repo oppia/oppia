@@ -90,22 +90,24 @@ oppia.directive('stateResponses', [
         'EditabilityService', 'ResponsesService',
         'StateCustomizationArgsService', 'StateEditorService',
         'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
-        'UrlInterpolationService', 'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS',
-        'INTERACTION_SPECS', 'PLACEHOLDER_OUTCOME_DEST',
-        'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+        'UrlInterpolationService', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
+        'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
+        'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
             $filter, $rootScope, $scope, $uibModal, AlertsService,
             AnswerGroupObjectFactory, ContextService,
             EditabilityService, ResponsesService,
             StateCustomizationArgsService, StateEditorService,
             StateInteractionIdService, StateSolicitAnswerDetailsService,
-            UrlInterpolationService, INTERACTION_IDS_WITHOUT_ANSWER_DETAILS,
-            INTERACTION_SPECS, PLACEHOLDER_OUTCOME_DEST,
-            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
+            UrlInterpolationService, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
+            INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
+            PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
           $scope.stateName = StateEditorService.getActiveStateName();
+          $scope.enableSolicitAnswerDetailsFeature = (
+            ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
           $scope.stateSolicitAnswerDetailsService = (
             StateSolicitAnswerDetailsService);
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
