@@ -161,7 +161,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
 
       var filenamesInState = [];
       imageIdsInState.forEach(function(imageId) {
-        filenamesInState.push(state.image_assets.image_mapping[imageId]['src'])
+        filenamesInState.push(state.image_assets.image_mapping[imageId].src);
       });
       return filenamesInState;
     };
