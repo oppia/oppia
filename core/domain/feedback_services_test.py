@@ -325,8 +325,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
                 'last_updated': thread_summaries[index]['last_updated'],
                 'last_message_text': 'not used here',
                 'total_message_count': 1,
-                'last_message_read': True,
-                'second_last_message_read': False,
+                'last_message_is_read': True,
+                'second_last_message_is_read': False,
                 'author_last_message': user_services.get_username(
                     self.user_id),
                 'author_second_last_message': None,
@@ -344,7 +344,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         # Check if the number of unread messages is equal to 1.
         self.assertEqual(number_of_unread_threads, 1)
 
-    def test_get_thread_summaries_increments_message_count(self):
+    def test_get_thread_summaries_returns_correct_message_count(self):
         thread_id_1 = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
@@ -429,7 +429,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         thread = feedback_models.GeneralFeedbackThreadModel.get(thread_id)
         self.assertEqual(thread.message_count, 2)
 
-    def test_get_thread_increments_message_count(self):
+    def test_get_thread_returns_correct_message_count(self):
         thread_id = feedback_services.create_thread(
             'exploration', self.EXP_ID_1, self.user_id,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')

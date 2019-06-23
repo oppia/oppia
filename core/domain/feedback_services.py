@@ -435,9 +435,9 @@ def get_thread_summaries(user_id, thread_ids):
             - 'last_message_text': str. The text of the last message.
             - 'total_message_count': int. The total number of messages in the
                 thread.
-            - 'last_message_read': boolean. Whether the last message is read by
+            - 'last_message_is_read': boolean. Whether the last message is read by
                 the user.
-            - 'second_last_message_read': boolean. Whether the second last
+            - 'second_last_message_is_read': boolean. Whether the second last
                 message is read by the user,
             - 'author_last_message': str. The name of the author of the last
                 message.
@@ -476,7 +476,7 @@ def get_thread_summaries(user_id, thread_ids):
         last_two_messages_ids)
 
     last_two_messages = [messages[i:i + 2] for i in range(0, len(messages), 2)]
-    last_message_read = False
+    last_message_is_read = False
 
     thread_summaries = []
     number_of_unread_threads = 0
@@ -484,7 +484,7 @@ def get_thread_summaries(user_id, thread_ids):
         feedback_thread_user_model_exists = (
             feedback_thread_user_models[index] is not None)
         if feedback_thread_user_model_exists:
-            last_message_read = (
+            last_message_is_read = (
                 last_two_messages[index][0].message_id
                 in feedback_thread_user_models[index].message_ids_read_by_user)
 
@@ -494,20 +494,20 @@ def get_thread_summaries(user_id, thread_ids):
             author_last_message = user_services.get_username(
                 last_two_messages[index][0].author_id)
 
-        second_last_message_read = False
+        second_last_message_is_read = False
         author_second_last_message = None
 
         does_second_message_exist = (last_two_messages[index][1] is not None)
         if does_second_message_exist:
             if feedback_thread_user_model_exists:
-                second_last_message_read = (
+                second_last_message_is_read = (
                     last_two_messages[index][1].message_id
                     in feedback_thread_user_models[index].message_ids_read_by_user) # pylint: disable=line-too-long
 
             if last_two_messages[index][1].author_id is not None:
                 author_second_last_message = user_services.get_username(
                     last_two_messages[index][1].author_id)
-        if not last_message_read:
+        if not last_message_is_read:
             number_of_unread_threads += 1
 
         total_message_count = thread.message_count
@@ -518,8 +518,8 @@ def get_thread_summaries(user_id, thread_ids):
             'last_updated': utils.get_time_in_millisecs(thread.last_updated),
             'last_message_text': last_two_messages[index][0].text,
             'total_message_count': total_message_count,
-            'last_message_read': last_message_read,
-            'second_last_message_read': second_last_message_read,
+            'last_message_is_read': last_message_is_read,
+            'second_last_message_is_read': second_last_message_is_read,
             'author_last_message': author_last_message,
             'author_second_last_message': author_second_last_message,
             'exploration_title': explorations[index].title,
