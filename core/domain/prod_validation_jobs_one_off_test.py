@@ -177,7 +177,7 @@ class MockSnapshotContentModelValidator(
 class MockSnapshotMetadataModelValidator(
         prod_validation_jobs_one_off.BaseSnapshotMetadataModelValidator):
 
-    related_model_name = 'related model'
+    RELATED_MODEL_NAME = 'related model'
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
