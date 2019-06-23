@@ -51,7 +51,47 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
     exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob,
-    prod_validation_jobs_one_off.ProdValidationAuditOneOffJob,
+    prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionRightsSnapshotMetadataModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.CollectionRightsSnapshotContentModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.CollectionSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ConfigPropertyModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ConfigPropertySnapshotMetadataModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.ConfigPropertySnapshotContentModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.SentEmailModelAuditOneOffJob,
+    prod_validation_jobs_one_off.BulkEmailModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralFeedbackEmailReplyToIdModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.ExplorationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationRightsSnapshotMetadataModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.ExplorationRightsSnapshotContentModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileMetadataSnapshotMetadataModelAuditOneOffJob, # pylint: disable=line-too-long
+    prod_validation_jobs_one_off.FileMetadataSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StoryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StorySnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StoryRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StoryRightsSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StoryRightsSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserSubscriptionsModelAuditOneOffJob,
     question_jobs_one_off.QuestionMigrationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     skill_jobs_one_off.SkillMigrationOneOffJob,
