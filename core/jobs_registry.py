@@ -89,6 +89,8 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.FileModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.JobModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.StoryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob,
