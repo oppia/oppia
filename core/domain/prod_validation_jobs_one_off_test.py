@@ -5273,7 +5273,9 @@ class SkillSnapshotMetadataModelValidatorTests(
             skill_models.SkillSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.SkillSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SkillSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         skill_services.update_skill(
@@ -5446,7 +5448,9 @@ class SkillSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             skill_models.SkillSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.SkillSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SkillSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         skill_services.update_skill(
@@ -5711,7 +5715,9 @@ class SkillRightsSnapshotMetadataModelValidatorTests(
             skill_models.SkillRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.SkillRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SkillRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5861,7 +5867,9 @@ class SkillRightsSnapshotContentModelValidatorTests(
             skill_models.SkillRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.SkillRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SkillRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5990,7 +5998,9 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             skill_models.SkillCommitLogEntryModel.get_by_id(
                 'rights-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.SkillCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .SkillCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         skill_services.update_skill(

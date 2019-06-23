@@ -1714,8 +1714,8 @@ class SkillModelValidator(BaseModelValidator):
             item: ndb.Model. SkillModel to validate.
         """
         questions_ids_linked_with_skill = (
-            question_models.QuestionSkillLinkModel.get_all_question_ids_linked_to_skill_id( # pylint: disable=line-too-long
-                item.id))
+            question_models.QuestionSkillLinkModel
+            .get_all_question_ids_linked_to_skill_id(item.id))
         if item.all_questions_merged and questions_ids_linked_with_skill:
             cls.errors['all questions merged check'].append(
                 'Entity id %s: all_questions_merged is True but there '
@@ -1838,8 +1838,10 @@ class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
             return skill_domain.SkillRightsChange
-        else:
+        elif item.id.startswith('skill'):
             return skill_domain.SkillChange
+        else:
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1933,8 +1935,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
     def _get_custom_validation_functions(cls):
         return [
             cls._validate_misconception_count,
-            cls._validate_worked_examples_count
-            ]
+            cls._validate_worked_examples_count]
 
 
 class StoryModelValidator(BaseModelValidator):
