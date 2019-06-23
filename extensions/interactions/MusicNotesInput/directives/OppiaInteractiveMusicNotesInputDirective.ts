@@ -31,6 +31,8 @@ require(
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 
+require('interactions/interactions-extension.constants.ts');
+
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'CurrentInteractionService', 'HtmlEscaperService',
   'MusicNotesInputRulesService', 'MusicPhrasePlayerService',

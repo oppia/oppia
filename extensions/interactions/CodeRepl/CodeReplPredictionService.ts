@@ -26,6 +26,8 @@ require('classifiers/PythonProgramTokenizer.ts');
 require('classifiers/SVMPredictionService.ts');
 require('classifiers/WinnowingPreprocessingService.ts');
 
+require('interactions/interactions-extension.constants.ts');
+
 oppia.factory('CodeReplPredictionService', [
   'CountVectorizerService', 'PythonProgramTokenType',
   'PythonProgramTokenizer', 'SVMPredictionService',
