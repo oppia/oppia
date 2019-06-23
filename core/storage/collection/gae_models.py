@@ -307,7 +307,7 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     A CollectionSummaryModel instance stores the following information:
 
-        id, title, category, objective, language_code, tags,
+        id, title, category, objective, language_code, tags, ratings,
         last_updated, created_on, status (private, public),
         community_owned, owner_ids, editor_ids,
         viewer_ids, version.
