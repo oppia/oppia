@@ -2040,7 +2040,7 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
         }
 
         with self.login_context(self.MODERATOR_EMAIL)
-        self.csrf_token = self.get_new_csrf_token()
+            self.csrf_token = self.get_new_csrf_token()
 
     def test_resolve_issue_handler(self):
         """Test that resolving an issue deletes associated playthroughs."""
