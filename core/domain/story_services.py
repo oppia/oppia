@@ -397,7 +397,9 @@ def _save_story(committer_id, story, commit_message, change_list):
                 node.exploration_id)
 
     # Story model cannot be None as story is passed as parameter here and that
-    # is only possible if a story model with that story id exists.
+    # is only possible if a story model with that story id exists. Also this is
+    # a private function and so it cannot be called independently with any
+    # story object.
     story_model = story_models.StoryModel.get(story.id)
     if story.version > story_model.version:
         raise Exception(

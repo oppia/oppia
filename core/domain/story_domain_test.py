@@ -980,37 +980,3 @@ class StorySummaryTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Invalid language code: invalid'):
             self.story_summary.validate()
-
-
-class StoryChangeTests(test_utils.GenericTestBase):
-
-    def test_cannot_create_story_change_instance_with_invalid_change_dict(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            story_domain.StoryChange({})
-
-    def test_cannot_update_story_node_property_with_invalid_property(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': 'invalid_property_name'
-            })
-
-    def test_cannot_update_story_property_with_invalid_property(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
-                'property_name': 'invalid_property_name'
-            })
-
-    def test_cannot_update_story_contents_property_with_invalid_property(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            story_domain.StoryChange({
-                'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
-                'property_name': 'invalid_property_name'
-            })
-
-    def test_cannot_create_story_change_instance_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            story_domain.StoryChange({
-                'cmd': 'invalid_cmd'
-            })
