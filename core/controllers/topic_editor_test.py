@@ -282,13 +282,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             'version': 2,
             'commit_message': 'Some changes and added a subtopic.',
             'topic_and_subtopic_page_change_dicts': [{
-                'change_affects_subtopic_page': False,
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
                 'old_value': '',
                 'new_value': 'A new name'
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
                 'old_value': {
@@ -301,12 +299,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content_id': 'content'
                 }
             }, {
-                'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
                 'old_value': {
@@ -319,7 +315,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 },
                 'subtopic_id': 2
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_audio',
                 'old_value': {
@@ -417,13 +412,11 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             'version': 2,
             'commit_message': 'Some changes and added a subtopic.',
             'topic_and_subtopic_page_change_dicts': [{
-                'change_affects_subtopic_page': False,
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
                 'old_value': '',
                 'new_value': 'A new name'
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
                 'old_value': {
@@ -436,12 +429,10 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                     'content_id': 'content'
                 }
             }, {
-                'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_html',
                 'old_value': {
@@ -454,7 +445,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 },
                 'subtopic_id': 2
             }, {
-                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'page_contents_audio',
                 'old_value': {
