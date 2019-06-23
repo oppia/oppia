@@ -226,6 +226,38 @@ def get_questions_and_skill_descriptions_by_skill_ids(
     return questions, skill_descriptions, next_cursor
 
 
+def get_questions_by_skill_ids(total_question_count, skill_ids):
+    """Returns constant number of questions linked to each given skill id.
+
+    Args:
+        total_question_count: int. The total number of questions to return.
+        skill_ids: list(str). The IDs of the skills to which the questions
+            should be linked.
+
+    Returns:
+        list(Question). The list containing an expected number of
+            total_question_count questions linked to each given skill id.
+            question count per skill will be total_question_count divided by
+            length of skill_ids, and it will be rounded up if not evenly
+            divisible. If not enough questions for one skill, simply return
+            all questions linked to it. The order of questions will follow the
+            order of given skill ids, but the order of questions for the same
+            skill is random.
+    """
+
+    if total_question_count > feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME:
+        raise Exception(
+            'Question count is too high, please limit the question count to '
+            '%d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME)
+
+    question_skill_link_models = (
+        question_models.QuestionSkillLinkModel.get_question_skill_links_equidistributed_by_skill( #pylint: disable=line-too-long
+            total_question_count, skill_ids))
+    question_ids = [model.question_id for model in question_skill_link_models]
+    questions = get_questions_by_ids(question_ids)
+    return questions
+
+
 def get_new_question_id():
     """Returns a new question id.
 
@@ -674,9 +706,10 @@ def get_question_summaries_by_creator_id(creator_id):
     question_summary_models = (
         question_models.QuestionSummaryModel.get_by_creator_id(creator_id))
 
-    for question_summary_model in question_summary_models:
-        question_summaries = [
-            get_question_summary_from_model(question_summary_model)]
+    question_summaries = [
+        get_question_summary_from_model(question_summary_model)
+        for question_summary_model in question_summary_models
+    ]
 
     return question_summaries
 

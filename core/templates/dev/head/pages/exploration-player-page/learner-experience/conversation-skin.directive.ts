@@ -16,6 +16,9 @@
  * @fileoverview Controller for the conversation skin.
  */
 
+require(
+  'components/question-directives/question-player/services/' +
+  'question-player-state.service.ts');
 require('components/ratings/rating-display/rating-display.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('components/summary-tile/collection-summary-tile.directive.ts');
@@ -38,6 +41,7 @@ require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/skill/ConceptCardBackendApiService.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/story_viewer/StoryViewerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
   'pages/exploration-player-page/services/' +
@@ -328,10 +332,12 @@ oppia.directive('conversationSkin', [
         'ExplorationEngineService', 'UrlService', 'FocusManagerService',
         'LearnerViewRatingService', 'WindowDimensionsService',
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
-        'LearnerParamsService', 'ExplorationRecommendationsService',
+        'QuestionPlayerStateService', 'LearnerParamsService',
+        'ExplorationRecommendationsService',
         'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
+        'StoryViewerBackendApiService',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'FEEDBACK_POPOVER_PATH',
@@ -355,10 +361,12 @@ oppia.directive('conversationSkin', [
             ExplorationEngineService, UrlService, FocusManagerService,
             LearnerViewRatingService, WindowDimensionsService,
             EditableExplorationBackendApiService, PlayerTranscriptService,
-            LearnerParamsService, ExplorationRecommendationsService,
+            QuestionPlayerStateService, LearnerParamsService,
+            ExplorationRecommendationsService,
             ReadOnlyExplorationBackendApiService, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
+            StoryViewerBackendApiService,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, FEEDBACK_POPOVER_PATH,
@@ -592,6 +600,18 @@ oppia.directive('conversationSkin', [
             }, TIME_NUM_CARDS_CHANGE_MSEC);
           };
 
+          if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
+            $rootScope.$on('hintConsumed', function(evt) {
+              QuestionPlayerStateService.hintUsed(
+                QuestionPlayerEngineService.getCurrentQuestionId());
+            });
+
+            $rootScope.$on('solutionViewed', function(evt, timestamp) {
+              QuestionPlayerStateService.solutionViewed(
+                QuestionPlayerEngineService.getCurrentQuestionId());
+            });
+          }
+
           $scope.isCurrentCardAtEndOfTranscript = function() {
             return PlayerTranscriptService.isLastCard(
               PlayerPositionService.getDisplayedCardIndex());
@@ -734,6 +754,14 @@ oppia.directive('conversationSkin', [
                     GLOBALS.collectionId, $scope.explorationId);
               }
 
+              if (ExplorationPlayerStateService.isInStoryChapterMode() &&
+                $scope.nextCard.isTerminal()) {
+                var storyId = UrlService.getUrlParams().story_id;
+                var nodeId = UrlService.getUrlParams().node_id;
+                StoryViewerBackendApiService.recordStoryNodeCompletion(
+                  storyId, nodeId);
+              }
+
               // For single state explorations, when the exploration reaches the
               // terminal state and explorationActuallyStarted is false, record
               // exploration actual start event.
@@ -803,6 +831,10 @@ oppia.directive('conversationSkin', [
                 if (!ExplorationPlayerStateService.isInQuestionMode()) {
                   $rootScope.$broadcast(
                     'playerStateChange', nextCard.getStateName());
+                } else {
+                  QuestionPlayerStateService.answerSubmitted(
+                    QuestionPlayerEngineService.getCurrentQuestionId(),
+                    !remainOnCurrentCard);
                 }
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
@@ -896,6 +928,11 @@ oppia.directive('conversationSkin', [
                     // the feedback, and display a 'Continue' button.
                     $scope.displayedCard.markAsCompleted();
                     if (isFinalQuestion) {
+                      if (ExplorationPlayerStateService.
+                        isInQuestionPlayerMode()) {
+                        // We will redirect to the results page here
+                        $scope.questionSessionCompleted = true;
+                      }
                       $scope.moveToExploration = true;
                       if (feedbackHtml) {
                         PlayerTranscriptService.addNewResponse(feedbackHtml);
@@ -994,6 +1031,12 @@ oppia.directive('conversationSkin', [
               $scope.returnToExplorationAfterConceptCard();
               return;
             }
+            if ($scope.questionSessionCompleted) {
+              $rootScope.$broadcast(
+                'questionSessionCompleted',
+                QuestionPlayerStateService.getQuestionPlayerStateData());
+              return;
+            }
             if ($scope.moveToExploration) {
               $scope.moveToExploration = false;
               ExplorationPlayerStateService.moveToExploration(
@@ -1003,7 +1046,7 @@ oppia.directive('conversationSkin', [
             if (
               $scope.displayedCard.isCompleted() &&
               ($scope.nextCard.getStateName() ===
-              $scope.displayedCard.getStateName())) {
+              $scope.displayedCard.getStateName()) && $scope.conceptCard) {
               ExplorationPlayerStateService.recordNewCardAdded();
               _addNewCard(
                 StateCardObjectFactory.createNewCard(
