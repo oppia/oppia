@@ -2086,6 +2086,8 @@ class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         elif item.id.startswith('topic'):
             return topic_domain.TopicChange
         else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
             return None
 
     @classmethod
