@@ -47,8 +47,8 @@ oppia.factory('ChangeListService', [
     var CMD_DELETE_STATE = 'delete_state';
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-    var CMD_IMAGE_ASSETS = 'image_assets'
-    var IMAGE_ASSETS_ACTION = 'add_image'
+    var CMD_IMAGE_ASSETS = 'image_assets';
+    var IMAGE_ASSETS_ACTION = 'add_image';
 
     var ALLOWED_EXPLORATION_BACKEND_NAMES = {
       category: true,

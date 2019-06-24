@@ -181,7 +181,8 @@ oppia.factory('ExplorationDiffService', [
             stateIds[newStateName] = stateIds[oldStateName];
             delete stateIds[oldStateName];
             stateData[stateIds[newStateName]].newestStateName = newStateName;
-          } else if (change.cmd === 'edit_state_property' || change.cmd === 'image_assets') {
+          } else if (change.cmd === 'edit_state_property' ||
+            change.cmd === 'image_assets') {
             if (stateData[stateIds[change.state_name]].stateProperty ===
                 STATE_PROPERTY_UNCHANGED) {
               stateData[stateIds[change.state_name]].stateProperty = (

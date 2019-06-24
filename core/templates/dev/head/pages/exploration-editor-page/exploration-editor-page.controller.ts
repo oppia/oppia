@@ -227,7 +227,8 @@ require(
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
 require(
-  'pages/exploration-editor-page/services/exploration-image-counter.service.ts');
+  'pages/exploration-editor-page/services/exploration-image-counter.' +
+  'service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');

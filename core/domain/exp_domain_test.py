@@ -890,7 +890,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         self.assertFalse(init_state.interaction.is_terminal)
 
     def test_update_image_counter(self):
-        # Updating valid image counter
+        # Updating valid image counter.
         exploration = exp_domain.Exploration.create_default_exploration('0')
         exploration.update_image_counter(10)
         self.assertEqual(exploration.image_counter, 10)
