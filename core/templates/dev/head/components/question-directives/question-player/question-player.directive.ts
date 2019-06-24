@@ -235,9 +235,9 @@ oppia.directive('questionPlayer', [
           var createScorePerSkillMapping = function() {
             var scorePerSkillMapping = {};
             if (questionPlayerConfig.skillList) {
-              for (var i = 0; i < questionPlayerConfig.skillList; i++) {
+              for (var i = 0; i < questionPlayerConfig.skillList.length; i++) {
                 var skillId = questionPlayerConfig.skillList[i];
-                var skillDescription = questionPlayerConfig.skillDescriptions;
+                var skillDescription = questionPlayerConfig.skillDescriptions[i];
                 scorePerSkillMapping[skillId] = {
                   description: skillDescription,
                   score: 0.0
@@ -269,7 +269,9 @@ oppia.directive('questionPlayer', [
               if (questionData.viewedSolution) {
                 questionScore = 0.0;
               } else {
-                questionScore -= (totalHintsPenalty + wrongAnswerPenalty);
+                // If questionScore goes negative, set it to 0
+                questionScore = Math.max(
+                  0, questionScore - totalHintsPenalty - wrongAnswerPenalty);
               }
               // Calculate total score
               ctrl.totalScore += questionScore;
@@ -283,8 +285,7 @@ oppia.directive('questionPlayer', [
                 if (!(skillId in scorePerSkillMapping)) {
                   continue;
                 }
-                var skillScore = scorePerSkillMapping[skillId];
-                skillScore.score += questionScore;
+                scorePerSkillMapping[skillId].score += questionScore;
               }
             }
             ctrl.totalScore = Math.round(

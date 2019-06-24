@@ -77,8 +77,11 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
     @acl_decorators.can_access_story_viewer_page
     def get(self, story_id):
         """Handles GET requests."""
+        print "===TEST"
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
+
+        print "===TEST: Flag is true"
 
         story = story_services.get_story_by_id(story_id)
         latest_completed_node_ids = (
@@ -86,9 +89,11 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
         )
 
         if story is None:
+            print "===TEST: Story is none"
             raise self.PageNotFoundException(
                 Exception('The story with the given id doesn\'t exist.'))
         if len(latest_completed_node_ids) == 0:
+            print "===TEST: Completed node ids is 0"
             raise self.PageNotFoundException
 
         try:
@@ -97,6 +102,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
                     latest_completed_node_ids
                 ))
         except Exception, e:
+            print "===TEST Exception: ", e
             raise self.PageNotFoundException(e)
         skills_with_description = {}
         for skill in skills:
