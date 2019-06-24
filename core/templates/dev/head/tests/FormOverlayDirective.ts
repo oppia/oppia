@@ -16,6 +16,10 @@
  * @fileoverview Directive for form overlay.
  */
 
+require('App.ts');
+
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('formOverlay', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

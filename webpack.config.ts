@@ -33,13 +33,13 @@ module.exports = {
   entries: {
     about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
-    app: commonPrefix + '/App.ts',
     collection_editor:
       commonPrefix + '/pages/collection-editor-page/' +
       'collection-editor-page.scripts.ts',
     collection_player:
       commonPrefix + '/pages/collection-player-page/' +
       'collection-player-page.scripts.ts',
+    console_errors: commonPrefix + '/tests/console-error-page.scripts.ts',
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
@@ -102,14 +102,14 @@ module.exports = {
     topics_and_skills_dashboard: (
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
-      'topics-and-skills-dashboard-page.controller.ts'
+      'topics-and-skills-dashboard-page.scripts.ts'
     ),
     topic_viewer:
       commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
     new HtmlWebpackPlugin({
-      chunks: ['app', 'admin'],
+      chunks: ['admin'],
       filename: 'admin-page.mainpage.html',
       template: commonPrefix + '/pages/admin-page/admin-page.mainpage.html',
       minify: htmlMinifyConfig,
@@ -123,7 +123,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'about'],
+      chunks: ['about'],
       filename: 'about-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -154,6 +154,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['console_errors'],
       filename: 'console_errors.html',
       template: commonPrefix + '/tests/console_errors.html',
       minify: htmlMinifyConfig,
@@ -226,7 +227,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'get_started'],
+      chunks: ['get_started'],
       filename: 'get-started-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -263,7 +264,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'maintenance'],
+      chunks: ['maintenance'],
       filename: 'maintenance-page.mainpage.html',
       template:
         commonPrefix + '/pages/maintenance-page/maintenance-page.mainpage.html',
@@ -279,7 +280,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'privacy'],
+      chunks: ['privacy'],
       filename: 'privacy-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -350,7 +351,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'splash'],
+      chunks: ['splash'],
       filename: 'splash-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -363,7 +364,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'splash'],
+      chunks: ['splash'],
       filename: 'splash_at0.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -417,7 +418,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'teach'],
+      chunks: ['teach'],
       filename: 'teach-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -430,7 +431,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'terms'],
+      chunks: ['terms'],
       filename: 'terms-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',

@@ -19,6 +19,8 @@
 
 require('services/contextual/WindowDimensionsService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('SidebarStatusService', [
   'WindowDimensionsService', function(WindowDimensionsService) {
     var pendingSidebarClick = false;

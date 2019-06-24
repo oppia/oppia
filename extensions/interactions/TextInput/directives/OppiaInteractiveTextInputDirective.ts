@@ -28,6 +28,8 @@ require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('oppiaInteractiveTextInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

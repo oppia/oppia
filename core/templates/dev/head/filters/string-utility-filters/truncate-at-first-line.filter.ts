@@ -16,6 +16,8 @@
  * @fileoverview TruncateAtFirstLine filter for Oppia.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.filter('truncateAtFirstLine', [function() {
   return function(input) {
     if (!input) {

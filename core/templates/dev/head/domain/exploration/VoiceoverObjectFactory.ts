@@ -17,6 +17,8 @@
  * Voiceover domain objects.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('VoiceoverObjectFactory', [function() {
   var Voiceover = function(filename, fileSizeBytes, needsUpdate) {
     this.filename = filename;

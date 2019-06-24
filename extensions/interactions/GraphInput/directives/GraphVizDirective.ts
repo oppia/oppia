@@ -25,6 +25,8 @@ require('interactions/GraphInput/directives/GraphDetailService.ts');
 require('services/contextual/DeviceInfoService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('graphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

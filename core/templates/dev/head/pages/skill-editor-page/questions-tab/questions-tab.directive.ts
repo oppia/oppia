@@ -34,6 +34,8 @@ require(
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

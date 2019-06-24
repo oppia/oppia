@@ -17,6 +17,8 @@
  * context.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant('PAGE_CONTEXT', {
   EXPLORATION_EDITOR: 'editor',
   EXPLORATION_PLAYER: 'learner',

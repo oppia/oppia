@@ -49,6 +49,8 @@ require('services/EditabilityService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

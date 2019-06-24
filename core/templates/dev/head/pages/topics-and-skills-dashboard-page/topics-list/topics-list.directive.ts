@@ -24,6 +24,8 @@ require(
   'pages/topics-and-skills-dashboard-page/' +
   'topics-and-skills-dashboard-page.constants.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

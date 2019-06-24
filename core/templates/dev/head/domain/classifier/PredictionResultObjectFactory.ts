@@ -17,6 +17,8 @@
  *     result domain objects.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('PredictionResultObjectFactory', [function() {
   /**
    * Stores the prediction result for an answer as returned by the

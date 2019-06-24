@@ -32,6 +32,8 @@ require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 
 // Gives the staff-lines human readable values.
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
   A5: 81,
   G5: 79,

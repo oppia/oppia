@@ -16,6 +16,8 @@
  * @fileoverview Directive for pie chart visualization.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('pieChart', [function() {
   return {
     restrict: 'E',

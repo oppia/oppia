@@ -18,6 +18,8 @@
 
 require('interactions/GraphInput/directives/GraphUtilsService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('GraphInputRulesService', [
   'GraphUtilsService', function(GraphUtilsService) {
     /**

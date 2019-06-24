@@ -20,6 +20,8 @@
 require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('ConceptCardObjectFactory', [
   'ContentIdsToAudioTranslationsObjectFactory', 'SubtitledHtmlObjectFactory',
   'COMPONENT_NAME_EXPLANATION',

@@ -19,6 +19,8 @@
 
 require('domain/state/StateObjectFactory.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('StatesObjectFactory', [
   'StateObjectFactory', 'INTERACTION_SPECS',
   function(StateObjectFactory, INTERACTION_SPECS) {

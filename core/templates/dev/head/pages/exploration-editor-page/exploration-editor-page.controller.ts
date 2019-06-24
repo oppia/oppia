@@ -259,6 +259,8 @@ require('services/StateTopAnswersStatsService.ts');
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

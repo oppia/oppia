@@ -25,6 +25,8 @@ require('services/HtmlEscaperService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('oppiaInteractiveFractionInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

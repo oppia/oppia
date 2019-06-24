@@ -19,6 +19,8 @@
 
 require('domain/utilities/LanguageUtilService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('TranslationLanguageService', [
   '$log', '$rootScope', 'LanguageUtilService',
   function($log, $rootScope, LanguageUtilService) {

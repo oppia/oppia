@@ -20,6 +20,8 @@
 require('domain/suggestion/QuestionSuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('SuggestionThreadObjectFactory', [
   'QuestionSuggestionObjectFactory', 'SuggestionObjectFactory',
   function(QuestionSuggestionObjectFactory, SuggestionObjectFactory) {

@@ -20,6 +20,8 @@
  * editor is initialized.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('InteractionDetailsCacheService', [function() {
   var _cache = {};
   return {

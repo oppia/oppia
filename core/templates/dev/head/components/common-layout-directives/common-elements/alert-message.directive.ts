@@ -18,6 +18,8 @@
 
 require('services/AlertsService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('alertMessage', [function() {
   return {
     restrict: 'E',

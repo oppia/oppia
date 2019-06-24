@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,12 +13,9 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the topic editor page.
+ * @fileoverview Scripts for the console error page.
  */
 
-require('App.ts');
+var oppia = require('AppInit.ts').moduleName;
 
-require(
-  'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');
-require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');
-require('pages/topic-editor-page/topic-editor-page.controller.ts');
+require('App.ts');

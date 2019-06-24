@@ -18,6 +18,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('select2Dropdown', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     // Directive for incorporating select2 dropdowns.

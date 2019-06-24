@@ -18,6 +18,8 @@
 
 require('services/AlertsService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('StatePropertyService', [
   '$log', 'AlertsService',
   function($log, AlertsService) {

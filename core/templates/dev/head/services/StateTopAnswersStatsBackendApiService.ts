@@ -16,6 +16,8 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant(
   'STATE_ANSWER_STATS_URL',
   '/createhandler/state_answer_stats/<exploration_id>');

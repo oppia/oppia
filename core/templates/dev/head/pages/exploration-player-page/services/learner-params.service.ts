@@ -17,6 +17,8 @@
  * learner.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('LearnerParamsService', [function() {
   var _paramDict = {};
 

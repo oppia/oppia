@@ -16,5 +16,7 @@
  * @fileoverview Constants for the topic viewer domain.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant(
   'TOPIC_DATA_URL_TEMPLATE', '/topic_data_handler/<topic_name>');

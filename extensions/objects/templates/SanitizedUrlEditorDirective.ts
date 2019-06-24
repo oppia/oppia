@@ -16,6 +16,8 @@
  * @fileoverview Directive for sanitized URL editor.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('sanitizedUrlEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {

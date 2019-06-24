@@ -31,6 +31,8 @@ require('services/contextual/WindowDimensionsService.ts');
 require('services/DebouncerService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('oppiaInteractiveMathExpressionInput', [
   'HtmlEscaperService', 'MathExpressionInputRulesService',
   'UrlInterpolationService',

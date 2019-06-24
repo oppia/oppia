@@ -16,6 +16,8 @@
  * @fileoverview Capitalize filter for Oppia.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.filter('capitalize', [function() {
   return function(input) {
     if (!input) {

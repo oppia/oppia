@@ -16,6 +16,8 @@
  * @fileoverview Service for keeping track of solution validity.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('SolutionValidityService', [
   function() {
     return {

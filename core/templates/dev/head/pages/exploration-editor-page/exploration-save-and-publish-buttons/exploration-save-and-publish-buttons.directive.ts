@@ -28,6 +28,8 @@ require(
   'pages/exploration-editor-page/services/exploration-warnings.service.ts');
 require('services/EditabilityService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('explorationSaveAndPublishButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

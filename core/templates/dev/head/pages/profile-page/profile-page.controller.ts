@@ -27,6 +27,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/UserService.ts');
 require('services/DateTimeFormatService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('profilePage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

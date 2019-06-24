@@ -27,6 +27,8 @@ require(
 require('services/EditabilityService.ts');
 require('services/stateful/FocusManagerService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('stateNameEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

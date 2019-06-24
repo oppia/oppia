@@ -27,7 +27,6 @@ module.exports = function(config) {
       'third_party/static/math-expressions-1.7.0/math-expressions.js',
       'third_party/static/ckeditor-4.9.2/ckeditor.js',
       generatedJs,
-      'local_compiled_js/core/templates/dev/head/AppInit.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
@@ -35,11 +34,12 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
       'local_compiled_js/extensions/**/*.js',
-      'core/templates/dev/head/**/*Spec.ts',
-      'core/templates/dev/head/*Spec.ts',
-      'core/templates/dev/head/**/*.spec.ts',
-      'core/templates/dev/head/*.spec.ts',
-      'extensions/**/*Spec.ts',
+      // 'core/templates/dev/head/**/*Spec.ts',
+      // 'core/templates/dev/head/*Spec.ts',
+      // 'core/templates/dev/head/**/*.spec.ts',
+      // 'core/templates/dev/head/*.spec.ts',
+      // 'extensions/**/*Spec.ts',
+      'core/templates/dev/head/pages/exploration-editor-page/editor-tab/services/solution-validity.service.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -158,6 +158,7 @@ module.exports = function(config) {
       resolve: {
         modules: [
           'core/templates/dev/head',
+          'node_modules',
           'extensions'
         ],
       },

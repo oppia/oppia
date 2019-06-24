@@ -19,6 +19,8 @@
 require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
 require('services/UserService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('emailDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

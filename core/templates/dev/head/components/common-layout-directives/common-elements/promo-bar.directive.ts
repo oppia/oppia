@@ -21,6 +21,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PromoBarService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('promoBar', [
   '$window', 'PromoBarService', 'UrlInterpolationService',
   function($window, PromoBarService, UrlInterpolationService) {

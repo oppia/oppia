@@ -28,6 +28,8 @@ require(
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('stateContentEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

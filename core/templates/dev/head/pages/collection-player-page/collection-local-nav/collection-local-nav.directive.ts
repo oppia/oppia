@@ -16,6 +16,8 @@
  * @fileoverview Directive for the local navigation in the collection view.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('collectionLocalNav', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

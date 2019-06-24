@@ -27,6 +27,8 @@
  */
 
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.constant('PythonProgramTokenType', {
   COMMENT: 'COMMENT',
   NL: 'NL',

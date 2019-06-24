@@ -19,6 +19,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('collectionNodeList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

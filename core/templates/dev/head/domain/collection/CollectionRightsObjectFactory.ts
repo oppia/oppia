@@ -17,6 +17,8 @@
  * collection rights domain objects.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('CollectionRightsObjectFactory', [
   function() {
     var CollectionRights = function(collectionRightsObject) {

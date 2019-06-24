@@ -20,6 +20,8 @@
 
 require('domain/collection/CollectionUpdateService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('CollectionLinearizerService', [
   'CollectionUpdateService',
   function(CollectionUpdateService) {

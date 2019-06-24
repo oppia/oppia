@@ -16,6 +16,8 @@
  * @fileoverview Shared constants for the Oppia module.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 for (var constantName in constants) {
   oppia.constant(constantName, constants[constantName]);
 }

@@ -17,6 +17,8 @@
  * page.
  */
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.factory('AdminTaskManagerService', [
   function() {
     var taskIsRunning = false;

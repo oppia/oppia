@@ -25,6 +25,8 @@ require('services/AutoplayedVideosService.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').moduleName;
+
 oppia.directive('oppiaNoninteractiveVideo', [
   '$sce', 'HtmlEscaperService', 'UrlInterpolationService',
   function($sce, HtmlEscaperService, UrlInterpolationService) {
