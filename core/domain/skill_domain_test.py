@@ -61,6 +61,61 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_skill_id('Skill id should be a string', 10)
         self._assert_valid_skill_id('Invalid skill id', 'abc')
 
+    def test_valid_misconception_id(self):
+        self.skill.next_misconception_id = 'invalid_id'
+        self._assert_validation_error(
+            'Expected misconception ID to be an integer')
+
+    def test_valid_content_ids_to_audio_translations(self):
+        self.skill.skill_contents.content_ids_to_audio_translations = []
+        self._assert_validation_error(
+            'Expected state content_ids_to_audio_translations to be a dict')
+
+    def test_valid_content_id(self):
+        self.skill.skill_contents.content_ids_to_audio_translations = {
+            1: {}
+        }
+        self._assert_validation_error('Expected content_id to be a string')
+
+    def test_valid_audio_translations(self):
+        self.skill.skill_contents.content_ids_to_audio_translations = {
+            'content_id': []
+        }
+        self._assert_validation_error(
+            'Expected audio_translations to be a dict')
+
+    def test_valid_language_code_type(self):
+        self.skill.skill_contents.content_ids_to_audio_translations = {
+            'content_id': {
+                1: state_domain.WrittenTranslations.from_dict(
+                    {'translations_mapping': {'1': {}, '2': {}}})
+            }
+        }
+        self._assert_validation_error('Expected language code to be a string')
+
+    def test_valid_language_code(self):
+        self.skill.skill_contents.content_ids_to_audio_translations = {
+            'content_id': {
+                'invalid_language_code': (
+                    state_domain.WrittenTranslations.from_dict(
+                        {'translations_mapping': {'1': {}, '2': {}}}))
+            }
+        }
+        self._assert_validation_error('Unrecognized language code')
+
+    def test_valid_translation(self):
+        self.skill.skill_contents.content_ids_to_audio_translations = {
+            'content_id': {
+                'en': state_domain.AudioTranslation.from_dict({
+                    'filename': 'file.mp3',
+                    'file_size_bytes': 'size',
+                    'needs_update': True
+                })
+            }
+        }
+
+        self._assert_validation_error('Expected file size to be an int')
+
     def test_description_validation(self):
         self.skill.description = 0
         self._assert_validation_error('Description should be a string')
@@ -213,10 +268,18 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test that to_dict and from_dict preserve all data within a
         skill_contents and misconception object.
         """
+        audio_translation = {
+            'en': state_domain.AudioTranslation.from_dict({
+                'filename': 'file.mp3',
+                'file_size_bytes': 'size',
+                'needs_update': True
+            })
+        }
         skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml('1', 'Explanation'), [
                 state_domain.SubtitledHtml('2', 'Example 1')],
-            {'1': {}, '2': {}}, state_domain.WrittenTranslations.from_dict(
+            {'1': audio_translation, '2': {}},
+            state_domain.WrittenTranslations.from_dict(
                 {'translations_mapping': {'1': {}, '2': {}}}))
         skill_contents_dict = skill_contents.to_dict()
         skill_contents_from_dict = skill_domain.SkillContents.from_dict(
@@ -257,3 +320,43 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')
         self.assertTrue(skill_rights.is_creator('user'))
         self.assertFalse(skill_rights.is_creator('fakeuser'))
+
+    def test_require_valid_description_with_empty_description_raise_error(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Description field should not be empty'):
+            self.skill.require_valid_description('')
+
+    def test_misconception_id_range(self):
+        self.skill.misconceptions[0].id = 5
+        self._assert_validation_error(
+            'The misconception with id 5 is out of bounds')
+
+    def test_cannot_create_skill_change_class_with_invalid_change_list(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            skill_domain.SkillChange({})
+
+    def test_cannot_update_skill_misconceptions(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': 'invalid_property'
+            })
+
+    def test_cannot_create_skill_rights_change_class_with_invalid_change_list(
+            self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            skill_domain.SkillRightsChange({})
+
+    def test_cannot_create_skill_rights_change_class_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+            skill_domain.SkillRightsChange({
+                'cmd': 'invalid_cmd'
+            })
+
+    def test_create_skill_rights_change_class(self):
+        skill_rights = skill_domain.SkillRightsChange({
+            'cmd': skill_domain.CMD_CREATE_NEW
+        })
+
+        self.assertEqual(
+            skill_rights.to_dict(), {'cmd': skill_domain.CMD_CREATE_NEW})
