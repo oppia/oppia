@@ -7810,10 +7810,16 @@ class TopicSummaryModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [
             (
                 u'[u\'failed validation check for uncategorized skill '
-                'count check of TopicSummaryModel\', '
-                '[u"Entity id 0: Uncategorized skill count: 10 does '
-                'not match the number of skill ids in '
-                'uncategorized_skill_ids in topic model: [u\'2\']"]]'
+                'count check of TopicSummaryModel\', [u"Entity id 0: '
+                'Uncategorized skill count: 10 does not match the '
+                'number of skill ids in uncategorized_skill_ids '
+                'in topic model: [u\'2\']"]]'
+            ), (
+                u'[u\'failed validation check for domain object '
+                'check of TopicSummaryModel\', [u"Entity id 0: '
+                'Entity fails domain validation with the error Expected '
+                'total_skill_count to be greater than or equal to '
+                'uncategorized_skill_count 10, received \'3\'"]]'
             ), u'[u\'fully-validated TopicSummaryModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 

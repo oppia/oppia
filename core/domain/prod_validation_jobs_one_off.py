@@ -1928,7 +1928,7 @@ class TopicModelValidator(BaseModelValidator):
         topic_models_list = topic_models.TopicModel.query().filter(
             topic_models.TopicModel.canonical_name == (
                 item.canonical_name)).filter(
-                    not topic_models.TopicModel.deleted).fetch()
+                    topic_models.TopicModel.deleted == False).fetch() # pylint: disable=singleton-comparison
         topic_model_ids = [
             topic_model.id
             for topic_model in topic_models_list if topic_model.id != item.id]
