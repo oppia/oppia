@@ -2042,7 +2042,7 @@ class TopicModelValidator(BaseModelValidator):
 class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating TopicSnapshotMetadataModel."""
 
-    RELATED_MODEL_NAME = 'topic'
+    EXTERNAL_MODEL_NAME = 'topic'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -2061,7 +2061,7 @@ class TopicSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 class TopicSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating TopicSnapshotContentModel."""
 
-    RELATED_MODEL_NAME = 'topic'
+    EXTERNAL_MODEL_NAME = 'topic'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2097,7 +2097,7 @@ class TopicRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating TopicRightsSnapshotMetadataModel."""
 
-    RELATED_MODEL_NAME = 'topic rights'
+    EXTERNAL_MODEL_NAME = 'topic rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -2118,7 +2118,7 @@ class TopicRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating TopicRightsSnapshotContentModel."""
 
-    RELATED_MODEL_NAME = 'topic rights'
+    EXTERNAL_MODEL_NAME = 'topic rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2132,7 +2132,7 @@ class TopicRightsSnapshotContentModelValidator(
 class TopicCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating TopicCommitLogEntryModel."""
 
-    RELATED_MODEL_NAME = 'topic'
+    EXTERNAL_MODEL_NAME = 'topic'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -2193,6 +2193,12 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
+            # The case for missing topic external model is ignored here
+            # since errors for missing topic external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if topic_model is None or topic_model.deleted:
+                continue
             if item.canonical_story_count != len(
                     topic_model.canonical_story_ids):
                 cls.errors['canonical story count check'].append((
@@ -2214,6 +2220,12 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
+            # The case for missing topic external model is ignored here
+            # since errors for missing topic external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if topic_model is None or topic_model.deleted:
+                continue
             if item.additional_story_count != len(
                     topic_model.additional_story_ids):
                 cls.errors['additional story count check'].append((
@@ -2235,6 +2247,12 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
+            # The case for missing topic external model is ignored here
+            # since errors for missing topic external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if topic_model is None or topic_model.deleted:
+                continue
             if item.uncategorized_skill_count != len(
                     topic_model.uncategorized_skill_ids):
                 cls.errors['uncategorized skill count check'].append((
@@ -2257,6 +2275,12 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
+            # The case for missing topic external model is ignored here
+            # since errors for missing topic external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if topic_model is None or topic_model.deleted:
+                continue
             subtopic_skill_ids = []
             for subtopic in topic_model.subtopics:
                 subtopic_skill_ids = subtopic_skill_ids + subtopic['skill_ids']
@@ -2283,6 +2307,12 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
             'topic_ids']
 
         for (_, _, topic_model) in topic_model_class_model_id_model_tuples:
+            # The case for missing topic external model is ignored here
+            # since errors for missing topic external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if topic_model is None or topic_model.deleted:
+                continue
             if item.subtopic_count != len(topic_model.subtopics):
                 cls.errors['subtopic count check'].append((
                     'Entity id %s: Subtopic count: %s does not '
@@ -2291,7 +2321,7 @@ class TopicSummaryModelValidator(BaseSummaryModelValidator):
                         item.id, item.subtopic_count, topic_model.subtopics))
 
     @classmethod
-    def _get_related_model_properties(cls):
+    def _get_external_model_properties(cls):
         topic_model_class_model_id_model_tuples = cls.external_instance_details[
             'topic_ids']
 
@@ -2359,7 +2389,7 @@ class SubtopicPageSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating SubtopicPageSnapshotMetadataModel."""
 
-    RELATED_MODEL_NAME = 'subtopic page'
+    EXTERNAL_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -2383,7 +2413,7 @@ class SubtopicPageSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating SubtopicPageSnapshotContentModel."""
 
-    RELATED_MODEL_NAME = 'subtopic page'
+    EXTERNAL_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -2401,7 +2431,7 @@ class SubtopicPageCommitLogEntryModelValidator(
         BaseCommitLogEntryModelValidator):
     """Class for validating SubtopicPageCommitLogEntryModel."""
 
-    RELATED_MODEL_NAME = 'subtopic page'
+    EXTERNAL_MODEL_NAME = 'subtopic page'
 
     @classmethod
     def _get_model_id_regex(cls, item):
