@@ -2368,8 +2368,13 @@ class SubtopicPageCommitLogEntryModelValidator(
         return regex_string
 
     @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return subtopic_page_domain.SubtopicPageChange
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('subtopicpage'):
+            return subtopic_page_domain.SubtopicPageChange
+        else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):

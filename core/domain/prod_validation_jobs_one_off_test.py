@@ -8611,7 +8611,11 @@ class SubtopicPageCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for model id check of '
                 'SubtopicPageCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id),
+            ) % (model_with_invalid_id.id), (
+                u'[u\'failed validation check for commit cmd check of '
+                'SubtopicPageCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
+                'No commit command domain object defined for entity with '
+                'commands: [{}]\']]'),
             u'[u\'fully-validated SubtopicPageCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
