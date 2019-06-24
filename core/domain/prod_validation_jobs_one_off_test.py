@@ -5397,7 +5397,7 @@ class SkillSnapshotMetadataModelValidatorTests(
                 'for command: {u\'cmd\': u\'delete_skill_misconception\', '
                 'u\'invalid_attribute\': u\'invalid\'} failed with error: '
                 'The following required attributes are missing: '
-                'id, The following extra attributes are present: '
+                'misconception_id, The following extra attributes are present: '
                 'invalid_attribute"]]'
             ), (
                 u'[u\'failed validation check for commit cmd '
@@ -6193,8 +6193,8 @@ class SkillCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 '[u"Entity id skill-0-1: Commit command domain validation '
                 'for command: {u\'cmd\': u\'delete_skill_misconception\', '
                 'u\'invalid_attribute\': u\'invalid\'} failed with error: '
-                'The following required attributes are missing: id, '
-                'The following extra attributes are present: '
+                'The following required attributes are missing: '
+                'misconception_id, The following extra attributes are present: '
                 'invalid_attribute"]]'
             ), u'[u\'fully-validated SkillCommitLogEntryModel\', 5]']
 
