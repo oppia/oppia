@@ -237,9 +237,9 @@ oppia.directive('questionPlayer', [
             if (questionPlayerConfig.skillList) {
               for (var i = 0; i < questionPlayerConfig.skillList.length; i++) {
                 var skillId = questionPlayerConfig.skillList[i];
-                var skillDescription = questionPlayerConfig.skillDescriptions[i];
+                var description = questionPlayerConfig.skillDescriptions[i];
                 scorePerSkillMapping[skillId] = {
-                  description: skillDescription,
+                  description: description,
                   score: 0.0
                 };
               }
