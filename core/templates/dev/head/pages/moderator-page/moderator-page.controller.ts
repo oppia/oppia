@@ -48,6 +48,8 @@ require(
   'schema-based-unicode-editor.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('base_components/BaseContentDirective.ts');
+
 require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 

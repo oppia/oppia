@@ -16,6 +16,8 @@
  * @fileoverview Data and controllers for the Oppia profile page.
  */
 
+require('base_components/BaseContentDirective.ts');
+
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/IdGenerationService.ts');
@@ -168,7 +170,7 @@ oppia.directive('signupPage', ['UrlInterpolationService', function(
             requestParams.username = username;
           }
 
-          if (GLOBALS.CAN_SEND_EMAILS && !ctrl.hasUsername) {
+          if (ctrl.showEmailPreferencesForm && !ctrl.hasUsername) {
             if (canReceiveEmailUpdates === null) {
               ctrl.emailPreferencesWarningText = 'I18N_SIGNUP_FIELD_REQUIRED';
               return;

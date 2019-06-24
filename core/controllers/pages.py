@@ -80,9 +80,6 @@ class ContactPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/contact-page.mainpage.html')
 
 
@@ -92,9 +89,6 @@ class DonatePage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/donate-page.mainpage.html')
 
 
@@ -104,9 +98,6 @@ class ThanksPage(base.BaseHandler):
     @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
-        })
         self.render_template('dist/thanks-page.mainpage.html')
 
 
