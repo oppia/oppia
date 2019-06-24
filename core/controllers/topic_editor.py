@@ -74,11 +74,6 @@ class TopicEditorStoryHandler(base.BaseHandler):
         topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
 
-        topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
-
         story_domain.Story.require_valid_title(title)
 
         new_story_id = story_services.get_new_story_id()
@@ -166,21 +161,6 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def _require_valid_version(
-            self, version_from_payload, subtopic_page_version):
-        """Check that the payload version matches the given subtopic page
-        version.
-        """
-        if version_from_payload is None:
-            raise base.BaseHandler.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
-
-        if version_from_payload != subtopic_page_version:
-            raise base.BaseHandler.InvalidInputException(
-                'Trying to update version %s of subtopic page from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (subtopic_page_version, version_from_payload))
-
     @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
@@ -249,9 +229,6 @@ class EditableTopicDataHandler(base.BaseHandler):
         """
         topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None:
-            raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
 
         version = self.payload.get('version')
         self._require_valid_version(version, topic.version)
@@ -348,37 +325,16 @@ class TopicPublishSendMailHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class TopicManagerRightsHandler(base.BaseHandler):
-    """A handler for assigning topic manager rights."""
-
-    @acl_decorators.can_manage_rights_for_topic
-    def put(self, topic_id, assignee_id):
-        """Assign topic manager role to a user for a particular topic, if the
-        user has general topic manager rights.
-        """
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        if assignee_id is None:
-            raise self.InvalidInputException(
-                'Expected a valid assignee id to be provided.')
-        assignee_actions_info = user_services.UserActionsInfo(assignee_id)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        try:
-            topic_services.assign_role(
-                user_actions_info, assignee_actions_info,
-                topic_domain.ROLE_MANAGER, topic_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
-
-        self.render_json(self.values)
-
-
 class TopicPublishHandler(base.BaseHandler):
     """A handler for publishing and unpublishing topics."""
 
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
         """Publishes or unpublishes a topic."""
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException
+
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
         publish_status = self.payload.get('publish_status')
