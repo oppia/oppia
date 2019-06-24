@@ -305,12 +305,12 @@ oppia.directive('explorationEditorPage', ['UrlInterpolationService', function(
           ExplorationTagsService, ExplorationTitleService,
           ExplorationWarningsService, GraphDataService, PageTitleService,
           ParamChangesObjectFactory, ParamSpecsObjectFactory,
-          PlaythroughIssuesService, RouterService,
-          SiteAnalyticsService, StateClassifierMappingService,
-          StateEditorService, StateTopAnswersStatsBackendApiService,
-          StateTopAnswersStatsService, StateTutorialFirstTimeService,
-          ThreadDataService, UrlInterpolationService,
-          UserEmailPreferencesService, EVENT_EXPLORATION_PROPERTY_CHANGED) {
+          PlaythroughIssuesService, RouterService, SiteAnalyticsService,
+          StateClassifierMappingService, StateEditorService,
+          StateTopAnswersStatsBackendApiService, StateTopAnswersStatsService,
+          StateTutorialFirstTimeService, ThreadDataService,
+          UrlInterpolationService, UserEmailPreferencesService,
+          EVENT_EXPLORATION_PROPERTY_CHANGED) {
         var ctrl = this;
         ctrl.EditabilityService = EditabilityService;
         ctrl.StateEditorService = StateEditorService;
