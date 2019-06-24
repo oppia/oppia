@@ -1745,7 +1745,7 @@ class SkillSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating SkillSnapshotMetadataModel."""
 
-    related_model_name = 'skill'
+    RELATED_MODEL_NAME = 'skill'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1766,7 +1766,7 @@ class SkillSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating SkillSnapshotContentModel."""
 
-    related_model_name = 'skill'
+    RELATED_MODEL_NAME = 'skill'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1803,7 +1803,7 @@ class SkillRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating SkillRightsSnapshotMetadataModel."""
 
-    related_model_name = 'skill rights'
+    RELATED_MODEL_NAME = 'skill rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1824,7 +1824,7 @@ class SkillRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating SkillRightsSnapshotContentModel."""
 
-    related_model_name = 'skill rights'
+    RELATED_MODEL_NAME = 'skill rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1838,7 +1838,7 @@ class SkillRightsSnapshotContentModelValidator(
 class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating SkillCommitLogEntryModel."""
 
-    related_model_name = 'skill'
+    RELATED_MODEL_NAME = 'skill'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1855,6 +1855,8 @@ class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         elif item.id.startswith('skill'):
             return skill_domain.SkillChange
         else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
             return None
 
     @classmethod
