@@ -124,9 +124,6 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
-# Interaction IDs for which answer details cannot be solicited.
-INTERACTION_IDS_WITHOUT_ANSWER_DETAILS = ['EndExploration', 'Continue']
-
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 ENTITY_TYPE_QUESTION = 'question'
