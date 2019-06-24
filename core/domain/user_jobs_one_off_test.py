@@ -1075,12 +1075,12 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
             self.admin, self.EXP_ID)
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, [
-            exp_domain.ExplorationChange({
-                'cmd': 'edit_state_property',
-                'state_name': init_state_name,
-                'property_name': 'widget_id',
-                'new_value': 'MultipleChoiceInput'
-            }), exp_domain.ExplorationChange({
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'state_name': init_state_name,
+                    'property_name': 'widget_id',
+                    'new_value': 'MultipleChoiceInput'
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': init_state_name,
                     'property_name': (
@@ -1091,7 +1091,7 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
                             '<p>This is value2 for MultipleChoice</p>'
                         ]}
                     }
-            })], 'commit')
+                })], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
