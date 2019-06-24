@@ -143,8 +143,6 @@ handlers:
   static_files: core/templates/dev/head/dist/get-started-page.mainpage.html
   upload: core/templates/dev/head/dist/get-started-page.mainpage.html
   http_headers:
-    Cache-Control: 'no-cache, must-revalidate'
-    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
     X-Content-Type-Options: nosniff
@@ -156,8 +154,6 @@ handlers:
   static_files: core/templates/dev/head/dist/splash-page.mainpage.html
   upload: core/templates/dev/head/dist/splash-page.mainpage.html
   http_headers:
-    Cache-Control: 'no-cache, must-revalidate'
-    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
     X-Content-Type-Options: nosniff
@@ -169,8 +165,6 @@ handlers:
   static_files: core/templates/dev/head/dist/splash_at0.html
   upload: core/templates/dev/head/dist/splash_at0.html
   http_headers:
-    Cache-Control: 'no-cache, must-revalidate'
-    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
     X-Content-Type-Options: nosniff
@@ -182,8 +176,6 @@ handlers:
   static_files: core/templates/dev/head/dist/splash_at1.html
   upload: core/templates/dev/head/dist/splash_at1.html
   http_headers:
-    Cache-Control: 'no-cache, must-revalidate'
-    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
     X-Content-Type-Options: nosniff
@@ -195,8 +187,6 @@ handlers:
   static_files: core/templates/dev/head/dist/teach-page.mainpage.html
   upload: core/templates/dev/head/dist/teach-page.mainpage.html
   http_headers:
-    Cache-Control: 'no-cache, must-revalidate'
-    Expires: 'Mon, 01 Jan 1990 00:00:00 GMT'
     Pragma: no-cache
     Strict-Transport-Security: 'max-age=31536000; includeSubDomains'
     X-Content-Type-Options: nosniff
