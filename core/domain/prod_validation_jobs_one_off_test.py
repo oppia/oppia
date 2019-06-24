@@ -174,11 +174,11 @@ class MockSnapshotContentModelValidator(
 class MockSnapshotMetadataModelValidator(
         prod_validation_jobs_one_off.BaseSnapshotMetadataModelValidator):
 
-    RELATED_MODEL_NAME = 'related model'
+    EXTERNAL_MODEL_NAME = 'external model'
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'related_model_ids': (MockModel, [])
+            'external_model_ids': (MockModel, [])
         }
 
 
@@ -193,13 +193,13 @@ class NotImplementedErrorTests(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             MockBaseModelValidator().validate(self.item)
 
-    def test_error_is_get_related_model_properties_is_undefined(self):
+    def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaises(NotImplementedError):
             MockSummaryModelValidator().validate(self.item)
 
-    def test_error_is_raised_if_related_model_name_is_undefined(self):
+    def test_error_is_raised_if_external_model_name_is_undefined(self):
         with self.assertRaisesRegexp(
-            Exception, 'Related model name should be specified'):
+            Exception, 'External model name should be specified'):
             MockSnapshotContentModelValidator().validate(self.item)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
