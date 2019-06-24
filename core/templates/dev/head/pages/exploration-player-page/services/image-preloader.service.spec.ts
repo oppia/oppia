@@ -72,6 +72,7 @@ describe('Image preloader service', function() {
       blurb: '',
       author_notes: '',
       states_schema_version: 15,
+      image_counter: 4,
       init_state_name: 'Introduction',
       states: {
         'State 1': {
@@ -169,7 +170,23 @@ describe('Image preloader service', function() {
             }
           },
           image_assets: {
-            image_mapping: {}
+            image_mapping: {
+              image_id_1: {
+                src: 'sIMChoice1_height_32_width_42.png',
+                placeholder: false,
+                instructions: ''
+              },
+              image_id_2: {
+                src: 'sIMChoice2_height_30_width_40.png',
+                placeholder: false,
+                instructions: ''
+              },
+              image_id_3: {
+                src: 'sIOFeedback_height_50_width_50.png',
+                placeholder: false,
+                instructions: ''
+              }
+            }
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -185,13 +202,11 @@ describe('Image preloader service', function() {
               choices: {
                 value: [
                   '<p> Go to ItemSelection <oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;' +
-                  'sIMChoice1_height_32_width_42.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>',
+                  ' id-with-value="&amp;quotimage_id_1amp;quot;">' +
+                  '</oppia-noninteractive-image></p>',
                   '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;' +
-                  'sIMChoice2_height_30_width_40.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>'
+                  ' id-with-value="&amp;quotimage_id_2amp;quot;">' +
+                  '</oppia-noninteractive-image></p>'
                 ]
               }
             },
@@ -203,9 +218,9 @@ describe('Image preloader service', function() {
                   feedback: {
                     content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
-                          '<oppia-noninteractive-image filepath-with-value=' +
-                          '"&amp;quot;sIOFeedback_height_50_width_50.png' +
-                          '&amp;quot;"></oppia-noninteractive-image></p>'
+                          '<oppia-noninteractive-image id-with-value=' +
+                          '"&amp;quotimage_id_3amp;quot;">' +
+                          '</oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
                   refresher_exploration_id: null,
@@ -271,7 +286,13 @@ describe('Image preloader service', function() {
             }
           },
           image_assets: {
-            image_mapping: {}
+            image_mapping: {
+              image_id_4: {
+                src: 's6Hint1_height_60_width_60.png',
+                placeholder: false,
+                instructions: ''
+              }
+            }
           },
           interaction: {
             id: 'TextInput',
@@ -335,8 +356,8 @@ describe('Image preloader service', function() {
             hints: [{
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p><oppia-noninteractive-image filepath-with-value="' +
-                      '&amp;quot;s6Hint1_height_60_width_60.png&amp;quot;">' +
+                html: '<p><oppia-noninteractive-image id-with-value="' +
+                      '&amp;quotimage_id_4amp;quot;">' +
                       '</oppia-noninteractive-image></p>'
               }
             }],

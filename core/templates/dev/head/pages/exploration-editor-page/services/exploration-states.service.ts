@@ -83,8 +83,8 @@ oppia.factory('ExplorationStatesService', [
           return hint.toBackendDict();
         });
       },
-      imageAssets: function(image_assets) {
-        return image_assets.toBackendDict();
+      imageAssets: function(imageAssets) {
+        return imageAssets.toBackendDict();
       },
       param_changes: function(paramChanges) {
         return paramChanges.map(function(paramChange) {
@@ -114,7 +114,7 @@ oppia.factory('ExplorationStatesService', [
       content: ['content'],
       recorded_voiceovers: ['recordedVoiceovers'],
       default_outcome: ['interaction', 'defaultOutcome'],
-      image_assets: ['image_assets'],
+      image_assets: ['imageAssets'],
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
       hints: ['interaction', 'hints'],
@@ -193,7 +193,7 @@ oppia.factory('ExplorationStatesService', [
 
     var getImageFilepathFromImageAssets = function(stateName, imageId) {
       var state = _states.getState(stateName);
-      return state.image_assets.image_mapping[imageId]['src']
+      return state.image_assets.image_mapping[imageId].src;
     };
 
     var addImageInState = function(stateName, image) {
@@ -404,7 +404,7 @@ oppia.factory('ExplorationStatesService', [
       saveImage: function(stateName, image) {
         addImageInState(stateName, image);
       },
-      getImagesource: function(stateName, imageId){
+      getImagesource: function(stateName, imageId) {
         return getImageFilepathFromImageAssets(stateName, imageId);
       },
       isInitialized: function() {

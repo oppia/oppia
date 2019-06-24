@@ -67,6 +67,7 @@ describe('Extracting Image file names in the state service', function() {
       blurb: '',
       author_notes: '',
       states_schema_version: 15,
+      image_counter: 11,
       init_state_name: 'Introduction',
       states: {
         'State 1': {
@@ -166,7 +167,23 @@ describe('Extracting Image file names in the state service', function() {
             }
           },
           image_assets: {
-            image_mapping: {}
+            image_mapping: {
+              image_id_1: {
+                src: 'sIMultipleChoice1.png',
+                placeholder: false,
+                instructions: '',
+              },
+              image_id_2: {
+                src: 'sIMultipleChoice2.png',
+                placeholder: false,
+                instructions: '',
+              },
+              image_id_3: {
+                src: 'sIOutcomeFeedback.png',
+                placeholder: false,
+                instructions: '',
+              }
+            }
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -182,11 +199,11 @@ describe('Extracting Image file names in the state service', function() {
               choices: {
                 value: [
                   '<p> Go to ItemSelection <oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;sIMultipleChoice1.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>',
+                  ' id-with-value="&amp;quot;image_id_1&amp;quot;">' +
+                  '</oppia-noninteractive-image></p>',
                   '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;sIMultipleChoice2.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>'
+                  ' id-with-value="&amp;quot;image_id_2&amp;quot;">' +
+                  '</oppia-noninteractive-image></p>'
                 ]
               }
             },
@@ -198,8 +215,8 @@ describe('Extracting Image file names in the state service', function() {
                   feedback: {
                     content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
-                          '<oppia-noninteractive-image filepath-with-value=' +
-                          '"&amp;quot;sIOutcomeFeedback.png&amp;quot;">' +
+                          '<oppia-noninteractive-image id-with-value=' +
+                          '"&amp;quot;image_id_3&amp;quot;">' +
                           '</oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
@@ -252,8 +269,8 @@ describe('Extracting Image file names in the state service', function() {
           param_changes: [],
           content: {
             content_id: 'content',
-            html: '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
-                  'quot;s4Content.png&amp;quot;">' +
+            html: '<p><oppia-noninteractive-image id-with-value="&amp;' +
+                  'quot;image_id_4&amp;quot;">' +
                   '</oppia-noninteractive-image></p>'
           },
           recorded_voiceovers: {
@@ -265,7 +282,38 @@ describe('Extracting Image file names in the state service', function() {
             }
           },
           image_assets: {
-            image_mapping: {}
+            image_mapping: {
+              image_id_4: {
+                src: 's4Content.png',
+                placeholder: false,
+                instructions: ''
+              },
+              image_id_5: {
+                src: 's4DefaultOutcomeFeedback.png',
+                placeholder: false,
+                instructions: ''
+              },
+              image_id_6: {
+                src: 's4Choice1.png',
+                placeholder: false,
+                instructions: ''
+              },
+              image_id_7: {
+                src: 's4Choice2.png',
+                placeholder: false,
+                instructions: ''
+              },
+              image_id_8: {
+                src: 's4Choice1.png',
+                placeholder: false,
+                instructions: ''
+              },
+              image_id_9: {
+                src: 's4Choice2.png',
+                placeholder: false,
+                instructions: ''
+              }
+            }
           },
           interaction: {
             id: 'ItemSelectionInput',
@@ -273,8 +321,7 @@ describe('Extracting Image file names in the state service', function() {
               feedback: {
                 content_id: 'content',
                 html: '<p>Try Again! <oppia-noninteractive-image' +
-                      'filepath-with-value="&amp;quot;' +
-                      's4DefaultOutcomeFeedback.png&amp;quot;">' +
+                      ' id-with-value="&amp;quot;image_id_5&amp;quot;">' +
                       '</oppia-noninteractive-image></p>'
               },
               dest: 'State 4',
@@ -290,11 +337,11 @@ describe('Extracting Image file names in the state service', function() {
               },
               choices: {
                 value: [
-                  '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
-                  'quot;s4Choice1.png&amp;quot;">' +
+                  '<p><oppia-noninteractive-image id-with-value="&amp;' +
+                  'quot;image_id_6&amp;quot;">' +
                   '</oppia-noninteractive-image></p>',
-                  '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
-                  'quot;s4Choice2.png&amp;quot;">' +
+                  '<p><oppia-noninteractive-image id-with-value="&amp;' +
+                  'quot;image_id_7&amp;quot;">' +
                   '</oppia-noninteractive-image></p>']
               }
             },
@@ -316,8 +363,8 @@ describe('Extracting Image file names in the state service', function() {
                   {
                     inputs: {
                       x: [
-                        '<p><oppia-noninteractive-image filepath-with-value=' +
-                        '"&amp;quot;s4Choice1.png&amp;quot;">' +
+                        '<p><oppia-noninteractive-image id-with-value=' +
+                        '"&amp;quot;image_id_8&amp;quot;">' +
                         '</oppia-noninteractive-image></p>'
                       ]
                     },
@@ -340,8 +387,8 @@ describe('Extracting Image file names in the state service', function() {
                   {
                     inputs: {
                       x: [
-                        '<p><oppia-noninteractive-image filepath-with-value=' +
-                        '"&amp;quot;s4Choice2.png&amp;quot;">' +
+                        '<p><oppia-noninteractive-image id-with-value=' +
+                        '"&amp;quot;image_id_9&amp;quot;">' +
                         '</oppia-noninteractive-image></p>'
                       ]
                     },
@@ -580,7 +627,18 @@ describe('Extracting Image file names in the state service', function() {
             }
           },
           image_assets: {
-            image_mapping: {}
+            image_mapping: {
+              image_id_10: {
+                src: 's6Hint1.png',
+                placeholder: false,
+                instructions: ''
+              },
+              image_id_11: {
+                src: 's6SolutionExplanation.png',
+                placeholder: false,
+                instructions: ''
+              }
+            }
           },
           interaction: {
             id: 'TextInput',
@@ -641,8 +699,8 @@ describe('Extracting Image file names in the state service', function() {
             hints: [{
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p><oppia-noninteractive-image filepath-with-value="' +
-                      '&amp;quot;s6Hint1.png&amp;quot;">' +
+                html: '<p><oppia-noninteractive-image id-with-value="' +
+                      '&amp;quot;image_id_10&amp;quot;">' +
                       '</oppia-noninteractive-image></p>'
               }
             }],
@@ -651,8 +709,8 @@ describe('Extracting Image file names in the state service', function() {
               correct_answer: 'cat',
               explanation: {
                 content_id: 'solution',
-                html: '<p><oppia-noninteractive-image filepath-with-value="' +
-                      '&amp;quot;s6SolutionExplanation.png&amp;quot;">' +
+                html: '<p><oppia-noninteractive-image id-with-value="' +
+                      '&amp;quot;image_id_11&amp;quot;">' +
                       '</oppia-noninteractive-image></p>'
               }
             },

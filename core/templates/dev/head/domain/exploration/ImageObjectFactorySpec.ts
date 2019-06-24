@@ -16,31 +16,30 @@
  * @fileoverview Unit tests for the Image object factory.
  */
 
-require('domain/exploration/WImageObjectFactory.ts');
+require('domain/exploration/ImageObjectFactory.ts');
 
 describe('Image object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('ImageObjectFactory', function() {
     var iof = null;
-    var image = null
+    var image = null;
 
     beforeEach(angular.mock.inject(function($injector) {
-        iof = $injector.get('ImageObjectFactory');
-        image = iof.createFromBackendDict({
-            src: '',
-            placeholder: false,
-            instructions: ''
-        });
-     }));
+      iof = $injector.get('ImageObjectFactory');
+      image = iof.createFromBackendDict({
+        src: '',
+        placeholder: false,
+        instructions: ''
+      });
+    }));
 
     it('should get and set value correctly', function() {
-        expect(image).toEqual(iof.createFromBackendDict({
-            src: '',
-            placeholder: false,
-            instructions: ''
-        }));
+      expect(image).toEqual(iof.createFromBackendDict({
+        src: '',
+        placeholder: false,
+        instructions: ''
+      }));
     });
-
   });
 });

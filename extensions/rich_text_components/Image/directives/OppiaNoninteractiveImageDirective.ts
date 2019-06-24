@@ -24,18 +24,21 @@ require('components/state-editor/state-editor.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
 require('services/AssetsBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 
 oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService', 'ExplorationEngineService',
-  'ExplorationStatesService', 'HtmlEscaperService', 'ImagePreloaderService',
-  'StateEditorService', 'UrlInterpolationService', 'LOADING_INDICATOR_URL',
+  '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
+  'ExplorationEngineService', 'ExplorationStatesService', 'HtmlEscaperService',
+  'ImagePreloaderService', 'PlayerPositionService', 'StateEditorService',
+  'UrlInterpolationService', 'LOADING_INDICATOR_URL',
   function(
-      $rootScope, $sce, AssetsBackendApiService, ContextService, ExplorationEngineService,
-      ExplorationStatesService, HtmlEscaperService, ImagePreloaderService,
-      StateEditorService, UrlInterpolationService, LOADING_INDICATOR_URL) {
+      $rootScope, $sce, AssetsBackendApiService, ContextService,
+      ExplorationEngineService, ExplorationStatesService, HtmlEscaperService,
+      ImagePreloaderService, PlayerPositionService, StateEditorService,
+      UrlInterpolationService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -54,7 +57,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           $attrs.idWithValue);
 
         if (ImagePreloaderService.inExplorationPlayer()) {
-          var stateName = ExplorationEngineService.currentStateName();
+          var stateName = PlayerPositionService.getCurrentStateName();
           ctrl.filepath = (
             ExplorationEngineService.getImageFilePath(stateName, imageId));
           ctrl.isLoadingIndicatorShown = true;

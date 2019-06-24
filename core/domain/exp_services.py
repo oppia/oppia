@@ -39,7 +39,6 @@ from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import fs_services
-from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import state_domain
@@ -782,9 +781,6 @@ def apply_change_list(exploration_id, change_list):
                     state.image_assets.add_image(
                         change.image_id, image_object)
                     exploration.update_image_counter(image_counter)
-                    print("             "*100)
-                    print(exploration.to_dict())
-                    print("             "*100)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -1211,17 +1207,9 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX)
 
     exploration = apply_change_list(exploration_id, change_list)
-    print("                 "*100)
-    print(exploration.to_dict())
-    print("                 "*100)
-
 
     # Removing images from image assets, which gets deleted.
     exploration.clean_image_assets()
-    print("                 "*100)
-    print(exploration.to_dict())
-    print("                 "*100)
-
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
     discard_draft(exploration_id, committer_id)

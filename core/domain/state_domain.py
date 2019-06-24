@@ -195,7 +195,7 @@ class Image(object):
         """Returns a dict representing this image domain object.
 
         Returns:
-            dict. A dict, mapping all fields of Image instance.
+            dict. A dict, representation of the image instance.
         """
         return {
             'src': self.src,
@@ -226,7 +226,7 @@ class Image(object):
             ValidationError: One or more attributes of the Image are not valid.
         """
         if not isinstance(self.src, basestring):
-            raise utils,ValidationError(
+            raise utils.ValidationError(
                 'Expected image src to be string, received %s' %
                 self.src)
         if not isinstance(self.placeholder, bool):
@@ -706,12 +706,9 @@ class InteractionInstance(object):
         if self.id in (
                 'ItemSelectionInput', 'MultipleChoiceInput',
                 'DragAndDropSortInput'):
-            try:
-                customization_args_html_list = (
-                    self.customization_args['choices']['value'])
-                html_list = html_list + customization_args_html_list
-            except KeyError:
-                return html_list
+            customization_args_html_list = (
+                self.customization_args['choices']['value'])
+            html_list = html_list + customization_args_html_list
 
         return html_list
 
@@ -2116,10 +2113,11 @@ class State(object):
         """
         content_html = self.content.html
         interaction_html_list = self.interaction.get_all_html_content_strings()
-        if interaction_html_list != []:
-            state_html = content_html + interaction_html_list[0]
-        else:
-            state_html = content_html
+
+        state_html = content_html
+        for html in interaction_html_list:
+            state_html = state_html + html
+
         image_ids_in_state = (
             html_validation_service.get_image_ids_from_image_tag(state_html))
 

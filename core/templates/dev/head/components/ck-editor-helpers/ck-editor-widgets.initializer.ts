@@ -19,7 +19,8 @@
 
 require('components/state-editor/state-editor.directive.ts');
 require(
-  'pages/exploration-editor-page/services/exploration-image-counter.service.ts');
+  'pages/exploration-editor-page/services/exploration-image-counter.' +
+  'service.ts');
 require('rich_text_components/richTextComponentsRequires.ts');
 require('services/HtmlEscaperService.ts');
 require('services/RteHelperService.ts');
@@ -30,8 +31,9 @@ oppia.run([
   'ExplorationImageCounterService', 'ExplorationStatesService',
   'StateEditorService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
-      HtmlEscaperService, ExplorationDataService, ExplorationImageCounterService,
-      ExplorationStatesService, StateEditorService) {
+      HtmlEscaperService, ExplorationDataService,
+      ExplorationImageCounterService, ExplorationStatesService,
+      StateEditorService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
@@ -44,7 +46,8 @@ oppia.run([
       var tagName = 'oppia-noninteractive-' + componentDefn.id;
       var customizationArgSpecs = componentDefn.customizationArgSpecs;
       var isInline = RteHelperService.isInlineComponent(componentDefn.id);
-      var imageId = ''
+      var imageId = '';
+      var imageTagName = 'oppiaimage';
 
       // Inline components will be wrapped in a span, while block components
       // will be wrapped in a div.
@@ -85,15 +88,14 @@ oppia.run([
                 customizationArgs,
                 function(customizationArgsDict) {
                   // Generating and adding imageId for image tag.
-                  if (ckName === 'oppiaimage') {
+                  if (ckName === imageTagName) {
                     var imageSrc = customizationArgsDict.filepath;
                     var imageIdIntegerPart = (
                       Number(ExplorationImageCounterService.displayed) + 1);
                     imageId = 'image_id_' + imageIdIntegerPart;
-                    ExplorationImageCounterService.displayed = imageIdIntegerPart;
+                    ExplorationImageCounterService.displayed = (
+                      imageIdIntegerPart);
                     ExplorationImageCounterService.saveDisplayedValue();
-                    console.log(ExplorationImageCounterService.displayed)
-                    alert("cjeck")
                     var image = {
                       image_id: imageId,
                       image_info: {
@@ -183,7 +185,7 @@ oppia.run([
               // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
                 // Replacing filepath with image id.
-                if (ckName === 'oppiaimage' && spec.name === 'filepath') {
+                if (ckName === imageTagName && spec.name === 'filepath') {
                   that.element.getChild(0).setAttribute(
                     'id-with-value',
                     HtmlEscaperService.objToEscapedJson(

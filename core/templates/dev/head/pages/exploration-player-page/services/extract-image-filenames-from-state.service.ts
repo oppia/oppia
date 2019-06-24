@@ -25,7 +25,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var INTERACTION_TYPE_IMAGE_CLICK_INPUT = 'ImageClickInput';
     var INTERACTION_TYPE_DRAG_AND_DROP_SORT = 'DragAndDropSortInput';
 
-    var filenamesInState = [];
+    var filename = '';
 
     /**
      * Gets the html from the state's content.
@@ -145,6 +145,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      */
     var _getImageFilenamesInState = function(state) {
       var imageIdsInState = [];
+      var filenamesInState = [];
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
@@ -158,12 +159,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         imageIdsInState = imageIdsInState.concat(
           _extractImageIdValueFromOppiaNonInteractiveImageTag(htmlStr));
       });
-
-      console.log(allHtmlOfState)
       imageIdsInState.forEach(function(imageId) {
-        console.log(imageId);
-        console.log(state)
-        filenamesInState.push(state.image_assets.image_mapping.imageId.src);
+        filenamesInState.push(state.image_assets.image_mapping[imageId].src);
       });
       return filenamesInState;
     };
