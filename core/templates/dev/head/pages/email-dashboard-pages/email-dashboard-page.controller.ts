@@ -19,79 +19,90 @@
 require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
 require('services/UserService.ts');
 
-oppia.controller('EmailDashboard', [
-  '$rootScope', '$scope', 'EmailDashboardDataService', 'UserService',
-  function($rootScope, $scope, EmailDashboardDataService, UserService) {
-    $scope.username = '';
-    $rootScope.loadingMessage = 'Loading';
-    UserService.getUserInfoAsync().then(function(userInfo) {
-      $scope.username = userInfo.getUsername();
-      $rootScope.loadingMessage = '';
-    });
+oppia.directive('emailDashboardPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/email-dashboard-pages/email-dashboard-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$rootScope', 'EmailDashboardDataService', 'UserService',
+      function($rootScope, EmailDashboardDataService, UserService) {
+        var ctrl = this;
+        ctrl.username = '';
+        $rootScope.loadingMessage = 'Loading';
+        UserService.getUserInfoAsync().then(function(userInfo) {
+          ctrl.username = userInfo.getUsername();
+          $rootScope.loadingMessage = '';
+        });
 
-    $scope.currentPageOfQueries = [];
+        ctrl.currentPageOfQueries = [];
 
-    $scope.resetForm = function() {
-      $scope.has_not_logged_in_for_n_days = null;
-      $scope.inactive_in_last_n_days = null;
-      $scope.created_at_least_n_exps = null;
-      $scope.created_fewer_than_n_exps = null;
-      $scope.edited_at_least_n_exps = null;
-      $scope.edited_fewer_than_n_exps = null;
-    };
+        ctrl.resetForm = function() {
+          ctrl.has_not_logged_in_for_n_days = null;
+          ctrl.inactive_in_last_n_days = null;
+          ctrl.created_at_least_n_exps = null;
+          ctrl.created_fewer_than_n_exps = null;
+          ctrl.edited_at_least_n_exps = null;
+          ctrl.edited_fewer_than_n_exps = null;
+        };
 
-    $scope.submitQuery = function() {
-      var data = {
-        has_not_logged_in_for_n_days: $scope.has_not_logged_in_for_n_days,
-        inactive_in_last_n_days: $scope.inactive_in_last_n_days,
-        created_at_least_n_exps: $scope.created_at_least_n_exps,
-        created_fewer_than_n_exps: $scope.created_fewer_than_n_exps,
-        edited_at_least_n_exps: $scope.edited_at_least_n_exps,
-        edited_fewer_than_n_exps: $scope.edited_fewer_than_n_exps
-      };
-      EmailDashboardDataService.submitQuery(data).then(function(queries) {
-        $scope.currentPageOfQueries = queries;
-      });
-      $scope.resetForm();
-      $scope.showSuccessMessage = true;
-    };
+        ctrl.submitQuery = function() {
+          var data = {
+            has_not_logged_in_for_n_days: ctrl.has_not_logged_in_for_n_days,
+            inactive_in_last_n_days: ctrl.inactive_in_last_n_days,
+            created_at_least_n_exps: ctrl.created_at_least_n_exps,
+            created_fewer_than_n_exps: ctrl.created_fewer_than_n_exps,
+            edited_at_least_n_exps: ctrl.edited_at_least_n_exps,
+            edited_fewer_than_n_exps: ctrl.edited_fewer_than_n_exps
+          };
+          EmailDashboardDataService.submitQuery(data).then(function(queries) {
+            ctrl.currentPageOfQueries = queries;
+          });
+          ctrl.resetForm();
+          ctrl.showSuccessMessage = true;
+        };
 
-    $scope.getNextPageOfQueries = function() {
-      if (EmailDashboardDataService.isNextPageAvailable()) {
+        ctrl.getNextPageOfQueries = function() {
+          if (EmailDashboardDataService.isNextPageAvailable()) {
+            EmailDashboardDataService.getNextQueries().then(function(queries) {
+              ctrl.currentPageOfQueries = queries;
+            });
+          }
+        };
+
+        ctrl.getPreviousPageOfQueries = function() {
+          if (EmailDashboardDataService.isPreviousPageAvailable()) {
+            ctrl.currentPageOfQueries = (
+              EmailDashboardDataService.getPreviousQueries());
+          }
+        };
+
+        ctrl.showNextButton = function() {
+          return EmailDashboardDataService.isNextPageAvailable();
+        };
+
+        ctrl.showPreviousButton = function() {
+          return EmailDashboardDataService.isPreviousPageAvailable();
+        };
+
+        ctrl.recheckStatus = function(index) {
+          var queryId = ctrl.currentPageOfQueries[index].id;
+          EmailDashboardDataService.fetchQuery(queryId).then(function(query) {
+            ctrl.currentPageOfQueries[index] = query;
+          });
+        };
+
+        ctrl.showLinkToResultPage = function(submitter, status) {
+          return (submitter === ctrl.username) && (status === 'completed');
+        };
+
         EmailDashboardDataService.getNextQueries().then(function(queries) {
-          $scope.currentPageOfQueries = queries;
+          ctrl.currentPageOfQueries = queries;
         });
       }
-    };
-
-    $scope.getPreviousPageOfQueries = function() {
-      if (EmailDashboardDataService.isPreviousPageAvailable()) {
-        $scope.currentPageOfQueries = (
-          EmailDashboardDataService.getPreviousQueries());
-      }
-    };
-
-    $scope.showNextButton = function() {
-      return EmailDashboardDataService.isNextPageAvailable();
-    };
-
-    $scope.showPreviousButton = function() {
-      return EmailDashboardDataService.isPreviousPageAvailable();
-    };
-
-    $scope.recheckStatus = function(index) {
-      var queryId = $scope.currentPageOfQueries[index].id;
-      EmailDashboardDataService.fetchQuery(queryId).then(function(query) {
-        $scope.currentPageOfQueries[index] = query;
-      });
-    };
-
-    $scope.showLinkToResultPage = function(submitter, status) {
-      return (submitter === $scope.username) && (status === 'completed');
-    };
-
-    EmailDashboardDataService.getNextQueries().then(function(queries) {
-      $scope.currentPageOfQueries = queries;
-    });
-  }
-]);
+    ]};
+}]);

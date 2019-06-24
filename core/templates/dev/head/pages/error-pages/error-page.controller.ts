@@ -16,20 +16,29 @@
  * @fileoverview Controllers for the error page.
  */
 
-require('pages/OppiaFooterDirective.ts');
-
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PageTitleService.ts');
 
-oppia.controller('Error', [
-  '$scope', 'PageTitleService', 'UrlInterpolationService',
-  function(
-      $scope, PageTitleService, UrlInterpolationService) {
-    $scope.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/general/oops_mint.png');
+oppia.directive('errorPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/error-pages/error-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      'PageTitleService', 'UrlInterpolationService',
+      function(
+          PageTitleService, UrlInterpolationService) {
+        var ctrl = this;
+        ctrl.oopsMintImgUrl = UrlInterpolationService.getStaticImageUrl(
+          '/general/oops_mint.png');
 
-    $scope.statusCode = GLOBALS.status_code;
+        ctrl.statusCode = GLOBALS.status_code;
 
-    PageTitleService.setPageTitle('Error ' + $scope.statusCode + ' - Oppia');
-  }
-]);
+        PageTitleService.setPageTitle('Error ' + ctrl.statusCode + ' - Oppia');
+      }
+    ]};
+}]);

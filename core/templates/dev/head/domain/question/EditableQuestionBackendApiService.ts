@@ -27,14 +27,7 @@ require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
-  '/question_editor_handler/data/<question_id>');
-oppia.constant(
-  'QUESTION_CREATION_URL', '/question_editor_handler/create_new/<skill_id>');
-oppia.constant(
-  'QUESTION_SKILL_LINK_URL_TEMPLATE',
-  '/manage_question_skill_link/<question_id>/<skill_id>');
+require('domain/question/question-domain.constants.ts');
 
 oppia.factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
@@ -46,9 +39,14 @@ oppia.factory('EditableQuestionBackendApiService', [
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
         skillId, questionDict, successCallback, errorCallback) {
+      // Note: We are passing only a single skillId for now because the
+      // frontend doesn't support multiple ids.
+      // The backend however can take in 1-n skill ids (comma separated)
+      // TODO(vinitamurthi): Pass a list of skill ids (comma separated)
+      // as part of the question_dict to the backend.
       var questionCreationUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_CREATION_URL, {
-          skill_id: skillId
+          comma_separated_skill_ids: skillId
         });
       var postData = {
         question_dict: questionDict

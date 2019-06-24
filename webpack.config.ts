@@ -31,7 +31,7 @@ var commonPrefix = './core/templates/dev/head';
 
 module.exports = {
   entries: {
-    about: commonPrefix + '/pages/about-page/about-page.controller.ts',
+    about: commonPrefix + '/pages/about-page/about-page.scripts.ts',
     admin: commonPrefix + '/pages/admin-page/admin-page.scripts.ts',
     app: commonPrefix + '/App.ts',
     collection_editor:
@@ -43,26 +43,26 @@ module.exports = {
     contact: commonPrefix + '/pages/contact-page/contact-page.scripts.ts',
     creator_dashboard:
       commonPrefix + '/pages/creator-dashboard-page/' +
-      'creator-dashboard-page.controller.ts',
-    donate: commonPrefix + '/pages/donate-page/donate-page.controller.ts',
+      'creator-dashboard-page.scripts.ts',
+    donate: commonPrefix + '/pages/donate-page/donate-page.scripts.ts',
     email_dashboard:
       commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-page.controller.ts',
+      '/pages/email-dashboard-pages/email-dashboard-page.scripts.ts',
     email_dashboard_result:
       commonPrefix +
-      '/pages/email-dashboard-pages/email-dashboard-result.controller.ts',
-    error: commonPrefix + '/pages/error-pages/error-page.controller.ts',
+      '/pages/email-dashboard-pages/email-dashboard-result.scripts.ts',
+    error: commonPrefix + '/pages/error-pages/error-page.scripts.ts',
     exploration_editor:
       commonPrefix + '/pages/exploration-editor-page/' +
-      'exploration-editor-page.controller.ts',
+      'exploration-editor-page.scripts.ts',
     exploration_player:
       commonPrefix + '/pages/exploration-player-page/' +
-      'exploration-player-page.controller.ts',
+      'exploration-player-page.scripts.ts',
     get_started:
       commonPrefix + '/pages/get-started-page/get-started-page.scripts.ts',
     landing:
       commonPrefix + '/pages/landing-pages/topic-landing-page/' +
-      'topic-landing-page.controller.ts',
+      'topic-landing-page.scripts.ts',
     learner_dashboard:
       commonPrefix + '/pages/learner-dashboard-page/' +
       'learner-dashboard-page.controller.ts',
@@ -70,40 +70,42 @@ module.exports = {
     maintenance:
       commonPrefix + '/pages/maintenance-page/maintenance-page.controller.ts',
     moderator:
-      commonPrefix + '/pages/moderator-page/moderator-page.controller.ts',
+      commonPrefix + '/pages/moderator-page/moderator-page.scripts.ts',
     notifications_dashboard:
       commonPrefix + '/pages/notifications-dashboard-page/' +
-      'notifications-dashboard-page.controller.ts',
+      'notifications-dashboard-page.scripts.ts',
     practice_session:
       commonPrefix + '/pages/practice-session-page/' +
-        'practice-session-page.controller.ts',
+        'practice-session-page.scripts.ts',
     privacy: commonPrefix + '/pages/privacy-page/privacy-page.controller.ts',
     preferences:
-      commonPrefix + '/pages/preferences-page/preferences-page.controller.ts',
-    profile: commonPrefix + '/pages/profile-page/profile-page.controller.ts',
-    signup: commonPrefix + '/pages/signup-page/signup-page.controller.ts',
+      commonPrefix + '/pages/preferences-page/preferences-page.scripts.ts',
+    profile: commonPrefix + '/pages/profile-page/profile-page.scripts.ts',
+    review_test:
+      commonPrefix + '/pages/review-test-page/review-test-page.scripts.ts',
+    signup: commonPrefix + '/pages/signup-page/signup-page.scripts.ts',
     skill_editor:
-      commonPrefix + '/pages/skill-editor-page/skill-editor-page.controller.ts',
-    splash: commonPrefix + '/pages/splash-page/splash-page.controller.ts',
-    stewards: (
-      commonPrefix +
-      '/pages/landing-pages/stewards-landing-page/' +
-      'stewards-landing-page.controller.ts'
-    ),
+      commonPrefix + '/pages/skill-editor-page/skill-editor-page.scripts.ts',
+    splash: commonPrefix + '/pages/splash-page/splash-page.scripts.ts',
+    stewards:
+      commonPrefix + '/pages/landing-pages/stewards-landing-page/' +
+      'stewards-landing-page.scripts.ts',
     story_editor:
-      commonPrefix + '/pages/story-editor-page/story-editor-page.controller.ts',
-    teach: commonPrefix + '/pages/teach-page/teach-page.controller.ts',
+      commonPrefix + '/pages/story-editor-page/story-editor-page.scripts.ts',
+    story_viewer:
+      commonPrefix + '/pages/story-viewer-page/story-viewer-page.scripts.ts',
+    teach: commonPrefix + '/pages/teach-page/teach-page.scripts.ts',
     terms: commonPrefix + '/pages/terms-page/terms-page.controller.ts',
     thanks: commonPrefix + '/pages/thanks-page/thanks-page.controller.ts',
     topic_editor:
-      commonPrefix + '/pages/topic-editor-page/topic-editor-page.controller.ts',
+      commonPrefix + '/pages/topic-editor-page/topic-editor-page.scripts.ts',
     topics_and_skills_dashboard: (
       commonPrefix +
       '/pages/topics-and-skills-dashboard-page/' +
       'topics-and-skills-dashboard-page.controller.ts'
     ),
     topic_viewer:
-      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.controller.ts',
+      commonPrefix + '/pages/topic-viewer-page/topic-viewer-page.scripts.ts',
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -324,6 +326,14 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
+      chunks: ['review_test'],
+      filename: 'review-test-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/review-test-page/review-test-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
       chunks: ['signup'],
       filename: 'signup-page.mainpage.html',
       template: commonPrefix + '/pages/signup-page/signup-page.mainpage.html',
@@ -394,6 +404,15 @@ module.exports = {
       template:
         commonPrefix + '/pages/story-editor-page/' +
         'story-editor-page.mainpage.html',
+      minify: htmlMinifyConfig,
+      inject: false
+    }),
+    new HtmlWebpackPlugin({
+      chunks: ['story_viewer'],
+      filename: 'story-viewer-page.mainpage.html',
+      template:
+        commonPrefix + '/pages/story-viewer-page/' +
+        'story-viewer-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
     }),

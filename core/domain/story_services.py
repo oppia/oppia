@@ -559,6 +559,33 @@ def save_story_summary(story_summary):
     story_summary_model.put()
 
 
+def get_node_index_by_story_id_and_node_id(story_id, node_id):
+    """Returns the index of the story node with the given story id
+    and node id.
+
+    Args:
+        story_id: str. ID of the story.
+        node_id: str. ID of the story node.
+
+    Returns:
+        int. The index of the corresponding node.
+
+    Raises:
+        Exception. The given story does not exist.
+        Exception. The given node does not exist in the story.
+    """
+    try:
+        story = get_story_by_id(story_id)
+    except Exception:
+        raise Exception('Story with id %s does not exist.' % story_id)
+
+    node_index = story.story_contents.get_node_index(node_id)
+    if node_index is None:
+        raise Exception('Story node with id %s does not exist '
+                        'in this story.' % node_id)
+    return node_index
+
+
 def get_completed_node_ids(user_id, story_id):
     """Returns the ids of the nodes completed in the story.
 
@@ -573,6 +600,35 @@ def get_completed_node_ids(user_id, story_id):
         user_id, story_id, strict=False)
 
     return progress_model.completed_node_ids if progress_model else []
+
+
+def get_latest_completed_node_ids(user_id, story_id):
+    """Returns the ids of the completed nodes that come latest in the story.
+
+    Args:
+        user_id: str. ID of the given user.
+        story_id: str. ID of the story.
+
+    Returns:
+        list(str). List of the completed node ids that come latest in the story.
+            If length is larger than 3, return the last three of them.
+            If length is smaller or equal to 3, return all of them.
+    """
+    progress_model = user_models.StoryProgressModel.get(
+        user_id, story_id, strict=False)
+
+    if not progress_model:
+        return []
+
+    num_of_nodes = min(len(progress_model.completed_node_ids), 3)
+    story = get_story_by_id(story_id)
+    ordered_node_ids = (
+        [node.id for node in story.story_contents.get_ordered_nodes()])
+    ordered_completed_node_ids = (
+        [node_id for node_id in ordered_node_ids
+         if node_id in progress_model.completed_node_ids]
+    )
+    return ordered_completed_node_ids[-num_of_nodes:]
 
 
 def get_node_ids_completed_in_stories(user_id, story_ids):

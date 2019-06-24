@@ -20,25 +20,7 @@ require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/skill/SkillObjectFactory.ts');
 
-oppia.constant('SKILL_PROPERTY_DESCRIPTION', 'description');
-oppia.constant('SKILL_PROPERTY_LANGUAGE_CODE', 'language_code');
-oppia.constant('SKILL_CONTENTS_PROPERTY_EXPLANATION', 'explanation');
-oppia.constant('SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES', 'worked_examples');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NAME', 'name');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_NOTES', 'notes');
-oppia.constant('SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK', 'feedback');
-
-oppia.constant('CMD_UPDATE_SKILL_PROPERTY',
-  'update_skill_property');
-oppia.constant('CMD_UPDATE_SKILL_CONTENTS_PROPERTY',
-  'update_skill_contents_property');
-oppia.constant('CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY',
-  'update_skill_misconceptions_property');
-
-oppia.constant('CMD_ADD_SKILL_MISCONCEPTION',
-  'add_skill_misconception');
-oppia.constant('CMD_DELETE_SKILL_MISCONCEPTION',
-  'delete_skill_misconception');
+require('domain/skill/skill-domain.constants.ts');
 
 oppia.factory('SkillUpdateService', [
   'ChangeObjectFactory', 'SkillObjectFactory',

@@ -100,16 +100,18 @@ oppia.directive('audioTranslationBar', [
         'ContextService', 'EditabilityService', 'ExplorationStatesService',
         'IdGenerationService', 'SiteAnalyticsService',
         'StateEditorService', 'StateRecordedVoiceoversService',
-        'TranslationLanguageService', 'TranslationTabActiveContentIdService',
-        'RECORDING_TIME_LIMIT', 'VoiceoverRecordingService',
+        'TranslationLanguageService', 'TranslationStatusService',
+        'TranslationTabActiveContentIdService', 'VoiceoverRecordingService',
+        'RECORDING_TIME_LIMIT',
         function(
             $filter, $interval, $rootScope, $scope, $uibModal, $window,
             AlertsService, AssetsBackendApiService, AudioPlayerService,
             ContextService, EditabilityService, ExplorationStatesService,
             IdGenerationService, SiteAnalyticsService,
             StateEditorService, StateRecordedVoiceoversService,
-            TranslationLanguageService, TranslationTabActiveContentIdService,
-            RECORDING_TIME_LIMIT, VoiceoverRecordingService) {
+            TranslationLanguageService, TranslationStatusService,
+            TranslationTabActiveContentIdService, VoiceoverRecordingService,
+            RECORDING_TIME_LIMIT) {
           $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
           $scope.voiceoverRecorder = null;
@@ -130,19 +132,24 @@ oppia.directive('audioTranslationBar', [
           $scope.timerInterval = null;
           $scope.unsavedAudioIsPlaying = false;
           $scope.waveSurfer = null;
+
           document.body.onkeyup = function(e) {
-            if (e.keyCode === 82 && !$scope.isAudioAvailable) {
-              // 82 belongs to the keycode for 'R'
+            if (e.code === 'KeyR' && !$scope.isAudioAvailable) {
               // Used as shortcut key for recording
               toggleStartAndStopRecording();
             }
           };
+
+          $scope.$on('$destroy', function() {
+            document.body.onkeyup = null;
+          });
 
           var saveRecordedVoiceoversChanges = function() {
             StateRecordedVoiceoversService.saveDisplayedValue();
             var stateName = StateEditorService.getActiveStateName();
             var value = StateRecordedVoiceoversService.displayed;
             ExplorationStatesService.saveRecordedVoiceovers(stateName, value);
+            TranslationStatusService.refresh();
           };
 
           var getAvailableAudio = function(contentId, languageCode) {
