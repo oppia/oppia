@@ -568,12 +568,24 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.admin, self.EXP_ID)
 
         exp_services.update_exploration(
-            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_state_property',
-                'state_name': init_state_name,
-                'property_name': 'widget_id',
-                'new_value': 'MultipleChoiceInput'
-            })], 'commit')
+            self.editor_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'state_name': init_state_name,
+                    'property_name': 'widget_id',
+                    'new_value': 'MultipleChoiceInput'
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value': {
+                        'choices': {'value': [
+                            '<p>This is value1 for MultipleChoice</p>',
+                            '<p>This is value2 for MultipleChoice</p>'
+                        ]}
+                    }
+                })], 'commit')
 
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
@@ -591,12 +603,24 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that commit to unpublished exploration does not update
         # contribution time.
         exp_services.update_exploration(
-            self.admin_id, self.EXP_ID, [exp_domain.ExplorationChange({
-                'cmd': 'edit_state_property',
-                'state_name': init_state_name,
-                'property_name': 'widget_id',
-                'new_value': 'MultipleChoiceInput'
-            })], '')
+            self.admin_id, self.EXP_ID, [
+                exp_domain.ExplorationChange({
+                    'cmd': 'edit_state_property',
+                    'state_name': init_state_name,
+                    'property_name': 'widget_id',
+                    'new_value': 'MultipleChoiceInput'
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value': {
+                        'choices': {'value': [
+                            '<p>This is value1 for MultipleChoice</p>',
+                            '<p>This is value2 for MultipleChoice</p>'
+                        ]}
+                    }
+                })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
 

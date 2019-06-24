@@ -99,6 +99,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value': {
+                        'choices': {'value': [
+                            '<p>This is value1 for MultipleChoice</p>',
+                            '<p>This is value2 for MultipleChoice</p>'
+                        ]}
+                    }
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': second_state_name,
                 }), exp_domain.ExplorationChange({
@@ -106,6 +117,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value': {
+                        'choices': {'value': [
+                            '<p>This is value1 for MultipleChoice</p>',
+                            '<p>This is value2 for MultipleChoice</p>'
+                        ]}
+                    }
                 })], 'Add new state')
             exp = exp_services.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -200,6 +222,18 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': first_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }),
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value': {
+                        'choices': {'value': [
+                            '<p>This is value1 for MultipleChoice</p>',
+                            '<p>This is value2 for MultipleChoice</p>'
+                        ]}
+                    }
                 })], 'Update interaction type')
             exp = exp_services.get_exploration_by_id(exp_id)
             exp_version = exp.version
@@ -255,6 +289,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
                 }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value': {
+                        'choices': {'value': [
+                            '<p>This is value1 for MultipleChoice</p>',
+                            '<p>This is value2 for MultipleChoice</p>'
+                        ]}
+                    }
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': second_state_name,
                 }), exp_domain.ExplorationChange({
@@ -262,6 +307,17 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': second_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value': {
+                        'choices': {'value': [
+                            '<p>This is value1 for MultipleChoice</p>',
+                            '<p>This is value2 for MultipleChoice</p>'
+                        ]}
+                    }
                 })], 'Add new state')
             exp = exp_services.get_exploration_by_id(exp_id)
             exp_version = exp.version

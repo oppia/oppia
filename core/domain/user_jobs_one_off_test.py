@@ -1074,11 +1074,23 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
         exp_services.update_exploration(
-            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
+            self.editor_id, self.EXP_ID, [
+            exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
+            }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name': (
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS),
+                    'new_value': {
+                        'choices': {'value': [
+                            '<p>This is value1 for MultipleChoice</p>',
+                            '<p>This is value2 for MultipleChoice</p>'
+                        ]}
+                    }
             })], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
