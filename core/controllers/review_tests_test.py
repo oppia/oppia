@@ -179,7 +179,6 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX, story_id),
                 expected_status_int=404)
-        
 
     def test_get_fails_when_story_doesnt_exist(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
