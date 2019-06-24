@@ -249,6 +249,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
     get_redirect_route(
+        r'%s/<story_id>/<node_id>' % feconf.STORY_NODE_COMPLETION_URL_PREFIX,
+        story_viewer.StoryNodeCompletionHandler),
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
     get_redirect_route(
@@ -593,9 +596,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_id>/<subtopic_id>' %
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableSubtopicPageDataHandler),
-    get_redirect_route(
-        r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
-        topic_editor.TopicManagerRightsHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
         topic_editor.TopicRightsHandler),

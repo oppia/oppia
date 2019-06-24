@@ -1524,8 +1524,9 @@ def can_edit_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
-        if topic_rights is None:
+        if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):
@@ -1709,8 +1710,9 @@ def can_add_new_story_to_topic(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
-        if topic_rights is None:
+        if topic_rights is None or topic is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
         if topic_services.check_can_edit_topic(self.user, topic_rights):

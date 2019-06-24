@@ -124,11 +124,9 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
-# Interaction IDs for which answer details cannot be solicited.
-INTERACTION_IDS_WITHOUT_ANSWER_DETAILS = ['EndExploration', 'Continue']
-
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
+ENTITY_TYPE_QUESTION = 'question'
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -197,6 +195,10 @@ CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema of LearnerAnswerInfo
+# dict schema changes.
+CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -680,6 +682,7 @@ SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
@@ -691,7 +694,6 @@ TOPIC_VIEWER_URL_PREFIX = '/topic'
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
-TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
 TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
 TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
