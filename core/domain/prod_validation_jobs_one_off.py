@@ -427,6 +427,16 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             item: ndb.Model. Entity to validate.
         """
         change_domain_object = cls._get_change_domain_class(item)
+        if change_domain_object is None:
+            # This is for cases where id of entity is invalid
+            # and no commtit command domain object is found for entity.
+            # For example, if a CollectionCommitLogEntryModel does
+            # not have id starting with collection/rights, there is
+            # no commit command domain object defined for this model.
+            cls.errors['commit cmd check'].append(
+                'Entity id %s: No commit command domain object defined '
+                'for entity with commands: %s' % (item.id, item.commit_cmds))
+            return
         for commit_cmd_dict in item.commit_cmds:
             if not commit_cmd_dict:
                 continue
@@ -745,6 +755,8 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         elif item.id.startswith('collection'):
             return collection_domain.CollectionChange
         else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
             return None
 
     @classmethod
@@ -1301,6 +1313,8 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         elif item.id.startswith('exploration'):
             return exp_domain.ExplorationChange
         else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
             return None
 
     @classmethod

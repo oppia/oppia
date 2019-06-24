@@ -362,7 +362,6 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             'version': 2,
             'commit_message': 'Changed name',
             'topic_and_subtopic_page_change_dicts': [{
-                'change_affects_subtopic_page': False,
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
                 'old_value': '',
