@@ -1938,6 +1938,12 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if not skill_model or skill_model.deleted:
+                continue
             if item.misconception_count != len(skill_model.misconceptions):
                 cls.errors['misconception count check'].append((
                     'Entity id %s: Misconception count: %s does not match '
@@ -1958,6 +1964,12 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, skill_model) in (
                 skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if not skill_model or skill_model.deleted:
+                continue
             if item.worked_examples_count != len(
                     skill_model.skill_contents['worked_examples']):
                 cls.errors['worked examples count check'].append((
