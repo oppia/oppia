@@ -301,22 +301,20 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html_before_deleting_image = (
-            '<p>ssssssssssssssss</p><oppia-noninteractive-image'
-            'id-with-value="&amp;quot;image_id_1&amp;quot;">'
-            '</oppia-noninteractive-image> hjkhjkhkjh'
-            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_2'
-            '&amp;quot;"></oppia-noninteractive-image> dgfsdgfd ggggggggggg'
-            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_3'
+            '<p>ssssssssssssssss</p>' +
+            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_1' +
+            '&amp;quot;"></oppia-noninteractive-image> hjkhjkhkjh' +
+            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_2' +
+            '&amp;quot;"></oppia-noninteractive-image> dgfsdgfd ggggggggggg' +
+            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_3' +
             '&amp;quot;"></oppia-noninteractive-image>ffffff ')
 
         new_html_after_deleting_image = (
-            '<p>ssssssssssssssss</p><oppia-noninteractive-image'
-            'id-with-value="&amp;quot;image_id_1&amp;quot;">'
-            '</oppia-noninteractive-image> hjkhjkhkjh'
-            '<oppia-noninteractive-image'
-            'id-with-value="&amp;quot;image_id_2&amp;quot;">'
-            '</oppia-noninteractive-image>dgfsdgfd'
-            )
+            '<p>ssssssssssssssss</p>' +
+            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_1' +
+            '&amp;quot;"></oppia-noninteractive-image> hjkhjkhkjh' +
+            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_2' +
+            '&amp;quot;"></oppia-noninteractive-image>dgfsdgfd ggggggggggg')
 
         change_dict_1 = {
             'new_value': {
@@ -339,7 +337,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_id': 'image_id_1',
             'image_info': {
                 'src': '',
-                'placeholder': True,
+                'placeholder': False,
                 'instructions': 'no instructions'
             }
         }
@@ -363,7 +361,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'image_id': 'image_id_3',
             'image_info': {
                 'src': '',
-                'placeholder': True,
+                'placeholder': False,
                 'instructions': 'no instructions'
             }
         }
@@ -376,7 +374,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': 'Introduction',
             'old_value': {
-                'html': new_html_before_deleting_image,
+                'html': '',
                 'content_id': 'content'
                 },
             'property_name': 'content',
@@ -421,13 +419,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                     'classifier_model_id': None,
                     'content': {
                         'content_id': u'content',
-                        'html': (
-                            '<p>ssssssssssssssss</p><oppia-noninteractive-image'
-                            'id-with-value="&amp;quot;image_id_1&amp;quot;">'
-                            '</oppia-noninteractive-image> hjkhjkhkjh'
-                            '<oppia-noninteractive-image id-with-value="&amp;'
-                            'quot;image_id_2&amp;quot;"></oppia-noninteractive'
-                            '-image>dgfsdgfd')
+                        'html': new_html_after_deleting_image,
                     },
                     'written_translations': {
                         'translations_mapping': {
@@ -437,12 +429,12 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                     },
                     'image_assets': {
                         'image_mapping': {
-                            u'image_id_1': {
+                            u'image_id_2': {
                                 'src': u'',
-                                'placeholder': True,
+                                'placeholder': False,
                                 'instructions': u'no instructions'
                             },
-                            u'image_id_2': {
+                            u'image_id_1': {
                                 'src': u'',
                                 'placeholder': False,
                                 'instructions': u'no instructions'
@@ -474,7 +466,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, change_list, 'one commit')
 
-        change_list = ([change_object_5])
+        change_list = [change_object_5]
         exp_services.update_exploration(
             self.editor_id, self.EXP_ID, change_list, 'second commit')
 
@@ -2137,6 +2129,13 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'missing_prerequisite_skill_id': None
         }
 
+        self.customization_args_dict = {
+            'choices': {'value': [
+                '<p>This is value1 for MultipleChoice</p>',
+                '<p>This is value2 for MultipleChoice</p>'
+            ]}
+        }
+
     def test_add_state_cmd(self):
         """Test adding of states."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -2261,7 +2260,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'MultipleChoiceInput'), '')
+                'MultipleChoiceInput') +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                self.customization_args_dict),
+            '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
@@ -2344,7 +2348,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                self.interaction_default_outcome),
+                self.interaction_default_outcome) +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                self.customization_args_dict),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -2378,7 +2386,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
+                    self.interaction_default_outcome) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                    self.customization_args_dict),
                 '')
 
     def test_update_state_missing_keys(self):
