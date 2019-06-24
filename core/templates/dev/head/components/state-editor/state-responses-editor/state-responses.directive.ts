@@ -56,6 +56,9 @@ require(
   'state-interaction-id.service.ts');
 require(
   'components/state-editor/state-editor-properties-services/' +
+  'state-solicit-answer-details.service.ts');
+require(
+  'components/state-editor/state-editor-properties-services/' +
   'state-solution.service.ts');
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
@@ -73,6 +76,7 @@ oppia.directive('stateResponses', [
         onResponsesInitialized: '=',
         onSaveInteractionAnswerGroups: '=',
         onSaveInteractionDefaultOutcome: '=',
+        onSaveSolicitAnswerDetails: '=',
         navigateToState: '=',
         refreshWarnings: '&',
         showMarkAllAudioAsNeedingUpdateModalIfRequired: '='
@@ -81,23 +85,31 @@ oppia.directive('stateResponses', [
         '/components/state-editor/state-responses-editor/' +
         'state-responses.directive.html'),
       controller: [
-        '$filter', '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'AnswerGroupObjectFactory', 'ContextService', 'EditabilityService',
-        'ResponsesService', 'StateCustomizationArgsService',
-        'StateEditorService', 'StateInteractionIdService',
-        'UrlInterpolationService', 'INTERACTION_SPECS',
+        '$filter', '$rootScope', '$scope', '$uibModal', 'AlertsService',
+        'AnswerGroupObjectFactory', 'ContextService',
+        'EditabilityService', 'ResponsesService',
+        'StateCustomizationArgsService', 'StateEditorService',
+        'StateInteractionIdService', 'StateSolicitAnswerDetailsService',
+        'UrlInterpolationService', 'ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE',
+        'INTERACTION_IDS_WITHOUT_ANSWER_DETAILS', 'INTERACTION_SPECS',
         'PLACEHOLDER_OUTCOME_DEST', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
         function(
-            $filter, $scope, $rootScope, $uibModal, AlertsService,
-            AnswerGroupObjectFactory, ContextService, EditabilityService,
-            ResponsesService, StateCustomizationArgsService,
-            StateEditorService, StateInteractionIdService,
-            UrlInterpolationService, INTERACTION_SPECS,
+            $filter, $rootScope, $scope, $uibModal, AlertsService,
+            AnswerGroupObjectFactory, ContextService,
+            EditabilityService, ResponsesService,
+            StateCustomizationArgsService, StateEditorService,
+            StateInteractionIdService, StateSolicitAnswerDetailsService,
+            UrlInterpolationService, ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE,
+            INTERACTION_IDS_WITHOUT_ANSWER_DETAILS, INTERACTION_SPECS,
             PLACEHOLDER_OUTCOME_DEST, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditabilityService = EditabilityService;
           $scope.stateName = StateEditorService.getActiveStateName();
+          $scope.enableSolicitAnswerDetailsFeature = (
+            ENABLE_SOLICIT_ANSWER_DETAILS_FEATURE);
+          $scope.stateSolicitAnswerDetailsService = (
+            StateSolicitAnswerDetailsService);
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
@@ -197,6 +209,12 @@ oppia.directive('stateResponses', [
             }
           };
 
+          $scope.onChangeSolicitAnswerDetails = function() {
+            $scope.onSaveSolicitAnswerDetails(
+              $scope.stateSolicitAnswerDetailsService.displayed);
+            StateSolicitAnswerDetailsService.saveDisplayedValue();
+          };
+
           $scope.isSelfLoopWithNoFeedback = function(outcome) {
             if (!outcome) {
               return false;
@@ -234,6 +252,12 @@ oppia.directive('stateResponses', [
           $scope.isCurrentInteractionLinear = function() {
             var interactionId = $scope.getCurrentInteractionId();
             return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
+
+          $scope.isCurrentInteractionTrivial = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return INTERACTION_IDS_WITHOUT_ANSWER_DETAILS.indexOf(
+              interactionId) !== -1;
           };
 
           $scope.isLinearWithNoFeedback = function(outcome) {
