@@ -14,6 +14,8 @@
 
 """Controllers for the cron jobs."""
 
+import ast
+import datetime
 import logging
 
 from core import jobs
@@ -28,6 +30,7 @@ from core.platform import models
 import feconf
 import utils
 
+from mapreduce import model as mapreduce_model
 from pipeline import pipeline
 
 (job_models, suggestion_models) = models.Registry.import_models([
@@ -39,6 +42,97 @@ TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
 MAX_JOBS_TO_REPORT_ON = 50
 
 
+def get_stuck_jobs(recency_msecs):
+    """Returns a list of jobs which were last updated at most recency_msecs
+    milliseconds ago and have experienced more than one retry.
+
+    Returns:
+        list(job_models.JobModel). Jobs which have retried at least once and
+            haven't finished yet.
+    """
+    threshold_time = (
+        datetime.datetime.utcnow() -
+        datetime.timedelta(0, 0, 0, recency_msecs))
+    shard_state_model_class = mapreduce_model.ShardState
+
+    # TODO(sll): Clean up old jobs so that this query does not have to iterate
+    # over so many elements in a full table scan.
+    recent_job_models = shard_state_model_class.all()
+
+    stuck_jobs = []
+    for job_model in recent_job_models:
+        if job_model.update_time > threshold_time and job_model.retries > 0:
+            stuck_jobs.append(job_model)
+
+    return stuck_jobs
+
+
+class JobCleanupManager(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for cleaning up old auxiliary entities for MR jobs."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """The entity types this job will handle."""
+        return [
+            mapreduce_model.MapreduceState,
+            mapreduce_model.ShardState
+        ]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function which will clean up jobs that have not
+        finished.
+
+        Args:
+            item: mapreduce_model.MapreduceState or mapreduce_model.ShardState.
+                A shard or job which may still be running.
+        Yields:
+            tuple(str, int). Describes the action taken for the item, and the
+                number of items this action was applied to.
+        """
+        max_start_time_msec = JobCleanupManager.get_mapper_param(
+            jobs.MAPPER_PARAM_MAX_START_TIME_MSEC)
+
+        if isinstance(item, mapreduce_model.MapreduceState):
+            if (item.result_status == 'success' and
+                    utils.get_time_in_millisecs(item.start_time) <
+                    max_start_time_msec):
+                item.delete()
+                yield ('mr_state_deleted', 1)
+            else:
+                yield ('mr_state_remaining', 1)
+
+        if isinstance(item, mapreduce_model.ShardState):
+            if (item.result_status == 'success' and
+                    utils.get_time_in_millisecs(item.update_time) <
+                    max_start_time_msec):
+                item.delete()
+                yield ('shard_state_deleted', 1)
+            else:
+                yield ('shard_state_remaining', 1)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        """Implements the reduce function which logs the results of the mapping
+        function.
+
+        Args:
+            key: str. Describes the action taken by a map call. One of:
+                'mr_state_deleted', 'mr_state_remaining', 'shard_state_deleted',
+                'shard_state_remaining'.
+            stringified_values: list(str). A list where each element is a
+                stringified number, counting the mapped items sharing the key.
+        """
+        values = [ast.literal_eval(v) for v in stringified_values]
+        if key.endswith('_deleted'):
+            logging.warning(
+                'Delete count: %s entities (%s)' % (sum(values), key))
+        else:
+            logging.warning(
+                'Entities remaining count: %s entities (%s)' %
+                (sum(values), key))
+
+
 class JobStatusMailerHandler(base.BaseHandler):
     """Handler for mailing admin about job failures."""
 
@@ -46,7 +140,7 @@ class JobStatusMailerHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Get the 50 most recent failed shards, not all of them.
-        failed_jobs = jobs.get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
+        failed_jobs = get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
         if failed_jobs:
             email_subject = 'MapReduce failure alert'
             email_message = (
@@ -180,11 +274,11 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         logging.warning('%s MR jobs cleaned up.' % num_cleaned)
 
         if job_models.JobModel.do_unfinished_jobs_exist(
-                jobs.JobCleanupManager.__name__):
+                JobCleanupManager.__name__):
             logging.warning('A previous cleanup job is still running.')
         else:
-            jobs.JobCleanupManager.enqueue(
-                jobs.JobCleanupManager.create_new(), additional_job_params={
+            JobCleanupManager.enqueue(
+                JobCleanupManager.create_new(), additional_job_params={
                     jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
                 })
             logging.warning('Deletion jobs for auxiliary entities kicked off.')

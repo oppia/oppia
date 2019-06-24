@@ -17,6 +17,8 @@
 """Tests for long running jobs and continuous computations."""
 
 import ast
+import logging
+import re
 
 from core import jobs
 from core import jobs_registry
@@ -27,14 +29,15 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+from mock import patch  # pylint: disable=import-only-modules
 
 from google.appengine.ext import ndb
-from google.appengine.api import taskqueue
 from mapreduce import input_readers
 
-
-(base_models, exp_models, stats_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
+(base_models, exp_models, stats_models, job_models) = (
+    models.Registry.import_models([
+        models.NAMES.base_model, models.NAMES.exploration,
+        models.NAMES.statistics, models.NAMES.job]))
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -48,9 +51,7 @@ class MockJobManagerOne(jobs.BaseDeferredJobManager):
 
 
 class MockJobManagerTwo(jobs.BaseDeferredJobManager):
-    @classmethod
-    def _run(cls, additional_job_params):
-        return 'output'
+    pass
 
 
 class MockJobManagerWithParams(jobs.BaseDeferredJobManager):
@@ -97,8 +98,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
     def test_failing_jobs(self):
 
-        def _mock_input_reader(unused_output):
-            raise Exception
+        # Mocks GoogleCloudStorageInputReader() to fail a job.
+        _mock_input_reader = lambda _: 1 / 0
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
@@ -637,8 +638,7 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_DEFAULT), 1)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            SampleMapReduceJobManager.get_output(job_id), ['[u\'sum\', 1]'])
+        self.assertEqual(jobs.get_job_output(job_id), ['[u\'sum\', 1]'])
         self.assertEqual(
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
@@ -724,6 +724,89 @@ class JobRegistryTests(test_utils.GenericTestBase):
             self.assertTrue(any([
                 issubclass(klass._get_batch_job_manager_class(), superclass)  # pylint: disable=protected-access
                 for superclass in allowed_base_batch_job_classes]))
+
+
+class BaseMapReduceJobManagerForContinuousComputationsTests(
+        test_utils.GenericTestBase):
+
+    def test_raise_error_with_get_continuous_computation_class(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'Subclasses of BaseMapReduceJobManagerForContinuousComputations'
+                ' must implement the _get_continuous_computation_class() '
+                'method.')):
+            (
+                jobs.BaseMapReduceJobManagerForContinuousComputations.  # pylint: disable=protected-access
+                _get_continuous_computation_class()
+            )
+
+    def test_raise_error_with_post_cancel_hook(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'Subclasses of BaseMapReduceJobManagerForContinuousComputations'
+                ' must implement the _get_continuous_computation_class() '
+                'method.')):
+            (
+                jobs.BaseMapReduceJobManagerForContinuousComputations.  # pylint: disable=protected-access
+                _post_cancel_hook('job_id', 'cancel message')
+            )
+
+    def test_raise_error_with_post_failure_hook(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'Subclasses of BaseMapReduceJobManagerForContinuousComputations'
+                ' must implement the _get_continuous_computation_class() '
+                'method.')):
+            (
+                jobs.BaseMapReduceJobManagerForContinuousComputations.  # pylint: disable=protected-access
+                _post_failure_hook('job_id')
+            )
+
+
+class BaseContinuousComputationManagerTests(test_utils.GenericTestBase):
+
+    def test_raise_error_with_get_event_types_listened_to(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'Subclasses of BaseContinuousComputationManager must implement '
+                'get_event_types_listened_to(). This method should return a '
+                'list of strings, each representing an event type that this '
+                'class subscribes to.')):
+            jobs.BaseContinuousComputationManager.get_event_types_listened_to()
+
+    def test_raise_error_with_get_realtime_datastore_class(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'Subclasses of BaseContinuousComputationManager must implement '
+                '_get_realtime_datastore_class(). This method should return '
+                'the datastore class to be used by the realtime layer.')):
+            jobs.BaseContinuousComputationManager._get_realtime_datastore_class(  # pylint: disable=protected-access
+                )
+
+    def test_raise_error_with_get_batch_job_manager_class(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'Subclasses of BaseContinuousComputationManager must implement '
+                '_get_batch_job_manager_class(). This method should return the'
+                'manager class for the continuously-running batch job.')):
+            jobs.BaseContinuousComputationManager._get_batch_job_manager_class()  # pylint: disable=protected-access
+
+    def test_raise_error_with_handle_incoming_event(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            re.escape(
+                'Subclasses of BaseContinuousComputationManager must implement '
+                '_handle_incoming_event(...). Please check the docstring of '
+                'this method in jobs.BaseContinuousComputationManager for '
+                'important developer information.')):
+            jobs.BaseContinuousComputationManager._handle_incoming_event(  # pylint: disable=protected-access
+                1, 'event_type')
 
 
 class JobQueriesTests(test_utils.GenericTestBase):
@@ -868,15 +951,9 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
             realtime_model_id = realtime_class.get_realtime_id(
                 active_realtime_layer, exp_id)
 
-            realtime_model = realtime_class.get(
-                realtime_model_id, strict=False)
-            if realtime_model is None:
-                realtime_class(
-                    id=realtime_model_id, count=1,
-                    realtime_layer=active_realtime_layer).put()
-            else:
-                realtime_model.count += 1
-                realtime_model.put()
+            realtime_class(
+                id=realtime_model_id, count=1,
+                realtime_layer=active_realtime_layer).put()
 
         transaction_services.run_in_transaction(_increment_counter)
 
@@ -917,6 +994,21 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.EXP_ID)
         exp_services.save_new_exploration('owner_id', exploration)
         self.process_and_flush_pending_tasks()
+
+    def test_cannot_get_entity_with_invalid_id(self):
+        with self.assertRaisesRegexp(
+            ValueError, 'Invalid realtime id: invalid_entity_id'):
+            MockStartExplorationRealtimeModel.get('invalid_entity_id')
+
+    def test_cannot_put_realtime_class_with_invalid_id(self):
+        realtime_class = MockStartExplorationRealtimeModel
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Realtime layer 1 does not match realtime id '
+            'invalid_realtime_model_id'):
+            realtime_class(
+                id='invalid_realtime_model_id', count=1, realtime_layer=1).put()
 
     def test_continuous_computation_workflow(self):
         """An integration test for continuous computations."""
@@ -1017,6 +1109,95 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             # after the batch job started.
             with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
                 stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
+
+    def test_cannot_start_new_job_while_existing_job_still_running(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS
+            ):
+            StartExplorationEventCounter.start_computation()
+            with self.assertRaisesRegexp(
+                Exception,
+                'Attempted to start computation StartExplorationEventCounter, '
+                'which is already running'):
+                StartExplorationEventCounter.start_computation()
+
+            self.process_and_flush_pending_tasks()
+            StartExplorationEventCounter.stop_computation('admin_user_id')
+
+    def test_get_continuous_computations_info_with_existing_model(self):
+        job_models.ContinuousComputationModel(
+            id='StartExplorationEventCounter').put()
+        continuous_computations_data = jobs.get_continuous_computations_info(
+            self.ALL_CC_MANAGERS_FOR_TESTS)
+
+        self.assertEqual(len(continuous_computations_data), 1)
+        continuous_computation_data = continuous_computations_data[0]
+
+        self.assertEqual(
+            continuous_computation_data['computation_type'],
+            'StartExplorationEventCounter')
+        self.assertEqual(
+            continuous_computation_data['status_code'], 'idle')
+        self.assertTrue(continuous_computation_data['is_startable'])
+        self.assertFalse(continuous_computation_data['is_stoppable'])
+
+    def test_failing_continuous_job(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        StartExplorationEventCounter.start_computation()
+
+        status = StartExplorationEventCounter.get_status_code()
+        self.assertEqual(
+            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
+
+        with self.swap(logging, 'error', _mock_logging_function):
+            StartExplorationEventCounter.on_batch_job_failure()
+
+        self.process_and_flush_pending_tasks()
+        StartExplorationEventCounter.stop_computation('admin_user_id')
+
+        self.assertEqual(
+            observed_log_messages, ['Job StartExplorationEventCounter failed.'])
+
+    def test_cancelling_continuous_job(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        StartExplorationEventCounter.start_computation()
+
+        status = StartExplorationEventCounter.get_status_code()
+        self.assertEqual(
+            status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
+
+        with self.swap(logging, 'info', _mock_logging_function):
+            StartExplorationEventCounter.on_batch_job_canceled()
+
+        self.process_and_flush_pending_tasks()
+        StartExplorationEventCounter.stop_computation('admin_user_id')
+
+        self.assertEqual(
+            observed_log_messages,
+            ['Job StartExplorationEventCounter canceled.'])
+
+    @patch('core.jobs.BaseContinuousComputationManager._kickoff_batch_job')
+    def test_kickoff_batch_job_after_previous_one_ends(self, mock):
+        """This tests that _kickoff_batch_job_after_previous_one_ends() calls
+        _kickoff_batch_job().
+        """
+        self.assertFalse(mock.called)
+        (
+            jobs.BaseContinuousComputationManager  # pylint: disable=protected-access
+            ._kickoff_batch_job_after_previous_one_ends()
+        )
+        self.assertTrue(mock.called)
 
 
 # TODO(sll): When we have some concrete ContinuousComputations running in
