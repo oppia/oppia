@@ -1818,8 +1818,13 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return story_domain.StoryChange
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('story'):
+            return story_domain.StoryChange
+        else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
