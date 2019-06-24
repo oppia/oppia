@@ -35,6 +35,7 @@ import zipfile
 from constants import constants
 from core.domain import activity_services
 from core.domain import classifier_services
+from core.domain import draft_upgrade_services
 from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import fs_domain
@@ -1977,6 +1978,34 @@ def create_or_update_draft(
     exp_user_data.draft_change_list_id = draft_change_list_id
     exp_user_data.put()
 
+def try_upgrading_draft_to_exp_version(exp_id, user_id):
+    """Try upgrading draft change list to match the latest exploration version.
+
+    If successful (all changes successfully upgraded), we commit the upgraded
+    draft change list to the ExplorationuserDataModel and increment
+    draft_change_list_exp_version. If not, we do not make any changes to the
+    ExplorationuserDataModel.
+
+    Returns:
+        bool: if successfully upgraded draft version
+    """
+    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
+    exploration = get_exploration_by_id(exp_id)
+    logging.info(
+        'Trying upgrading draft from version %s to version %s.' %
+        (exp_user_data.draft_change_list_exp_version, exploration.version))
+    new_draft_change_list = (
+        draft_upgrade_services.try_upgrade_from_version_to_version(
+            exp_user_data.draft_change_list,
+            exp_user_data.draft_change_list_exp_version, exploration.version,
+            exp_id))
+    if new_draft_change_list:
+        exp_user_data.draft_change_list = new_draft_change_list
+        exp_user_data.draft_change_list_exp_version = exploration.version
+        exp_user_data.put()
+        logging.info('successfully upgraded all drafts.')
+        return True
+    return False
 
 def get_exp_with_draft_applied(exp_id, user_id):
     """If a draft exists for the given user and exploration,
@@ -1993,6 +2022,15 @@ def get_exp_with_draft_applied(exp_id, user_id):
     exploration = get_exploration_by_id(exp_id)
     if exp_user_data:
         if exp_user_data.draft_change_list:
+            if (
+                    exploration.version >
+                    exp_user_data.draft_change_list_exp_version):
+                logging.info(
+                    'Exploration and draft versions out of sync, trying '
+                    'to upgrade draft version to match exploration\'s.')
+                try_upgrading_draft_to_exp_version(exp_id, user_id)
+                exp_user_data = user_models.ExplorationUserDataModel.get(
+                    user_id, exp_id)
             draft_change_list = [
                 exp_domain.ExplorationChange(change)
                 for change in exp_user_data.draft_change_list]

@@ -33,6 +33,7 @@ from core.domain import param_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
+import logging
 import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
@@ -211,7 +212,6 @@ class ExplorationChange(object):
                     self, attribute_name)
 
         return exploration_change_dict
-
 
 class ExplorationCommitLogEntry(object):
     """Value object representing a commit to an exploration."""
