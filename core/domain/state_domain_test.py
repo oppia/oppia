@@ -412,9 +412,9 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             utils.ValidationError, (
-                'Invalid html: <a>Test</a> for rte with invalid tags '
-                'and strings: .+')
-            ):
+                'Invalid html: <a>Test</a> for rte with invalid tags and '
+                'strings: {\'invalidTags\': \\[u\'a\'], '
+                '\'strings\': \\[\'<a>Test</a>\']}')):
             with self.swap(subtitled_html, 'html', '<a>Test</a>'):
                 subtitled_html.validate()
 
@@ -428,8 +428,11 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Invalid html: <oppia-noninteractive-image>'
                 '</oppia-noninteractive-image> due to errors in '
-                'customization_args: .+')
-            ):
+                'customization_args: {"Missing attributes: '
+                '\\[u\'alt-with-value\', u\'caption-with-value\', '
+                'u\'filepath-with-value\'], Extra attributes: \\[]": '
+                '\\[\'<oppia-noninteractive-image>'
+                '</oppia-noninteractive-image>\']}')):
             with self.swap(
                 subtitled_html, 'html',
                 '<oppia-noninteractive-image></oppia-noninteractive-image>'):
