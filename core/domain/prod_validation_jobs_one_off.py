@@ -1439,7 +1439,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
             # since errors for missing exploration external model are already
             # checked and stored in _validate_external_id_relationships
             # function.
-            if not exploration_model or exploration_model.deleted:
+            if exploration_model is None or exploration_model.deleted:
                 continue
             last_human_update_ms = exp_services.get_last_updated_by_human_ms(
                 exploration_model.id)
