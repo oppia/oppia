@@ -202,10 +202,10 @@ describe('Image preloader service', function() {
               choices: {
                 value: [
                   '<p> Go to ItemSelection <oppia-noninteractive-image' +
-                  ' id-with-value="&amp;quotimage_id_1amp;quot;">' +
+                  ' id-with-value="&amp;quot;image_id_1&amp;quot;">' +
                   '</oppia-noninteractive-image></p>',
                   '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
-                  ' id-with-value="&amp;quotimage_id_2amp;quot;">' +
+                  ' id-with-value="&amp;quot;image_id_2&amp;quot;">' +
                   '</oppia-noninteractive-image></p>'
                 ]
               }
@@ -219,7 +219,7 @@ describe('Image preloader service', function() {
                     content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
                           '<oppia-noninteractive-image id-with-value=' +
-                          '"&amp;quotimage_id_3amp;quot;">' +
+                          '"&amp;quot;image_id_3&amp;quot;">' +
                           '</oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
@@ -357,7 +357,7 @@ describe('Image preloader service', function() {
               hint_content: {
                 content_id: 'hint_1',
                 html: '<p><oppia-noninteractive-image id-with-value="' +
-                      '&amp;quotimage_id_4amp;quot;">' +
+                      '&amp;quot;image_id_4&amp;quot;">' +
                       '</oppia-noninteractive-image></p>'
               }
             }],

@@ -22,7 +22,7 @@ require('domain/exploration/ImageObjectFactory.ts');
 oppia.factory('ImageAssetsObjectFactory', [
   'ImageObjectFactory', function(ImageObjectFactory) {
     var ImageAssets = function(imageMapping) {
-      this.image_mapping = imageMapping;
+      this.imageMapping = imageMapping;
     };
 
     ImageAssets.prototype.toBackendDict = function() {
@@ -33,7 +33,7 @@ oppia.factory('ImageAssetsObjectFactory', [
         imageMapping[imageId] = imageDict;
       }
       return {
-        image_mapping: imageMapping
+        imageMapping: imageMapping
       };
     };
 

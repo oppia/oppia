@@ -450,7 +450,7 @@ oppia.factory('ExplorationEngineService', [
       },
       getImageFilePath: function(stateName, imageId) {
         var state = exploration.getState(stateName);
-        return state.image_assets.image_mapping[imageId].src;
+        return state.imageAssets.imageMapping[imageId].src;
       }
     };
   }

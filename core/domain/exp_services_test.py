@@ -144,7 +144,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         change_list = [change_object_1, change_object_2]
         with self.assertRaisesRegexp(
-            Exception, 'Image Id is greater then image_id counter not possible,'
+            Exception, 'Image ID cannot be greater than image_counter,'
             ' received image_id is image_id_50'):
             exp_services.update_exploration(
                 self.editor_id, self.EXP_ID, change_list, 'one commit')

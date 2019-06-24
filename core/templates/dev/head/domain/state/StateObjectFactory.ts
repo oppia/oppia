@@ -33,13 +33,13 @@ oppia.factory('StateObjectFactory', [
       ImageAssetsObjectFactory, InteractionObjectFactory,
       ParamChangesObjectFactory, RecordedVoiceoversObjectFactory,
       SubtitledHtmlObjectFactory, WrittenTranslationsObjectFactory) {
-    var State = function(name, classifierModelId, content, imageAassets,
+    var State = function(name, classifierModelId, content, imageAssets,
         interaction, paramChanges, recordedVoiceovers, solicitAnswerDetails,
         writtenTranslations) {
       this.name = name;
       this.classifierModelId = classifierModelId;
       this.content = content;
-      this.image_assets = imageAssets;
+      this.imageAssets = imageAssets;
       this.interaction = interaction;
       this.paramChanges = paramChanges;
       this.recordedVoiceovers = recordedVoiceovers;
@@ -56,7 +56,7 @@ oppia.factory('StateObjectFactory', [
       return {
         content: this.content.toBackendDict(),
         classifier_model_id: this.classifierModelId,
-        image_assets: this.image_assets.toBackendDict(),
+        image_assets: this.imageAssets.toBackendDict(),
         interaction: this.interaction.toBackendDict(),
         param_changes: this.paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();
@@ -71,7 +71,7 @@ oppia.factory('StateObjectFactory', [
       this.name = otherState.name;
       this.classifierModelId = otherState.classifierModelId;
       this.content = angular.copy(otherState.content);
-      this.image_assets = angular.copy(otherState.imageAssets);
+      this.imageAssets = angular.copy(otherState.imageAssets);
       this.interaction.copy(otherState.interaction);
       this.paramChanges = angular.copy(otherState.paramChanges);
       this.recordedVoiceovers = angular.copy(otherState.recordedVoiceovers);

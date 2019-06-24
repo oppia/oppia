@@ -193,14 +193,14 @@ oppia.factory('ExplorationStatesService', [
 
     var getImageFilepathFromImageAssets = function(stateName, imageId) {
       var state = _states.getState(stateName);
-      return state.image_assets.image_mapping[imageId].src;
+      return state.imageAssets.imageMapping[imageId].src;
     };
 
     var addImageInState = function(stateName, image) {
       var state = _states.getState(stateName);
       var imageId = image.image_id;
       var imageInfo = image.image_info;
-      state.image_assets.image_mapping[imageId] = imageInfo;
+      state.imageAssets.imageMapping[imageId] = imageInfo;
 
       _setState(stateName, angular.copy(state), true);
       ChangeListService.addImage(stateName, image);
