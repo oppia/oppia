@@ -32,7 +32,7 @@ require(
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
-require('services/ExplorationFeaturesService.ts');
+import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService.ts';
 require('services/PlaythroughIssuesService.ts');
 require('services/PlaythroughService.ts');
 require('services/contextual/UrlService.ts');

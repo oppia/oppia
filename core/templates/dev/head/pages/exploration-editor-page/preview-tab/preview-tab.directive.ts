@@ -44,7 +44,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/ContextService.ts');
-require('services/ExplorationFeaturesService.ts');
+import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService.ts';
 
 var oppia = require('AppInit.ts').moduleName;
 
