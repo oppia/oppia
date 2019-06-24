@@ -1,34 +1,31 @@
-{% extends 'dist/base.html' %}
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Topics and Skills Dashboard - Oppia"})
+    <script>
+      var GLOBALS = {
+        csrf_token: JSON.parse('{{csrf_token|js_string}}')
+      }
+    </script>
+  </head>
+  <body>
+    <base-content>
+      <navbar-breadcrumb>
+        <topics-and-skills-dashboard-navbar-breadcrumb>
+        </topics-and-skills-dashboard-navbar-breadcrumb>
+      </navbar-breadcrumb>
 
-{% block maintitle %}
-  Topics and Skills Dashboard - Oppia
-{% endblock maintitle %}
+      <nav-options>
+        <topics-and-skills-dashboard-navbar>
+        </topics-and-skills-dashboard-navbar>
+      </nav-options>
 
-{% block navbar_breadcrumb %}
-  <topics-and-skills-dashboard-navbar-breadcrumb>
-  </topics-and-skills-dashboard-navbar-breadcrumb>
-{% endblock navbar_breadcrumb %}
+      <content>
+        <topics-and-skills-dashboard-page></topics-and-skills-dashboard-page>
+      </content>
+      <page-footer></page-footer>
+    </base-content>
 
-{% block local_top_nav_options %}
-  <topics-and-skills-dashboard-navbar>
-  </topics-and-skills-dashboard-navbar>
-{% endblock local_top_nav_options %}
-
-
-{% block content %}
-  <topics-and-skills-dashboard-page></topics-and-skills-dashboard-page>
-{% endblock %}
-
-
-{% block footer_js %}
-  {{ super() }}
-  <!-- This code is used for inserting webpack bundles
-     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
-  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
-    <% if (webpackConfig.mode == 'production') { %>
-      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } else { %>
-      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
-    <% } %>
-  <% } %>
-{% endblock footer_js %}
+    @require('../footer_js_libs.html')
+  </body>
+</html>
