@@ -1783,7 +1783,7 @@ class SkillSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating SkillSnapshotMetadataModel."""
 
-    RELATED_MODEL_NAME = 'skill'
+    EXTERNAL_MODEL_NAME = 'skill'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1804,7 +1804,7 @@ class SkillSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating SkillSnapshotContentModel."""
 
-    RELATED_MODEL_NAME = 'skill'
+    EXTERNAL_MODEL_NAME = 'skill'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1841,7 +1841,7 @@ class SkillRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating SkillRightsSnapshotMetadataModel."""
 
-    RELATED_MODEL_NAME = 'skill rights'
+    EXTERNAL_MODEL_NAME = 'skill rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1862,7 +1862,7 @@ class SkillRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating SkillRightsSnapshotContentModel."""
 
-    RELATED_MODEL_NAME = 'skill rights'
+    EXTERNAL_MODEL_NAME = 'skill rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1876,7 +1876,7 @@ class SkillRightsSnapshotContentModelValidator(
 class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating SkillCommitLogEntryModel."""
 
-    RELATED_MODEL_NAME = 'skill'
+    EXTERNAL_MODEL_NAME = 'skill'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1968,7 +1968,7 @@ class SkillSummaryModelValidator(BaseSummaryModelValidator):
                         skill_model.skill_contents['worked_examples']))
 
     @classmethod
-    def _get_related_model_properties(cls):
+    def _get_external_model_properties(cls):
         skill_model_class_model_id_model_tuples = (
             cls.external_instance_details['skill_ids'])
 
