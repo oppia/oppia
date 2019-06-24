@@ -201,7 +201,7 @@ class TestBase(unittest.TestCase):
                 'correct_answer': u'Solution',
                 'explanation': {
                     'content_id': u'solution',
-                    'html': u'Solution explanation'
+                    'html': u'<p>Solution explanation</p>'
                 },
                 'answer_is_exclusive': False
             },
@@ -226,7 +226,7 @@ class TestBase(unittest.TestCase):
             'hints': [{
                 'hint_content': {
                     'content_id': u'hint_1',
-                    'html': u'Hint 1'
+                    'html': u'<p>Hint 1</p>'
                 }
             }]
         },
@@ -270,7 +270,7 @@ class TestBase(unittest.TestCase):
                         'dest': 'END',
                         'feedback': {
                             'content_id': 'feedback_1',
-                            'html': 'Correct!'},
+                            'html': '<p>Correct!</p>'},
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
                         'param_changes': [],
@@ -1855,7 +1855,7 @@ class AppEngineTestBase(TestBase):
             'correct_answer': 'Solution',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'This is a solution.'
+                'html': '<p>This is a solution.</p>'
             }
         }
         hints_list = [{

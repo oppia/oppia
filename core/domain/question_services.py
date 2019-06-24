@@ -295,6 +295,13 @@ def delete_question(
     question_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
         force_deletion=force_deletion)
+    question_rights_model = question_models.QuestionRightsModel.get(
+        question_id)
+    question_rights_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_QUESTION_DELETED,
+        force_deletion=force_deletion)
+
+    question_models.QuestionSummaryModel.get(question_id).delete()
 
 
 def get_question_from_model(question_model):

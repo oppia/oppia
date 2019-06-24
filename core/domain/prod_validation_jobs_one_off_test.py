@@ -181,11 +181,11 @@ class MockSnapshotContentModelValidator(
 class MockSnapshotMetadataModelValidator(
         prod_validation_jobs_one_off.BaseSnapshotMetadataModelValidator):
 
-    related_model_name = 'related model'
+    EXTERNAL_MODEL_NAME = 'external model'
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'related_model_ids': (MockModel, [])
+            'external_model_ids': (MockModel, [])
         }
 
 
@@ -200,13 +200,13 @@ class NotImplementedErrorTests(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             MockBaseModelValidator().validate(self.item)
 
-    def test_error_is_get_related_model_properties_is_undefined(self):
+    def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaises(NotImplementedError):
             MockSummaryModelValidator().validate(self.item)
 
-    def test_error_is_raised_if_related_model_name_is_undefined(self):
+    def test_error_is_raised_if_external_model_name_is_undefined(self):
         with self.assertRaisesRegexp(
-            Exception, 'Related model name should be specified'):
+            Exception, 'External model name should be specified'):
             MockSnapshotContentModelValidator().validate(self.item)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
@@ -1813,7 +1813,11 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for model id check of '
                 'CollectionCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id),
+            ) % (model_with_invalid_id.id), (
+                u'[u\'failed validation check for commit cmd check of '
+                'CollectionCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
+                'No commit command domain object defined for entity with '
+                'commands: [{}]\']]'),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -3900,7 +3904,11 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for model id check of '
                 'ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id),
+            ) % (model_with_invalid_id.id), (
+                u'[u\'failed validation check for commit cmd check of '
+                'ExplorationCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
+                'No commit command domain object defined for entity with '
+                'commands: [{}]\']]'),
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -7133,7 +7141,11 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for model id check of '
                 'StoryCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id),
+            ) % (model_with_invalid_id.id), (
+                u'[u\'failed validation check for commit cmd check of '
+                'StoryCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
+                'No commit command domain object defined for entity with '
+                'commands: [{}]\']]'),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
