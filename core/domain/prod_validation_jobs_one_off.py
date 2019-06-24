@@ -1701,7 +1701,7 @@ class QuestionSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating QuestionSnapshotMetadataModel."""
 
-    RELATED_MODEL_NAME = 'question'
+    EXTERNAL_MODEL_NAME = 'question'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1722,7 +1722,7 @@ class QuestionSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating QuestionSnapshotContentModel."""
 
-    RELATED_MODEL_NAME = 'question'
+    EXTERNAL_MODEL_NAME = 'question'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1759,7 +1759,7 @@ class QuestionRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating QuestionRightsSnapshotMetadataModel."""
 
-    related_model_name = 'question rights'
+    EXTERNAL_MODEL_NAME = 'question rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1780,7 +1780,7 @@ class QuestionRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating QuestionRightsSnapshotContentModel."""
 
-    related_model_name = 'question rights'
+    EXTERNAL_MODEL_NAME = 'question rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1794,7 +1794,7 @@ class QuestionRightsSnapshotContentModelValidator(
 class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating QuestionCommitLogEntryModel."""
 
-    related_model_name = 'question'
+    EXTERNAL_MODEL_NAME = 'question'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1850,6 +1850,12 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, question_model) in (
                 question_model_class_model_id_model_tuples):
+            # The case for missing question external model is ignored here
+            # since errors for missing question external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if question_model is None or question_model.deleted:
+                continue
             content_html = question_model.question_state_data['content']['html']
             if item.question_content != content_html:
                 cls.errors['question content check'].append((
@@ -1860,7 +1866,7 @@ class QuestionSummaryModelValidator(BaseSummaryModelValidator):
                         content_html))
 
     @classmethod
-    def _get_related_model_properties(cls):
+    def _get_external_model_properties(cls):
         question_model_class_model_id_model_tuples = (
             cls.external_instance_details['question_ids'])
 
