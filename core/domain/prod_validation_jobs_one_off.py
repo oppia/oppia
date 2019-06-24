@@ -1663,7 +1663,7 @@ class QuestionSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating QuestionSnapshotMetadataModel."""
 
-    related_model_name = 'question'
+    RELATED_MODEL_NAME = 'question'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1684,7 +1684,7 @@ class QuestionSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating QuestionSnapshotContentModel."""
 
-    related_model_name = 'question'
+    RELATED_MODEL_NAME = 'question'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1767,8 +1767,13 @@ class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return question_domain.QuestionChange
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('question'):
+            return question_domain.QuestionChange
+        else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
