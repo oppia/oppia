@@ -479,8 +479,9 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
         self.observed_object.question_content = '<a>Test</a>'
         with self.assertRaisesRegexp(
             utils.ValidationError, (
-                'Invalid html: <a>Test</a> for rte with '
-                'invalid tags and strings: .+')):
+                'Invalid html: <a>Test</a> for rte with invalid tags and '
+                'strings: {\'invalidTags\': \\[u\'a\'], '
+                '\'strings\': \\[\'<a>Test</a>\']}')):
             self.observed_object.validate()
 
     def test_validation_with_invalid_customization_args_in_question_content(
@@ -494,7 +495,11 @@ class QuestionSummaryTest(test_utils.GenericTestBase):
             utils.ValidationError, (
                 'Invalid html: <oppia-noninteractive-image>'
                 '</oppia-noninteractive-image> due to errors in '
-                'customization_args: .+')):
+                'customization_args: {"Missing attributes: '
+                '\\[u\'alt-with-value\', u\'caption-with-value\', '
+                'u\'filepath-with-value\'], Extra attributes: \\[]": '
+                '\\[\'<oppia-noninteractive-image>'
+                '</oppia-noninteractive-image>\']}')):
             self.observed_object.validate()
 
 
