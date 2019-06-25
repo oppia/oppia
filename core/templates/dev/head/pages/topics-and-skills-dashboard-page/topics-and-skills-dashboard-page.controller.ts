@@ -16,6 +16,7 @@
  * @fileoverview Controllers for the topics and skills dashboard.
  */
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');

@@ -13,12 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview File to import necessary scripts for contact page.
+ * @fileoverview A data service that stores the solicit answer details value.
  */
 
-require('App.ts');
-
-require('base_components/BaseContentDirective.ts');
 require(
-  'components/common-layout-directives/common-elements/' +
-  'background-banner.directive.ts');
+  'components/state-editor/state-editor-properties-services/' +
+  'state-property.service.ts');
+
+oppia.factory('StateSolicitAnswerDetailsService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
+    child.setterMethodKey = 'saveSolicitAnswerDetails';
+    return child;
+  }
+]);
