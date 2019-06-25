@@ -227,7 +227,8 @@ class Image(object):
         """
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
         if not re.match(filename_re, self.src):
-            raise Exception('Invalid filepath, received %s' %
+            raise utils.ValidationError(
+                'Invalid filepath, received %s' %
                 self.src)
         if not isinstance(self.placeholder, bool):
             raise utils.ValidationError(
