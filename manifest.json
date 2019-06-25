@@ -167,29 +167,31 @@
         "files": ["angular-mocks.js", "angular-scenario.js"]
       },
       "angularTranslate": {
-        "version": "2.8.1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-translate/bower-angular-translate/archive/2.8.1.zip",
+        "version": "2.18.1",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/",
         "rootDirPrefix": "bower-angular-translate-",
         "targetDirPrefix": "bower-angular-translate-",
+        "files": ["angular-translate.min.js"],
         "bundle": {
           "js": ["angular-translate.min.js"]
         }
       },
       "angularTranslateLoader": {
-        "version": "2.8.1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-translate/bower-angular-translate-loader-static-files/archive/2.8.1.zip",
+        "version": "2.18.1",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-static-files/",
         "rootDirPrefix": "bower-angular-translate-loader-static-files-",
         "targetDirPrefix": "bower-angular-translate-loader-static-files-",
+        "files": ["angular-translate-loader-static-files.min.js"],
         "bundle": {
           "js": ["angular-translate-loader-static-files.min.js"]
         }
       },
       "angularCookiesRev": {
-        "version": "1.4.0",
+        "version": "1.5.8",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.4.0.zip",
+        "url": "https://github.com/angular/bower-angular-cookies/archive/v1.5.8.zip",
         "rootDirPrefix": "bower-angular-cookies-",
         "targetDirPrefix": "bower-angular-cookies-",
         "bundle": {
@@ -207,19 +209,20 @@
         }
       },
       "angularStorageCookiesRev": {
-        "version": "2.8.1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/PascalPrecht/bower-angular-translate-storage-cookie/archive/2.8.1.zip",
+        "version": "2.18.1",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-storage-cookie/",
         "rootDirPrefix": "bower-angular-translate-storage-cookie-",
         "targetDirPrefix": "bower-angular-translate-storage-cookie-",
+        "files": ["angular-translate-storage-cookie.min.js"],
         "bundle": {
           "js": ["angular-translate-storage-cookie.min.js"]
         }
       },
       "messageFormat": {
-        "version": "0.3.1",
+        "version": "2.0.5",
         "downloadFormat": "zip",
-        "url": "https://github.com/messageformat/messageformat/archive/v0.3.1.zip",
+        "url": "https://github.com/messageformat/messageformat/archive/v2.0.5.zip",
         "targetDirPrefix": "messageformat-",
         "rootDirPrefix": "messageformat-",
         "bundle": {
@@ -227,11 +230,12 @@
         }
       },
       "angularTranslateInterpolationMessageFormat": {
-        "version": "2.11.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-translate/bower-angular-translate-interpolation-messageformat/archive/2.11.0.zip",
+        "version": "2.18.1",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-interpolation-messageformat/",
         "rootDirPrefix": "bower-angular-translate-interpolation-messageformat-",
         "targetDirPrefix": "bower-angular-translate-interpolation-messageformat-",
+        "files": ["angular-translate-interpolation-messageformat.min.js"],
         "bundle": {
           "js": ["angular-translate-interpolation-messageformat.min.js"]
         }
@@ -260,11 +264,12 @@
         }
       },
       "bowerAngularTranslateLoaderPartial": {
-        "version": "2.7.2",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular-translate/bower-angular-translate-loader-partial/archive/2.7.2.zip",
+        "version": "2.18.1",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/angular-translate/2.18.1/angular-translate-loader-partial/",
         "rootDirPrefix": "bower-angular-translate-loader-partial-",
         "targetDirPrefix": "bower-angular-translate-loader-partial-",
+        "files": ["angular-translate-loader-partial.min.js"],
         "bundle": {
           "js": ["angular-translate-loader-partial.min.js"]
         }
