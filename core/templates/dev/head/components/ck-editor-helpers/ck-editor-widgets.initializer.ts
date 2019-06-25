@@ -30,8 +30,8 @@ oppia.run([
   'HtmlEscaperService', 'ExplorationImageCounterService',
   'ExplorationStatesService', 'StateEditorService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
-      HtmlEscaperService, ExplorationImageCounterService,ExplorationStatesService,
-      StateEditorService) {
+      HtmlEscaperService, ExplorationImageCounterService,
+      ExplorationStatesService, StateEditorService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
