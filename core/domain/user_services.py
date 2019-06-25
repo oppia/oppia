@@ -942,8 +942,6 @@ def update_user_role(user_id, role):
         raise Exception('Role %s does not exist.' % role)
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.role = role
-    if role == feconf.ROLE_ID_GUEST:
-        user_settings.username = None
     _save_user_settings(user_settings)
 
 
@@ -973,12 +971,9 @@ def get_human_readable_user_ids(user_ids):
             raise Exception('User not found.')
         elif user_settings.user_id == feconf.SYSTEM_COMMITTER_ID:
             usernames.append('admin')
-        elif user_settings.username:
-            usernames.append(user_settings.username)
         else:
-            usernames.append(
-                '[Awaiting user registration: %s]' %
-                user_settings.truncated_email)
+            usernames.append(user_settings.username)
+
     return usernames
 
 

@@ -1162,9 +1162,6 @@ class UserSettingsTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
-        self.guest_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
-        user_services.update_user_role(self.guest_id, feconf.ROLE_ID_GUEST)
 
         self.user_settings = user_services.get_user_settings(self.owner_id)
         self.user_settings.validate()
@@ -1176,7 +1173,7 @@ class UserSettingsTests(test_utils.GenericTestBase):
             Exception, 'Expected user_id to be a string'):
             self.user_settings.validate()
 
-    def test_validate_user_id(self):
+    def test_validate_empty_user_id(self):
         self.user_settings.user_id = ''
         with self.assertRaisesRegexp(Exception, 'No user id specified.'):
             self.user_settings.validate()
@@ -1249,10 +1246,8 @@ class UserSettingsTests(test_utils.GenericTestBase):
 
     def test_get_human_readable_user_ids(self):
         user_ids = user_services.get_human_readable_user_ids(
-            [self.owner_id, feconf.SYSTEM_COMMITTER_ID, self.guest_id])
-        expected_user_ids = [
-            'owner', 'admin',
-            '[Awaiting user registration: new.u..@example.com]']
+            [self.owner_id, feconf.SYSTEM_COMMITTER_ID])
+        expected_user_ids = ['owner', 'admin']
 
         self.assertEqual(user_ids, expected_user_ids)
 
