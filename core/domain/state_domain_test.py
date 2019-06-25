@@ -695,7 +695,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
 
         # Test for deleting image, whose image id does not exist.
         with self.assertRaisesRegexp(
-            Exception, 'ImageId does not exist: image_id_8'):
+            Exception, 'Image Id does not exist: image_id_8'):
             image_assets.delete_image('image_id_8')
 
     def test_add_image(self):
@@ -743,7 +743,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         # Test for adding image_id, which is greater then image counter.
         image_assets.add_image('image_id_10', self.image_object)
         with self.assertRaisesRegexp(
-            Exception, 'Image Id is greater then image_id counter not possible,'
+            Exception, 'Image ID cannot be greater than image_counter,'
             ' received image_id is image_id_10'):
             image_assets.validate(3)
 

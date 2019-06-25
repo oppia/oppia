@@ -1116,3 +1116,81 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_validation_service.regenerate_image_filename_using_dimensions(
                 'abc.png', 45, 45))
         self.assertEqual(regenerated_name, 'abc_height_45_width_45.png')
+
+    def test_add_image_id_and_remove_filepath_from_image_tag(self):
+        html = (
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+            'random_1.png&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+            'random_2.png&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+            'random_3.png&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+        )
+        image_id_to_src_dict = {
+            'image_id_1': 'random_1.png',
+            'image_id_2': 'random_2.png',
+            'image_id_3': 'random_3.png',
+        }
+        expected_html = (
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image id-with-value="&amp;quot;'
+            'image_id_1&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image id-with-value="&amp;quot;'
+            'image_id_2&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image id-with-value="&amp;quot;'
+            'image_id_3&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+        )
+
+        returned_html = (
+            html_validation_service.add_image_id_and_remove_filepath_from_image_tag(    # pylint: disable=line-too-long
+                image_id_to_src_dict, html))
+        self.assertEqual(returned_html, expected_html)
+
+    def test_get_image_src_from_html(self):
+        html = (
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+            'random_1.png&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+            'random_2.png&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+            '<pre>Hello this is <b> testing '
+            '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+            'random_3.png&amp;quot;"></oppia-noninteractive-image> in '
+            '</b>progress</pre>'
+        )
+
+        image_src_list = html_validation_service.get_image_src_from_html(html)
+        expected_image_src_list = [u'random_1.png', u'random_2.png',
+                                   u'random_3.png']
+        self.assertEqual(image_src_list, expected_image_src_list)
+
+    def test_get_image_ids_from_image_tag(self):
+        html = (
+            'random text <oppia-noninteractive-image id-with-value='
+            '"&amp;quot;image_id_1&amp;quot;" caption-with-value='
+            '"&amp;quot;random text&amp;quot;"></oppia-noninteractive-image>'
+            'random text <oppia-noninteractive-image id-with-value='
+            '"&amp;quot;image_id_2&amp;quot;" caption-with-value='
+            '"&amp;quot;random text&amp;quot;"></oppia-noninteractive-image>'
+            'random text <oppia-noninteractive-image id-with-value='
+            '"&amp;quot;image_id_3&amp;quot;" caption-with-value='
+            '"&amp;quot;random text&amp;quot;"></oppia-noninteractive-image>'
+        )
+
+        image_ids = html_validation_service.get_image_ids_from_image_tag(html)
+        expected_image_ids = [u'image_id_1', u'image_id_2', u'image_id_3']
+        self.assertEqual(image_ids, expected_image_ids)
