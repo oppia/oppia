@@ -1,4 +1,3 @@
-sudo: required
 # In order to install Chrome stable we need trusty distribution.
 dist: trusty
 language: python
