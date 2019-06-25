@@ -37,6 +37,22 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
         filename, 490, 120)
 
 
+# This function should be only be used while loading v26 textangular
+# exploration. If we do not use a mock there, the loading will
+# not pass the validation, since the current html validation
+# assumes CKEditor formatting.
+def mock_validate_rte_format_for_v26(unused_html_list, unused_rte_format):
+    return {}
+
+
+# This function should be only be used while loading v27 exploration
+# without image caption. If we do not use a mock there, the loading will
+# not pass the validation, since the current html validation
+# requires image tags to have a caption attribute.
+def mock_validate_customization_args_for_v27(unused_html_list):
+    return {}
+
+
 class ExplorationChangeTests(test_utils.GenericTestBase):
 
     def test_exp_change_object_with_missing_cmd(self):
@@ -414,7 +430,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Feedback'
+                    'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -4625,9 +4641,13 @@ states:
           feedback:
             content_id: feedback_1
             html: Here is the image1 <i><oppia-noninteractive-image
-                filepath-with-value="&amp;quot;startBlue.png&amp;quot;">
+                caption-with-value="&amp;quot;&amp;quot;"
+                filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
+                alt-with-value="&amp;quot;&amp;quot;">
                 </oppia-noninteractive-image></i>Here is the image2
-                <div><oppia-noninteractive-image filepath-with-value="&amp;quot;startBlue.png&amp;quot;">
+                <div><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+                filepath-with-value="&amp;quot;startBlue.png&amp;quot;"
+                alt-with-value="&amp;quot;&amp;quot;">
                 </oppia-noninteractive-image></div>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -4854,10 +4874,11 @@ states:
           dest: state1
           feedback:
             content_id: feedback_1
-            html: <p>Here is the image1 </p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-              filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
-              </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
+            html: <p>Here is the image1 </p><oppia-noninteractive-image alt-with-value="&amp;quot;&amp;quot;"
               caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
+              </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
+              alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
+              filepath-with-value="&amp;quot;startBlue_height_490_width_120.png&amp;quot;">
               </oppia-noninteractive-image>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -5158,23 +5179,34 @@ title: Title
 
     def test_load_from_v26_textangular(self):
         """Test direct loading from a v26 yaml file."""
-        with self.swap(
+        mock_get_filename_with_dimensions_context = self.swap(
             html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
+            mock_get_filename_with_dimensions)
+        mock_validate_rte_format_for_v26_context = self.swap(
+            html_validation_service, 'validate_rte_format',
+            mock_validate_rte_format_for_v26)
 
-            exploration = exp_domain.Exploration.from_yaml(
-                'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
+        with mock_get_filename_with_dimensions_context:
+            with mock_validate_rte_format_for_v26_context:
+                exploration = exp_domain.Exploration.from_yaml(
+                    'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_IMAGE_DIMENSIONS)
 
+
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
-        with self.swap(
+        mock_get_filename_with_dimensions_context = self.swap(
             html_validation_service, 'get_filename_with_dimensions',
-            mock_get_filename_with_dimensions):
+            mock_get_filename_with_dimensions)
+        mock_validate_customization_args_for_v27_context = self.swap(
+            html_validation_service, 'validate_customization_args',
+            mock_validate_customization_args_for_v27)
 
-            exploration = exp_domain.Exploration.from_yaml(
-                'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
+        with mock_get_filename_with_dimensions_context:
+            with mock_validate_customization_args_for_v27_context:
+                exploration = exp_domain.Exploration.from_yaml(
+                    'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V34_WITH_IMAGE_CAPTION)
 
