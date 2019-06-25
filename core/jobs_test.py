@@ -97,9 +97,16 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
                 'job_id', taskqueue_services.QUEUE_NAME_DEFAULT, None)
 
     def test_failing_jobs(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
 
         # Mocks GoogleCloudStorageInputReader() to fail a job.
-        _mock_input_reader = lambda _: 1 / 0
+        _mock_input_reader = lambda _, __: 1 / 0
 
         input_reader_swap = self.swap(
             input_readers, 'GoogleCloudStorageInputReader', _mock_input_reader)
@@ -108,9 +115,15 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job_id = MockJobManagerOne.create_new()
         store_map_reduce_results = jobs.StoreMapReduceResults()
 
-        with assert_raises_context_manager, input_reader_swap:
+        with input_reader_swap, assert_raises_context_manager, logging_swap:
             store_map_reduce_results.run(
                 job_id, 'core.jobs_test.MockJobManagerOne', 'output')
+
+        expected_log_message = 'Job %s failed at' % job_id
+
+        self.assertEqual(len(observed_log_messages), 2)
+        self.assertTrue(
+            observed_log_messages[1].startswith(expected_log_message))
 
     def test_enqueue_job(self):
         """Test the enqueueing of a job."""
@@ -669,8 +682,8 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         job_id = SampleMapReduceJobManager.create_new()
         with self.assertRaisesRegexp(
             Exception,
-            'Additional job param entity_kinds shadows an existing mapper'
-            ' param'):
+            'Additional job param entity_kinds shadows an existing mapper '
+            'param'):
             SampleMapReduceJobManager.enqueue(
                 job_id, taskqueue_services.QUEUE_NAME_DEFAULT,
                 additional_job_params={'entity_kinds': ''})
@@ -733,9 +746,9 @@ class BaseMapReduceJobManagerForContinuousComputationsTests(
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'Subclasses of BaseMapReduceJobManagerForContinuousComputations'
-                ' must implement the _get_continuous_computation_class() '
-                'method.')):
+                'Subclasses of '
+                'BaseMapReduceJobManagerForContinuousComputations must '
+                'implement the _get_continuous_computation_class() method.')):
             (
                 jobs.BaseMapReduceJobManagerForContinuousComputations.  # pylint: disable=protected-access
                 _get_continuous_computation_class()
@@ -745,9 +758,9 @@ class BaseMapReduceJobManagerForContinuousComputationsTests(
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'Subclasses of BaseMapReduceJobManagerForContinuousComputations'
-                ' must implement the _get_continuous_computation_class() '
-                'method.')):
+                'Subclasses of '
+                'BaseMapReduceJobManagerForContinuousComputations must '
+                'implement the _get_continuous_computation_class() method.')):
             (
                 jobs.BaseMapReduceJobManagerForContinuousComputations.  # pylint: disable=protected-access
                 _post_cancel_hook('job_id', 'cancel message')
@@ -757,9 +770,9 @@ class BaseMapReduceJobManagerForContinuousComputationsTests(
         with self.assertRaisesRegexp(
             NotImplementedError,
             re.escape(
-                'Subclasses of BaseMapReduceJobManagerForContinuousComputations'
-                ' must implement the _get_continuous_computation_class() '
-                'method.')):
+                'Subclasses of '
+                'BaseMapReduceJobManagerForContinuousComputations must '
+                'implement the _get_continuous_computation_class() method.')):
             (
                 jobs.BaseMapReduceJobManagerForContinuousComputations.  # pylint: disable=protected-access
                 _post_failure_hook('job_id')
