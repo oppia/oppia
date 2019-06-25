@@ -624,15 +624,17 @@ var CodeMirrorChecker = function(elem) {
    *  - 'checked': true or false, whether the line has been checked
    */
   var _compareTextFromLine = function(
-      currentLineNumber, scrollTo, compareDict) {
+      currentLineNumber, scrollTo, Pane, compareDict) {
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
+      "$('.CodeMirror-vscrollbar')."+ Pane +".scrollTop(" + String(scrollTo) +
       ');');
     elem.getText().then(function(text) {
       // The 'text' arg is a string 2n lines long representing n lines of text
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
+      //Adding an empty line at the last.
+      textArray[textArray.length]='';
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
@@ -647,6 +649,7 @@ var CodeMirrorChecker = function(elem) {
         _compareTextFromLine(
           largestLineNumber,
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+          Pane,
           compareDict);
       } else {
         for (var dictLineNumber in compareDict) {
@@ -680,7 +683,7 @@ var CodeMirrorChecker = function(elem) {
      * Compares text with codemirror. The input should be a string (with
      * line breaks) of the expected display on codemirror.
      */
-    expectTextToBe: function(expectedTextString) {
+    expectTextToBe: function(expectedTextString, Pane) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
@@ -690,7 +693,7 @@ var CodeMirrorChecker = function(elem) {
           checked: false
         };
       }
-      _compareTextFromLine(1, 0, expectedDict);
+      _compareTextFromLine(1, 0, Pane, expectedDict);
     }
   };
 };

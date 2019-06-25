@@ -202,10 +202,10 @@ var ExplorationEditorHistoryTab = function() {
       expectTextToMatch: function(v1StateContents, v2StateContents) {
         forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).first()
-        ).expectTextToBe(v1StateContents);
+        ).expectTextToBe(v1StateContents, 'first()');
         forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).last()
-        ).expectTextToBe(v2StateContents);
+        ).expectTextToBe(v2StateContents, 'last()');
       },
       /*
        *  This function compares regular/highlighted text contents of 2
