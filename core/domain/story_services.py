@@ -559,6 +559,33 @@ def save_story_summary(story_summary):
     story_summary_model.put()
 
 
+def get_node_index_by_story_id_and_node_id(story_id, node_id):
+    """Returns the index of the story node with the given story id
+    and node id.
+
+    Args:
+        story_id: str. ID of the story.
+        node_id: str. ID of the story node.
+
+    Returns:
+        int. The index of the corresponding node.
+
+    Raises:
+        Exception. The given story does not exist.
+        Exception. The given node does not exist in the story.
+    """
+    try:
+        story = get_story_by_id(story_id)
+    except Exception:
+        raise Exception('Story with id %s does not exist.' % story_id)
+
+    node_index = story.story_contents.get_node_index(node_id)
+    if node_index is None:
+        raise Exception('Story node with id %s does not exist '
+                        'in this story.' % node_id)
+    return node_index
+
+
 def get_completed_node_ids(user_id, story_id):
     """Returns the ids of the nodes completed in the story.
 
