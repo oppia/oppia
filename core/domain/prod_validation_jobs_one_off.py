@@ -2244,6 +2244,7 @@ class TopicModelValidator(BaseModelValidator):
         skill_ids = item.uncategorized_skill_ids
         for subtopic in item.subtopics:
             skill_ids = skill_ids + subtopic['skill_ids']
+        skill_ids = list(set(skill_ids))
         return {
             'topic_commit_log_entry_ids': (
                 topic_models.TopicCommitLogEntryModel,
