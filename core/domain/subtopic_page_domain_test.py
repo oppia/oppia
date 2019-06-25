@@ -218,33 +218,18 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             self.subtopic_page.to_dict(), expected_subtopic_page_dict)
 
-    def test_cannot_create_subtopic_page_change_with_empty_change_dict(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            subtopic_page_domain.SubtopicPageChange({})
-
-    def test_cannot_create_subtopic_page_change_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            subtopic_page_domain.SubtopicPageChange({
-                'cmd': 'invalid_cmd'
-            })
-
-    def test_cannot_update_subtopic_page_property_with_invalid_property(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
-            subtopic_page_domain.SubtopicPageChange({
-                'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-                'property_name': 'invalid_property'
-            })
-
     def test_create_subtopic_page_change(self):
         subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
             'cmd': subtopic_page_domain.CMD_CREATE_NEW,
-            'topic_id': self.topic_id
+            'topic_id': self.topic_id,
+            'subtopic_id': 'subtopic_id'
         })
 
         self.assertEqual(
             subtopic_page_change_object.to_dict(), {
                 'cmd': subtopic_page_domain.CMD_CREATE_NEW,
-                'topic_id': self.topic_id
+                'topic_id': self.topic_id,
+                'subtopic_id': 'subtopic_id'
             })
 
     def test_validate_version_number(self):
