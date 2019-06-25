@@ -575,7 +575,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'new_value': {
                         'content_id': 'content',
-                        'html': 'New content'
+                        'html': '<p>New content</p>'
                     },
                 })], 'Change state content')
 
@@ -691,7 +691,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'new_value': {
                         'content_id': 'content',
-                        'html': 'New content description'
+                        'html': '<p>New content description</p>'
                     }
                 })], 'Change content description')
 

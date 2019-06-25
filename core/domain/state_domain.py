@@ -225,9 +225,9 @@ class Image(object):
         Raises:
             ValidationError: One or more attributes of the Image are not valid.
         """
-        if not isinstance(self.src, basestring):
-            raise utils.ValidationError(
-                'Expected image src to be string, received %s' %
+        filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
+        if not re.match(filename_re, self.src):
+            raise Exception('Invalid filepath, received %s' %
                 self.src)
         if not isinstance(self.placeholder, bool):
             raise utils.ValidationError(
@@ -1491,7 +1491,13 @@ class SubtitledHtml(object):
                 a way as to contain a restricted set of HTML tags.
         """
         self.content_id = content_id
-        self.html = html_cleaner.clean(html)
+        # The initial clean up of html by converting it to ckeditor format
+        # is required since user may copy and paste some stuff in the rte
+        # which is not a valid ckeditor html string but can be converted
+        # to a valid ckeditor string without errors. This initial clean up
+        # ensures that validation will not fail in such cases.
+        self.html = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(html))
         self.validate()
 
     def to_dict(self):
@@ -1531,11 +1537,24 @@ class SubtitledHtml(object):
                 'Expected content id to be a string, received %s' %
                 self.content_id)
 
-        # TODO(sll): Add HTML sanitization checking.
-        # TODO(sll): Validate customization args for rich-text components.
         if not isinstance(self.html, basestring):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
+
+        err_dict = html_validation_service.validate_rte_format(
+            [self.html], feconf.RTE_FORMAT_CKEDITOR)
+        for key in err_dict:
+            if err_dict[key]:
+                raise utils.ValidationError(
+                    'Invalid html: %s for rte with invalid tags and '
+                    'strings: %s' % (self.html, err_dict))
+
+        err_dict = html_validation_service.validate_customization_args([
+            self.html])
+        if err_dict:
+            raise utils.ValidationError(
+                'Invalid html: %s due to errors in customization_args: %s' % (
+                    self.html, err_dict))
 
     def to_html(self, params):
         """Exports this SubtitledHTML object to an HTML string. The HTML is

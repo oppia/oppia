@@ -349,12 +349,30 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[2].id, question_id_2)
 
     def test_delete_question(self):
+        question_rights_model = question_models.QuestionRightsModel.get(
+            self.question_id)
+        self.assertFalse(question_rights_model is None)
+
+        question_summary_model = question_models.QuestionSummaryModel.get(
+            self.question_id)
+        self.assertFalse(question_summary_model is None)
+
         question_services.delete_question(self.editor_id, self.question_id)
 
         with self.assertRaisesRegexp(Exception, (
             'Entity for class QuestionModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionModel.get(self.question_id)
+
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class QuestionRightsModel with id %s not found' % (
+                self.question_id))):
+            question_models.QuestionRightsModel.get(self.question_id)
+
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class QuestionSummaryModel with id %s not found' % (
+                self.question_id))):
+            question_models.QuestionSummaryModel.get(self.question_id)
 
         with self.assertRaisesRegexp(
             Exception, 'Entity for class QuestionModel with id question_id '

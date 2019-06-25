@@ -541,7 +541,7 @@ class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
                 'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Try again'
+                    'html': '<p>Try again</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2106,7 +2106,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'dest': self.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Try again'
+                    'html': '<p>Try again</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -2121,7 +2121,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'dest': self.init_state_name,
             'feedback': {
                 'content_id': 'default_outcome',
-                'html': '<b>Incorrect</b>'
+                'html': '<p><strong>Incorrect</strong></p>'
             },
             'labelled_as_correct': False,
             'param_changes': [],
@@ -2362,7 +2362,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         outcome = init_interaction.answer_groups[0].outcome
         self.assertEqual(rule_specs[0].rule_type, 'Equals')
         self.assertEqual(rule_specs[0].inputs, {'x': 0})
-        self.assertEqual(outcome.feedback.html, 'Try again')
+        self.assertEqual(outcome.feedback.html, '<p>Try again</p>')
         self.assertEqual(outcome.dest, self.init_state_name)
         self.assertEqual(init_interaction.default_outcome.dest, 'State 2')
 
@@ -2440,14 +2440,15 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'content', {
-                    'html': '<b>Test content</b>',
+                    'html': '<p><strong>Test content</strong></p>',
                     'content_id': 'content',
                 }),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            exploration.init_state.content.html, '<b>Test content</b>')
+            exploration.init_state.content.html,
+            '<p><strong>Test content</strong></p>')
 
     def test_update_solicit_answer_details(self):
         """Test updating of solicit_answer_details."""
