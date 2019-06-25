@@ -198,7 +198,7 @@ class TestBase(unittest.TestCase):
                 'correct_answer': u'Solution',
                 'explanation': {
                     'content_id': u'solution',
-                    'html': u'Solution explanation'
+                    'html': u'<p>Solution explanation</p>'
                 },
                 'answer_is_exclusive': False
             },
@@ -223,7 +223,7 @@ class TestBase(unittest.TestCase):
             'hints': [{
                 'hint_content': {
                     'content_id': u'hint_1',
-                    'html': u'Hint 1'
+                    'html': u'<p>Hint 1</p>'
                 }
             }]
         },
@@ -267,7 +267,7 @@ class TestBase(unittest.TestCase):
                         'dest': 'END',
                         'feedback': {
                             'content_id': 'feedback_1',
-                            'html': 'Correct!'},
+                            'html': '<p>Correct!</p>'},
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
                         'param_changes': [],
@@ -478,18 +478,6 @@ tags: []
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
-    def setUp(self):
-        """Initializes the fixture for the test suite. Subclasses of TestBase
-        should override this method.
-        """
-        raise NotImplementedError
-
-    def tearDown(self):
-        """Cleans up the fixture after the test runs. Subclasses of
-        TestBase should override this method.
-        """
-        raise NotImplementedError
-
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
@@ -506,12 +494,6 @@ tags: []
         script that calls the test.
         """
         print '%s%s' % (LOG_LINE_PREFIX, line)
-
-    def _delete_all_models(self):
-        """Deletes all keys from the NDB datastore. Subclasses of TestBase
-        should override this method.
-        """
-        raise NotImplementedError
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -534,10 +516,6 @@ tags: []
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
         return None
-
-    def get_expected_login_url(self, slug):
-        """Returns the expected login URL."""
-        return current_user_services.create_login_url(slug)
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -641,7 +619,9 @@ tags: []
             webtest.TestResponse. The test response.
         """
         if params is not None:
-            self.assertTrue(isinstance(params, dict))
+            self.assertTrue(
+                isinstance(params, dict),
+                msg='Expected params to be a dict, received %s' % params)
 
         response = self.testapp.get(url, params, expect_errors=True)
 
@@ -714,7 +694,9 @@ tags: []
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
         if params:
-            self.assertTrue(isinstance(params, dict))
+            self.assertTrue(
+                isinstance(params, dict),
+                msg='Expected params to be a dict, received %s' % params)
 
         expect_errors = False
         if expected_status_int >= 400:
@@ -929,15 +911,6 @@ tags: []
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
-
-    def get_current_logged_in_user_id(self):
-        """Gets the user_id of the current logged-in user.
-
-        Returns:
-            str. The user_id of the currently logged-in user. In tests, we
-                simulate this using a USER_ID env variable.
-        """
-        return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
         """Gets the user_id corresponding to the given email.
@@ -1824,7 +1797,7 @@ class AppEngineTestBase(TestBase):
                         else self.testapp)
                     response = app.post(
                         url=str(task.url), params=(task.payload or ''),
-                        headers=headers)
+                        headers=headers, expect_errors=True)
                     if response.status_code != 200:
                         raise RuntimeError(
                             'MapReduce task to URL %s failed' % task.url)
@@ -1851,7 +1824,7 @@ class AppEngineTestBase(TestBase):
             'correct_answer': 'Solution',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'This is a solution.'
+                'html': '<p>This is a solution.</p>'
             }
         }
         hints_list = [{
@@ -1998,8 +1971,8 @@ class FailingFunction(FunctionWrapper):
 
         if not (self._num_tries_before_success >= 0 or self._always_fail):
             raise ValueError(
-                'num_tries_before_success should either be an'
-                'integer greater than or equal to 0,'
+                'num_tries_before_success should either be an '
+                'integer greater than or equal to 0, '
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
