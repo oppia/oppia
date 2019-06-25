@@ -194,6 +194,13 @@ if [ ! -d "$TOOLS_DIR/PyGithub-1.43.7" ]; then
   pip_install PyGithub==1.43.7 --target="$TOOLS_DIR/PyGithub-1.43.7"
 fi
 
+echo Checking if Mock is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/Mock-3.0.5" ]; then
+  echo Installing Mock
+
+  pip_install Mock==3.0.5 --target="$TOOLS_DIR/Mock-3.0.5"
+fi
+
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
