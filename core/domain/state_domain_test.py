@@ -974,10 +974,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }]
         solution = {
             'answer_is_exclusive': True,
-            'correct_answer': 'hello_world!',
+            'correct_answer': u'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': u'<p>hello_world is a string</p>'
             }
         }
 
