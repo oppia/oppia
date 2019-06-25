@@ -432,8 +432,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'Invalid html: <oppia-noninteractive-image>'
                 '</oppia-noninteractive-image> due to errors in '
                 'customization_args: {"Missing attributes: '
-                '\\[u\'alt-with-value\', u\'caption-with-value\', '
-                'u\'filepath-with-value\'], Extra attributes: \\[]": '
+                '\\[u\'id-with-value\', u\'alt-with-value\', '
+                'u\'caption-with-value\'], Extra attributes: \\[]": '
                 '\\[\'<oppia-noninteractive-image>'
                 '</oppia-noninteractive-image>\']}')):
             with self.swap(
@@ -645,7 +645,7 @@ class ImageDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operate on Image."""
     def test_from_and_to_dict_works_correctly(self):
         image_dict = {
-            'src': '',
+            'src': 'random.png',
             'placeholder': True,
             'instructions': 'no instructions'
         }
@@ -654,7 +654,7 @@ class ImageDomainUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_instructions(self):
         image_dict = {
-            'src': '',
+            'src': 'random.png',
             'placeholder': True,
             'instructions': 5555
         }
@@ -663,7 +663,7 @@ class ImageDomainUnitTests(test_utils.GenericTestBase):
 
     def test_invalid_placeholder(self):
         image_dict = {
-            'src': '',
+            'src': 'random.png',
             'placeholder': 'invalid',
             'instructions': 'no instructions'
         }
@@ -678,12 +678,12 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         self.image_assets_dict = {
             'image_mapping': {
                 'image_id_1': {
-                    'src': '',
+                    'src': 'random.png',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 },
                 'image_id_2': {
-                    'src': '',
+                    'src': 'random.png',
                     'placeholder': False,
                     'instructions': 'no instructions'
                 }
@@ -691,7 +691,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         }
 
         self.image_dict = {
-            'src': '',
+            'src': 'random.png',
             'placeholder': False,
             'instructions': 'no instructions'
         }
@@ -722,7 +722,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         expected_image_assets_dict = {
             'image_mapping': {
                 'image_id_1': {
-                    'src': '',
+                    'src': 'random.png',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 }
@@ -741,24 +741,24 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
     def test_add_image(self):
         # Test for adding valid image.
         image_3_dict = {
-            'src': '',
+            'src': 'random.png',
             'placeholder': True,
             'instructions': 'no instructions'
         }
         expected_image_assets_dict = {
             'image_mapping': {
                 'image_id_1': {
-                    'src': '',
+                    'src': 'random.png',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 },
                 'image_id_2': {
-                    'src': '',
+                    'src': 'random.png',
                     'placeholder': False,
                     'instructions': 'no instructions'
                 },
                 'image_id_3': {
-                    'src': '',
+                    'src': 'random.png',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 }
@@ -802,7 +802,7 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         expected_image_assets_dict = {
             'image_mapping': {
                 'image_id_1': {
-                    'src': '',
+                    'src': 'random.png',
                     'placeholder': True,
                     'instructions': 'no instructions'
                 }

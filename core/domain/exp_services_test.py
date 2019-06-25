@@ -111,7 +111,9 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image ' +
-                    'id-with-value="&amp;quot;image_id_50&amp;quot;">' +
+                    'id-with-value="&amp;quot;image_id_50&amp;quot;" ' +
+                    'alt-with-value="&amp;quot;&amp;quot;" ' +
+                    'caption-with-value="&amp;quot;&amp;quot;">' +
                     '</oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
@@ -134,7 +136,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'action': 'add_image',
             'image_id': 'image_id_50',
             'image_info': {
-                'src': '',
+                'src': 'random.png',
                 'placeholder': True,
                 'instructions': 'no instructions'
                 }
@@ -156,7 +158,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'action': 'add_image',
             'image_id': 'image_id_invalid',
             'image_info': {
-                'src': '',
+                'src': 'random.png',
                 'placeholder': True,
                 'instructions': 'no instructions'
                 }
@@ -190,6 +192,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image ' +
+                    'alt-with-value="&amp;quot;&amp;quot;" ' +
+                    'caption-with-value="&amp;quot;&amp;quot;"' +
                     'id-with-value="&amp;quot;image_id_1&amp;quot;">' +
                     '</oppia-noninteractive-image>')
         change_dict_1 = {
@@ -212,7 +216,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'action': 'add_image',
             'image_id': 'image_id_1',
             'image_info': {
-                'src': '',
+                'src': 'random.png',
                 'placeholder': True,
                 'instructions': 'no instructions'
                 }
@@ -263,7 +267,12 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                     'classifier_model_id': None,
                     'content': {
                         'content_id': u'content',
-                        'html': new_html
+                        'html': (u'<p>ssssssssssssssss</p>' +
+                                 '<oppia-noninteractive-image ' +
+                                 'alt-with-value="&amp;quot;&amp;quot;" ' +
+                                 'caption-with-value="&amp;quot;&amp;quot;" ' +
+                                 'id-with-value="&amp;quot;image_id_1&amp' +
+                                 ';quot;"></oppia-noninteractive-image>')
                     },
                     'written_translations': {
                         'translations_mapping': {
@@ -273,8 +282,8 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                     },
                     'image_assets': {
                         'image_mapping': {
-                            'image_id_1': {
-                                'src': u'',
+                            u'image_id_1': {
+                                'src': u'random.png',
                                 'placeholder': True,
                                 'instructions': u'no instructions'
                             }
@@ -302,19 +311,34 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
 
         new_html_before_deleting_image = (
             '<p>ssssssssssssssss</p>' +
-            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_1' +
-            '&amp;quot;"></oppia-noninteractive-image> hjkhjkhkjh' +
-            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_2' +
-            '&amp;quot;"></oppia-noninteractive-image> dgfsdgfd ggggggggggg' +
-            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_3' +
-            '&amp;quot;"></oppia-noninteractive-image>ffffff ')
+            '<oppia-noninteractive-image '
+            'id-with-value="&amp;quot;image_id_1&amp;quot;" ' +
+            'alt-with-value="&amp;quot;&amp;quot;" ' +
+            'caption-with-value="&amp;quot;&amp;quot;">' +
+            '</oppia-noninteractive-image> hjkhjkhkjh' +
+            '<oppia-noninteractive-image '
+            'id-with-value="&amp;quot;image_id_2&amp;quot;" ' +
+            'alt-with-value="&amp;quot;&amp;quot;" ' +
+            'caption-with-value="&amp;quot;&amp;quot;">' +
+            '</oppia-noninteractive-image> dgfsdgfd ggggggggggg' +
+            '<oppia-noninteractive-image '
+            'id-with-value="&amp;quot;image_id_3&amp;quot;"' +
+            'alt-with-value="&amp;quot;&amp;quot;" ' +
+            'caption-with-value="&amp;quot;&amp;quot;">' +
+            '</oppia-noninteractive-image>ffffff ')
 
         new_html_after_deleting_image = (
             '<p>ssssssssssssssss</p>' +
-            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_1' +
-            '&amp;quot;"></oppia-noninteractive-image> hjkhjkhkjh' +
-            '<oppia-noninteractive-image id-with-value="&amp;quot;image_id_2' +
-            '&amp;quot;"></oppia-noninteractive-image>dgfsdgfd ggggggggggg')
+            '<oppia-noninteractive-image '
+            'id-with-value="&amp;quot;image_id_1&amp;quot;" ' +
+            'alt-with-value="&amp;quot;&amp;quot;" ' +
+            'caption-with-value="&amp;quot;&amp;quot;">' +
+            '</oppia-noninteractive-image> hjkhjkhkjh' +
+            '<oppia-noninteractive-image '
+            'id-with-value="&amp;quot;image_id_2&amp;quot;" ' +
+            'alt-with-value="&amp;quot;&amp;quot;" ' +
+            'caption-with-value="&amp;quot;&amp;quot;">' +
+            '</oppia-noninteractive-image> dgfsdgfd ggggggggggg')
 
         change_dict_1 = {
             'new_value': {
@@ -336,7 +360,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'action': 'add_image',
             'image_id': 'image_id_1',
             'image_info': {
-                'src': '',
+                'src': 'random.png',
                 'placeholder': False,
                 'instructions': 'no instructions'
             }
@@ -348,7 +372,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'action': 'add_image',
             'image_id': 'image_id_2',
             'image_info': {
-                'src': '',
+                'src': 'random.png',
                 'placeholder': False,
                 'instructions': 'no instructions'
             }
@@ -360,7 +384,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'action': 'add_image',
             'image_id': 'image_id_3',
             'image_info': {
-                'src': '',
+                'src': 'random.png',
                 'placeholder': False,
                 'instructions': 'no instructions'
             }
@@ -419,7 +443,19 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                     'classifier_model_id': None,
                     'content': {
                         'content_id': u'content',
-                        'html': new_html_after_deleting_image,
+                        'html': (
+                            u'<p>ssssssssssssssss</p>' +
+                            '<oppia-noninteractive-image ' +
+                            'alt-with-value="&amp;quot;&amp;quot;" ' +
+                            'caption-with-value="&amp;quot;&amp;quot;" ' +
+                            'id-with-value="&amp;quot;image_id_1&amp;quot;">' +
+                            '</oppia-noninteractive-image><p> hjkhjkhkjh</p>' +
+                            '<oppia-noninteractive-image alt-with-value="' +
+                            '&amp;quot;&amp;quot;" caption-with-value="&amp;' +
+                            'quot;&amp;quot;" id-with-value="&amp;quot;' +
+                            'image_id_2&amp;quot;">' +
+                            '</oppia-noninteractive-image><p> dgfsdgfd ' +
+                            'ggggggggggg</p>')
                     },
                     'written_translations': {
                         'translations_mapping': {
@@ -430,12 +466,12 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
                     'image_assets': {
                         'image_mapping': {
                             u'image_id_2': {
-                                'src': u'',
+                                'src': u'random.png',
                                 'placeholder': False,
                                 'instructions': u'no instructions'
                             },
                             u'image_id_1': {
-                                'src': u'',
+                                'src': u'random.png',
                                 'placeholder': False,
                                 'instructions': u'no instructions'
                             }
@@ -478,7 +514,9 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         new_html = ('<p>ssssssssssssssss</p><oppia-noninteractive-image ' +
-                    'id-with-value="&amp;quot;image_id_1&amp;quot;">'
+                    'id-with-value="&amp;quot;image_id_1&amp;quot;" '
+                    'alt-with-value="&amp;quot;&amp;quot;" ' +
+                    'caption-with-value="&amp;quot;&amp;quot;">' +
                     '</oppia-noninteractive-image>')
         change_dict_1 = {
             'new_value': {
@@ -500,7 +538,7 @@ class ImageWorkflowTests(ExplorationServicesUnitTests):
             'action': 'add_image',
             'image_id': 'image_id_1',
             'image_info': {
-                'src': '',
+                'src': 'random.png',
                 'placeholder': True,
                 'instructions': 'no instructions'
                 }

@@ -86,12 +86,12 @@ for arg in "$@"; do
 done
 
 # Compile typescript files
-echo "Compiling typescript..."
-$NODE_MODULE_DIR/typescript/bin/tsc --project .
+# echo "Compiling typescript..."
+# $NODE_MODULE_DIR/typescript/bin/tsc --project .
 
-echo "Compiling webpack..."
-$NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.prod.config.ts
-$PYTHON_CMD scripts/build.py
+# echo "Compiling webpack..."
+# $NODE_MODULE_DIR/webpack/bin/webpack.js --config webpack.prod.config.ts
+# $PYTHON_CMD scripts/build.py
 
 $PYTHON_CMD scripts/backend_tests.py $@
 

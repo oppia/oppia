@@ -1499,7 +1499,6 @@ class SubtitledHtml(object):
         # ensures that validation will not fail in such cases.
         self.html = html_validation_service.convert_to_ckeditor(
             html_cleaner.clean(html))
-        self.validate()
 
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.
