@@ -16,7 +16,19 @@
 
 """Tests for test_utils, mainly for the FunctionWrapper."""
 
+import os
+
+from constants import constants
+from core import jobs
+from core.domain import param_domain
+from core.domain import user_services
+from core.platform import models
+from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
+import feconf
+import utils
+
+exp_models, = models.Registry.import_models([models.NAMES.exploration])
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
@@ -140,6 +152,12 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         self.assertEqual(wrapped('foobar'), 'foobarfoobar')
         self.assertEqual(data.get('value'), 'foobar')
 
+    def test_pre_call_hook_does_nothing(self):
+        function = lambda x: x ** 2
+        wrapped = test_utils.FunctionWrapper(function)
+
+        self.assertIsNone(wrapped.pre_call_hook('args'))
+
 
 class CallCounterTests(test_utils.GenericTestBase):
     def test_call_counter_counts_the_number_of_times_a_function_gets_called(
@@ -156,20 +174,6 @@ class CallCounterTests(test_utils.GenericTestBase):
 
 
 class FailingFunctionTests(test_utils.GenericTestBase):
-    def test_failing_function_fails_for_first_n_calls(self):
-        class MockError(Exception):
-            pass
-
-        function = lambda x: x ** 2
-
-        failing_func = test_utils.FailingFunction(function, MockError, 5)
-
-        for i in xrange(5):
-            with self.assertRaises(MockError):
-                failing_func(i)
-                raise ValueError(str(i))
-
-        self.assertEqual(failing_func(5), 25)
 
     def test_failing_function_never_succeeds_when_n_is_infinity(self):
         class MockError(Exception):
@@ -183,3 +187,116 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         for i in xrange(20):
             with self.assertRaises(MockError):
                 failing_func(i)
+
+    def test_failing_function_raises_error_with_invalid_num_tries(self):
+        class MockError(Exception):
+            pass
+
+        function = lambda x: x ** 2
+
+        with self.assertRaisesRegexp(
+            ValueError,
+            'num_tries_before_success should either be an integer greater than '
+            'or equal to 0, or FailingFunction.INFINITY'):
+            test_utils.FailingFunction(function, MockError, -1)
+
+
+class FailingMapReduceJobManager(jobs.BaseMapReduceJobManager):
+    """Test job that fails because map is a classmethod."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return []
+
+    @classmethod
+    def map(cls):
+        pass
+
+
+class TestUtilsTests(test_utils.GenericTestBase):
+
+    def test_failing_job(self):
+        self.assertIsNone(FailingMapReduceJobManager.map())
+
+        job_id = FailingMapReduceJobManager.create_new()
+        FailingMapReduceJobManager.enqueue(
+            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(None), 1)
+        with self.assertRaisesRegexp(
+            RuntimeError, 'MapReduce task to URL .+ failed'):
+            self.process_and_flush_pending_tasks()
+
+    def test_get_static_asset_url(self):
+        asset_url = self.get_static_asset_url('/images/subjects/Lightbulb.svg')
+        self.assertEqual(asset_url, '/assets/images/subjects/Lightbulb.svg')
+
+    def test_get_static_asset_filepath_with_prod_mode_on(self):
+        with self.swap(constants, 'DEV_MODE', False):
+            filepath = self.get_static_asset_filepath()
+            self.assertEqual(filepath, 'build')
+
+    def test_cannot_get_updated_param_dict_with_invalid_param_name(self):
+        param_change_list = [
+            param_domain.ParamChange(
+                'a', 'Copier', {
+                    'value': 'firstValue', 'parse_with_jinja': False
+                }
+            )
+        ]
+        exp_param_specs = {
+            'b': param_domain.ParamSpec('UnicodeString'),
+        }
+
+        with self.assertRaisesRegexp(Exception, 'Parameter a not found'):
+            self.get_updated_param_dict(
+                {}, param_change_list, exp_param_specs)
+
+    def test_cannot_save_new_linear_exp_with_no_state_name(self):
+        with self.assertRaisesRegexp(
+            ValueError, 'must provide at least one state name'):
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exp_id', 'owner_id', [], ['interaction_id'])
+
+    def test_cannot_save_new_linear_exp_with_no_interaction_id(self):
+        with self.assertRaisesRegexp(
+            ValueError, 'must provide at least one interaction type'):
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                'exp_id', 'owner_id', ['state_name'], [])
+
+    def test_error_is_raised_with_fake_reply_to_id(self):
+        # Generate reply email.
+        recipient_email = 'reply+%s@%s' % (
+            'fake_id', feconf.INCOMING_EMAILS_DOMAIN_NAME)
+        # Send email to Oppia.
+        self.post_email(
+            recipient_email, self.NEW_USER_EMAIL, 'feedback email reply',
+            'New reply', html_body='<p>New reply!</p>', expected_status_int=404)
+
+    def test_cannot_perform_delete_json_with_non_dict_params(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected params to be a dict'):
+            self.delete_json('random_url', params='invalid_params')
+
+    def test_cannot_get_response_with_non_dict_params(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected params to be a dict'):
+            self.get_response_without_checking_for_errors(
+                'random_url', [200], params='invalid_params')
+
+    def test_fetch_gravatar_with_headers(self):
+        user_email = 'user@example.com'
+        expected_gravatar_filepath = os.path.join(
+            self.get_static_asset_filepath(), 'assets', 'images', 'avatar',
+            'gravatar_example.png')
+        with open(expected_gravatar_filepath, 'r') as f:
+            gravatar = f.read()
+
+        headers_dict = {
+            'content_type': 'application/json; charset=utf-8'
+        }
+        with self.urlfetch_mock(content=gravatar, headers=headers_dict):
+            profile_picture = user_services.fetch_gravatar(user_email)
+            gravatar_data_url = utils.convert_png_to_data_url(
+                expected_gravatar_filepath)
+            self.assertEqual(profile_picture, gravatar_data_url)
