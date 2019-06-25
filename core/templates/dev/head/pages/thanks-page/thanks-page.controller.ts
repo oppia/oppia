@@ -16,12 +16,9 @@
  * @fileoverview Controllers for the 'thanks' page.
  */
 
-<<<<<<< HEAD
 require('App.ts');
 
-=======
 require('base_components/BaseContentDirective.ts');
->>>>>>> develop
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
