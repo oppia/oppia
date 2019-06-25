@@ -722,8 +722,7 @@ class Skill(object):
         Args:
             explanation: SubtitledHtml. The new explanation of the skill.
         """
-        self.skill_contents.explanation = (
-            state_domain.SubtitledHtml.from_dict(explanation))
+        self.skill_contents.explanation = (explanation)
 
     def update_worked_examples(self, worked_examples):
         """Updates the worked examples list of the skill.
