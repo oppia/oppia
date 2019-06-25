@@ -20,21 +20,19 @@
 // var oppia = require('AppInit.ts').moduleName;
 
 import { Injectable } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
 
 @Injectable()
 export class ExplorationFeaturesService {
-  settings = {
+  static settings = {
     isImprovementsTabEnabled: false,
     isPlaythroughRecordingEnabled: false,
     areParametersEnabled: false
   }
-
+  
   init(explorationData, featuresData) {
-    this.settings.isImprovementsTabEnabled =
+    ExplorationFeaturesService.settings.isImprovementsTabEnabled =
       featuresData.is_improvements_tab_enabled;
-    this.settings.isPlaythroughRecordingEnabled =
+    ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled =
       featuresData.is_exploration_whitelisted;
     if (explorationData.param_changes &&
         explorationData.param_changes.length > 0) {
@@ -49,17 +47,15 @@ export class ExplorationFeaturesService {
     }
   }
   areParametersEnabled() {
-    return this.settings.areParametersEnabled;
+    return ExplorationFeaturesService.settings.areParametersEnabled;
   }
   isImprovementsTabEnabled() {
-    return this.settings.isImprovementsTabEnabled;
+    return ExplorationFeaturesService.settings.isImprovementsTabEnabled;
   }
   isPlaythroughRecordingEnabled() {
-    return this.settings.isPlaythroughRecordingEnabled;
+    return ExplorationFeaturesService.settings.isPlaythroughRecordingEnabled;
   }
   enableParameters() {
-    this.settings.areParametersEnabled = true;
+    ExplorationFeaturesService.settings.areParametersEnabled = true;
   }
 };
-
-// angular.module('oppia').factory('ExplorationFeaturesService', downgradeInjectable(ExplorationFeaturesService));
