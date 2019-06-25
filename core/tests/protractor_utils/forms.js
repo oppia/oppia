@@ -625,16 +625,18 @@ var CodeMirrorChecker = function(elem) {
    */
   var _compareTextFromLine = function(
       currentLineNumber, scrollTo, Pane, compareDict) {
+    /* eslint-disable */
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar')."+ Pane +".scrollTop(" + String(scrollTo) +
+      "$('.CodeMirror-vscrollbar')." + Pane + ".scrollTop(" + String(scrollTo) +
       ');');
+    /* eslint-enable */
     elem.getText().then(function(text) {
       // The 'text' arg is a string 2n lines long representing n lines of text
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
-      //Adding an empty line at the last.
-      textArray[textArray.length]='';
+      // Adding an empty line at the last.
+      textArray[textArray.length] = '';
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
