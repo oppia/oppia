@@ -19,6 +19,7 @@
 import copy
 
 from constants import constants
+from core.domain import change_domain
 from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
@@ -59,163 +60,121 @@ CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION = 'migrate_subtopic_schema_to_latest_version' # pylint: disable=line-too-long
 
 
-class TopicChange(object):
-    """Domain object for changes made to topic object."""
+class TopicChange(change_domain.BaseChange):
+    """Domain object for changes made to topic object.
+
+    The allowed commands, together with the attributes:
+        - 'add_subtopic' (with title, subtopic_id)
+        - 'delete_subtopic' (with subtopic_id)
+        - 'add_uncategorized_skill_id' (with
+        new_uncategorized_skill_id)
+        - 'remove_uncategorized_skill_id' (with uncategorized_skill_id)
+        - 'move_skill_id_to_subtopic' (with old_subtopic_id,
+        new_subtopic_id and skill_id)
+        - 'remove_skill_id_from_subtopic' (with subtopic_id and
+        skill_id)
+        - 'update_topic_property' (with property_name, new_value
+        and old_value)
+        - 'update_subtopic_property' (with subtopic_id, property_name,
+        new_value and old_value)
+        - 'migrate_subtopic_schema_to_latest_version' (with
+        from_version and to_version)
+        - 'create_new' (with name)
+    """
+
+    # The allowed list of topic properties which can be used in
+    # update_topic_property command.
     TOPIC_PROPERTIES = (
         TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_DESCRIPTION,
         TOPIC_PROPERTY_CANONICAL_STORY_IDS, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
         TOPIC_PROPERTY_LANGUAGE_CODE)
 
+    # The allowed list of subtopic properties which can be used in
+    # update_subtopic_property command.
     SUBTOPIC_PROPERTIES = (SUBTOPIC_PROPERTY_TITLE,)
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'name', 'id', 'title',
-        'old_subtopic_id', 'new_subtopic_id', 'subtopic_id', 'from_version',
-        'to_version'
-    ]
-
-    def __init__(self, change_dict):
-        """Initialize a TopicChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'add_subtopic' (with title)
-                - 'delete_subtopic' (with subtopic_id)
-                - 'add_uncategorized_skill_id' (with
-                new_uncategorized_skill_id)
-                - 'remove_uncategorized_skill_id' (with subtopic_id
-                and skill_id)
-                - 'move_skill_id_to_subtopic' (with old_subtopic_id,
-                new_subtopic_id and skill_id)
-                - 'remove_skill_id_from_subtopic' (with subtopic_id and
-                skill_id)
-                - 'update_topic_property' (with property_name, new_value
-                and old_value)
-                - 'update_subtopic_property' (with property_name, new_value
-                and old_value)
-                - 'migrate_subtopic_schema_to_latest_version' (with
-                from_version and to_version)
-                - 'create_new' (with name)
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_ADD_SUBTOPIC:
-            self.title = change_dict['title']
-            self.subtopic_id = change_dict['subtopic_id']
-        elif self.cmd == CMD_DELETE_SUBTOPIC:
-            self.id = change_dict['subtopic_id']
-        elif self.cmd == CMD_ADD_UNCATEGORIZED_SKILL_ID:
-            self.id = change_dict['new_uncategorized_skill_id']
-        elif self.cmd == CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
-            self.id = change_dict['uncategorized_skill_id']
-        elif self.cmd == CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
-            self.old_subtopic_id = change_dict['old_subtopic_id']
-            self.new_subtopic_id = change_dict['new_subtopic_id']
-            self.skill_id = change_dict['skill_id']
-        elif self.cmd == CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
-            self.subtopic_id = change_dict['subtopic_id']
-            self.skill_id = change_dict['skill_id']
-        elif self.cmd == CMD_UPDATE_TOPIC_PROPERTY:
-            if change_dict['property_name'] not in self.TOPIC_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_UPDATE_SUBTOPIC_PROPERTY:
-            if change_dict['property_name'] not in self.SUBTOPIC_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.id = change_dict['subtopic_id']
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        elif self.cmd == CMD_CREATE_NEW:
-            self.name = change_dict['name']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the TopicChange domain object.
-
-        Returns:
-            A dict, mapping all fields of TopicChange instance.
-        """
-        topic_change_dict = {}
-        topic_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                topic_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return topic_change_dict
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['name'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_SUBTOPIC,
+        'required_attribute_names': ['title', 'subtopic_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_UNCATEGORIZED_SKILL_ID,
+        'required_attribute_names': ['new_uncategorized_skill_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
+        'required_attribute_names': ['uncategorized_skill_id'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+        'required_attribute_names': [
+            'old_subtopic_id', 'new_subtopic_id', 'skill_id'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+        'required_attribute_names': ['subtopic_id', 'skill_id'],
+        'optional_attribute_names': [],
+    }, {
+        'name': CMD_UPDATE_SUBTOPIC_PROPERTY,
+        'required_attribute_names': [
+            'subtopic_id', 'property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': SUBTOPIC_PROPERTIES}
+    }, {
+        'name': CMD_UPDATE_TOPIC_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': TOPIC_PROPERTIES}
+    }, {
+        'name': CMD_MIGRATE_SUBTOPIC_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }]
 
 
-class TopicRightsChange(object):
-    """Domain object for changes made to a topic rights object."""
+class TopicRightsChange(change_domain.BaseChange):
+    """Domain object for changes made to a topic rights object.
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'assignee_id', 'new_role', 'old_role', 'removed_user_id'
-    ]
+    The allowed commands, together with the attributes:
+        - 'change_role' (with assignee_id, new_role and old_role)
+        - 'create_new'
+        - 'publish_story'
+        - 'unpublish_story'.
+    """
 
-    def __init__(self, change_dict):
-        """Initialize a TopicRightsChange object from a dict.
+    # The allowed list of roles which can be used in change_role command.
+    ALLOWED_ROLES = [ROLE_NONE, ROLE_MANAGER]
 
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'change_role' (with assignee_id, new_role and old_role)
-                - 'create_new'
-                - 'publish_topic'
-                - 'unpublish_topic'
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_CHANGE_ROLE:
-            self.assignee_id = change_dict['assignee_id']
-            self.new_role = change_dict['new_role']
-            self.old_role = change_dict['old_role']
-        elif self.cmd == CMD_REMOVE_MANAGER_ROLE:
-            self.removed_user_id = change_dict['removed_user_id']
-        elif self.cmd == CMD_CREATE_NEW:
-            pass
-        elif self.cmd == CMD_PUBLISH_TOPIC:
-            pass
-        elif self.cmd == CMD_UNPUBLISH_TOPIC:
-            pass
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the TopicRightsChange domain object.
-
-        Returns:
-            A dict, mapping all fields of TopicRightsChange instance.
-        """
-        topic_rights_change_dict = {}
-        topic_rights_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                topic_rights_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return topic_rights_change_dict
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_CHANGE_ROLE,
+        'required_attribute_names': ['assignee_id', 'new_role', 'old_role'],
+        'optional_attribute_names': [],
+        'allowed_values': {'new_role': ALLOWED_ROLES, 'old_role': ALLOWED_ROLES}
+    }, {
+        'name': CMD_REMOVE_MANAGER_ROLE,
+        'required_attribute_names': ['removed_user_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_PUBLISH_TOPIC,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_UNPUBLISH_TOPIC,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }]
 
 
 class Subtopic(object):
@@ -870,6 +829,88 @@ class TopicSummary(object):
         self.total_skill_count = total_skill_count
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
+
+    def validate(self):
+        """Validates all properties of this topic summary.
+
+        Raises:
+            ValidationError: One or more attributes of the Topic summary
+                are not valid.
+        """
+        if not isinstance(self.name, basestring):
+            raise utils.ValidationError('Name should be a string.')
+        if self.name == '':
+            raise utils.ValidationError('Name field should not be empty')
+
+        if not isinstance(self.canonical_name, basestring):
+            raise utils.ValidationError('Canonical name should be a string.')
+        if self.canonical_name == '':
+            raise utils.ValidationError(
+                'Canonical name field should not be empty')
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.canonical_story_count, int):
+            raise utils.ValidationError(
+                'Expected canonical story count to be an integer, '
+                'received \'%s\'' % self.canonical_story_count)
+
+        if self.canonical_story_count < 0:
+            raise utils.ValidationError(
+                'Expected canonical_story_count to be non-negative, '
+                'received \'%s\'' % self.canonical_story_count)
+
+        if not isinstance(self.additional_story_count, int):
+            raise utils.ValidationError(
+                'Expected additional story count to be an integer, '
+                'received \'%s\'' % self.additional_story_count)
+
+        if self.additional_story_count < 0:
+            raise utils.ValidationError(
+                'Expected additional_story_count to be non-negative, '
+                'received \'%s\'' % self.additional_story_count)
+
+        if not isinstance(self.uncategorized_skill_count, int):
+            raise utils.ValidationError(
+                'Expected uncategorized skill count to be an integer, '
+                'received \'%s\'' % self.uncategorized_skill_count)
+
+        if self.uncategorized_skill_count < 0:
+            raise utils.ValidationError(
+                'Expected uncategorized_skill_count to be non-negative, '
+                'received \'%s\'' % self.uncategorized_skill_count)
+
+        if not isinstance(self.total_skill_count, int):
+            raise utils.ValidationError(
+                'Expected total skill count to be an integer, received \'%s\''
+                % self.total_skill_count)
+
+        if self.total_skill_count < 0:
+            raise utils.ValidationError(
+                'Expected total_skill_count to be non-negative, '
+                'received \'%s\'' % self.total_skill_count)
+
+        if self.total_skill_count < self.uncategorized_skill_count:
+            raise utils.ValidationError(
+                'Expected total_skill_count to be greater than or equal to '
+                'uncategorized_skill_count %s, received \'%s\'' % (
+                    self.uncategorized_skill_count, self.total_skill_count))
+
+        if not isinstance(self.subtopic_count, int):
+            raise utils.ValidationError(
+                'Expected subtopic count to be an integer, received \'%s\''
+                % self.subtopic_count)
+
+        if self.subtopic_count < 0:
+            raise utils.ValidationError(
+                'Expected subtopic_count to be non-negative, '
+                'received \'%s\'' % self.subtopic_count)
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
