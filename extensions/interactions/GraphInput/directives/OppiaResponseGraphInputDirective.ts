@@ -24,6 +24,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('interactions/GraphInput/directives/GraphDetailService.ts');
 require('services/HtmlEscaperService.ts');
 
+require('interactions/interactions-extension.constants.ts');
+
 oppia.directive('oppiaResponseGraphInput', [
   'GraphDetailService', 'HtmlEscaperService', 'UrlInterpolationService',
   'GRAPH_INPUT_LEFT_MARGIN',
