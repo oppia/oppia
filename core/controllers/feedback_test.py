@@ -559,8 +559,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
     def test_post_feedback_threads_with_no_text_and_no_updated_status_raise_400(
             self):
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         thread_id = feedback_services.create_thread(
             feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, self.owner_id_1,
@@ -582,8 +581,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
     def test_post_feedback_threads_with_updated_suggestion_status_raises_400(
             self):
         self.login(self.OWNER_EMAIL_1)
-        response = self.get_html_response('/create/%s' % self.EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         new_content = state_domain.SubtitledHtml(
             'content', '<p>new content html</p>').to_dict()

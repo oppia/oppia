@@ -367,9 +367,7 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             }]
         }
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         json_response = self.put_json(
             '%s/%s' % (
@@ -716,9 +714,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_get_can_not_access_handler_with_invalid_publish_status(self):
         self.login(self.ADMIN_EMAIL)
 
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         response = self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
@@ -763,9 +759,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
     def test_get_can_not_access_handler_with_invalid_topic_id(self):
         self.login(self.ADMIN_EMAIL)
 
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
 
         new_topic_id = topic_services.get_new_topic_id()
         self.put_json(
@@ -776,9 +770,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
     def test_cannot_publish_a_published_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         self.put_json(
             '%s/%s' % (
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
@@ -795,9 +787,7 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
 
     def test_cannot_unpublish_an_unpublished_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         topic_rights = topic_services.get_topic_rights(self.topic_id)
         self.assertFalse(topic_rights.topic_is_published)
 
