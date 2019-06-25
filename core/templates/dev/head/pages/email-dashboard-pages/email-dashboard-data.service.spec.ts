@@ -19,7 +19,7 @@
 require('pages/email-dashboard-pages/email-dashboard-data.service.ts');
 
 describe('Email Dashboard Services', function() {
-  beforeEach(angular.mock.module('oppia'));
+  beforeEach(angular.mock.module('emailDashboardPage'));
 
   describe('Email Dashboard Services', function() {
     var service, $httpBackend, recentQueries;

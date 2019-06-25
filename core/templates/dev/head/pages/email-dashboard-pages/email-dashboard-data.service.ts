@@ -18,7 +18,7 @@
 
 var oppia = require('AppInit.ts').moduleName;
 
-oppia.factory('EmailDashboardDataService', [
+angular.module('emailDashboardPage').factory('EmailDashboardDataService', [
   '$http', '$q', function($http, $q) {
     var QUERY_DATA_URL = '/emaildashboarddatahandler';
     var QUERY_STATUS_CHECK_URL = '/querystatuscheck';
