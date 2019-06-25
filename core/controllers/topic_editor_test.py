@@ -64,6 +64,55 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
 
 class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
 
+    def test_handler_updates_story_summary_dicts(self):
+        self.login(self.ADMIN_EMAIL)
+
+        topic_id = topic_services.get_new_topic_id()
+        canonical_story_id = story_services.get_new_story_id()
+        additional_story_id = story_services.get_new_story_id()
+
+        # 'self.topic_id' does not contain any canonical_story_summary_dicts
+        # or additional_story_summary_dicts.
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id))
+
+        self.assertEqual(response['canonical_story_summary_dicts'], [])
+        self.assertEqual(response['additional_story_summary_dicts'], [])
+
+        self.save_new_topic(
+            topic_id, self.admin_id, 'New name', 'New description',
+            [canonical_story_id], [additional_story_id], [self.skill_id],
+            [], 1)
+
+        self.save_new_story(
+            canonical_story_id, self.admin_id, 'title', 'description',
+            'note', topic_id)
+        self.save_new_story(
+            additional_story_id, self.admin_id, 'another title',
+            'another description', 'another note', topic_id)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, topic_id))
+        canonical_story_summary_dicts = response[
+            'canonical_story_summary_dicts'][0]
+        additional_story_summary_dicts = response[
+            'additional_story_summary_dicts'][0]
+
+        self.assertEqual(
+            canonical_story_summary_dicts['description'], 'description')
+        self.assertEqual(canonical_story_summary_dicts['title'], 'title')
+        self.assertEqual(
+            canonical_story_summary_dicts['id'], canonical_story_id)
+        self.assertEqual(
+            additional_story_summary_dicts['description'],
+            'another description')
+        self.assertEqual(
+            additional_story_summary_dicts['title'], 'another title')
+        self.assertEqual(
+            additional_story_summary_dicts['id'], additional_story_id)
+
+        self.logout()
+
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
         response = self.get_html_response(
@@ -145,6 +194,17 @@ class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
 
 
 class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_handler_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        self.get_json(
+            '%s/%s/%s' % (
+                feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                self.topic_id, topic_services.get_new_topic_id()),
+            expected_status_int=404)
+
+        self.logout()
 
     def test_editable_subtopic_page_get(self):
         # Check that non-admins and non-topic managers cannot access the
@@ -230,6 +290,16 @@ class SubtopicPageEditorTests(BaseTopicEditorControllerTests):
 
 class TopicEditorTests(BaseTopicEditorControllerTests):
 
+    def test_get_can_not_access_topic_page_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        self.get_html_response(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
+
+        self.logout()
+
     def test_access_topic_editor_page(self):
         """Test access to editor pages for the sample topic."""
 
@@ -275,6 +345,41 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             'Skill Description',
             json_response['skill_id_to_description_dict'][self.skill_id])
         self.logout()
+
+        # Check that editable topic handler is accessed only when a topic id
+        # passed has an associated topic.
+        self.login(self.ADMIN_EMAIL)
+
+        self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
+
+        self.logout()
+
+    def test_editable_topic_handler_put_raises_error_with_invalid_name(self):
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Changed name',
+            'topic_and_subtopic_page_change_dicts': [{
+                'change_affects_subtopic_page': False,
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 0
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            change_cmd, csrf_token=csrf_token, expected_status_int=400)
+
+        self.assertEqual(json_response['error'], 'Name should be a string.')
 
     def test_editable_topic_handler_put(self):
         # Check that admins can edit a topic.
@@ -412,6 +517,42 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
             change_cmd, csrf_token=csrf_token, expected_status_int=401)
 
+        # Check that topic can not be edited when version is None.
+        self.login(self.ADMIN_EMAIL)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+            {'version': None}, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Invalid POST request: a version must be specified.')
+
+        self.logout()
+
+        # Check topic can not be edited when payload version differs from
+        # topic version.
+        self.login(self.ADMIN_EMAIL)
+
+        topic_id_1 = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            topic_id_1, self.admin_id, 'Name 1', 'Description 1', [], [],
+            [self.skill_id], [], 1)
+
+        json_response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX, topic_id_1),
+            {'version': '3'}, csrf_token=csrf_token,
+            expected_status_int=400)
+
+        self.assertEqual(
+            json_response['error'],
+            'Trying to update version 1 of topic from version 3, '
+            'which is too old. Please reload the page and try again.')
+
+        self.logout()
+
     def test_editable_topic_handler_put_for_assigned_topic_manager(self):
         change_cmd = {
             'version': 2,
@@ -517,39 +658,16 @@ class TopicEditorTests(BaseTopicEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
-
-class TopicManagerRightsHandlerTests(BaseTopicEditorControllerTests):
-
-    def test_assign_topic_manager_role(self):
-        """Test the assign topic manager role for a topic functionality."""
+        # Check that topic can not be deleted when the topic id passed does
+        # not have a topic associated with it.
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(
-            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-        csrf_token = self.get_csrf_token_from_response(response)
 
-        # Test for when assignee does not have sufficient rights to become a
-        # manager for a topic.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.new_user_id),
-            {}, csrf_token=csrf_token, expected_status_int=401)
+        self.delete_json(
+            '%s/%s' % (
+                feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=404)
 
-        # Test for valid case.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.topic_manager_id),
-            {}, csrf_token=csrf_token)
         self.logout()
-
-        # Test for when committer doesn't have sufficient rights to assign
-        # someone as manager.
-        self.put_json(
-            '%s/%s/%s' % (
-                feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
-                self.new_user_id),
-            {}, csrf_token=csrf_token, expected_status_int=401)
 
 
 class TopicPublishSendMailHandlerTests(BaseTopicEditorControllerTests):
@@ -597,8 +715,39 @@ class TopicRightsHandlerTests(BaseTopicEditorControllerTests):
             expected_status_int=401)
         self.logout()
 
+    def test_can_not_get_topic_rights_when_topic_id_has_no_associated_topic(
+            self):
+        self.login(self.ADMIN_EMAIL)
+
+        json_response = self.get_json(
+            '%s/%s' % (
+                feconf.TOPIC_RIGHTS_URL_PREFIX,
+                topic_services.get_new_topic_id()), expected_status_int=400)
+        self.assertEqual(
+            json_response['error'],
+            'Expected a valid topic id to be provided.')
+
+        self.logout()
+
 
 class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
+
+    def test_get_can_not_access_handler_with_invalid_publish_status(self):
+        self.login(self.ADMIN_EMAIL)
+
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': 'invalid_status'}, csrf_token=csrf_token,
+            expected_status_int=400)
+        self.assertEqual(
+            response['error'],
+            'Publish status should only be true or false.')
+
+        self.logout()
 
     def test_publish_and_unpublish_topic(self):
         """Test the publish and unpublish functionality."""
@@ -629,4 +778,53 @@ class TopicPublishHandlerTests(BaseTopicEditorControllerTests):
                 feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
             {'publish_status': False}, csrf_token=csrf_token,
             expected_status_int=401)
+
         self.logout()
+
+    def test_get_can_not_access_handler_with_invalid_topic_id(self):
+        self.login(self.ADMIN_EMAIL)
+
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        new_topic_id = topic_services.get_new_topic_id()
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, new_topic_id),
+            {'publish_status': True}, csrf_token=csrf_token,
+            expected_status_int=404)
+
+    def test_cannot_publish_a_published_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': True}, csrf_token=csrf_token)
+        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        self.assertTrue(topic_rights.topic_is_published)
+
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': True}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(response['error'], 'The topic is already published.')
+
+    def test_cannot_unpublish_an_unpublished_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(
+            '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+        csrf_token = self.get_csrf_token_from_response(response)
+        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        self.assertFalse(topic_rights.topic_is_published)
+
+        response = self.put_json(
+            '%s/%s' % (
+                feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+            {'publish_status': False}, csrf_token=csrf_token,
+            expected_status_int=401)
+        self.assertEqual(response['error'], 'The topic is already unpublished.')
