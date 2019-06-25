@@ -238,7 +238,8 @@ class EditableTopicDataHandler(base.BaseHandler):
             'topic_and_subtopic_page_change_dicts')
         topic_and_subtopic_page_change_list = []
         for change in topic_and_subtopic_page_change_dicts:
-            if change['change_affects_subtopic_page']:
+            if change['cmd'] == (
+                    subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
                 topic_and_subtopic_page_change_list.append(
                     subtopic_page_domain.SubtopicPageChange(change))
             else:
