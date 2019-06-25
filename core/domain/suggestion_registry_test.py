@@ -759,6 +759,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
+        # We are not setting value in suggestion.change.question_dict
+        # directly since pylint produces unsupported-assignment-operation
+        # error. The detailed analysis for the same can be checked
+        # in this issue: https://github.com/oppia/oppia/issues/7008.
         question_dict = suggestion.change.question_dict
         question_dict['question_state_data_schema_version'] = 0
         suggestion.change.question_dict = question_dict
@@ -810,6 +814,10 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.pre_accept_validate()
 
+        # We are not setting value in suggestion.change.question_dict
+        # directly since pylint produces unsupported-assignment-operation
+        # error. The detailed analysis for the same can be checked
+        # in this issue: https://github.com/oppia/oppia/issues/7008.
         question_dict = suggestion.change.question_dict
         question_dict['question_state_data_schema_version'] = 1
         suggestion.change.question_dict = question_dict

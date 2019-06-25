@@ -41,7 +41,7 @@ def mock_get_filename_with_dimensions(filename, unused_exp_id):
 # exploration. If we do not use a mock there, the loading will
 # not pass the validation, since the current html validation
 # assumes CKEditor formatting.
-def mock_validate_rte_format(unused_html_list, unused_rte_format):
+def mock_validate_rte_format_for_v26(unused_html_list, unused_rte_format):
     return {}
 
 
@@ -49,7 +49,7 @@ def mock_validate_rte_format(unused_html_list, unused_rte_format):
 # without image caption. If we do not use a mock there, the loading will
 # not pass the validation, since the current html validation
 # requires image tags to have a caption attribute.
-def mock_validate_customization_args(unused_html_list):
+def mock_validate_customization_args_for_v27(unused_html_list):
     return {}
 
 
@@ -5182,12 +5182,12 @@ title: Title
         mock_get_filename_with_dimensions_context = self.swap(
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions)
-        mock_validate_rte_format_context = self.swap(
+        mock_validate_rte_format_for_v26_context = self.swap(
             html_validation_service, 'validate_rte_format',
-            mock_validate_rte_format)
+            mock_validate_rte_format_for_v26)
 
         with mock_get_filename_with_dimensions_context:
-            with mock_validate_rte_format_context:
+            with mock_validate_rte_format_for_v26_context:
                 exploration = exp_domain.Exploration.from_yaml(
                     'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
@@ -5199,12 +5199,12 @@ title: Title
         mock_get_filename_with_dimensions_context = self.swap(
             html_validation_service, 'get_filename_with_dimensions',
             mock_get_filename_with_dimensions)
-        mock_validate_customization_args_context = self.swap(
+        mock_validate_customization_args_for_v27_context = self.swap(
             html_validation_service, 'validate_customization_args',
-            mock_validate_customization_args)
+            mock_validate_customization_args_for_v27)
 
         with mock_get_filename_with_dimensions_context:
-            with mock_validate_customization_args_context:
+            with mock_validate_customization_args_for_v27_context:
                 exploration = exp_domain.Exploration.from_yaml(
                     'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
         self.assertEqual(
