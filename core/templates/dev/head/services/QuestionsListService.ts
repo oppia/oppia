@@ -19,9 +19,7 @@
 
 require('domain/question/QuestionBackendApiService.ts');
 require('services/ContextService.ts');
-
-oppia.constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
+require('services/services.constants.ts');
 
 oppia.factory('QuestionsListService', [
   '$rootScope', 'QuestionBackendApiService',

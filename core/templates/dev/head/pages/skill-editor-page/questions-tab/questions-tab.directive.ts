@@ -32,8 +32,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/AlertsService.ts');
-require('services/contextual/UrlService.ts');
 require('services/QuestionsListService.ts');
+require('services/contextual/UrlService.ts');
 
 
 oppia.directive('questionsTab', [

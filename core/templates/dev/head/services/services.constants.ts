@@ -30,6 +30,9 @@ oppia.constant('EXPLORATION_EDITOR_TAB_CONTEXT', {
 });
 
 oppia.constant(
+  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');
+
+oppia.constant(
   'EXPLORATION_FEATURES_URL', '/explorehandler/features/<exploration_id>');
 
 oppia.constant(
