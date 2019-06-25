@@ -39,7 +39,7 @@ module.exports = function(config) {
       // 'core/templates/dev/head/**/*.spec.ts',
       // 'core/templates/dev/head/*.spec.ts',
       // 'extensions/**/*Spec.ts',
-      'core/templates/dev/head/pages/creator-dashboard-page/creator-dashboard-page.controller.spec.ts',
+      'core/templates/dev/head/pages/email-dashboard-pages/email-dashboard-data.service.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
