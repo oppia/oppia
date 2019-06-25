@@ -105,6 +105,7 @@ states:
       audio_translations: {}
       html: "<div>The aim of this exercise is to explain how to solve Problem #1 on\
         \ Project Euler (<oppia-noninteractive-link url-with-value=\"&amp;quot;http://projecteuler.net/problems&amp;quot;\"\
+        \ text-with-value=\"&amp;quot;&amp;quot;\"\
         ></oppia-noninteractive-link>). Here is the problem:</div><div><br></div><div><i>\_\
         \ \_ \_Find the sum of all multiples of 3 or 5 below 1000.</i></div><div><br></div><div>We\
         \ can tackle this directly, or we could also try to check that we understand\

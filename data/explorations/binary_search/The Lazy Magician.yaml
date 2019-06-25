@@ -342,14 +342,14 @@ states:
       html: "<p>\_</p><p>It works almost the same as when we added the third try!</p><p>When\
         \ we had only two tries, we could guess any number from 1 to 3.</p><oppia-noninteractive-image\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;2tree_height_366_width_753.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>With 3 tries, and the trick of asking\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>With 3 tries, and the trick of asking\
         \ \"Is it 4?\" first, we added 4 more numbers, so we could guess from 1 to\
         \ 7.<br></p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;3tree_height_408_width_839.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>If we have 4 tries, we can use the\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>If we have 4 tries, we can use the\
         \ same trick:<br></p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;4tree-half_height_556_width_1121.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>You can write in all the numbers\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>You can write in all the numbers\
         \ from left to right (or just count them up!).<br></p><p>So, how many is that?</p>"
     content_ids_to_audio_translations:
       content: {}
@@ -483,12 +483,12 @@ states:
       content_id: content
       html: "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;elimination_height_419_width_1596.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>\"So, no matter which number the\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>\"So, no matter which number the\
         \ magician is thinking of, if we guess 2 on our first try, we can eliminate\
         \ two numbers! Then for the second try (if we even need it), we know exactly\
         \ what number to guess!\"<br></p><oppia-noninteractive-image caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;2tree_height_366_width_753.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p><br>\"So maybe we don't save TOO much time\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br>\"So maybe we don't save TOO much time\
         \ by being able to guess a number between 1-3 in just two tries... but I wonder\
         \ what we could do with one more try?\"</p><p>\"If we had three tries, what\
         \ kind of range of numbers would we be able to always guess?\"</p>"
@@ -640,11 +640,11 @@ states:
         The simplest thing would be if I had to guess a number from 1 to 1. Then I\
         \ know the answer in one try - it's 1!\"</p><p>\_</p><oppia-noninteractive-image\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;magician-1_height_147_width_125.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p><br><br></p><p>\"The next simplest thing\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br><br></p><p>\"The next simplest thing\
         \ is if I had a number between 1 and 2. How many tries would I need?..\"<br></p><p>\_\
         </p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;magician-2_height_223_width_504.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p><br><br><br></p>"
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br><br><br></p>"
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
@@ -1339,7 +1339,7 @@ states:
         we have to guess as close to the middle as possible."<br><br>"So in this case,
         if we guess either 5 or 6, the worst case will be that the new range is 5
         numbers long. That's the best we can do!"</p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-        filepath-with-value="&amp;quot;middleworst1-10_height_511_width_647.png&amp;quot;"></oppia-noninteractive-image><p><br>"(there's
+        filepath-with-value="&amp;quot;middleworst1-10_height_511_width_647.png&amp;quot;" alt-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image><p><br>"(there's
         no whole number exactly between 1 and 10... we could of course try guessing
         5 and a half, but that doesn't make a whole lot of sense!)"</p>
     content_ids_to_audio_translations:
@@ -1522,7 +1522,7 @@ states:
         \ magician would answer that the real number is either less than 7, greater\
         \ than 7, or is 7.\_</p><oppia-noninteractive-image caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;pick7worst_height_653_width_538.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>What would be the worst of those\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>What would be the worst of those\
         \ cases for me?</p>"
     content_ids_to_audio_translations:
       content: {}
@@ -1808,12 +1808,12 @@ states:
         every time you make a guess."<br><br>"So if we're guessing a number between
         1 and 10, then at first we know that the number is <strong>greater than</strong>
         0, and <strong>smaller than</strong> 11. Or we can just say it's 0-11"<br></p><oppia-noninteractive-image
-        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;range0-11_height_131_width_644.png&amp;quot;"></oppia-noninteractive-image><p><br>"Then,
+        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;range0-11_height_131_width_644.png&amp;quot;" alt-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image><p><br>"Then,
         suppose we guess 5, and the Magician says it's bigger than that."<br></p><oppia-noninteractive-image
-        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;rangeadd5_height_246_width_695.png&amp;quot;"></oppia-noninteractive-image><p><br>"Now
+        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;rangeadd5_height_246_width_695.png&amp;quot;" alt-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image><p><br>"Now
         we just have to remember that it's <strong>greater than</strong> 5, but <strong>smaller
         than</strong> 11. In other words, the range is 5-11 "<br></p><oppia-noninteractive-image
-        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;range5-11_height_90_width_467.png&amp;quot;"></oppia-noninteractive-image><p><br>"Now
+        caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="&amp;quot;range5-11_height_90_width_467.png&amp;quot;" alt-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-image><p><br>"Now
         suppose after that, we guess 7; and the Magician says it's smaller than that!"<br><br>"What
         is the range now? put it in the same format as '0-11' or '5-11' from before."</p>
     content_ids_to_audio_translations:
@@ -1888,14 +1888,14 @@ states:
         \ - that we know the magician is thinking of a number between 1 and 3:\"\_\
         </p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;ThinkOf3_height_489_width_608.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>\"So our first guess, and the information\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>\"So our first guess, and the information\
         \ the magician gave us in response, narrowed down our possibilities to numbers\
         \ between 1 and 3.\"<br></p><oppia-noninteractive-image caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3guessSeq1_height_674_width_648.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>\"What could his response have been?\"\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>\"What could his response have been?\"\
         </p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;3guessSeq3_height_679_width_648.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p>"
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p>"
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
@@ -1982,7 +1982,7 @@ states:
         \ and that told us that the number is between 1 and 3, what must our guess\
         \ have been?\"</p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;3guessSeq4_height_693_width_616.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p>"
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p>"
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
@@ -2064,7 +2064,7 @@ states:
         \ and 3? Now I think there's some kind of trick I can use to make it go faster.\"\
         <br>\"How many tries do I need to guess a range of 3 numbers?\"</p><oppia-noninteractive-image\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;ThinkOf3_height_489_width_608.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p>"
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p>"
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
@@ -2141,7 +2141,7 @@ states:
       content_id: content
       html: "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;3tree_height_408_width_839.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>\"Wow! having three tries means\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>\"Wow! having three tries means\
         \ that we can guess any number from 1 to 7! That's a lot better than what\
         \ we could do with 2 tries!\"</p><p>\"In fact, the extra try more than doubled\
         \ our range! On the first guess, we split our range into two, and then no\
@@ -2320,14 +2320,14 @@ states:
         \ guess a number in 3 tries. And we decided that on our first try, we should\
         \ guess the number 4.\"</p><oppia-noninteractive-image caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3guessSeq5_height_594_width_517.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>\"If the magician says his number\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>\"If the magician says his number\
         \ is less than 4, we already know what to do, and we can definitely guess\
         \ that number in 2 more tries!\"</p><oppia-noninteractive-image caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3tree-half_height_426_width_711.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>\"OK, now suppose we guessed 4 but\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>\"OK, now suppose we guessed 4 but\
         \ the magician told us his number was bigger than that!\"</p><oppia-noninteractive-image\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;3guessbigger_height_651_width_514.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>\"Now we have two tries left, and\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>\"Now we have two tries left, and\
         \ we know that the number is between 5 and SOMETHING... and we're trying to\
         \ figure out what that SOMETHING can be, so that we can still do this in two\
         \ tries.\"</p><p>\_</p><p>\"I have a feeling that we can do almost the same\
@@ -2435,7 +2435,7 @@ states:
         \ numbers! So I figured out what I can do so I don't have to do too much!\
         \ See?\"</p><p><br>He shows you his hand. It's covered in ink scribblings:<br></p><oppia-noninteractive-image\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;Algorithm_height_443_width_662.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p><br>\"Just like we did!\"<br><br>\"That's\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br>\"Just like we did!\"<br><br>\"That's\
         \ right! \_I call these little notes <strong>algorithms</strong>. Hey, you\
         \ guys are pretty clever - maybe you can help me figure out another one! You\
         \ see, I really want to travel to a Far Away land, but I really don't want\

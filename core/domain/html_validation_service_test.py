@@ -445,7 +445,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<code>oppia </code>'
             ),
             'expected_output': (
-                '<p>Lorem <span>ipsum </span></p> Hello this is '
+                '<p>Lorem <span>ipsum </span></p><p> Hello this is </p>'
                 '<code>oppia </code>'
             )
         }, {

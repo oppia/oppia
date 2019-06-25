@@ -159,7 +159,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'topic_id': 'topic_id',
             'page_contents': {
                 'subtitled_html': {
-                    'html': 'hello world',
+                    'html': '<p>hello world</p>',
                     'content_id': 'content'
                 },
                 'content_ids_to_audio_translations': {
@@ -177,7 +177,7 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             'version': 0
         }
         self.subtopic_page.update_page_contents_html({
-            'html': 'hello world',
+            'html': '<p>hello world</p>',
             'content_id': 'content'
         })
         self.assertEqual(self.subtopic_page.to_dict(),
@@ -270,7 +270,7 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
     def test_to_and_from_dict(self):
         subtopic_page_contents_dict = {
             'subtitled_html': {
-                'html': 'test',
+                'html': '<p>test</p>',
                 'content_id': 'content'
             },
             'content_ids_to_audio_translations': {
@@ -298,3 +298,92 @@ class SubtopicPageContentsDomainUnitTests(test_utils.GenericTestBase):
                 subtopic_page_contents_dict))
         self.assertEqual(subtopic_page_contents.to_dict(),
                          subtopic_page_contents_dict)
+
+
+class SubtopicPageChangeTests(test_utils.GenericTestBase):
+
+    def test_subtopic_page_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            subtopic_page_domain.SubtopicPageChange({'invalid': 'data'})
+
+    def test_subtopic_page_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            subtopic_page_domain.SubtopicPageChange({'cmd': 'invalid'})
+
+    def test_subtopic_page_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_value, old_value')):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'update_subtopic_page_property',
+                'property_name': '<p>page_contents_html</p>',
+            })
+
+    def test_subtopic_page_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'create_new',
+                'topic_id': 'topic_id',
+                'subtopic_id': 'subtopic_id',
+                'invalid': 'invalid'
+            })
+
+    def test_subtopic_page_change_object_with_invalid_subtopic_page_property(
+            self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_subtopic_page_property: '
+                'invalid is not allowed')):
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'update_subtopic_page_property',
+                'subtopic_id': 'subtopic_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_subtopic_page_change_object_with_update_subtopic_page_property(
+            self):
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange({
+            'cmd': 'update_subtopic_page_property',
+            'subtopic_id': 'subtopic_id',
+            'property_name': 'page_contents_html',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(
+            subtopic_page_change_object.cmd, 'update_subtopic_page_property')
+        self.assertEqual(subtopic_page_change_object.subtopic_id, 'subtopic_id')
+        self.assertEqual(
+            subtopic_page_change_object.property_name, 'page_contents_html')
+        self.assertEqual(subtopic_page_change_object.new_value, 'new_value')
+        self.assertEqual(subtopic_page_change_object.old_value, 'old_value')
+
+    def test_subtopic_page_change_object_with_create_new(self):
+        subtopic_page_change_object = (
+            subtopic_page_domain.SubtopicPageChange({
+                'cmd': 'create_new',
+                'topic_id': 'topic_id',
+                'subtopic_id': 'subtopic_id'
+            }))
+
+        self.assertEqual(subtopic_page_change_object.cmd, 'create_new')
+        self.assertEqual(subtopic_page_change_object.topic_id, 'topic_id')
+        self.assertEqual(subtopic_page_change_object.subtopic_id, 'subtopic_id')
+
+    def test_to_dict(self):
+        subtopic_page_change_dict = {
+            'cmd': 'create_new',
+            'topic_id': 'topic_id',
+            'subtopic_id': 'subtopic_id'
+        }
+        subtopic_page_change_object = subtopic_page_domain.SubtopicPageChange(
+            subtopic_page_change_dict)
+        self.assertEqual(
+            subtopic_page_change_object.to_dict(), subtopic_page_change_dict)

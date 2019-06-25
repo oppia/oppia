@@ -199,7 +199,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             set([self.skill_id_1, self.skill_id_2, 'skill_3']))
 
     def test_cannot_create_topic_change_class_with_invalid_changelist(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception, 'Missing cmd key in change dict'):
             topic_domain.TopicChange({
                 'invalid_cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
                 'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
@@ -208,7 +209,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_cannot_update_topic_property_with_invalid_changelist(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception, (
+                'Value for property_name in cmd update_topic_property: '
+                'invalid property is not allowed')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
                 'property_name': 'invalid property',
@@ -217,7 +221,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             })
 
     def test_cannot_update_subtopic_property_with_invalid_changelist(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception, (
+                'The following required attributes are '
+                'missing: subtopic_id')):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
                 'property_name': 'invalid property',
@@ -247,7 +254,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[0].title, 'New Title')
 
     def test_cannot_create_topic_change_class_with_invalid_cmd(self):
-        with self.assertRaisesRegexp(Exception, 'Invalid change_dict'):
+        with self.assertRaisesRegexp(
+            Exception, 'Command invalid cmd is not allowed'):
             topic_domain.TopicChange({
                 'cmd': 'invalid cmd',
                 'property_name': 'title',

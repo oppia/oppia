@@ -13,7 +13,7 @@ states:
     content:
       audio_translations: {}
       html: "<div>Oppia.org is a hosted version of the Oppia codebase:\_</div><div><oppia-noninteractive-link\
-        \ url-with-value=\"&amp;quot;https://github.com/oppia/oppia/&amp;quot;\"></oppia-noninteractive-link></div><div><br></div><div>This\
+        \ url-with-value=\"&amp;quot;https://github.com/oppia/oppia/&amp;quot;\" text-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-link></div><div><br></div><div>This\
         \ site is maintained by a group of volunteers in their spare time. If you\
         \ want to help, let us know! You can email the site admins at admin@oppia.org.</div><div><br></div><div>Much\
         \ of the code powering this site is written by Google engineers. However,\
@@ -70,13 +70,13 @@ states:
     content:
       audio_translations: {}
       html: <div>If you have a question relating to this site, you can get in touch
-        by posting to our forum:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://www.oppia.org/forum&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
+        by posting to our forum:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://www.oppia.org/forum&amp;quot;" text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
         can also follow our blog to get the latest updates:</div><div><oppia-noninteractive-link
-        url-with-value="&amp;quot;https://medium.com/oppia-org&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
+        url-with-value="&amp;quot;https://medium.com/oppia-org&amp;quot;" text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
         you find a bug or have a feature request, please create an issue on the Oppia
-        bug tracker:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://github.com/oppia/oppia/issues/new&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
+        bug tracker:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://github.com/oppia/oppia/issues/new&amp;quot;" text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>You
         can also get in touch with the developers of the open-source Oppia codebase
-        via the developers' forum:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://groups.google.com/forum/#!forum/oppia-dev&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
+        via the developers' forum:</div><div><oppia-noninteractive-link url-with-value="&amp;quot;https://groups.google.com/forum/#!forum/oppia-dev&amp;quot;" text-with-value="&amp;quot;&amp;quot;"></oppia-noninteractive-link><br></div><div><br></div><div>If
         you need to contact the admins privately, you can email them at admin@oppia.org.</div>
     interaction:
       answer_groups:
