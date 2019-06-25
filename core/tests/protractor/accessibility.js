@@ -45,7 +45,7 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 });
 
-fdescribe('Cache Slugs', function() {
+describe('Cache Slugs', function() {
   it('should check that errors get logged for missing resources', function() {
     browser.waitForAngularEnabled(false);
     browser.get('/console_errors');
