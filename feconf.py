@@ -807,17 +807,12 @@ DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
 # The following are all page descriptions for the meta tag.
-CONTACT_PAGE_DESCRIPTION = (
-    'Contact the Oppia team, submit feedback, and learn how to get involved '
-    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
 CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
-DONATE_PAGE_DESCRIPTION = (
-    'Donate to The Oppia Foundation.')
 LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
@@ -826,15 +821,9 @@ LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
     'exploring!')
-PREFERENCES_PAGE_DESCRIPTION = (
-    'Change your Oppia profile settings and preferences')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')
-SIGNUP_PAGE_DESCRIPTION = (
-    'Sign up for Oppia and begin exploring a new subject.')
-THANKS_PAGE_DESCRIPTION = (
-    'Thank you for donating to The Oppia Foundation.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
