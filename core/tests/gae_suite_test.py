@@ -29,7 +29,7 @@ class GaeSuiteTests(test_utils.GenericTestBase):
 
     def test_create_test_suites(self):
         test_suite = gae_suite.create_test_suites(
-            test_target='core.controllers.admin_test')
+            test_target='core.tests.gae_suite_test')
         self.assertEqual(len(test_suite), 1)
         self.assertEqual(type(test_suite[0]), unittest.suite.TestSuite)
 
