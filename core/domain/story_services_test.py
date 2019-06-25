@@ -607,7 +607,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
             'property_name': story_domain.STORY_PROPERTY_NOTES,
-            'node_id': 'node_1',
             'old_value': 'Notes',
             'new_value': 'New notes'
         })]
@@ -626,7 +625,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
             'property_name': story_domain.STORY_PROPERTY_LANGUAGE_CODE,
-            'node_id': 'node_1',
             'old_value': 'en',
             'new_value': 'bn'
         })]
@@ -651,7 +649,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
             'property_name': story_domain.STORY_PROPERTY_LANGUAGE_CODE,
-            'node_id': 'node_1',
             'old_value': 'en',
             'new_value': 'bn'
         })]
@@ -869,7 +866,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
             'property_name': story_domain.STORY_PROPERTY_LANGUAGE_CODE,
-            'node_id': 'node_1',
             'old_value': 'en',
             'new_value': 'bn'
         })]
@@ -888,7 +884,6 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         change_list = [story_domain.StoryChange({
             'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
             'property_name': story_domain.INITIAL_NODE_ID,
-            'node_id': self.NODE_ID_1,
             'old_value': '',
             'new_value': 'new_initial_node_id'
         })]
