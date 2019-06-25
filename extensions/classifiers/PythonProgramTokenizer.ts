@@ -26,21 +26,9 @@
  * https://github.com/python/cpython/blob/2.7/Lib/tokenize.py
  */
 
+require('classifiers/classifiers-extension.constants.ts');
 
 var oppia = require('AppInit.ts').moduleName;
-
-oppia.constant('PythonProgramTokenType', {
-  COMMENT: 'COMMENT',
-  NL: 'NL',
-  STRING: 'STRING',
-  INDENT: 'INDENT',
-  DEDENT: 'DEDENT',
-  ENDMARKER: 'ENDMARKER',
-  NUMBER: 'NUMBER',
-  NAME: 'NAME',
-  OP: 'OP',
-  ERRORTOKEN: 'ERRORTOKEN'
-});
 
 oppia.factory('PythonProgramTokenizer', [
   '$log', 'PythonProgramTokenType', function($log, PythonProgramTokenType) {

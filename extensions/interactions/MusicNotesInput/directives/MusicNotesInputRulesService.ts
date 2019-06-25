@@ -21,6 +21,8 @@ require(
   'interactions/MusicNotesInput/directives/' +
   'OppiaInteractiveMusicNotesInputDirective.ts');
 
+require('interactions/interactions-extension.constants.ts');
+
 var oppia = require('AppInit.ts').moduleName;
 
 oppia.factory('MusicNotesInputRulesService', [

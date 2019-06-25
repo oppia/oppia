@@ -18,14 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+require('domain/story_viewer/story-viewer-domain.constants.ts');
+
 var oppia = require('AppInit.ts').moduleName;
-
-oppia.constant(
-  'STORY_DATA_URL_TEMPLATE', '/story_data_handler/<story_id>');
-
-oppia.constant(
-  'STORY_NODE_COMPLETION_URL_TEMPLATE',
-  '/story_node_completion_handler/<story_id>/<node_id>');
 
 oppia.factory('StoryViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'STORY_DATA_URL_TEMPLATE',

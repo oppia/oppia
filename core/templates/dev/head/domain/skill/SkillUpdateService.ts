@@ -71,7 +71,7 @@ oppia.factory('SkillUpdateService', [
         property_name: propertyName,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
-        id: misconceptionId,
+        misconception_id: misconceptionId,
       }, apply, reverse);
     };
 
@@ -208,7 +208,7 @@ oppia.factory('SkillUpdateService', [
 
       deleteMisconception: function(skill, misconceptionId) {
         var params = {
-          id: misconceptionId
+          misconception_id: misconceptionId
         };
         var oldMisconception = skill.findMisconceptionById(misconceptionId);
         _applyChange(

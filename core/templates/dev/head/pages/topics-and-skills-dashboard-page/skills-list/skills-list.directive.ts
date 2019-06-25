@@ -134,8 +134,7 @@ oppia.directive('skillsList', [
             modalInstance.result.then(function(topicIds) {
               var changeList = [{
                 cmd: 'add_uncategorized_skill_id',
-                new_uncategorized_skill_id: skillId,
-                change_affects_subtopic_page: false
+                new_uncategorized_skill_id: skillId
               }];
               var topicSummaries = $scope.getEditableTopicSummaries();
               for (var i = 0; i < topicIds.length; i++) {

@@ -127,7 +127,6 @@ def run_job_and_check_output(
         self.assertEqual(actual_output, expected_output)
 
 
-
 def update_datastore_types_for_mock_datetime():
     """Updates datastore types for MockDatetime13Hours to ensure that validation
     of ndb datetime properties does not fail.
@@ -175,11 +174,11 @@ class MockSnapshotContentModelValidator(
 class MockSnapshotMetadataModelValidator(
         prod_validation_jobs_one_off.BaseSnapshotMetadataModelValidator):
 
-    related_model_name = 'related model'
+    EXTERNAL_MODEL_NAME = 'external model'
     @classmethod
     def _get_external_id_relationships(cls, item):
         return {
-            'related_model_ids': (MockModel, [])
+            'external_model_ids': (MockModel, [])
         }
 
 
@@ -194,13 +193,13 @@ class NotImplementedErrorTests(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             MockBaseModelValidator().validate(self.item)
 
-    def test_error_is_get_related_model_properties_is_undefined(self):
+    def test_error_is_get_external_model_properties_is_undefined(self):
         with self.assertRaises(NotImplementedError):
             MockSummaryModelValidator().validate(self.item)
 
-    def test_error_is_raised_if_related_model_name_is_undefined(self):
+    def test_error_is_raised_if_external_model_name_is_undefined(self):
         with self.assertRaisesRegexp(
-            Exception, 'Related model name should be specified'):
+            Exception, 'External model name should be specified'):
             MockSnapshotContentModelValidator().validate(self.item)
 
     def test_error_is_raised_if_get_change_domain_class_is_undefined(self):
@@ -662,7 +661,9 @@ class CollectionSnapshotMetadataModelValidatorTests(
             collection_models.CollectionSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         collection_services.update_collection(
@@ -827,7 +828,9 @@ class CollectionSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             collection_models.CollectionSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         collection_services.update_collection(
@@ -1153,7 +1156,9 @@ class CollectionRightsSnapshotMetadataModelValidatorTests(
             collection_models.CollectionRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -1318,7 +1323,9 @@ class CollectionRightsSnapshotContentModelValidatorTests(
             collection_models.CollectionRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -1444,7 +1451,9 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             collection_models.CollectionCommitLogEntryModel.get_by_id(
                 'collection-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.CollectionCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .CollectionCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         collection_services.update_collection(
@@ -1553,7 +1562,11 @@ class CollectionCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for model id check of '
                 'CollectionCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id),
+            ) % (model_with_invalid_id.id), (
+                u'[u\'failed validation check for commit cmd check of '
+                'CollectionCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
+                'No commit command domain object defined for entity with '
+                'commands: [{}]\']]'),
             u'[u\'fully-validated CollectionCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -2004,7 +2017,9 @@ class ConfigPropertySnapshotMetadataModelValidatorTests(
             config_models.ConfigPropertySnapshotMetadataModel.get_by_id(
                 'oppia_csrf_secret-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ConfigPropertySnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ConfigPropertySnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         self.config_model.commit(self.admin_id, [])
@@ -2137,7 +2152,9 @@ class ConfigPropertySnapshotContentModelValidatorTests(
             config_models.ConfigPropertySnapshotContentModel.get_by_id(
                 'oppia_csrf_secret-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ConfigPropertySnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ConfigPropertySnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         self.config_model.commit(self.admin_id, [])
@@ -2512,7 +2529,9 @@ class GeneralFeedbackEmailReplyToIdModelValidatorTests(
                 self.user_id, self.thread_id))
         self.model_instance.put()
 
-        self.job_class = prod_validation_jobs_one_off.GeneralFeedbackEmailReplyToIdModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .GeneralFeedbackEmailReplyToIdModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [(
@@ -2785,7 +2804,9 @@ class ExplorationSnapshotMetadataModelValidatorTests(
             exp_models.ExplorationSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         exp_services.update_exploration(
@@ -2939,7 +2960,9 @@ class ExplorationSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             exp_models.ExplorationSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         exp_services.update_exploration(
@@ -3248,7 +3271,9 @@ class ExplorationRightsSnapshotMetadataModelValidatorTests(
             exp_models.ExplorationRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -3400,7 +3425,9 @@ class ExplorationRightsSnapshotContentModelValidatorTests(
             exp_models.ExplorationRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -3514,7 +3541,9 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             exp_models.ExplorationCommitLogEntryModel.get_by_id(
                 'exploration-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         exp_services.update_exploration(
@@ -3623,7 +3652,11 @@ class ExplorationCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for model id check of '
                 'ExplorationCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id),
+            ) % (model_with_invalid_id.id), (
+                u'[u\'failed validation check for commit cmd check of '
+                'ExplorationCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
+                'No commit command domain object defined for entity with '
+                'commands: [{}]\']]'),
             u'[u\'fully-validated ExplorationCommitLogEntryModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
 
@@ -4135,7 +4168,9 @@ class FileMetadataSnapshotMetadataModelValidatorTests(
             file_models.FileMetadataSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.id_1))
 
-        self.job_class = prod_validation_jobs_one_off.FileMetadataSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .FileMetadataSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -4264,7 +4299,9 @@ class FileMetadataSnapshotContentModelValidatorTests(
             file_models.FileMetadataSnapshotContentModel.get_by_id(
                 '%s-1' % self.id_1))
 
-        self.job_class = prod_validation_jobs_one_off.FileMetadataSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .FileMetadataSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -4490,7 +4527,9 @@ class FileSnapshotMetadataModelValidatorTests(
             file_models.FileSnapshotMetadataModel.get_by_id(
                 '%s-1' % self.id_1))
 
-        self.job_class = prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .FileSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -4617,7 +4656,8 @@ class FileSnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             file_models.FileSnapshotContentModel.get_by_id(
                 '%s-1' % self.id_1))
 
-        self.job_class = prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -4720,7 +4760,9 @@ class ExplorationRecommendationsModelValidatorTests(test_utils.GenericTestBase):
             recommendations_models.ExplorationRecommendationsModel.get_by_id(
                 '1'))
 
-        self.job_class = prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .ExplorationRecommendationsModelAuditOneOffJob)
 
     def test_standard_model(self):
         expected_output = [(
@@ -5208,7 +5250,9 @@ class StorySnapshotMetadataModelValidatorTests(
             story_models.StorySnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StorySnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         story_services.update_story(
@@ -5369,7 +5413,9 @@ class StorySnapshotContentModelValidatorTests(test_utils.GenericTestBase):
             story_models.StorySnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StorySnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StorySnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         story_services.update_story(
@@ -5641,7 +5687,9 @@ class StoryRightsSnapshotMetadataModelValidatorTests(
             story_models.StoryRightsSnapshotMetadataModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StoryRightsSnapshotMetadataModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StoryRightsSnapshotMetadataModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5798,7 +5846,9 @@ class StoryRightsSnapshotContentModelValidatorTests(
             story_models.StoryRightsSnapshotContentModel.get_by_id(
                 '2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StoryRightsSnapshotContentModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StoryRightsSnapshotContentModelAuditOneOffJob)
 
     def test_standard_operation(self):
         expected_output = [
@@ -5908,7 +5958,9 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
             story_models.StoryCommitLogEntryModel.get_by_id(
                 'story-2-1'))
 
-        self.job_class = prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob # pylint: disable=line-too-long
+        self.job_class = (
+            prod_validation_jobs_one_off
+            .StoryCommitLogEntryModelAuditOneOffJob)
 
     def test_standard_operation(self):
         story_services.update_story(
@@ -6002,7 +6054,11 @@ class StoryCommitLogEntryModelValidatorTests(test_utils.GenericTestBase):
                 u'[u\'failed validation check for model id check of '
                 'StoryCommitLogEntryModel\', '
                 '[u\'Entity id %s: Entity id does not match regex pattern\']]'
-            ) % (model_with_invalid_id.id),
+            ) % (model_with_invalid_id.id), (
+                u'[u\'failed validation check for commit cmd check of '
+                'StoryCommitLogEntryModel\', [u\'Entity id invalid-0-1: '
+                'No commit command domain object defined for entity with '
+                'commands: [{}]\']]'),
             u'[u\'fully-validated StoryCommitLogEntryModel\', 3]']
         run_job_and_check_output(self, expected_output, sort=True)
 
