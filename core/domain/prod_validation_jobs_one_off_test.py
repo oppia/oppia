@@ -4771,7 +4771,7 @@ class QuestionModelValidatorTests(test_utils.GenericTestBase):
 
         self.job_class = (
             prod_validation_jobs_one_off.QuestionModelAuditOneOffJob)
-
+    
     def test_standard_operation(self):
         question_services.update_question(
             self.owner_id, '0', [question_domain.QuestionChange({
