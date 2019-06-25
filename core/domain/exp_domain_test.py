@@ -398,6 +398,13 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(exp_change.version_number, 1)
 
+        exp_change = exp_domain.ExplorationChange({
+            'cmd': exp_models.ExplorationModel.CMD_REVERT_COMMIT,
+            'version_number': 2
+        })
+
+        self.assertEqual(exp_change.version_number, 2)
+
 
 class ExpVersionReferenceTests(test_utils.GenericTestBase):
 
@@ -972,11 +979,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state = demo.states[feconf.DEFAULT_INIT_STATE_NAME]
         self.assertFalse(init_state.interaction.is_terminal)
 
-    def test_cannot_create_exploration_with_invalid_param_changes(self):
+    def test_cannot_create_demo_exp_with_invalid_param_changes(self):
         demo = exp_domain.Exploration.create_default_exploration('0')
         demo_dict = demo.to_dict()
-        new_state = state_domain.State.create_default_state(
-            'new_state_name')
+        new_state = state_domain.State.create_default_state('new_state_name')
         new_state.param_changes = [param_domain.ParamChange.from_dict({
             'customization_args': {
                 'list_of_values': ['1', '2'], 'parse_with_jinja': False
@@ -999,6 +1005,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.category = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected category to be a string'):
@@ -1008,6 +1016,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.objective = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected objective to be a string'):
@@ -1017,6 +1027,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.blurb = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected blurb to be a string'):
@@ -1026,6 +1038,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.language_code = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected language_code to be a string'):
@@ -1035,6 +1049,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.author_notes = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected author_notes to be a string'):
@@ -1044,6 +1060,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.states = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected states to be a dict'):
@@ -1053,6 +1071,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.init_state.interaction.default_outcome.dest = None
         with self.assertRaisesRegexp(
             Exception, 'Every outcome should have a destination.'):
@@ -1062,6 +1082,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.init_state.interaction.default_outcome.dest = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected outcome dest to be a string'):
@@ -1071,6 +1093,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.states_schema_version = None
         with self.assertRaisesRegexp(
             Exception, 'This exploration has no states schema version.'):
@@ -1080,6 +1104,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.auto_tts_enabled = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected auto_tts_enabled to be a bool'):
@@ -1089,6 +1115,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.correctness_feedback_enabled = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected correctness_feedback_enabled to be a bool'):
@@ -1098,6 +1126,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.param_specs = {
             1: param_domain.ParamSpec.from_dict(
                 {'obj_type': 'UnicodeString'})
@@ -1110,6 +1140,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.param_changes = 1
         with self.assertRaisesRegexp(
             Exception, 'Expected param_changes to be a list'):
@@ -1119,6 +1151,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.param_changes = [param_domain.ParamChange.from_dict({
             'customization_args': {
                 'list_of_values': ['1', '2'], 'parse_with_jinja': False
@@ -1136,6 +1170,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.param_changes = [param_domain.ParamChange.from_dict({
             'customization_args': {
                 'list_of_values': ['1', '2'], 'parse_with_jinja': False
@@ -1153,6 +1189,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         exploration.add_states(['DEF'])
         (
             exploration.init_state.interaction.default_outcome
@@ -1168,6 +1206,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='', category='',
             objective='', end_state_name='End')
+        exploration.validate()
+
         param_changes = [{
             'customization_args': {
                 'list_of_values': ['1', '2'], 'parse_with_jinja': False
@@ -1208,6 +1248,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
     def test_verify_all_states_reachable(self):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'owner_id')
+        exploration.validate()
 
         exploration.add_states(['End'])
         end_state = exploration.states['End']
@@ -1245,6 +1286,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             'exp_id', 'user@example.com', title='title', category='category',
             objective='objective', end_state_name='End')
+        exploration.validate(strict=True)
 
         (exploration.init_state.interaction.default_outcome
          .labelled_as_correct) = True
@@ -5910,6 +5952,207 @@ title: Title
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V33)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_cannot_load_from_yaml_with_no_schema_version(self):
+        sample_yaml_content = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+tags: []
+""")
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid YAML file: no schema version specified.'):
+            exp_domain.Exploration.from_untitled_yaml(
+                'eid', 'Title', 'Category', sample_yaml_content)
+
+    def test_cannot_load_from_yaml_with_invalid_schema_version(self):
+        sample_yaml_content = ("""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 0
+skin_customizations:
+  panels_contents: {}
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: InputString
+            name: Equals
+            rule_type: atomic
+          dest: END
+          feedback:
+            - Correct!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: TextInput
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  END:
+    content:
+    - type: text
+      value: Congratulations, you have finished!
+    interaction:
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      id: EndExploration
+      triggers: []
+    param_changes: []
+tags: []
+""")
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1 to v%s exploration YAML files '
+            'at present.' % exp_domain.Exploration.CURRENT_EXP_SCHEMA_VERSION):
+            exp_domain.Exploration.from_untitled_yaml(
+                'eid', 'Title', 'Category', sample_yaml_content)
 
 
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
