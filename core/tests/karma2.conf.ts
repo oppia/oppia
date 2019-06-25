@@ -33,8 +33,11 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*_directive.html',
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
-      // 'local_compiled_js/extensions/**/*.js',
-      'core/templates/dev/head/AppSpec.ts',
+      'core/templates/dev/head/components/state-editor/state-editor-properties-services/state-property.service.spec.ts',
+    //   'local_compiled_js/extensions/**/*.js',
+    //   'core/templates/dev/head/domain/collection/CollectionNodeObjectFactorySpec.ts',
+    //   'core/templates/dev/head/domain/classifier/ClassifierObjectFactorySpec.ts',
+    //   'core/templates/dev/head/domain/classifier/AnswerClassificationResultObjectFactorySpec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
