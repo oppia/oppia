@@ -167,7 +167,7 @@ oppia.directive('questionsList', [
 
           ctrl.createQuestion = function() {
             if (ctrl.getSkill()) {
-              ctrl.initializeNewQuestionCreation([ctrl.getSkill()]);
+              ctrl.initializeNewQuestionCreation([ctrl.getSkill().getId()]);
               return;
             }
             var allSkillSummaries = ctrl.getAllSkillSummaries();
@@ -215,7 +215,7 @@ oppia.directive('questionsList', [
                     return MisconceptionObjectFactory.createFromBackendDict(
                       misconceptionsBackendDict);
                   });
-                  ctrl.initializeNewQuestionCreation();
+                  ctrl.initializeNewQuestionCreation([skillId]);
                 }, function(error) {
                   AlertsService.addWarning();
                 });

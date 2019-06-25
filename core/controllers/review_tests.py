@@ -80,7 +80,6 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-
         story = story_services.get_story_by_id(story_id)
         latest_completed_node_ids = (
             story_services.get_latest_completed_node_ids(self.user_id, story_id)
@@ -91,6 +90,7 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
                 Exception('The story with the given id doesn\'t exist.'))
         if len(latest_completed_node_ids) == 0:
             raise self.PageNotFoundException
+
 
         try:
             skills = skill_services.get_multi_skills(

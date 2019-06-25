@@ -151,7 +151,7 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 expected_status_int=404)
 
     def test_get_fails_when_acquired_skills_dont_exist(self):
-        story_id = 'story_id'
+        story_id = 'story_id_3'
         node_id = 'node_1'
         node = {
             'id': node_id,
@@ -175,6 +175,8 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
         story_services.publish_story(story_id, self.admin_id)
 
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            story_services.record_completed_node_in_story_context(
+                self.viewer_id, story_id, node_id)
             self.get_json(
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX, story_id),
