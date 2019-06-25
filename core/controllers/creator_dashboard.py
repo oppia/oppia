@@ -65,9 +65,6 @@ class NotificationsDashboardPage(base.BaseHandler):
 
     @acl_decorators.can_access_creator_dashboard
     def get(self):
-        self.values.update({
-            'meta_description': feconf.CREATOR_DASHBOARD_PAGE_DESCRIPTION,
-        })
         self.render_template(
             'dist/notifications-dashboard-page.mainpage.html')
 
