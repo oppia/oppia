@@ -673,7 +673,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/resolveissuehandler/<exploration_id>', editor.ResolveIssueHandler),
 
     get_redirect_route(
-        r'/csrfhandler', base.CsrfTokenHandler),
+        r'%s' % feconf.CSRF_HANDLER_URL, base.CsrfTokenHandler),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),

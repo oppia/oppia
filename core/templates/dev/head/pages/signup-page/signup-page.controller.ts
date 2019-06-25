@@ -60,7 +60,6 @@ oppia.directive('signupPage', ['UrlInterpolationService', function(
           ctrl.showEmailPreferencesForm = data.can_send_emails;
           ctrl.hasUsername = Boolean(ctrl.username);
           FocusManagerService.setFocus('usernameInputField');
-          CsrfTokenService.setToken(data.csrf_token);
         });
 
         ctrl.blurredAtLeastOnce = false;

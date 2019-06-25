@@ -2039,17 +2039,17 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
             'is_valid': True
         }
 
-        with self.login_context(self.MODERATOR_EMAIL):
-            self.csrf_token = self.get_new_csrf_token()
 
     def test_resolve_issue_handler(self):
         """Test that resolving an issue deletes associated playthroughs."""
-        self.post_json(
-            '/resolveissuehandler/%s' % (self.EXP_ID),
-            {
-                'exp_issue_dict': self.exp_issue_dict,
-                'exp_version': 1
-            }, csrf_token=self.csrf_token)
+        with self.login_context(self.MODERATOR_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            self.post_json(
+                '/resolveissuehandler/%s' % (self.EXP_ID),
+                {
+                    'exp_issue_dict': self.exp_issue_dict,
+                    'exp_version': 1
+                }, csrf_token=csrf_token)
 
         exp_issues = stats_services.get_exp_issues(self.EXP_ID, 1)
         self.assertEqual(exp_issues.unresolved_issues, [])
@@ -2065,13 +2065,16 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
         del self.exp_issue_dict['issue_type']
         # Since we deleted the 'issue_type' key in the exploration issue dict,
         # the dict is invalid now and exception should be raised.
-        self.post_json(
-            '/resolveissuehandler/%s' % (self.EXP_ID),
-            {
-                'exp_issue_dict': self.exp_issue_dict,
-                'exp_version': 1
-            }, csrf_token=self.csrf_token,
-            expected_status_int=404)
+
+        with self.login_context(self.MODERATOR_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            self.post_json(
+                '/resolveissuehandler/%s' % (self.EXP_ID),
+                {
+                    'exp_issue_dict': self.exp_issue_dict,
+                    'exp_version': 1
+                }, csrf_token=csrf_token,
+                expected_status_int=404)
 
     def test_error_on_passing_non_matching_exp_issue_dict(self):
         """Test that error is raised on passing an exploration issue dict that
@@ -2079,21 +2082,27 @@ class ResolveIssueHandlerTests(test_utils.GenericTestBase):
         """
         self.exp_issue_dict['issue_customization_args']['state_name'][
             'value'] = 'state_name2'
-        self.post_json(
-            '/resolveissuehandler/%s' % (self.EXP_ID),
-            {
-                'exp_issue_dict': self.exp_issue_dict,
-                'exp_version': 1
-            }, csrf_token=self.csrf_token,
-            expected_status_int=404)
+
+        with self.login_context(self.MODERATOR_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            self.post_json(
+                '/resolveissuehandler/%s' % (self.EXP_ID),
+                {
+                    'exp_issue_dict': self.exp_issue_dict,
+                    'exp_version': 1
+                }, csrf_token=csrf_token,
+                expected_status_int=404)
 
     def test_error_on_passing_invalid_exploration_version(self):
-        self.post_json(
-            '/resolveissuehandler/%s' % (self.EXP_ID),
-            {
-                'exp_issue_dict': self.exp_issue_dict,
-                'exp_version': 2
-            }, csrf_token=self.csrf_token, expected_status_int=404)
+
+        with self.login_context(self.MODERATOR_EMAIL):
+            csrf_token = self.get_new_csrf_token()
+            self.post_json(
+                '/resolveissuehandler/%s' % (self.EXP_ID),
+                {
+                    'exp_issue_dict': self.exp_issue_dict,
+                    'exp_version': 2
+                }, csrf_token=csrf_token, expected_status_int=404)
 
 
 class EditorAutosaveTest(BaseEditorControllerTests):

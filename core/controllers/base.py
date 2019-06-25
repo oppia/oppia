@@ -579,6 +579,7 @@ class CsrfTokenHandler(BaseHandler):
     """Handles sending CSRF tokens to the frontend."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+    REDIRECT_UNFINISHED_SIGNUPS = False
 
     def get(self):
         csrf_token = CsrfTokenManager.create_csrf_token(

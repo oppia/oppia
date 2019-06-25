@@ -1722,7 +1722,7 @@ class AppEngineTestBase(TestBase):
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
-        # self.signup_superadmin_user()
+        self.signup_superadmin_user()
 
     def tearDown(self):
         self.logout()
