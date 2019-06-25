@@ -33,7 +33,7 @@ oppia.directive('baseContent', [
         breadcrumb: '?navbarBreadcrumb',
         content: 'content',
         footer: '?pageFooter',
-        navOptions: '?localTopNavOptions',
+        navOptions: '?navOptions',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/base_components/base_content_directive.html'),
