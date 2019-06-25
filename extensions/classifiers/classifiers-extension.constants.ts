@@ -13,23 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to fetch statistics about an exploration's states.
+ * @fileoverview Constants for classfiers extensions.
  */
 
-require('services/services.constants.ts');
-
-oppia.factory('StateTopAnswersStatsBackendApiService', [
-  '$http', 'UrlInterpolationService', 'STATE_ANSWER_STATS_URL',
-  function($http, UrlInterpolationService, STATE_ANSWER_STATS_URL) {
-    return {
-      fetchStats: function(explorationId) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            STATE_ANSWER_STATS_URL, {exploration_id: explorationId})
-        ).then(function(response) {
-          return response.data;
-        });
-      },
-    };
-  }
-]);
+oppia.constant('PythonProgramTokenType', {
+  COMMENT: 'COMMENT',
+  NL: 'NL',
+  STRING: 'STRING',
+  INDENT: 'INDENT',
+  DEDENT: 'DEDENT',
+  ENDMARKER: 'ENDMARKER',
+  NUMBER: 'NUMBER',
+  NAME: 'NAME',
+  OP: 'OP',
+  ERRORTOKEN: 'ERRORTOKEN'
+});

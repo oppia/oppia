@@ -17,18 +17,7 @@
  * context.
  */
 
-oppia.constant('PAGE_CONTEXT', {
-  EXPLORATION_EDITOR: 'editor',
-  EXPLORATION_PLAYER: 'learner',
-  QUESTION_EDITOR: 'question_editor',
-  QUESTION_PLAYER: 'question_player',
-  OTHER: 'other'
-});
-
-oppia.constant('EXPLORATION_EDITOR_TAB_CONTEXT', {
-  EDITOR: 'editor',
-  PREVIEW: 'preview'
-});
+require('services/services.constants.ts');
 
 oppia.factory('ContextService', [
   'UrlService', 'EXPLORATION_EDITOR_TAB_CONTEXT', 'PAGE_CONTEXT',

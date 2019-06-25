@@ -347,20 +347,6 @@ CODEOWNER_IMPORTANT_PATHS = [
     '/scripts/install_third_party.sh',
     '/.github/']
 
-# This list contains the directories and files that do not follow the new
-# constant declaration rules.
-# TODO(YashJipkate) Bring these directories and files under the new constant
-# declaration rules and empty the list.
-OLD_CONVENTION_PATHS = [
-    'core/templates/dev/head/services',
-    'core/templates/dev/head/base_components',
-    'core/templates/dev/head/directives',
-    'core/templates/dev/head/domain',
-    'core/templates/dev/head/expressions',
-    'core/templates/dev/head/tests',
-    'core/templates/dev/head/App.ts',
-    'extensions/']
-
 if not os.getcwd().endswith('oppia'):
     print ''
     print 'ERROR    Please run this script from the oppia root directory.'
@@ -2449,13 +2435,9 @@ class LintChecksManager(object):
         failed = False
 
         with _redirect_stdout(_TARGET_STDOUT):
-            all_ts_files = [
+            ts_files_to_check = [
                 filepath for filepath in self.all_filepaths if (
                     filepath.endswith('.ts'))]
-            ts_files_to_check = [
-                filepath for filepath in all_ts_files if not any(
-                    filepath.startswith(pattern) for pattern in (
-                        OLD_CONVENTION_PATHS))]
             constants_to_source_filepaths_dict = {}
             for filepath in ts_files_to_check:
                 # Check that the constants are declared only in a *.constants.ts

@@ -13,23 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to fetch statistics about an exploration's states.
+ * @fileoverview Constants for story viewer domain.
  */
 
-require('services/services.constants.ts');
+oppia.constant(
+  'STORY_DATA_URL_TEMPLATE', '/story_data_handler/<story_id>');
 
-oppia.factory('StateTopAnswersStatsBackendApiService', [
-  '$http', 'UrlInterpolationService', 'STATE_ANSWER_STATS_URL',
-  function($http, UrlInterpolationService, STATE_ANSWER_STATS_URL) {
-    return {
-      fetchStats: function(explorationId) {
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            STATE_ANSWER_STATS_URL, {exploration_id: explorationId})
-        ).then(function(response) {
-          return response.data;
-        });
-      },
-    };
-  }
-]);
+oppia.constant(
+  'STORY_NODE_COMPLETION_URL_TEMPLATE',
+  '/story_node_completion_handler/<story_id>/<node_id>');
