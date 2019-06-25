@@ -781,20 +781,15 @@ class Skill(object):
                 return ind
         return None
 
-    def add_misconception(self, misconception_dict):
+    def add_misconception(self, misconception):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception_dict: dict. The misconception to be added.
+            misconception: Misconception. The misconception to be added.
         """
-        misconception = Misconception(
-            misconception_dict['id'],
-            misconception_dict['name'],
-            misconception_dict['notes'],
-            misconception_dict['feedback'])
         self.misconceptions.append(misconception)
         self.next_misconception_id = self.get_incremented_misconception_id(
-            misconception_dict['id'])
+            misconception.id)
 
     def get_incremented_misconception_id(self, misconception_id):
         """Returns the incremented misconception id.
