@@ -184,8 +184,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'Invalid html: <oppia-noninteractive-image>'
             '</oppia-noninteractive-image> due to errors in '
             'customization_args: {"Missing attributes: '
-            '\\[u\'alt-with-value\', u\'caption-with-value\', '
-            'u\'filepath-with-value\'], Extra attributes: \\[]": '
+            '\\[u\'id-with-value\', u\'alt-with-value\', '
+            'u\'caption-with-value\'], Extra attributes: \\[]": '
             '\\[\'<oppia-noninteractive-image>'
             '</oppia-noninteractive-image>\']}')
 
@@ -203,8 +203,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'Invalid html: <oppia-noninteractive-image>'
             '</oppia-noninteractive-image> due to errors in '
             'customization_args: {"Missing attributes: '
-            '\\[u\'alt-with-value\', u\'caption-with-value\', '
-            'u\'filepath-with-value\'], Extra attributes: \\[]": '
+            '\\[u\'id-with-value\', u\'alt-with-value\', '
+            'u\'caption-with-value\'], Extra attributes: \\[]": '
             '\\[\'<oppia-noninteractive-image>'
             '</oppia-noninteractive-image>\']}')
 

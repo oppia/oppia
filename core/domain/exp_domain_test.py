@@ -5048,8 +5048,7 @@ states:
               caption-with-value="&amp;quot;&amp;quot;" id-with-value="&amp;quot;image_id_2&amp;quot;">
               </oppia-noninteractive-image><p>Here is the image2 </p><oppia-noninteractive-image
               alt-with-value="&amp;quot;&amp;quot;" caption-with-value="&amp;quot;&amp;quot;"
-              id-with-value="&amp;quot;image_id_1&amp;quot;">
-              </oppia-noninteractive-image>
+              id-with-value="&amp;quot;image_id_1&amp;quot;"> </oppia-noninteractive-image>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
