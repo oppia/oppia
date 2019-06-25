@@ -5135,8 +5135,8 @@ class SkillModelValidatorTests(test_utils.GenericTestBase):
             (
                 u'[u\'failed validation check for all questions merged '
                 'check of SkillModel\', '
-                '[u"Entity id 0: all_questions_merged is True but there '
-                'are following question ids still linked to the skill: '
+                '[u"Entity id 0: all_questions_merged is True but the '
+                'following question ids are still linked to the skill: '
                 '[u\'question1\']"]]'
             ), u'[u\'fully-validated SkillModel\', 4]']
         run_job_and_check_output(self, expected_output, sort=True)
