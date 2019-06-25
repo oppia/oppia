@@ -440,7 +440,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
         change_domain_object = cls._get_change_domain_class(item)
         if change_domain_object is None:
             # This is for cases where id of entity is invalid
-            # and no commtit command domain object is found for entity.
+            # and no commit command domain object is found for entity.
             # For example, if a CollectionCommitLogEntryModel does
             # not have id starting with collection/rights, there is
             # no commit command domain object defined for this model.
