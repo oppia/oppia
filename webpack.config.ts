@@ -115,7 +115,6 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app'],
       filename: 'base.html',
       template: 'core/templates/dev/head/pages/base.html',
       minify: htmlMinifyConfig,
@@ -159,7 +158,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'contact'],
+      chunks: ['contact'],
       filename: 'contact-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -180,7 +179,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'donate'],
+      chunks: ['donate'],
       filename: 'donate-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -191,7 +190,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'email_dashboard'],
+      chunks: ['email_dashboard'],
       filename: 'email-dashboard-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -205,7 +204,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'email_dashboard_result'],
+      chunks: ['email_dashboard_result'],
       filename: 'email-dashboard-result.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -256,7 +255,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'landing'],
+      chunks: ['landing'],
       filename: 'topic-landing-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -270,7 +269,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'learner_dashboard'],
+      chunks: ['learner_dashboard'],
       filename: 'learner-dashboard-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -299,7 +298,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'moderator'],
+      chunks: ['moderator'],
       filename: 'moderator-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -324,7 +323,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'notifications_dashboard'],
+      chunks: ['notifications_dashboard'],
       filename: 'notifications-dashboard-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -349,7 +348,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'preferences'],
+      chunks: ['preferences'],
       filename: 'preferences-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -376,7 +375,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'signup'],
+      chunks: ['signup'],
       filename: 'signup-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -435,7 +434,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'stewards'],
+      chunks: ['stewards'],
       filename: 'stewards-landing-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -494,7 +493,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'thanks'],
+      chunks: ['thanks'],
       filename: 'thanks-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
@@ -514,7 +513,7 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['app', 'topics_and_skills_dashboard'],
+      chunks: ['topics_and_skills_dashboard'],
       filename: 'topics-and-skills-dashboard-page.mainpage.html',
       meta: {
         name: 'Personalized Online Learning from Oppia',
