@@ -32,6 +32,8 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import skill_domain
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.platform import models
@@ -41,14 +43,14 @@ import feconf
     activity_models, audit_models, base_models,
     collection_models, config_models, email_models,
     exp_models, feedback_models, file_models,
-    recommendations_models, story_models,
-    user_models,) = (
+    question_models, recommendations_models,
+    skill_models, story_models, user_models,) = (
         models.Registry.import_models([
             models.NAMES.activity, models.NAMES.audit, models.NAMES.base_model,
             models.NAMES.collection, models.NAMES.config, models.NAMES.email,
             models.NAMES.exploration, models.NAMES.feedback, models.NAMES.file,
-            models.NAMES.recommendations, models.NAMES.story,
-            models.NAMES.user]))
+            models.NAMES.question, models.NAMES.recommendations,
+            models.NAMES.skill, models.NAMES.story, models.NAMES.user]))
 datastore_services = models.Registry.import_datastore_services()
 
 ALLOWED_AUDIO_EXTENSIONS = feconf.ACCEPTED_AUDIO_EXTENSIONS.keys()
@@ -257,51 +259,58 @@ class BaseSummaryModelValidator(BaseModelValidator):
     """Base class for validating summary models."""
 
     @classmethod
-    def _get_related_model_properties(cls):
-        """Returns a tuple of related external_models and properties.
+    def _get_external_model_properties(cls):
+        """Returns a tuple of external models and properties.
 
         This should be implemented by subclasses.
 
         Returns:
             tuple(str, list(tuple), dict): A tuple with first element as
-                related model name, second element as a tuple of
+                external model name, second element as a tuple of
                 cls.external_instance_details and the third element
                 as a properties dict with key as property name in summary
-                model and value as property name in related model.
+                model and value as property name in external model.
         """
         raise NotImplementedError
 
     @classmethod
-    def _validate_related_model_properties(cls, item):
+    def _validate_external_model_properties(cls, item):
         """Validate that properties of the model match the corresponding
-        properties of the related model.
+        properties of the external model.
 
         Args:
             item: ndb.Model. BaseSummaryModel to validate.
         """
 
         for (
-                related_model_name,
-                related_model_class_model_id_model_tuples,
-                related_model_properties_dict
-            ) in cls._get_related_model_properties():
+                external_model_name,
+                external_model_class_model_id_model_tuples,
+                external_model_properties_dict
+            ) in cls._get_external_model_properties():
 
-            for (_, _, related_model) in (
-                    related_model_class_model_id_model_tuples):
-                for (property_name, related_model_property_name) in (
-                        related_model_properties_dict.iteritems()):
+            for (_, _, external_model) in (
+                    external_model_class_model_id_model_tuples):
+                # The case for missing external model is ignored here
+                # since errors for missing external model are already
+                # checked and stored in _validate_external_id_relationships
+                # function.
+                if external_model is None or external_model.deleted:
+                    continue
+                for (property_name, external_model_property_name) in (
+                        external_model_properties_dict.iteritems()):
                     value_in_summary_model = getattr(item, property_name)
-                    value_in_related_model = getattr(
-                        related_model, related_model_property_name)
+                    value_in_external_model = getattr(
+                        external_model, external_model_property_name)
 
-                    if value_in_summary_model != value_in_related_model:
+                    if value_in_summary_model != value_in_external_model:
                         cls.errors['%s field check' % property_name].append((
                             'Entity id %s: %s field in entity: %s does not '
                             'match corresponding %s %s field: %s') % (
                                 item.id, property_name,
                                 value_in_summary_model,
-                                related_model_name, related_model_property_name,
-                                value_in_related_model))
+                                external_model_name,
+                                external_model_property_name,
+                                value_in_external_model))
 
     @classmethod
     def validate(cls, item):
@@ -312,7 +321,7 @@ class BaseSummaryModelValidator(BaseModelValidator):
         """
         super(BaseSummaryModelValidator, cls).validate(item)
 
-        cls._validate_related_model_properties(item)
+        cls._validate_external_model_properties(item)
 
 
 class BaseSnapshotContentModelValidator(BaseModelValidator):
@@ -320,16 +329,16 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
     # The name of the model which is to be used in the error messages.
     # This can be overridden by subclasses, if needed.
-    model_name = 'snapshot content'
+    MODEL_NAME = 'snapshot content'
 
-    # The name of the related model in lowercase which is used to obtain
-    # the name of the key for the fetch of related model and the name
-    # of the related model to be used in error messages.
-    # For example, if related model is CollectionRights, then
-    # related_model_name = collection rights, key to fetch = collection_rights
+    # The name of the external model in lowercase which is used to obtain
+    # the name of the key for the fetch of external model and the name
+    # of the external model to be used in error messages.
+    # For example, if external model is CollectionRights, then
+    # EXTERNAL_MODEL_NAME = collection rights, key to fetch = collection_rights
     # Name of model to be used in error message = CollectionRights
     # This should be overridden by subclasses.
-    related_model_name = ''
+    EXTERNAL_MODEL_NAME = ''
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -337,40 +346,46 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
     @classmethod
     def _validate_base_model_version_from_item_id(cls, item):
-        """Validate that related model corresponding to item.id
+        """Validate that external model corresponding to item.id
         has a version greater than or equal to the version in item.id.
 
         Args:
             item: ndb.Model. BaseSnapshotContentModel to validate.
         """
 
-        if cls.related_model_name == '':
-            raise Exception('Related model name should be specified')
+        if cls.EXTERNAL_MODEL_NAME == '':
+            raise Exception('External model name should be specified')
 
-        related_model_name = cls.related_model_name
+        external_model_name = cls.EXTERNAL_MODEL_NAME
         if item.id.startswith('rights'):
-            related_model_name = related_model_name + ' rights'
+            external_model_name = external_model_name + ' rights'
 
-        name_split_by_space = related_model_name.split(' ')
+        name_split_by_space = external_model_name.split(' ')
         key_to_fetch = ('_').join(name_split_by_space)
-        capitalized_related_model_name = ('').join([
+        capitalized_external_model_name = ('').join([
             val.capitalize() for val in name_split_by_space])
 
-        related_model_class_model_id_model_tuples = (
+        external_model_class_model_id_model_tuples = (
             cls.external_instance_details['%s_ids' % key_to_fetch])
 
         version = item.id[item.id.rfind('-') + 1:]
-        for (_, _, related_model) in (
-                related_model_class_model_id_model_tuples):
-            if int(related_model.version) < int(version):
+        for (_, _, external_model) in (
+                external_model_class_model_id_model_tuples):
+            # The case for missing external model is ignored here
+            # since errors for missing external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if external_model is None or external_model.deleted:
+                continue
+            if int(external_model.version) < int(version):
                 cls.errors[
-                    '%s model version check' % cls.related_model_name].append((
+                    '%s model version check' % cls.EXTERNAL_MODEL_NAME].append((
                         'Entity id %s: %s model corresponding to '
                         'id %s has a version %s which is less than '
                         'the version %s in %s model id' % (
-                            item.id, capitalized_related_model_name,
-                            related_model.id, related_model.version, version,
-                            cls.model_name)))
+                            item.id, capitalized_external_model_name,
+                            external_model.id, external_model.version, version,
+                            cls.MODEL_NAME)))
 
     @classmethod
     def validate(cls, item):
@@ -387,7 +402,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
     """Base class for validating snapshot metadata models."""
 
-    model_name = 'snapshot metadata'
+    MODEL_NAME = 'snapshot metadata'
 
     @classmethod
     def _validate_commit_type(cls, item):
@@ -425,6 +440,16 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
             item: ndb.Model. Entity to validate.
         """
         change_domain_object = cls._get_change_domain_class(item)
+        if change_domain_object is None:
+            # This is for cases where id of the entity is invalid
+            # and no commit command domain object is found for the entity.
+            # For example, if a CollectionCommitLogEntryModel does
+            # not have id starting with collection/rights, there is
+            # no commit command domain object defined for this model.
+            cls.errors['commit cmd check'].append(
+                'Entity id %s: No commit command domain object defined '
+                'for entity with commands: %s' % (item.id, item.commit_cmds))
+            return
         for commit_cmd_dict in item.commit_cmds:
             if not commit_cmd_dict:
                 continue
@@ -453,7 +478,7 @@ class BaseSnapshotMetadataModelValidator(BaseSnapshotContentModelValidator):
 class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
     """Base class for validating commit log entry models."""
 
-    model_name = 'commit log entry'
+    MODEL_NAME = 'commit log entry'
 
     @classmethod
     def _validate_post_commit_status(cls, item):
@@ -577,8 +602,8 @@ class CollectionModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'exploration_ids': (
                 exp_models.ExplorationModel,
@@ -605,7 +630,7 @@ class CollectionSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionSnapshotMetadataModel."""
 
-    related_model_name = 'collection'
+    EXTERNAL_MODEL_NAME = 'collection'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -626,7 +651,7 @@ class CollectionSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating CollectionSnapshotContentModel."""
 
-    related_model_name = 'collection'
+    EXTERNAL_MODEL_NAME = 'collection'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -643,8 +668,8 @@ class CollectionRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'collection_ids': (
                 collection_models.CollectionModel, [item.id]),
@@ -691,7 +716,7 @@ class CollectionRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating CollectionRightsSnapshotMetadataModel."""
 
-    related_model_name = 'collection rights'
+    EXTERNAL_MODEL_NAME = 'collection rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -712,7 +737,7 @@ class CollectionRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating CollectionRightsSnapshotContentModel."""
 
-    related_model_name = 'collection rights'
+    EXTERNAL_MODEL_NAME = 'collection rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -726,7 +751,7 @@ class CollectionRightsSnapshotContentModelValidator(
 class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating CollectionCommitLogEntryModel."""
 
-    related_model_name = 'collection'
+    EXTERNAL_MODEL_NAME = 'collection'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -740,8 +765,12 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
             return rights_manager.CollectionRightsChange
-        else:
+        elif item.id.startswith('collection'):
             return collection_domain.CollectionChange
+        else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -810,6 +839,12 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
 
         for (_, _, collection_model) in (
                 collection_model_class_model_id_model_tuples):
+            # The case for missing collection external model is ignored here
+            # since errors for missing collection external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if collection_model is None or collection_model.deleted:
+                continue
             nodes = collection_model.collection_contents['nodes']
             if item.node_count != len(nodes):
                 cls.errors['node count check'].append((
@@ -830,7 +865,7 @@ class CollectionSummaryModelValidator(BaseSummaryModelValidator):
                 'empty but received %s' % (item.id, item.ratings))
 
     @classmethod
-    def _get_related_model_properties(cls):
+    def _get_external_model_properties(cls):
         collection_model_class_model_id_model_tuples = (
             cls.external_instance_details['collection_ids'])
         collection_rights_model_class_model_id_model_tuples = (
@@ -883,8 +918,8 @@ class ConfigPropertyModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'snapshot_metadata_ids': (
                 config_models.ConfigPropertySnapshotMetadataModel,
@@ -899,7 +934,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ConfigPropertySnapshotMetadataModel."""
 
-    related_model_name = 'config property'
+    EXTERNAL_MODEL_NAME = 'config property'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -924,7 +959,7 @@ class ConfigPropertySnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating ConfigPropertySnapshotContentModel."""
 
-    related_model_name = 'config property'
+    EXTERNAL_MODEL_NAME = 'config property'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -984,14 +1019,19 @@ class SentEmailModelValidator(BaseModelValidator):
 
         for (_, _, sender_model) in (
                 sender_model_class_model_id_model_tuples):
-            if sender_model and not sender_model.deleted:
-                if sender_model.email != item.sender_email:
-                    cls.errors['sender email check'].append((
-                        'Entity id %s: Sender email %s in entity does not '
-                        'match with email %s of user obtained through '
-                        'sender id %s') % (
-                            item.id, item.sender_email, sender_model.email,
-                            item.sender_id))
+            # The case for missing sender external model is ignored here
+            # since errors for missing sender external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if sender_model is None or sender_model.deleted:
+                continue
+            if sender_model.email != item.sender_email:
+                cls.errors['sender email check'].append((
+                    'Entity id %s: Sender email %s in entity does not '
+                    'match with email %s of user obtained through '
+                    'sender id %s') % (
+                        item.id, item.sender_email, sender_model.email,
+                        item.sender_id))
 
     @classmethod
     def _validate_recipient_email(cls, item):
@@ -1006,14 +1046,19 @@ class SentEmailModelValidator(BaseModelValidator):
 
         for (_, _, recipient_model) in (
                 recipient_model_class_model_id_model_tuples):
-            if recipient_model and not recipient_model.deleted:
-                if recipient_model.email != item.recipient_email:
-                    cls.errors['recipient email check'].append((
-                        'Entity id %s: Recipient email %s in entity does '
-                        'not match with email %s of user obtained through '
-                        'recipient id %s') % (
-                            item.id, item.recipient_email,
-                            recipient_model.email, item.recipient_id))
+            # The case for missing recipient external model is ignored here
+            # since errors for missing recipient external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if recipient_model is None or recipient_model.deleted:
+                continue
+            if recipient_model.email != item.recipient_email:
+                cls.errors['recipient email check'].append((
+                    'Entity id %s: Recipient email %s in entity does '
+                    'not match with email %s of user obtained through '
+                    'recipient id %s') % (
+                        item.id, item.recipient_email,
+                        recipient_model.email, item.recipient_id))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -1061,14 +1106,19 @@ class BulkEmailModelValidator(BaseModelValidator):
 
         for (_, _, sender_model) in (
                 sender_model_class_model_id_model_tuples):
-            if sender_model and not sender_model.deleted:
-                if sender_model.email != item.sender_email:
-                    cls.errors['sender email check'].append((
-                        'Entity id %s: Sender email %s in entity does not '
-                        'match with email %s of user obtained through '
-                        'sender id %s') % (
-                            item.id, item.sender_email, sender_model.email,
-                            item.sender_id))
+            # The case for missing sender external model is ignored here
+            # since errors for missing sender external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if sender_model is None or sender_model.deleted:
+                continue
+            if sender_model.email != item.sender_email:
+                cls.errors['sender email check'].append((
+                    'Entity id %s: Sender email %s in entity does not '
+                    'match with email %s of user obtained through '
+                    'sender id %s') % (
+                        item.id, item.sender_email, sender_model.email,
+                        item.sender_id))
 
     @classmethod
     def _get_custom_validation_functions(cls):
@@ -1131,8 +1181,8 @@ class ExplorationModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'exploration_commit_log_entry_ids': (
                 exp_models.ExplorationCommitLogEntryModel,
@@ -1155,7 +1205,7 @@ class ExplorationSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationSnapshotMetadataModel."""
 
-    related_model_name = 'exploration'
+    EXTERNAL_MODEL_NAME = 'exploration'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1175,7 +1225,7 @@ class ExplorationSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating ExplorationSnapshotContentModel."""
 
-    related_model_name = 'exploration'
+    EXTERNAL_MODEL_NAME = 'exploration'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1194,8 +1244,8 @@ class ExplorationRightsModelValidator(BaseModelValidator):
         if item.cloned_from:
             cloned_from_exploration_id.append(item.cloned_from)
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'exploration_ids': (
                 exp_models.ExplorationModel, [item.id]),
@@ -1245,7 +1295,7 @@ class ExplorationRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating ExplorationRightsSnapshotMetadataModel."""
 
-    related_model_name = 'exploration rights'
+    EXTERNAL_MODEL_NAME = 'exploration rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1266,7 +1316,7 @@ class ExplorationRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating ExplorationRightsSnapshotContentModel."""
 
-    related_model_name = 'exploration rights'
+    EXTERNAL_MODEL_NAME = 'exploration rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1280,7 +1330,7 @@ class ExplorationRightsSnapshotContentModelValidator(
 class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating ExplorationCommitLogEntryModel."""
 
-    related_model_name = 'exploration'
+    EXTERNAL_MODEL_NAME = 'exploration'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1294,8 +1344,12 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     def _get_change_domain_class(cls, item):
         if item.id.startswith('rights'):
             return rights_manager.ExplorationRightsChange
-        else:
+        elif item.id.startswith('exploration'):
             return exp_domain.ExplorationChange
+        else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1383,7 +1437,11 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
             cls.external_instance_details['exploration_ids'])
         for (_, _, exploration_model) in (
                 exploration_model_class_model_id_model_tuples):
-            if not exploration_model or exploration_model.deleted:
+            # The case for missing exploration external model is ignored here
+            # since errors for missing exploration external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if exploration_model is None or exploration_model.deleted:
                 continue
             last_human_update_ms = exp_services.get_last_updated_by_human_ms(
                 exploration_model.id)
@@ -1398,7 +1456,7 @@ class ExpSummaryModelValidator(BaseSummaryModelValidator):
                         last_human_update_time))
 
     @classmethod
-    def _get_related_model_properties(cls):
+    def _get_external_model_properties(cls):
         exploration_model_class_model_id_model_tuples = (
             cls.external_instance_details['exploration_ids'])
         exploration_rights_model_class_model_id_model_tuples = (
@@ -1450,8 +1508,8 @@ class FileMetadataModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
 
         # Item id is of the format:
         # /exploration/exp_id/assets/(image|audio)/filepath.
@@ -1476,7 +1534,7 @@ class FileMetadataSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating FileMetadataSnapshotMetadataModel."""
 
-    related_model_name = 'file metadata'
+    EXTERNAL_MODEL_NAME = 'file metadata'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1501,7 +1559,7 @@ class FileMetadataSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating FileMetadataSnapshotContentModel."""
 
-    related_model_name = 'file metadata'
+    EXTERNAL_MODEL_NAME = 'file metadata'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1526,8 +1584,8 @@ class FileModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
 
         # Item id is of the format:
         # /exploration/exp_id/assets/(image|audio)/filepath.
@@ -1551,7 +1609,7 @@ class FileModelValidator(BaseModelValidator):
 class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating FileSnapshotMetadataModel."""
 
-    related_model_name = 'file'
+    EXTERNAL_MODEL_NAME = 'file'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1575,7 +1633,7 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating FileSnapshotContentModel."""
 
-    related_model_name = 'file'
+    EXTERNAL_MODEL_NAME = 'file'
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
@@ -1662,6 +1720,290 @@ class TopicSimilaritiesModelValidator(BaseModelValidator):
         return [cls._validate_topic_similarities]
 
 
+class SkillModelValidator(BaseModelValidator):
+    """Class for validating SkillModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return skill_services.get_skill_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        superseding_skill_ids = []
+        if item.superseding_skill_id:
+            superseding_skill_ids = [item.superseding_skill_id]
+        return {
+            'skill_commit_log_entry_ids': (
+                skill_models.SkillCommitLogEntryModel,
+                ['skill-%s-%s' % (item.id, version) for version in range(
+                    1, item.version + 1)]),
+            'skill_summary_ids': (
+                skill_models.SkillSummaryModel, [item.id]),
+            'skill_rights_ids': (
+                skill_models.SkillRightsModel, [item.id]),
+            'superseding_skill_ids': (
+                skill_models.SkillModel, superseding_skill_ids),
+            'snapshot_metadata_ids': (
+                skill_models.SkillSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_ids': (
+                skill_models.SkillSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+    @classmethod
+    def _validate_all_questions_merged(cls, item):
+        """Validate that all_questions_merged is True only if
+        superseding_skill_id is not None and there are no
+        questions linked with the skill. The superseding skill
+        id check is already performed in domain object validation,
+        so it is not repeated here.
+
+        Args:
+            item: ndb.Model. SkillModel to validate.
+        """
+        questions_ids_linked_with_skill = (
+            question_models.QuestionSkillLinkModel
+            .get_all_question_ids_linked_to_skill_id(item.id))
+        if item.all_questions_merged and questions_ids_linked_with_skill:
+            cls.errors['all questions merged check'].append(
+                'Entity id %s: all_questions_merged is True but the '
+                'following question ids are still linked to the skill: %s' % (
+                    item.id, questions_ids_linked_with_skill))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_all_questions_merged]
+
+
+class SkillSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating SkillSnapshotMetadataModel."""
+
+    EXTERNAL_MODEL_NAME = 'skill'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return skill_domain.SkillChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_ids': (
+                skill_models.SkillModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_ids': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+
+class SkillSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating SkillSnapshotContentModel."""
+
+    EXTERNAL_MODEL_NAME = 'skill'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_ids': (
+                skill_models.SkillModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+
+class SkillRightsModelValidator(BaseModelValidator):
+    """Class for validating SkillRightsModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'skill_ids': (
+                skill_models.SkillModel, [item.id]),
+            'creator_user_ids': (
+                user_models.UserSettingsModel, [item.creator_id]),
+            'snapshot_metadata_ids': (
+                skill_models.SkillRightsSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_ids': (
+                skill_models.SkillRightsSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+
+class SkillRightsSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating SkillRightsSnapshotMetadataModel."""
+
+    EXTERNAL_MODEL_NAME = 'skill rights'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return skill_domain.SkillRightsChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_rights_ids': (
+                skill_models.SkillRightsModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_ids': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+
+class SkillRightsSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating SkillRightsSnapshotContentModel."""
+
+    EXTERNAL_MODEL_NAME = 'skill rights'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_rights_ids': (
+                skill_models.SkillRightsModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+
+class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
+    """Class for validating SkillCommitLogEntryModel."""
+
+    EXTERNAL_MODEL_NAME = 'skill'
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [skill/rights]-[skill_id]-[skill_version].
+        regex_string = '^(skill|rights)-%s-\\d*$' % (
+            item.skill_id)
+
+        return regex_string
+
+    @classmethod
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('rights'):
+            return skill_domain.SkillRightsChange
+        elif item.id.startswith('skill'):
+            return skill_domain.SkillChange
+        else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
+            return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        external_id_relationships = {
+            'skill_ids': (
+                skill_models.SkillModel, [item.skill_id]),
+        }
+        if item.id.startswith('rights'):
+            external_id_relationships['skill_rights_ids'] = (
+                skill_models.SkillRightsModel, [item.skill_id])
+        return external_id_relationships
+
+
+class SkillSummaryModelValidator(BaseSummaryModelValidator):
+    """Class for validating SkillSummaryModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return skill_services.get_skill_summary_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'skill_ids': (
+                skill_models.SkillModel, [item.id]),
+            'skill_rights_ids': (
+                skill_models.SkillRightsModel, [item.id])
+        }
+
+    @classmethod
+    def _validate_misconception_count(cls, item):
+        """Validate that misconception_count of model is equal to
+        number of misconceptions in SkillModel.misconceptions.
+
+        Args:
+            item: ndb.Model. SkillSummaryModel to validate.
+        """
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        for (_, _, skill_model) in (
+                skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if not skill_model or skill_model.deleted:
+                continue
+            if item.misconception_count != len(skill_model.misconceptions):
+                cls.errors['misconception count check'].append((
+                    'Entity id %s: Misconception count: %s does not match '
+                    'the number of misconceptions in skill model: %s') % (
+                        item.id, item.misconception_count,
+                        skill_model.misconceptions))
+
+    @classmethod
+    def _validate_worked_examples_count(cls, item):
+        """Validate that worked examples count of model is equal to
+        number of misconceptions in SkillModel.skill_contents.worked_examples.
+
+        Args:
+            item: ndb.Model. SkillSummaryModel to validate.
+        """
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        for (_, _, skill_model) in (
+                skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if not skill_model or skill_model.deleted:
+                continue
+            if item.worked_examples_count != len(
+                    skill_model.skill_contents['worked_examples']):
+                cls.errors['worked examples count check'].append((
+                    'Entity id %s: Worked examples count: %s does not match '
+                    'the number of worked examples in skill_contents '
+                    'in skill model: %s') % (
+                        item.id, item.worked_examples_count,
+                        skill_model.skill_contents['worked_examples']))
+
+    @classmethod
+    def _get_external_model_properties(cls):
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+
+        skill_model_properties_dict = {
+            'description': 'description',
+            'language_code': 'language_code',
+            'skill_model_created_on': 'created_on',
+            'skill_model_last_updated': 'last_updated'
+        }
+
+        return [(
+            'skill',
+            skill_model_class_model_id_model_tuples,
+            skill_model_properties_dict
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_misconception_count,
+            cls._validate_worked_examples_count]
+
+
 class StoryModelValidator(BaseModelValidator):
     """Class for validating StoryModel."""
 
@@ -1672,8 +2014,8 @@ class StoryModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'story_commit_log_entry_ids': (
                 story_models.StoryCommitLogEntryModel,
@@ -1699,7 +2041,7 @@ class StoryModelValidator(BaseModelValidator):
 class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
     """Class for validating StorySnapshotMetadataModel."""
 
-    related_model_name = 'story'
+    EXTERNAL_MODEL_NAME = 'story'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1718,7 +2060,7 @@ class StorySnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 class StorySnapshotContentModelValidator(BaseSnapshotContentModelValidator):
     """Class for validating StorySnapshotContentModel."""
 
-    related_model_name = 'story'
+    EXTERNAL_MODEL_NAME = 'story'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1734,8 +2076,8 @@ class StoryRightsModelValidator(BaseModelValidator):
     @classmethod
     def _get_external_id_relationships(cls, item):
         snapshot_model_ids = [
-            '%s-%d' % (item.id, version) for version in range(
-                1, item.version + 1)]
+            '%s-%d' % (item.id, version)
+            for version in range(1, item.version + 1)]
         return {
             'story_ids': (
                 story_models.StoryModel, [item.id]),
@@ -1754,7 +2096,7 @@ class StoryRightsSnapshotMetadataModelValidator(
         BaseSnapshotMetadataModelValidator):
     """Class for validating StoryRightsSnapshotMetadataModel."""
 
-    related_model_name = 'story rights'
+    EXTERNAL_MODEL_NAME = 'story rights'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1775,7 +2117,7 @@ class StoryRightsSnapshotContentModelValidator(
         BaseSnapshotContentModelValidator):
     """Class for validating StoryRightsSnapshotContentModel."""
 
-    related_model_name = 'story rights'
+    EXTERNAL_MODEL_NAME = 'story rights'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1789,7 +2131,7 @@ class StoryRightsSnapshotContentModelValidator(
 class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     """Class for validating StoryCommitLogEntryModel."""
 
-    related_model_name = 'story'
+    EXTERNAL_MODEL_NAME = 'story'
 
     @classmethod
     def _get_model_id_regex(cls, item):
@@ -1800,8 +2142,13 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
         return regex_string
 
     @classmethod
-    def _get_change_domain_class(cls, unused_item):
-        return story_domain.StoryChange
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('story'):
+            return story_domain.StoryChange
+        else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
+            return None
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1839,6 +2186,12 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
             'story_ids']
 
         for (_, _, story_model) in story_model_class_model_id_model_tuples:
+            # The case for missing story external model is ignored here
+            # since errors for missing story external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if story_model is None or story_model.deleted:
+                continue
             nodes = story_model.story_contents['nodes']
             if item.node_count != len(nodes):
                 cls.errors['node count check'].append((
@@ -1847,7 +2200,7 @@ class StorySummaryModelValidator(BaseSummaryModelValidator):
                         item.id, item.node_count, nodes))
 
     @classmethod
-    def _get_related_model_properties(cls):
+    def _get_external_model_properties(cls):
         story_model_class_model_id_model_tuples = cls.external_instance_details[
             'story_ids']
 
@@ -1942,6 +2295,19 @@ MODEL_TO_VALIDATOR_MAPPING = {
         ExplorationRecommendationsModelValidator),
     recommendations_models.TopicSimilaritiesModel: (
         TopicSimilaritiesModelValidator),
+    skill_models.SkillModel: SkillModelValidator,
+    skill_models.SkillSnapshotMetadataModel: (
+        SkillSnapshotMetadataModelValidator),
+    skill_models.SkillSnapshotContentModel: (
+        SkillSnapshotContentModelValidator),
+    skill_models.SkillRightsModel: SkillRightsModelValidator,
+    skill_models.SkillRightsSnapshotMetadataModel: (
+        SkillRightsSnapshotMetadataModelValidator),
+    skill_models.SkillRightsSnapshotContentModel: (
+        SkillRightsSnapshotContentModelValidator),
+    skill_models.SkillCommitLogEntryModel: (
+        SkillCommitLogEntryModelValidator),
+    skill_models.SkillSummaryModel: SkillSummaryModelValidator,
     story_models.StoryModel: StoryModelValidator,
     story_models.StorySnapshotMetadataModel: (
         StorySnapshotMetadataModelValidator),
@@ -2264,6 +2630,75 @@ class TopicSimilaritiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [recommendations_models.TopicSimilaritiesModel]
+
+
+class SkillModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillModel]
+
+
+class SkillSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillSnapshotMetadataModel]
+
+
+class SkillSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillSnapshotContentModel]
+
+
+class SkillRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillRightsModel]
+
+
+class SkillRightsSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillRightsSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillRightsSnapshotMetadataModel]
+
+
+class SkillRightsSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillRightsSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillRightsSnapshotContentModel]
+
+
+class SkillCommitLogEntryModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillCommitLogEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillCommitLogEntryModel]
+
+
+class SkillSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates SkillSummaryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [skill_models.SkillSummaryModel]
 
 
 class StoryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
