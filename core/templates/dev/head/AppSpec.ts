@@ -16,8 +16,6 @@
  * @fileoverview Unit tests for generic services.
  */
 
-require('app.constants.ts');
-
 describe('Constants Generating', function() {
   beforeEach(angular.mock.module('oppia'));
 

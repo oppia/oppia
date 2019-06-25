@@ -17,8 +17,6 @@
  * collection node domain objects.
  */
 
-require('app.constants.ts');
-
 var oppia = require('AppInit.ts').moduleName;
 
 oppia.factory('CollectionNodeObjectFactory', [
