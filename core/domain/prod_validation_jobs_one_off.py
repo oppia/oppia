@@ -1770,8 +1770,8 @@ class SkillModelValidator(BaseModelValidator):
             .get_all_question_ids_linked_to_skill_id(item.id))
         if item.all_questions_merged and questions_ids_linked_with_skill:
             cls.errors['all questions merged check'].append(
-                'Entity id %s: all_questions_merged is True but there '
-                'are following question ids still linked to the skill: %s' % (
+                'Entity id %s: all_questions_merged is True but the '
+                'following question ids are still linked to the skill: %s' % (
                     item.id, questions_ids_linked_with_skill))
 
     @classmethod
