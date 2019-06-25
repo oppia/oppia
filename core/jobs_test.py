@@ -29,10 +29,10 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
+from mock import patch  # pylint: disable=import-only-modules
 
 from google.appengine.ext import ndb
 from mapreduce import input_readers
-from mock import patch  # pylint: disable=import-only-module
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
