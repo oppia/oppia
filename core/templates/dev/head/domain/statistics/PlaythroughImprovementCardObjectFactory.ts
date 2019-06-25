@@ -21,7 +21,7 @@ require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');
+require('domain/statistics/statistics-domain.constants.ts');
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
   '$uibModal', 'ImprovementActionButtonObjectFactory',

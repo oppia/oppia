@@ -37,26 +37,7 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-  <div ng-controller="ExplorationPlayer">
-    <background-banner></background-banner>
-    <conversation-skin></conversation-skin>
-    <attribution-guide></attribution-guide>
-  </div>
-  <style>
-    .oppia-exploration-h1 {
-      color: #ffffff;
-      display: inline;
-      font-size: 1em;
-      font-weight: normal;
-    }
-    .oppia-exploration-info-icon:hover {
-      background: #fff;
-      color: #009688;
-      margin-top: -13px;
-      height: 56px;
-      padding-top: 12px;
-    }
-  </style>
+  <exploration-player-page></exploration-player-page>
 {% endblock %}
 
 {% block footer %}

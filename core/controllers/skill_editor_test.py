@@ -14,6 +14,8 @@
 
 """Tests for the skill editor page."""
 
+from constants import constants
+from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import topic_services
@@ -281,5 +283,36 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
             self.put_json(
                 self.url, {'version': 1}, csrf_token=csrf_token,
                 expected_status_int=401)
+
+        self.logout()
+
+
+class SkillEditorQuestionHandlerTests(BaseSkillEditorControllerTests):
+
+    def test_skill_editor_question_handler_updates_question_summary_dicts(self):
+        self.login(self.ADMIN_EMAIL)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.SKILL_EDITOR_QUESTION_URL, self.skill_id))
+        question_summary_dicts = response['question_summary_dicts']
+
+        self.assertEqual(question_summary_dicts, [])
+
+        question_id = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id, self.admin_id,
+            self._create_valid_question_data('ABC'), [self.skill_id])
+        question_services.create_new_question_skill_link(
+            self.admin_id, question_id, self.skill_id,
+            constants.DEFAULT_SKILL_DIFFICULTY)
+
+        response = self.get_json(
+            '%s/%s' % (feconf.SKILL_EDITOR_QUESTION_URL, self.skill_id))
+        question_summary_dict = response['question_summary_dicts'][0]
+
+        self.assertEqual(
+            question_summary_dict['skill_description'], 'Description')
+        self.assertEqual(
+            question_summary_dict['summary']['id'], question_id)
 
         self.logout()

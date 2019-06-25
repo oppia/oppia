@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for Pencil Code Editor rules.
  */
 
+require(
+  'interactions/PencilCodeEditor/directives/PencilCodeEditorRulesService.ts');
+
 describe('Pencil Code Editor rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 
