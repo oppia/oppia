@@ -19,7 +19,7 @@
 oppia.factory('CsrfTokenService', [function() {
   var token = null;
   return {
-    setToken: function (csrfToken) {
+    setToken: function(csrfToken) {
       token = csrfToken;
     },
     getToken: function() {
