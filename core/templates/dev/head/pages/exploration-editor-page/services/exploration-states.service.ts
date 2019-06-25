@@ -404,7 +404,7 @@ oppia.factory('ExplorationStatesService', [
       saveImage: function(stateName, image) {
         addImageInState(stateName, image);
       },
-      getImagesource: function(stateName, imageId) {
+      getImageSource: function(stateName, imageId) {
         return getImageFilepathFromImageAssets(stateName, imageId);
       },
       isInitialized: function() {

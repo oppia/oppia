@@ -48,7 +48,7 @@ oppia.factory('ChangeListService', [
     var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
     var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
     var CMD_IMAGE_ASSETS = 'image_assets';
-    var IMAGE_ASSETS_ACTION = 'add_image';
+    var IMAGE_ASSETS_ACTION_ADD_IMAGE = 'add_image';
 
     var ALLOWED_EXPLORATION_BACKEND_NAMES = {
       category: true,
@@ -242,7 +242,7 @@ oppia.factory('ChangeListService', [
       },
       addImage: function(stateName, image) {
         var changeDict = {
-          action: IMAGE_ASSETS_ACTION,
+          action: IMAGE_ASSETS_ACTION_ADD_IMAGE,
           cmd: CMD_IMAGE_ASSETS,
           image_id: image.image_id,
           image_info: image.image_info,

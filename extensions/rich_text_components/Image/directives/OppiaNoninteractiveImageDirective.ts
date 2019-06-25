@@ -23,6 +23,7 @@
 require('components/state-editor/state-editor.directive.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
+require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('services/AssetsBackendApiService.ts');
@@ -95,7 +96,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           // we directly assign the url to the imageUrl.
           var stateName = StateEditorService.getActiveStateName();
           ctrl.filepath = (
-            ExplorationStatesService.getImagesource(stateName, imageId));
+            ExplorationStatesService.getImageSource(stateName, imageId));
           ctrl.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
             ContextService.getExplorationId(), ctrl.filepath);
         }

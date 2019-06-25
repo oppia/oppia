@@ -30,8 +30,8 @@ oppia.run([
   'HtmlEscaperService', 'ExplorationImageCounterService',
   'ExplorationStatesService', 'StateEditorService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
-      HtmlEscaperService, ExplorationImageCounterService,
-      ExplorationStatesService, StateEditorService) {
+      HtmlEscaperService, ExplorationImageCounterService,ExplorationStatesService,
+      StateEditorService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
@@ -45,7 +45,7 @@ oppia.run([
       var customizationArgSpecs = componentDefn.customizationArgSpecs;
       var isInline = RteHelperService.isInlineComponent(componentDefn.id);
       var imageId = '';
-      var imageTagName = 'oppiaimage';
+      var IMAGE_TAG_NAME = 'oppiaimage';
 
       // Inline components will be wrapped in a span, while block components
       // will be wrapped in a div.
@@ -86,7 +86,7 @@ oppia.run([
                 customizationArgs,
                 function(customizationArgsDict) {
                   // Generating and adding imageId for image tag.
-                  if (ckName === imageTagName) {
+                  if (ckName === IMAGE_TAG_NAME) {
                     var imageSrc = customizationArgsDict.filepath;
                     var imageIdIntegerPart = (
                       Number(ExplorationImageCounterService.displayed) + 1);
@@ -183,7 +183,7 @@ oppia.run([
               // Set attributes of component according to data values.
               customizationArgSpecs.forEach(function(spec) {
                 // Replacing filepath with image id.
-                if (ckName === imageTagName && spec.name === 'filepath') {
+                if (ckName === IMAGE_TAG_NAME && spec.name === 'filepath') {
                   that.element.getChild(0).setAttribute(
                     'id-with-value',
                     HtmlEscaperService.objToEscapedJson(
