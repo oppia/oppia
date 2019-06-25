@@ -34,6 +34,7 @@ IMPORTANT NOTES:
     where [APP_NAME] is the name of your app. Note that the root folder MUST be
     named 'oppia'.
 """
+from __future__ import print_function
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -153,7 +154,7 @@ def preprocess_release():
         new_assets_file.write(content)
 
     # Removes the version field from app.yaml.
-    print 'Removing the version field from app.yaml ...'
+    print('Removing the version field from app.yaml ...')
     with open('app.yaml', 'r') as f:
         content = f.read()
         assert content.count('version: default') == 1
@@ -161,7 +162,7 @@ def preprocess_release():
     content = content.replace('version: default', '')
     with open('app.yaml', 'w') as f:
         f.write(content)
-    print 'Version field removed.'
+    print('Version field removed.')
 
 
 def _execute_deployment():
@@ -197,11 +198,11 @@ def _execute_deployment():
         ['git', 'rev-parse', 'HEAD']).strip()
 
     # Create a folder in which to save the release candidate.
-    print 'Ensuring that the release directory parent exists'
+    print('Ensuring that the release directory parent exists')
     common.ensure_directory_exists(os.path.dirname(RELEASE_DIR_PATH))
 
     # Copy files to the release directory. Omits the .git subfolder.
-    print 'Copying files to the release directory'
+    print('Copying files to the release directory')
     shutil.copytree(
         os.getcwd(), RELEASE_DIR_PATH, ignore=shutil.ignore_patterns('.git'))
 
@@ -212,9 +213,9 @@ def _execute_deployment():
                 'Invalid directory accessed during deployment: %s'
                 % os.getcwd())
 
-        print 'Changing directory to %s' % os.getcwd()
+        print('Changing directory to %s' % os.getcwd())
 
-        print 'Preprocessing release...'
+        print('Preprocessing release...')
         preprocess_release()
 
         # Update indexes, then prompt for a check that they are all serving
@@ -228,7 +229,7 @@ def _execute_deployment():
             APP_NAME)
         common.open_new_tab_in_browser_if_possible(datastore_indexes_url)
         while True:
-            print '******************************************************'
+            print('******************************************************')
             print (
                 'PLEASE CONFIRM: are all datastore indexes serving? See %s '
                 '(y/n)' % datastore_indexes_url)
@@ -241,7 +242,7 @@ def _execute_deployment():
                     'script again to complete the deployment. Exiting.')
 
         # Do a build, while outputting to the terminal.
-        print 'Building and minifying scripts...'
+        print('Building and minifying scripts...')
         build_process = subprocess.Popen(
             ['python', 'scripts/build.py', '--prod_env'],
             stdout=subprocess.PIPE)
@@ -249,7 +250,7 @@ def _execute_deployment():
             line = build_process.stdout.readline().strip()
             if not line:
                 break
-            print line
+            print(line)
         # Wait for process to terminate, then check return code.
         build_process.communicate()
         if build_process.returncode > 0:
@@ -270,7 +271,7 @@ def _execute_deployment():
                     APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),
                     current_git_revision))
 
-        print 'Returning to oppia/ root directory.'
+        print('Returning to oppia/ root directory.')
 
     # If this is a test server deployment and the current release version is
     # already serving, open the library page (for sanity checking) and the GAE
@@ -286,7 +287,7 @@ def _execute_deployment():
             'project=%s&key1=default&minLogLevel=500'
             % APP_NAME_OPPIATESTSERVER)
 
-    print 'Done!'
+    print('Done!')
 
 
 def get_unique_id():

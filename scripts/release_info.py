@@ -17,6 +17,7 @@
 """Script that simplifies releases by collecting various information.
 Should be run from the oppia root dir.
 """
+from __future__ import print_function
 import argparse
 import collections
 import os
@@ -404,7 +405,7 @@ def main():
             for link in issue_links:
                 out.write('* [%s](%s)  \n' % (link, link))
 
-    print 'Done. Summary file generated in ../release_summary.md'
+    print('Done. Summary file generated in ../release_summary.md')
 
 
 if __name__ == '__main__':

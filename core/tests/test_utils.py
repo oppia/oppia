@@ -15,6 +15,7 @@
 # limitations under the License.
 
 """Common utilities for test classes."""
+from __future__ import print_function
 
 import contextlib
 import copy
@@ -496,7 +497,7 @@ tags: []
         """Print the line with a prefix that can be identified by the
         script that calls the test.
         """
-        print '%s%s' % (LOG_LINE_PREFIX, line)
+        print('%s%s' % (LOG_LINE_PREFIX, line))
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.

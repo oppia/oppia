@@ -19,6 +19,7 @@ execute:
 
     bash scripts/run_backend_tests.sh
 """
+from __future__ import print_function
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -74,9 +75,9 @@ def log(message, show_time=False):
     """
     with LOG_LOCK:
         if show_time:
-            print datetime.datetime.utcnow().strftime('%H:%M:%S'), message
+            print(datetime.datetime.utcnow().strftime('%H:%M:%S'), message)
         else:
-            print message
+            print(message)
 
 
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
@@ -253,13 +254,13 @@ def main():
         if '_test' in parsed_args.test_target:
             all_test_targets = [parsed_args.test_target]
         else:
-            print ''
-            print '---------------------------------------------------------'
-            print 'WARNING : test_target flag should point to the test file.'
-            print '---------------------------------------------------------'
-            print ''
+            print('')
+            print('---------------------------------------------------------')
+            print('WARNING : test_target flag should point to the test file.')
+            print('---------------------------------------------------------')
+            print('')
             time.sleep(3)
-            print 'Redirecting to its corresponding test file...'
+            print('Redirecting to its corresponding test file...')
             all_test_targets = [parsed_args.test_target + '_test']
     else:
         include_load_tests = not parsed_args.exclude_load_tests
@@ -287,11 +288,11 @@ def main():
         if task.exception:
             log(str(task.exception))
 
-    print ''
-    print '+------------------+'
-    print '| SUMMARY OF TESTS |'
-    print '+------------------+'
-    print ''
+    print('')
+    print('+------------------+')
+    print('| SUMMARY OF TESTS |')
+    print('+------------------+')
+    print('')
 
     # Check we ran all tests as expected.
     total_count = 0
@@ -301,14 +302,14 @@ def main():
         spec = task_to_taskspec[task]
 
         if not task.finished:
-            print 'CANCELED  %s' % spec.test_target
+            print('CANCELED  %s' % spec.test_target)
             test_count = 0
         elif 'No tests were run' in str(task.exception):
-            print 'ERROR     %s: No tests found.' % spec.test_target
+            print('ERROR     %s: No tests found.' % spec.test_target)
             test_count = 0
         elif task.exception:
             exc_str = str(task.exception).decode(encoding='utf-8')
-            print exc_str[exc_str.find('='): exc_str.rfind('-')]
+            print(exc_str[exc_str.find('='): exc_str.rfind('-')])
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
@@ -321,19 +322,19 @@ def main():
                 failures = int(tests_failed_regex_match.group(3))
                 total_errors += errors
                 total_failures += failures
-                print 'FAILED    %s: %s errors, %s failures' % (
-                    spec.test_target, errors, failures)
+                print('FAILED    %s: %s errors, %s failures' % (
+                    spec.test_target, errors, failures))
             except AttributeError:
                 # There was an internal error, and the tests did not run (The
                 # error message did not match `tests_failed_regex_match`).
                 test_count = 0
                 total_errors += 1
-                print ''
-                print '------------------------------------------------------'
-                print '    WARNING: FAILED TO RUN %s' % spec.test_target
-                print ''
-                print '    This is most likely due to an import error.'
-                print '------------------------------------------------------'
+                print('')
+                print('------------------------------------------------------')
+                print('    WARNING: FAILED TO RUN %s' % spec.test_target)
+                print('')
+                print('    This is most likely due to an import error.')
+                print('------------------------------------------------------')
         else:
             try:
                 tests_run_regex_match = re.search(
@@ -349,18 +350,18 @@ def main():
 
         total_count += test_count
 
-    print ''
+    print('')
     if total_count == 0:
         raise Exception('WARNING: No tests were run.')
     else:
-        print 'Ran %s test%s in %s test class%s.' % (
+        print('Ran %s test%s in %s test class%s.' % (
             total_count, '' if total_count == 1 else 's',
-            len(tasks), '' if len(tasks) == 1 else 'es')
+            len(tasks), '' if len(tasks) == 1 else 'es'))
 
         if total_errors or total_failures:
-            print '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures)
+            print('(%s ERRORS, %s FAILURES)' % (total_errors, total_failures))
         else:
-            print 'All tests passed.'
+            print('All tests passed.')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')

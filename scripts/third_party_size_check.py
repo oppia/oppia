@@ -18,6 +18,7 @@
 size limit is exceeded. The aim of this is to prevent us accidentally
 breaching the 10k file limit on App Engine.
 """
+from __future__ import print_function
 
 import os
 import sys
@@ -38,7 +39,7 @@ def _get_skip_files_list():
         try:
             app_yaml_dict = yaml.safe_load(app_yaml)
         except yaml.YAMLError as yaml_exception:
-            print yaml_exception
+            print(yaml_exception)
         skip_files_list = app_yaml_dict.get('skip_files')
 
         skip_files_list = [os.getcwd() + '/' + skip_files_dir
@@ -77,28 +78,28 @@ def _check_third_party_size():
     skip_files_list = _get_skip_files_list()
     number_of_files_in_third_party = _check_size_in_dir(
         THIRD_PARTY_PATH, skip_files_list)
-    print ''
-    print '------------------------------------------------------'
-    print '    Number of files in third-party folder: %d' % (
-        number_of_files_in_third_party)
-    print ''
+    print('')
+    print('------------------------------------------------------')
+    print('    Number of files in third-party folder: %d' % (
+        number_of_files_in_third_party))
+    print('')
     if number_of_files_in_third_party > THIRD_PARTY_SIZE_LIMIT:
         print(
             '    ERROR: The third-party folder size exceeded the %d files'
             ' limit.' % THIRD_PARTY_SIZE_LIMIT)
-        print '------------------------------------------------------'
-        print ''
+        print('------------------------------------------------------')
+        print('')
         sys.exit(1)
     else:
-        print '    The size of third-party folder is within the limits.'
-        print '------------------------------------------------------'
-        print ''
-        print 'Done!'
-        print ''
+        print('    The size of third-party folder is within the limits.')
+        print('------------------------------------------------------')
+        print('')
+        print('Done!')
+        print('')
 
 
 if __name__ == '__main__':
-    print 'Running third-party size check'
+    print('Running third-party size check')
     _check_third_party_size()
-    print 'Third-party folder size check passed.'
-    print ''
+    print('Third-party folder size check passed.')
+    print('')

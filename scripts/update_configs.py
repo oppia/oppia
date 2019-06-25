@@ -20,6 +20,7 @@ Usage: Run this script from your oppia root folder:
 
     python scripts/update_configs.py
 """
+from __future__ import print_function
 
 import os
 import re
@@ -96,7 +97,7 @@ def _update_configs():
     _apply_changes_based_on_config(
         LOCAL_CONSTANTS_PATH, CONSTANTS_CONFIG_PATH, '^(  "[A-Z_]+": ).*$')
 
-    print 'Done! Please check manually to ensure all the changes are correct.'
+    print('Done! Please check manually to ensure all the changes are correct.')
 
 
 if __name__ == '__main__':

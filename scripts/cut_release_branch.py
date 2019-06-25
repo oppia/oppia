@@ -22,6 +22,7 @@ Usage: Run this script from your oppia root folder:
 
 where x.y.z is the new version of Oppia, e.g. 2.5.3.
 """
+from __future__ import print_function
 
 import argparse
 import json
@@ -174,18 +175,18 @@ def _execute_branch_cut():
             sys.exit()
 
     # Cut a new release branch.
-    print 'Cutting a new release branch: %s' % NEW_BRANCH_NAME
+    print('Cutting a new release branch: %s' % NEW_BRANCH_NAME)
     subprocess.call(['git', 'checkout', '-b', NEW_BRANCH_NAME])
 
     # Push the new release branch to GitHub.
-    print 'Pushing new release branch to GitHub.'
+    print('Pushing new release branch to GitHub.')
     subprocess.call(['git', 'push', remote_alias, NEW_BRANCH_NAME])
 
-    print ''
+    print('')
     print (
         'New release branch successfully cut. You are now on branch %s' %
         NEW_BRANCH_NAME)
-    print 'Done!'
+    print('Done!')
 
 
 if __name__ == '__main__':

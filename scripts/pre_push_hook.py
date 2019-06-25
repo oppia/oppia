@@ -26,6 +26,7 @@ This hook works only on Unix like systems as of now.
 On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
+from __future__ import print_function
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
@@ -236,11 +237,11 @@ def _collect_files_being_pushed(ref_list, remote):
 
     for branch, (modified_files, files_to_lint) in collected_files.iteritems():
         if modified_files:
-            print '\nModified files in %s:' % branch
+            print('\nModified files in %s:' % branch)
             pprint.pprint(modified_files)
-            print '\nFiles to lint in %s:' % branch
+            print('\nFiles to lint in %s:' % branch)
             pprint.pprint(files_to_lint)
-            print '\n'
+            print('\n')
     return collected_files
 
 
@@ -249,7 +250,7 @@ def _get_refs():
     # Git provides refs in STDIN.
     ref_list = [GitRef(*ref_str.split()) for ref_str in sys.stdin]
     if ref_list:
-        print 'ref_list:'
+        print('ref_list:')
         pprint.pprint(ref_list)
     return ref_list
 
@@ -284,15 +285,15 @@ def _install_hook():
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_push_file = os.path.join(hooks_dir, 'pre-push')
     if os.path.islink(pre_push_file):
-        print 'Symlink already exists'
+        print('Symlink already exists')
         return
     try:
         os.symlink(os.path.abspath(__file__), pre_push_file)
-        print 'Created symlink in .git/hooks directory'
+        print('Created symlink in .git/hooks directory')
     # Raises AttributeError on windows, OSError added as failsafe.
     except (OSError, AttributeError):
         shutil.copy(__file__, pre_push_file)
-        print 'Copied file to .git/hooks directory'
+        print('Copied file to .git/hooks directory')
 
 
 def does_diff_include_js_or_ts_files(files_to_lint):
@@ -342,13 +343,13 @@ def main():
             if files_to_lint:
                 lint_status = _start_linter(files_to_lint)
                 if lint_status != 0:
-                    print 'Push failed, please correct the linting issues above'
+                    print('Push failed, please correct the linting issues above')
                     sys.exit(1)
             frontend_status = 0
             if does_diff_include_js_or_ts_files(files_to_lint):
                 frontend_status = _start_sh_script(FRONTEND_TEST_SCRIPT)
             if frontend_status != 0:
-                print 'Push aborted due to failing frontend tests.'
+                print('Push aborted due to failing frontend tests.')
                 sys.exit(1)
     sys.exit(0)
 
