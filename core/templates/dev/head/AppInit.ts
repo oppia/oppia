@@ -25,6 +25,8 @@ import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
 
+import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule
@@ -33,7 +35,8 @@ import { ServicesConstants } from 'services/services.constants.ts';
     AppConstants,
     CreatorDashboardConstants,
     ExplorationPlayerConstants,
-    ServicesConstants
+    ServicesConstants,
+    ClassifiersExtensionConstants
   ]
 })
 class MainAngularModule {

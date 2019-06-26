@@ -33,7 +33,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-fdescribe('Issues visualization', function() {
+describe('Issues visualization', function() {
   var EXPLORATION_TITLE = 'Welcome to Oppia!';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
@@ -132,7 +132,7 @@ fdescribe('Issues visualization', function() {
       });
   });
 
-  fit('records early quit issue.', function() {
+  it('records early quit issue.', function() {
     users.login('user2@ExplorationIssues.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);

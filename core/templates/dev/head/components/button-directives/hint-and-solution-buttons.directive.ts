@@ -29,8 +29,6 @@ require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/DeviceInfoService.ts');
 
-require('app.constants.ajs.ts');
-
 var oppia = require('AppInit.ts').moduleName;
 
 oppia.directive('hintAndSolutionButtons', [
@@ -124,11 +122,13 @@ oppia.directive('hintAndSolutionButtons', [
           };
 
           $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
-            ctrl.displayedCard = newCard;
-            HintsAndSolutionManagerService.reset(
-              newCard.getHints(), newCard.getSolution()
-            );
-            resetLocalHintsArray();
+            if (newCard) {
+              ctrl.displayedCard = newCard;
+              HintsAndSolutionManagerService.reset(
+                newCard.getHints(), newCard.getSolution()
+              );
+              resetLocalHintsArray();
+            }
           });
 
           ctrl.isTooltipVisible = function() {

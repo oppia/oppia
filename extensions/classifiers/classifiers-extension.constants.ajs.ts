@@ -16,17 +16,10 @@
  * @fileoverview Constants for classfiers extensions.
  */
 
-export class ClassifiersExtensionConstants {
-  public static PythonProgramTokenType = {
-    COMMENT: 'COMMENT',
-    NL: 'NL',
-    STRING: 'STRING',
-    INDENT: 'INDENT',
-    DEDENT: 'DEDENT',
-    ENDMARKER: 'ENDMARKER',
-    NUMBER: 'NUMBER',
-    NAME: 'NAME',
-    OP: 'OP',
-    ERRORTOKEN: 'ERRORTOKEN'
-  };
-}
+import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
+
+var oppia = require('AppInit.ts').moduleName;
+
+oppia.constant(
+  'PythonProgramTokenType',
+  ClassifiersExtensionConstants.PythonProgramTokenType);
