@@ -49,8 +49,7 @@ oppia.factory('ImageAssetsObjectFactory', [
       var imageMapping = {};
       for (var imageId in imageAssetsDict.image_mapping) {
         var imageDict = imageAssetsDict.image_mapping[imageId];
-        var imageObject = (ImageObjectFactory.
-          createFromBackendDict(imageDict));
+        var imageObject = ImageObjectFactory.createFromBackendDict(imageDict);
         imageMapping[imageId] = imageObject;
       }
       return new ImageAssets(imageMapping);

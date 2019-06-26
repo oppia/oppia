@@ -27,8 +27,8 @@ oppia.factory('ExplorationImageCounterService', [
             imageCounter = value;
         },
         getImageId: function() {
-            var imageId = 'image_id_' + imageCounter;
             imageCounter += 1
+            var imageId = 'image_id_' + imageCounter;
             return imageId;
         }
     }

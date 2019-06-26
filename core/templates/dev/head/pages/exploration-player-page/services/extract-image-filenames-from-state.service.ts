@@ -112,10 +112,10 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     };
 
     /**
-     * Extracts the filepath object from the filepath-value attribute of the
+     * Extracts the image id from the id-value attribute of the
      * oppia-noninteractive-image tags in the strHtml(given string).
      * @param {string} strHtml - The string from which the object of
-     *                           filepath should be extracted.
+     *                           image id should be extracted.
      */
     var _extractImageIdValueFromOppiaNonInteractiveImageTag = function(
         strHtml) {
@@ -127,10 +127,10 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       var imageTagList = dummyElement.getElementsByTagName(
         'oppia-noninteractive-image');
       for (var i = 0; i < imageTagList.length; i++) {
-        // We have the attribute of filepath in oppia-noninteractive-image tag.
-        // But it actually contains the filename only. We use the variable
-        // filename instead of filepath since in the end we are retrieving the
-        // filenames in the exploration.
+        // We have the attribute of id in oppia-noninteractive-image tag.
+        // But it actually contains the id only. We use the variable
+        // id instead of id since in the end we are retrieving the
+        // id in the exploration.
         var imageId = JSON.parse(
           imageTagList[i].getAttribute('id-with-value'));
         imageIds.push(imageId);

@@ -40,7 +40,7 @@ oppia.factory('ExplorationObjectFactory', [
       this.states = states;
       this.title = title;
       this.languageCode = languageCode;
-      this.image_counter = imageCounter;
+      this.imageCounter = imageCounter;
     };
 
     // Instance methods
@@ -167,14 +167,6 @@ oppia.factory('ExplorationObjectFactory', [
 
     Exploration.prototype.getAllVoiceoverLanguageCodes = function() {
       return this.states.getAllVoiceoverLanguageCodes();
-    };
-
-    Exploration.prototype.getImageCounter = function() {
-      return this.imageCounter;
-    };
-
-    Exploration.prototype.updateImageCounter = function(imageCounter) {
-      this.imageCounter = imageCounter;
     };
 
     // Static class methods. Note that "this" is not available in

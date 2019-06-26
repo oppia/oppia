@@ -215,6 +215,9 @@ require(
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
+  'exploration-image-counter.service.ts');
+require(
+  'pages/exploration-editor-page/services/' +
   'exploration-init-state-name.service.ts');
 require(
   'pages/exploration-editor-page/services/' +
@@ -226,9 +229,6 @@ require(
   'exploration-param-changes.service.ts');
 require(
   'pages/exploration-editor-page/services/exploration-param-specs.service.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-image-counter.' +
-  'service.ts');
 require('pages/exploration-editor-page/services/exploration-rights.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/exploration-tags.service.ts');

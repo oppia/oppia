@@ -530,7 +530,7 @@ oppia.factory('ExplorationStatesService', [
       },
       registerOnStateInteractionSavedCallback: function(callback) {
         stateInteractionSavedCallbacks.push(callback);
-      },
+      }
     };
   }
 ]);
