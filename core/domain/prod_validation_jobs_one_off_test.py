@@ -10440,6 +10440,17 @@ class UserStatsModelValidatorTests(test_utils.GenericTestBase):
         run_job_and_check_output(self, expected_output)
 
     def test_model_with_last_updated_greater_than_current_time(self):
+        time_str = (
+            datetime.datetime.utcnow() - datetime.timedelta(days=1)).strftime(
+                feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+        self.model_instance.weekly_creator_stats_list = [{
+            time_str: {
+                'num_ratings': 5,
+                'average_ratings': 4,
+                'total_plays': 5
+            }
+        }]
+        self.model_instance.put()
         expected_output = [(
             u'[u\'failed validation check for current time check of '
             'UserStatsModel\', '

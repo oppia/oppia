@@ -3777,7 +3777,6 @@ MODEL_TO_VALIDATOR_MAPPING = {
         QuestionCommitLogEntryModelValidator),
     question_models.QuestionSummaryModel: QuestionSummaryModelValidator,
     recommendations_models.ExplorationRecommendationsModel: (
-    recommendations_models.ExplorationRecommendationsModel: (
         ExplorationRecommendationsModelValidator),
     recommendations_models.TopicSimilaritiesModel: (
         TopicSimilaritiesModelValidator),
