@@ -28,10 +28,17 @@ oppia.factory('CsrfTokenService', [function() {
           resolve(token);
         } else {
           // Fetch token if it is't already available.
-          fetch('/csrfhandler').then(function(response) {
-            return response.text();
-          }).then(function(response) {
-            resolve(JSON.parse(response.substring(5)).token);
+          $.ajax({
+            url: '/csrfhandler',
+            type: 'GET',
+            dataType: 'text',
+            dataFilter: function(data) {
+              // Remove the XSSI prefix.
+              var transformedData = data.substring(5);
+              return JSON.parse(transformedData);
+            },
+          }).done(function(response) {
+            resolve(response.token);
           });
         }
       });
