@@ -59,19 +59,6 @@ module.exports = function(config) {
       'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
-      // TODO(vojtechjelinek): add these back after the templateCache
-      // is repaired (#6960)
-      'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
-      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
-       'services/solution-verification.service.spec.ts'),
-      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
-       'state-name-editor/state-name-editor.directive.spec.ts'),
-      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
-       'state-content-editor.directive.spec.ts'),
-      ('core/templates/dev/head/components/state-editor/' +
-       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
-      ('extensions/interactions/MusicNotesInput/directives/' +
-       'MusicNotesInputSpec.ts')
     ],
     proxies: {
       // Karma serves files under the /base directory.
