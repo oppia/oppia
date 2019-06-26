@@ -155,32 +155,33 @@ oppia.factory('AssetsBackendApiService', [
       form.append('payload', JSON.stringify({
         filename: filename
       }));
-      form.append('csrf_token', CsrfTokenService.getToken());
-
-      $.ajax({
-        url: _getAudioUploadUrl(explorationId),
-        data: form,
-        processData: false,
-        contentType: false,
-        type: 'POST',
-        dataType: 'text',
-        dataFilter: function(data) {
+      CsrfTokenService.getToken().then(function(token) {
+        form.append('csrf_token', token);
+        $.ajax({
+          url: _getAudioUploadUrl(explorationId),
+          data: form,
+          processData: false,
+          contentType: false,
+          type: 'POST',
+          dataType: 'text',
+          dataFilter: function(data) {
+            // Remove the XSSI prefix.
+            var transformedData = data.substring(5);
+            return JSON.parse(transformedData);
+          },
+        }).done(function(response) {
+          if (successCallback) {
+            successCallback(response);
+          }
+        }).fail(function(data) {
           // Remove the XSSI prefix.
-          var transformedData = data.substring(5);
-          return JSON.parse(transformedData);
-        },
-      }).done(function(response) {
-        if (successCallback) {
-          successCallback(response);
-        }
-      }).fail(function(data) {
-        // Remove the XSSI prefix.
-        var transformedData = data.responseText.substring(5);
-        var parsedResponse = angular.fromJson(transformedData);
-        console.error(parsedResponse);
-        if (errorCallback) {
-          errorCallback(parsedResponse);
-        }
+          var transformedData = data.responseText.substring(5);
+          var parsedResponse = angular.fromJson(transformedData);
+          console.error(parsedResponse);
+          if (errorCallback) {
+            errorCallback(parsedResponse);
+          }
+        });
       });
     };
 

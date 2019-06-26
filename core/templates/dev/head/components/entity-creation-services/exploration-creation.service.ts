@@ -101,32 +101,33 @@ oppia.factory('ExplorationCreationService', [
           var form = new FormData();
           form.append('yaml_file', yamlFile);
           form.append('payload', JSON.stringify({}));
-          form.append('csrf_token', CsrfTokenService.getToken());
-
-          $.ajax({
-            contentType: false,
-            data: form,
-            dataFilter: function(data) {
-              // Remove the XSSI prefix.
-              return JSON.parse(data.substring(5));
-            },
-            dataType: 'text',
-            processData: false,
-            type: 'POST',
-            url: 'contributehandler/upload'
-          }).done(function(data) {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
-                exploration_id: data.explorationId
-              }
-            );
-          }).fail(function(data) {
-            var transformedData = data.responseText.substring(5);
-            var parsedResponse = JSON.parse(transformedData);
-            AlertsService.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
-            $rootScope.loadingMessage = '';
-            $rootScope.$apply();
+          CsrfTokenService.getToken().then(function(token) {
+            form.append('csrf_token', token);
+            $.ajax({
+              contentType: false,
+              data: form,
+              dataFilter: function(data) {
+                // Remove the XSSI prefix.
+                return JSON.parse(data.substring(5));
+              },
+              dataType: 'text',
+              processData: false,
+              type: 'POST',
+              url: 'contributehandler/upload'
+            }).done(function(data) {
+              $window.location = UrlInterpolationService.interpolateUrl(
+                CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+                  exploration_id: data.explorationId
+                }
+              );
+            }).fail(function(data) {
+              var transformedData = data.responseText.substring(5);
+              var parsedResponse = JSON.parse(transformedData);
+              AlertsService.addWarning(
+                parsedResponse.error || 'Error communicating with server.');
+              $rootScope.loadingMessage = '';
+              $rootScope.$apply();
+            });
           });
         });
       }

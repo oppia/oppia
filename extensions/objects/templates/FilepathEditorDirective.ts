@@ -637,35 +637,36 @@ oppia.directive('filepathEditor', [
             filename: ctrl.generateImageFilename(
               dimensions.height, dimensions.width)
           }));
-          form.append('csrf_token', CsrfTokenService.getToken());
-
-          $.ajax({
-            url: '/createhandler/imageupload/' + ctrl.explorationId,
-            data: form,
-            processData: false,
-            contentType: false,
-            type: 'POST',
-            dataFilter: function(data) {
+          CsrfTokenService.getToken().then(function(token) {
+            form.append('csrf_token', token);
+            $.ajax({
+              url: '/createhandler/imageupload/' + ctrl.explorationId,
+              data: form,
+              processData: false,
+              contentType: false,
+              type: 'POST',
+              dataFilter: function(data) {
+                // Remove the XSSI prefix.
+                var transformedData = data.substring(5);
+                return JSON.parse(transformedData);
+              },
+              dataType: 'text'
+            }).done(function(data) {
+              // Pre-load image before marking the image as saved.
+              var img = new Image();
+              img.onload = function() {
+                ctrl.setSavedImageFilename(data.filename, true);
+                $scope.$apply();
+              };
+              img.src = getTrustedResourceUrlForImageFileName(data.filename);
+            }).fail(function(data) {
               // Remove the XSSI prefix.
-              var transformedData = data.substring(5);
-              return JSON.parse(transformedData);
-            },
-            dataType: 'text'
-          }).done(function(data) {
-            // Pre-load image before marking the image as saved.
-            var img = new Image();
-            img.onload = function() {
-              ctrl.setSavedImageFilename(data.filename, true);
+              var transformedData = data.responseText.substring(5);
+              var parsedResponse = JSON.parse(transformedData);
+              AlertsService.addWarning(
+                parsedResponse.error || 'Error communicating with server.');
               $scope.$apply();
-            };
-            img.src = getTrustedResourceUrlForImageFileName(data.filename);
-          }).fail(function(data) {
-            // Remove the XSSI prefix.
-            var transformedData = data.responseText.substring(5);
-            var parsedResponse = JSON.parse(transformedData);
-            AlertsService.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
-            $scope.$apply();
+            });
           });
         };
 

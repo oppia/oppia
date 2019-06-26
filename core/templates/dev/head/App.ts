@@ -106,11 +106,15 @@ oppia.config([
     $httpProvider.interceptors.push([
       '$q', '$log', 'AlertsService', 'CsrfTokenService',
       function($q, $log, AlertsService, CsrfTokenService) {
+        var csrfToken;
+        CsrfTokenService.getToken().then(function(token) {
+          csrfToken = token;
+        });
         return {
           request: function(config) {
             if (config.data) {
               config.data = $.param({
-                csrf_token: CsrfTokenService.getToken(),
+                csrf_token: csrfToken,
                 payload: JSON.stringify(config.data),
                 source: document.URL
               }, true);
@@ -204,22 +208,24 @@ oppia.factory('$exceptionHandler', ['$log', 'CsrfTokenService',
         try {
           // We use jQuery here instead of Angular's $http, since the latter
           // creates a circular dependency.
-          $.ajax({
-            type: 'POST',
-            url: '/frontend_errors',
-            data: $.param({
-              csrf_token: CsrfTokenService.getToken(),
-              payload: JSON.stringify({
-                error: messageAndSourceAndStackTrace
-              }),
-              source: document.URL
-            }, true),
-            contentType: 'application/x-www-form-urlencoded',
-            dataType: 'text',
-            async: true
-          });
+          CsrfTokenService.getToken().then(function(token) {
+            $.ajax({
+              type: 'POST',
+              url: '/frontend_errors',
+              data: $.param({
+                csrf_token: token,
+                payload: JSON.stringify({
+                  error: messageAndSourceAndStackTrace
+                }),
+                source: document.URL
+              }, true),
+              contentType: 'application/x-www-form-urlencoded',
+              dataType: 'text',
+              async: true
+            });
 
-          timeOfLastPostedError = Date.now();
+            timeOfLastPostedError = Date.now();
+          });
         } catch (loggingError) {
           $log.warn('Error logging failed.');
         }

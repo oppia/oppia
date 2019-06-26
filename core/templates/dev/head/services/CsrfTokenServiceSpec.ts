@@ -29,7 +29,8 @@ describe('Csrf Token Service', function() {
 
   it('should correctly set the csrf token', function() {
     CsrfTokenService.setToken('sample csrf token');
-
-    expect(CsrfTokenService.getToken()).toBe('sample csrf token');
+    CsrfTokenService.getToken().then(function(token) {
+      expect(token).toBe('sample csrf token');
+    });
   });
 });
