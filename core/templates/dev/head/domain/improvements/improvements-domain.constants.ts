@@ -16,4 +16,4 @@
  * @fileoverview Constants for the statistics domain.
  */
 
-oppia.constant('LEARNER_ACTION_SCHEMA_LATEST_VERSION', 1);
+oppia.constant('PLAYTHROUGH_IMPROVEMENT_CARD_TYPE', 'playthrough');

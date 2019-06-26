@@ -17,11 +17,11 @@
  */
 
 
-require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+require('domain/improvements/ImprovementActionButtonObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-require('domain/statistics/statistics-domain.constants.ts');
+require('domain/improvements/improvements-domain.constants.ts');
 
 oppia.factory('PlaythroughImprovementCardObjectFactory', [
   '$uibModal', 'ImprovementActionButtonObjectFactory',

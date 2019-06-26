@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the ImprovementCardService.
  */
 
-require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
+require('domain/improvements/PlaythroughImprovementCardObjectFactory.ts');
 require('services/ImprovementCardService.ts');
 
 describe('ImprovementCardService', function() {

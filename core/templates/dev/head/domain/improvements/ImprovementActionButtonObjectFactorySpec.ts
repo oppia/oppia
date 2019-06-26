@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for the ImprovementActionButtonObjectFactory.
  */
 
-require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
+require('domain/improvements/ImprovementActionButtonObjectFactory.ts');
 
 describe('ImprovementActionButtonObjectFactory', function() {
   beforeEach(angular.mock.module('oppia'));
