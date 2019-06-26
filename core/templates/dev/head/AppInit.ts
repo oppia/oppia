@@ -20,9 +20,14 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { StaticProvider } from '@angular/core';
 
+import { AppConstants } from 'app.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule
+  ],
+  providers: [
+    AppConstants
   ]
 })
 class MainAngularModule {
