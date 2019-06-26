@@ -60,10 +60,10 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
           $http.get(reviewTestsDataUrl).then(function(result) {
             var skillIdList = [];
             var skillDescriptions = [];
-            for (var skillId in result.data.skills_with_description) {
+            for (var skillId in result.data.skill_descriptions) {
               skillIdList.push(skillId);
               skillDescriptions.push(
-                result.data.skills_with_description[skillId]);
+                result.data.skill_descriptions[skillId]);
             }
             var questionPlayerConfig = {
               skillList: skillIdList,
