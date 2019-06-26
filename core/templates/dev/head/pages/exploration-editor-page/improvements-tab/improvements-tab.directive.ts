@@ -23,7 +23,9 @@ require(
 );
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/ImprovementCardService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-cards.service.ts');
 
 oppia.directive('improvementsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {

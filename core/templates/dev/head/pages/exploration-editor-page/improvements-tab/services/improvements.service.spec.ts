@@ -16,7 +16,9 @@
  * @fileoverview Unit tests for improvements service.
  */
 
-require('services/ImprovementsService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvements.service.ts');
 
 describe('ImprovementsService', function() {
   beforeEach(angular.mock.module('oppia'));

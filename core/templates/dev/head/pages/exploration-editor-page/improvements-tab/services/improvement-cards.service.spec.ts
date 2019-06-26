@@ -17,7 +17,9 @@
  */
 
 require('domain/improvements/PlaythroughImprovementCardObjectFactory.ts');
-require('services/ImprovementCardService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvement-cards.service.ts');
 
 describe('ImprovementCardService', function() {
   beforeEach(angular.mock.module('oppia'));

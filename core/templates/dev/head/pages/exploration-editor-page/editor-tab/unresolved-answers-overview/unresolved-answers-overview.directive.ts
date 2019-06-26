@@ -26,7 +26,9 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 require('services/EditabilityService.ts');
-require('services/ImprovementsService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'improvements.service.ts');
 require('services/StateTopAnswersStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
