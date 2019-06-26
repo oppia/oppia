@@ -43,6 +43,8 @@ oppia.directive('adminJobsTab', [
           GLOBALS.CONTINUOUS_COMPUTATIONS_DATA);
         ctrl.ONE_OFF_JOB_SPECS = GLOBALS.ONE_OFF_JOB_SPECS;
         ctrl.UNFINISHED_JOB_DATA = GLOBALS.UNFINISHED_JOB_DATA;
+        ctrl.PROD_VALIDATION_ONE_OFF_JOB_SPECS = (
+          GLOBALS.PROD_VALIDATION_ONE_OFF_JOB_SPECS);
         ctrl.RECENT_JOB_DATA = GLOBALS.RECENT_JOB_DATA;
 
         ctrl.showingJobOutput = false;

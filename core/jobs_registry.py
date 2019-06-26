@@ -51,6 +51,31 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.InteractionCustomizationArgsValidationJob,
     exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob,
     exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob,
+    question_jobs_one_off.QuestionMigrationOneOffJob,
+    recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
+    skill_jobs_one_off.SkillMigrationOneOffJob,
+    stats_jobs_one_off.PlaythroughAudit,
+    stats_jobs_one_off.RecomputeStatisticsOneOffJob,
+    stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
+    stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob,
+    stats_jobs_one_off.StatisticsAuditV1,
+    stats_jobs_one_off.StatisticsAuditV2,
+    stats_jobs_one_off.StatisticsAudit,
+    story_jobs_one_off.StoryMigrationOneOffJob,
+    topic_jobs_one_off.TopicMigrationOneOffJob,
+    user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
+    user_jobs_one_off.DashboardSubscriptionsOneOffJob,
+    user_jobs_one_off.LongUserBiosOneOffJob,
+    user_jobs_one_off.UserContributionsOneOffJob,
+    user_jobs_one_off.UserFirstContributionMsecOneOffJob,
+    user_jobs_one_off.UserLastExplorationActivityOneOffJob,
+    user_jobs_one_off.UserProfilePictureOneOffJob,
+    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
+]
+
+# List of all manager classes for prod validation one-off batch jobs for which
+# to show controls on the admin dashboard.
+PROD_VALIDATION_ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
@@ -173,34 +198,13 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.UserQueryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserBulkEmailsModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserSkillMasteryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob,
-    question_jobs_one_off.QuestionMigrationOneOffJob,
-    recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
-    skill_jobs_one_off.SkillMigrationOneOffJob,
-    stats_jobs_one_off.PlaythroughAudit,
-    stats_jobs_one_off.RecomputeStatisticsOneOffJob,
-    stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
-    stats_jobs_one_off.RegenerateMissingStatsModelsOneOffJob,
-    stats_jobs_one_off.StatisticsAuditV1,
-    stats_jobs_one_off.StatisticsAuditV2,
-    stats_jobs_one_off.StatisticsAudit,
-    story_jobs_one_off.StoryMigrationOneOffJob,
-    topic_jobs_one_off.TopicMigrationOneOffJob,
-    user_jobs_one_off.CleanupActivityIdsFromUserSubscriptionsModelOneOffJob,
-    user_jobs_one_off.DashboardSubscriptionsOneOffJob,
-    user_jobs_one_off.LongUserBiosOneOffJob,
-    user_jobs_one_off.UserContributionsOneOffJob,
-    user_jobs_one_off.UserFirstContributionMsecOneOffJob,
-    user_jobs_one_off.UserLastExplorationActivityOneOffJob,
-    user_jobs_one_off.UserProfilePictureOneOffJob,
-    user_jobs_one_off.UsernameLengthDistributionOneOffJob,
+    prod_validation_jobs_one_off.UserContributionScoringModelAuditOneOffJob
 ]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
-# it should be registered here. This should also be updated in
-# prod_validation_jobs_one_off.ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES.
+# it should be registered here.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
     stats_jobs_continuous.InteractionAnswerSummariesAggregator,
