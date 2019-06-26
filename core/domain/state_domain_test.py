@@ -675,7 +675,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_solution(solution)
         with self.assertRaisesRegexp(
-            Exception, 'Expected answer_is_exclusive to be bool'):
+            Exception, 'Expected answer_is_exclusive to be bool, received 1'):
             exploration.validate()
 
     def test_validate_non_list_param_changes(self):
@@ -683,7 +683,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         exploration.init_state.param_changes = 0
 
         with self.assertRaisesRegexp(
-            Exception, 'Expected state param_changes to be a list'):
+            Exception, 'Expected state param_changes to be a list, received 0'):
             exploration.init_state.validate(None, True)
 
     def test_validate_duplicate_content_id_with_answer_groups(self):
@@ -710,9 +710,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'tagged_misconception_id': None
         }
 
-        exploration.init_state.interaction.answer_groups = [
-            state_domain.AnswerGroup.from_dict(answer_groups_dict)]
-        exploration.init_state.content.content_id = 'feedback_1'
+        exploration.init_state.update_interaction_answer_groups(
+            [answer_groups_dict])
+        exploration.init_state.update_content({
+            'content_id': 'feedback_1',
+            'html': 'Feedback'
+        })
 
         with self.assertRaisesRegexp(Exception, 'Found a duplicate content id'):
             exploration.init_state.validate(None, True)
@@ -732,19 +735,28 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.update_interaction_default_outcome(
             default_outcome_dict)
-        exploration.init_state.content.content_id = 'default_outcome'
+        exploration.init_state.update_content({
+            'content_id': 'default_outcome',
+            'html': ''
+        })
 
         with self.assertRaisesRegexp(Exception, 'Found a duplicate content id'):
             exploration.init_state.validate(None, True)
 
     def test_validate_duplicate_content_id_with_hints(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        subtitled_html = state_domain.SubtitledHtml('content_id', 'some html')
+        hints_list = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': 'some html'
+            }
+        }]
 
-        hints_list = [state_domain.Hint(subtitled_html)]
-
-        exploration.init_state.interaction.hints = hints_list
-        exploration.init_state.content.content_id = 'content_id'
+        exploration.init_state.update_interaction_hints(hints_list)
+        exploration.init_state.update_content({
+            'content_id': 'hint_1',
+            'html': ''
+        })
 
         with self.assertRaisesRegexp(Exception, 'Found a duplicate content id'):
             exploration.init_state.validate(None, True)
@@ -766,7 +778,10 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_solution(solution)
-        exploration.init_state.content.content_id = 'solution'
+        exploration.init_state.update_content({
+            'content_id': 'solution',
+            'html': ''
+        })
 
         with self.assertRaisesRegexp(Exception, 'Found a duplicate content id'):
             exploration.init_state.validate(None, True)
@@ -1362,6 +1377,16 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected content_id to be a string, '):
             written_translations.validate([123])
 
+    def test_validate_non_dict_language_code_to_written_translation(self):
+        written_translations = state_domain.WrittenTranslations({
+            'en': []
+        })
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape('Expected content_id value to be a dict, received []')):
+            written_translations.validate(None)
+
     def test_validation_with_invalid_type_langauge_code_raise_error(self):
         written_translations_dict = {
             'translations_mapping': {
@@ -1583,6 +1608,16 @@ class RecordedVoiceoversDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Expected content_id to be a string, '):
             recorded_voiceovers.validate([123])
 
+    def test_validate_non_dict_language_code_to_voiceover(self):
+        recorded_voiceovers = state_domain.RecordedVoiceovers({
+            'en': []
+        })
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape('Expected content_id value to be a dict, received []')):
+            recorded_voiceovers.validate(None)
+
     def test_validation_with_invalid_type_langauge_code_raise_error(self):
         recorded_voiceovers_dict = {
             'voiceovers_mapping': {
@@ -1651,20 +1686,22 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
     def setUp(self):
         super(VoiceoverDomainTests, self).setUp()
         self.voiceover = state_domain.Voiceover('filename.mp3', 10, False)
-        self.voiceover.validate()
 
     def test_validate_non_str_filename(self):
+        self.voiceover.validate()
         self.voiceover.filename = 0
         with self.assertRaisesRegexp(
             Exception, 'Expected audio filename to be a string'):
             self.voiceover.validate()
 
     def test_validate_filename(self):
+        self.voiceover.validate()
         self.voiceover.filename = 'invalid_filename'
         with self.assertRaisesRegexp(Exception, 'Invalid audio filename'):
             self.voiceover.validate()
 
     def test_validate_audio_extension(self):
+        self.voiceover.validate()
         self.voiceover.filename = 'filename.png'
         with self.assertRaisesRegexp(
             Exception,
@@ -1674,17 +1711,20 @@ class VoiceoverDomainTests(test_utils.GenericTestBase):
             self.voiceover.validate()
 
     def test_validate_non_int_file_size_bytes(self):
+        self.voiceover.validate()
         self.voiceover.file_size_bytes = 'file_size_bytes'
         with self.assertRaisesRegexp(
             Exception, 'Expected file size to be an int'):
             self.voiceover.validate()
 
     def test_validate_negative_file_size_bytes(self):
+        self.voiceover.validate()
         self.voiceover.file_size_bytes = -1
         with self.assertRaisesRegexp(Exception, 'Invalid file size'):
             self.voiceover.validate()
 
     def test_validate_non_bool_needs_update(self):
+        self.voiceover.validate()
         self.voiceover.needs_update = 'needs_update'
         with self.assertRaisesRegexp(
             Exception, 'Expected needs_update to be a bool'):

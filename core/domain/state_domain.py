@@ -940,6 +940,10 @@ class WrittenTranslations(object):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
+            if not isinstance(language_code_to_written_translation, dict):
+                raise utils.ValidationError(
+                    'Expected content_id value to be a dict, received %s'
+                    % language_code_to_written_translation)
             for (language_code, written_translation) in (
                     language_code_to_written_translation.iteritems()):
                 if not isinstance(language_code, basestring):
@@ -1083,6 +1087,10 @@ class RecordedVoiceovers(object):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received %s'
                     % content_id)
+            if not isinstance(language_code_to_voiceover, dict):
+                raise utils.ValidationError(
+                    'Expected content_id value to be a dict, received %s'
+                    % language_code_to_voiceover)
             for (language_code, voiceover) in (
                     language_code_to_voiceover.iteritems()):
                 if not isinstance(language_code, basestring):

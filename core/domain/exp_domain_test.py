@@ -538,7 +538,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.param_changes = [param_domain.ParamChange(
             0, 'generator_id', {})]
         self._assert_validation_error(
-            exploration, 'Expected param_change name to be a string')
+            exploration,
+            'Expected param_change name to be a string, received 0')
 
         outcome.param_changes = []
         exploration.validate()
@@ -635,16 +636,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.update_interaction_default_outcome(default_outcome.to_dict())
         exploration.validate()
 
-        interaction.solution = state_domain.Solution.from_dict(
-            interaction.id, {
-                'answer_is_exclusive': True,
-                'correct_answer': 'hello_world!',
-                'explanation': {
-                    'content_id': 'solution',
-                    'html': 'hello_world is a string'
+        init_state.update_interaction_solution({
+            'answer_is_exclusive': True,
+            'correct_answer': 'hello_world!',
+            'explanation': {
+                'content_id': 'solution',
+                'html': 'hello_world is a string'
                 }
-            }
-        )
+        })
         self._assert_validation_error(
             exploration,
             re.escape('Hint(s) must be specified if solution is specified'))
@@ -656,10 +655,33 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         interaction.hints = []
 
         # Validate AnswerGroup.
-        init_state.interaction.answer_groups[0].tagged_misconception_id = (
-            'invalid_tagged_misconception_id')
+        answer_groups_dict = {
+            'outcome': {
+                'dest': exploration.init_state_name,
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': 'Feedback'
+                },
+                'labelled_as_correct': False,
+                'param_changes': [],
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'rule_specs': [{
+                'inputs': {
+                    'x': 'Test'
+                },
+                'rule_type': 'Contains'
+            }],
+            'training_data': [],
+            'tagged_misconception_id': 'invalid_tagged_misconception_id'
+        }
+        init_state.update_interaction_answer_groups([answer_groups_dict])
+
         self._assert_validation_error(
-            exploration, 'Expected tagged misconception id to be an int')
+            exploration,
+            'Expected tagged misconception id to be an int, received '
+            'invalid_tagged_misconception_id')
 
         init_state.interaction.answer_groups[0].rule_specs = {}
         self._assert_validation_error(
