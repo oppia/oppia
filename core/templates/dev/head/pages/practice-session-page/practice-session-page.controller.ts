@@ -28,7 +28,6 @@ require('objects/objectComponentsRequiresForPlayers.ts');
 
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
-
 require('pages/practice-session-page/practice-session-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
@@ -44,17 +43,29 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
     controller: [
       '$http', '$rootScope', 'AlertsService',
       'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL', 'TOTAL_QUESTIONS',
+      'FATAL_ERROR_CODES', 'PRACTICE_SESSIONS_DATA_URL',
+      'PRACTICE_SESSIONS_URL',
+      'TOPIC_VIEWER_PAGE', 'TOTAL_QUESTIONS',
       function(
           $http, $rootScope, AlertsService,
           UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL, TOTAL_QUESTIONS
+          FATAL_ERROR_CODES, PRACTICE_SESSIONS_DATA_URL,
+          PRACTICE_SESSIONS_URL,
+          TOPIC_VIEWER_PAGE, TOTAL_QUESTIONS
       ) {
         var ctrl = this;
         ctrl.topicName = UrlService.getTopicNameFromLearnerUrl();
         var _fetchSkillDetails = function() {
           var practiceSessionsDataUrl = UrlInterpolationService.interpolateUrl(
             PRACTICE_SESSIONS_DATA_URL, {
+              topic_name: ctrl.topicName
+            });
+          var practiceSessionsUrl = UrlInterpolationService.interpolateUrl(
+            PRACTICE_SESSIONS_URL, {
+              topic_name: ctrl.topicName
+            });
+          var topicViewerUrl = UrlInterpolationService.interpolateUrl(
+            TOPIC_VIEWER_PAGE, {
               topic_name: ctrl.topicName
             });
           $http.get(practiceSessionsDataUrl).then(function(result) {
@@ -66,6 +77,22 @@ oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
                 result.data.skills_with_description[skillId]);
             }
             var questionPlayerConfig = {
+              resultActionButtons: [
+                {
+                  type: 'BOOST_SCORE',
+                  text: 'Boost My Score'
+                },
+                {
+                  type: 'RETRY_SESSION',
+                  text: 'New Session',
+                  url: practiceSessionsUrl
+                },
+                {
+                  type: 'DASHBOARD',
+                  text: 'My Dashboard',
+                  url: topicViewerUrl
+                }
+              ],
               skillList: skillList,
               skillDescriptions: skillDescriptions,
               questionCount: TOTAL_QUESTIONS
