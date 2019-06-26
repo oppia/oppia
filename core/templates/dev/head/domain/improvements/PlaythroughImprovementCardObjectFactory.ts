@@ -18,7 +18,9 @@
 
 require('domain/improvements/ImprovementActionButtonObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/PlaythroughIssuesService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'playthrough-issues.service.ts');
 
 require('domain/improvements/improvements-domain.constants.ts');
 

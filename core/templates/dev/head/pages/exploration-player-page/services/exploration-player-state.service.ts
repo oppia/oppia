@@ -21,6 +21,9 @@ require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/question/QuestionPlayerBackendApiService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'playthrough-issues.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -33,7 +36,6 @@ require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/ContextService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
 require('services/ExplorationFeaturesService.ts');
-require('services/PlaythroughIssuesService.ts');
 require('services/PlaythroughRecordingService.ts');
 require('services/contextual/UrlService.ts');
 

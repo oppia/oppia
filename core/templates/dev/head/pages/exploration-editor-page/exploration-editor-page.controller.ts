@@ -244,6 +244,9 @@ require(
 require(
   'pages/exploration-editor-page/feedback-tab/services/thread-data.service.ts');
 require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'playthrough-issues.service.ts');
+require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/ContextService.ts');
@@ -251,7 +254,6 @@ require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/PageTitleService.ts');
-require('services/PlaythroughIssuesService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/StateTopAnswersStatsBackendApiService.ts');
 require('services/StateTopAnswersStatsService.ts');

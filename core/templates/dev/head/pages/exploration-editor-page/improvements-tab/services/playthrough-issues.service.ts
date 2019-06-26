@@ -18,11 +18,11 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/services/' +
-  'learner-action-render.service.ts');
-require(
   'pages/exploration-editor-page/improvements-tab/services/' +
   'playthrough-issues-backend-api.service.ts');
+require(
+  'pages/exploration-editor-page/statistics-tab/services/' +
+  'learner-action-render.service.ts');
 
 oppia.factory('PlaythroughIssuesService', [
   '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',

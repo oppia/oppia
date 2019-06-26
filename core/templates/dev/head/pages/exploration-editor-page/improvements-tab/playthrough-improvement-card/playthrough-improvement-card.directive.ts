@@ -17,7 +17,9 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/PlaythroughIssuesService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'playthrough-issues.service.ts');
 
 oppia.directive('playthroughImprovementCard', [
   'UrlInterpolationService', function(UrlInterpolationService) {

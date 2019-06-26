@@ -17,6 +17,9 @@
  */
 
 require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'playthrough-issues.service.ts');
+require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'early-quit-issue.directive.ts');
 require(
@@ -27,7 +30,6 @@ require(
   'cyclic-transitions-issue.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-require('services/PlaythroughIssuesService.ts');
 
 oppia.directive('playthroughIssues', [
   'UrlInterpolationService', function(UrlInterpolationService) {

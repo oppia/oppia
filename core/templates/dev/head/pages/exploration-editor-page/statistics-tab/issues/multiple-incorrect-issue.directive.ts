@@ -17,8 +17,10 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require(
+  'pages/exploration-editor-page/improvements-tab/services/' +
+  'playthrough-issues.service.ts');
 require('services/AlertsService.ts');
-require('services/PlaythroughIssuesService.ts');
 
 oppia.directive('multipleIncorrectIssue', [
   'UrlInterpolationService', function(UrlInterpolationService) {
