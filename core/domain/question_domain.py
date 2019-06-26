@@ -392,7 +392,7 @@ class Question(object):
             question_state_domain_object: object. A State domain object representing the question
                 state data.
         """
-        self.question_state_data = question_state_domain_object
+        self.question_state_data = (question_state_domain_object)
 
 
 class QuestionSummary(object):
