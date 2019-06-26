@@ -814,7 +814,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<li>This is Some <p>Test<li> ABC</li>Content</p></li>'
             ),
             'expected_output': (
-                'This is Some Test<ul><li> ABC</li></ul>Content'
+                '<p>This is Some </p><p>Test</p><ul><li> ABC</li></ul><p>'
+                'Content</p>'
             )
         }, {
             'html_content': (
@@ -1044,6 +1045,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'caption-with-value="&amp;quot;Hello&amp;quot;" '
             'filepath-with-value="&amp;quot;46503*.jpg&amp;quot;">'
             '</oppia-noninteractive-image>'
+        ), (
+            '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;quot;'
+            'title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,&amp;quot;'
+            'content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;lt;'
+            'oppia-noninteractive-link url-with-value=\\&amp;quot;&amp;amp;amp;'
+            'quot;https://www.oppia.org&amp;amp;amp;quot;\\&amp;quot;&amp;gt;'
+            '&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;&amp;'
+            'quot;}]"></oppia-noninteractive-tabs>'
         )]
 
         actual_output = html_validation_service.validate_customization_args(
@@ -1119,6 +1128,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '/oppia-noninteractive-link&amp;gt;&amp;lt;/p&amp;gt;&amp;'
                 'quot;" heading-with-value="&amp;quot;Hello&amp;quot;">'
                 '</oppia-noninteractive-collapsible>'
+            ), (
+                '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
+                'quot;title&amp;quot;:&amp;quot;Hint introduction&amp;quot;,'
+                '&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;&amp;'
+                'lt;oppia-noninteractive-link url-with-value=\\&amp;quot;&amp;'
+                'amp;amp;quot;https://www.oppia.org&amp;amp;amp;quot;\\&amp;'
+                'quot;&amp;gt;&amp;lt;/oppia-noninteractive-link&amp;gt;&amp;'
+                'lt;/p&amp;gt;&amp;quot;}]"></oppia-noninteractive-tabs>'
             )],
             'Expected bool, received hello': [(
                 '<oppia-noninteractive-video autoplay-with-value="&amp;quot;'
@@ -1358,7 +1375,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem('exploration/%s' % exp_id))
+            fs_domain.DatastoreBackedFileSystem(
+                fs_domain.ENTITY_TYPE_EXPLORATION, exp_id))
         fs.commit(owner_id, 'image/abc1.png', raw_image, mimetype='image/png')
 
         with assert_raises_context_manager, logging_swap:

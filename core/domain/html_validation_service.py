@@ -756,7 +756,8 @@ def _validate_customization_args_in_tag(tag):
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html, 'html.parser')
                 for component_name in simple_component_tag_names:
-                    for component_tag in soup_for_tabs.findAll(name=tag_name):
+                    for component_tag in soup_for_tabs.findAll(
+                            name=component_name):
                         for err_msg in _validate_customization_args_in_tag(
                                 component_tag):
                             yield err_msg
