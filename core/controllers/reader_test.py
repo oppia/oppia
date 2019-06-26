@@ -1883,3 +1883,50 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
             'This is an answer.'
         )
         self.logout()
+
+
+class LearnerAnswerInfoHandlerTests(test_utils.GenericTestBase):
+    """Tests for learner answer info handler tests."""
+
+    def test_submit_learner_answer_details(self):
+        exp_id = '6'
+        exp_services.delete_demo(exp_id)
+        exp_services.load_demo(exp_id)
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+        self.login(self.VIEWER_EMAIL)
+
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        state_name = exploration_dict['exploration']['init_state_name']
+        interaction_id = exploration_dict['exploration'][
+            'states'][state_name]['interaction']['id']
+        state_reference = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) #pylint: disable=line-too-long
+
+        self.assertEqual(state_name, 'Sentence')
+        self.assertEqual(interaction_id, 'TextInput')
+        self.post_json(
+            '/explorehandler/learner_answer_details/%s' % exp_id,
+            {
+                'state_name': state_name,
+                'interaction_id': interaction_id,
+                'answer': 'This is an answer.',
+                'answer_details': 'This is an answer details.',
+            }
+        )
+
+        learner_answer_details = stats_services.get_learner_answer_details(
+            entity_type, state_reference)
+        self.assertEqual(
+            learner_answer_details.state_reference, state_reference)
+        self.assertEqual(learner_answer_details.interaction_id, interaction_id)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_list[0].answer,
+            'This is an answer.')
+        self.assertEqual(
+            learner_answer_details.learner_answer_info_list[0].answer_details,
+            'This is an answer details.')

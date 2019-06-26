@@ -1040,3 +1040,24 @@ class QuestionPlayerHandler(base.BaseHandler):
             'question_dicts': question_dicts
         })
         self.render_json(self.values)
+
+
+class LearnerAnswerInfoHandler(base.BaseHandler):
+    """Handles the learner answer details submission."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+
+        state_name = self.payload.get('state_name')
+        interaction_id = self.payload.get('interaction_id')
+        answer = self.payload.get('answer')
+        answer_details = self.payload.get('answer_details')
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        state_reference = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exploration_id, state_name)) #pylint: disable=line-too-long
+        stats_services.record_learner_answer_info(
+            entity_type, state_reference,
+            interaction_id, answer, answer_details)
+        self.render_json({})
