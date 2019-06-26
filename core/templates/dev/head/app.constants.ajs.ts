@@ -17,6 +17,10 @@
  */
 
 import { AppConstants } from 'app.constants.ts';
+<<<<<<< HEAD
+=======
+import { APP_BASE_HREF } from '@angular/common';
+>>>>>>> f3f1eb3747205be1afae3114a4c2bb3d053e6f62
 
 var oppia = require('AppInit.ts').moduleName;
 
@@ -31,7 +35,11 @@ for (var constantName in constants) {
 oppia.constant('DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
 
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
+<<<<<<< HEAD
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+=======
+    AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+>>>>>>> f3f1eb3747205be1afae3114a4c2bb3d053e6f62
 
 oppia.constant(
   'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
