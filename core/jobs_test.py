@@ -29,10 +29,11 @@ from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
-from mock import patch  # pylint: disable=import-only-modules
+import main_taskqueue
 
 from google.appengine.ext import ndb
 from mapreduce import input_readers
+import webtest
 
 (base_models, exp_models, stats_models, job_models) = (
     models.Registry.import_models([
@@ -991,13 +992,60 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
         return answer
 
 
+TIMES_RUN = 0
+
+
+class MockMRJobManager(jobs.BaseMapReduceJobManagerForContinuousComputations):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockContinuousComputationManager
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return []
+
+    @staticmethod
+    def map(item):
+        pass
+
+    @staticmethod
+    def reduce(key, values):
+        pass
+
+
+class MockContinuousComputationManager(jobs.BaseContinuousComputationManager):
+
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return []
+
+    @classmethod
+    def _get_realtime_datastore_class(cls):
+        return MockStartExplorationRealtimeModel
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        global TIMES_RUN  # pylint: disable=global-statement
+        if TIMES_RUN < 2:
+            (
+                super(cls, MockContinuousComputationManager)
+                ._kickoff_batch_job_after_previous_one_ends()
+            )
+            TIMES_RUN += 1
+
+
 class ContinuousComputationTests(test_utils.GenericTestBase):
     """Tests continuous computations for 'start exploration' events."""
 
     EXP_ID = 'exp_id'
 
     ALL_CC_MANAGERS_FOR_TESTS = [
-        StartExplorationEventCounter]
+        StartExplorationEventCounter, MockContinuousComputationManager]
 
     def setUp(self):
         """Create an exploration and register the event listener manually."""
@@ -1007,6 +1055,37 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.EXP_ID)
         exp_services.save_new_exploration('owner_id', exploration)
         self.process_and_flush_pending_tasks()
+
+    def _process_pending_tasks(self):
+        """"Runs but not flushes pending tasks."""
+        queue_names = self._get_all_queue_names()
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
+        for queue in queue_names:
+            self.taskqueue_stub.FlushQueue(queue)
+
+        for task in tasks:
+            if task.url == '/_ah/queue/deferred':
+                from google.appengine.ext import deferred
+                deferred.run(task.payload)
+            else:
+                # All other tasks are expected to be mapreduce ones, or
+                # Oppia-taskqueue-related ones.
+                headers = {
+                    key: str(val) for key, val in task.headers.iteritems()
+                }
+                headers['Content-Length'] = str(len(task.payload or ''))
+
+                app = (
+                    webtest.TestApp(main_taskqueue.app)
+                    if task.url.startswith('/task')
+                    else self.testapp)
+                response = app.post(
+                    url=str(task.url), params=(task.payload or ''),
+                    headers=headers, expect_errors=True)
+                if response.status_code != 200:
+                    raise RuntimeError(
+                        'MapReduce task to URL %s failed' % task.url)
 
     def test_cannot_get_entity_with_invalid_id(self):
         with self.assertRaisesRegexp(
@@ -1171,7 +1250,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'error', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_failure()
 
-        self.process_and_flush_pending_tasks()
+        self._process_pending_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1193,24 +1272,35 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'info', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_canceled()
 
-        self.process_and_flush_pending_tasks()
+        self._process_pending_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
             observed_log_messages,
             ['Job StartExplorationEventCounter canceled.'])
 
-    @patch('core.jobs.BaseContinuousComputationManager._kickoff_batch_job')
-    def test_kickoff_batch_job_after_previous_one_ends(self, mock):
-        """This tests that _kickoff_batch_job_after_previous_one_ends() calls
-        _kickoff_batch_job().
-        """
-        self.assertFalse(mock.called)
-        (
-            jobs.BaseContinuousComputationManager  # pylint: disable=protected-access
-            ._kickoff_batch_job_after_previous_one_ends()
-        )
-        self.assertTrue(mock.called)
+    def test_kickoff_batch_job_after_previous_one_ends(self):
+        with self.swap(
+            jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+            self.ALL_CC_MANAGERS_FOR_TESTS
+        ):
+            MockContinuousComputationManager.start_computation()
+            (
+                MockContinuousComputationManager  # pylint: disable=protected-access
+                ._kickoff_batch_job_after_previous_one_ends()
+            )
+            status = MockContinuousComputationManager.get_status_code()
+
+            self.assertEqual(
+                status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
+
+            self._process_pending_tasks()
+            MockContinuousComputationManager.stop_computation('admin_user_id')
+            status = MockContinuousComputationManager.get_status_code()
+
+            self.assertEqual(
+                status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+            self.assertEqual(TIMES_RUN, 1)
 
 
 # TODO(sll): When we have some concrete ContinuousComputations running in
