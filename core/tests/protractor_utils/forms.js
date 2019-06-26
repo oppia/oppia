@@ -618,6 +618,7 @@ var CodeMirrorChecker = function(elem) {
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
+   * Pane specifices the codemirror Left or Right Pane which is to be scrolled. 
    * compareDict is an object whose keys are line numbers and whose values are
    * objects corresponding to that line with the following key-value pairs:
    *  - 'text': the exact string of text expected on that line
@@ -634,7 +635,7 @@ var CodeMirrorChecker = function(elem) {
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
-      // Adding an empty line at the last.
+      // Inserting an empty line at the last of TextArray.
       textArray[textArray.length] = '';
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
