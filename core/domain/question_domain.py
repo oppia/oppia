@@ -385,14 +385,14 @@ class Question(object):
         """
         self.linked_skill_ids = list(set(linked_skill_ids))
 
-    def update_question_state_data(self, question_state_domain_object):
+    def update_question_state_data(self, question_state_data):
         """Updates the question data of the question.
 
         Args:
-            question_state_domain_object: object. A State domain object
+            question_state_data: State. A State domain object
                 representing the question state data.
         """
-        self.question_state_data = (question_state_domain_object)
+        self.question_state_data = question_state_data
 
 
 class QuestionSummary(object):
