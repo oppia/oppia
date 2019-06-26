@@ -16,7 +16,7 @@ require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/UtilsService.ts');
 
-require('app.constants.ts');
+require('app.constants.ajs.ts');
 /**
  * @fileoverview Service to construct URLs by inserting variables within them as
  * necessary to have a fully-qualified URL.
