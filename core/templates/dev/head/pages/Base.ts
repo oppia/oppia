@@ -58,11 +58,6 @@ oppia.controller('Base', [
       $scope.currentLang = response.language;
     });
 
-    // This is done outside the service to prevent
-    // circular dependency issues.
-    $http.get('/csrfhandler').then(function(response) {
-      CsrfTokenService.setToken(response.data.token);
-    });
     // TODO(sll): use 'touchstart' for mobile.
     $document.on('click', function() {
       SidebarStatusService.onDocumentClick();

@@ -77,7 +77,6 @@ require('value_generators/valueGeneratorsRequires.ts');
 require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-router.service.ts');
-require('services/CsrfTokenService.ts');
 require('services/UtilsService.ts');
 
 oppia.directive('adminPage', ['UrlInterpolationService',
@@ -91,9 +90,9 @@ oppia.directive('adminPage', ['UrlInterpolationService',
       controllerAs: '$ctrl',
       controller: [
         '$http', '$location', '$scope', 'AdminRouterService',
-        'CsrfTokenService', 'DEV_MODE',
+        'DEV_MODE',
         function($http, $location, $scope, AdminRouterService,
-            CsrfTokenService, DEV_MODE) {
+            DEV_MODE) {
           var ctrl = this;
           ctrl.userEmail = GLOBALS.USER_EMAIL;
           ctrl.inDevMode = DEV_MODE;
@@ -104,12 +103,6 @@ oppia.directive('adminPage', ['UrlInterpolationService',
           ctrl.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
           ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
           ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
-
-          $http.get('/csrfhandler').then(function(response) {
-            // This is done outside the service to prevent
-            // circular dependency issues.
-            CsrfTokenService.setToken(response.data.token);
-          });
 
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for managing csrf tokens
+ * @fileoverview Service for managing CSRF tokens.
  */
 
 oppia.factory('CsrfTokenService', [function() {
@@ -23,11 +23,13 @@ oppia.factory('CsrfTokenService', [function() {
       token = csrfToken;
     },
     getToken: function() {
+      // We use jQuery here instead of Angular's $http, since the latter
+      // creates a circular dependency.
       return new Promise(function(resolve, reject) {
         if (token) {
           resolve(token);
         } else {
-          // Fetch token if it is't already available.
+          // Fetch token if it is'nt already available.
           $.ajax({
             url: '/csrfhandler',
             type: 'GET',
@@ -38,6 +40,7 @@ oppia.factory('CsrfTokenService', [function() {
               return JSON.parse(transformedData);
             },
           }).done(function(response) {
+            token = response.token;
             resolve(response.token);
           });
         }

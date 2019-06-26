@@ -20,7 +20,6 @@ require('base_components/BaseContentDirective.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
-require('services/CsrfTokenService.ts');
 require('services/IdGenerationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
@@ -38,12 +37,12 @@ oppia.directive('signupPage', ['UrlInterpolationService', function(
     controllerAs: '$ctrl',
     controller: [
       '$http', '$rootScope', '$uibModal', 'AlertsService',
-      'CsrfTokenService', 'FocusManagerService',
+      'FocusManagerService',
       'SiteAnalyticsService', 'UrlInterpolationService', 'UrlService',
       'SITE_NAME',
       function(
           $http, $rootScope, $uibModal, AlertsService,
-          CsrfTokenService, FocusManagerService,
+          FocusManagerService,
           SiteAnalyticsService, UrlInterpolationService, UrlService,
           SITE_NAME) {
         var ctrl = this;

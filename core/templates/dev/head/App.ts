@@ -106,18 +106,20 @@ oppia.config([
     $httpProvider.interceptors.push([
       '$q', '$log', 'AlertsService', 'CsrfTokenService',
       function($q, $log, AlertsService, CsrfTokenService) {
-        var csrfToken;
-        CsrfTokenService.getToken().then(function(token) {
-          csrfToken = token;
-        });
         return {
           request: function(config) {
             if (config.data) {
-              config.data = $.param({
-                csrf_token: csrfToken,
-                payload: JSON.stringify(config.data),
-                source: document.URL
-              }, true);
+              return $q(function(resolve, reject) {
+                // Get CSRF token before sending the request.
+                CsrfTokenService.getToken().then(function(token) {
+                  config.data = $.param({
+                    csrf_token: token,
+                    payload: JSON.stringify(config.data),
+                    source: document.URL
+                  }, true);
+                  resolve(config);
+                });
+              });
             }
             return config;
           },
