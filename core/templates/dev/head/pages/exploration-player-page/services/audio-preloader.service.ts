@@ -25,7 +25,7 @@ require('services/AssetsBackendApiService.ts');
 require('services/ComputeGraphService.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('AudioPreloaderService', [
   '$uibModal', 'AssetsBackendApiService', 'AudioTranslationLanguageService',

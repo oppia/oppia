@@ -16,7 +16,7 @@
  * @fileoverview FormatTimer filter for Oppia.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('formatTimer', [function() {
   return function(input) {

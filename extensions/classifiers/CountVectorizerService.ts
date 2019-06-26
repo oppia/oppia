@@ -23,7 +23,7 @@
  * propagated here.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CountVectorizerService', [function() {
   return {

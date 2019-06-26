@@ -35,7 +35,7 @@ require('services/GenerateContentIdService.ts');
 
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('skillConceptCardEditor', [
   'GenerateContentIdService', 'SkillEditorStateService', 'SkillUpdateService',

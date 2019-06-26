@@ -17,7 +17,7 @@
  * SchemaBasedList item.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SchemaDefaultValueService', [function() {
   return {

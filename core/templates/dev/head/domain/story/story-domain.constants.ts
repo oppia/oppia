@@ -16,7 +16,7 @@
  * @fileoverview Constants for story domain.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'EDITABLE_STORY_DATA_URL_TEMPLATE',

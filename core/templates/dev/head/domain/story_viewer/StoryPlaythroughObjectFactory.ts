@@ -19,7 +19,7 @@
 
 require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StoryPlaythroughObjectFactory', [
   'ReadOnlyStoryNodeObjectFactory', function(ReadOnlyStoryNodeObjectFactory) {

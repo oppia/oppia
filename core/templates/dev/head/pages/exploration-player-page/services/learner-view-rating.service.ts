@@ -18,7 +18,7 @@
 
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerViewRatingService', [
   '$http', '$rootScope', 'ExplorationEngineService',

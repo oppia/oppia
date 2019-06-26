@@ -36,7 +36,7 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('solutionEditor', [
   '$uibModal', 'AlertsService', 'ContextService',

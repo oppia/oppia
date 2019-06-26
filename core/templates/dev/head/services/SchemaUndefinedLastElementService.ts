@@ -17,7 +17,7 @@
  * is undefined.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SchemaUndefinedLastElementService', [function() {
   return {

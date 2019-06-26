@@ -16,7 +16,7 @@
  * @fileoverview Constants for the creator dashboard.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'EXPLORATION_DROPDOWN_STATS', {

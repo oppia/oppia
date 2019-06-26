@@ -16,7 +16,7 @@
  * @fileoverview Service to load the i18n translation file.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TranslationFileHashLoaderService', [
   '$http', '$q', 'UrlInterpolationService',

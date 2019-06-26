@@ -17,7 +17,7 @@
    dashboard activity ids domain object.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerDashboardActivityIdsObjectFactory', [function() {
   var LearnerDashboardActivityIds = function(

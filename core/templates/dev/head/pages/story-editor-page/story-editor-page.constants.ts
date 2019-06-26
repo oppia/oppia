@@ -16,7 +16,7 @@
  * @fileoverview Primary controller for the story editor page.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant('NODE_ID_PREFIX', 'node_');
 oppia.constant(

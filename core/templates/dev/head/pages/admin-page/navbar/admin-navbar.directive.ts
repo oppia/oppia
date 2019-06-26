@@ -22,7 +22,7 @@ require('services/UserService.ts');
 
 require('pages/admin-page/admin-page.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('adminNavbar', [
   'AdminRouterService', 'UrlInterpolationService', 'ADMIN_TAB_URLS',

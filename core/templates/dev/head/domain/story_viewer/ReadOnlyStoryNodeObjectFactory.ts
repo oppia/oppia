@@ -17,7 +17,7 @@
  * story viewer.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ReadOnlyStoryNodeObjectFactory', [function() {
   var StoryNode = function(

@@ -19,7 +19,7 @@
  * This cache should be reset each time the state editor is initialized.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('AnswerGroupsCacheService', [function() {
   var _cache = {};

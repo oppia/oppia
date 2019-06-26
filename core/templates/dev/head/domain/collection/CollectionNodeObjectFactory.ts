@@ -17,7 +17,7 @@
  * collection node domain objects.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CollectionNodeObjectFactory', [
   'ACTIVITY_STATUS_PRIVATE',

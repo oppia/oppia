@@ -17,7 +17,7 @@
  */
 
 // TODO(bhenning): These constants should be provided by the backend.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'EDITABLE_COLLECTION_DATA_URL_TEMPLATE',

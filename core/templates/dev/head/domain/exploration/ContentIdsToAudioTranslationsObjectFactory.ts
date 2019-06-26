@@ -20,7 +20,7 @@
 require('domain/exploration/AudioTranslationObjectFactory.ts');
 require('domain/utilities/LanguageUtilService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
   'AudioTranslationObjectFactory', 'LanguageUtilService',

@@ -51,7 +51,7 @@ require('services/ContextService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationSaveService', [
   '$log', '$q', '$rootScope', '$timeout', '$uibModal', '$window',

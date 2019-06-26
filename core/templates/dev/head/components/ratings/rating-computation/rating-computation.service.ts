@@ -16,7 +16,7 @@
  * @fileoverview Service for computing the average rating.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('RatingComputationService', [function() {
   var areRatingsShown = function(ratingFrequencies) {

@@ -20,7 +20,7 @@ require('base_components/BaseContentDirective.ts');
 
 require('services/DateTimeFormatService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('notificationsDashboardPage', [
   'UrlInterpolationService', function(

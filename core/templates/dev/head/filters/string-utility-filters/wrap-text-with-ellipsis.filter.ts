@@ -19,7 +19,7 @@
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/UtilsService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('wrapTextWithEllipsis', [
   '$filter', 'UtilsService', function($filter, UtilsService) {

@@ -16,7 +16,7 @@
  * @fileoverview Object factory for creating audio languages.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('AudioLanguageObjectFactory', [
   function() {

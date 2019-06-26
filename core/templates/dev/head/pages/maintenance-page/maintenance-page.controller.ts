@@ -20,7 +20,7 @@ require('App.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.controller('Maintenance', [
   '$rootScope', '$scope', 'UrlInterpolationService', 'DEV_MODE',

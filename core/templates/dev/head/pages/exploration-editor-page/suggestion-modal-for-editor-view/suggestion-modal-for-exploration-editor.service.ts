@@ -25,7 +25,7 @@ require(
 require('services/EditabilityService.ts');
 require('services/SuggestionModalService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SuggestionModalForExplorationEditorService', [
   '$log', '$rootScope', '$uibModal',

@@ -24,7 +24,7 @@ require('services/SiteAnalyticsService.ts');
 // duplicated code between CollectionCreationService and
 // ExplorationCreationService.
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CollectionCreationService', [
   '$http', '$rootScope', '$timeout', '$window', 'AlertsService',

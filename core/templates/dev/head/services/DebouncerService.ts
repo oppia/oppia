@@ -16,7 +16,7 @@
  * @fileoverview Service for debouncing function calls.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('DebouncerService', [function() {
   return {

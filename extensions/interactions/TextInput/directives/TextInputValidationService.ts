@@ -18,7 +18,7 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TextInputValidationService', [
   'baseInteractionValidationService', 'INTERACTION_SPECS', 'WARNING_TYPES',

@@ -19,7 +19,7 @@
 require(
   'pages/exploration-editor-page/services/exploration-property.service.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationTagsService', [
   'ExplorationPropertyService',

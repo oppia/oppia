@@ -94,7 +94,7 @@ require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('explorationPlayerPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {

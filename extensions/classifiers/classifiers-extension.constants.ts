@@ -16,7 +16,7 @@
  * @fileoverview Constants for classfiers extensions.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant('PythonProgramTokenType', {
   COMMENT: 'COMMENT',

@@ -19,7 +19,7 @@
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/CodeNormalizerService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CodeReplRulesService', [
   '$filter', 'CodeNormalizerService',

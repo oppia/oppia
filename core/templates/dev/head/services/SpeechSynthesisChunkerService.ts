@@ -23,7 +23,7 @@
  * Credits to Peter Woolley and Brett Zamir.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SpeechSynthesisChunkerService', [
   '$timeout', 'RTE_COMPONENT_SPECS', function($timeout, RTE_COMPONENT_SPECS) {

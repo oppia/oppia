@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/question/question-domain.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('PretestQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'PRETEST_QUESTIONS_URL_TEMPLATE',

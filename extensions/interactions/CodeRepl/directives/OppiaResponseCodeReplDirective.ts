@@ -24,7 +24,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaResponseCodeRepl', [
   'HtmlEscaperService', 'UrlInterpolationService',

@@ -16,7 +16,7 @@
  * @fileoverview Constants for the Oppia admin page.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');

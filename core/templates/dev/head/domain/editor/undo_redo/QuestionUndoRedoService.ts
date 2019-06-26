@@ -17,7 +17,7 @@
  * domain object.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('QuestionUndoRedoService', [
   'BaseUndoRedoService', function(BaseUndoRedoService) {
