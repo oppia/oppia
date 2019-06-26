@@ -181,17 +181,17 @@ if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
+if [ ! -d "$TOOLS_DIR/selenium-3.13.0" ]; then
   echo Installing selenium
 
-  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip_install selenium==3.13.0 --target="$TOOLS_DIR/selenium-3.13.0"
 fi
 
 echo Checking if PyGithub is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/PyGithub-1.43.5" ]; then
+if [ ! -d "$TOOLS_DIR/PyGithub-1.43.7" ]; then
   echo Installing PyGithub
 
-  pip_install PyGithub==1.43.5 --target="$TOOLS_DIR/PyGithub-1.43.5"
+  pip_install PyGithub==1.43.7 --target="$TOOLS_DIR/PyGithub-1.43.7"
 fi
 
 # install pre-push script

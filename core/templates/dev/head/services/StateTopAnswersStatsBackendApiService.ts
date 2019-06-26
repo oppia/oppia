@@ -16,9 +16,7 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
-oppia.constant(
-  'STATE_ANSWER_STATS_URL',
-  '/createhandler/state_answer_stats/<exploration_id>');
+require('services/services.constants.ts');
 
 oppia.factory('StateTopAnswersStatsBackendApiService', [
   '$http', 'UrlInterpolationService', 'STATE_ANSWER_STATS_URL',

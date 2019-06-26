@@ -42,6 +42,7 @@ from core.controllers import question_editor
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import review_tests
 from core.controllers import skill_editor
 from core.controllers import story_editor
 from core.controllers import story_viewer
@@ -235,8 +236,17 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_DATA_URL_PREFIX,
         practice_sessions.PracticeSessionsPageDataHandler),
     get_redirect_route(
+        r'%s/<story_id>' % feconf.REVIEW_TEST_DATA_URL_PREFIX,
+        review_tests.ReviewTestsPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>' % feconf.REVIEW_TEST_URL_PREFIX,
+        review_tests.ReviewTestsPage),
+    get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_DATA_HANDLER,
         story_viewer.StoryPageDataHandler),
+    get_redirect_route(
+        r'%s/<story_id>/<node_id>' % feconf.STORY_NODE_COMPLETION_URL_PREFIX,
+        story_viewer.StoryNodeCompletionHandler),
     get_redirect_route(
         r'%s/<story_id>' % feconf.STORY_VIEWER_URL_PREFIX,
         story_viewer.StoryPage),
@@ -585,9 +595,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_id>/<subtopic_id>' %
         feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableSubtopicPageDataHandler),
-    get_redirect_route(
-        r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
-        topic_editor.TopicManagerRightsHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
         topic_editor.TopicRightsHandler),

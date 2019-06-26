@@ -495,8 +495,9 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'old_value': None
         }
         with self.assertRaisesRegexp(
-            Exception,
-            'The new change cmd must be equal to edit_state_property'):
+            Exception, (
+                'The following extra attributes are present: new_value, '
+                'old_value, property_name')):
             suggestion.pre_update_validate(exp_domain.ExplorationChange(change))
 
     def test_pre_update_validate_change_property_name(self):
@@ -551,7 +552,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             self.reviewer_id, expected_suggestion_dict['change'],
             expected_suggestion_dict['score_category'], self.fake_date)
         new_content = state_domain.SubtitledHtml(
-            'content', 'new suggestion html').to_dict()
+            'content', '<p>new suggestion html</p>').to_dict()
 
         suggestion.change.new_value = new_content
 
@@ -758,8 +759,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.validate()
 
-        suggestion.change.question_dict[
-            'question_state_data_schema_version'] = 0
+        # We are not setting value in suggestion.change.question_dict
+        # directly since pylint produces unsupported-assignment-operation
+        # error. The detailed analysis for the same can be checked
+        # in this issue: https://github.com/oppia/oppia/issues/7008.
+        question_dict = suggestion.change.question_dict
+        question_dict['question_state_data_schema_version'] = 0
+        suggestion.change.question_dict = question_dict
 
         with self.assertRaisesRegexp(
             Exception,
@@ -808,8 +814,13 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
 
         suggestion.pre_accept_validate()
 
-        suggestion.change.question_dict[
-            'question_state_data_schema_version'] = 1
+        # We are not setting value in suggestion.change.question_dict
+        # directly since pylint produces unsupported-assignment-operation
+        # error. The detailed analysis for the same can be checked
+        # in this issue: https://github.com/oppia/oppia/issues/7008.
+        question_dict = suggestion.change.question_dict
+        question_dict['question_state_data_schema_version'] = 1
+        suggestion.change.question_dict = question_dict
 
         with self.assertRaisesRegexp(
             Exception, 'Question state schema version is not up to date.'):
@@ -934,16 +945,6 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
                 question_domain.QuestionChange(change))
 
     def test_pre_update_validate_change_question_dict(self):
-        expected_suggestion_dict = self.suggestion_dict
-
-        suggestion = suggestion_registry.SuggestionAddQuestion(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.reviewer_id, expected_suggestion_dict['change'],
-            expected_suggestion_dict['score_category'], self.fake_date)
-
         change = {
             'cmd': question_domain.CMD_CREATE_NEW_FULLY_SPECIFIED_QUESTION,
             'question_dict': {
@@ -955,6 +956,12 @@ class SuggestionAddQuestionTest(test_utils.GenericTestBase):
             },
             'skill_id': 'skill_1'
         }
+
+        suggestion = suggestion_registry.SuggestionAddQuestion(
+            'exploration.exp1.thread1', 'exp1', 1,
+            suggestion_models.STATUS_ACCEPTED, self.author_id,
+            self.reviewer_id, change,
+            'question.topic_1', self.fake_date)
 
         with self.assertRaisesRegexp(
             Exception,

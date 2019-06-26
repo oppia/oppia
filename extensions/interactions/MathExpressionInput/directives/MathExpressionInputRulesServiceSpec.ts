@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for math expression rules.
  */
 
+require(
+  'interactions/MathExpressionInput/directives/' +
+  'MathExpressionInputRulesService.ts');
+
 describe('Math expression input rules service', function() {
   beforeEach(angular.mock.module('oppia'));
 
