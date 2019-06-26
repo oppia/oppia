@@ -220,6 +220,7 @@
 /core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
 /core/templates/dev/head/services/MessengerService.ts @brianrodri
+/core/templates/dev/head/services/PlaythroughRecordingService*.ts @brianrodri
 /core/templates/dev/head/services/StateRulesStatsService*.ts @brianrodri
 /core/templates/dev/head/services/StateTopAnswersStats*.ts @brianrodri
 /extensions/actions/ @brianrodri

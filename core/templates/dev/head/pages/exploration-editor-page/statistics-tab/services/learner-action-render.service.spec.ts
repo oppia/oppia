@@ -24,7 +24,7 @@ require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
 require('services/ExplorationFeaturesService.ts');
-require('services/PlaythroughService.ts');
+require('services/PlaythroughRecordingService.ts');
 
 describe('Learner Action Render Service', function() {
   beforeEach(angular.mock.module('oppia'));
@@ -34,10 +34,11 @@ describe('Learner Action Render Service', function() {
       this.$sce = $injector.get('$sce');
       this.LearnerActionObjectFactory =
         $injector.get('LearnerActionObjectFactory');
-      this.PlaythroughService = $injector.get('PlaythroughService');
+      this.PlaythroughRecordingService =
+        $injector.get('PlaythroughRecordingService');
       this.ExplorationFeaturesService =
         $injector.get('ExplorationFeaturesService');
-      this.PlaythroughService.initSession('expId1', 1, 1.0);
+      this.PlaythroughRecordingService.initSession('expId1', 1, 1.0);
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(true);
 
@@ -47,14 +48,17 @@ describe('Learner Action Render Service', function() {
 
     it('should split up EarlyQuit learner actions into display blocks.',
       function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'stateName1');
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
+        this.PlaythroughRecordingService.recordExplorationQuitAction(
+          'stateName2', 120);
 
-        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var learnerActions =
+          this.PlaythroughRecordingService.getPlaythrough().actions;
         var displayBlocks =
           this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
@@ -83,28 +87,31 @@ describe('Learner Action Render Service', function() {
 
     it('should split up many learner actions into different display blocks.',
       function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'stateName1');
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
+        this.PlaythroughRecordingService.recordExplorationQuitAction(
+          'stateName1', 120);
 
-        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var learnerActions =
+          this.PlaythroughRecordingService.getPlaythrough().actions;
         var displayBlocks =
           this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
@@ -230,22 +237,25 @@ describe('Learner Action Render Service', function() {
 
     it('should assign multiple learner actions at same state to same block.',
       function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'stateName1');
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
+        this.PlaythroughRecordingService.recordExplorationQuitAction(
+          'stateName1', 120);
 
-        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var learnerActions =
+          this.PlaythroughRecordingService.getPlaythrough().actions;
         var displayBlocks =
           this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
@@ -281,20 +291,23 @@ describe('Learner Action Render Service', function() {
         var feedback = {
           _html: 'Try again'
         };
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'stateName1');
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', feedback, 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
+        this.PlaythroughRecordingService.recordExplorationQuitAction(
+          'stateName1', 120);
 
-        var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+        var learnerActions =
+          this.PlaythroughRecordingService.getPlaythrough().actions;
         var displayBlocks =
           this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 
@@ -322,14 +335,17 @@ describe('Learner Action Render Service', function() {
       });
 
     it('should render HTML for learner action display blocks.', function() {
-      this.PlaythroughService.recordExplorationStartAction('stateName1');
-      this.PlaythroughService.recordAnswerSubmitAction(
+      this.PlaythroughRecordingService.recordExplorationStartAction(
+        'stateName1');
+      this.PlaythroughRecordingService.recordAnswerSubmitAction(
         'stateName1', 'stateName2', 'Continue', '', 'Welcome', 30);
-      this.PlaythroughService.recordAnswerSubmitAction(
+      this.PlaythroughRecordingService.recordAnswerSubmitAction(
         'stateName2', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      this.PlaythroughService.recordExplorationQuitAction('stateName2', 120);
+      this.PlaythroughRecordingService.recordExplorationQuitAction(
+        'stateName2', 120);
 
-      var learnerActions = this.PlaythroughService.getPlaythrough().actions;
+      var learnerActions =
+        this.PlaythroughRecordingService.getPlaythrough().actions;
       var displayBlocks =
         this.LearnerActionRenderService.getDisplayBlocks(learnerActions);
 

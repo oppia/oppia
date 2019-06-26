@@ -22,19 +22,19 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/ContextService.ts');
 require('services/MessengerService.ts');
-require('services/PlaythroughService.ts');
+require('services/PlaythroughRecordingService.ts');
 require('services/SiteAnalyticsService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
 oppia.factory('StatsReportingService', [
   '$http', '$interval', 'ContextService', 'MessengerService',
-  'PlaythroughService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
+  'PlaythroughRecordingService', 'SiteAnalyticsService', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
   'PAGE_CONTEXT', 'STATS_EVENT_TYPES', 'STATS_REPORTING_URLS',
   function(
       $http, $interval, ContextService, MessengerService,
-      PlaythroughService, SiteAnalyticsService, StopwatchObjectFactory,
+      PlaythroughRecordingService, SiteAnalyticsService, StopwatchObjectFactory,
       UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
       PAGE_CONTEXT, STATS_EVENT_TYPES, STATS_REPORTING_URLS) {
     var explorationId = null;
@@ -197,7 +197,7 @@ oppia.factory('StatsReportingService', [
           session_id: sessionId
         });
 
-        PlaythroughService.recordExplorationStartAction(stateName);
+        PlaythroughRecordingService.recordExplorationStartAction(stateName);
         explorationActuallyStarted = true;
       },
       recordSolutionHit: function(stateName) {
@@ -299,10 +299,10 @@ oppia.factory('StatsReportingService', [
         SiteAnalyticsService.registerFinishExploration();
 
         postStatsToBackend();
-        PlaythroughService.recordExplorationQuitAction(
+        PlaythroughRecordingService.recordExplorationQuitAction(
           stateName, stateStopwatch.getTimeInSecs());
 
-        PlaythroughService.recordPlaythrough(true);
+        PlaythroughRecordingService.recordPlaythrough(true);
         explorationIsComplete = true;
       },
       recordAnswerSubmitted: function(
@@ -342,13 +342,13 @@ oppia.factory('StatsReportingService', [
 
         postStatsToBackend();
 
-        PlaythroughService.recordExplorationQuitAction(
+        PlaythroughRecordingService.recordExplorationQuitAction(
           stateName, stateStopwatch.getTimeInSecs());
-        PlaythroughService.recordPlaythrough();
+        PlaythroughRecordingService.recordPlaythrough();
       },
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback) {
-        PlaythroughService.recordAnswerSubmitAction(
+        PlaythroughRecordingService.recordAnswerSubmitAction(
           stateName, destStateName, interactionId, answer, feedback,
           stateStopwatch.getTimeInSecs());
       }

@@ -19,12 +19,13 @@
 require('App.ts');
 require('domain/statistics/LearnerActionObjectFactory.ts');
 require('services/ExplorationFeaturesService.ts');
-require('services/PlaythroughService.ts');
+require('services/PlaythroughRecordingService.ts');
 
-describe('PlaythroughService', function() {
+describe('PlaythroughRecordingService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {
-    this.PlaythroughService = $injector.get('PlaythroughService');
+    this.PlaythroughRecordingService =
+      $injector.get('PlaythroughRecordingService');
     this.LearnerActionObjectFactory =
       $injector.get('LearnerActionObjectFactory');
     this.ExplorationFeaturesService =
@@ -37,10 +38,10 @@ describe('PlaythroughService', function() {
       this.expVersion = 1;
       this.playthroughRecordingProbability = 1.0;
 
-      this.PlaythroughService.initSession(
+      this.PlaythroughRecordingService.initSession(
         this.expId, this.expVersion, this.playthroughRecordingProbability);
 
-      var playthrough = this.PlaythroughService.getPlaythrough();
+      var playthrough = this.PlaythroughRecordingService.getPlaythrough();
       expect(playthrough.expId).toEqual(this.expId);
       expect(playthrough.expVersion).toEqual(this.expVersion);
       expect(playthrough.actions).toEqual([]);
@@ -54,7 +55,7 @@ describe('PlaythroughService', function() {
       this.expVersion = 1;
       this.playthroughRecordingProbability = 1.0;
 
-      this.PlaythroughService.initSession(
+      this.PlaythroughRecordingService.initSession(
         this.expId, this.expVersion, this.playthroughRecordingProbability);
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(true);
@@ -62,9 +63,10 @@ describe('PlaythroughService', function() {
 
     describe('.recordExplorationStartAction()', function() {
       it('adds a learner action object to the actions array', function() {
-        this.PlaythroughService.recordExplorationStartAction('initStateName1');
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'initStateName1');
 
-        var playthrough = this.PlaythroughService.getPlaythrough();
+        var playthrough = this.PlaythroughRecordingService.getPlaythrough();
         expect(playthrough.actions).toEqual([
           this.LearnerActionObjectFactory.createNew('ExplorationStart', {
             state_name: {value: 'initStateName1'},
@@ -75,10 +77,10 @@ describe('PlaythroughService', function() {
 
     describe('.recordAnswerSubmitAction()', function() {
       it('adds a learner action object to the actions array', function() {
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
 
-        var playthrough = this.PlaythroughService.getPlaythrough();
+        var playthrough = this.PlaythroughRecordingService.getPlaythrough();
         expect(playthrough.actions).toEqual([
           this.LearnerActionObjectFactory.createNew('AnswerSubmit', {
             state_name: {value: 'stateName1'},
@@ -94,9 +96,10 @@ describe('PlaythroughService', function() {
 
     describe('.recordAnswerSubmitAction()', function() {
       it('adds a learner action object to the actions array', function() {
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
+        this.PlaythroughRecordingService.recordExplorationQuitAction(
+          'stateName1', 120);
 
-        var playthrough = this.PlaythroughService.getPlaythrough();
+        var playthrough = this.PlaythroughRecordingService.getPlaythrough();
         expect(playthrough.actions).toEqual([
           this.LearnerActionObjectFactory.createNew('ExplorationQuit', {
             state_name: {value: 'stateName1'},
@@ -108,21 +111,22 @@ describe('PlaythroughService', function() {
 
     describe('.recordPlaythrough()', function() {
       it('identifies multiple incorrect submissions', function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'stateName1');
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
 
-        this.PlaythroughService.recordPlaythrough();
+        this.PlaythroughRecordingService.recordPlaythrough();
 
-        var playthrough = this.PlaythroughService.getPlaythrough();
+        var playthrough = this.PlaythroughRecordingService.getPlaythrough();
         expect(playthrough.issueType).toEqual('MultipleIncorrectSubmissions');
         expect(playthrough.issueCustomizationArgs).toEqual({
           state_name: {value: 'stateName1'},
@@ -131,14 +135,16 @@ describe('PlaythroughService', function() {
       });
 
       it('identifies early quits', function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'stateName1');
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 60);
+        this.PlaythroughRecordingService.recordExplorationQuitAction(
+          'stateName1', 60);
 
-        this.PlaythroughService.recordPlaythrough();
+        this.PlaythroughRecordingService.recordPlaythrough();
 
-        var playthrough = this.PlaythroughService.getPlaythrough();
+        var playthrough = this.PlaythroughRecordingService.getPlaythrough();
         expect(playthrough.issueType).toEqual('EarlyQuit');
         // We don't check the time spent issue customization arg because it is
         // flaky between tests.
@@ -147,30 +153,32 @@ describe('PlaythroughService', function() {
       });
 
       it('identifies cyclic state transitions', function() {
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'stateName1');
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName1', 30);
+        this.PlaythroughRecordingService.recordExplorationQuitAction(
+          'stateName1', 30);
 
-        this.PlaythroughService.recordPlaythrough();
+        this.PlaythroughRecordingService.recordPlaythrough();
 
-        var playthrough = this.PlaythroughService.getPlaythrough();
+        var playthrough = this.PlaythroughRecordingService.getPlaythrough();
         expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         expect(playthrough.issueCustomizationArgs).toEqual({
           state_names: {
@@ -186,26 +194,28 @@ describe('PlaythroughService', function() {
         //               [6] <- [5]
         // 1, 2, 3, 4, 5, 6, 3, 4, 5, 6, 3, 4, 5, 6...
 
-        this.PlaythroughService.recordExplorationStartAction('stateName1');
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordExplorationStartAction(
+          'stateName1');
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordAnswerSubmitAction(
+        this.PlaythroughRecordingService.recordAnswerSubmitAction(
           'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-        this.PlaythroughService.recordExplorationQuitAction('stateName2', 60);
+        this.PlaythroughRecordingService.recordExplorationQuitAction(
+          'stateName2', 60);
 
-        this.PlaythroughService.recordPlaythrough();
+        this.PlaythroughRecordingService.recordPlaythrough();
 
-        var playthrough = this.PlaythroughService.getPlaythrough();
+        var playthrough = this.PlaythroughRecordingService.getPlaythrough();
         expect(playthrough.issueType).toEqual('CyclicStateTransitions');
         // The cycle is stateName2->stateName3->stateName2.
         expect(playthrough.issueCustomizationArgs).toEqual({
@@ -220,17 +230,19 @@ describe('PlaythroughService', function() {
       this.expId = 'expId';
       this.expVersion = 1;
       this.playthroughRecordingProbability = 1.0;
-      this.PlaythroughService.initSession(
+      this.PlaythroughRecordingService.initSession(
         this.expId, this.expVersion, this.playthroughRecordingProbability);
       spyOn(this.ExplorationFeaturesService, 'isPlaythroughRecordingEnabled')
         .and.returnValue(false);
 
-      this.PlaythroughService.recordExplorationStartAction('initStateName1');
-      this.PlaythroughService.recordAnswerSubmitAction(
+      this.PlaythroughRecordingService.recordExplorationStartAction(
+        'initStateName1');
+      this.PlaythroughRecordingService.recordAnswerSubmitAction(
         'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
-      this.PlaythroughService.recordExplorationQuitAction('stateName1', 120);
+      this.PlaythroughRecordingService.recordExplorationQuitAction(
+        'stateName1', 120);
 
-      var playthrough = this.PlaythroughService.getPlaythrough();
+      var playthrough = this.PlaythroughRecordingService.getPlaythrough();
       expect(playthrough.actions).toEqual([]);
     });
   });

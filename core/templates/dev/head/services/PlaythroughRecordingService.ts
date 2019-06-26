@@ -24,7 +24,7 @@ require('services/ExplorationFeaturesService.ts');
 
 require('services/services.constants.ts');
 
-oppia.factory('PlaythroughService', [
+oppia.factory('PlaythroughRecordingService', [
   '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',
   'PlaythroughObjectFactory', 'StopwatchObjectFactory',
   'UrlInterpolationService', 'ACTION_TYPE_ANSWER_SUBMIT',

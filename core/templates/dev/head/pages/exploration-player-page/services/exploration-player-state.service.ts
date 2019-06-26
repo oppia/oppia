@@ -34,7 +34,7 @@ require('services/ContextService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
 require('services/ExplorationFeaturesService.ts');
 require('services/PlaythroughIssuesService.ts');
-require('services/PlaythroughService.ts');
+require('services/PlaythroughRecordingService.ts');
 require('services/contextual/UrlService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
@@ -45,7 +45,7 @@ oppia.factory('ExplorationPlayerStateService', [
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
-  'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
+  'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughRecordingService',
   'PretestQuestionBackendApiService', 'QuestionPlayerBackendApiService',
   'QuestionPlayerEngineService', 'ReadOnlyExplorationBackendApiService',
   'StateClassifierMappingService', 'StatsReportingService',
@@ -56,7 +56,7 @@ oppia.factory('ExplorationPlayerStateService', [
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
-      PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
+      PlayerTranscriptService, PlaythroughIssuesService, PlaythroughRecordingService,
       PretestQuestionBackendApiService, QuestionPlayerBackendApiService,
       QuestionPlayerEngineService, ReadOnlyExplorationBackendApiService,
       StateClassifierMappingService, StatsReportingService,
@@ -75,7 +75,7 @@ oppia.factory('ExplorationPlayerStateService', [
       StatsReportingService.initSession(
         explorationId, returnDict.exploration.title, version,
         returnDict.session_id, GLOBALS.collectionId);
-      PlaythroughService.initSession(
+      PlaythroughRecordingService.initSession(
         explorationId, version, returnDict.record_playthrough_probability);
       PlaythroughIssuesService.initSession(explorationId, version);
       PlayerCorrectnessFeedbackEnabledService.init(
