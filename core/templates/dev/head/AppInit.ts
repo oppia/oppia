@@ -21,13 +21,15 @@ import { BrowserModule } from '@angular/platform-browser';
 import { StaticProvider } from '@angular/core';
 
 import { AppConstants } from 'app.constants.ts';
+import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
 
 @NgModule({
   imports: [
     BrowserModule
   ],
   providers: [
-    AppConstants
+    AppConstants,
+    CreatorDashboardConstants
   ]
 })
 class MainAngularModule {
