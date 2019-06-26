@@ -121,11 +121,13 @@ oppia.directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'HASH_PARAM', '$scope', '$sce', '$rootScope', '$location',
+        'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
+        '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$window', 'HtmlEscaperService',
         'QuestionPlayerBackendApiService',
         function(
-            HASH_PARAM, $scope, $sce, $rootScope, $location,
+            HASH_PARAM, MAX_SCORE_PER_QUESTION,
+            $scope, $sce, $rootScope, $location,
             $sanitize, $window, HtmlEscaperService,
             QuestionPlayerBackendApiService) {
           var ctrl = this;
@@ -251,7 +253,6 @@ oppia.directive('questionPlayer', [
             var scorePerSkillMapping = createScorePerSkillMapping();
             $scope.resultsLoaded = false;
             var totalScore = 0.0;
-            var minScore = Number.MAX_VALUE;
             var totalQuestions = Object.keys(questionStateData).length;
             for (var question in questionStateData) {
               var questionData = questionStateData[question];
@@ -265,7 +266,7 @@ oppia.directive('questionPlayer', [
                 totalHintsPenalty = (
                   questionData.usedHints.length * VIEW_HINT_PENALTY);
               }
-              var questionScore = 1.0;
+              var questionScore = MAX_SCORE_PER_QUESTION;
               if (questionData.viewedSolution) {
                 questionScore = 0.0;
               } else {

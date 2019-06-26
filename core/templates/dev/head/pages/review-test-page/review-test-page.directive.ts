@@ -57,18 +57,18 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
               story_id: ctrl.storyId
             });
           $http.get(reviewTestsDataUrl).then(function(result) {
-            var skillList = [];
+            var skillIdList = [];
             var skillDescriptions = [];
             for (var skillId in result.data.skills_with_description) {
-              skillList.push(skillId);
+              skillIdList.push(skillId);
               skillDescriptions.push(
                 result.data.skills_with_description[skillId]);
             }
             var questionPlayerConfig = {
-              skillList: skillList,
+              skillList: skillIdList,
               skillDescriptions: skillDescriptions,
               questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
-                skillList.length)
+                skillIdList.length)
             };
             ctrl.questionPlayerConfig = questionPlayerConfig;
           });
