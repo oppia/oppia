@@ -4006,7 +4006,7 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             if unmarked_exp_ids:
                 error_msg = error_msg + (
                     'Following exploration ids are not marked in '
-                    'CompletedActivitiesModel.  %s' % unmarked_exp_ids)
+                    'CompletedActivitiesModel %s.' % unmarked_exp_ids)
 
             if error_msg:
                 cls.errors['explorations in completed node check'].append(
