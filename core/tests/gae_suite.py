@@ -47,9 +47,9 @@ DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(THIRD_PARTY_DIR, 'beautifulsoup4-4.7.1'),
     os.path.join(THIRD_PARTY_DIR, 'bleach-3.1.0'),
     os.path.join(THIRD_PARTY_DIR, 'callbacks-0.3.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.15.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.17.0'),
-    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.17.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-cloud-storage-1.9.22.1'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-mapreduce-1.9.22.0'),
+    os.path.join(THIRD_PARTY_DIR, 'gae-pipeline-1.9.22.1'),
     os.path.join(THIRD_PARTY_DIR, 'graphy-1.0.0'),
     os.path.join(THIRD_PARTY_DIR, 'html5lib-python-1.0.1'),
     os.path.join(THIRD_PARTY_DIR, 'mutagen-1.42.0'),
@@ -76,23 +76,12 @@ def create_test_suites(test_target=None):
     return (
         [loader.loadTestsFromName(test_target)]
         if test_target else [loader.discover(
-            CURR_DIR, pattern='*_test.py', top_level_dir=CURR_DIR)])
+            CURR_DIR, pattern='[^core/tests/data]*_test.py',
+            top_level_dir=CURR_DIR)])
 
 
 def main():
     """Runs the tests."""
-
-    def _iterate(test_suite_or_case):
-        """Iterate through all the test cases in `test_suite_or_case`."""
-        try:
-            suite = iter(test_suite_or_case)
-        except TypeError:
-            yield test_suite_or_case
-        else:
-            for test in suite:
-                for subtest in _iterate(test):
-                    yield subtest
-
     for directory in DIRS_TO_ADD_TO_SYS_PATH:
         if not os.path.exists(os.path.dirname(directory)):
             raise Exception('Directory %s does not exist.' % directory)
@@ -107,16 +96,11 @@ def main():
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]
 
-    tests_run = 0
     for result in results:
-        tests_run += result.testsRun
         if result.errors or result.failures:
             raise Exception(
                 'Test suite failed: %s tests run, %s errors, %s failures.' % (
                     result.testsRun, len(result.errors), len(result.failures)))
-
-    if tests_run == 0:
-        raise Exception('No tests were run.')
 
 
 if __name__ == '__main__':

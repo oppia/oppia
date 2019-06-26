@@ -18,7 +18,7 @@ import os
 import subprocess
 
 GCLOUD_PATH = os.path.join(
-    '..', 'oppia_tools', 'google-cloud-sdk-222.0.0', 'google-cloud-sdk',
+    '..', 'oppia_tools', 'google-cloud-sdk-251.0.0', 'google-cloud-sdk',
     'bin', 'gcloud')
 
 
