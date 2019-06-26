@@ -15,7 +15,6 @@
 require('domain/sidebar/SidebarStatusService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
-require('services/CsrfTokenService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 
@@ -27,13 +26,11 @@ require('app.constants.ts');
 
 oppia.controller('Base', [
   '$document', '$http', '$rootScope', '$scope', 'AlertsService',
-  'BackgroundMaskService', 'CsrfTokenService', 'SidebarStatusService',
-  'UrlInterpolationService', 'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL',
-  'SITE_NAME',
+  'BackgroundMaskService', 'SidebarStatusService', 'UrlInterpolationService',
+  'UrlService', 'DEV_MODE', 'SITE_FEEDBACK_FORM_URL', 'SITE_NAME',
   function($document, $http, $rootScope, $scope, AlertsService,
-      BackgroundMaskService, CsrfTokenService, SidebarStatusService,
-      UrlInterpolationService, UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL,
-      SITE_NAME) {
+      BackgroundMaskService, SidebarStatusService, UrlInterpolationService,
+      UrlService, DEV_MODE, SITE_FEEDBACK_FORM_URL, SITE_NAME) {
     $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
