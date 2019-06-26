@@ -37,10 +37,6 @@ class ReviewTestsPage(base.BaseHandler):
 
         story = story_services.get_story_by_id(story_id)
 
-        if story is None:
-            raise self.PageNotFoundException(
-                Exception('The story with the given id doesn\'t exist.'))
-
         interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
         interaction_dependency_ids = (
@@ -84,9 +80,6 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
             story_services.get_latest_completed_node_ids(self.user_id, story_id)
         )
 
-        if story is None:
-            raise self.PageNotFoundException(
-                Exception('The story with the given id doesn\'t exist.'))
         if len(latest_completed_node_ids) == 0:
             raise self.PageNotFoundException
 

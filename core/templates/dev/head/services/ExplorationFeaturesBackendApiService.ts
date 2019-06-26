@@ -17,10 +17,9 @@
  * configured to support.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+require('services/services.constants.ts');
 
-oppia.constant(
-  'EXPLORATION_FEATURES_URL', '/explorehandler/features/<exploration_id>');
+var oppia = require('AppInit.ts').moduleName;
 
 oppia.factory('ExplorationFeaturesBackendApiService', [
   '$http', 'UrlInterpolationService', 'EXPLORATION_FEATURES_URL',

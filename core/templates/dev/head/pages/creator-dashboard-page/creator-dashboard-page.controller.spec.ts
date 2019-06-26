@@ -53,9 +53,16 @@ describe('Creator dashboard controller', function() {
         total_open_feedback: 0
       }
     };
-
-    beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+    var sampleUserInfoBackendObject = {
+      is_moderator: false,
+      is_admin: false,
+      is_super_admin: false,
+      is_topic_manager: false,
+      can_create_collections: true,
+      preferred_site_language_code: null,
+      username: 'tester',
+      user_is_logged_in: true
+    };
 
     beforeEach(function() {
       angular.mock.module('oppia');
@@ -71,7 +78,9 @@ describe('Creator dashboard controller', function() {
     }));
 
     beforeEach(angular.mock.inject(
-      function(CreatorDashboardBackendApiService) {
+      function(CreatorDashboardBackendApiService, UrlInterpolationService) {
+        $httpBackend.expect('GET', '/userinfohandler').respond(
+          200, sampleUserInfoBackendObject);
         $httpBackend.expect('GET', CREATOR_DASHBOARD_DATA_URL).respond(
           dashboardData);
         ctrl = componentController('creatorDashboardPage', null, {

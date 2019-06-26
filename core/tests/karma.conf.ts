@@ -39,7 +39,7 @@ module.exports = function(config) {
       // 'core/templates/dev/head/**/*.spec.ts',
       // 'core/templates/dev/head/*.spec.ts',
       // 'extensions/**/*Spec.ts',
-      'core/templates/dev/head/pages/exploration-editor-page/editor-tab/services/solution-validity.service.spec.ts',
+      'core/templates/dev/head/one.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,

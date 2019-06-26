@@ -16,9 +16,9 @@
  * @fileoverview search service for activityTilesInfinityGrid
  */
 
-var oppia = require('AppInit.ts').moduleName;
+require('services/services.constants.ts');
 
-oppia.constant('SEARCH_DATA_URL', '/searchhandler/data');
+var oppia = require('AppInit.ts').moduleName;
 
 oppia.factory('SearchService', [
   '$http', '$log', '$rootScope', '$translate', 'SEARCH_DATA_URL',

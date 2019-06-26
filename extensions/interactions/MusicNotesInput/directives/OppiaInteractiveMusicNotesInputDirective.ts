@@ -31,24 +31,9 @@ require(
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 
-// Gives the staff-lines human readable values.
-var oppia = require('AppInit.ts').moduleName;
+require('interactions/interactions-extension.constants.ts');
 
-oppia.constant('NOTE_NAMES_TO_MIDI_VALUES', {
-  A5: 81,
-  G5: 79,
-  F5: 77,
-  E5: 76,
-  D5: 74,
-  C5: 72,
-  B4: 71,
-  A4: 69,
-  G4: 67,
-  F4: 65,
-  E4: 64,
-  D4: 62,
-  C4: 60
-});
+var oppia = require('AppInit.ts').moduleName;
 
 oppia.directive('oppiaInteractiveMusicNotesInput', [
   'CurrentInteractionService', 'HtmlEscaperService',

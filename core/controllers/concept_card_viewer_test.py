@@ -37,9 +37,9 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
 
         self.skill_contents = skill_domain.SkillContents(
             state_domain.SubtitledHtml(
-                '1', 'Skill Explanation'), [
-                    state_domain.SubtitledHtml('2', 'Example 1'),
-                    state_domain.SubtitledHtml('3', 'Example 2')],
+                '1', '<p>Skill Explanation</p>'), [
+                    state_domain.SubtitledHtml('2', '<p>Example 1</p>'),
+                    state_domain.SubtitledHtml('3', '<p>Example 2</p>')],
             {'1': {}, '2': {}, '3': {}},
             state_domain.WrittenTranslations.from_dict({
                 'translations_mapping': {'1': {}, '2': {}, '3': {}}
@@ -55,15 +55,15 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             json_response = self.get_json(
                 '%s/%s' % (feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(
-                'Skill Explanation',
+                '<p>Skill Explanation</p>',
                 json_response['concept_card_dict']['explanation']['html'])
             self.assertEqual(
                 [{
                     'content_id': '2',
-                    'html': 'Example 1'
+                    'html': '<p>Example 1</p>'
                 }, {
                     'content_id': '3',
-                    'html': 'Example 2'
+                    'html': '<p>Example 2</p>'
                 }],
                 json_response['concept_card_dict']['worked_examples'])
 

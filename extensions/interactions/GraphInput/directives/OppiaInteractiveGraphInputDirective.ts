@@ -32,8 +32,6 @@ require('services/contextual/WindowDimensionsService.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 
-oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
-
 oppia.directive('oppiaInteractiveGraphInput', [
   'GraphInputRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
   'UrlService', 'EVENT_NEW_CARD_AVAILABLE',
