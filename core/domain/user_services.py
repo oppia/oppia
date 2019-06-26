@@ -971,9 +971,12 @@ def get_human_readable_user_ids(user_ids):
             raise Exception('User not found.')
         elif user_settings.user_id == feconf.SYSTEM_COMMITTER_ID:
             usernames.append('admin')
-        else:
+        elif user_settings.username:
             usernames.append(user_settings.username)
-
+        else:
+            usernames.append(
+                '[Awaiting user registration: %s]' %
+                user_settings.truncated_email)
     return usernames
 
 

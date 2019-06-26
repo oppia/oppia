@@ -1245,9 +1245,16 @@ class UserSettingsTests(test_utils.GenericTestBase):
             ])
 
     def test_get_human_readable_user_ids(self):
+        # Create an unregistered user who has no username.
+        user_models.UserSettingsModel(
+            id='unregistered_user_id', email='user@example.com',
+            username='').put()
+
         user_ids = user_services.get_human_readable_user_ids(
-            [self.owner_id, feconf.SYSTEM_COMMITTER_ID])
-        expected_user_ids = ['owner', 'admin']
+            [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
+        expected_user_ids = [
+            'owner', 'admin',
+            '[Awaiting user registration: u..@example.com]']
 
         self.assertEqual(user_ids, expected_user_ids)
 
