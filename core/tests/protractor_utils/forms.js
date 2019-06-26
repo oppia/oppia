@@ -560,6 +560,7 @@ var CodeMirrorChecker = function(elem) {
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
+   8 Pane specifies the codemirror Left or Right Pane which is to be scrolled.
    * compareDict is an object whose keys are line numbers and whose values are
    * objects corresponding to that line with the following key-value pairs:
    *  - 'text': the exact string of text expected on that line
@@ -567,12 +568,12 @@ var CodeMirrorChecker = function(elem) {
    *  - 'checked': true or false, whether the line has been checked
    */
   var _compareTextAndHighlightingFromLine = function(
-      currentLineNumber, scrollTo, compareDict) {
+      currentLineNumber, scrollTo, Pane, compareDict) {
     // This is used to scroll the text in codemirror to a point scrollTo pixels
     // from the top of the text or the bottom of the text if scrollTo is too
     // large.
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
+      "$('.CodeMirror-vscrollbar')."+Pane+".scrollTop(" + String(scrollTo) +
       ');');
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
@@ -600,6 +601,7 @@ var CodeMirrorChecker = function(elem) {
         _compareTextAndHighlightingFromLine(
           largestLineNumber,
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
+          Pane,
           compareDict);
       } else {
         for (var lineNumber in compareDict) {
@@ -618,7 +620,7 @@ var CodeMirrorChecker = function(elem) {
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
-   * Pane specifices the codemirror Left or Right Pane which is to be scrolled. 
+   * Pane specifies the codemirror Left or Right Pane which is to be scrolled. 
    * compareDict is an object whose keys are line numbers and whose values are
    * objects corresponding to that line with the following key-value pairs:
    *  - 'text': the exact string of text expected on that line
@@ -675,11 +677,11 @@ var CodeMirrorChecker = function(elem) {
      * This runs much slower than checking without highlighting, so the
      * expectTextToBe() function should be used when possible.
      */
-    expectTextWithHighlightingToBe: function(expectedTextDict) {
+    expectTextWithHighlightingToBe: function(expectedTextDict, Pane) {
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
-      _compareTextAndHighlightingFromLine(1, 0, expectedTextDict);
+      _compareTextAndHighlightingFromLine(1, 0, Pane, expectedTextDict);
     },
     /**
      * Compares text with codemirror. The input should be a string (with

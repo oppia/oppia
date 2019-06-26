@@ -222,10 +222,10 @@ var ExplorationEditorHistoryTab = function() {
           v1StateContents, v2StateContents) {
         forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).first()
-        ).expectTextWithHighlightingToBe(v1StateContents);
+        ).expectTextWithHighlightingToBe(v1StateContents, 'first()');
         forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).last()
-        ).expectTextWithHighlightingToBe(v2StateContents);
+        ).expectTextWithHighlightingToBe(v2StateContents, 'last()');
       }
     };
   };
