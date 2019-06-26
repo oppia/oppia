@@ -51,7 +51,7 @@ export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
 export DEFAULT_RUN_MINIFIED_TESTS=false
 maybeInstallDependencies "$@"
 
-find . -type f \( -name "*.spec.ts" ! -name "state-interaction-editor.directive.spec.ts" -o -name "*Spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/one.spec.ts
+find . -type f \( -name "*.spec.ts" ! -name "state-interaction-editor.directive.spec.ts" -o -name "*Spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/combined-tests.spec.ts
 
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"
@@ -75,6 +75,6 @@ if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
   $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.ts --prodEnv
 fi
 
-rm ./core/templates/dev/head/one.spec.ts
+rm ./core/templates/dev/head/combined-tests.spec.ts
 
 echo Done!
