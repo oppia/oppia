@@ -795,15 +795,15 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(image_ids, expected_image_ids)
 
     def test_clean_image_assets(self):
-        image_ids_in_state = [u'image_id_1']
+        image_ids_to_delete = [u'image_id_1']
         image_assets_object = (
             state_domain.ImageAssets.from_dict(self.image_assets_dict))
-        image_assets_object.clean(image_ids_in_state)
+        image_assets_object.clean(image_ids_to_delete)
         expected_image_assets_dict = {
             'image_mapping': {
-                'image_id_1': {
+                'image_id_2': {
                     'src': 'random.png',
-                    'placeholder': True,
+                    'placeholder': False,
                     'instructions': 'no instructions'
                 }
             }

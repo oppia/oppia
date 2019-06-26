@@ -85,7 +85,7 @@ class ExplorationModel(base_models.VersionedModel):
     # exploration.
     correctness_feedback_enabled = ndb.BooleanProperty(
         default=False, indexed=True)
-    image_counter = ndb.IntegerProperty(default=0, indexed=False)
+    image_counter = ndb.IntegerProperty(required=True, default=0, indexed=False)
 
     # DEPRECATED in v2.0.0.rc.2. Do not use. Retaining it here because deletion
     # caused GAE to raise an error on fetching a specific version of the

@@ -17,6 +17,7 @@
 """Classes for Rich Text Components in Oppia."""
 
 import re
+
 import bs4
 import constants
 from extensions.objects.models import objects

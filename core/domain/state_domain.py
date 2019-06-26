@@ -226,10 +226,9 @@ class Image(object):
             ValidationError: One or more attributes of the Image are not valid.
         """
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
-        if not re.match(filename_re, self.src):
+        if (not re.match(filename_re, self.src) or self.src == ''):
             raise utils.ValidationError(
-                'Invalid filepath, received %s' %
-                self.src)
+                'Invalid filepath, received %s' % self.src)
         if not isinstance(self.placeholder, bool):
             raise utils.ValidationError(
                 'Expected placeholder to be bool, received %s' %
@@ -253,6 +252,9 @@ class ImageAssets(object):
     def validate(self, image_counter):
         """Validates all properties of ImageAssets.
 
+        Args:
+            image_couter: int. Counter for image ids.
+
         Raises:
             ValidationError: One or more attributes of the ImageAssets are not
                 valid.
@@ -261,8 +263,10 @@ class ImageAssets(object):
             raise utils.ValidationError(
                 'Expected image_mapping to be dict, received %s' %
                 self.image_mapping)
-        image_ids = self.image_mapping.keys()
-        for image_id in image_ids:
+        for (image_id, image) in self.image_mapping.iteritems():
+            if not isinstance(image_id, basestring):
+                raise utils.ValidationError(
+                    'Invalid image_id received: %s' % image_id)                
             if not self.does_image_id_have_valid_pattern(image_id):
                 raise utils.ValidationError(
                     'Invalid image_id received: %s' % image_id)
@@ -271,7 +275,6 @@ class ImageAssets(object):
                 raise Exception(
                     'Image ID cannot be greater than image_counter,'
                     ' received image_id is %s' % image_id)
-            image = self.image_mapping[image_id]
             image.validate()
 
     def to_dict(self):
@@ -283,8 +286,7 @@ class ImageAssets(object):
         image_assets = {}
         image_mapping = {}
 
-        for image_id in self.image_mapping:
-            image = self.image_mapping[image_id]
+        for (image_id, image) in self.image_mapping.iteritems():
             image_mapping[image_id] = image.to_dict()
 
         image_assets['image_mapping'] = image_mapping
@@ -339,42 +341,36 @@ class ImageAssets(object):
     def does_image_id_have_valid_pattern(self, image_id):
         """Checks if the image ID has a valid pattern.
         Valid image pattern is 'image_id_[digits]' eg. 'image_id_1' or
-        'image_id_50'
-        Invalid image pattern were :
-            1) 'image_id_random_text'
-            2) 'image_id_invalid55'
-            3) 'image_id_55invalid'
-            4) 'dd_image_id'
+        'image_id_50'.
+        Invalid image patterns are 'image_id_random_text',
+        'image_id_invalid55' etc.
 
         Args:
             image_id: str. ID of the image.
 
         Returns:
-            bool. True if image_id follows the pattern.
+            bool. Whether the image_id is in the correct pattern.
         """
         image_re = r'image_id_[0-9]{1,}$'
-        if re.match(image_re, image_id):
-            return True
-        return False
+        return re.match(image_re, image_id)
 
     def get_all_image_ids(self):
         """Returns all image ids of images in the image assets.
 
         Returns:
-            set. A set of image ids of all the images present in image assets.
+            List. A list of image ids of all the images present in image assets.
         """
         return self.image_mapping.keys()
 
-    def clean(self, image_ids_in_state_html):
-        """Deletes all image ids, which are no more present un HTML.
+    def clean(self, image_ids_to_delete):
+        """Deletes all image ids, which are no more present in HTML.
 
         Args:
-            image_ids_in_state_html: list. List of all image ids pesent in a
-                state HTML.
+            image_ids_to_delete: list. List of all image ids thats needs to be
+                delete.
         """
-        for image_id in self.image_mapping.keys():
-            if image_id not in image_ids_in_state_html:
-                del self.image_mapping[image_id]
+        for image_id in image_ids_to_delete:
+            del self.image_mapping[image_id]
 
 
 class Solution(object):
@@ -1499,6 +1495,7 @@ class SubtitledHtml(object):
         # ensures that validation will not fail in such cases.
         self.html = html_validation_service.convert_to_ckeditor(
             html_cleaner.clean(html))
+        self.validate()
 
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.
@@ -1600,8 +1597,7 @@ class State(object):
                 this state.
             interaction: InteractionInstance. The interaction instance
                 associated with this state.
-            image_assets: ImageAssets. The images for the state
-                contents.
+            image_assets: ImageAssets. The images for the state contents.
             recorded_voiceovers: RecordedVoiceovers. The recorded voiceovers for
                 the state contents and translations.
             written_translations: WrittenTranslations. The written translations
@@ -1642,7 +1638,7 @@ class State(object):
                 are ParamSpec value objects with an object type
                 property(obj_type). It is None if the state belongs to a
                 question.
-            image_counter: str. Counter for image ids.
+            image_counter: int. Counter for image ids.
             allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
 

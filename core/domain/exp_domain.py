@@ -151,8 +151,7 @@ class ExplorationChange(change_domain.BaseChange):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled',
-        'image_counter')
+        'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
     ALLOWED_COMMANDS = [{
         'name': CMD_CREATE_NEW,
@@ -2243,6 +2242,7 @@ class Exploration(object):
         image_counter = 0
         for key, state_dict in states_dict.iteritems():
             image_id_to_src_dict = {}
+            image_mapping = {}
             state_dict['image_assets'] = {}
             state_dict['image_assets']['image_mapping'] = {}
 
@@ -2252,8 +2252,8 @@ class Exploration(object):
                 state.interaction.get_all_html_content_strings())
 
             state_html = content_html
-            if interaction_html_list != []:
-                state_html = state_html + interaction_html_list[0]
+            for html in interaction_html_list:
+                state_html = state_html + html
 
             # Gets image src of each image form HTML.
             image_src_list = html_validation_service.get_image_src_from_html(
@@ -2261,15 +2261,15 @@ class Exploration(object):
             # Maps image_id with the image source.
             image_id_to_src_dict = (
                 cls.generate_image_id_and_maps_image_id_with_image_src(
-                    image_src_list, image_counter, image_id_to_src_dict))
+                    image_src_list, image_counter))
             # Add image info in image assets.
-            for image_id in image_id_to_src_dict:
-                filepath = image_id_to_src_dict[image_id]
-                state_dict['image_assets']['image_mapping'][image_id] = {
+            for (image_id, filepath) in image_id_to_src_dict.iteritems():
+                image_mapping[image_id] = {
                     'instructions': '',
                     'placeholder': False,
                     'src': filepath,
                 }
+            state_dict['image_assets']['image_mapping'] = image_mapping
             # Add image id in image tag.
             add_image_id_and_remove_filepath_from_image_tag = functools.partial(
                 html_validation_service.add_image_id_and_remove_filepath_from_image_tag, # pylint: disable=line-too-long
@@ -3331,19 +3331,19 @@ class Exploration(object):
 
     @classmethod
     def generate_image_id_and_maps_image_id_with_image_src(
-            cls, image_src_list, image_counter, image_info_dict): #pylint: disable=too-many-function-args
+            cls, image_src_list, image_counter):
         """Maps image source to the image id. Creates image id with the help of
         image counter.
 
         Args:
             image_src_list: list. List contaning image sources.
             image_counter: int. Counter for an image.
-            image_info_dict: dict. Dict contaning image id with source,
-                image ids that needs to be added in image tag.
+
         Returns:
-            image_info_dict: dict. Dict contaning image id with source,
+            image_id_to_src_dict: dict. Dict contaning image id with source,
                 image ids that needs to be added in image tag.
         """
+        image_id_to_src_dict = {}
         image_id_starting_range = image_counter + 1
         image_id_ending_range = image_counter + len(image_src_list)
         image_src_list_counter = 0
@@ -3351,10 +3351,10 @@ class Exploration(object):
         for _id in range(image_id_starting_range, image_id_ending_range + 1):
             image_id = 'image_id_' + str(_id)
             filepath = image_src_list[image_src_list_counter]
-            image_info_dict[image_id] = filepath
+            image_id_to_src_dict[image_id] = filepath
             image_src_list_counter += 1
 
-        return image_info_dict
+        return image_id_to_src_dict
 
     def get_all_images_ids_in_exploration(self):
         """Returns a list of Ids, of all images present in an exploration.
@@ -3371,9 +3371,14 @@ class Exploration(object):
 
     def clean_image_assets(self):
         """Remove all deleted images from image assets."""
+        image_ids_to_delete = []
         for state in self.states.values():
             image_ids_in_state_html = state.get_image_ids_of_state()
-            state.image_assets.clean(image_ids_in_state_html)
+            image_ids_in_image_assets = state.image_assets.image_mapping.keys()
+            for image_id in image_ids_in_state_html:
+                if image_id not in image_ids_in_image_assets:
+                    image_ids_to_delete.append(image_id)
+            state.image_assets.clean(image_ids_to_delete)
 
 
 class ExplorationSummary(object):

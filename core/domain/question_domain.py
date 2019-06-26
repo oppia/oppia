@@ -209,11 +209,11 @@ class Question(object):
         """Converts from version 29 to 30. Version 30 added image assets field
         in state model. This funtion extracts HTML of the state and does 3
         operations on each HTML content. The 3 operations and their sequence
-        are.
+        are as follows:
           1) Gets image src of all images present in a state.
-          2) Maps each image with an image ID.
-          3) Replaces filepath attribute in the image tag, and adds an image
-             id attribute to it.
+          2) Maps each image filepath with an image ID.
+          3) Replaces filepath-with-value attribute in the image tag with the
+             id-with-value attribute.
         After the above 3 operations each image info present in image dict is
         added to image assets.
 
@@ -227,6 +227,7 @@ class Question(object):
         """
         image_counter = 0
         image_id_to_src_dict = {}
+        image_mapping = {}
         question_state_dict['image_assets'] = {}
         question_state_dict['image_assets']['image_mapping'] = {}
 
@@ -235,10 +236,9 @@ class Question(object):
         interaction_html_list = (
             state.interaction.get_all_html_content_strings())
 
-        if interaction_html_list != []:
-            state_html = content_html + interaction_html_list[0]
-        else:
-            state_html = content_html
+        state_html = content_html
+        for html in interaction_html_list:
+            state_html = state_html + html
 
         # Gets image src of each image form HTML.
         image_src_list = html_validation_service.get_image_src_from_html(
@@ -246,18 +246,16 @@ class Question(object):
 
         image_id_to_src_dict = (
             cls.generate_image_id_and_maps_image_id_with_image_src(
-                image_src_list, image_counter, image_id_to_src_dict))
+                image_src_list, image_counter))
 
         # Add image info in image assets.
-        for image_id in image_id_to_src_dict:
-            filepath = image_id_to_src_dict[image_id]
-            (question_state_dict['image_assets']['image_mapping']
-             [image_id]) = {
+        for (image_id, filepath) in image_id_to_src_dict.iteritems():
+            image_mapping[image_id] = {
                  'instructions': '',
                  'placeholder': False,
                  'src': filepath,
              }
-
+        question_state_dict['image_assets']['image_mapping'] = image_mapping
         # Add image id in image tag.
         add_image_id_and_remove_filepath_from_image_tag = functools.partial(
             html_validation_service.add_image_id_and_remove_filepath_from_image_tag, # pylint: disable=line-too-long
@@ -452,30 +450,30 @@ class Question(object):
 
     @classmethod
     def generate_image_id_and_maps_image_id_with_image_src(
-            cls, image_src_list, image_counter, image_info_dict): #pylint: disable=too-many-function-args
+            cls, image_src_list, image_counter): #pylint: disable=too-many-function-args
         """Maps image source with the image id. Creates image id with the
             help of image counter.
 
         Args:
             image_src_list: list. List contaning image sources.
             image_counter: int. Counter for an image.
-            image_info_dict: dict. Dict contaning image id with source,
-                image ids that needs to be added in image tag.
+
         Returns:
-            image_info_dict: dict. Dict contaning image id with source,
+            image_id_to_src_dict: dict. Dict contaning image id with source,
                 image ids that needs to be added in image tag.
         """
-        image_id_starting_range = image_counter - len(image_src_list) + 1
-        image_id_ending_range = image_counter + 1
+        image_id_to_src_dict = {}
+        image_id_starting_range = image_counter + 1
+        image_id_ending_range = image_counter + len(image_src_list)
         image_src_list_counter = 0
 
-        for _id in range(image_id_starting_range, image_id_ending_range):
-            image_id = 'image_id_' + str(_id)
+        for counter in range(image_id_starting_range, image_id_ending_range + 1):
+            image_id = 'image_id_' + str(counter)
             filepath = image_src_list[image_src_list_counter]
-            image_info_dict[image_id] = filepath
+            image_id_to_src_dict[image_id] = filepath
             image_src_list_counter += 1
 
-        return image_info_dict
+        return image_id_to_src_dict
 
 
 class QuestionSummary(object):

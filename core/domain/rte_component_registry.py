@@ -67,9 +67,8 @@ class Registry(object):
                 for ca_spec in component_specs['customization_arg_specs']]
 
         # Add 'id-with-value' in oppia custom tags.
-        (
-            component_tags[u'oppia-noninteractive-image'].
-            append(u'id-with-value'))
+        component_tags[u'oppia-noninteractive-image'].append(u'id-with-value')
+
         return component_tags
 
     @classmethod
