@@ -41,15 +41,12 @@ const downgradedModule = downgradeModule(bootstrapFn);
 
 declare var angular: any;
 
-require('pages/email-dashboard-pages/email-dashboard-page.module.ts');
-require('pages/signup-page/signup-page.module.ts');
 var oppia = angular.module(
   'oppia', [
     'dndLists', 'headroom', 'infinite-scroll', 'ngAnimate',
     'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
     'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
     'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-    'emailDashboardPage', 'signupPage',
     downgradedModule
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));

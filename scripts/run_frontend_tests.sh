@@ -51,7 +51,7 @@ export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
 export DEFAULT_RUN_MINIFIED_TESTS=false
 maybeInstallDependencies "$@"
 
-# find . -type f \( -name "*.spec.ts" -o -name "*Spec.ts" -not -name "*editor.directive.spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/one.spec.ts
+find . -type f \( -name "*.spec.ts" ! -name "state-interaction-editor.directive.spec.ts" -o -name "*Spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/one.spec.ts
 
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"
@@ -74,5 +74,7 @@ if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
   $PYTHON_CMD scripts/build.py --prod_env --minify_third_party_libs_only
   $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.ts --prodEnv
 fi
+
+rm ./core/templates/dev/head/one.spec.ts
 
 echo Done!

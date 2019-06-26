@@ -251,11 +251,11 @@ oppia.directive('creatorDashboardPage', ['UrlInterpolationService', function(
             ctrl.topicSummaries = responseData.topic_summary_dicts;
             if (responseData.threads_for_created_suggestions_list) {
               var numberOfCreatedSuggestions = (
-                responseData.threads_for_created_suggestions_list.length);  
+                responseData.threads_for_created_suggestions_list.length);
             }
             if (responseData.threads_for_suggestions_to_review_list) {
               var numberOfSuggestionsToReview = (
-                responseData.threads_for_suggestions_to_review_list.length);  
+                responseData.threads_for_suggestions_to_review_list.length);
             }
             ctrl.mySuggestionsList = [];
             for (var i = 0; i < numberOfCreatedSuggestions; i++) {

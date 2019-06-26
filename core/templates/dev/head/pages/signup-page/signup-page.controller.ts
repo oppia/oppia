@@ -28,7 +28,7 @@ require('services/stateful/FocusManagerService.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 
-angular.module('signupPage').directive('signupPage', ['UrlInterpolationService', function(
+oppia.directive('signupPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',

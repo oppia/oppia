@@ -64,19 +64,7 @@ describe('Creator dashboard controller', function() {
       user_is_logged_in: true
     };
 
-    // beforeEach(
-    //   angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-
     beforeEach(function() {
-      // angular.mock.module(function($provide) {
-      //   // $provide.service('CreatorDashboardBackendApiService', function() {
-      //   //   jasmine.createSpy('fetchDashboardData').and.callThrough();
-      //   // });
-      //   // $provide.service('UrlInterpolationService', function() {
-      //   //   jasmine.createSpy('getDirectiveTemplateUrl').and.callThrough();
-      //   // })
-      //   $provide.value('CreatorDashboardBackendApiService', CreatorDashboardBackendApiService)
-      // });
       angular.mock.module('oppia');
     });
 

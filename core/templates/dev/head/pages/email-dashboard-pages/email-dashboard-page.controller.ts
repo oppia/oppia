@@ -23,7 +23,7 @@ require('services/UserService.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 
-angular.module('emailDashboardPage').directive('emailDashboardPage', ['UrlInterpolationService', function(
+oppia.directive('emailDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
     restrict: 'E',
