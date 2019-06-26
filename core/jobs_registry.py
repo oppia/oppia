@@ -89,7 +89,6 @@ ONE_OFF_JOB_MANAGERS = [
         .ExplorationRightsSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
@@ -98,7 +97,29 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.FileModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSkillLinkModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionRightsModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .QuestionRightsSnapshotMetadataModelAuditOneOffJob),
+    (
+        prod_validation_jobs_one_off
+        .QuestionRightsSnapshotContentModelAuditOneOffJob),
+    prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillRightsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillRightsSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillRightsSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.SkillSummaryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StoryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySnapshotContentModelAuditOneOffJob,

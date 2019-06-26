@@ -856,6 +856,63 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(story_rights.is_manager(self.USER_ID_1))
         self.assertFalse(story_rights.is_manager('fakeuser'))
 
+    def test_validate_non_str_exploration_id(self):
+        self.story.story_contents.nodes[0].exploration_id = 1
+        self._assert_validation_error(
+            'Expected exploration ID to be a string')
+
+    def test_validate_non_str_outline(self):
+        self.story.story_contents.nodes[0].outline = 0
+        self._assert_validation_error(
+            'Expected outline to be a string')
+
+    def test_validate_non_list_destination_node_ids(self):
+        self.story.story_contents.nodes[0].destination_node_ids = 0
+        self._assert_validation_error(
+            'Expected destination node ids to be a list')
+
+    def test_validate_node_id(self):
+        self.story.story_contents.nodes[0].destination_node_ids = [
+            self.NODE_ID_1]
+        self._assert_validation_error(
+            'The story node with ID %s points to itself.' % self.NODE_ID_1)
+
+    def test_validate_non_str_node_id(self):
+        self.story.story_contents.nodes[0].destination_node_ids = [0]
+        self._assert_validation_error('Expected node ID to be a string')
+
+    def test_validate_out_of_bounds_node_id(self):
+        self.story.story_contents.nodes[0].id = 'node_3'
+        self._assert_validation_error(
+            'The node with id node_3 is out of bounds.')
+
+    def test_get_node_index_with_invalid_node_id(self):
+        self.assertIsNone(
+            self.story.story_contents.get_node_index('invalid_node_id'))
+
+    def test_validate_empty_title(self):
+        self.story.title = ''
+        self._assert_validation_error('Title field should not be empty')
+
+    def test_story_summary_creation(self):
+        curr_time = datetime.datetime.utcnow()
+        story_summary = story_domain.StorySummary(
+            'story_id', 'title', 'description', 'en', 1, 1, curr_time,
+            curr_time)
+
+        expected_dict = {
+            'id': 'story_id',
+            'title': 'title',
+            'description': 'description',
+            'language_code': 'en',
+            'version': 1,
+            'node_count': 1,
+            'story_model_created_on': utils.get_time_in_millisecs(curr_time),
+            'story_model_last_updated': utils.get_time_in_millisecs(curr_time),
+        }
+
+        self.assertEqual(story_summary.to_dict(), expected_dict)
+
 
 class StorySummaryTests(test_utils.GenericTestBase):
 
