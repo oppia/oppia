@@ -2179,7 +2179,7 @@ class ContinuousComputationModelValidator(BaseModelValidator):
     def _get_custom_validation_functions(cls):
         return [cls._validate_time_fields]
 
-      
+
 class QuestionModelValidator(BaseModelValidator):
     """Class for validating QuestionModel."""
 
