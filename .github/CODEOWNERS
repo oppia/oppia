@@ -215,6 +215,7 @@
 /core/domain/visualization_registry*.py @brianrodri
 /core/storage/statistics/ @brianrodri
 /core/templates/dev/head/components/common-layout-directives/common-elements/confirmation-modal.template.html @brianrodri
+/core/templates/dev/head/domain/improvements/ @brianrodri
 /core/templates/dev/head/domain/statistics/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/improvements-tab/ @brianrodri
 /core/templates/dev/head/pages/exploration-editor-page/statistics-tab/ @brianrodri
