@@ -17,7 +17,6 @@
  * text components.
  */
 
-require('components/state-editor/state-editor.directive.ts');
 require(
   'pages/exploration-editor-page/services/' +
   'exploration-image-counter.service.ts');
@@ -84,7 +83,7 @@ oppia.run([
                 customizationArgSpecs,
                 customizationArgs,
                 function(customizationArgsDict) {
-                /* 'ExplorationStatesService', 'StateEditorService' and 
+                /* 'ExplorationStatesService', 'ExplorationImageCounterService' and
                  * are not imported at the time of initializing of CKEditor
                  * because this services are of editor-page not of learner-page.
                  * So this services should only be imported at editor learner

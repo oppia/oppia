@@ -56,7 +56,7 @@ describe('Core exploration functionality', function() {
     userNumber++;
   });
 
-  fit('should display plain text content', function() {
+  it('should display plain text content', function() {
     explorationEditorMainTab.setContent(forms.toRichText('plain text'));
     explorationEditorMainTab.setInteraction('Continue', 'click here');
     explorationEditorMainTab.getResponseEditor('default')
