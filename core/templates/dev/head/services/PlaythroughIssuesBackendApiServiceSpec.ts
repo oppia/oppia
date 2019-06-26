@@ -16,8 +16,8 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
+require('domain/improvements/PlaythroughIssueObjectFactory.ts');
 require('domain/statistics/PlaythroughObjectFactory.ts');
-require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 require('services/PlaythroughIssuesBackendApiService.ts');
 
 describe('PlaythroughIssuesBackendApiService', function() {
