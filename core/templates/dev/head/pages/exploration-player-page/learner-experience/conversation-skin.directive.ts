@@ -67,7 +67,6 @@ require('pages/exploration-player-page/services/learner-params.service.ts');
 require(
   'pages/exploration-player-page/services/learner-view-rating.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require(
   'pages/exploration-player-page/services/' +
   'player-correctness-feedback-enabled.service.ts');
@@ -92,7 +91,7 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
+require('pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ts');
 
 // Note: This file should be assumed to be in an IIFE, and the constants below

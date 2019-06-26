@@ -22,6 +22,7 @@ import { StaticProvider } from '@angular/core';
 
 import { AppConstants } from 'app.constants.ts';
 import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
 import { ServicesConstants } from 'services/services.constants.ts';
 
 @NgModule({
@@ -31,6 +32,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
   providers: [
     AppConstants,
     CreatorDashboardConstants,
+    ExplorationPlayerConstants,
     ServicesConstants
   ]
 })
