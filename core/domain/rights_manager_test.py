@@ -639,7 +639,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 self.user_a, self.EXP_ID, self.user_id_a,
                 rights_manager.ROLE_OWNER)
 
-    def test_assign_viewer_role_owner(self):
+    def test_assign_viewer_to_role_owner(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -656,7 +656,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(exp_rights.is_owner(self.user_id_b))
 
-    def test_assign_voice_artist_role_owner(self):
+    def test_assign_voice_artist_to_role_owner(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -673,7 +673,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.assertTrue(exp_rights.is_owner(self.user_id_b))
 
-    def test_editor_cannot_be_reassigned_editor(self):
+    def test_editor_cannot_be_reassigned_as_editor(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -687,7 +687,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_manager.ROLE_EDITOR)
 
-    def test_voice_artist_cannot_be_reassigned_voice_artist(self):
+    def test_voice_artist_cannot_be_reassigned_as_voice_artist(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -701,7 +701,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_manager.ROLE_VOICE_ARTIST)
 
-    def test_viewer_cannot_be_reassigned_viewer(self):
+    def test_viewer_cannot_be_reassigned_as_viewer(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -727,7 +727,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
                 self.user_a, self.EXP_ID, self.user_id_b,
                 rights_manager.ROLE_VIEWER)
 
-    def test_cannot_assign_role_with_invalid_role(self):
+    def test_cannot_assign_invalid_role(self):
         exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
         exp_services.save_new_exploration(self.user_id_a, exp)
 
@@ -1196,26 +1196,26 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'Public explorations should have no viewers specified.'):
             self.activity_rights.validate()
 
-    def test_validate_owner_editor(self):
+    def test_validate_owner_cannot_be_editor(self):
         self.activity_rights.editor_ids = [self.owner_id]
         with self.assertRaisesRegexp(
             Exception, 'A user cannot be both an owner and an editor.'):
             self.activity_rights.validate()
 
-    def test_validate_owner_voice_artist(self):
+    def test_validate_owner_cannot_be_voice_artist(self):
         self.activity_rights.voice_artist_ids = [self.owner_id]
         with self.assertRaisesRegexp(
             Exception, 'A user cannot be both an owner and a voice artist.'):
             self.activity_rights.validate()
 
-    def test_validate_owner_viewer(self):
+    def test_validate_owner_cannot_be_viewer(self):
         self.activity_rights.viewer_ids = [self.owner_id]
         self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
         with self.assertRaisesRegexp(
             Exception, 'A user cannot be both an owner and a viewer.'):
             self.activity_rights.validate()
 
-    def test_validate_editor_voice_artist(self):
+    def test_validate_editor_cannot_be_voice_artist(self):
         self.activity_rights.voice_artist_ids = [self.viewer_id]
         self.activity_rights.editor_ids = [self.viewer_id]
         self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
@@ -1223,7 +1223,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'A user cannot be both an editor and a voice artist.'):
             self.activity_rights.validate()
 
-    def test_validate_editor_viewer(self):
+    def test_validate_editor_cannot_be_viewer(self):
         self.activity_rights.viewer_ids = [self.viewer_id]
         self.activity_rights.editor_ids = [self.viewer_id]
         self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
@@ -1231,7 +1231,7 @@ class ActivityRightsTests(test_utils.GenericTestBase):
             Exception, 'A user cannot be both an editor and a viewer.'):
             self.activity_rights.validate()
 
-    def test_validate_voice_artist_viewer(self):
+    def test_validate_voice_artist_cannot_be_viewer(self):
         self.activity_rights.viewer_ids = [self.viewer_id]
         self.activity_rights.voice_artist_ids = [self.viewer_id]
         self.activity_rights.status = rights_manager.ACTIVITY_STATUS_PRIVATE
