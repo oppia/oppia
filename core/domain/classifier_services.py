@@ -115,6 +115,10 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
     Raises:
         Exception. This method should not be called by exploration with version
             number 1.
+
+    Returns:
+        list(str). State names which don't have classifier model for previous
+            version of exploration.
     """
     exp_id = exploration.id
     current_exp_version = exploration.version
@@ -135,12 +139,15 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
         exp_id, old_exp_version, state_names_to_retrieve)
 
     job_exploration_mappings = []
+    state_names_without_classifier = []
     for index, classifier_training_job in enumerate(classifier_training_jobs):
         if classifier_training_job is None:
             logging.error(
                 'The ClassifierTrainingJobModel for the %s state of Exploration'
                 ' with exp_id %s and exp_version %s does not exist.' % (
                     state_names_to_retrieve[index], exp_id, old_exp_version))
+            state_names_without_classifier.append(
+                state_names_to_retrieve[index])
             continue
         new_state_name = state_names[index]
         job_exploration_mapping = (
@@ -152,6 +159,8 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
 
     classifier_models.TrainingJobExplorationMappingModel.create_multi(
         job_exploration_mappings)
+
+    return state_names_without_classifier
 
 
 def convert_strings_to_float_numbers_in_classifier_data(
