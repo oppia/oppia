@@ -107,8 +107,20 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.FileModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
-    prod_validation_jobs_one_off.JobModelAuditOneOffJob,
-    prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSkillLinkModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionRightsModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .QuestionRightsSnapshotMetadataModelAuditOneOffJob),
+    (
+        prod_validation_jobs_one_off
+        .QuestionRightsSnapshotContentModelAuditOneOffJob),
+    prod_validation_jobs_one_off.QuestionCommitLogEntryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.QuestionSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSimilaritiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.SkillModelAuditOneOffJob,
     prod_validation_jobs_one_off.SkillSnapshotMetadataModelAuditOneOffJob,
