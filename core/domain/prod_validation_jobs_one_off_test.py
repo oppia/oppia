@@ -14847,7 +14847,7 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for completed node check of '
             'StoryProgressModel\', [u"Entity id %s: Following completed '
             'node ids [u\'invalid\'] do not belong to the story with '
-            'id story corresponding to the entity."]]') % (
+            'id story corresponding to the entity"]]') % (
                 self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 

@@ -4631,17 +4631,23 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             private_exp_ids = []
             missing_exp_ids = []
             unmarked_exp_ids = []
+            completed_exp_ids = []
             for node in story_model.story_contents['nodes']:
                 if node['id'] in item.completed_node_ids:
-                    exp_id = node['exploration_id']
-                    exp = exp_models.ExplorationModel.get_by_id(exp_id)
-                    if exp is None or exp.deleted:
-                        missing_exp_ids.append(exp_id)
-                        continue
-                    if exp_id not in completed_activity_model.exploration_ids:
-                        unmarked_exp_ids.append(exp_id)
-                    if rights_manager.is_exploration_private(exp_id):
-                        private_exp_ids.append(exp_id)
+                    completed_exp_ids.append(node['exploration_id'])
+                    if node['exploration_id'] not in (
+                            completed_activity_model.exploration_ids):
+                        unmarked_exp_ids.append(node['exploration_id'])
+                    if rights_manager.is_exploration_private(
+                            node['exploration_id']):
+                        private_exp_ids.append(node['exploration_id'])
+
+            exp_model_list = exp_models.ExplorationModel.get_multi(
+                completed_exp_ids)
+            for index, exp_model in enumerate(exp_model_list):
+                if exp_model is None or exp_model.deleted:
+                    missing_exp_ids.append(completed_exp_ids[index])
+
             error_msg = ''
             if private_exp_ids:
                 error_msg = error_msg + (
@@ -4723,15 +4729,20 @@ class UserQueryModelValidator(BaseUserModelValidator):
                         item.id, email_model.sender_id,
                         email_model.id, item.submitter_id))
 
-            for recipient_id in email_model.recipient_ids:
-                if recipient_id in item.user_ids:
-                    user_bulk_emails_model = (
-                        user_models.UserBulkEmailsModel.get_by_id(recipient_id))
-                    if user_bulk_emails_model is None or (
-                            user_bulk_emails_model.deleted):
-                        cls.errors['user bulk email check'].append(
-                            'Entity id %s: UserBulkEmails model is missing for '
-                            'recipient with id %s' % (item.id, recipient_id))
+            recipient_user_ids = [
+                recipient_id
+                for recipient_id in email_model.recipient_ids if (
+                    recipient_id in item.user_ids)]
+            user_bulk_emails_model_list = (
+                user_models.UserBulkEmailsModel.get_multi(recipient_user_ids))
+            for index, user_bulk_emails_model in enumerate(
+                    user_bulk_emails_model_list):
+                if user_bulk_emails_model is None or (
+                        user_bulk_emails_model.deleted):
+                    cls.errors['user bulk email check'].append(
+                        'Entity id %s: UserBulkEmails model is missing for '
+                        'recipient with id %s' % (
+                            item.id, recipient_user_ids[index]))
 
     @classmethod
     def _get_custom_validation_functions(cls):
