@@ -469,7 +469,7 @@ class UnsentFeedbackEmailModel(base_models.BaseModel):
     """
 
     # The list of feedback messages that need to be sent to this user.
-    # Each element in this list is a dict with keys 'exploration_id',
+    # Each element in this list is a dict with keys 'entity_type', 'entity_id',
     # 'thread_id' and 'message_id'; this information is used to retrieve
     # corresponding FeedbackMessageModel instance.
     feedback_message_references = ndb.JsonProperty(repeated=True)

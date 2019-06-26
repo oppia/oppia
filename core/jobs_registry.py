@@ -53,6 +53,10 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.DeleteStateIdMappingModelsOneOffJob,
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
+    (
+        prod_validation_jobs_one_off
+        .TrainingJobExplorationMappingModelAuditOneOffJob),
     prod_validation_jobs_one_off.CollectionModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.CollectionSnapshotContentModelAuditOneOffJob,
@@ -89,6 +93,12 @@ ONE_OFF_JOB_MANAGERS = [
         .ExplorationRightsSnapshotContentModelAuditOneOffJob),
     prod_validation_jobs_one_off.ExplorationCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpSummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralFeedbackThreadModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralFeedbackMessageModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralFeedbackThreadUserModelAuditOneOffJob,
+    prod_validation_jobs_one_off.FeedbackAnalyticsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UnsentFeedbackEmailModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ExplorationRecommendationsModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileMetadataModelAuditOneOffJob,
     (
         prod_validation_jobs_one_off
@@ -97,6 +107,8 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.FileModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.FileSnapshotContentModelAuditOneOffJob,
+    prod_validation_jobs_one_off.JobModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ContinuousComputationModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionSkillLinkModelAuditOneOffJob,
     prod_validation_jobs_one_off.QuestionSnapshotMetadataModelAuditOneOffJob,
@@ -128,6 +140,8 @@ ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.StoryRightsSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.StoryCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.StorySummaryModelAuditOneOffJob,
+    prod_validation_jobs_one_off.GeneralSuggestionModelAuditOneOffJob,
+    prod_validation_jobs_one_off.ReviewerRotationTrackingModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSnapshotMetadataModelAuditOneOffJob,
     prod_validation_jobs_one_off.TopicSnapshotContentModelAuditOneOffJob,
@@ -168,7 +182,8 @@ ONE_OFF_JOB_MANAGERS = [
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
-# it should be registered here.
+# it should be registered here. This should also be updated in
+# prod_validation_jobs_one_off.ALL_CONTINUOUS_COMPUTATION_MANAGERS_CLASS_NAMES.
 ALL_CONTINUOUS_COMPUTATION_MANAGERS = [
     feedback_jobs_continuous.FeedbackAnalyticsAggregator,
     stats_jobs_continuous.InteractionAnswerSummariesAggregator,
