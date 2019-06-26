@@ -401,7 +401,8 @@ oppia.factory('ExplorationStatesService', [
         saveStateProperty(
           stateName, 'written_translations', newWrittenTranslations);
       },
-      saveImage: function(stateName, image) {
+      saveImage: function(image) {
+        var stateName = StateEditorService.getActiveStateName();
         addImageInState(stateName, image);
       },
       getImageSource: function(stateName, imageId) {

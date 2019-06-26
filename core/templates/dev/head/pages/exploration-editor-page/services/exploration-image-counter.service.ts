@@ -17,18 +17,20 @@
  * counter so that it can be displayed and edited in multiple places in the UI.
  */
 
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require(
-  'pages/exploration-editor-page/services/exploration-property.service.ts');
-require('services/ValidatorsService.ts');
-
 oppia.factory('ExplorationImageCounterService', [
-  '$filter', 'ExplorationPropertyService', 'ValidatorsService',
-  function(
-      $filter, ExplorationPropertyService, ValidatorsService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'image_counter';
-    child._normalize = $filter('number');
-    return child;
+  '$filter',
+  function($filter) {
+    var imageCounter = 0;
+
+    return {
+        init: function(value) {
+            imageCounter = value;
+        },
+        getImageId: function() {
+            var imageId = 'image_id_' + imageCounter;
+            imageCounter += 1
+            return imageId;
+        }
+    }
   }
 ]);

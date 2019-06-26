@@ -118,7 +118,6 @@ oppia.factory('ChangeListService', [
       }
       explorationChangeList.push(changeDict);
       undoneChangeStack = [];
-
       autosaveChangeListOnChange(explorationChangeList);
     };
 

@@ -226,7 +226,7 @@ class Image(object):
             ValidationError: One or more attributes of the Image are not valid.
         """
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
-        if (not re.match(filename_re, self.src) or self.src == ''):
+        if not re.match(filename_re, self.src):
             raise utils.ValidationError(
                 'Invalid filepath, received %s' % self.src)
         if not isinstance(self.placeholder, bool):

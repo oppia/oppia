@@ -36,6 +36,7 @@ require('pages/exploration-player-page/services/number-attempts.service.ts');
 require(
   'pages/exploration-player-page/services/' +
   'player-correctness-feedback-enabled.service.ts');
+require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
@@ -63,11 +64,12 @@ oppia.factory('ExplorationEngineService', [
   'FocusManagerService', 'GuestCollectionProgressService',
   'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
   'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
-  'PlayerTranscriptService', 'ReadOnlyExplorationBackendApiService',
-  'StateCardObjectFactory', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'UserService',
-  'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS',
-  'PAGE_CONTEXT', 'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  'PlayerPositionService', 'PlayerTranscriptService',
+  'ReadOnlyExplorationBackendApiService', 'StateCardObjectFactory',
+  'StateClassifierMappingService', 'StatsReportingService',
+  'UrlInterpolationService', 'UserService', 'WindowDimensionsService',
+  'DEFAULT_PROFILE_IMAGE_PATH', 'INTERACTION_SPECS', 'PAGE_CONTEXT',
+  'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $q, $rootScope, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService, ContextService,
@@ -76,11 +78,12 @@ oppia.factory('ExplorationEngineService', [
       FocusManagerService, GuestCollectionProgressService,
       ImagePreloaderService, LanguageUtilService, LearnerParamsService,
       NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
-      PlayerTranscriptService, ReadOnlyExplorationBackendApiService,
-      StateCardObjectFactory, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, UserService,
-      WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS,
-      PAGE_CONTEXT, WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
+      PlayerPositionService, PlayerTranscriptService,
+      ReadOnlyExplorationBackendApiService, StateCardObjectFactory,
+      StateClassifierMappingService, StatsReportingService,
+      UrlInterpolationService, UserService, WindowDimensionsService,
+      DEFAULT_PROFILE_IMAGE_PATH, INTERACTION_SPECS, PAGE_CONTEXT,
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = ContextService.isInExplorationEditorPage();
     var answerIsBeingProcessed = false;
@@ -446,7 +449,10 @@ oppia.factory('ExplorationEngineService', [
         return answerIsBeingProcessed;
       },
       currentStateName: function() {
-        return visitedStateNames[visitedStateNames.length - 1];
+        if (PlayerPositionService.getCurrentStateName() != currentStateName) {
+          return PlayerPositionService.getCurrentStateName()
+        }
+        return nextStateName;
       },
       getImageFilePath: function(stateName, imageId) {
         var state = exploration.getState(stateName);

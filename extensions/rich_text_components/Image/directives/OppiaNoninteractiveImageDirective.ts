@@ -25,20 +25,17 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/image-preloader.service.ts');
-require('pages/exploration-player-page/services/player-position.service.ts');
 require('services/AssetsBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 
 oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'AssetsBackendApiService', 'ContextService',
-  'ExplorationEngineService', 'ExplorationStatesService', 'HtmlEscaperService',
-  'ImagePreloaderService', 'PlayerPositionService', 'StateEditorService',
+  '$injector', '$rootScope', '$sce', 'AssetsBackendApiService',
+  'ContextService', 'HtmlEscaperService', 'ImagePreloaderService',
   'UrlInterpolationService', 'LOADING_INDICATOR_URL',
   function(
-      $rootScope, $sce, AssetsBackendApiService, ContextService,
-      ExplorationEngineService, ExplorationStatesService, HtmlEscaperService,
-      ImagePreloaderService, PlayerPositionService, StateEditorService,
+      $injector, $rootScope, $sce, AssetsBackendApiService, ContextService,
+      HtmlEscaperService, ImagePreloaderService,
       UrlInterpolationService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
@@ -58,7 +55,9 @@ oppia.directive('oppiaNoninteractiveImage', [
           $attrs.idWithValue);
 
         if (ImagePreloaderService.inExplorationPlayer()) {
-          var stateName = PlayerPositionService.getCurrentStateName();
+          var ExplorationEngineService = (
+            $injector.get('ExplorationEngineService'));
+          var stateName = ExplorationEngineService.currentStateName();
           ctrl.filepath = (
             ExplorationEngineService.getImageFilePath(stateName, imageId));
           ctrl.isLoadingIndicatorShown = true;
@@ -94,6 +93,17 @@ oppia.directive('oppiaNoninteractiveImage', [
           // preview mode. We don't have loading indicator or try again for
           // showing images in the exploration editor or in preview mode. So
           // we directly assign the url to the imageUrl.
+
+          /* 'ExplorationStatesService' and 'StateEditorService' are not
+           * imported at the time of initializing of OppiaNoninteractiveImage
+           * directive because this services are of editor-page not of
+           * learner-page. So this services should only be imported at editor
+           * page not at learner page otherwise it leads to error. 
+           */
+          var ExplorationStatesService = (
+            $injector.get('ExplorationStatesService'));
+          var StateEditorService = (
+            $injector.get('StateEditorService'));
           var stateName = StateEditorService.getActiveStateName();
           ctrl.filepath = (
             ExplorationStatesService.getImageSource(stateName, imageId));

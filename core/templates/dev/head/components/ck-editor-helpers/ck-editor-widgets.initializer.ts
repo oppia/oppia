@@ -19,19 +19,18 @@
 
 require('components/state-editor/state-editor.directive.ts');
 require(
-  'pages/exploration-editor-page/services/exploration-image-counter.' +
-  'service.ts');
+  'pages/exploration-editor-page/services/' +
+  'exploration-image-counter.service.ts');
+require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('rich_text_components/richTextComponentsRequires.ts');
 require('services/HtmlEscaperService.ts');
 require('services/RteHelperService.ts');
 
 oppia.run([
-  '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
-  'HtmlEscaperService', 'ExplorationImageCounterService',
-  'ExplorationStatesService', 'StateEditorService',
-  function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
-      HtmlEscaperService, ExplorationImageCounterService,
-      ExplorationStatesService, StateEditorService) {
+  '$timeout', '$compile', '$injector', '$rootScope', '$uibModal', 'RteHelperService',
+  'HtmlEscaperService',
+  function($timeout, $compile, $injector, $rootScope, $uibModal, RteHelperService,
+      HtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
@@ -85,15 +84,22 @@ oppia.run([
                 customizationArgSpecs,
                 customizationArgs,
                 function(customizationArgsDict) {
+                /* 'ExplorationStatesService', 'StateEditorService' and 
+                 * are not imported at the time of initializing of CKEditor
+                 * because this services are of editor-page not of learner-page.
+                 * So this services should only be imported at editor learner
+                 * page otherwise it leads to error. 
+                 */
                   // Generating and adding imageId for image tag.
                   if (ckName === IMAGE_TAG_NAME) {
+                    var ExplorationImageCounterService = (
+                      $injector.get('ExplorationImageCounterService'));
+                    var ExplorationStatesService = (
+                      $injector.get('ExplorationStatesService'));
+
                     var imageSrc = customizationArgsDict.filepath;
-                    var imageIdIntegerPart = (
-                      Number(ExplorationImageCounterService.displayed) + 1);
-                    imageId = 'image_id_' + imageIdIntegerPart;
-                    ExplorationImageCounterService.displayed = (
-                      imageIdIntegerPart);
-                    ExplorationImageCounterService.saveDisplayedValue();
+                    imageId = ExplorationImageCounterService.getImageId();
+                    console.log(imageId)
                     var image = {
                       image_id: imageId,
                       image_info: {
@@ -102,8 +108,7 @@ oppia.run([
                         instructions: ''
                       }
                     };
-                    var stateName = StateEditorService.getActiveStateName();
-                    ExplorationStatesService.saveImage(stateName, image);
+                    ExplorationStatesService.saveImage(image);
                   }
 
                   for (var arg in customizationArgsDict) {
