@@ -252,7 +252,6 @@ oppia.directive('questionPlayer', [
           var calculateScores = function(questionStateData) {
             var scorePerSkillMapping = createScorePerSkillMapping();
             $scope.resultsLoaded = false;
-            var totalScore = 0.0;
             var totalQuestions = Object.keys(questionStateData).length;
             for (var question in questionStateData) {
               var questionData = questionStateData[question];
