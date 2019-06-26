@@ -17,7 +17,7 @@
  * context.
  */
 
-require('services/services.constants.ts');
+require('services/services.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 

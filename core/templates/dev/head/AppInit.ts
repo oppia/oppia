@@ -22,6 +22,7 @@ import { StaticProvider } from '@angular/core';
 
 import { AppConstants } from 'app.constants.ts';
 import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
+import { ServicesConstants } from 'services/services.constants.ts';
 
 @NgModule({
   imports: [
@@ -29,7 +30,8 @@ import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-
   ],
   providers: [
     AppConstants,
-    CreatorDashboardConstants
+    CreatorDashboardConstants,
+    ServicesConstants
   ]
 })
 class MainAngularModule {
