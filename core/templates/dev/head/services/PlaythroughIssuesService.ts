@@ -18,7 +18,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require(
-  'pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.ts');
+  'pages/exploration-editor-page/statistics-tab/services/' +
+  'learner-action-render.service.ts');
 require('services/PlaythroughIssuesBackendApiService.ts');
 
 oppia.factory('PlaythroughIssuesService', [
