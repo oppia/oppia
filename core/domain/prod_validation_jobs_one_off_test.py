@@ -11034,7 +11034,8 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for completed node check of '
             'StoryProgressModel\', [u"Entity id %s: Following completed '
             'node ids [u\'invalid\'] do not belong to the story with '
-            'id story corresponding to the entity"]]') % self.model_instance.id]
+            'id story corresponding to the entity. "]]') % (
+                self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
     def test_private_exploration(self):
@@ -11042,7 +11043,7 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for explorations in completed '
             'node check of StoryProgressModel\', [u"Entity id %s: '
-            'Following exploration ids are private [u\'1\']"]]') % (
+            'Following exploration ids are private [u\'1\']. "]]') % (
                 self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
@@ -11052,7 +11053,7 @@ class StoryProgressModelValidatorTests(test_utils.GenericTestBase):
         expected_output = [(
             u'[u\'failed validation check for explorations in completed '
             'node check of StoryProgressModel\', [u"Entity id %s: '
-            'Following exploration ids are missing [u\'1\']"]]') % (
+            'Following exploration ids are missing [u\'1\']. "]]') % (
                 self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 

@@ -359,7 +359,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9]{1,%s}-\\d*$' % base_models.ID_LENGTH
+        return '^[A-Za-z0-9]{1,%s}-\\d+$' % base_models.ID_LENGTH
 
     @classmethod
     def _validate_base_model_version_from_item_id(cls, item):
@@ -549,7 +549,7 @@ class BaseUserModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^\\d*$'
+        return '^\\d+$'
 
     @classmethod
     def _get_exp_ids(cls, unused_item):
@@ -610,9 +610,16 @@ class BaseUserModelValidator(BaseModelValidator):
     @classmethod
     def _get_common_properties_of_external_model_which_should_not_match(
             cls, unused_item):
-        """Returns a list common properties to dismatch.
+        """Returns a list of common properties to dismatch. For example,
+        the exploration ids present in a CompletedActivitiesModel
+        should not be present in an IncompleteActivitiesModel. So,
+        this function will return the following list for
+        CompletedActivitiesModel:
+        ['IncompleteActivitiesModel', 'exploration_ids', list of
+        exploration_ids in completed activities, 'exploration_ids',
+        list of exploration_ids in incomplete activities]
 
-        # This can be overridden by subclasses, if needed.
+        This can be overridden by subclasses, if needed.
 
         Args:
             unused_item: ndb.Model. BaseUserModel to validate.
@@ -712,7 +719,7 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [user_id].[timestamp_in_sec].[intent].[random_number]
-        regex_string = '^%s\\.\\d*\\.%s\\.\\d*$' % (item.user_id, item.intent)
+        regex_string = '^%s\\.\\d+\\.%s\\.\\d+$' % (item.user_id, item.intent)
         return regex_string
 
     @classmethod
@@ -884,7 +891,7 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [collection/rights]-[collection_id]-[collection_version].
-        regex_string = '^(collection|rights)-%s-\\d*$' % (
+        regex_string = '^(collection|rights)-%s-\\d+$' % (
             item.collection_id)
 
         return regex_string
@@ -1066,7 +1073,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d*$'
+        return '^.*-\\d+$'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1091,7 +1098,7 @@ class ConfigPropertySnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d*$'
+        return '^.*-\\d+$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1261,7 +1268,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return (
-            '^\\d*\\.(exploration|topic)\\.[A-Za-z0-9]{1,12}\\.'
+            '^\\d+\\.(exploration|topic)\\.[A-Za-z0-9]{1,12}\\.'
             '[A-Za-z0-9=+/]{1,}')
 
     @classmethod
@@ -1463,7 +1470,7 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [exploration/rights]-[exploration_id]-[exploration-version].
-        regex_string = '^(exploration|rights)-%s-\\d*$' % (
+        regex_string = '^(exploration|rights)-%s-\\d+$' % (
             item.exploration_id)
 
         return regex_string
@@ -1666,7 +1673,7 @@ class FileMetadataSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d*$' % FILE_MODELS_REGEX
+        return '%s-\\d+$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1691,7 +1698,7 @@ class FileMetadataSnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d*$' % FILE_MODELS_REGEX
+        return '%s-\\d+$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1741,7 +1748,7 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d*$' % FILE_MODELS_REGEX
+        return '%s-\\d+$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1765,7 +1772,7 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d*$' % FILE_MODELS_REGEX
+        return '%s-\\d+$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1927,7 +1934,7 @@ class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [question]-[question_id]-[question_version].
-        regex_string = '^(question)-%s-\\d*$' % (
+        regex_string = '^(question)-%s-\\d+$' % (
             item.question_id)
 
         return regex_string
@@ -2258,7 +2265,7 @@ class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [skill/rights]-[skill_id]-[skill_version].
-        regex_string = '^(skill|rights)-%s-\\d*$' % (
+        regex_string = '^(skill|rights)-%s-\\d+$' % (
             item.skill_id)
 
         return regex_string
@@ -2513,7 +2520,7 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [story]-[story_id]-[story_version].
-        regex_string = '^(story)-%s-\\d*$' % (
+        regex_string = '^(story)-%s-\\d+$' % (
             item.story_id)
 
         return regex_string
@@ -2634,14 +2641,14 @@ class UserSettingsModelValidator(BaseUserModelValidator):
         }
         current_time = datetime.datetime.utcnow()
         for time_field_name, time_field_value in time_fields.iteritems():
-            if time_field_value and time_field_value > current_time:
+            if time_field_value is not None and time_field_value > current_time:
                 cls.errors['%s check' % time_field_name].append(
                     'Entity id %s: Value for %s: %s is greater than the '
                     'time when job was run' % (
                         item.id, time_field_name, time_field_value))
 
         current_msec = utils.get_current_time_in_millisecs()
-        if item.first_contribution_msec and (
+        if item.first_contribution_msec is not None and (
                 item.first_contribution_msec > current_msec):
             cls.errors['first contribution check'].append(
                 'Entity id %s: Value for first contribution msec: %s is '
@@ -2982,7 +2989,7 @@ class UserSubscriptionsModelValidator(BaseUserModelValidator):
             item: ndb.Model. UserSubscriptionsModel to validate.
         """
         current_time = datetime.datetime.utcnow()
-        if item.last_checked and item.last_checked > current_time:
+        if item.last_checked is not None and item.last_checked > current_time:
             cls.errors['last checked check'].append(
                 'Entity id %s: last checked %s is greater than '
                 'the time when job was run' % (
@@ -3145,26 +3152,17 @@ class UserStatsModelValidator(BaseUserModelValidator):
             feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
         for stat in item.weekly_creator_stats_list:
             for key, value in stat.iteritems():
-                is_invalid = False
+                allowed_properties = [
+                    'average_ratings', 'num_ratings', 'total_plays']
                 try:
                     datetime.datetime.strptime(
                         key, feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
-                except Exception:
-                    is_invalid = True
-                if not is_invalid and key > current_time_str:
-                    is_invalid = True
-                if not isinstance(value, dict):
-                    is_invalid = True
-                allowed_properties = [
-                    'average_ratings', 'num_ratings', 'total_plays']
-                if not is_invalid and (
-                        sorted(value.keys()) != allowed_properties):
-                    is_invalid = True
-                if not is_invalid:
+                    assert key <= current_time_str
+                    assert isinstance(value, dict)
+                    assert sorted(value.keys()) == allowed_properties
                     for property_name in allowed_properties:
-                        if not isinstance(value[property_name], int):
-                            is_invalid = True
-                if is_invalid:
+                        assert isinstance(value[property_name], int)
+                except Exception:
                     cls.errors['weekly creator stats list'].append(
                         'Entity id %s: Invalid stats dict: %s' % (
                             item.id, stat))
@@ -3215,7 +3213,7 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. ExplorationUserDataModel to validate.
         """
-        if item.rating and (item.rating < 1 or item.rating > 5):
+        if item.rating is not None and (item.rating < 1 or item.rating > 5):
             cls.errors['rating check'].append(
                 'Entity id %s: Expected rating to be in range [1, 5], '
                 'received %s' % (item.id, item.rating))
@@ -3228,12 +3226,12 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
         Args:
             item: ndb.Model. ExplorationUserDataModel to validate.
         """
-        if item.rating and not item.rated_on:
+        if item.rating is not None and not item.rated_on:
             cls.errors['rated on check'].append(
                 'Entity id %s: rating %s exists but rated on is None' % (
                     item.id, item.rating))
         current_time = datetime.datetime.utcnow()
-        if item.rated_on and item.rated_on > current_time:
+        if item.rated_on is not None and item.rated_on > current_time:
             cls.errors['rated on check'].append(
                 'Entity id %s: rated on %s is greater than the time '
                 'when job was run' % (item.id, item.rated_on))
@@ -3252,7 +3250,7 @@ class ExplorationUserDataModelValidator(BaseUserModelValidator):
                 'draft change list last updated is None' % (
                     item.id, item.draft_change_list))
         current_time = datetime.datetime.utcnow()
-        if item.draft_change_list_last_updated and (
+        if item.draft_change_list_last_updated is not None and (
                 item.draft_change_list_last_updated > current_time):
             cls.errors['draft change list last updated check'].append(
                 'Entity id %s: draft change list last updated %s is '
@@ -3477,16 +3475,16 @@ class StoryProgressModelValidator(BaseUserModelValidator):
             error_msg = ''
             if private_exp_ids:
                 error_msg = error_msg + (
-                    'Following exploration ids are private %s' % (
+                    'Following exploration ids are private %s. ' % (
                         private_exp_ids))
             if missing_exp_ids:
                 error_msg = error_msg + (
-                    'Following exploration ids are missing %s' % (
+                    'Following exploration ids are missing %s. ' % (
                         missing_exp_ids))
             if unmarked_exp_ids:
                 error_msg = error_msg + (
                     'Following exploration ids are not marked in '
-                    'CompletedActivitiesModel %s' % unmarked_exp_ids)
+                    'CompletedActivitiesModel.  %s' % unmarked_exp_ids)
 
             if error_msg:
                 cls.errors['explorations in completed node check'].append(
