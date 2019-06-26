@@ -16,7 +16,6 @@
  * @fileoverview Unit tests for the PlaythroughImprovementCardObjectFactory.
  */
 
-require('domain/improvements/PlaythroughImprovementCardObjectFactory.ts');
 require('domain/statistics/PlaythroughIssueObjectFactory.ts');
 
 describe('PlaythroughImprovementCardObjectFactory', function() {
