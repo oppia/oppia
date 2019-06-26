@@ -51,6 +51,8 @@ export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
 export DEFAULT_RUN_MINIFIED_TESTS=false
 maybeInstallDependencies "$@"
 
+# find . -type f \( -name "*.spec.ts" -o -name "*Spec.ts" -not -name "*editor.directive.spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/one.spec.ts
+
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"
 echo ""

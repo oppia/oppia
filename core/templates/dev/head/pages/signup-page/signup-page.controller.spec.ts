@@ -24,10 +24,10 @@ describe('Signup controller', function() {
     var $componentController;
 
     beforeEach(
-      angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+      angular.mock.module('signupPage', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(angular.mock.inject(function(
-        _$componentController_, $http, _$httpBackend_, $rootScope) {
+        _$componentController_, $http, _$httpBackend_, $rootScope, $translate) {
       $componentController = _$componentController_;
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/signuphandler/data').respond({

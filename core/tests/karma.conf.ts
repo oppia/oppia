@@ -39,7 +39,9 @@ module.exports = function(config) {
       // 'core/templates/dev/head/**/*.spec.ts',
       // 'core/templates/dev/head/*.spec.ts',
       // 'extensions/**/*Spec.ts',
-      'core/templates/dev/head/pages/email-dashboard-pages/email-dashboard-data.service.spec.ts',
+      // 'core/templates/dev/head/one.spec.ts',
+      'core/templates/dev/head/components/forms/validators/is-at-most.filter.spec.ts',
+      'core/templates/dev/head/components/forms/validators/is-at-least.filter.spec.js',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
