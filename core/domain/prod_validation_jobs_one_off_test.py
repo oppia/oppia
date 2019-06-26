@@ -229,7 +229,6 @@ class NotImplementedErrorTests(test_utils.GenericTestBase):
             jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
             job_id = job_class.create_new()
             job_class.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
 
 
 class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
