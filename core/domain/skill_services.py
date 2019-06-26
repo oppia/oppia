@@ -428,7 +428,7 @@ def apply_change_list(skill_id, change_list, committer_id):
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     skill.update_worked_examples(change.new_value)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
-                skill.add_misconception(change.new_value)
+                skill.add_misconception(change.new_misconception_dict)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
             elif (change.cmd ==
@@ -445,6 +445,8 @@ def apply_change_list(skill_id, change_list, committer_id):
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif (change.cmd ==
                   skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
                   or change.cmd ==
