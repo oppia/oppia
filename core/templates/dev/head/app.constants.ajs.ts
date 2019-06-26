@@ -33,10 +33,6 @@ oppia.constant('DEFAULT_TRANSLATIONS', AppConstants.DEFAULT_TRANSLATIONS);
 oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
   AppConstants.RULE_SUMMARY_WRAP_CHARACTER_COUNT);
 
-oppia.constant(
-  'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
-  AppConstants.FEEDBACK_SUBJECT_MAX_CHAR_LIMIT);
-
 /* Called always when learner moves to a new card.
    Also called when card is selected by clicking on progress dots */
 oppia.constant(
