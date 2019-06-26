@@ -30,6 +30,8 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.domain import skill_domain
@@ -1648,6 +1650,255 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
         }
 
 
+class QuestionModelValidator(BaseModelValidator):
+    """Class for validating QuestionModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return question_services.get_question_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'question_commit_log_entry_ids': (
+                question_models.QuestionCommitLogEntryModel,
+                ['question-%s-%s' % (item.id, version) for version in range(
+                    1, item.version + 1)]),
+            'question_summary_ids': (
+                question_models.QuestionSummaryModel, [item.id]),
+            'question_rights_ids': (
+                question_models.QuestionRightsModel, [item.id]),
+            'snapshot_metadata_ids': (
+                question_models.QuestionSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_ids': (
+                question_models.QuestionSnapshotContentModel,
+                snapshot_model_ids),
+            'linked_skill_ids': (
+                skill_models.SkillModel, item.linked_skill_ids)
+        }
+
+
+class QuestionSkillLinkModelValidator(BaseModelValidator):
+    """Class for validating QuestionSkillLinkModel."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '%s:%s' % (item.question_id, item.skill_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'question_ids': (
+                question_models.QuestionModel, [item.question_id]),
+            'skill_ids': (
+                skill_models.SkillModel, [item.skill_id])
+        }
+
+
+class QuestionSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating QuestionSnapshotMetadataModel."""
+
+    EXTERNAL_MODEL_NAME = 'question'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return question_domain.QuestionChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'question_ids': (
+                question_models.QuestionModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_ids': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+
+class QuestionSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating QuestionSnapshotContentModel."""
+
+    EXTERNAL_MODEL_NAME = 'question'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'question_ids': (
+                question_models.QuestionModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+
+class QuestionRightsModelValidator(BaseModelValidator):
+    """Class for validating QuestionRightsModel."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        snapshot_model_ids = [
+            '%s-%d' % (item.id, version) for version in range(
+                1, item.version + 1)]
+        return {
+            'question_ids': (
+                question_models.QuestionModel, [item.id]),
+            'creator_user_ids': (
+                user_models.UserSettingsModel, [item.creator_id]),
+            'snapshot_metadata_ids': (
+                question_models.QuestionRightsSnapshotMetadataModel,
+                snapshot_model_ids),
+            'snapshot_content_ids': (
+                question_models.QuestionRightsSnapshotContentModel,
+                snapshot_model_ids),
+        }
+
+
+class QuestionRightsSnapshotMetadataModelValidator(
+        BaseSnapshotMetadataModelValidator):
+    """Class for validating QuestionRightsSnapshotMetadataModel."""
+
+    EXTERNAL_MODEL_NAME = 'question rights'
+
+    @classmethod
+    def _get_change_domain_class(cls, unused_item):
+        return question_domain.QuestionRightsChange
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'question_rights_ids': (
+                question_models.QuestionRightsModel,
+                [item.id[:item.id.find('-')]]),
+            'committer_ids': (
+                user_models.UserSettingsModel, [item.committer_id])
+        }
+
+
+class QuestionRightsSnapshotContentModelValidator(
+        BaseSnapshotContentModelValidator):
+    """Class for validating QuestionRightsSnapshotContentModel."""
+
+    EXTERNAL_MODEL_NAME = 'question rights'
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'question_rights_ids': (
+                question_models.QuestionRightsModel,
+                [item.id[:item.id.find('-')]]),
+        }
+
+
+class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
+    """Class for validating QuestionCommitLogEntryModel."""
+
+    EXTERNAL_MODEL_NAME = 'question'
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        # Valid id: [question]-[question_id]-[question_version].
+        regex_string = '^(question)-%s-\\d*$' % (
+            item.question_id)
+
+        return regex_string
+
+    @classmethod
+    def _get_change_domain_class(cls, item):
+        if item.id.startswith('question'):
+            return question_domain.QuestionChange
+        else:
+            # The case of invalid id is being ignored here since this
+            # case will already be checked by the id regex test.
+            return None
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'question_ids': (
+                question_models.QuestionModel, [item.question_id]),
+        }
+
+
+class QuestionSummaryModelValidator(BaseSummaryModelValidator):
+    """Class for validating QuestionSummaryModel."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return question_services.get_question_summary_from_model(item)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'question_ids': (
+                question_models.QuestionModel, [item.id]),
+            'question_rights_ids': (
+                question_models.QuestionRightsModel, [item.id])
+        }
+
+    @classmethod
+    def _validate_question_content(cls, item):
+        """Validate that question_content model is equal to
+        QuestionModel.question_state_data.content.html.
+
+        Args:
+            item: ndb.Model. QuestionSummaryModel to validate.
+        """
+        question_model_class_model_id_model_tuples = (
+            cls.external_instance_details['question_ids'])
+
+        for (_, _, question_model) in (
+                question_model_class_model_id_model_tuples):
+            # The case for missing question external model is ignored here
+            # since errors for missing question external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if question_model is None or question_model.deleted:
+                continue
+            content_html = question_model.question_state_data['content']['html']
+            if item.question_content != content_html:
+                cls.errors['question content check'].append((
+                    'Entity id %s: Question content: %s does not match '
+                    'content html in question state data in question '
+                    'model: %s') % (
+                        item.id, item.question_content,
+                        content_html))
+
+    @classmethod
+    def _get_external_model_properties(cls):
+        question_model_class_model_id_model_tuples = (
+            cls.external_instance_details['question_ids'])
+
+        question_rights_model_class_model_id_model_tuples = (
+            cls.external_instance_details['question_rights_ids'])
+
+        question_model_properties_dict = {
+            'question_model_created_on': 'created_on',
+            'question_model_last_updated': 'last_updated'
+        }
+
+        question_rights_model_properties_dict = {
+            'creator_id': 'creator_id',
+        }
+
+        return [(
+            'question',
+            question_model_class_model_id_model_tuples,
+            question_model_properties_dict
+        ), (
+            'question rights',
+            question_rights_model_class_model_id_model_tuples,
+            question_rights_model_properties_dict
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_question_content]
+
+
 class ExplorationRecommendationsModelValidator(BaseModelValidator):
     """Class for validating ExplorationRecommendationsModel."""
 
@@ -2291,6 +2542,21 @@ MODEL_TO_VALIDATOR_MAPPING = {
     file_models.FileModel: FileModelValidator,
     file_models.FileSnapshotMetadataModel: FileSnapshotMetadataModelValidator,
     file_models.FileSnapshotContentModel: FileSnapshotContentModelValidator,
+    question_models.QuestionModel: QuestionModelValidator,
+    question_models.QuestionSkillLinkModel: (
+        QuestionSkillLinkModelValidator),
+    question_models.QuestionSnapshotMetadataModel: (
+        QuestionSnapshotMetadataModelValidator),
+    question_models.QuestionSnapshotContentModel: (
+        QuestionSnapshotContentModelValidator),
+    question_models.QuestionRightsModel: QuestionRightsModelValidator,
+    question_models.QuestionRightsSnapshotMetadataModel: (
+        QuestionRightsSnapshotMetadataModelValidator),
+    question_models.QuestionRightsSnapshotContentModel: (
+        QuestionRightsSnapshotContentModelValidator),
+    question_models.QuestionCommitLogEntryModel: (
+        QuestionCommitLogEntryModelValidator),
+    question_models.QuestionSummaryModel: QuestionSummaryModelValidator,
     recommendations_models.ExplorationRecommendationsModel: (
         ExplorationRecommendationsModelValidator),
     recommendations_models.TopicSimilaritiesModel: (
@@ -2613,6 +2879,83 @@ class FileMetadataSnapshotContentModelAuditOneOffJob(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [file_models.FileMetadataSnapshotContentModel]
+
+
+class QuestionModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionModel]
+
+
+class QuestionSkillLinkModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionSkillLinkModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionSkillLinkModel]
+
+
+class QuestionSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionSnapshotMetadataModel]
+
+
+class QuestionSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionSnapshotContentModel]
+
+
+class QuestionRightsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionRightsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionRightsModel]
+
+
+class QuestionRightsSnapshotMetadataModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionRightsSnapshotMetadataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionRightsSnapshotMetadataModel]
+
+
+class QuestionRightsSnapshotContentModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionRightsSnapshotContentModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionRightsSnapshotContentModel]
+
+
+class QuestionCommitLogEntryModelAuditOneOffJob(
+        ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionCommitLogEntryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionCommitLogEntryModel]
+
+
+class QuestionSummaryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates QuestionSummaryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [question_models.QuestionSummaryModel]
 
 
 class ExplorationRecommendationsModelAuditOneOffJob(
