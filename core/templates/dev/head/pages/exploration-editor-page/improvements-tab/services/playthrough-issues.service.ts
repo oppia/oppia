@@ -22,7 +22,7 @@ require(
   'learner-action-render.service.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
-  'PlaythroughIssuesBackendApiService.ts');
+  'playthrough-issues-backend-api.service.ts');
 
 oppia.factory('PlaythroughIssuesService', [
   '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',

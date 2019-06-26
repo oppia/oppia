@@ -20,7 +20,7 @@ require('domain/improvements/PlaythroughIssueObjectFactory.ts');
 require('domain/statistics/PlaythroughObjectFactory.ts');
 require(
   'pages/exploration-editor-page/improvements-tab/services/' +
-  'PlaythroughIssuesBackendApiService.ts');
+  'playthrough-issues-backend-api.service.ts');
 
 describe('PlaythroughIssuesBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));
