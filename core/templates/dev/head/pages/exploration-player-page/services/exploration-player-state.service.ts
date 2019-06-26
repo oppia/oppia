@@ -45,22 +45,22 @@ oppia.factory('ExplorationPlayerStateService', [
   'ExplorationEngineService', 'ExplorationFeaturesBackendApiService',
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
-  'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughRecordingService',
-  'PretestQuestionBackendApiService', 'QuestionPlayerBackendApiService',
-  'QuestionPlayerEngineService', 'ReadOnlyExplorationBackendApiService',
-  'StateClassifierMappingService', 'StatsReportingService',
-  'UrlService', 'EXPLORATION_MODE',
+  'PlayerTranscriptService', 'PlaythroughIssuesService',
+  'PlaythroughRecordingService', 'PretestQuestionBackendApiService',
+  'QuestionPlayerBackendApiService', 'QuestionPlayerEngineService',
+  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
       $log, $q, $rootScope, ContextService,
       EditableExplorationBackendApiService,
       ExplorationEngineService, ExplorationFeaturesBackendApiService,
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
-      PlayerTranscriptService, PlaythroughIssuesService, PlaythroughRecordingService,
-      PretestQuestionBackendApiService, QuestionPlayerBackendApiService,
-      QuestionPlayerEngineService, ReadOnlyExplorationBackendApiService,
-      StateClassifierMappingService, StatsReportingService,
-      UrlService, EXPLORATION_MODE) {
+      PlayerTranscriptService, PlaythroughIssuesService,
+      PlaythroughRecordingService, PretestQuestionBackendApiService,
+      QuestionPlayerBackendApiService, QuestionPlayerEngineService,
+      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
+      StatsReportingService, UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
