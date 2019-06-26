@@ -389,8 +389,8 @@ class Question(object):
         """Updates the question data of the question.
 
         Args:
-            question_state_domain_object: object. A State domain object representing the question
-                state data.
+            question_state_domain_object: object. A State domain object 
+                representing the question state data.
         """
         self.question_state_data = (question_state_domain_object)
 
