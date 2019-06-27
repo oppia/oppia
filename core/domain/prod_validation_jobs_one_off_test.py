@@ -14737,6 +14737,18 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
                 'doesn\'t exist"]]') % self.model_instance.id]
         run_job_and_check_output(self, expected_output)
 
+    def test_missing_completed_activities_model_failure(self):
+        user_models.CompletedActivitiesModel.get_by_id(self.user_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for completed_activities_ids '
+                'field check of CollectionProgressModel\', '
+                '[u"Entity id %s: based on field completed_activities_ids '
+                'having value %s, expect model CompletedActivitiesModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.model_instance.id, self.user_id, self.user_id)]
+        run_job_and_check_output(self, expected_output)
+
     def test_private_exploration(self):
         rights_manager.unpublish_exploration(self.owner, '0')
         expected_output = [
@@ -14764,7 +14776,8 @@ class CollectionProgressModelValidatorTests(test_utils.GenericTestBase):
             u'[u\'failed validation check for completed exploration check of '
             'CollectionProgressModel\', [u"Entity id %s: Following completed '
             'exploration ids [u\'2\'] are not present in '
-            'CompletedActivitesModel for the user"]]') % self.model_instance.id]
+            'CompletedActivitiesModel for the user"]]') % (
+                self.model_instance.id)]
         run_job_and_check_output(self, expected_output)
 
     def test_completed_exploration_missing_in_collection(self):

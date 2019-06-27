@@ -4457,7 +4457,7 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
                 collection_models.CollectionModel, [item.collection_id]),
             'exploration_ids': (
                 exp_models.ExplorationModel, item.completed_explorations),
-            'completed_activites_ids': (
+            'completed_activities_ids': (
                 user_models.CompletedActivitiesModel, [item.user_id])
         }
 
@@ -4472,7 +4472,7 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
     @classmethod
     def _validate_completed_exploration(cls, item):
         """Validates that completed exploration ids belong to
-        the collection and are present in CompletedActivitesModel
+        the collection and are present in CompletedActivitiesModel
         for the user.
 
         Args:
@@ -4480,24 +4480,24 @@ class CollectionProgressModelValidator(BaseUserModelValidator):
         """
         completed_exp_ids = item.completed_explorations
         completed_activities_model_class_model_id_model_tuples = (
-            cls.external_instance_details['completed_activites_ids'])
-        for (_, _, completed_activites_model) in (
+            cls.external_instance_details['completed_activities_ids'])
+        for (_, _, completed_activities_model) in (
                 completed_activities_model_class_model_id_model_tuples):
             # The case for missing completed activities external model is
             # ignored here since errors for missing completed activities
             # external model are already checked and stored in
             # _validate_external_id_relationships function.
-            if completed_activites_model is None or (
-                    completed_activites_model.deleted):
+            if completed_activities_model is None or (
+                    completed_activities_model.deleted):
                 continue
             missing_exp_ids = [
                 exp_id
                 for exp_id in completed_exp_ids if exp_id not in (
-                    completed_activites_model.exploration_ids)]
+                    completed_activities_model.exploration_ids)]
             if missing_exp_ids:
                 cls.errors['completed exploration check'].append(
                     'Entity id %s: Following completed exploration ids %s are '
-                    'not present in CompletedActivitesModel for the user' % (
+                    'not present in CompletedActivitiesModel for the user' % (
                         item.id, missing_exp_ids))
 
         collection_model_class_model_id_model_tuples = (
