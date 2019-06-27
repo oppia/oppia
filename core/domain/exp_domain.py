@@ -2246,14 +2246,7 @@ class Exploration(object):
             state_dict['image_assets'] = {}
             state_dict['image_assets']['image_mapping'] = {}
 
-            state = state_domain.State.from_dict(state_dict)
-            content_html = state.content.html
-            interaction_html_list = (
-                state.interaction.get_all_html_content_strings())
-
-            state_html = content_html
-            for html in interaction_html_list:
-                state_html = state_html + html
+            state_html = cls.get_all_html_content_strings_from_state_dict(state_dict)
 
             # Gets image src of each image form HTML.
             image_src_list = html_validation_service.get_image_src_from_html(
@@ -3379,6 +3372,49 @@ class Exploration(object):
                 if image_id not in image_ids_in_image_assets:
                     image_ids_to_delete.append(image_id)
             state.image_assets.clean(image_ids_to_delete)
+
+    @classmethod
+    def get_all_html_content_strings_from_state_dict(cls, state_dict):
+        """Extract all HTML of state from the state dict.
+
+        Args:
+            state_dict: dict. A dict representation of state.
+
+        Returns:
+            state_html: str. All HTML present in a state.
+        """
+        state_html = ''
+        state_html = state_html + state_dict['content']['html']
+
+
+        if state_dict['interaction']['default_outcome']:
+            state_html = state_html + state_dict[
+                'interaction']['default_outcome']['feedback']['html']
+
+        for answer_group in state_dict['interaction']['answer_groups']:
+            state_html = state_html + (
+                answer_group['outcome']['feedback']['html'])
+            if state_dict['interaction']['id'] in (
+                    'ItemSelectionInput', 'DragAndDropSortInput'):
+                for rule_spec in answer_group['rule_specs']:
+                    for x in rule_spec['inputs']['x']:
+                        state_html = state_html + x
+
+        for hint in state_dict['interaction']['hints']:
+            state_html = state_html + hint['hint_content']['html']
+
+        if state_dict['interaction']['solution']:
+            state_html = state_html + state_dict[
+                'interaction']['solution']['explanation']['html']
+
+        if state_dict['interaction']['id'] in (
+                'ItemSelectionInput', 'MultipleChoiceInput',
+                'DragAndDropSortInput'):
+            for value in (state_dict['interaction']['customization_args'][
+                    'choices']['value']):
+                state_html = state_html + value
+
+        return state_html
 
 
 class ExplorationSummary(object):

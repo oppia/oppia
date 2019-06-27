@@ -1146,6 +1146,13 @@ class ExplorationSummaryTests(test_utils.GenericTestBase):
             'Expected each id in contributor_ids to be string, received 2'):
             self.exp_summary.validate()
 
+    # def test_get_all_html_content_strings(self):
+    #     with self.swap(
+    #         html_validation_service, 'get_filename_with_dimensions',
+    #         mock_get_filename_with_dimensions):
+    #         exp_services.load_demo('0')
+    #         exploration = exp_services.get_exploration_by_id('0')
+    #         # self.assertEqual(exploration.get_all_html_content_strings(), 'keshav')
 
 class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""

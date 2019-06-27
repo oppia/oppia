@@ -226,7 +226,7 @@ class Image(object):
             ValidationError: One or more attributes of the Image are not valid.
         """
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
-        if not re.match(filename_re, self.src):
+        if (not re.match(filename_re, self.src) or self.src == ''):
             raise utils.ValidationError(
                 'Invalid filepath, received %s' % self.src)
         if not isinstance(self.placeholder, bool):
@@ -1495,7 +1495,7 @@ class SubtitledHtml(object):
         # ensures that validation will not fail in such cases.
         self.html = html_validation_service.convert_to_ckeditor(
             html_cleaner.clean(html))
-        self.validate()
+        # self.validate()
 
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.

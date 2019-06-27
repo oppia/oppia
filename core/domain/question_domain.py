@@ -231,41 +231,34 @@ class Question(object):
         question_state_dict['image_assets'] = {}
         question_state_dict['image_assets']['image_mapping'] = {}
 
-        state = state_domain.State.from_dict(question_state_dict)
-        content_html = state.content.html
-        interaction_html_list = (
-            state.interaction.get_all_html_content_strings())
-
-        state_html = content_html
-        for html in interaction_html_list:
-            state_html = state_html + html
+        state_html = cls.get_all_html_content_strings_from_state_dict(
+            question_state_dict)
 
         # Gets image src of each image form HTML.
         image_src_list = html_validation_service.get_image_src_from_html(
             state_html)
-
+        # Maps image_id with the image source.
         image_id_to_src_dict = (
             cls.generate_image_id_and_maps_image_id_with_image_src(
                 image_src_list, image_counter))
-
         # Add image info in image assets.
         for (image_id, filepath) in image_id_to_src_dict.iteritems():
             image_mapping[image_id] = {
-                 'instructions': '',
-                 'placeholder': False,
-                 'src': filepath,
-             }
+                'instructions': '',
+                'placeholder': False,
+                'src': filepath,
+            }
         question_state_dict['image_assets']['image_mapping'] = image_mapping
         # Add image id in image tag.
         add_image_id_and_remove_filepath_from_image_tag = functools.partial(
             html_validation_service.add_image_id_and_remove_filepath_from_image_tag, # pylint: disable=line-too-long
             image_id_to_src_dict)
-        question_state_dict = (
-            state_domain.State.convert_html_fields_in_state(
-                question_state_dict,
-                add_image_id_and_remove_filepath_from_image_tag))
+        question_state_dict = state_domain.State.convert_html_fields_in_state(
+            question_state_dict,
+            add_image_id_and_remove_filepath_from_image_tag)
 
         return question_state_dict
+
 
 
     @classmethod
@@ -450,7 +443,7 @@ class Question(object):
 
     @classmethod
     def generate_image_id_and_maps_image_id_with_image_src(
-            cls, image_src_list, image_counter): #pylint: disable=too-many-function-args
+            cls, image_src_list, image_counter):
         """Maps image source with the image id. Creates image id with the
             help of image counter.
 
@@ -467,13 +460,58 @@ class Question(object):
         image_id_ending_range = image_counter + len(image_src_list)
         image_src_list_counter = 0
 
-        for counter in range(image_id_starting_range, image_id_ending_range + 1):
+        for counter in range(
+                image_id_starting_range, image_id_ending_range + 1):
             image_id = 'image_id_' + str(counter)
             filepath = image_src_list[image_src_list_counter]
             image_id_to_src_dict[image_id] = filepath
             image_src_list_counter += 1
 
         return image_id_to_src_dict
+
+    @classmethod
+    def get_all_html_content_strings_from_state_dict(cls, question_state_dict):
+        """Extract all HTML of state from the state dict.
+
+        Args:
+            question_state_dict: dict. A dict representaton of question state.
+
+        Returns:
+            state_html: str. All HTML present in a state.
+        """
+        state_html = ''
+        state_html = state_html + question_state_dict['content']['html']
+
+
+        if question_state_dict['interaction']['default_outcome']:
+            state_html = state_html + question_state_dict[
+                'interaction']['default_outcome']['feedback']['html']
+
+        for answer_group in (
+                question_state_dict['interaction']['answer_groups']):
+            state_html = (
+                state_html + answer_group['outcome']['feedback']['html'])
+            if question_state_dict['interaction']['id'] in (
+                    'ItemSelectionInput', 'DragAndDropSortInput'):
+                for rule_spec in answer_group['rule_specs']:
+                    for x in rule_spec['inputs']['x']:
+                        state_html = state_html + x
+
+        for hint in question_state_dict['interaction']['hints']:
+            state_html = state_html + hint['hint_content']['html']
+
+        if question_state_dict['interaction']['solution']:
+            state_html = state_html + question_state_dict[
+                'interaction']['solution']['explanation']['html']
+
+        if question_state_dict['interaction']['id'] in (
+                'ItemSelectionInput', 'MultipleChoiceInput',
+                'DragAndDropSortInput'):
+            for value in (question_state_dict['interaction']
+                          ['customization_args']['choices']['value']):
+                state_html = state_html + value
+
+        return state_html
 
 
 class QuestionSummary(object):
