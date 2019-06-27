@@ -84,6 +84,7 @@ class StoryChange(change_domain.BaseChange):
         to_version)
         - 'create_new' (with title)
     """
+
     # The allowed list of story properties which can be used in
     # update_story_property command.
     STORY_PROPERTIES = (
@@ -1080,7 +1081,12 @@ class StorySummary(object):
 
         if not isinstance(self.node_count, int):
             raise utils.ValidationError(
-                'Expected node_count to be a int, received \'%s\'' % (
+                'Expected node_count to be an int, received \'%s\'' % (
+                    self.node_count))
+
+        if self.node_count < 0:
+            raise utils.ValidationError(
+                'Expected node_count to be non-negative, received \'%s\'' % (
                     self.node_count))
 
         if not isinstance(self.language_code, basestring):
