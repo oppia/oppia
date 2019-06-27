@@ -45,8 +45,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     ClassifiersExtensionConstants,
     SkillDomainConstants,
     StoryDomainConstants,
-    TopicDomainConstants,
-    InteractionSpecsConstants
+    TopicDomainConstants
   ]
 })
 class MainAngularModule {
