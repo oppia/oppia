@@ -47,8 +47,13 @@ import { StoryViewerDomainConstants } from
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants.ts';
+import { TopicsAndSkillsDashboardDomainConstants } from
+  ('domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-domain.constants.ts');
 
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
+import { CollectionEditorPageConstants } from
+  'pages/collection-editor-page/collection-editor-page.constants.ts';
 import { CreatorDashboardConstants } from
   'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
 import { ExplorationPlayerConstants } from
@@ -85,7 +90,9 @@ import { ServicesConstants } from 'services/services.constants.ts';
     StoryViewerDomainConstants,
     TopicDomainConstants,
     TopicViewerDomainConstants,
+    TopicsAndSkillsDashboardDomainConstants,
     AdminPageConstants,
+    CollectionEditorPageConstants,
     CreatorDashboardConstants,
     ExplorationPlayerConstants,
     LibraryPageConstants,

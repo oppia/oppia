@@ -19,7 +19,7 @@
 
 require(
   'domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-domain.constants.ts');
+  'topics-and-skills-dashboard-domain.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

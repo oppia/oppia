@@ -16,6 +16,12 @@
  * @fileoverview Constants for topics and skills dashboard domain.
  */
 
-export class TopicsAndSkillsDashboardDomainConstants {
-  public static MERGE_SKILLS_URL = '/merge_skills_handler';
-}
+import { TopicsAndSkillsDashboardDomainConstants } from
+  ('domain/topics_and_skills_dashboard/' +
+  'topics-and-skills-dashboard-domain.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
+oppia.constant(
+  'MERGE_SKILLS_URL',
+  TopicsAndSkillsDashboardDomainConstants.MERGE_SKILLS_URL);
