@@ -3362,7 +3362,7 @@ class Exploration(object):
         for html in exploration_html_list:
             image_ids = image_ids + (
                 html_validation_service.get_image_ids_from_image_tag(
-                html))
+                    html))
 
         return image_ids
 

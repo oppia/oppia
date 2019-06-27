@@ -918,16 +918,6 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             'invalid_image_counter'):
             exploration.validate()
 
-    # def test_get_all_images_ids_in_exploration(self):
-    #     with self.swap(
-    #         html_validation_service, 'get_filename_with_dimensions',
-    #         mock_get_filename_with_dimensions):
-    #         exp_services.load_demo('2')
-    #         exploration = exp_services.get_exploration_by_id('2')
-
-    #     self.assertEqual(
-    #     exploration.get_all_images_ids_in_exploration(), "keshav")
-
 
 class ExplorationSummaryTests(test_utils.GenericTestBase):
 
