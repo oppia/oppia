@@ -2430,7 +2430,31 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
             state_stats['answers'], {
                 exp.init_state_name: [
                     {'answer': 'C', 'frequency': 12},
-                    {'answer': 'B', 'frequency': 11},
+                  (  {'answer': 'B', 'frequency': 11},
                     {'answer': 'A', 'frequency': 10},
                 ],
             })
+
+
+class LearnerAnswerDetailsHandlerTests(BaseEditorControllerTests):
+
+    def test_get_learner_answer_details_of_exploration_states(self):
+        with self.login_context(self.OWNER_EMAIL) as owner_id:
+            exp_id = exp_services.get_new_exploration_id()
+            self.save_new_valid_exploration(exp_id, owner_id)
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
+        state_name = exploration_dict['exploration']['init_state_name']
+        interaction_id = exploration_dict['exploration'][
+            'states'][state_name]['interaction']['id']
+        answer = "This is an answer"
+        answer_details = "These are the answer details"
+        state_reference = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_reference)) #pylint: disable=line-too-long
+        stats_services.record_learner_answer_info(
+            entity_type, state_reference, interaction_id,
+            answer, answer_details)
+        learner_answer_details = self.get_json('%s/%s' % feconf.)
+
+

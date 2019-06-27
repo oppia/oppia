@@ -45,7 +45,8 @@ import jinja2
 
 app_identity_services = models.Registry.import_app_identity_services()
 current_user_services = models.Registry.import_current_user_services()
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(stats_models, user_models) = models.Registry.import_models(
+    [models.NAMES.statistics, models.NAMES.user])
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(
     'default_twitter_share_message_editor', {
@@ -774,4 +775,28 @@ class TopUnresolvedAnswersHandler(EditorHandler):
 
         self.render_json({
             'unresolved_answers': unresolved_answers_with_frequency
+        })
+
+
+class LearnerAnswerDetailsHandler(EditorHandler):
+    """Returns a list of learner answer details."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_edit_exploration
+    def get(self, exp_id):
+        state_name = self.request.get('state_name')
+        if not state_name:
+            raise self.PageNotFoundException
+
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        state_reference = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) #pylint: disable=line-too-long
+        learner_answer_details_list = stats_services.get_learner_answer_details(
+            entity_type, state_reference)
+        learner_answer_details_dict_list = [learner_answer_details.to_dict()
+                                            for learner_answer_details in
+                                            learner_answer_details_list]
+        self.render_json({
+            'learner_answer_details_dict_list': learner_answer_details_dict_list
         })
