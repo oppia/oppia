@@ -23,7 +23,6 @@ require('domain/statistics/LearnerActionObjectFactory.ts');
 require(
   'pages/exploration-editor-page/statistics-tab/services/' +
   'learner-action-render.service.ts');
-import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService.ts';
 require('services/PlaythroughService.ts');
 
 describe('Learner Action Render Service', function() {

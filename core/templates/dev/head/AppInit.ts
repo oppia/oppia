@@ -26,7 +26,8 @@ import { downgradeInjectable } from '@angular/upgrade/static';
 
 import { Component } from '@angular/core';
 import { downgradeComponent } from '@angular/upgrade/static';
-import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService.ts';
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
 
 @Component({
   selector: 'service-bootstrap',
@@ -75,8 +76,12 @@ var oppia = angular.module(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
     .directive(
       'serviceBootstrap',
-      downgradeComponent({ component: ServiceBootstrapComponent }) as angular.IDirectiveFactory);
+      downgradeComponent({
+        component: ServiceBootstrapComponent
+      }) as angular.IDirectiveFactory);
 
-oppia.factory('ExplorationFeaturesService', downgradeInjectable(ExplorationFeaturesService));
+oppia.factory(
+  'ExplorationFeaturesService',
+  downgradeInjectable(ExplorationFeaturesService));
 
 exports.module = oppia;
