@@ -18,7 +18,7 @@
 
 import { AppConstants } from 'app.constants.ts';
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 for (var constantName in constants) {
   oppia.constant(constantName, constants[constantName]);

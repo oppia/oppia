@@ -18,7 +18,7 @@
 
 import { EditorDomainConstants } from 'domain/editor/editor-domain.constants.ts';
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',

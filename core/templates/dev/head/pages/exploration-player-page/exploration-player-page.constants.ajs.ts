@@ -18,7 +18,7 @@
 
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'CONTENT_FOCUS_LABEL_PREFIX',

@@ -20,7 +20,7 @@
 require('filters/string-utility-filters/camel-case-to-hyphens.filter.ts');
 
 // Service for assembling extension tags (for interactions).
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExtensionTagAssemblerService', [
   '$filter', 'HtmlEscaperService', function($filter, HtmlEscaperService) {

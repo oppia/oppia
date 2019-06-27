@@ -18,7 +18,7 @@
 
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'CONCEPT_CARD_DATA_URL_TEMPLATE',

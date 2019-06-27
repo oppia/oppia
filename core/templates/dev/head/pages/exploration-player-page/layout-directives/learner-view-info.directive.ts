@@ -29,7 +29,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/ContextService.ts');
 require('services/DateTimeFormatService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('learnerViewInfo', ['UrlInterpolationService', function(
     UrlInterpolationService) {

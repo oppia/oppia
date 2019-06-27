@@ -36,7 +36,7 @@ require(
   'state-property.service.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('answerGroupEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

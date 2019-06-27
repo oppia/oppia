@@ -18,7 +18,7 @@
  * NB: Reusable component directives should go in the components/ folder.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 // When set as an attr of an <input> element, moves focus to that element
 // when a 'focusOn' event is broadcast.

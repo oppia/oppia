@@ -17,7 +17,7 @@
  * topic rights domain objects.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TopicRightsObjectFactory', [
   function() {

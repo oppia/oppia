@@ -23,7 +23,7 @@ require('domain/question/QuestionObjectFactory.ts');
 
 require('domain/question/question-domain.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('QuestionUpdateService', [
   'ChangeObjectFactory', 'QuestionObjectFactory', 'QuestionUndoRedoService',

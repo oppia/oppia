@@ -80,4 +80,4 @@ var oppia = angular.module(
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
-exports.moduleName = oppia;
+exports.module = oppia;

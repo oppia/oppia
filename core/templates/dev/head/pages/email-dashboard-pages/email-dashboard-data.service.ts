@@ -16,7 +16,7 @@
  * @fileoverview Services for oppia email dashboard page.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('EmailDashboardDataService', [
   '$http', '$q', function($http, $q) {

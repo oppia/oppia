@@ -18,7 +18,7 @@
 
 require('domain/objects/FractionObjectFactory.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('FractionInputRulesService', [
   'FractionObjectFactory',

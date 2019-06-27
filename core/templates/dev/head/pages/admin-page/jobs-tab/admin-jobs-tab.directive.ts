@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('pages/admin-page/admin-page.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('adminJobsTab', [
   '$http', '$timeout', 'UrlInterpolationService', 'ADMIN_HANDLER_URL',

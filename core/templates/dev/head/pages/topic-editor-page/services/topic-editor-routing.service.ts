@@ -16,7 +16,7 @@
  * @fileoverview Service that handles routing for the topic editor page.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TopicEditorRoutingService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',

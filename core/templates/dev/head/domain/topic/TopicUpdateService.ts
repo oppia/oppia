@@ -24,7 +24,7 @@ require('domain/editor/undo_redo/UndoRedoService.ts');
 
 require('domain/topic/topic-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',

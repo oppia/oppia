@@ -16,7 +16,7 @@
  * @fileoverview Directive for real editor.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('realEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',

@@ -18,4 +18,5 @@
 
 require('App.ts');
 
+require('base_components/BaseContentDirective.ts');
 require('pages/about-page/about-page.controller.ts');

@@ -18,7 +18,7 @@
 
 require('services/UtilsService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ChangesInHumanReadableFormService', [
   'UtilsService', function(UtilsService) {

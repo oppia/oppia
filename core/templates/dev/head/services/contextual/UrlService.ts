@@ -17,7 +17,7 @@
  * functions on $window to be mocked in unit tests.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('UrlService', ['$window', function($window) {
   return {

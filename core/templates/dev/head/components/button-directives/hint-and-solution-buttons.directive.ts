@@ -29,7 +29,7 @@ require('pages/exploration-player-page/services/stats-reporting.service.ts');
 require('services/ContextService.ts');
 require('services/contextual/DeviceInfoService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {

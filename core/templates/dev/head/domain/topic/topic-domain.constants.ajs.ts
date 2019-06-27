@@ -18,7 +18,7 @@
 
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'TOPIC_EDITOR_STORY_URL_TEMPLATE',

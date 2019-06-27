@@ -19,7 +19,7 @@
 
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SidebarStatusService', [
   'WindowDimensionsService', function(WindowDimensionsService) {

@@ -16,7 +16,7 @@
  * @fileoverview Directive for drag and drop positive int editor.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('dragAndDropPositiveIntEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',

@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaShortResponseEndExploration', [function() {
   return {

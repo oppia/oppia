@@ -27,7 +27,7 @@ require(
 require('services/contextual/WindowDimensionsService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveNumericInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {

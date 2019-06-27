@@ -19,7 +19,7 @@ require('services/contextual/UrlService.ts');
  * @fileoverview Service for user data.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('UserService', [
   '$http', '$q', '$window', 'UrlInterpolationService', 'UrlService',

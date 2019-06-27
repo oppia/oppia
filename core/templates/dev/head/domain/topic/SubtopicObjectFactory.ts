@@ -19,7 +19,7 @@
 
 require('domain/skill/SkillSummaryObjectFactory.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
   function(SkillSummaryObjectFactory) {

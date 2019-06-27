@@ -16,7 +16,7 @@
  * @fileoverview Data and controllers for the Oppia splash page.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 require('base_components/BaseContentDirective.ts');
 

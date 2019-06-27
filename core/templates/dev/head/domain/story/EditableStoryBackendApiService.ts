@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/story/story-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('EditableStoryBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

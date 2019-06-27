@@ -19,7 +19,7 @@
 
 require('domain/objects/objects-domain.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('FractionObjectFactory', [
   'FRACTION_PARSING_ERRORS', function(FRACTION_PARSING_ERRORS) {

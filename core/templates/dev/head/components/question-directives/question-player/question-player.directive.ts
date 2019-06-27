@@ -103,7 +103,7 @@ require(
 
 require('pages/interaction-specs.constants.ajs.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',

@@ -23,7 +23,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 // separate CollectionDataService implementation which returns a local copy of
 // the collection instead. This file should not be included on the page in that
 // scenario.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ReadOnlyCollectionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'COLLECTION_DATA_URL_TEMPLATE',

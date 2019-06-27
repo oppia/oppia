@@ -20,7 +20,7 @@ require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/contextual/DeviceInfoService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('schemaBasedUnicodeEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

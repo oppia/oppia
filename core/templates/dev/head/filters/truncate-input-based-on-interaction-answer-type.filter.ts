@@ -24,7 +24,7 @@ require('filters/string-utility-filters/truncate.filter.ts');
     truncated.
  * @param {integer} length - Truncated length of answer.
  */
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('truncateInputBasedOnInteractionAnswerType', [
   '$filter', 'INTERACTION_SPECS', function($filter, INTERACTION_SPECS) {

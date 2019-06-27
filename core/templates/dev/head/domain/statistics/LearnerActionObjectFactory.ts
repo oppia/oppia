@@ -19,7 +19,7 @@
 
 require('domain/statistics/statistics-domain.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('LearnerActionObjectFactory', [
   'LEARNER_ACTION_SCHEMA_LATEST_VERSION',

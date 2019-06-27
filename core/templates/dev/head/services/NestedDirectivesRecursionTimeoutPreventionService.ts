@@ -17,7 +17,7 @@
  * in nested directives. See: http://stackoverflow.com/q/14430655
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('NestedDirectivesRecursionTimeoutPreventionService', [
   '$compile',

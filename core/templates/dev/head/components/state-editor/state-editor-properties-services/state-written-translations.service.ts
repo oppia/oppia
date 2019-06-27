@@ -16,7 +16,7 @@
  * @fileoverview A data service that stores the written translations.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StateWrittenTranslationsService', [
   'StatePropertyService', function(StatePropertyService) {

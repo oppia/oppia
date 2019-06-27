@@ -27,7 +27,7 @@ require('services/stateful/FocusManagerService.ts');
 
 require('interactions/interactions-extension.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('graphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {

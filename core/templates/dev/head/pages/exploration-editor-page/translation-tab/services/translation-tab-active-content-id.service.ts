@@ -23,7 +23,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-recorded-voiceovers.service.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TranslationTabActiveContentIdService', [
   '$log', '$rootScope', 'StateRecordedVoiceoversService',

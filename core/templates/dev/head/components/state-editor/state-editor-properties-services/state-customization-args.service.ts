@@ -19,7 +19,7 @@
  */
 
 // TODO(sll): Add validation.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StateCustomizationArgsService', [
   'StatePropertyService', function(StatePropertyService) {

@@ -20,7 +20,7 @@ require('services/UtilsService.ts');
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('normalizeWhitespace', ['UtilsService', function(UtilsService) {
   return function(input) {

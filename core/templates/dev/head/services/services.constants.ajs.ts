@@ -18,7 +18,7 @@
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant('PAGE_CONTEXT', ServicesConstants.PAGE_CONTEXT);
 

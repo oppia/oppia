@@ -18,7 +18,7 @@
 
 require('domain/editor/undo_redo/BaseUndoRedoService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('UndoRedoService', [
   'BaseUndoRedoService', function(BaseUndoRedoService) {

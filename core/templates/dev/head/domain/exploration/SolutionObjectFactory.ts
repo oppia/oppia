@@ -24,7 +24,7 @@ require('filters/string-utility-filters/convert-to-plain-text.filter.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SolutionObjectFactory', [
   '$filter', 'ExplorationHtmlFormatterService', 'FractionObjectFactory',

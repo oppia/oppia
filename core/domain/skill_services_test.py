@@ -736,8 +736,9 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
             self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2]))
 
 
-# TODO: Remove this mock class and tests for the mock skill migrations
-# once the actual functions are implemented.
+# TODO(lilithxxx): Remove this mock class and tests for the mock skill
+# migrations once the actual functions are implemented.
+# See issue: https://github.com/oppia/oppia/issues/7009.
 class MockSkillObject(skill_domain.Skill):
     """Mocks Skill domain object."""
 

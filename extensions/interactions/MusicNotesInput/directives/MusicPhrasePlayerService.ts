@@ -16,7 +16,7 @@
  * @fileoverview Player service for the interaction.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('MusicPhrasePlayerService', ['$timeout', function($timeout) {
   var _MIDI_CHANNEL = 0;
