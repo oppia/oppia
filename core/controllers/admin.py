@@ -99,8 +99,7 @@ class AdminPage(base.BaseHandler):
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
             'one_off_job_specs': one_off_job_specs,
-            'audit_job_specs': (
-                audit_job_specs),
+            'audit_job_specs': audit_job_specs,
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
             'updatable_roles': {
