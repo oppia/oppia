@@ -549,7 +549,7 @@ var toRichText = function(text) {
  * CodeMirror loads a part of the text at once, and scrolling in the element
  * loads more divs.
  */
-var CodeMirrorChecker = function(elem) {
+var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   // The number of pixels to scroll between reading different sections of
   // CodeMirror's text. 400 pixels is about 15 lines, which will work if
   // codemirror's buffer (viewportMargin) is set to at least 10 (the default).
@@ -569,7 +569,7 @@ var CodeMirrorChecker = function(elem) {
    *  - 'checked': true or false, whether the line has been checked
    */
   var _compareTextAndHighlightingFromLine = function(
-      currentLineNumber, scrollTo, codeMirrorPaneToScroll, compareDict) {
+      currentLineNumber, scrollTo, compareDict) {
     // This is used to match and scroll the text in codemirror to a point
     // scrollTo pixels from the top of the text or the bottom of the text
     // if scrollTo is too large.
@@ -602,7 +602,6 @@ var CodeMirrorChecker = function(elem) {
         _compareTextAndHighlightingFromLine(
           largestLineNumber,
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-          codeMirrorPaneToScroll,
           compareDict);
       } else {
         for (var lineNumber in compareDict) {
@@ -629,7 +628,7 @@ var CodeMirrorChecker = function(elem) {
    *  - 'checked': true or false, whether the line has been checked
    */
   var _compareTextFromLine = function(
-      currentLineNumber, scrollTo, codeMirrorPaneToScroll, compareDict) {
+      currentLineNumber, scrollTo, compareDict) {
     // This is used to match and scroll the text in codemirror to a point
     // scrollTo pixels from the top of the text or the bottom of the text
     // if scrollTo is too large.
@@ -641,7 +640,9 @@ var CodeMirrorChecker = function(elem) {
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
-      // Inserting an empty line at the last of textArray.
+      // We have an empty line in the codemirror panes which is retrived as NULL
+      // in codemirror5 getText() method hence, we needto add an empty line in 
+      // to the textArray to match with compareDict. 
       textArray[textArray.length] = '';
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
@@ -657,7 +658,6 @@ var CodeMirrorChecker = function(elem) {
         _compareTextFromLine(
           largestLineNumber,
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
-          codeMirrorPaneToScroll,
           compareDict);
       } else {
         for (var dictLineNumber in compareDict) {
@@ -681,19 +681,17 @@ var CodeMirrorChecker = function(elem) {
      * This runs much slower than checking without highlighting, so the
      * expectTextToBe() function should be used when possible.
      */
-    expectTextWithHighlightingToBe: function(
-        expectedTextDict, codeMirrorPaneToScroll) {
+    expectTextWithHighlightingToBe: function(expectedTextDict) {
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber].checked = false;
       }
-      _compareTextAndHighlightingFromLine(1, 0,
-        codeMirrorPaneToScroll, expectedTextDict);
+      _compareTextAndHighlightingFromLine(1, 0, expectedTextDict);
     },
     /**
      * Compares text with codemirror. The input should be a string (with
      * line breaks) of the expected display on codemirror.
      */
-    expectTextToBe: function(expectedTextString, codeMirrorPaneToScroll) {
+    expectTextToBe: function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
@@ -703,7 +701,7 @@ var CodeMirrorChecker = function(elem) {
           checked: false
         };
       }
-      _compareTextFromLine(1, 0, codeMirrorPaneToScroll, expectedDict);
+      _compareTextFromLine(1, 0, expectedDict);
     }
   };
 };
