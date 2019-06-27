@@ -16,21 +16,15 @@
  * @fileoverview Constants for the Oppia contributors' library page.
  */
 
+import { LibraryPageConstants } from 'pages/library-page/library-page.constants.ts';
+
 // NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example
 // LIBRARY_PAGE_MODES.GROUP should have the same value as
 // LIBRARY_PAGE_MODE_GROUP in feconf.py.
-export class LibraryPageConstants {
-  public static LIBRARY_PAGE_MODES = {
-    GROUP: 'group',
-    INDEX: 'index',
-    SEARCH: 'search'
-  };
+var oppia = require('AppInit.ts').module;
 
-  public static LIBRARY_PATHS_TO_MODES = {
-    '/library': 'index',
-    '/library/top_rated': 'group',
-    '/library/recently_published': 'group',
-    '/search/find': 'search'
-  };
-}
+oppia.constant('LIBRARY_PAGE_MODES', LibraryPageConstants.LIBRARY_PAGE_MODES);
+
+oppia.constant(
+  'LIBRARY_PATHS_TO_MODES', LibraryPageConstants.LIBRARY_PATHS_TO_MODES);

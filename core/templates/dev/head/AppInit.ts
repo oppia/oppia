@@ -25,6 +25,7 @@ import { AppConstants } from 'app.constants.ts';
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
 import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
+import { LibraryPageConstants } from 'pages/library-page/library-page.constants.ts';
 
 import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
 
@@ -45,6 +46,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     AdminPageConstants,
     CreatorDashboardConstants,
     ExplorationPlayerConstants,
+    LibraryPageConstants,
     ServicesConstants,
     ClassifiersExtensionConstants,
     EditorDomainConstants,

@@ -18,7 +18,7 @@
 
 require('pages/OppiaFooterDirective.ts');
 
-require('pages/library-page/library-page.constants.ts');
+require('pages/library-page/library-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 
