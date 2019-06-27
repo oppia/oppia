@@ -678,10 +678,9 @@ class ImageDomainUnitTests(test_utils.GenericTestBase):
             'placeholder': False,
             'instructions': 'no instructions'
         }
-        
         with self.assertRaisesRegexp(
             Exception, 'Invalid filepath, received random'):
-            image_object = state_domain.Image.from_dict(image_dict)
+            state_domain.Image.from_dict(image_dict)
 
 
 class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
@@ -790,7 +789,8 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
     def test_invalid_image_mapping(self):
         image_assets = state_domain.ImageAssets('image_mapping_string')
         with self.assertRaisesRegexp(
-            Exception, 'Expected image_mapping to be dict, received image_mapping_string'):
+            Exception,
+            'Expected image_mapping to be dict, received image_mapping_string'):
             image_assets.validate(1)
 
     def test_invalid_image_id(self):

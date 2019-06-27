@@ -225,9 +225,9 @@ class Image(object):
         Raises:
             ValidationError: One or more attributes of the Image are not valid.
         """
-        if (self.placeholder == False and self.src == ''):
+        if (self.placeholder is False and self.src == ''):
             raise utils.ValidationError('Image src can\'t be empty')
-        if (self.placeholder == True and self.instructions == ''):
+        if (self.placeholder is True and self.instructions == ''):
             raise utils.ValidationError(
                 'Instructions can\'t be empty for a placeholder')
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
@@ -258,7 +258,7 @@ class ImageAssets(object):
         """Validates all properties of ImageAssets.
 
         Args:
-            image_couter: int. Counter for image ids.
+            image_counter: int. Counter for image ids.
 
         Raises:
             ValidationError: One or more attributes of the ImageAssets are not
@@ -271,7 +271,7 @@ class ImageAssets(object):
         for (image_id, image) in self.image_mapping.iteritems():
             if not isinstance(image_id, basestring):
                 raise utils.ValidationError(
-                    'Invalid image_id received: %s' % image_id)                
+                    'Invalid image_id received: %s' % image_id)
             if not self.does_image_id_have_valid_pattern(image_id):
                 raise utils.ValidationError(
                     'Invalid image_id received: %s' % image_id)
