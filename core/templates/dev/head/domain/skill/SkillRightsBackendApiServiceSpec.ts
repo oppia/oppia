@@ -36,6 +36,7 @@ describe('Skill rights backend API service', function() {
     $rootScope = $injector.get('$rootScope');
     $scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
+    CsrfService = $injector.get('CsrfTokenService');
 
     spyOn(CsrfService, 'getToken').and.callFake(function() {
       var deferred = $q.defer();

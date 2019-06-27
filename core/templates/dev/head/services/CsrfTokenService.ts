@@ -29,7 +29,7 @@ oppia.factory('CsrfTokenService', [function() {
         if (token) {
           resolve(token);
         } else {
-          // Fetch token if it is'nt already available.
+          // Fetch token if it isn't already available.
           $.ajax({
             url: '/csrfhandler',
             type: 'GET',
