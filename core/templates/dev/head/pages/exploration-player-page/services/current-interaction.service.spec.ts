@@ -22,6 +22,16 @@ require(
 describe('Current Interaction Service', function() {
   beforeEach(angular.mock.module('oppia'));
 
+  beforeEach(function() {
+    angular.mock.module(function($provide) {
+      $provide.value('UrlService', {
+        getPathname: function() {
+          return '/explore/123';
+        }
+      });
+    });
+  });
+
   var DUMMY_ANSWER = 'dummy_answer';
 
   var CurrentInteractionService;
