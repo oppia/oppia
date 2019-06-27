@@ -16,7 +16,8 @@
  * @fileoverview Constants for objects domain.
  */
 
-import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

@@ -16,7 +16,8 @@
  * @fileoverview Constants for the statistics domain.
  */
 
-import { StatisticsDomainConstants } from 'domain/statistics/statistics-domain.constants.ts';
+import { StatisticsDomainConstants } from
+  'domain/statistics/statistics-domain.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

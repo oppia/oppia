@@ -27,7 +27,7 @@ export class CollectionDomainConstants {
   public static CMD_SWAP_COLLECTION_NODES = 'swap_nodes';
   public static CMD_DELETE_COLLECTION_NODE = 'delete_collection_node';
   public static CMD_EDIT_COLLECTION_PROPERTY = 'edit_collection_property';
-  public static 
+  public static
     CMD_EDIT_COLLECTION_NODE_PROPERTY = 'edit_collection_node_property';
   public static COLLECTION_PROPERTY_TITLE = 'title';
   public static COLLECTION_PROPERTY_CATEGORY = 'category';
@@ -36,8 +36,8 @@ export class CollectionDomainConstants {
   public static COLLECTION_PROPERTY_TAGS = 'tags';
   public static CMD_ADD_COLLECTION_SKILL = 'add_collection_skill';
   public static CMD_DELETE_COLLECTION_SKILL = 'delete_collection_skill';
-  public static 
+  public static
     COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids';
-  public static 
+  public static
     COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS = 'acquired_skill_ids';
 }

@@ -16,7 +16,8 @@
  * @fileoverview Constants for the state editor directive.
  */
 
-import { StateEditorConstants } from 'components/state-editor/state-editor.constants.ts';
+import { StateEditorConstants } from
+  'components/state-editor/state-editor.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

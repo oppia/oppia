@@ -16,7 +16,8 @@
  * @fileoverview Constants for question domain.
  */
 
-import { QuestionDomainConstants } from 'domain/question/question-domain.constants.ts';
+import { QuestionDomainConstants } from
+  'domain/question/question-domain.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

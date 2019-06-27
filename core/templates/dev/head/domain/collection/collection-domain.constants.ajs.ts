@@ -22,7 +22,8 @@
 // NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
 // 'acquired_skills' are deprecated. Do not use them.
 
-import { CollectionDomainConstants } from 'domain/collection/collection-domain.constants.ts';
+import { CollectionDomainConstants } from
+  'domain/collection/collection-domain.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

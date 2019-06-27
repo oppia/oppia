@@ -16,7 +16,8 @@
  * @fileoverview Constants for the Oppia contributors' library page.
  */
 
-import { LibraryPageConstants } from 'pages/library-page/library-page.constants.ts';
+import { LibraryPageConstants } from
+  'pages/library-page/library-page.constants.ts';
 
 // NOTE TO DEVELOPERS: The constants defined below in LIBRARY_PAGE_MODES should
 // be same as the LIBRARY_PAGE_MODE constants defined in feconf.py. For example

@@ -16,7 +16,8 @@
  * @fileoverview Constants for editor domain.
  */
 
-import { EditorDomainConstants } from 'domain/editor/editor-domain.constants.ts';
+import { EditorDomainConstants } from
+  'domain/editor/editor-domain.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

@@ -32,7 +32,8 @@ export class ObjectsDomainConstants {
       'Please enter a valid currency (e.g., $5 or Rs 5)',
     INVALID_CURRENCY_FORMAT: 'Please write currency units at the beginning',
     INVALID_UNIT_CHARS:
-      'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
+      'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, ' +
+      '/, -'
   };
 
   public static CURRENCY_UNITS = {
