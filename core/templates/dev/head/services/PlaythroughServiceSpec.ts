@@ -18,7 +18,6 @@
 
 require('App.ts');
 require('domain/statistics/LearnerActionObjectFactory.ts');
-import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService.ts';
 require('services/PlaythroughService.ts');
 
 describe('PlaythroughService', function() {

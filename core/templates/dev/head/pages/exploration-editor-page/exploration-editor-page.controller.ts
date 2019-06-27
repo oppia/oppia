@@ -249,7 +249,6 @@ require(
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesBackendApiService.ts');
-import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService.ts';
 require('services/PageTitleService.ts');
 require('services/PlaythroughIssuesService.ts');
 require('services/SiteAnalyticsService.ts');

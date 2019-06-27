@@ -20,7 +20,6 @@ require('domain/statistics/LearnerActionObjectFactory.ts');
 require('domain/statistics/PlaythroughObjectFactory.ts');
 require('domain/utilities/StopwatchObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
-import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService.ts';
 
 require('services/services.constants.ts');
 
