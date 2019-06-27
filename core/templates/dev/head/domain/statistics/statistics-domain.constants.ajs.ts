@@ -16,7 +16,13 @@
  * @fileoverview Constants for the statistics domain.
  */
 
-export class StatisticsDomainConstants {
-  public static LEARNER_ACTION_SCHEMA_LATEST_VERSION = 1;
-  public static PLAYTHROUGH_IMPROVEMENT_CARD_TYPE = 'playthrough';
-}
+import { StatisticsDomainConstants } from 'domain/statistics/statistics-domain.constants.ts';
+
+var oppia = require('AppInit.ts').module;
+
+oppia.constant(
+  'LEARNER_ACTION_SCHEMA_LATEST_VERSION',
+  StatisticsDomainConstants.LEARNER_ACTION_SCHEMA_LATEST_VERSION);
+oppia.constant(
+  'PLAYTHROUGH_IMPROVEMENT_CARD_TYPE',
+  StatisticsDomainConstants.PLAYTHROUGH_IMPROVEMENT_CARD_TYPE);

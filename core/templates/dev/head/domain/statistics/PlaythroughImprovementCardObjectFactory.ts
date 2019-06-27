@@ -21,7 +21,7 @@ require('domain/statistics/ImprovementActionButtonObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesService.ts');
 
-require('domain/statistics/statistics-domain.constants.ts');
+require('domain/statistics/statistics-domain.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 
