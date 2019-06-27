@@ -13,24 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview A data service that stores the current exploration image
- * counter so that it can be displayed and edited in multiple places in the UI.
+ * @fileoverview Unit tests for the ImageAssets object factory.
  */
 
-oppia.factory('ExplorationImageCounterService', [
-  '$filter',
-  function($filter) {
-    var imageCounter = 0;
-
-    return {
-      init: function(value) {
-        imageCounter = value;
-      },
-      getImageId: function() {
-        imageCounter += 1;
-        var imageId = 'image_id_' + imageCounter;
-        return imageId;
-      }
-    };
-  }
-]);
+require('domain/exploration/ImageAssetsObjectFactory.ts');

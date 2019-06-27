@@ -28,7 +28,7 @@ describe('Image object factory', function() {
     beforeEach(angular.mock.inject(function($injector) {
       iof = $injector.get('ImageObjectFactory');
       image = iof.createFromBackendDict({
-        src: '',
+        src: 'random.png',
         placeholder: false,
         instructions: ''
       });
@@ -36,10 +36,19 @@ describe('Image object factory', function() {
 
     it('should get and set value correctly', function() {
       expect(image).toEqual(iof.createFromBackendDict({
-        src: '',
+        src: 'random.png',
         placeholder: false,
         instructions: ''
       }));
+    });
+
+    it('should create a new image', function() {
+      expect(iof.createNew('random.png', false, '')).toEqual(
+        iof.createFromBackendDict({
+          src: 'random.png',
+          placeholder: false,
+          instructions: ''
+        }));
     });
   });
 });

@@ -225,6 +225,11 @@ class Image(object):
         Raises:
             ValidationError: One or more attributes of the Image are not valid.
         """
+        if (self.placeholder == False and self.src == ''):
+            raise utils.ValidationError('Image src can\'t be empty')
+        if (self.placeholder == True and self.instructions == ''):
+            raise utils.ValidationError(
+                'Instructions can\'t be empty for a placeholder')
         filename_re = r'^[A-Za-z0-9+/_-]*\.((png)|(jpeg)|(gif)|(jpg))$'
         if (not re.match(filename_re, self.src) or self.src == ''):
             raise utils.ValidationError(
@@ -270,7 +275,11 @@ class ImageAssets(object):
             if not self.does_image_id_have_valid_pattern(image_id):
                 raise utils.ValidationError(
                     'Invalid image_id received: %s' % image_id)
-            numeric_part_of_image_id = int(image_id.strip('image_id_'))
+            try:
+                numeric_part_of_image_id = int(image_id.strip('image_id_'))
+            except:
+                raise Exception(
+                    'Invalid image_id received: %s' % image_id)
             if numeric_part_of_image_id > image_counter:
                 raise Exception(
                     'Image ID cannot be greater than image_counter,'
@@ -1495,7 +1504,7 @@ class SubtitledHtml(object):
         # ensures that validation will not fail in such cases.
         self.html = html_validation_service.convert_to_ckeditor(
             html_cleaner.clean(html))
-        # self.validate()
+        self.validate()
 
     def to_dict(self):
         """Returns a dict representing this SubtitledHtml domain object.

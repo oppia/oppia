@@ -25,8 +25,6 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var INTERACTION_TYPE_IMAGE_CLICK_INPUT = 'ImageClickInput';
     var INTERACTION_TYPE_DRAG_AND_DROP_SORT = 'DragAndDropSortInput';
 
-    var filename = '';
-
     /**
      * Gets the html from the state's content.
      * @param {object} state - The state from which the html of the content

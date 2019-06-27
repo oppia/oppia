@@ -2252,7 +2252,7 @@ class Exploration(object):
             image_src_list = html_validation_service.get_image_src_from_html(
                 state_html)
             # Maps image_id with the image source.
-            image_id_to_src_dict = (
+            (image_id_to_src_dict, image_counter) = (
                 cls.generate_image_id_and_maps_image_id_with_image_src(
                     image_src_list, image_counter))
             # Add image info in image assets.
@@ -3341,13 +3341,14 @@ class Exploration(object):
         image_id_ending_range = image_counter + len(image_src_list)
         image_src_list_counter = 0
 
-        for _id in range(image_id_starting_range, image_id_ending_range + 1):
-            image_id = 'image_id_' + str(_id)
+        for counter in range(image_id_starting_range, image_id_ending_range + 1):
+            image_id = 'image_id_' + str(counter)
             filepath = image_src_list[image_src_list_counter]
             image_id_to_src_dict[image_id] = filepath
             image_src_list_counter += 1
+        image_counter = image_id_ending_range
 
-        return image_id_to_src_dict
+        return (image_id_to_src_dict, image_counter)
 
     def get_all_images_ids_in_exploration(self):
         """Returns a list of Ids, of all images present in an exploration.
@@ -3355,10 +3356,13 @@ class Exploration(object):
         Returns:
             image_ids. List of ids, of all images present in an exploration.
         """
-        exploration_html = self.get_all_html_content_strings()[0]
-        image_ids = (
+        exploration_html_list = self.get_all_html_content_strings()
+        image_ids = []
+
+        for html in exploration_html_list:
+            image_ids = image_ids + (
             html_validation_service.get_image_ids_from_image_tag(
-                exploration_html))
+                html))
 
         return image_ids
 
@@ -3368,8 +3372,8 @@ class Exploration(object):
         for state in self.states.values():
             image_ids_in_state_html = state.get_image_ids_of_state()
             image_ids_in_image_assets = state.image_assets.image_mapping.keys()
-            for image_id in image_ids_in_state_html:
-                if image_id not in image_ids_in_image_assets:
+            for image_id in image_ids_in_image_assets:
+                if image_id not in image_ids_in_state_html:
                     image_ids_to_delete.append(image_id)
             state.image_assets.clean(image_ids_to_delete)
 
@@ -3398,7 +3402,8 @@ class Exploration(object):
                     'ItemSelectionInput', 'DragAndDropSortInput'):
                 for rule_spec in answer_group['rule_specs']:
                     for x in rule_spec['inputs']['x']:
-                        state_html = state_html + x
+                        for x_html in x:
+                            state_html = state_html + x_html
 
         for hint in state_dict['interaction']['hints']:
             state_html = state_html + hint['hint_content']['html']

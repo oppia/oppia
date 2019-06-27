@@ -834,6 +834,26 @@ class ImageAssetsDomainUnitTests(test_utils.GenericTestBase):
             Exception, 'Image Id does not exist: image_id_8'):
             self.image_assets_object.delete_image('image_id_8')
 
+    def test_image_src_cannot_empty_for_image(self):
+        image_dict = {
+            'src': '',
+            'placeholder': False,
+            'instructions': ''
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'Image src can\'t be empty'):
+            state_domain.Image.from_dict(image_dict)
+
+    def test_instructions_cannot_empty_for_placeholder(self):
+        image_dict = {
+            'src': '',
+            'placeholder': True,
+            'instructions': ''
+        }
+        with self.assertRaisesRegexp(
+            Exception, 'Instructions can\'t be empty for a placeholder'):
+            state_domain.Image.from_dict(image_dict)
+
 
 class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
     """Test methods operating on written transcripts."""

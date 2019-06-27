@@ -24,14 +24,6 @@ oppia.factory('ImageObjectFactory', [function() {
     this.instrutions = instructions;
   };
 
-  Image.prototype.toBackendDict = function() {
-    return {
-      src: this.src,
-      placeholder: this.placeholder,
-      instructions: this.instructions
-    };
-  };
-
   /* eslint-disable dot-notation */
   Image['createNew'] = function(src, placeholder, instructions) {
   /* eslint-enable dot-notation */

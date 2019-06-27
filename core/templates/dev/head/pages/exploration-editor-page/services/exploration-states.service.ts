@@ -83,9 +83,6 @@ oppia.factory('ExplorationStatesService', [
           return hint.toBackendDict();
         });
       },
-      imageAssets: function(imageAssets) {
-        return imageAssets.toBackendDict();
-      },
       param_changes: function(paramChanges) {
         return paramChanges.map(function(paramChange) {
           return paramChange.toBackendDict();

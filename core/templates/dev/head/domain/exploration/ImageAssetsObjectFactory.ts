@@ -33,7 +33,7 @@ oppia.factory('ImageAssetsObjectFactory', [
         imageMapping[imageId] = imageDict;
       }
       return {
-        imageMapping: imageMapping
+        image_mapping: imageMapping
       };
     };
 
