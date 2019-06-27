@@ -22,7 +22,7 @@
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
-require('domain/story/story-domain.constants.ts');
+require('domain/story/story-domain.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 
