@@ -43,7 +43,7 @@ require('services/AlertsService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-require('pages/learner-dashboard-page/learner-dashboard-page.constants.ts');
+require('pages/learner-dashboard-page/learner-dashboard-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

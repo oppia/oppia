@@ -60,6 +60,8 @@ import { ExplorationEditorPageConstants } from
   'pages/exploration-editor-page/exploration-editor-page.constants.ts';
 import { ExplorationPlayerConstants } from
   'pages/exploration-player-page/exploration-player-page.constants.ts';
+import { LearnerDashboardPageConstants } from
+  'pages/learner-dashboard-page/learner-dashboard-page.constants.ts';
 import { LibraryPageConstants } from
   'pages/library-page/library-page.constants.ts';
 import { ReviewTestPageConstants } from
@@ -100,6 +102,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     CreatorDashboardConstants,
     ExplorationEditorPageConstants,
     ExplorationPlayerConstants,
+    LearnerDashboardPageConstants,
     LibraryPageConstants,
     ReviewTestPageConstants,
     SkillEditorPageConstants,
