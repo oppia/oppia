@@ -21,13 +21,16 @@ import { BrowserModule } from '@angular/platform-browser';
 import { StaticProvider } from '@angular/core';
 
 import { AppConstants } from 'app.constants.ts';
+
 import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
-import { ServicesConstants } from 'services/services.constants.ts';
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants.ts';
 
 import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
 
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants.ts';
+import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
+
+import { ServicesConstants } from 'services/services.constants.ts';
 
 @NgModule({
   imports: [
@@ -39,6 +42,7 @@ import { InteractionSpecsConstants } from 'pages/interaction-specs.constants.ts'
     ExplorationPlayerConstants,
     ServicesConstants,
     ClassifiersExtensionConstants,
+    SkillDomainConstants,
     InteractionSpecsConstants
   ]
 })
