@@ -27,13 +27,14 @@ import feconf
 
 class UserSettingsModelTest(test_utils.GenericTestBase):
     """Tests for UserSettingsModel class."""
+    user_id = 'user_id'
     user_email = 'user@example.com'
     user_role = feconf.ROLE_ID_ADMIN
     user2_email = 'user2@example.com'
     user2_role = feconf.ROLE_ID_BANNED_USER
     user3_email = 'user3@example.com'
     user3_role = feconf.ROLE_ID_ADMIN
-    user3_id = 3
+    user3_id = 'user3_id'
     generic_username = 'user'
     generic_date = datetime.datetime(2019, 5, 20)
     generic_image_url = 'www.example.com/example.png'
@@ -44,7 +45,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
         user_models.UserSettingsModel(
-            email=self.user_email, role=self.user_role).put()
+            id=self.user_id, email=self.user_email, role=self.user_role).put()
         user_models.UserSettingsModel(
             email=self.user2_email, role=self.user2_role).put()
         user_models.UserSettingsModel(
@@ -77,8 +78,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
     def test_export_data_trivial(self):
-        user = user_models.UserSettingsModel.get_by_role(
-            feconf.ROLE_ID_ADMIN)[0]
+        user = user_models.UserSettingsModel.get_by_id(self.user_id)
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': 'user@example.com',
@@ -103,8 +103,7 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(expected_user_data, user_data)
 
     def test_export_data_nontrivial(self):
-        user = user_models.UserSettingsModel.get_by_role(
-            feconf.ROLE_ID_ADMIN)[1]
+        user = user_models.UserSettingsModel.get_by_id(self.user3_id)
         user_data = user.export_data(user.id)
         expected_user_data = {
             'email': self.user3_email,
