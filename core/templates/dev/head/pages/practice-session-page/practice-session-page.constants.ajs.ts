@@ -16,9 +16,13 @@
  * @fileoverview Constants for the practice session.
  */
 
-export class PracticeSessionPageConstants {
-  public static TOTAL_QUESTIONS = 20;
+import { PracticeSessionPageConstants } from
+  'pages/practice-session-page/practice-session-page.constants.ts';
 
-  public static PRACTICE_SESSIONS_DATA_URL =
-    '/practice_session/data/<topic_name>';
-}
+var oppia = require('AppInit.ts').module;
+
+oppia.constant('TOTAL_QUESTIONS', PracticeSessionPageConstants.TOTAL_QUESTIONS);
+
+oppia.constant(
+  'PRACTICE_SESSIONS_DATA_URL',
+  PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL);

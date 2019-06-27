@@ -29,7 +29,7 @@ require('objects/objectComponentsRequiresForPlayers.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/practice-session-page/practice-session-page.constants.ts');
+require('pages/practice-session-page/practice-session-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;

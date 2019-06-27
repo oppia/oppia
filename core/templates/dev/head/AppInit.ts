@@ -64,6 +64,8 @@ import { LearnerDashboardPageConstants } from
   'pages/learner-dashboard-page/learner-dashboard-page.constants.ts';
 import { LibraryPageConstants } from
   'pages/library-page/library-page.constants.ts';
+import { PracticeSessionPageConstants } from
+  'pages/practice-session-page/practice-session-page.constants.ts';
 import { ReviewTestPageConstants } from
   'pages/review-test-page/review-test-page.constants.ts';
 import { SkillEditorPageConstants } from
@@ -104,6 +106,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     ExplorationPlayerConstants,
     LearnerDashboardPageConstants,
     LibraryPageConstants,
+    PracticeSessionPageConstants,
     ReviewTestPageConstants,
     SkillEditorPageConstants,
     StoryEditorPageConstants,
