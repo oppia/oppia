@@ -59,6 +59,12 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run:
+          name: CodeClimate before-build
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+            ./cc-test-reporter before-build
+      - run:
           name: Run frontend tests
           command: |
             bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
@@ -66,7 +72,9 @@ jobs:
           name: Generate frontend coverage report
           command: |
             sudo pip install codecov
-            codecov --file ../karma_coverage_reports/coverage-final.json
+            ./cc-test-reporter format-coverage -t codecov --file ../karma_coverage_reports/coverage-final.json
+            ./cc-test-reporter sum-coverage coverage/codeclimate.*.json
+            ./cc-test-reporter upload-coverage
           when: on_success
 
   backend_tests:
@@ -77,14 +85,22 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run:
+          name: CodeClimate before-build
+          command: |
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+            ./cc-test-reporter before-build
+      - run:
           name: Run backend tests
           command: |
-            bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests
+            bash scripts/run_backend_tests.sh --test_path='core/platform' --generate_coverage_report --exclude_load_tests
       - run:
           name: Generate backend coverage report
           command: |
             sudo pip install codecov
-            codecov
+            ./cc-test-reporter format-coverage -t codecov
+            ./cc-test-reporter sum-coverage coverage/codeclimate.*.json
+            ./cc-test-reporter upload-coverage
           when: on_success
 
 workflows:
