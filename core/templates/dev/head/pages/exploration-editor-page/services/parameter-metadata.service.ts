@@ -24,7 +24,7 @@ require(
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('pages/exploration-editor-page/services/graph-data.service.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

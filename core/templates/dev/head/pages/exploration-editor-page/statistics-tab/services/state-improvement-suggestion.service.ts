@@ -16,7 +16,7 @@
  * @fileoverview Service for suggestion improvements to a specific state.
  */
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

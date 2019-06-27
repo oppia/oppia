@@ -17,7 +17,7 @@
  * tab.
  */
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
+require('pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

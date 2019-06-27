@@ -1,0 +1,79 @@
+// Copyright 2019 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Constants for the exploration editor page and the editor
+ *               help tab in the navbar.
+ */
+
+import { ExplorationEditorPageConstants } from
+  'pages/exploration-editor-page/exploration-editor-page.constants.ts';
+
+var oppia = require('AppInit.ts').module;
+
+oppia.constant(
+  'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
+  ExplorationEditorPageConstants.EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
+
+oppia.constant(
+  'EVENT_EXPLORATION_PROPERTY_CHANGED',
+  ExplorationEditorPageConstants.EVENT_EXPLORATION_PROPERTY_CHANGED);
+
+oppia.constant(
+  'PARAM_ACTION_GET', ExplorationEditorPageConstants.PARAM_ACTION_GET);
+
+oppia.constant(
+  'PARAM_ACTION_SET', ExplorationEditorPageConstants.PARAM_ACTION_SET);
+
+oppia.constant(
+  'VOICEOVER_MODE', ExplorationEditorPageConstants.VOICEOVER_MODE);
+
+oppia.constant(
+  'TRANSLATION_MODE', ExplorationEditorPageConstants.TRANSLATION_MODE);
+
+// When an unresolved answer's frequency exceeds this threshold, an exploration
+// will be blocked from being published until the answer is resolved.
+oppia.constant(
+  'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD',
+  ExplorationEditorPageConstants.UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD);
+
+// Constant for audio recording time limit.
+oppia.constant(
+  'RECORDING_TIME_LIMIT', ExplorationEditorPageConstants.RECORDING_TIME_LIMIT);
+
+oppia.constant(
+  'IMPROVE_TYPE_INCOMPLETE',
+  ExplorationEditorPageConstants.IMPROVE_TYPE_INCOMPLETE);
+
+oppia.constant(
+  'DEFAULT_AUDIO_LANGUAGE',
+  ExplorationEditorPageConstants.DEFAULT_AUDIO_LANGUAGE);
+
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_VALID',
+  ExplorationEditorPageConstants.INFO_MESSAGE_SOLUTION_IS_VALID);
+
+oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
+  ExplorationEditorPageConstants
+    .INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE);
+
+oppia.constant(
+  'ACTION_ACCEPT_SUGGESTION',
+  ExplorationEditorPageConstants.ACTION_ACCEPT_SUGGESTION);
+oppia.constant(
+  'ACTION_REJECT_SUGGESTION',
+  ExplorationEditorPageConstants.ACTION_REJECT_SUGGESTION);
+
+oppia.constant(
+  'COMPONENT_NAME_DEFAULT_OUTCOME',
+  ExplorationEditorPageConstants.COMPONENT_NAME_DEFAULT_OUTCOME);
