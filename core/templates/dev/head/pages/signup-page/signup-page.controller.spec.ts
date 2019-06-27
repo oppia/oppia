@@ -27,7 +27,7 @@ describe('Signup controller', function() {
       angular.mock.module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(angular.mock.inject(function(
-        _$componentController_, $http, _$httpBackend_, $rootScope, $translate) {
+        _$componentController_, $http, _$httpBackend_, $rootScope) {
       $componentController = _$componentController_;
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/signuphandler/data').respond({

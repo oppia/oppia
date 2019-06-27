@@ -144,8 +144,8 @@ module.exports = function(config) {
       resolve: {
         modules: [
           'core/templates/dev/head',
+          'extensions',
           'node_modules',
-          'extensions'
         ],
       },
       module: {
