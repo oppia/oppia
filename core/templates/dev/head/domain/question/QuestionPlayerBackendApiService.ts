@@ -16,7 +16,7 @@
  * skill_ids.
  */
 
-require('domain/question/question-domain.constants.ts');
+require('domain/question/question-domain.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

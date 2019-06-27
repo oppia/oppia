@@ -27,7 +27,7 @@ require('domain/exploration/WrittenTranslationObjectFactory.ts');
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/question/question-domain.constants.ts');
+require('domain/question/question-domain.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

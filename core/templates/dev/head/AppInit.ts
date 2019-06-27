@@ -29,8 +29,10 @@ import { LibraryPageConstants } from 'pages/library-page/library-page.constants.
 
 import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
 
+import { CollectionDomainConstants } from 'domain/collection/collection-domain.constants.ts';
 import { EditorDomainConstants } from 'domain/editor/editor-domain.constants.ts';
 import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants.ts';
+import { QuestionDomainConstants } from 'domain/question/question-domain.constants.ts';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
@@ -49,8 +51,10 @@ import { ServicesConstants } from 'services/services.constants.ts';
     LibraryPageConstants,
     ServicesConstants,
     ClassifiersExtensionConstants,
+    CollectionDomainConstants,
     EditorDomainConstants,
     ObjectsDomainConstants,
+    QuestionDomainConstants,
     SkillDomainConstants,
     StoryDomainConstants,
     TopicDomainConstants

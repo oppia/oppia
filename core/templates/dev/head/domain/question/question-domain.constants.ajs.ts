@@ -1,0 +1,50 @@
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/**
+ * @fileoverview Constants for question domain.
+ */
+
+import { QuestionDomainConstants } from 'domain/question/question-domain.constants.ts';
+
+var oppia = require('AppInit.ts').module;
+
+oppia.constant(
+  'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
+  QuestionDomainConstants.EDITABLE_QUESTION_DATA_URL_TEMPLATE);
+oppia.constant(
+  'QUESTION_CREATION_URL',
+  QuestionDomainConstants.QUESTION_CREATION_URL);
+oppia.constant(
+  'QUESTION_SKILL_LINK_URL_TEMPLATE',
+  QuestionDomainConstants.QUESTION_SKILL_LINK_URL_TEMPLATE);
+
+oppia.constant(
+  'PRETEST_QUESTIONS_URL_TEMPLATE',
+  QuestionDomainConstants.PRETEST_QUESTIONS_URL_TEMPLATE);
+
+oppia.constant(
+  'QUESTION_PLAYER_URL_TEMPLATE',
+  QuestionDomainConstants.QUESTION_PLAYER_URL_TEMPLATE);
+
+oppia.constant(
+  'QUESTION_PROPERTY_LANGUAGE_CODE',
+  QuestionDomainConstants.QUESTION_PROPERTY_LANGUAGE_CODE);
+oppia.constant(
+  'QUESTION_PROPERTY_QUESTION_STATE_DATA',
+  QuestionDomainConstants.QUESTION_PROPERTY_QUESTION_STATE_DATA);
+
+oppia.constant(
+  'CMD_UPDATE_QUESTION_PROPERTY',
+  QuestionDomainConstants.CMD_UPDATE_QUESTION_PROPERTY);
