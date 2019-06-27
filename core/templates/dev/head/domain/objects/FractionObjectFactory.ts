@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-require('domain/objects/objects-domain.constants.ts');
+require('domain/objects/objects-domain.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 

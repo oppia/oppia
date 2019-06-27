@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,10 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for editor domain.
+ * @fileoverview Constants for objects domain.
  */
 
-export class EditorDomainConstants {
-  public static EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED =
-    'undoRedoServiceChangeApplied'
-}
+import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants.ts';
+
+var oppia = require('AppInit.ts').moduleName;
+
+oppia.constant(
+  'FRACTION_PARSING_ERRORS', ObjectsDomainConstants.FRACTION_PARSING_ERRORS);
+
+oppia.constant(
+  'NUMBER_WITH_UNITS_PARSING_ERRORS',
+  ObjectsDomainConstants.NUMBER_WITH_UNITS_PARSING_ERRORS);
+
+oppia.constant('CURRENCY_UNITS', ObjectsDomainConstants.CURRENCY_UNITS);

@@ -20,7 +20,7 @@
 require('domain/objects/FractionObjectFactory.ts');
 require('domain/objects/UnitsObjectFactory.ts');
 
-require('domain/objects/objects-domain.constants.ts');
+require('domain/objects/objects-domain.constants.ajs.ts');
 
 /* Guidelines for adding new custom currency units in Number with Units
   interaction:

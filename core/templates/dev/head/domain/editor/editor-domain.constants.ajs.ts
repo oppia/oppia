@@ -16,7 +16,10 @@
  * @fileoverview Constants for editor domain.
  */
 
-export class EditorDomainConstants {
-  public static EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED =
-    'undoRedoServiceChangeApplied'
-}
+import { EditorDomainConstants } from 'domain/editor/editor-domain.constants.ts';
+
+var oppia = require('AppInit.ts').moduleName;
+
+oppia.constant(
+  'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+  EditorDomainConstants.EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
