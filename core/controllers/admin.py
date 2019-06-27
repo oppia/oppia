@@ -59,7 +59,7 @@ class AdminPage(base.BaseHandler):
                 klass.__name__ == job['job_type']
                 for klass in (
                     jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                        jobs_registry.PROD_VALIDATION_ONE_OFF_JOB_MANAGERS))])
+                        jobs_registry.AUDIT_JOB_MANAGERS))])
 
         queued_or_running_job_types = set([
             job['job_type'] for job in unfinished_job_data])
@@ -68,11 +68,11 @@ class AdminPage(base.BaseHandler):
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
         } for klass in jobs_registry.ONE_OFF_JOB_MANAGERS]
-        prod_validation_one_off_job_specs = [{
+        audit_job_specs = [{
             'job_type': klass.__name__,
             'is_queued_or_running': (
                 klass.__name__ in queued_or_running_job_types)
-        } for klass in jobs_registry.PROD_VALIDATION_ONE_OFF_JOB_MANAGERS]
+        } for klass in jobs_registry.AUDIT_JOB_MANAGERS]
 
         continuous_computations_data = jobs.get_continuous_computations_info(
             jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS)
@@ -99,8 +99,8 @@ class AdminPage(base.BaseHandler):
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
             'one_off_job_specs': one_off_job_specs,
-            'prod_validation_one_off_job_specs': (
-                prod_validation_one_off_job_specs),
+            'audit_job_specs': (
+                audit_job_specs),
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
             'updatable_roles': {
@@ -178,8 +178,7 @@ class AdminHandler(base.BaseHandler):
             elif self.payload.get('action') == 'start_new_job':
                 for klass in (
                         jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                            jobs_registry
-                            .PROD_VALIDATION_ONE_OFF_JOB_MANAGERS)):
+                            jobs_registry.AUDIT_JOB_MANAGERS)):
                     if klass.__name__ == self.payload.get('job_type'):
                         klass.enqueue(klass.create_new())
                         break
@@ -188,8 +187,7 @@ class AdminHandler(base.BaseHandler):
                 job_type = self.payload.get('job_type')
                 for klass in (
                         jobs_registry.ONE_OFF_JOB_MANAGERS + (
-                            jobs_registry
-                            .PROD_VALIDATION_ONE_OFF_JOB_MANAGERS)):
+                            jobs_registry.AUDIT_JOB_MANAGERS)):
                     if klass.__name__ == job_type:
                         klass.cancel(job_id, self.user_id)
                         break

@@ -75,7 +75,7 @@ ONE_OFF_JOB_MANAGERS = [
 
 # List of all manager classes for prod validation one-off batch jobs for which
 # to show controls on the admin dashboard.
-PROD_VALIDATION_ONE_OFF_JOB_MANAGERS = [
+AUDIT_JOB_MANAGERS = [
     prod_validation_jobs_one_off.ActivityReferencesModelAuditOneOffJob,
     prod_validation_jobs_one_off.RoleQueryAuditModelAuditOneOffJob,
     prod_validation_jobs_one_off.ClassifierTrainingJobModelAuditOneOffJob,
