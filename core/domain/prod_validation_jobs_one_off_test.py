@@ -14061,6 +14061,20 @@ class UserSubscriptionsModelValidatorTests(test_utils.GenericTestBase):
             ), u'[u\'fully-validated UserSubscriptionsModel\', 1]']
         run_job_and_check_output(self, expected_output, sort=True)
 
+    def test_missing_subscriber_model_failure(self):
+        user_models.UserSubscribersModel.get_by_id(self.owner_id).delete()
+        expected_output = [
+            (
+                u'[u\'failed validation check for subscriber_ids '
+                'field check of UserSubscriptionsModel\', '
+                '[u"Entity id %s: based on '
+                'field subscriber_ids having value '
+                '%s, expect model UserSubscribersModel '
+                'with id %s but it doesn\'t exist"]]') % (
+                    self.user_id, self.owner_id, self.owner_id),
+            u'[u\'fully-validated UserSubscriptionsModel\', 1]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
     def test_get_external_id_relationship_failure(self):
         nonexist_thread_id = 'nonexist_thread_id'
         subscription_services.subscribe_to_thread(
