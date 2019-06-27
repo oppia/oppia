@@ -1885,7 +1885,7 @@ class AnswerSubmittedEventHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class LearnerAnswerInfoHandlerTests(test_utils.GenericTestBase):
+class LearnerAnswerInfoSubmissionHandlerTests(test_utils.GenericTestBase):
     """Tests for learner answer info handler tests."""
 
     def test_submit_learner_answer_details(self):
@@ -1908,7 +1908,7 @@ class LearnerAnswerInfoHandlerTests(test_utils.GenericTestBase):
         self.assertEqual(state_name, 'Sentence')
         self.assertEqual(interaction_id, 'TextInput')
         self.post_json(
-            '/explorehandler/learner_answer_details/%s' % exp_id,
+            '%s/%s' % (feconf.LEARNER_ANSWER_DETAILS_SUBMIT_URL, exp_id),
             {
                 'state_name': state_name,
                 'interaction_id': interaction_id,

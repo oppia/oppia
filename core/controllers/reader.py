@@ -1042,7 +1042,7 @@ class QuestionPlayerHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class LearnerAnswerInfoHandler(base.BaseHandler):
+class LearnerAnswerInfoSubmissionHandler(base.BaseHandler):
     """Handles the learner answer details submission."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
