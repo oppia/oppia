@@ -751,10 +751,6 @@ class BaseMapReduceJobManager(BaseJobManager):
         Raises:
             Exception: The parameter is not associated to this job type.
         """
-        mapper_params = context.get().mapreduce_spec.mapper.params
-        if param_name not in mapper_params:
-            raise Exception(
-                'Could not find %s in %s' % (param_name, mapper_params))
         return context.get().mapreduce_spec.mapper.params[param_name]
 
     @classmethod

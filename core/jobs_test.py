@@ -689,15 +689,6 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
                 job_id, taskqueue_services.QUEUE_NAME_DEFAULT,
                 additional_job_params={'entity_kinds': ''})
 
-    def test_raises_error_with_invalid_param_name(self):
-        job_id = SampleMapReduceJobManager.create_new()
-        SampleMapReduceJobManager.enqueue(
-            job_id, taskqueue_services.QUEUE_NAME_DEFAULT)
-        self.process_and_flush_pending_tasks()
-        with self.assertRaisesRegexp(
-            Exception, 'Could not find invalid_param_name'):
-            SampleMapReduceJobManager.get_mapper_param('invalid_param_name')
-
 
 class JobRegistryTests(test_utils.GenericTestBase):
     """Tests job registry."""
@@ -1066,7 +1057,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 webtest.TestApp(main_taskqueue.app)
                 if task.url.startswith('/task')
                 else self.testapp)
-            response = app.post(
+            app.post(
                 url=str(task.url), params=(task.payload or ''),
                 headers=headers)
 
