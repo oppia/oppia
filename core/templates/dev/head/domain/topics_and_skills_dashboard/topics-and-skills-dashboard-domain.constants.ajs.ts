@@ -16,9 +16,11 @@
  * @fileoverview Constants for topics and skills dashboard domain.
  */
 
-import { TopicsAndSkillsDashboardDomainConstants } from
-  ('domain/topics_and_skills_dashboard/' +
-  'topics-and-skills-dashboard-domain.constants.ts');
+import {
+  TopicsAndSkillsDashboardDomainConstants
+} from
+'domain/topics_and_skills_dashboard/\
+topics-and-skills-dashboard-domain.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 
