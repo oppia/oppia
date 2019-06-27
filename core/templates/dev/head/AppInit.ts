@@ -57,6 +57,8 @@ import { ReviewTestPageConstants } from
   'pages/review-test-page/review-test-page.constants.ts';
 import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
+import { StoryEditorPageConstants } from
+  'pages/story-editor-page/story-editor-page.constants.ts';
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
@@ -84,6 +86,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     LibraryPageConstants,
     ReviewTestPageConstants,
     SkillEditorPageConstants,
+    StoryEditorPageConstants,
     ServicesConstants
   ]
 })

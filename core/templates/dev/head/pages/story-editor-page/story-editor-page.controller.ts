@@ -107,7 +107,7 @@ require('pages/story-editor-page/services/story-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
-require('pages/story-editor-page/story-editor-page.constants.ts');
+require('pages/story-editor-page/story-editor-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 
