@@ -1565,6 +1565,9 @@ def load_demo(exploration_id):
     Raises:
         Exception: The exploration id provided is invalid.
     """
+    if not exp_domain.Exploration.is_demo_exploration_id(exploration_id):
+        raise Exception('Invalid demo exploration id %s' % exploration_id)
+
     delete_demo(exploration_id)
 
     exp_filename = feconf.DEMO_EXPLORATIONS[exploration_id]

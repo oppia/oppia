@@ -419,11 +419,13 @@ class ExpVersionReferenceTests(test_utils.GenericTestBase):
 
     def test_validate_exp_version(self):
         with self.assertRaisesRegexp(
-            Exception, 'Expected version to be an int'):
+            Exception,
+            'Expected version to be an int, received invalid_version'):
             exp_domain.ExpVersionReference('exp_id', 'invalid_version')
 
     def test_validate_exp_id(self):
-        with self.assertRaisesRegexp(Exception, 'Expected exp_id to be a str'):
+        with self.assertRaisesRegexp(
+            Exception, 'Expected exp_id to be a str, received 0'):
             exp_domain.ExpVersionReference(0, 1)
 
 
@@ -1009,7 +1011,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.category = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected category to be a string'):
+            Exception, 'Expected category to be a string, received 1'):
             exploration.validate()
 
     def test_validate_exploration_objective(self):
@@ -1020,7 +1022,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.objective = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected objective to be a string'):
+            Exception, 'Expected objective to be a string, received 1'):
             exploration.validate()
 
     def test_validate_exploration_blurb(self):
@@ -1031,7 +1033,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.blurb = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected blurb to be a string'):
+            Exception, 'Expected blurb to be a string, received 1'):
             exploration.validate()
 
     def test_validate_exploration_language_code(self):
@@ -1042,7 +1044,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.language_code = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected language_code to be a string'):
+            Exception, 'Expected language_code to be a string, received 1'):
             exploration.validate()
 
     def test_validate_exploration_author_notes(self):
@@ -1053,7 +1055,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.author_notes = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected author_notes to be a string'):
+            Exception, 'Expected author_notes to be a string, received 1'):
             exploration.validate()
 
     def test_validate_exploration_states(self):
@@ -1064,7 +1066,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.states = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected states to be a dict'):
+            Exception, 'Expected states to be a dict, received 1'):
             exploration.validate()
 
     def test_validate_exploration_outcome_dest(self):
@@ -1086,7 +1088,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.init_state.interaction.default_outcome.dest = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected outcome dest to be a string'):
+            Exception, 'Expected outcome dest to be a string, received 1'):
             exploration.validate()
 
     def test_validate_exploration_states_schema_version(self):
@@ -1108,7 +1110,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.auto_tts_enabled = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected auto_tts_enabled to be a bool'):
+            Exception, 'Expected auto_tts_enabled to be a bool, received 1'):
             exploration.validate()
 
     def test_validate_exploration_correctness_feedback_enabled(self):
@@ -1119,7 +1121,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.correctness_feedback_enabled = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected correctness_feedback_enabled to be a bool'):
+            Exception,
+            'Expected correctness_feedback_enabled to be a bool, received 1'):
             exploration.validate()
 
     def test_validate_exploration_param_specs(self):
@@ -1133,7 +1136,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 {'obj_type': 'UnicodeString'})
         }
         with self.assertRaisesRegexp(
-            Exception, 'Expected parameter name to be a string'):
+            Exception, 'Expected parameter name to be a string, received 1'):
             exploration.validate()
 
     def test_validate_exploration_param_changes_type(self):
@@ -1144,7 +1147,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.param_changes = 1
         with self.assertRaisesRegexp(
-            Exception, 'Expected param_changes to be a list'):
+            Exception, 'Expected param_changes to be a list, received 1'):
             exploration.validate()
 
     def test_validate_exploration_param_name(self):

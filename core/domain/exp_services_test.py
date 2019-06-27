@@ -829,8 +829,13 @@ class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
 
     def test_load_demo_with_invalid_demo_exploration_id_raises_error(self):
         with self.assertRaisesRegexp(
-            Exception, 'Invalid demo exploration id'):
+            Exception, 'Invalid demo exploration id invalid_exploration_id'):
             exp_services.load_demo('invalid_exploration_id')
+
+    def test_delete_demo_with_invalid_demo_exploration_id_raises_error(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid demo exploration id invalid_exploration_id'):
+            exp_services.delete_demo('invalid_exploration_id')
 
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
@@ -4027,7 +4032,7 @@ title: Old Title
             'correct_answer': 'helloworld!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             },
         }
 
