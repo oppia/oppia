@@ -22,12 +22,9 @@ import { StaticProvider } from '@angular/core';
 
 import { AppConstants } from 'app.constants.ts';
 
-import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
-import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
-import { LibraryPageConstants } from 'pages/library-page/library-page.constants.ts';
-
 import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
+
+import { StateEditorConstants } from 'components/state-editor/state-editor.constants.ts';
 
 import { CollectionDomainConstants } from 'domain/collection/collection-domain.constants.ts';
 import { EditorDomainConstants } from 'domain/editor/editor-domain.constants.ts';
@@ -38,6 +35,11 @@ import { StatisticsDomainConstants } from 'domain/statistics/statistics-domain.c
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
+import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
+import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
+import { LibraryPageConstants } from 'pages/library-page/library-page.constants.ts';
+
 import { ServicesConstants } from 'services/services.constants.ts';
 
 @NgModule({
@@ -46,12 +48,8 @@ import { ServicesConstants } from 'services/services.constants.ts';
   ],
   providers: [
     AppConstants,
-    AdminPageConstants,
-    CreatorDashboardConstants,
-    ExplorationPlayerConstants,
-    LibraryPageConstants,
-    ServicesConstants,
     ClassifiersExtensionConstants,
+    StateEditorConstants,
     CollectionDomainConstants,
     EditorDomainConstants,
     ObjectsDomainConstants,
@@ -59,7 +57,12 @@ import { ServicesConstants } from 'services/services.constants.ts';
     SkillDomainConstants,
     StatisticsDomainConstants,
     StoryDomainConstants,
-    TopicDomainConstants
+    TopicDomainConstants,
+    AdminPageConstants,
+    CreatorDashboardConstants,
+    ExplorationPlayerConstants,
+    LibraryPageConstants,
+    ServicesConstants
   ]
 })
 class MainAngularModule {
