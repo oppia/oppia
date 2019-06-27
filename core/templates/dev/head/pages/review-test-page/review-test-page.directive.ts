@@ -24,7 +24,7 @@ require(
   'question-player.directive.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 require('pages/interaction-specs.constants.ajs.ts');
-require('pages/review-test-page/review-test-page.constants.ts');
+require('pages/review-test-page/review-test-page.constants.ajs.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');

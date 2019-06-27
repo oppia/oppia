@@ -16,6 +16,10 @@
  * @fileoverview Constants for the review tests.
  */
 
-export class ReviewTestPageConstants {
-  public static REVIEW_TEST_DATA_URL = '/review_test_handler/data/<story_id>';
-}
+import { ReviewTestPageConstants } from
+  'pages/review-test-page/review-test-page.constants.ts';
+
+var oppia = require('AppInit.ts').module;
+
+oppia.constant(
+  'REVIEW_TEST_DATA_URL', ReviewTestPageConstants.REVIEW_TEST_DATA_URL);
