@@ -32,6 +32,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import learner_progress_services
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import recommendations_services
@@ -45,6 +46,7 @@ from core.domain import subtopic_page_services
 from core.domain import suggestion_services
 from core.domain import topic_domain
 from core.domain import topic_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
@@ -381,7 +383,7 @@ class BaseSnapshotContentModelValidator(BaseModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^[A-Za-z0-9-_]{1,%s}-\\d*$' % base_models.ID_LENGTH
+        return '^[A-Za-z0-9-_]{1,%s}-\\d+$' % base_models.ID_LENGTH
 
     @classmethod
     def _validate_base_model_version_from_item_id(cls, item):
@@ -566,6 +568,124 @@ class BaseCommitLogEntryModelValidator(BaseSnapshotMetadataModelValidator):
         cls._validate_post_commit_is_private(item)
 
 
+class BaseUserModelValidator(BaseModelValidator):
+    """Class for validating BaseUserModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^\\d+$'
+
+    @classmethod
+    def _get_exp_ids(cls, unused_item):
+        """Returns a list of exploration ids related to the user model.
+
+        Args:
+            unused_item: ndb.Model. BaseUserModel to validate.
+
+        Returns:
+            list(str). List of exploration ids related to the model.
+        """
+        return []
+
+    @classmethod
+    def _get_col_ids(cls, unused_item):
+        """Returns a list of collection ids related to the user model.
+
+        Args:
+            unused_item: ndb.Model. BaseUserModel to validate.
+
+        Returns:
+            list(str). List of collection ids related to the model.
+        """
+        return []
+
+    @classmethod
+    def _validate_explorations_are_public(cls, item):
+        """Validates that explorations for model are public.
+
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
+        """
+        exp_ids = cls._get_exp_ids(item)
+        private_exp_ids = [
+            exp_id for exp_id in exp_ids if (
+                rights_manager.is_exploration_private(exp_id))]
+        if private_exp_ids:
+            cls.errors['public exploration check'].append(
+                'Entity id %s: Explorations with ids %s are private' % (
+                    item.id, private_exp_ids))
+
+    @classmethod
+    def _validate_collections_are_public(cls, item):
+        """Validates that collections for model are public.
+
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
+        """
+        col_ids = cls._get_col_ids(item)
+        private_col_ids = [
+            col_id for col_id in col_ids if (
+                rights_manager.is_collection_private(col_id))]
+        if private_col_ids:
+            cls.errors['public collection check'].append(
+                'Entity id %s: Collections with ids %s are private' % (
+                    item.id, private_col_ids))
+
+    @classmethod
+    def _get_common_properties_of_external_model_which_should_not_match(
+            cls, unused_item):
+        """Returns a list of common properties to dismatch. For example,
+        the exploration ids present in a CompletedActivitiesModel
+        should not be present in an IncompleteActivitiesModel. So,
+        this function will return the following list for
+        CompletedActivitiesModel:
+        ['IncompleteActivitiesModel', 'exploration_ids', list of
+        exploration_ids in completed activities, 'exploration_ids',
+        list of exploration_ids in incomplete activities]
+
+        This can be overridden by subclasses, if needed.
+
+        Args:
+            unused_item: ndb.Model. BaseUserModel to validate.
+
+        Returns:
+            list(tuple(str, str, list, str, list):
+                A list of tuple which consists of External model name,
+                property name in model, list of property value in model,
+                property name in external model, list of property value
+                in external model.
+        """
+        return []
+
+    @classmethod
+    def _validate_common_properties_do_not_match(cls, item):
+        """Validates that properties common with an external model
+        are different in item and external model.
+
+        Args:
+            item: ndb.Model. BaseUserModel to validate.
+        """
+        common_properties = (
+            cls._get_common_properties_of_external_model_which_should_not_match(
+                item))
+        for property_details in common_properties:
+            (
+                external_model_name, property_name_in_model, value_in_model,
+                property_name_in_external_model, value_in_external_model
+            ) = property_details
+            common_values = [
+                value
+                for value in value_in_model if value in (
+                    value_in_external_model)]
+            if common_values:
+                cls.errors['%s match check' % property_name_in_model].append(
+                    'Entity id %s: Common values for %s in entity and '
+                    '%s in %s: %s' % (
+                        item.id, property_name_in_model,
+                        property_name_in_external_model, external_model_name,
+                        common_values))
+
+
 class ActivityReferencesModelValidator(BaseModelValidator):
     """Class for validating ActivityReferencesModels."""
 
@@ -623,7 +743,7 @@ class RoleQueryAuditModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [user_id].[timestamp_in_sec].[intent].[random_number]
-        regex_string = '^%s\\.\\d*\\.%s\\.\\d*$' % (item.user_id, item.intent)
+        regex_string = '^%s\\.\\d+\\.%s\\.\\d+$' % (item.user_id, item.intent)
         return regex_string
 
     @classmethod
@@ -950,7 +1070,7 @@ class CollectionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [collection/rights]-[collection_id]-[collection_version].
-        regex_string = '^(collection|rights)-%s-\\d*$' % (
+        regex_string = '^(collection|rights)-%s-\\d+$' % (
             item.collection_id)
 
         return regex_string
@@ -1132,7 +1252,7 @@ class ConfigPropertySnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d*$'
+        return '^.*-\\d+$'
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1157,7 +1277,7 @@ class ConfigPropertySnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '^.*-\\d*$'
+        return '^.*-\\d+$'
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -1327,7 +1447,7 @@ class GeneralFeedbackEmailReplyToIdModelValidator(BaseModelValidator):
     @classmethod
     def _get_model_id_regex(cls, unused_item):
         return (
-            '^\\d*\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
+            '^\\d+\\.(%s)\\.[A-Za-z0-9-_]{1,%s}\\.'
             '[A-Za-z0-9=+/]{1,}') % (
                 ('|').join(suggestion_models.TARGET_TYPE_CHOICES),
                 base_models.ID_LENGTH)
@@ -1529,7 +1649,7 @@ class ExplorationCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [exploration/rights]-[exploration_id]-[exploration-version].
-        regex_string = '^(exploration|rights)-%s-\\d*$' % (
+        regex_string = '^(exploration|rights)-%s-\\d+$' % (
             item.exploration_id)
 
         return regex_string
@@ -1938,7 +2058,7 @@ class FileMetadataSnapshotMetadataModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d*$' % FILE_MODELS_REGEX
+        return '%s-\\d+$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -1963,7 +2083,7 @@ class FileMetadataSnapshotContentModelValidator(
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d*$' % FILE_MODELS_REGEX
+        return '%s-\\d+$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2013,7 +2133,7 @@ class FileSnapshotMetadataModelValidator(BaseSnapshotMetadataModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d*$' % FILE_MODELS_REGEX
+        return '%s-\\d+$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_change_domain_class(cls, unused_item):
@@ -2037,7 +2157,7 @@ class FileSnapshotContentModelValidator(BaseSnapshotContentModelValidator):
 
     @classmethod
     def _get_model_id_regex(cls, unused_item):
-        return '%s-\\d*$' % FILE_MODELS_REGEX
+        return '%s-\\d+$' % FILE_MODELS_REGEX
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -2335,7 +2455,7 @@ class QuestionCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [question]-[question_id]-[question_version].
-        regex_string = '^(question)-%s-\\d*$' % (
+        regex_string = '^(question)-%s-\\d+$' % (
             item.question_id)
 
         return regex_string
@@ -2666,7 +2786,7 @@ class SkillCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [skill/rights]-[skill_id]-[skill_version].
-        regex_string = '^(skill|rights)-%s-\\d*$' % (
+        regex_string = '^(skill|rights)-%s-\\d+$' % (
             item.skill_id)
 
         return regex_string
@@ -2921,7 +3041,7 @@ class StoryCommitLogEntryModelValidator(BaseCommitLogEntryModelValidator):
     @classmethod
     def _get_model_id_regex(cls, item):
         # Valid id: [story]-[story_id]-[story_version].
-        regex_string = '^(story)-%s-\\d*$' % (
+        regex_string = '^(story)-%s-\\d+$' % (
             item.story_id)
 
         return regex_string
@@ -3657,12 +3777,340 @@ class SubtopicPageCommitLogEntryModelValidator(
         }
 
 
-class UserSubscriptionsModelValidator(BaseModelValidator):
-    """Class for validating UserSubscriptionsModels."""
+class UserSettingsModelValidator(BaseUserModelValidator):
+    """Class for validating UserSettingsModels."""
 
     @classmethod
-    def _get_model_id_regex(cls, unused_item):
-        return '^\\d*$'
+    def _get_model_domain_object_instance(cls, item):
+        return user_services.get_user_settings(item.id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_contributions_ids': (
+                user_models.UserContributionsModel, [item.id])
+        }
+
+    @classmethod
+    def _validate_time_fields_of_user_actions(cls, item):
+        """Validates that value for time fields for user actions is
+        less than the current time when the job is run.
+
+        Args:
+            item: ndb.Model. UserSettingsModel to validate.
+        """
+        time_fields = {
+            'last agreed to terms': item.last_agreed_to_terms,
+            'last started state editor tutorial': (
+                item.last_started_state_editor_tutorial),
+            'last started state translation tutorial': (
+                item.last_started_state_translation_tutorial),
+            'last logged in': item.last_logged_in,
+            'last edited an exploration': item.last_edited_an_exploration,
+            'last created an exploration': item.last_created_an_exploration
+        }
+        current_time = datetime.datetime.utcnow()
+        for time_field_name, time_field_value in time_fields.iteritems():
+            if time_field_value is not None and time_field_value > current_time:
+                cls.errors['%s check' % time_field_name].append(
+                    'Entity id %s: Value for %s: %s is greater than the '
+                    'time when job was run' % (
+                        item.id, time_field_name, time_field_value))
+
+        current_msec = utils.get_current_time_in_millisecs()
+        if item.first_contribution_msec is not None and (
+                item.first_contribution_msec > current_msec):
+            cls.errors['first contribution check'].append(
+                'Entity id %s: Value for first contribution msec: %s is '
+                'greater than the time when job was run' % (
+                    item.id, item.first_contribution_msec))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_time_fields_of_user_actions]
+
+
+class CompletedActivitiesModelValidator(BaseUserModelValidator):
+    """Class for validating CompletedActivitiesModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id]),
+            'exploration_ids': (
+                exp_models.ExplorationModel, item.exploration_ids),
+            'collection_ids': (
+                collection_models.CollectionModel, item.collection_ids)
+        }
+
+    @classmethod
+    def _get_exp_ids(cls, item):
+        return item.exploration_ids
+
+    @classmethod
+    def _get_col_ids(cls, item):
+        return item.collection_ids
+
+    @classmethod
+    def _get_common_properties_of_external_model_which_should_not_match(
+            cls, item):
+        return [(
+            'IncompleteActivitiesModel',
+            'exploration_ids',
+            item.exploration_ids,
+            'exploration_ids',
+            learner_progress_services.get_all_incomplete_exp_ids(item.id)
+        ), (
+            'IncompleteActivitiesModel',
+            'collection_ids',
+            item.collection_ids,
+            'collection_ids',
+            learner_progress_services.get_all_incomplete_collection_ids(item.id)
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_common_properties_do_not_match,
+            cls._validate_explorations_are_public,
+            cls._validate_collections_are_public]
+
+
+class IncompleteActivitiesModelValidator(BaseUserModelValidator):
+    """Class for validating IncompleteActivitiesModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id]),
+            'exploration_ids': (
+                exp_models.ExplorationModel, item.exploration_ids),
+            'collection_ids': (
+                collection_models.CollectionModel, item.collection_ids)
+        }
+
+    @classmethod
+    def _get_exp_ids(cls, item):
+        return item.exploration_ids
+
+    @classmethod
+    def _get_col_ids(cls, item):
+        return item.collection_ids
+
+    @classmethod
+    def _get_common_properties_of_external_model_which_should_not_match(
+            cls, item):
+        return [(
+            'CompletedActivitiesModel',
+            'exploration_ids',
+            item.exploration_ids,
+            'exploration_ids',
+            learner_progress_services.get_all_completed_exp_ids(item.id)
+        ), (
+            'CompletedActivitiesModel',
+            'collection_ids',
+            item.collection_ids,
+            'collection_ids',
+            learner_progress_services.get_all_completed_collection_ids(item.id)
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_common_properties_do_not_match,
+            cls._validate_explorations_are_public,
+            cls._validate_collections_are_public]
+
+
+class ExpUserLastPlaythroughModelValidator(BaseUserModelValidator):
+    """Class for validating ExpUserLastPlaythroughModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '^%s\\.%s$' % (item.user_id, item.exploration_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.user_id]),
+            'exploration_ids': (
+                exp_models.ExplorationModel, [item.exploration_id])
+        }
+
+    @classmethod
+    def _get_exp_ids(cls, item):
+        return [item.exploration_id]
+
+    @classmethod
+    def _validate_exp_id_is_marked_as_incomplete(cls, item):
+        """Validates that exploration id for model is marked as
+        incomplete.
+
+        Args:
+            item: ndb.Model. ExpUserLastPlaythroughModel to validate.
+        """
+        if item.exploration_id not in (
+                learner_progress_services.get_all_incomplete_exp_ids(
+                    item.user_id)):
+            cls.errors['incomplete exp id check'].append(
+                'Entity id %s: Exploration id %s for entity is not marked '
+                'as incomplete' % (item.id, item.exploration_id))
+
+    @classmethod
+    def _validate_exp_version(cls, item):
+        """Validates that last played exp version is less than or equal to
+        for version of the exploration.
+
+        Args:
+            item: ndb.Model. ExpUserLastPlaythroughModel to validate.
+        """
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+        for (_, _, exploration_model) in (
+                exploration_model_class_model_id_model_tuples):
+            # The case for missing exploration external model is ignored here
+            # since errors for missing exploration external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if exploration_model is None or exploration_model.deleted:
+                continue
+            if item.last_played_exp_version > exploration_model.version:
+                cls.errors['version check'].append(
+                    'Entity id %s: last played exp version %s is greater than '
+                    'current version %s of exploration with id %s' % (
+                        item.id, item.last_played_exp_version,
+                        exploration_model.version, exploration_model.id))
+
+    @classmethod
+    def _validate_state_name(cls, item):
+        """Validates that state name is a valid state in the exploration
+        corresponding to the entity                         .
+
+        Args:
+            item: ndb.Model. ExpUserLastPlaythroughModel to validate.
+        """
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+        for (_, _, exploration_model) in (
+                exploration_model_class_model_id_model_tuples):
+            # The case for missing exploration external model is ignored here
+            # since errors for missing exploration external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if exploration_model is None or exploration_model.deleted:
+                continue
+            if item.last_played_state_name not in (
+                    exploration_model.states.keys()):
+                cls.errors['state name check'].append(
+                    'Entity id %s: last played state name %s is not present '
+                    'in exploration states %s for exploration id %s' % (
+                        item.id, item.last_played_state_name,
+                        exploration_model.states.keys(), exploration_model.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_explorations_are_public,
+            cls._validate_exp_id_is_marked_as_incomplete,
+            cls._validate_exp_version,
+            cls._validate_state_name
+        ]
+
+
+class LearnerPlaylistModelValidator(BaseUserModelValidator):
+    """Class for validating LearnerPlaylistModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id]),
+            'exploration_ids': (
+                exp_models.ExplorationModel, item.exploration_ids),
+            'collection_ids': (
+                collection_models.CollectionModel, item.collection_ids)
+        }
+
+    @classmethod
+    def _get_exp_ids(cls, item):
+        return item.exploration_ids
+
+    @classmethod
+    def _get_col_ids(cls, item):
+        return item.collection_ids
+
+    @classmethod
+    def _get_common_properties_of_external_model_which_should_not_match(
+            cls, item):
+        return [(
+            'CompletedActivitiesModel',
+            'exploration_ids',
+            item.exploration_ids,
+            'exploration_ids',
+            learner_progress_services.get_all_completed_exp_ids(item.id)
+        ), (
+            'CompletedActivitiesModel',
+            'collection_ids',
+            item.collection_ids,
+            'collection_ids',
+            learner_progress_services.get_all_completed_collection_ids(item.id)
+        ), (
+            'IncompleteActivitiesModel',
+            'exploration_ids',
+            item.exploration_ids,
+            'exploration_ids',
+            learner_progress_services.get_all_incomplete_exp_ids(item.id)
+        ), (
+            'IncompleteActivitiesModel',
+            'collection_ids',
+            item.collection_ids,
+            'collection_ids',
+            learner_progress_services.get_all_incomplete_collection_ids(item.id)
+        )]
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_common_properties_do_not_match,
+            cls._validate_explorations_are_public,
+            cls._validate_collections_are_public]
+
+
+class UserContributionsModelValidator(BaseUserModelValidator):
+    """Class for validating UserContributionsModels."""
+
+    @classmethod
+    def _get_model_domain_object_instance(cls, item):
+        return user_services.get_user_contributions(item.id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id]),
+            'created_exploration_ids': (
+                exp_models.ExplorationModel, item.created_exploration_ids),
+            'edited_exploration_ids': (
+                exp_models.ExplorationModel, item.edited_exploration_ids)
+        }
+
+
+class UserEmailPreferencesModelValidator(BaseUserModelValidator):
+    """Class for validating UserEmailPreferencesModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id])
+        }
+
+
+class UserSubscriptionsModelValidator(BaseUserModelValidator):
+    """Class for validating UserSubscriptionsModels."""
 
     @classmethod
     def _get_external_id_relationships(cls, item):
@@ -3675,8 +4123,753 @@ class UserSubscriptionsModelValidator(BaseModelValidator):
                 feedback_models.GeneralFeedbackThreadModel,
                 item.general_feedback_thread_ids),
             'creator_ids': (user_models.UserSettingsModel, item.creator_ids),
+            'subscriber_ids': (
+                user_models.UserSubscribersModel, item.creator_ids),
             'id': (user_models.UserSettingsModel, [item.id]),
         }
+
+    @classmethod
+    def _validate_last_checked(cls, item):
+        """Validates that last checked time field is less than the time
+        when job was run.
+
+        Args:
+            item: ndb.Model. UserSubscriptionsModel to validate.
+        """
+        current_time = datetime.datetime.utcnow()
+        if item.last_checked is not None and item.last_checked > current_time:
+            cls.errors['last checked check'].append(
+                'Entity id %s: last checked %s is greater than '
+                'the time when job was run' % (
+                    item.id, item.last_checked))
+
+    @classmethod
+    def _validate_user_id_in_subscriber_ids(cls, item):
+        """Validates that user id is present in list of
+        subscriber ids of the creators the user has subscribed to.
+
+        Args:
+            item: ndb.Model. UserSubscriptionsModel to validate.
+        """
+        subscriber_model_class_model_id_model_tuples = (
+            cls.external_instance_details['subscriber_ids'])
+        for (_, _, subscriber_model) in (
+                subscriber_model_class_model_id_model_tuples):
+            # The case for missing subscriber external model is ignored here
+            # since errors for missing subscriber external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if subscriber_model is None or subscriber_model.deleted:
+                continue
+            if item.id not in subscriber_model.subscriber_ids:
+                cls.errors['subscriber id check'].append(
+                    'Entity id %s: User id is not present in subscriber ids of '
+                    'creator with id %s to whom the user has subscribed' % (
+                        item.id, subscriber_model.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_last_checked,
+            cls._validate_user_id_in_subscriber_ids]
+
+
+class UserSubscribersModelValidator(BaseUserModelValidator):
+    """Class for validating UserSubscribersModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'subscriber_ids': (
+                user_models.UserSettingsModel, item.subscriber_ids),
+            'user_settings_ids': (user_models.UserSettingsModel, [item.id]),
+            'subscription_ids': (
+                user_models.UserSubscriptionsModel, item.subscriber_ids)
+        }
+
+    @classmethod
+    def _validate_user_id_not_in_subscriber_ids(cls, item):
+        """Validates that user id is not present in list of
+        subscribers of user.
+
+        Args:
+            item: ndb.Model. UserSubscribersModel to validate.
+        """
+        if item.id in item.subscriber_ids:
+            cls.errors['subscriber id check'].append(
+                'Entity id %s: User id is present in subscriber ids '
+                'for user' % item.id)
+
+    @classmethod
+    def _validate_user_id_in_creator_ids(cls, item):
+        """Validates that user id is present in list of
+        creator ids to which the subscribers of user have
+        subscribed.
+
+        Args:
+            item: ndb.Model. UserSubscribersModel to validate.
+        """
+        subscription_model_class_model_id_model_tuples = (
+            cls.external_instance_details['subscription_ids'])
+        for (_, _, subscription_model) in (
+                subscription_model_class_model_id_model_tuples):
+            # The case for missing subscription external model is ignored here
+            # since errors for missing subscription external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if subscription_model is None or subscription_model.deleted:
+                continue
+            if item.id not in subscription_model.creator_ids:
+                cls.errors['subscription creator id check'].append(
+                    'Entity id %s: User id is not present in creator ids to '
+                    'which the subscriber of user with id %s has subscribed' % (
+                        item.id, subscription_model.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_user_id_not_in_subscriber_ids,
+            cls._validate_user_id_in_creator_ids]
+
+
+class UserRecentChangesBatchModelValidator(BaseUserModelValidator):
+    """Class for validating UserRecentChangesBatchModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id])
+        }
+
+    @classmethod
+    def _validate_job_queued_msec(cls, item):
+        """Validates that job queued msec is less than the time
+        when job was run.
+
+        Args:
+            item: ndb.Model. UserRecentChangesBatchModel to validate.
+        """
+        current_msec = utils.get_current_time_in_millisecs()
+        if item.job_queued_msec > current_msec:
+            cls.errors['job queued msec check'].append(
+                'Entity id %s: job queued msec %s is greater than '
+                'the time when job was run' % (
+                    item.id, item.job_queued_msec))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_job_queued_msec]
+
+
+class UserStatsModelValidator(BaseUserModelValidator):
+    """Class for validating UserStatsModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id])
+        }
+
+    @classmethod
+    def _validate_schema_version(cls, item):
+        """Validates that schema version is less than current version.
+
+        Args:
+            item: ndb.Model. UserStatsModel to validate.
+        """
+        if item.schema_version > feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION:
+            cls.errors['schema version check'].append(
+                'Entity id %s: schema version %s is greater than '
+                'current version %s' % (
+                    item.id, item.schema_version,
+                    feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION))
+
+    @classmethod
+    def _validate_weekly_creator_stats_list(cls, item):
+        """Validates that each item weekly_creator_stats_list is keyed
+        by a datetime field and value as a dict with keys: num_ratings,
+        average_ratings, total_plays. Values for these keys should be
+        integers.
+
+        Args:
+            item: ndb.Model. UserStatsModel to validate.
+        """
+        current_time_str = datetime.datetime.utcnow().strftime(
+            feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+        for stat in item.weekly_creator_stats_list:
+            for key, value in stat.iteritems():
+                allowed_properties = [
+                    'average_ratings', 'num_ratings', 'total_plays']
+                try:
+                    datetime.datetime.strptime(
+                        key, feconf.DASHBOARD_STATS_DATETIME_STRING_FORMAT)
+                    assert key <= current_time_str
+                    assert isinstance(value, dict)
+                    assert sorted(value.keys()) == allowed_properties
+                    for property_name in allowed_properties:
+                        assert isinstance(value[property_name], int)
+                except Exception:
+                    cls.errors['weekly creator stats list'].append(
+                        'Entity id %s: Invalid stats dict: %s' % (
+                            item.id, stat))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_schema_version,
+            cls._validate_weekly_creator_stats_list]
+
+
+class ExplorationUserDataModelValidator(BaseUserModelValidator):
+    """Class for validating ExplorationUserDataModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '^%s\\.%s$' % (item.user_id, item.exploration_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.user_id]),
+            'exploration_ids': (
+                exp_models.ExplorationModel, [item.exploration_id])
+        }
+
+    @classmethod
+    def _validate_draft_change_list(cls, item):
+        """Validates that commands in draft change list follow
+        the schema of ExplorationChange domain object.
+
+        Args:
+            item: ndb.Model. ExplorationUserDataModel to validate.
+        """
+        for change_dict in item.draft_change_list:
+            try:
+                exp_domain.ExplorationChange(change_dict)
+            except Exception as e:
+                cls.errors['draft change list check'].append(
+                    'Entity id %s: Invalid change dict %s due to error %s' % (
+                        item.id, change_dict, e))
+
+    @classmethod
+    def _validate_rating(cls, item):
+        """Validates that rating is in the interval [1, 5].
+
+        Args:
+            item: ndb.Model. ExplorationUserDataModel to validate.
+        """
+        if item.rating is not None and (item.rating < 1 or item.rating > 5):
+            cls.errors['rating check'].append(
+                'Entity id %s: Expected rating to be in range [1, 5], '
+                'received %s' % (item.id, item.rating))
+
+    @classmethod
+    def _validate_rated_on(cls, item):
+        """Validates that rated on is less than the time when job
+        was run.
+
+        Args:
+            item: ndb.Model. ExplorationUserDataModel to validate.
+        """
+        if item.rating is not None and not item.rated_on:
+            cls.errors['rated on check'].append(
+                'Entity id %s: rating %s exists but rated on is None' % (
+                    item.id, item.rating))
+        current_time = datetime.datetime.utcnow()
+        if item.rated_on is not None and item.rated_on > current_time:
+            cls.errors['rated on check'].append(
+                'Entity id %s: rated on %s is greater than the time '
+                'when job was run' % (item.id, item.rated_on))
+
+    @classmethod
+    def _validate_draft_change_list_last_updated(cls, item):
+        """Validates that draft change list last updated is less than
+        the time when job was run.
+
+        Args:
+            item: ndb.Model. ExplorationUserDataModel to validate.
+        """
+        if item.draft_change_list and not item.draft_change_list_last_updated:
+            cls.errors['draft change list last updated check'].append(
+                'Entity id %s: draft change list %s exists but '
+                'draft change list last updated is None' % (
+                    item.id, item.draft_change_list))
+        current_time = datetime.datetime.utcnow()
+        if item.draft_change_list_last_updated is not None and (
+                item.draft_change_list_last_updated > current_time):
+            cls.errors['draft change list last updated check'].append(
+                'Entity id %s: draft change list last updated %s is '
+                'greater than the time when job was run' % (
+                    item.id, item.draft_change_list_last_updated))
+
+    @classmethod
+    def _validate_exp_version(cls, item):
+        """Validates that draft change exp version is less than version
+        of the exploration corresponding to the model.
+
+        Args:
+            item: ndb.Model. ExplorationUserDataModel to validate.
+        """
+        exploration_model_class_model_id_model_tuples = (
+            cls.external_instance_details['exploration_ids'])
+        for (_, _, exploration_model) in (
+                exploration_model_class_model_id_model_tuples):
+            # The case for missing exploration external model is ignored here
+            # since errors for missing exploration external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if exploration_model is None or exploration_model.deleted:
+                continue
+            if item.draft_change_list_exp_version > exploration_model.version:
+                cls.errors['exp version check'].append(
+                    'Entity id %s: draft change list exp version %s is '
+                    'greater than version %s of corresponding exploration '
+                    'with id %s' % (
+                        item.id, item.draft_change_list_exp_version,
+                        exploration_model.version, exploration_model.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_draft_change_list,
+            cls._validate_rating,
+            cls._validate_rated_on,
+            cls._validate_draft_change_list_last_updated,
+            cls._validate_exp_version]
+
+
+class CollectionProgressModelValidator(BaseUserModelValidator):
+    """Class for validating CollectionProgressModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '^%s\\.%s$' % (item.user_id, item.collection_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.user_id]),
+            'collection_ids': (
+                collection_models.CollectionModel, [item.collection_id]),
+            'exploration_ids': (
+                exp_models.ExplorationModel, item.completed_explorations),
+            'completed_activities_ids': (
+                user_models.CompletedActivitiesModel, [item.user_id])
+        }
+
+    @classmethod
+    def _get_exp_ids(cls, item):
+        return item.completed_explorations
+
+    @classmethod
+    def _get_col_ids(cls, item):
+        return [item.collection_id]
+
+    @classmethod
+    def _validate_completed_exploration(cls, item):
+        """Validates that completed exploration ids belong to
+        the collection and are present in CompletedActivitiesModel
+        for the user.
+
+        Args:
+            item: ndb.Model. CollectionProgressModel to validate.
+        """
+        completed_exp_ids = item.completed_explorations
+        completed_activities_model_class_model_id_model_tuples = (
+            cls.external_instance_details['completed_activities_ids'])
+        for (_, _, completed_activities_model) in (
+                completed_activities_model_class_model_id_model_tuples):
+            # The case for missing completed activities external model is
+            # ignored here since errors for missing completed activities
+            # external model are already checked and stored in
+            # _validate_external_id_relationships function.
+            if completed_activities_model is None or (
+                    completed_activities_model.deleted):
+                continue
+            missing_exp_ids = [
+                exp_id
+                for exp_id in completed_exp_ids if exp_id not in (
+                    completed_activities_model.exploration_ids)]
+            if missing_exp_ids:
+                cls.errors['completed exploration check'].append(
+                    'Entity id %s: Following completed exploration ids %s are '
+                    'not present in CompletedActivitiesModel for the user' % (
+                        item.id, missing_exp_ids))
+
+        collection_model_class_model_id_model_tuples = (
+            cls.external_instance_details['collection_ids'])
+        for (_, _, collection_model) in (
+                collection_model_class_model_id_model_tuples):
+            # The case for missing collection external model is ignored here
+            # since errors for missing collection external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if collection_model is None or collection_model.deleted:
+                continue
+            collection_node_ids = [
+                node['exploration_id'] for node in (
+                    collection_model.collection_contents['nodes'])]
+            invalid_exp_ids = [
+                exp_id
+                for exp_id in completed_exp_ids if exp_id not in (
+                    collection_node_ids)]
+            if invalid_exp_ids:
+                cls.errors['completed exploration check'].append(
+                    'Entity id %s: Following completed exploration ids %s do '
+                    'not belong to the collection with id %s corresponding '
+                    'to the entity' % (
+                        item.id, invalid_exp_ids, collection_model.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_completed_exploration,
+            cls._validate_explorations_are_public,
+            cls._validate_collections_are_public]
+
+
+class StoryProgressModelValidator(BaseUserModelValidator):
+    """Class for validating StoryProgressModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '^%s\\.%s$' % (item.user_id, item.story_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.user_id]),
+            'story_ids': (
+                story_models.StoryModel, [item.story_id])
+        }
+
+    @classmethod
+    def _validate_story_is_public(cls, item):
+        """Validates that story is public.
+
+        Args:
+            item: ndb.Model. StoryProgressModel to validate.
+        """
+        story_model_class_model_id_model_tuples = (
+            cls.external_instance_details['story_ids'])
+        for (_, _, story_model) in (
+                story_model_class_model_id_model_tuples):
+            # The case for missing story external model is ignored here
+            # since errors for missing story external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if story_model is None or story_model.deleted:
+                continue
+            story_rights = story_services.get_story_rights(story_model.id)
+            if not story_rights.story_is_published:
+                cls.errors['public story check'].append(
+                    'Entity id %s: Story with id %s corresponding to entity '
+                    'is private' % (item.id, story_model.id))
+
+    @classmethod
+    def _validate_completed_nodes(cls, item):
+        """Validates that completed nodes belong to the story
+
+        Args:
+            item: ndb.Model. StoryProgressModel to validate.
+        """
+        completed_activity_model = user_models.CompletedActivitiesModel.get(
+            item.user_id)
+        story_model_class_model_id_model_tuples = (
+            cls.external_instance_details['story_ids'])
+        for (_, _, story_model) in (
+                story_model_class_model_id_model_tuples):
+            # The case for missing story external model is ignored here
+            # since errors for missing story external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if story_model is None or story_model.deleted:
+                continue
+            story_node_ids = [
+                node['id'] for node in story_model.story_contents['nodes']]
+            invalid_node_ids = [
+                node_id
+                for node_id in item.completed_node_ids if node_id not in (
+                    story_node_ids)]
+            if invalid_node_ids:
+                cls.errors['completed node check'].append(
+                    'Entity id %s: Following completed node ids %s do '
+                    'not belong to the story with id %s corresponding '
+                    'to the entity' % (
+                        item.id, invalid_node_ids, story_model.id))
+
+            # Checks that the explorations corresponding to completed nodes
+            # exist, are marked as completed in CompletedActivitiesModel
+            # and are public.
+            private_exp_ids = []
+            missing_exp_ids = []
+            unmarked_exp_ids = []
+            completed_exp_ids = []
+            for node in story_model.story_contents['nodes']:
+                if node['id'] in item.completed_node_ids:
+                    completed_exp_ids.append(node['exploration_id'])
+                    if node['exploration_id'] not in (
+                            completed_activity_model.exploration_ids):
+                        unmarked_exp_ids.append(node['exploration_id'])
+                    if rights_manager.is_exploration_private(
+                            node['exploration_id']):
+                        private_exp_ids.append(node['exploration_id'])
+
+            exp_model_list = exp_models.ExplorationModel.get_multi(
+                completed_exp_ids)
+            for index, exp_model in enumerate(exp_model_list):
+                if exp_model is None or exp_model.deleted:
+                    missing_exp_ids.append(completed_exp_ids[index])
+
+            error_msg = ''
+            if private_exp_ids:
+                error_msg = error_msg + (
+                    'Following exploration ids are private %s. ' % (
+                        private_exp_ids))
+            if missing_exp_ids:
+                error_msg = error_msg + (
+                    'Following exploration ids are missing %s. ' % (
+                        missing_exp_ids))
+            if unmarked_exp_ids:
+                error_msg = error_msg + (
+                    'Following exploration ids are not marked in '
+                    'CompletedActivitiesModel %s.' % unmarked_exp_ids)
+
+            if error_msg:
+                cls.errors['explorations in completed node check'].append(
+                    'Entity id %s: %s' % (item.id, error_msg))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_story_is_public,
+            cls._validate_completed_nodes]
+
+
+class UserQueryModelValidator(BaseUserModelValidator):
+    """Class for validating UserQueryModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, unused_item):
+        return '^[A-Za-z0-9-_]{1,%s}$' % base_models.ID_LENGTH
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, (
+                    item.user_ids + [item.submitter_id])),
+            'sent_email_model_ids': (
+                email_models.BulkEmailModel, [item.sent_email_model_id])
+        }
+
+    @classmethod
+    def _validate_sender_and_recipient_ids(cls, item):
+        """Validates that sender id of BulkEmailModel matches the
+        submitter id of query and all recipient ids are present in
+        user ids who satisfy the query. It is not necessary that
+        all user ids are present in recipient ids since email
+        is only sent to a limited maximum of qualified users.
+        It also checks that a UserBulkEmailsModel exists for each
+        of the recipients.
+
+        Args:
+            item: ndb.Model. UserQueryModel to validate.
+        """
+        email_model_class_model_id_model_tuples = (
+            cls.external_instance_details['sent_email_model_ids'])
+        for (_, _, email_model) in (
+                email_model_class_model_id_model_tuples):
+            # The case for missing email external model is ignored here
+            # since errors for missing email external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if email_model is None or email_model.deleted:
+                continue
+            extra_recipient_ids = [
+                user_id
+                for user_id in email_model.recipient_ids if user_id not in (
+                    item.user_ids)]
+            if extra_recipient_ids:
+                cls.errors['recipient check'].append(
+                    'Entity id %s: Email model %s for query has following '
+                    'extra recipients %s which are not qualified as per the '
+                    'query' % (item.id, email_model.id, extra_recipient_ids))
+            if email_model.sender_id != item.submitter_id:
+                cls.errors['sender check'].append(
+                    'Entity id %s: Sender id %s in email model with id %s '
+                    'does not match submitter id %s of query' % (
+                        item.id, email_model.sender_id,
+                        email_model.id, item.submitter_id))
+
+            recipient_user_ids = [
+                recipient_id
+                for recipient_id in email_model.recipient_ids if (
+                    recipient_id in item.user_ids)]
+            user_bulk_emails_model_list = (
+                user_models.UserBulkEmailsModel.get_multi(recipient_user_ids))
+            for index, user_bulk_emails_model in enumerate(
+                    user_bulk_emails_model_list):
+                if user_bulk_emails_model is None or (
+                        user_bulk_emails_model.deleted):
+                    cls.errors['user bulk email check'].append(
+                        'Entity id %s: UserBulkEmails model is missing for '
+                        'recipient with id %s' % (
+                            item.id, recipient_user_ids[index]))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_sender_and_recipient_ids]
+
+
+class UserBulkEmailsModelValidator(BaseUserModelValidator):
+    """Class for validating UserBulkEmailsModels."""
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.id]),
+            'sent_email_model_ids': (
+                email_models.BulkEmailModel, item.sent_email_model_ids)
+        }
+
+    @classmethod
+    def _validate_user_id_in_recipient_id_for_emails(cls, item):
+        """Validates that user id is present in recipient ids
+        for bulk email model.
+
+        Args:
+            item: ndb.Model. UserBulkEmailsModel to validate.
+        """
+        email_model_class_model_id_model_tuples = (
+            cls.external_instance_details['sent_email_model_ids'])
+        for (_, _, email_model) in (
+                email_model_class_model_id_model_tuples):
+            # The case for missing email external model is ignored here
+            # since errors for missing email external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if email_model is None or email_model.deleted:
+                continue
+            if item.id not in email_model.recipient_ids:
+                cls.errors['recipient check'].append(
+                    'Entity id %s: user id is not present in recipient ids '
+                    'of BulkEmailModel with id %s' % (item.id, email_model.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [cls._validate_user_id_in_recipient_id_for_emails]
+
+
+class UserSkillMasteryModelValidator(BaseUserModelValidator):
+    """Class for validating UserSkillMasteryModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '^%s\\.%s$' % (item.user_id, item.skill_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.user_id]),
+            'skill_ids': (
+                skill_models.SkillModel, [item.skill_id])
+        }
+
+    @classmethod
+    def _validate_skill_mastery(cls, item):
+        """Validates that skill mastery is in range [0.0, 1.0].
+
+        Args:
+            item: ndb.Model. UserSkillMasteryModel to validate.
+        """
+        if item.degree_of_mastery < 0 or item.degree_of_mastery > 1:
+            cls.errors['skill mastery check'].append(
+                'Entity id %s: Expected degree of mastery to be in '
+                'range [0.0, 1.0], received %s' % (
+                    item.id, item.degree_of_mastery))
+
+    @classmethod
+    def _validate_skill_is_public(cls, item):
+        """Validates that skill is public.
+
+        Args:
+            item: ndb.Model. UserSkillMasteryModel to validate.
+        """
+        skill_model_class_model_id_model_tuples = (
+            cls.external_instance_details['skill_ids'])
+        for (_, _, skill_model) in (
+                skill_model_class_model_id_model_tuples):
+            # The case for missing skill external model is ignored here
+            # since errors for missing skill external model are already
+            # checked and stored in _validate_external_id_relationships
+            # function.
+            if skill_model is None or skill_model.deleted:
+                continue
+            skill_rights = skill_services.get_skill_rights(skill_model.id)
+            if skill_rights.skill_is_private:
+                cls.errors['public skill check'].append(
+                    'Entity id %s: skill with id %s corresponding to entity '
+                    'is private' % (item.id, skill_model.id))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_skill_mastery,
+            cls._validate_skill_is_public]
+
+
+class UserContributionScoringModelValidator(BaseUserModelValidator):
+    """Class for validating UserContributionScoringModels."""
+
+    @classmethod
+    def _get_model_id_regex(cls, item):
+        return '^%s\\.%s$' % (item.score_category, item.user_id)
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {
+            'user_settings_ids': (
+                user_models.UserSettingsModel, [item.user_id])
+        }
+
+    @classmethod
+    def _validate_score_category(cls, item):
+        """Validates that score category belongs to allowed score categories.
+
+        Args:
+            item: ndb.Model. UserContributionScoringModel to validate.
+        """
+        score_category_regex = '^(%s)$' % ('|').join(ALLOWED_SCORE_CATEGORIES)
+        if not re.compile(score_category_regex).match(item.score_category):
+            cls.errors['score category check'].append(
+                'Entity id %s: Score category %s is invalid' % (
+                    item.id, item.score_category))
+
+    @classmethod
+    def _validate_score(cls, item):
+        """Validates that score is non-negative.
+
+        Args:
+            item: ndb.Model. UserContributionScoringModel to validate.
+        """
+        if item.score < 0:
+            cls.errors['score check'].append(
+                'Entity id %s: Expected score to be non-negative, '
+                'received %s' % (item.id, item.score))
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_score_category,
+            cls._validate_score]
 
 
 MODEL_TO_VALIDATOR_MAPPING = {
@@ -3807,7 +5000,27 @@ MODEL_TO_VALIDATOR_MAPPING = {
         SubtopicPageSnapshotContentModelValidator),
     topic_models.SubtopicPageCommitLogEntryModel: (
         SubtopicPageCommitLogEntryModelValidator),
+    user_models.UserSettingsModel: UserSettingsModelValidator,
+    user_models.CompletedActivitiesModel: CompletedActivitiesModelValidator,
+    user_models.IncompleteActivitiesModel: IncompleteActivitiesModelValidator,
+    user_models.ExpUserLastPlaythroughModel: (
+        ExpUserLastPlaythroughModelValidator),
+    user_models.LearnerPlaylistModel: LearnerPlaylistModelValidator,
+    user_models.UserContributionsModel: UserContributionsModelValidator,
+    user_models.UserEmailPreferencesModel: UserEmailPreferencesModelValidator,
     user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
+    user_models.UserSubscribersModel: UserSubscribersModelValidator,
+    user_models.UserRecentChangesBatchModel: (
+        UserRecentChangesBatchModelValidator),
+    user_models.UserStatsModel: UserStatsModelValidator,
+    user_models.ExplorationUserDataModel: ExplorationUserDataModelValidator,
+    user_models.CollectionProgressModel: CollectionProgressModelValidator,
+    user_models.StoryProgressModel: StoryProgressModelValidator,
+    user_models.UserQueryModel: UserQueryModelValidator,
+    user_models.UserBulkEmailsModel: UserBulkEmailsModelValidator,
+    user_models.UserSkillMasteryModel: UserSkillMasteryModelValidator,
+    user_models.UserContributionScoringModel: (
+        UserContributionScoringModelValidator)
 }
 
 
@@ -4527,9 +5740,167 @@ class SubtopicPageCommitLogEntryModelAuditOneOffJob(
         return [topic_models.SubtopicPageCommitLogEntryModel]
 
 
+class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserSettingsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+
+class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates normalized usernames."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        if not model_instance.deleted:
+            yield(model_instance.normalized_username, model_instance.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if len(values) > 1:
+            yield(
+                'failed validation check for normalized username check of '
+                'UserSettingsModel',
+                'Users with ids %s have the same normalized username %s' % (
+                    sorted(values), key))
+
+
+class CompletedActivitiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates CompletedActivitiesModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.CompletedActivitiesModel]
+
+
+class IncompleteActivitiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates IncompleteActivitiesModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.IncompleteActivitiesModel]
+
+
+class ExpUserLastPlaythroughModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExpUserLastPlaythroughModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExpUserLastPlaythroughModel]
+
+
+class LearnerPlaylistModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates LearnerPlaylistModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.LearnerPlaylistModel]
+
+
+class UserContributionsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserContributionsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserContributionsModel]
+
+
+class UserEmailPreferencesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserEmailPreferencesModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserEmailPreferencesModel]
+
+
 class UserSubscriptionsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     """Job that audits and validates UserSubscriptionsModel."""
 
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserSubscriptionsModel]
+
+
+class UserSubscribersModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserSubscribersModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSubscribersModel]
+
+
+class UserRecentChangesBatchModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserRecentChangesBatchModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserRecentChangesBatchModel]
+
+
+class UserStatsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserStatsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserStatsModel]
+
+
+class ExplorationUserDataModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates ExplorationUserDataModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.ExplorationUserDataModel]
+
+
+class CollectionProgressModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates CollectionProgressModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.CollectionProgressModel]
+
+
+class StoryProgressModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates StoryProgressModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.StoryProgressModel]
+
+
+class UserQueryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserQueryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserQueryModel]
+
+
+class UserBulkEmailsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserBulkEmailsModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserBulkEmailsModel]
+
+
+class UserSkillMasteryModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserSkillMasteryModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSkillMasteryModel]
+
+
+class UserContributionScoringModelAuditOneOffJob(ProdValidationAuditOneOffJob):
+    """Job that audits and validates UserContributionScoringModel."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserContributionScoringModel]
