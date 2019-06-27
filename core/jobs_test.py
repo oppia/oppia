@@ -909,7 +909,7 @@ class MockStartExplorationMRJobManager(
     @staticmethod
     def map(item):
         current_class = MockStartExplorationMRJobManager
-        if current_class.entity_created_before_job_queued(item):  # pylint: disable=protected-access
+        if current_class.entity_created_before_job_queued(item):
             yield (
                 item.exploration_id, {
                     'event_type': item.event_type,
@@ -1005,14 +1005,6 @@ class MockMRJobManager(jobs.BaseMapReduceJobManagerForContinuousComputations):
     def entity_classes_to_map_over(cls):
         return []
 
-    @staticmethod
-    def map(item):
-        pass
-
-    @staticmethod
-    def reduce(key, values):
-        pass
-
 
 class MockContinuousComputationManager(jobs.BaseContinuousComputationManager):
 
@@ -1065,27 +1057,18 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.taskqueue_stub.FlushQueue(queue)
 
         for task in tasks:
-            if task.url == '/_ah/queue/deferred':
-                from google.appengine.ext import deferred
-                deferred.run(task.payload)
-            else:
-                # All other tasks are expected to be mapreduce ones, or
-                # Oppia-taskqueue-related ones.
-                headers = {
-                    key: str(val) for key, val in task.headers.iteritems()
-                }
-                headers['Content-Length'] = str(len(task.payload or ''))
+            headers = {
+                key: str(val) for key, val in task.headers.iteritems()
+            }
+            headers['Content-Length'] = str(len(task.payload or ''))
 
-                app = (
-                    webtest.TestApp(main_taskqueue.app)
-                    if task.url.startswith('/task')
-                    else self.testapp)
-                response = app.post(
-                    url=str(task.url), params=(task.payload or ''),
-                    headers=headers, expect_errors=True)
-                if response.status_code != 200:
-                    raise RuntimeError(
-                        'MapReduce task to URL %s failed' % task.url)
+            app = (
+                webtest.TestApp(main_taskqueue.app)
+                if task.url.startswith('/task')
+                else self.testapp)
+            response = app.post(
+                url=str(task.url), params=(task.payload or ''),
+                headers=headers)
 
     def test_cannot_get_entity_with_invalid_id(self):
         with self.assertRaisesRegexp(
