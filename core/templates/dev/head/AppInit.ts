@@ -51,6 +51,9 @@ import { TopicsAndSkillsDashboardDomainConstants } from
   ('domain/topics_and_skills_dashboard/' +
   'topics-and-skills-dashboard-domain.constants.ts');
 
+import { InteractionsExtensionsConstants } from
+  'interactions/interactions-extension.constants.ts';
+
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
 import { CollectionEditorPageConstants } from
   'pages/collection-editor-page/collection-editor-page.constants.ts';
@@ -76,6 +79,9 @@ import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants.ts';
 import { TopicLandingPageConstants } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts';
+import { TopicsAndSkillsDashboardPageConstants } from
+  ('pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ts');
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
@@ -99,6 +105,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     TopicDomainConstants,
     TopicViewerDomainConstants,
     TopicsAndSkillsDashboardDomainConstants,
+    InteractionsExtensionsConstants,
     AdminPageConstants,
     CollectionEditorPageConstants,
     CreatorDashboardConstants,
@@ -112,6 +119,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     StoryEditorPageConstants,
     TopicEditorPageConstants,
     TopicLandingPageConstants,
+    TopicsAndSkillsDashboardPageConstants,
     ServicesConstants
   ]
 })

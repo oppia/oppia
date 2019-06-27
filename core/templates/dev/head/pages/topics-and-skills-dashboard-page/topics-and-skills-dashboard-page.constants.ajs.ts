@@ -16,11 +16,21 @@
  * @fileoverview Constants for the topics and skills dashboard.
  */
 
-export class TopicsAndSkillsDashboardPageConstants {
-  public static EVENT_TYPE_TOPIC_CREATION_ENABLED = 'topicCreationEnabled';
+import { TopicsAndSkillsDashboardPageConstants } from
+  ('pages/topics-and-skills-dashboard-page/' +
+  'topics-and-skills-dashboard-page.constants.ts');
 
-  public static EVENT_TYPE_SKILL_CREATION_ENABLED = 'skillCreationEnabled';
+var oppia = require('AppInit.ts').module;
 
-  public static EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED =
-    'topicsAndSkillsDashboardReinitialized';
-}
+oppia.constant(
+  'EVENT_TYPE_TOPIC_CREATION_ENABLED',
+  TopicsAndSkillsDashboardPageConstants.EVENT_TYPE_TOPIC_CREATION_ENABLED);
+
+oppia.constant(
+  'EVENT_TYPE_SKILL_CREATION_ENABLED',
+  TopicsAndSkillsDashboardPageConstants.EVENT_TYPE_SKILL_CREATION_ENABLED);
+
+oppia.constant(
+  'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+  TopicsAndSkillsDashboardPageConstants
+    .EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);

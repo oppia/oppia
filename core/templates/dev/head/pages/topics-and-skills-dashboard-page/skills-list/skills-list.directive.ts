@@ -27,7 +27,7 @@ require('services/AlertsService.ts');
 
 require(
   'pages/topics-and-skills-dashboard-page/' +
-  'topics-and-skills-dashboard-page.constants.ts');
+  'topics-and-skills-dashboard-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

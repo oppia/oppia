@@ -24,7 +24,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('interactions/GraphInput/directives/GraphDetailService.ts');
 require('services/HtmlEscaperService.ts');
 
-require('interactions/interactions-extension.constants.ts');
+require('interactions/interactions-extension.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 
