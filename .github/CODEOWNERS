@@ -320,7 +320,7 @@
 /core/templates/dev/head/App*.ts @ankita240796
 /core/templates/dev/head/app.constants.ts @ankita240796
 /core/templates/dev/head/app.constants.ajs.ts @ankita240796
-/core/templates/dev/head/pages/interaction-specs.constants.ts @vojtechjelinek
+/core/templates/dev/head/pages/interaction-specs.constants.ajs.ts @vojtechjelinek
 /core/templates/dev/head/I18nFooter.ts @seanlip
 /core/templates/dev/head/services/TranslationFileHashLoaderService.ts @seanlip
 

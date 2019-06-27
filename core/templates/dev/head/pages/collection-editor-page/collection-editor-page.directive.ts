@@ -33,7 +33,7 @@ require(
 require('services/PageTitleService.ts');
 
 require('pages/collection-editor-page/collection-editor-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 

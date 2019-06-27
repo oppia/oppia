@@ -66,7 +66,7 @@ oppia.constant(
 // page visited.
 oppia.constant('ENABLE_PROMO_BAR', ServicesConstants.ENABLE_PROMO_BAR);
 
-oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
+oppia.constant('RTE_COMPONENT_SPECS', ServicesConstants.RTE_COMPONENT_SPECS);
 
 oppia.constant('SEARCH_DATA_URL', ServicesConstants.SEARCH_DATA_URL);
 

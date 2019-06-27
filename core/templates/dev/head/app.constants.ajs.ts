@@ -38,7 +38,7 @@ oppia.constant('RULE_SUMMARY_WRAP_CHARACTER_COUNT',
 oppia.constant(
   'EVENT_ACTIVE_CARD_CHANGED', AppConstants.EVENT_ACTIVE_CARD_CHANGED);
 /* Called when the learner moves to a new card that they haven't seen before. */
-oppia.constant('EVENT_NEW_CARD_OPENED', AppConstants.EVENT_NEW_CARD_AVAILABLE);
+oppia.constant('EVENT_NEW_CARD_OPENED', AppConstants.EVENT_NEW_CARD_OPENED);
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   AppConstants.EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE);

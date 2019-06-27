@@ -27,6 +27,8 @@ import { ServicesConstants } from 'services/services.constants.ts';
 
 import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
 
+import { InteractionSpecsConstants } from 'pages/interaction-specs.constants.ts';
+
 @NgModule({
   imports: [
     BrowserModule
@@ -36,7 +38,8 @@ import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension
     CreatorDashboardConstants,
     ExplorationPlayerConstants,
     ServicesConstants,
-    ClassifiersExtensionConstants
+    ClassifiersExtensionConstants,
+    InteractionSpecsConstants
   ]
 })
 class MainAngularModule {

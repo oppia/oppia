@@ -122,13 +122,11 @@ oppia.directive('hintAndSolutionButtons', [
           };
 
           $scope.$on(EVENT_NEW_CARD_OPENED, function(evt, newCard) {
-            if (newCard) {
-              ctrl.displayedCard = newCard;
-              HintsAndSolutionManagerService.reset(
-                newCard.getHints(), newCard.getSolution()
-              );
-              resetLocalHintsArray();
-            }
+            ctrl.displayedCard = newCard;
+            HintsAndSolutionManagerService.reset(
+              newCard.getHints(), newCard.getSolution()
+            );
+            resetLocalHintsArray();
           });
 
           ctrl.isTooltipVisible = function() {

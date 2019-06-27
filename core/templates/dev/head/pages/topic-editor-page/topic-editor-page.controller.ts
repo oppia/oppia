@@ -121,7 +121,7 @@ require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
-require('pages/interaction-specs.constants.ts');
+require('pages/interaction-specs.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 
