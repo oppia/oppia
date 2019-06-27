@@ -1221,7 +1221,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         job_models.ContinuousComputationModel(
             id='StartExplorationEventCounter').put()
         continuous_computations_data = jobs.get_continuous_computations_info(
-            self.ALL_CC_MANAGERS_FOR_TESTS)
+            [StartExplorationEventCounter])
 
         self.assertEqual(len(continuous_computations_data), 1)
         continuous_computation_data = continuous_computations_data[0]
