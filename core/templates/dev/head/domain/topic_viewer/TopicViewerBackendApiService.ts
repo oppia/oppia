@@ -20,7 +20,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/topic_viewer/topic-viewer-domain.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TopicViewerBackendApiService', [
   '$http', '$q', 'UrlInterpolationService', 'TOPIC_DATA_URL_TEMPLATE',

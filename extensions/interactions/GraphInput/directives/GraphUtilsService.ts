@@ -16,7 +16,7 @@
  * @fileoverview Utils service for the interaction.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('GraphUtilsService', [function() {
   return {

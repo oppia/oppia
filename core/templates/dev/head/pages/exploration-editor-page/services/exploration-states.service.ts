@@ -38,7 +38,7 @@ require('services/AlertsService.ts');
 require('services/ContextService.ts');
 require('services/ValidatorsService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationStatesService', [
   '$filter', '$injector', '$location', '$log', '$q', '$rootScope', '$uibModal',

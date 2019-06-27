@@ -22,7 +22,7 @@
 //
 // This directive is based on the UnicodeString directive.
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('htmlEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',

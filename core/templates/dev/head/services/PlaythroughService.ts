@@ -24,7 +24,7 @@ import { ExplorationFeaturesService } from 'services/ExplorationFeaturesService.
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('PlaythroughService', [
   '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',

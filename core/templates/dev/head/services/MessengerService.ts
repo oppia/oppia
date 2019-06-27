@@ -19,7 +19,7 @@
  * be attempted due to cross-domain security issues.)
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
   var isPositiveInteger = function(n) {

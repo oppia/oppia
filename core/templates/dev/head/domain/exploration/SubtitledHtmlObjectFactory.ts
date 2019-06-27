@@ -17,7 +17,7 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SubtitledHtmlObjectFactory', [function() {
   var SubtitledHtml = function(html, contentId) {

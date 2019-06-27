@@ -16,7 +16,7 @@
  * @fileoverview GetAbbreviatedText filter for Oppia.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('getAbbreviatedText', [function() {
   return function(text, characterCount) {

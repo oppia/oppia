@@ -18,7 +18,7 @@
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout',

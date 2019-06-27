@@ -68,7 +68,7 @@ require('app.constants.ts');
 // loaded after app.constants.ts
 require('I18nFooter.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.config([
   '$compileProvider', '$cookiesProvider', '$httpProvider',

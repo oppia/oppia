@@ -22,7 +22,7 @@
 // Note that events are only sent if the CAN_SEND_ANALYTICS_EVENTS flag is
 // turned on. This flag must be turned on explicitly by the application
 // owner in feconf.py.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SiteAnalyticsService', ['$window', function($window) {
   var CAN_SEND_ANALYTICS_EVENTS = constants.CAN_SEND_ANALYTICS_EVENTS;

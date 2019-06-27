@@ -19,7 +19,7 @@
 // TODO(sll): Remove this directive (as well as the whole of the value
 // generators framework).
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('copier', ['$compile', function($compile) {
   return {

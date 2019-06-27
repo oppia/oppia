@@ -36,7 +36,7 @@ require('services/stateful/FocusManagerService.ts');
 //
 // The state-name argument is optional. If it is not provided, the feedback is
 // assumed to apply to the exploration as a whole.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('feedbackPopup', [
   'ExplorationEngineService', 'UrlInterpolationService',

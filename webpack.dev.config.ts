@@ -24,8 +24,8 @@ module.exports = {
   resolve: {
     modules: [
       path.resolve(__dirname, 'core/templates/dev/head'),
-      path.resolve(__dirname, 'node_modules'),
-      path.resolve(__dirname, 'extensions')
+      path.resolve(__dirname, 'extensions'),
+      path.resolve(__dirname, 'node_modules')
     ],
     alias: {
       '@angular/upgrade/static': (

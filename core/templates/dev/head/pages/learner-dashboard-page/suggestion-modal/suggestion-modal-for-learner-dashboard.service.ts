@@ -19,7 +19,7 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SuggestionModalService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SuggestionModalForLearnerDashboardService', [
   '$rootScope', '$uibModal', 'UrlInterpolationService',

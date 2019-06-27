@@ -19,7 +19,7 @@
 
 require('pages/admin-page/admin-page.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('AdminRouterService', [
   'ADMIN_TAB_URLS',

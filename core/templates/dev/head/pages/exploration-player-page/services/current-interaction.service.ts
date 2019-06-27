@@ -19,7 +19,7 @@
  * answer submission process.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CurrentInteractionService', [
   function() {

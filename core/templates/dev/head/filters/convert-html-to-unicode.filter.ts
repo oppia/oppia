@@ -16,7 +16,7 @@
  * @fileoverview Converts HTML to unicode.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('convertHtmlToUnicode', [function() {
   return function(html) {

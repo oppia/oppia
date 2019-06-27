@@ -44,7 +44,7 @@ require(
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',

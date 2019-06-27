@@ -16,7 +16,7 @@
  * @fileoverview Directive for fraction editor.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('fractionEditor', [
   'FractionObjectFactory', 'UrlInterpolationService',

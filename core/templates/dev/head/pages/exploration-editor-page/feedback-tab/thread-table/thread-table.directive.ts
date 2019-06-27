@@ -25,7 +25,7 @@ require(
   'thread-status-display.service.ts');
 require('services/DateTimeFormatService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('threadTable', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -17,6 +17,4 @@
  */
 
 require('App.ts');
-
-require('App.ts');
 require('pages/splash-page/splash-page.controller.ts');

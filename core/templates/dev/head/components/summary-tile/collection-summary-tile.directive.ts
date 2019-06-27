@@ -25,7 +25,7 @@ require('services/UserService.ts');
 
 require('components/summary-tile/collection-summary-tile.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('collectionSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -66,7 +66,7 @@ require('expressions/ExpressionParserService.js');
 require('expressions/ExpressionSyntaxTreeService.ts');
 
 // Service for expression evaluation.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExpressionEvaluatorService', [
   '$log', 'ExpressionParserService', 'ExpressionSyntaxTreeService',

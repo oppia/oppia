@@ -79,4 +79,4 @@ var oppia = angular.module(
 
 oppia.factory('ExplorationFeaturesService', downgradeInjectable(ExplorationFeaturesService));
 
-exports.moduleName = oppia;
+exports.module = oppia;

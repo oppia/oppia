@@ -20,7 +20,7 @@
 // line, and removes blank lines. Note that any spaces whose removal does not
 // result in two alphanumeric "words" being joined together are also removed,
 // so "hello ? " becomes "hello?".
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
   return function(input) {

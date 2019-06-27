@@ -17,7 +17,7 @@
  *     Classification Result domain objects.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('AnswerClassificationResultObjectFactory', [function() {
   var AnswerClassificationResult = function(

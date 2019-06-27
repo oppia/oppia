@@ -22,7 +22,7 @@ require('app.constants.ts');
  * necessary to have a fully-qualified URL.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('UrlInterpolationService', [
   'AlertsService', 'UrlService', 'UtilsService', 'DEV_MODE',

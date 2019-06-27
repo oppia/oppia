@@ -16,7 +16,7 @@
  * @fileoverview Validator to check if input is integer.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('isInteger', [function() {
   return function(input) {

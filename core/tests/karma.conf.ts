@@ -34,12 +34,11 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*.directive.html',
       'core/templates/dev/head/**/*.template.html',
       'local_compiled_js/extensions/**/*.js',
-      // 'core/templates/dev/head/**/*Spec.ts',
-      // 'core/templates/dev/head/*Spec.ts',
-      // 'core/templates/dev/head/**/*.spec.ts',
-      // 'core/templates/dev/head/*.spec.ts',
-      // 'extensions/**/*Spec.ts',
-      'core/templates/dev/head/one.spec.ts',
+      // This is a file that is generated on running the run_frontend_tests.sh
+      // script. This generated file is a combination of all the spec files
+      // since Karma is unable to run tests on multiple files due to some
+      // unknown reason.
+      'core/templates/dev/head/combined-tests.spec.ts',
       {
         pattern: 'extensions/**/*.png',
         watched: false,
@@ -60,19 +59,6 @@ module.exports = function(config) {
       'local_compiled_js/core/templates/dev/head/**/*-e2e.js',
       'local_compiled_js/extensions/**/protractor.js',
       'backend_prod_files/extensions/**',
-      // TODO(vojtechjelinek): add these back after the templateCache
-      // is repaired (#6960)
-      'core/templates/dev/head/components/RatingDisplayDirectiveSpec.js',
-      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
-       'services/solution-verification.service.spec.ts'),
-      ('core/templates/dev/head/pages/exploration-editor-page/editor-tab/' +
-       'state-name-editor/state-name-editor.directive.spec.ts'),
-      ('core/templates/dev/head/components/state-editor/state-content-editor/' +
-       'state-content-editor.directive.spec.ts'),
-      ('core/templates/dev/head/components/state-editor/' +
-       'state-interaction-editor/state-interaction-editor.directive.spec.ts'),
-      ('extensions/interactions/MusicNotesInput/directives/' +
-       'MusicNotesInputSpec.ts')
     ],
     proxies: {
       // Karma serves files under the /base directory.
@@ -158,8 +144,8 @@ module.exports = function(config) {
       resolve: {
         modules: [
           'core/templates/dev/head',
+          'extensions',
           'node_modules',
-          'extensions'
         ],
       },
       module: {

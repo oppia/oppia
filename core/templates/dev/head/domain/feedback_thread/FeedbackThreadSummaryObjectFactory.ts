@@ -17,7 +17,7 @@
    domain objects.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   var FeedbackThreadSummary = function(

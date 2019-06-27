@@ -22,7 +22,7 @@ require('domain/skill/SkillObjectFactory.ts');
 
 require('domain/skill/skill-domain.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SkillUpdateService', [
   'ChangeObjectFactory', 'SkillObjectFactory',

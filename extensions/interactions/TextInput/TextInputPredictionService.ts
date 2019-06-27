@@ -27,7 +27,7 @@ require('classifiers/CountVectorizerService.ts');
 
 require('interactions/interactions-extension.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TextInputPredictionService', [
   'CountVectorizerService', 'SVMPredictionService',

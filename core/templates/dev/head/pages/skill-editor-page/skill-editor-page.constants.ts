@@ -16,7 +16,7 @@
  * @fileoverview Constants for the skill editor page.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'SKILL_RIGHTS_URL_TEMPLATE',

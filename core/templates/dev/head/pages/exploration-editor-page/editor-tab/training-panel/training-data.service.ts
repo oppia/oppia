@@ -27,7 +27,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('TrainingDataService', [
   '$http', '$rootScope', 'ExplorationStatesService', 'GraphDataService',

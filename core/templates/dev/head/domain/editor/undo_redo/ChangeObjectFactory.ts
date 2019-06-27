@@ -21,7 +21,7 @@
 // TODO(bhenning): Consolidate the backend ExplorationChange and
 // CollectionChange domain objects.
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ChangeObjectFactory', [function() {
   var Change = function(

@@ -107,7 +107,7 @@ require('pages/skill-editor-page/questions-tab/questions-tab.directive.ts');
 require('pages/skill-editor-page/skill-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('skillEditorPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {

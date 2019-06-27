@@ -1,4 +1,4 @@
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExpressionParserService', ['$log', function($log) {
   /*

@@ -16,7 +16,7 @@
  * @fileoverview Service to handle common code for suggestion modal display.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('SuggestionModalService', [function() {
   return {

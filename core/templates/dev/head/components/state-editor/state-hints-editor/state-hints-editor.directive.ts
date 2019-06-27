@@ -39,7 +39,7 @@ require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/GenerateContentIdService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

@@ -17,7 +17,7 @@
  * in the test session.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('QuestionPlayerStateService', [
   function() {

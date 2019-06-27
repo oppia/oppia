@@ -18,7 +18,7 @@
 
 require('services/services.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('PromoBarService', [
   '$http', '$q', 'ENABLE_PROMO_BAR',

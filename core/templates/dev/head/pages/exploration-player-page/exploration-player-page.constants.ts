@@ -16,7 +16,7 @@
  * @fileoverview Constants to be used in the learner view.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant('CONTENT_FOCUS_LABEL_PREFIX', 'content-focus-label-');
 

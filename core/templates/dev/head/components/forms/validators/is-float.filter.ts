@@ -16,7 +16,7 @@
  * @fileoverview Validator to check if input is float.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('isFloat', [function() {
   return function(input) {

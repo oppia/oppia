@@ -21,7 +21,7 @@
 // backend.
 // NOTE TO DEVELOPERS: the properties 'prerequisite_skills' and
 // 'acquired_skills' are deprecated. Do not use them.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant('CMD_ADD_COLLECTION_NODE', 'add_collection_node');
 oppia.constant('CMD_SWAP_COLLECTION_NODES', 'swap_nodes');

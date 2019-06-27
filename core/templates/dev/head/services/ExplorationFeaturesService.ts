@@ -17,8 +17,6 @@
  *               the exploration editor.
  */
 
-// var oppia = require('AppInit.ts').moduleName;
-
 import { Injectable } from '@angular/core';
 
 @Injectable()

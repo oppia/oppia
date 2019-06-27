@@ -17,7 +17,7 @@
  */
 
 // Filter that replaces all {{...}} in a string with '...'.
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.filter('replaceInputsWithEllipses', [function() {
   var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;

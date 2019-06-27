@@ -45,7 +45,7 @@ require('services/UserService.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {

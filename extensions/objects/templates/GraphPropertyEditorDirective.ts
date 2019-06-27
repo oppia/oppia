@@ -21,7 +21,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('graphPropertyEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',

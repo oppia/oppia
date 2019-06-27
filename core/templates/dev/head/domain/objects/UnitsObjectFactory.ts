@@ -16,7 +16,7 @@
  * @fileoverview Factory for creating instances of Units domain objects.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
   function(CURRENCY_UNITS) {

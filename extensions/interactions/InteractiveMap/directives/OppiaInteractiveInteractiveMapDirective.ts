@@ -27,7 +27,7 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('oppiaInteractiveInteractiveMap', [
   'HtmlEscaperService', 'InteractiveMapRulesService', 'UrlInterpolationService',

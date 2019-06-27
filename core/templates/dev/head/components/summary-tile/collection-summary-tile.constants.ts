@@ -16,7 +16,7 @@
  * @fileoverview Constants for summary tile for collections.
  */
 
-var oppia = require('AppInit.ts').moduleName;
+var oppia = require('AppInit.ts').module;
 
 oppia.constant(
   'COLLECTION_VIEWER_URL', '/collection/<collection_id>');
