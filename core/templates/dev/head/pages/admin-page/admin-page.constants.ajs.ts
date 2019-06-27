@@ -16,25 +16,23 @@
  * @fileoverview Constants for the Oppia admin page.
  */
 
-export class AdminPageConstants {
-  public static
-    ADMIN_ROLE_HANDLER_URL = '/adminrolehandler';
+import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
 
-  public static ADMIN_HANDLER_URL = '/adminhandler';
-  public static
-    ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL = '/admintopicscsvdownloadhandler';
+var oppia = require('AppInit.ts').moduleName;
 
-  public static
-    ADMIN_JOB_OUTPUT_URL_TEMPLATE = '/adminjoboutput?job_id=<jobId>';
+oppia.constant(
+  'ADMIN_ROLE_HANDLER_URL', AdminPageConstants.ADMIN_ROLE_HANDLER_URL);
 
-  public static ADMIN_TAB_URLS = {
-    ACTIVITIES: '#activities',
-    JOBS: '#jobs',
-    CONFIG: '#config',
-    ROLES: '#roles',
-    MISC: '#misc'
-  };
+oppia.constant('ADMIN_HANDLER_URL', AdminPageConstants.ADMIN_HANDLER_URL);
+oppia.constant(
+  'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
+  AdminPageConstants.ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL);
 
-  public static
-    PROFILE_URL_TEMPLATE = '/profile/<username>';
-}
+oppia.constant(
+  'ADMIN_JOB_OUTPUT_URL_TEMPLATE',
+  AdminPageConstants.ADMIN_JOB_OUTPUT_URL_TEMPLATE);
+
+oppia.constant('ADMIN_TAB_URLS', AdminPageConstants.ADMIN_TAB_URLS);
+
+oppia.constant(
+  'PROFILE_URL_TEMPLATE', AdminPageConstants.PROFILE_URL_TEMPLATE);
