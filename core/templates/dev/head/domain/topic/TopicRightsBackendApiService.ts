@@ -18,7 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-require('domain/topic/topic-domain.constants.ts');
+require('domain/topic/topic-domain.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').moduleName;
 

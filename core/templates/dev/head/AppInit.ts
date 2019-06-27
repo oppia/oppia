@@ -30,6 +30,7 @@ import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension
 
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
+import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
@@ -45,6 +46,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     ClassifiersExtensionConstants,
     SkillDomainConstants,
     StoryDomainConstants,
+    TopicDomainConstants,
     InteractionSpecsConstants
   ]
 })
