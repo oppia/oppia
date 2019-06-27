@@ -415,13 +415,10 @@ def convert_to_ckeditor(html_data):
                         else:
                             break
 
-    # This block wraps p tag in li tag if the parent of p is ol/ul tag. Also,
-    # if the parent of p tag is pre tag, it unwraps the p tag.
+    # This block unwraps the p tag, if the parent of p tag is pre tag.
     for p in soup.findAll(name='p'):
         if p.parent.name == 'pre':
             p.unwrap()
-        elif p.parent.name in list_tags:
-            p.wrap(soup.new_tag('li'))
 
     # This block ensures that ol/ul tag is not a direct child of another ul/ol
     # tag. The conversion works as follows:
@@ -759,7 +756,8 @@ def _validate_customization_args_in_tag(tag):
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html, 'html.parser')
                 for component_name in simple_component_tag_names:
-                    for component_tag in soup_for_tabs.findAll(name=tag_name):
+                    for component_tag in soup_for_tabs.findAll(
+                            name=component_name):
                         for err_msg in _validate_customization_args_in_tag(
                                 component_tag):
                             yield err_msg
