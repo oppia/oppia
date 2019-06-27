@@ -182,6 +182,7 @@ PROD_VALIDATION_ONE_OFF_JOB_MANAGERS = [
     prod_validation_jobs_one_off.SubtopicPageSnapshotContentModelAuditOneOffJob,
     prod_validation_jobs_one_off.SubtopicPageCommitLogEntryModelAuditOneOffJob,
     prod_validation_jobs_one_off.UserSettingsModelAuditOneOffJob,
+    prod_validation_jobs_one_off.UserNormalizedNameAuditOneOffJob,
     prod_validation_jobs_one_off.CompletedActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.IncompleteActivitiesModelAuditOneOffJob,
     prod_validation_jobs_one_off.ExpUserLastPlaythroughModelAuditOneOffJob,

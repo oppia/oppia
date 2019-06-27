@@ -3826,30 +3826,8 @@ class UserSettingsModelValidator(BaseUserModelValidator):
                     item.id, item.first_contribution_msec))
 
     @classmethod
-    def _validate_normalized_username_is_unique(cls, item):
-        """Validates that normalized username is unique.
-
-        Args:
-            item: ndb.Model. UserSettingsModel to validate.
-        """
-        user_models_list = user_models.UserSettingsModel.query().filter(
-            user_models.UserSettingsModel.normalized_username == (
-                item.normalized_username)).filter(
-                    user_models.UserSettingsModel.deleted == False).fetch() # pylint: disable=singleton-comparison
-        user_model_ids = [
-            user_model.id
-            for user_model in user_models_list if user_model.id != item.id]
-        if user_model_ids:
-            cls.errors['normalized username check'].append(
-                'Entity id %s: normalized username %s matches with normalized '
-                'username of user models with ids %s' % (
-                    item.id, item.normalized_username, user_model_ids))
-
-    @classmethod
     def _get_custom_validation_functions(cls):
-        return [
-            cls._validate_time_fields_of_user_actions,
-            cls._validate_normalized_username_is_unique]
+        return [cls._validate_time_fields_of_user_actions]
 
 
 class CompletedActivitiesModelValidator(BaseUserModelValidator):
@@ -5768,6 +5746,28 @@ class UserSettingsModelAuditOneOffJob(ProdValidationAuditOneOffJob):
     @classmethod
     def entity_classes_to_map_over(cls):
         return [user_models.UserSettingsModel]
+
+
+class UserNormalizedNameAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that audits and validates normalized usernames."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(model_instance):
+        if not model_instance.deleted:
+            yield(model_instance.normalized_username, model_instance.id)
+
+    @staticmethod
+    def reduce(key, values):
+        if len(values) > 1:
+            yield(
+                'failed validation check for normalized username check of '
+                'UserSettingsModel',
+                'Users with ids %s have the same normalized username %s' % (
+                    sorted(values), key))
 
 
 class CompletedActivitiesModelAuditOneOffJob(ProdValidationAuditOneOffJob):
