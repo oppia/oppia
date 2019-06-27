@@ -16,7 +16,8 @@
  * @fileoverview Constants for the creator dashboard.
  */
 
-import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
+import { CreatorDashboardConstants } from
+  'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

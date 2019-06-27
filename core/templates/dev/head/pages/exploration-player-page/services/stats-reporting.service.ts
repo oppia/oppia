@@ -25,7 +25,8 @@ require('services/MessengerService.ts');
 require('services/PlaythroughService.ts');
 require('services/SiteAnalyticsService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

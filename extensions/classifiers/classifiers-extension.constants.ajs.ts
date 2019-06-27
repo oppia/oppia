@@ -16,7 +16,8 @@
  * @fileoverview Constants for classfiers extensions.
  */
 
-import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
+import { ClassifiersExtensionConstants } from
+  'classifiers/classifiers-extension.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

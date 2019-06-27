@@ -18,6 +18,7 @@
 
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants.ts';
+
 var oppia = require('AppInit.ts').module;
 
 oppia.constant(

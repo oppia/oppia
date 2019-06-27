@@ -16,7 +16,8 @@
  * @fileoverview Constants to be used in the learner view.
  */
 
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
+import { ExplorationPlayerConstants } from
+  'pages/exploration-player-page/exploration-player-page.constants.ts';
 
 var oppia = require('AppInit.ts').module;
 

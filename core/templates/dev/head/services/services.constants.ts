@@ -58,7 +58,7 @@ export class ServicesConstants {
 
   public static SEARCH_DATA_URL = '/searchhandler/data';
 
-  public static STATE_ANSWER_STATS_URL = 
+  public static STATE_ANSWER_STATS_URL =
     '/createhandler/state_answer_stats/<exploration_id>';
 
   public static RTE_COMPONENT_SPECS = richTextComponents;

@@ -24,7 +24,8 @@ require(
   'pages/exploration-player-page/services/state-classifier-mapping.service.ts');
 require('services/AlertsService.ts');
 
-require('pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
+require(
+  'pages/exploration-player-page/exploration-player-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;

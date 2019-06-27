@@ -37,7 +37,7 @@ export class ExplorationPlayerConstants {
   public static DELAY_FOR_HINT_FEEDBACK_MSEC = 100;
 
   // Array of i18n IDs for the possible hint request strings.
-  public static 
+  public static
     HINT_REQUEST_STRING_I18N_IDS = [
       'I18N_PLAYER_HINT_REQUEST_STRING_1',
       'I18N_PLAYER_HINT_REQUEST_STRING_2',
@@ -46,7 +46,7 @@ export class ExplorationPlayerConstants {
   /* This should match the CSS class defined in the tutor card directive. */
   public static AUDIO_HIGHLIGHT_CSS_CLASS = 'conversation-skin-audio-highlight';
 
-  public static 
+  public static
     FLAG_EXPLORATION_URL_TEMPLATE = '/flagexplorationhandler/<exploration_id>';
 
   // TODO(bhenning): Find a better place for these constants.
