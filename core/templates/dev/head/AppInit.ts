@@ -25,6 +25,8 @@ import { AppConstants } from 'app.constants.ts';
 import { ClassifiersExtensionConstants } from
   'classifiers/classifiers-extension.constants.ts';
 
+import { CollectionSummaryTileConstants } from
+  'components/summary-tile/collection-summary-tile.constants.ts';
 import { StateEditorConstants } from
   'components/state-editor/state-editor.constants.ts';
 
@@ -71,6 +73,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
   providers: [
     AppConstants,
     ClassifiersExtensionConstants,
+    CollectionSummaryTileConstants,
     StateEditorConstants,
     CollectionDomainConstants,
     EditorDomainConstants,

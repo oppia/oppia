@@ -16,8 +16,14 @@
  * @fileoverview Constants for summary tile for collections.
  */
 
-export class CollectionSummaryTileConstants {
-  public static COLLECTION_VIEWER_URL = '/collection/<collection_id>';
-  public static COLLECTION_EDITOR_URL =
-    '/collection_editor/create/<collection_id>';
-}
+import { CollectionSummaryTileConstants } from
+  'components/summary-tile/collection-summary-tile.constants.ts';
+
+var oppia = require('AppInit.ts').module;
+
+oppia.constant(
+  'COLLECTION_VIEWER_URL',
+  CollectionSummaryTileConstants.COLLECTION_VIEWER_URL);
+oppia.constant(
+  'COLLECTION_EDITOR_URL',
+  CollectionSummaryTileConstants.COLLECTION_EDITOR_URL);

@@ -23,7 +23,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
-require('components/summary-tile/collection-summary-tile.constants.ts');
+require('components/summary-tile/collection-summary-tile.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 
