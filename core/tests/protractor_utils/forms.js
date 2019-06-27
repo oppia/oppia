@@ -641,8 +641,8 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
       // We have an empty line in the codemirror panes which is retrived as NULL
-      // in codemirror5 getText() method hence, we needto add an empty line in 
-      // to the textArray to match with compareDict. 
+      // in codemirror5 getText() method hence, we needto add an empty line in
+      // to the textArray to match with compareDict.
       textArray[textArray.length] = '';
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
