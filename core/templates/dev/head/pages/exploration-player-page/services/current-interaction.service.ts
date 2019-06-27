@@ -85,7 +85,6 @@ oppia.factory('CurrentInteractionService', [
         /* This starts the answer submit process, it should be called once the
          * learner presses the "Submit" button.
          */
-        _submitAnswerFn = null;
         if (_submitAnswerFn === null) {
           var additionalInfo = ('\nUndefined submit answer debug logs:' +
             '\nInteraction ID: ' + StateInteractionIdService.savedMemento +
