@@ -27,7 +27,7 @@ require('domain/topic/TopicRightsBackendApiService.ts');
 require('domain/topic/TopicRightsObjectFactory.ts');
 require('services/AlertsService.ts');
 
-require('pages/topic-editor-page/topic-editor-page.constants.ts');
+require('pages/topic-editor-page/topic-editor-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

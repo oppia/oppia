@@ -59,6 +59,8 @@ import { SkillEditorPageConstants } from
   'pages/skill-editor-page/skill-editor-page.constants.ts';
 import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants.ts';
+import { TopicEditorPageConstants } from
+  'pages/topic-editor-page/topic-editor-page.constants.ts';
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
@@ -87,6 +89,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     ReviewTestPageConstants,
     SkillEditorPageConstants,
     StoryEditorPageConstants,
+    TopicEditorPageConstants,
     ServicesConstants
   ]
 })
