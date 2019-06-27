@@ -24,7 +24,6 @@ import { AppConstants } from 'app.constants.ts';
 
 import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
 import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
-import { InteractionSpecsConstants } from 'pages/interaction-specs.constants.ts';
 
 import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
 
