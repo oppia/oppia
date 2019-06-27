@@ -22,25 +22,39 @@ import { StaticProvider } from '@angular/core';
 
 import { AppConstants } from 'app.constants.ts';
 
-import { ClassifiersExtensionConstants } from 'classifiers/classifiers-extension.constants.ts';
+import { ClassifiersExtensionConstants } from
+  'classifiers/classifiers-extension.constants.ts';
 
-import { StateEditorConstants } from 'components/state-editor/state-editor.constants.ts';
+import { StateEditorConstants } from
+  'components/state-editor/state-editor.constants.ts';
 
-import { CollectionDomainConstants } from 'domain/collection/collection-domain.constants.ts';
-import { EditorDomainConstants } from 'domain/editor/editor-domain.constants.ts';
-import { ObjectsDomainConstants } from 'domain/objects/objects-domain.constants.ts';
-import { QuestionDomainConstants } from 'domain/question/question-domain.constants.ts';
+import { CollectionDomainConstants } from
+  'domain/collection/collection-domain.constants.ts';
+import { EditorDomainConstants } from
+  'domain/editor/editor-domain.constants.ts';
+import { ObjectsDomainConstants } from
+  'domain/objects/objects-domain.constants.ts';
+import { QuestionDomainConstants } from
+  'domain/question/question-domain.constants.ts';
 import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
-import { StatisticsDomainConstants } from 'domain/statistics/statistics-domain.constants.ts';
+import { StatisticsDomainConstants } from
+  'domain/statistics/statistics-domain.constants.ts';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
+import { TopicViewerDomainConstants } from
+  'domain/topic_viewer/topic-viewer-domain.constants.ts';
 
 import { AdminPageConstants } from 'pages/admin-page/admin-page.constants.ts';
-import { CreatorDashboardConstants } from 'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
-import { ExplorationPlayerConstants } from 'pages/exploration-player-page/exploration-player-page.constants.ts';
-import { LibraryPageConstants } from 'pages/library-page/library-page.constants.ts';
+import { CreatorDashboardConstants } from
+  'pages/creator-dashboard-page/creator-dashboard-page.constants.ts';
+import { ExplorationPlayerConstants } from
+  'pages/exploration-player-page/exploration-player-page.constants.ts';
+import { LibraryPageConstants } from
+  'pages/library-page/library-page.constants.ts';
 import { ReviewTestPageConstants } from
   'pages/review-test-page/review-test-page.constants.ts';
+import { StoryViewerDomainConstants } from
+  'domain/story_viewer/story-viewer-domain.constants.ts';
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
@@ -60,11 +74,13 @@ import { ServicesConstants } from 'services/services.constants.ts';
     StatisticsDomainConstants,
     StoryDomainConstants,
     TopicDomainConstants,
+    TopicViewerDomainConstants,
     AdminPageConstants,
     CreatorDashboardConstants,
     ExplorationPlayerConstants,
     LibraryPageConstants,
     ReviewTestPageConstants,
+    StoryViewerDomainConstants,
     ServicesConstants
   ]
 })

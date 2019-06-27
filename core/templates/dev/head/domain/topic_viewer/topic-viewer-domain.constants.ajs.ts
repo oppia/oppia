@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for story viewer domain.
+ * @fileoverview Constants for the topic viewer domain.
  */
 
-export class StoryViewerDomainConstants {
-  public static STORY_DATA_URL_TEMPLATE = '/story_data_handler/<story_id>';
+import { TopicViewerDomainConstants } from
+  'domain/topic_viewer/topic-viewer-domain.constants.ts';
+var oppia = require('AppInit.ts').module;
 
-  public static STORY_NODE_COMPLETION_URL_TEMPLATE =
-    '/story_node_completion_handler/<story_id>/<node_id>';
-}
+oppia.constant(
+  'TOPIC_DATA_URL_TEMPLATE',
+  TopicViewerDomainConstants.TOPIC_DATA_URL_TEMPLATE);
