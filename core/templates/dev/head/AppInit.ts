@@ -70,6 +70,8 @@ import { StoryEditorPageConstants } from
   'pages/story-editor-page/story-editor-page.constants.ts';
 import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants.ts';
+import { TopicLandingPageConstants } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts';
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
@@ -103,6 +105,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     SkillEditorPageConstants,
     StoryEditorPageConstants,
     TopicEditorPageConstants,
+    TopicLandingPageConstants,
     ServicesConstants
   ]
 })
