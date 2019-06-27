@@ -44,13 +44,11 @@ oppia.directive('questionsList', [
       scope: {},
       bindToController: {
         getSkill: '&skill',
-        getTopicId: '&topicId',
         getQuestionSummaries: '=',
         fetchQuestionSummaries: '=',
         isLastPage: '=isLastQuestionBatch',
         getAllSkillSummaries: '&allSkillSummaries',
         canEditQuestion: '&',
-        getQuestionSuggestionThreads: '&questionSuggestionThreads'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/question-directives/questions-list/' +
@@ -88,15 +86,12 @@ oppia.directive('questionsList', [
                   return summary;
                 });
             }
-            ctrl.activeQuestion = null;
             ctrl.questionIsBeingUpdated = false;
             ctrl.misconceptions = [];
             if (ctrl.getSkill()) {
               ctrl.misconceptions = ctrl.getSkill().getMisconceptions();
               ctrl.skillId = ctrl.getSkill().getId();
               ctrl.entityId = ctrl.skillId;
-            } else {
-              ctrl.entityId = ctrl.getTopicId();
             }
           };
 
@@ -329,99 +324,6 @@ oppia.directive('questionsList', [
 
             modalInstance.result.then(function() {
               ctrl.saveAndPublishQuestion();
-            });
-          };
-
-          ctrl.setActiveQuestion = function(questionSuggestionThread) {
-            if (questionSuggestionThread.getSuggestionStatus() === 'review') {
-              ctrl.activeQuestion = (
-                questionSuggestionThread.suggestion.question);
-              ctrl.idOfActiveSuggestion = (
-                questionSuggestionThread.suggestion.suggestionId);
-            }
-          };
-
-          ctrl.clearActiveQuestion = function() {
-            ctrl.activeQuestion = null;
-            ctrl.idOfActiveSuggestion = null;
-            ctrl.suggestionReviewMessage = null;
-          };
-
-          ctrl.showSelectSkillModal = function() {
-            var allSkillSummaries = ctrl.getAllSkillSummaries();
-            $uibModal.open({
-              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/topic-editor-page/modal-templates/' +
-                'select-skill-modal.template.html'),
-              backdrop: true,
-              controller: [
-                '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {
-                  $scope.selectedSkillId = null;
-                  $scope.skillSummaries = allSkillSummaries;
-
-                  $scope.selectSkill = function(skillId) {
-                    $scope.selectedSkillId = skillId;
-                  };
-
-                  $scope.done = function() {
-                    $uibModalInstance.close({
-                      skillId: $scope.selectedSkillId
-                    });
-                  };
-
-                  $scope.cancel = function() {
-                    $uibModalInstance.dismiss('cancel');
-                  };
-                }
-              ]
-            }).result.then(function(res) {
-              ctrl.selectedSkillId = res.skillId;
-              EditableSkillBackendApiService.fetchSkill(res.skillId).then(
-                function(skillDict) {
-                  ctrl.misconceptions = skillDict.misconceptions.map(function(
-                      misconceptionsBackendDict) {
-                    return MisconceptionObjectFactory.createFromBackendDict(
-                      misconceptionsBackendDict);
-                  });
-                }, function(error) {
-                  AlertsService.addWarning();
-                });
-            });
-          };
-
-          ctrl.acceptQuestion = function(suggestionId, reviewMessage) {
-            var suggestionActionHandlerUrl = (
-              UrlInterpolationService.interpolateUrl(
-                '/suggestionactionhandler/topic/<topic_id>/<suggestion_id>', {
-                  topic_id: ctrl.getTopicId(),
-                  suggestion_id: suggestionId
-                }));
-            $http.put(suggestionActionHandlerUrl, {
-              action: 'accept',
-              skill_id: ctrl.selectedSkillId,
-              commit_message: 'unused_commit_message',
-              review_message: reviewMessage
-            }).then(function() {
-              ctrl.clearActiveQuestion();
-              $window.location.reload();
-            });
-          };
-
-          ctrl.rejectQuestion = function(suggestionId, reviewMessage) {
-            var suggestionActionHandlerUrl = (
-              UrlInterpolationService.interpolateUrl(
-                '/suggestionactionhandler/topic/<topic_id>/<suggestion_id>', {
-                  topic_id: ctrl.getTopicId(),
-                  suggestion_id: suggestionId
-                }));
-            $http.put(suggestionActionHandlerUrl, {
-              action: 'reject',
-              commit_message: 'unused_commit_message',
-              review_message: reviewMessage
-            }).then(function() {
-              ctrl.clearActiveQuestion();
-              $window.location.reload();
             });
           };
 
