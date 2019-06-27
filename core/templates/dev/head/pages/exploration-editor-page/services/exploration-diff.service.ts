@@ -16,7 +16,8 @@
  * @fileoverview Service for computing diffs of explorations.
  */
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

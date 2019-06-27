@@ -66,7 +66,8 @@ require('services/AlertsService.ts');
 require('services/EditabilityService.ts');
 require('services/ExplorationFeaturesService.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

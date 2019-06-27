@@ -20,6 +20,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { StaticProvider } from '@angular/core';
 
+/* eslint-disable max-len */
 import { AppConstants } from 'app.constants.ts';
 
 import { ClassifiersExtensionConstants } from
@@ -47,11 +48,8 @@ import { StoryViewerDomainConstants } from
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants.ts';
-import {
-  TopicsAndSkillsDashboardDomainConstants
-} from
-'domain/topics_and_skills_dashboard/\
-topics-and-skills-dashboard-domain.constants.ts';
+import { TopicsAndSkillsDashboardDomainConstants } from
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants.ts';
 
 import { InteractionsExtensionsConstants } from
   'interactions/interactions-extension.constants.ts';
@@ -81,13 +79,11 @@ import { TopicEditorPageConstants } from
   'pages/topic-editor-page/topic-editor-page.constants.ts';
 import { TopicLandingPageConstants } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts';
-import {
-  TopicsAndSkillsDashboardPageConstants
-} from
-'pages/topics-and-skills-dashboard-page/\
-topics-and-skills-dashboard-page.constants.ts';
+import { TopicsAndSkillsDashboardPageConstants } from
+  'pages/topics-and-skills-dashboard-page/topics-and-skills-dashboard-page.constants.ts';
 
 import { ServicesConstants } from 'services/services.constants.ts';
+/* eslint-enable max-len */
 
 @NgModule({
   imports: [

@@ -16,11 +16,10 @@
  * @fileoverview Constants for topics and skills dashboard domain.
  */
 
-import {
-  TopicsAndSkillsDashboardDomainConstants
-} from
-'domain/topics_and_skills_dashboard/\
-topics-and-skills-dashboard-domain.constants.ts';
+/* eslint-disable max-len */
+import { TopicsAndSkillsDashboardDomainConstants } from
+  'domain/topics_and_skills_dashboard/topics-and-skills-dashboard-domain.constants.ts';
+/* eslint-enable max-len */
 
 var oppia = require('AppInit.ts').module;
 

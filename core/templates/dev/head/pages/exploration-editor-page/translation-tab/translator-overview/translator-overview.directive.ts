@@ -26,7 +26,8 @@ require(
   'pages/exploration-editor-page/translation-tab/services/' +
   'translation-status.service.ts');
 
-require('pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
+require(
+  'pages/exploration-editor-page/exploration-editor-page.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;
 

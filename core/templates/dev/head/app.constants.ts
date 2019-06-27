@@ -145,3 +145,5 @@ export class AppConstants {
   public static COLLECTION_DATA_URL_TEMPLATE =
     '/collection_handler/data/<collection_id>';
 }
+
+Object.assign(AppConstants, constants);
