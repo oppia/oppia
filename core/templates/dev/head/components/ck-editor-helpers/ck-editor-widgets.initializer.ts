@@ -26,10 +26,10 @@ require('services/HtmlEscaperService.ts');
 require('services/RteHelperService.ts');
 
 oppia.run([
-  '$timeout', '$compile', '$injector', '$rootScope', '$uibModal', 'RteHelperService',
-  'HtmlEscaperService',
-  function($timeout, $compile, $injector, $rootScope, $uibModal, RteHelperService,
-      HtmlEscaperService) {
+  '$timeout', '$compile', '$injector', '$rootScope', '$uibModal',
+  'RteHelperService', 'HtmlEscaperService',
+  function($timeout, $compile, $injector, $rootScope, $uibModal,
+    RteHelperService, HtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
@@ -83,11 +83,11 @@ oppia.run([
                 customizationArgSpecs,
                 customizationArgs,
                 function(customizationArgsDict) {
-                /* 'ExplorationStatesService', 'ExplorationImageCounterService' and
+                /* 'ExplorationStatesService', 'ExplorationImageCounterService'
                  * are not imported at the time of initializing of CKEditor
                  * because this services are of editor-page not of learner-page.
                  * So this services should only be imported at editor learner
-                 * page otherwise it leads to error. 
+                 * page otherwise it leads to error.
                  */
                   // Generating and adding imageId for image tag.
                   if (ckName === IMAGE_TAG_NAME) {
@@ -98,7 +98,6 @@ oppia.run([
 
                     var imageSrc = customizationArgsDict.filepath;
                     imageId = ExplorationImageCounterService.getImageId();
-                    console.log(imageId)
                     var image = {
                       image_id: imageId,
                       image_info: {

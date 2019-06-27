@@ -449,8 +449,8 @@ oppia.factory('ExplorationEngineService', [
         return answerIsBeingProcessed;
       },
       currentStateName: function() {
-        if (PlayerPositionService.getCurrentStateName() != currentStateName) {
-          return PlayerPositionService.getCurrentStateName()
+        if (PlayerPositionService.getCurrentStateName() !== currentStateName) {
+          return PlayerPositionService.getCurrentStateName();
         }
         return nextStateName;
       },

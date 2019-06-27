@@ -98,7 +98,7 @@ oppia.directive('oppiaNoninteractiveImage', [
            * imported at the time of initializing of OppiaNoninteractiveImage
            * directive because this services are of editor-page not of
            * learner-page. So this services should only be imported at editor
-           * page not at learner page otherwise it leads to error. 
+           * page not at learner page otherwise it leads to error.
            */
           var ExplorationStatesService = (
             $injector.get('ExplorationStatesService'));
