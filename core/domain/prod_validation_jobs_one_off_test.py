@@ -197,10 +197,25 @@ class MockSnapshotMetadataModelValidator(
         }
 
 
-class NotImplementedErrorTests(test_utils.GenericTestBase):
+class MockBaseUserModelValidator(
+        prod_validation_jobs_one_off.BaseUserModelValidator):
+
+    @classmethod
+    def _get_external_id_relationships(cls, item):
+        return {}
+
+    @classmethod
+    def _get_custom_validation_functions(cls):
+        return [
+            cls._validate_common_properties_do_not_match,
+            cls._validate_explorations_are_public,
+            cls._validate_collections_are_public]
+
+
+class BaseValidatorTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        super(NotImplementedErrorTests, self).setUp()
+        super(BaseValidatorTests, self).setUp()
         self.item = MockModel(id='mockmodel')
         self.item.put()
 
@@ -229,6 +244,11 @@ class NotImplementedErrorTests(test_utils.GenericTestBase):
             jobs_registry, 'ONE_OFF_JOB_MANAGERS', [job_class]):
             job_id = job_class.create_new()
             job_class.enqueue(job_id)
+
+    def test_no_error_is_raised_for_base_user_model(self):
+        user = MockModel(id='12345')
+        user.put()
+        MockBaseUserModelValidator().validate(user)
 
 
 class ActivityReferencesModelValidatorTests(test_utils.GenericTestBase):
@@ -12914,6 +12934,22 @@ class UserSettingsModelValidatorTests(test_utils.GenericTestBase):
             ) % (
                 self.user_id,
                 self.model_instance_0.last_created_an_exploration),
+            u'[u\'fully-validated UserSettingsModel\', 2]']
+        run_job_and_check_output(self, expected_output, sort=True)
+
+    def test_invalid_first_contribution_msec(self):
+        self.model_instance_0.first_contribution_msec = (
+            utils.get_current_time_in_millisecs() * 10)
+        self.model_instance_0.put()
+        expected_output = [
+            (
+                u'[u\'failed validation check for first contribution '
+                'check of UserSettingsModel\', '
+                '[u\'Entity id %s: Value for first contribution msec: %s '
+                'is greater than the time when job was run\']]'
+            ) % (
+                self.user_id,
+                self.model_instance_0.first_contribution_msec),
             u'[u\'fully-validated UserSettingsModel\', 2]']
         run_job_and_check_output(self, expected_output, sort=True)
 
