@@ -104,7 +104,7 @@ require(
   'pages/skill-editor-page/navbar/skill-editor-navbar-breadcrumb.directive.ts');
 require('pages/skill-editor-page/questions-tab/questions-tab.directive.ts');
 
-require('pages/skill-editor-page/skill-editor-page.constants.ts');
+require('pages/skill-editor-page/skill-editor-page.constants.ajs.ts');
 require('pages/interaction-specs.constants.ajs.ts');
 
 var oppia = require('AppInit.ts').module;

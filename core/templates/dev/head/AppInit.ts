@@ -40,6 +40,8 @@ import { SkillDomainConstants } from 'domain/skill/skill-domain.constants.ts';
 import { StatisticsDomainConstants } from
   'domain/statistics/statistics-domain.constants.ts';
 import { StoryDomainConstants } from 'domain/story/story-domain.constants.ts';
+import { StoryViewerDomainConstants } from
+  'domain/story_viewer/story-viewer-domain.constants.ts';
 import { TopicDomainConstants } from 'domain/topic/topic-domain.constants.ts';
 import { TopicViewerDomainConstants } from
   'domain/topic_viewer/topic-viewer-domain.constants.ts';
@@ -53,8 +55,8 @@ import { LibraryPageConstants } from
   'pages/library-page/library-page.constants.ts';
 import { ReviewTestPageConstants } from
   'pages/review-test-page/review-test-page.constants.ts';
-import { StoryViewerDomainConstants } from
-  'domain/story_viewer/story-viewer-domain.constants.ts';
+import { SkillEditorPageConstants } from
+  'pages/skill-editor-page/skill-editor-page.constants.ts';
 
 import { ServicesConstants } from 'services/services.constants.ts';
 
@@ -73,6 +75,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     SkillDomainConstants,
     StatisticsDomainConstants,
     StoryDomainConstants,
+    StoryViewerDomainConstants,
     TopicDomainConstants,
     TopicViewerDomainConstants,
     AdminPageConstants,
@@ -80,7 +83,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     ExplorationPlayerConstants,
     LibraryPageConstants,
     ReviewTestPageConstants,
-    StoryViewerDomainConstants,
+    SkillEditorPageConstants,
     ServicesConstants
   ]
 })
