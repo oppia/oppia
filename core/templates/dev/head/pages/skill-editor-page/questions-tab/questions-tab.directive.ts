@@ -47,15 +47,14 @@ oppia.directive('questionsTab', [
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService',
-        'NUM_QUESTIONS_PER_PAGE', function(
+        'QuestionUndoRedoService', 'UndoRedoService', 'NUM_QUESTIONS_PER_PAGE',
+        function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             SkillEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService,
-            NUM_QUESTIONS_PER_PAGE) {
+            QuestionUndoRedoService, UndoRedoService, NUM_QUESTIONS_PER_PAGE) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.getQuestionSummaries =
             SkillEditorStateService.getQuestionSummaries;
