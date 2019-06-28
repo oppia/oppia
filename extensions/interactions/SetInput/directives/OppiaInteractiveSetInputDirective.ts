@@ -26,8 +26,6 @@ require(
   'pages/exploration-player-page/services/current-interaction.service.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('oppiaInteractiveSetInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

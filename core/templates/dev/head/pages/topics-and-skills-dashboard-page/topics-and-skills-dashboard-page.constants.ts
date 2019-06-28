@@ -16,8 +16,6 @@
  * @fileoverview Constants for the topics and skills dashboard.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.constant(
   'EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
 

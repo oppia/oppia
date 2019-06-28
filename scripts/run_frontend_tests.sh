@@ -51,12 +51,6 @@ export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
 export DEFAULT_RUN_MINIFIED_TESTS=false
 maybeInstallDependencies "$@"
 
-# The following command finds all the spec files (except known failing files)
-# and merges them all to a single file which Karma uses to run its tests. The
-# Karma is unable to run the tests on multiple files and the DI fails in that
-# case, the reason of which is unclear.
-find . -type f \( -name "*.spec.ts" -o -name "*Spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/combined-tests.spec.ts
-
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"
 echo ""
@@ -78,8 +72,5 @@ if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
   $PYTHON_CMD scripts/build.py --prod_env --minify_third_party_libs_only
   $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.ts --prodEnv
 fi
-
-# The following command removes the file formed by combining the spec files.
-rm ./core/templates/dev/head/combined-tests.spec.ts
 
 echo Done!

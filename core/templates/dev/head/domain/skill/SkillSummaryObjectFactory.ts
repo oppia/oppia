@@ -17,8 +17,6 @@
  * skill summary domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('SkillSummaryObjectFactory', [
   function() {
     var SkillSummary = function(skillId, skillDescription) {

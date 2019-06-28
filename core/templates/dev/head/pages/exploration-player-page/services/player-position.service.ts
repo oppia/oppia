@@ -19,8 +19,6 @@
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('services/ContextService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('PlayerPositionService', [
   'ContextService', 'PlayerTranscriptService', function(
       ContextService, PlayerTranscriptService) {

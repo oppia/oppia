@@ -16,8 +16,6 @@
  * @fileoverview Utility service for the review tests.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ReviewTestEngineService', [
   function() {
     return {

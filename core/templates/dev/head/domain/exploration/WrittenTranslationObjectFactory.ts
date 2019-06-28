@@ -17,8 +17,6 @@
  * WrittenTranslation domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('WrittenTranslationObjectFactory', [function() {
   var WrittenTranslation = function(html, needsUpdate) {
     this.html = html;

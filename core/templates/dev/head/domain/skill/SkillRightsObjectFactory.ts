@@ -17,8 +17,6 @@
  * skill rights domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('SkillRightsObjectFactory', [
   function() {
     var SkillRights = function(

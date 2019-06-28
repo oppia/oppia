@@ -16,7 +16,5 @@
  * @fileoverview Directive scripts for landing page.
  */
 
-require('App.ts');
-
 require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.controller.ts');

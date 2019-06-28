@@ -17,8 +17,6 @@
    args.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.filter('isAtMost', [function() {
   return function(input, args) {
     return (input <= args.maxValue);

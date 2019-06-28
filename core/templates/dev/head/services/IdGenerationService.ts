@@ -16,8 +16,6 @@
  * @fileoverview Service for generating random IDs.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('IdGenerationService', [function() {
   return {
     generateNewId: function() {

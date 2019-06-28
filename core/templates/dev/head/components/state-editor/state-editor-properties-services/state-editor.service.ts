@@ -21,8 +21,6 @@ require(
   'pages/exploration-editor-page/editor-tab/services/' +
   'solution-validity.service.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('StateEditorService', [
   '$log', 'SolutionValidityService',
   function(

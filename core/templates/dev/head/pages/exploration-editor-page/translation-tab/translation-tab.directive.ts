@@ -48,8 +48,6 @@ require(
 require('services/ContextService.ts');
 require('services/EditabilityService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('translationTab', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {

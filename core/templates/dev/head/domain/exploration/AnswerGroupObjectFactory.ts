@@ -20,8 +20,6 @@
 require('domain/exploration/OutcomeObjectFactory.ts');
 require('domain/exploration/RuleObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('AnswerGroupObjectFactory', [
   'OutcomeObjectFactory', 'RuleObjectFactory',
   function(OutcomeObjectFactory, RuleObjectFactory) {
