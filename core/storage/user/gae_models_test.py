@@ -408,13 +408,11 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
         super(UserSubscriptionsModelTests, self).setUp()
         user_models.UserSubscriptionsModel(id=self.USER_ID_1).put()
 
-        user_model_2 = user_models.UserSubscriptionsModel(id=self.USER_ID_2)
-        user_model_2.creator_ids = self.CREATOR_IDS
-        user_model_2.collection_ids = self.COLLECTION_IDS
-        user_model_2.activity_ids = self.ACTIVITY_IDS
-        user_model_2.general_feedback_thread_ids = (
-            self.GENERAL_FEEDBACK_THREAD_IDS)
-        user_models.UserSubscriptionsModel.put(user_model_2)
+        user_models.UserSubscriptionsModel(
+            id=self.USER_ID_2, creator_ids=self.CREATOR_IDS,
+            collection_ids=self.COLLECTION_IDS,
+            activity_ids=self.ACTIVITY_IDS,
+            general_feedback_thread_ids=self.GENERAL_FEEDBACK_THREAD_IDS).put()
 
     def test_export_data_trivial(self):
         """Test if empty user data is properly exported."""

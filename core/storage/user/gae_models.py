@@ -333,7 +333,14 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
     @staticmethod
     def export_data(user_id):
-        """Export UserSubscriptionsModel data."""
+        """Export UserSubscriptionsModel data as dict for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of data from UserSubscriptionsModel.
+        """
         user_model = UserSubscriptionsModel.get(user_id, strict=False)
 
         if user_model is None:
