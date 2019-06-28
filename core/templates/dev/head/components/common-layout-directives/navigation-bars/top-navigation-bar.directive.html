@@ -1,4 +1,4 @@
-<div class="navbar-header protractor-test-navbar-header float-left">
+<div class="navbar-header protractor-test-navbar-header pull-left">
   <a ng-if="$ctrl.windowIsNarrow" ng-click="$ctrl.toggleSidebar()"
      class="navbar-brand oppia-navbar-menu oppia-transition-200 protractor-mobile-test-navbar-button"
      tabindex="0">
@@ -17,7 +17,7 @@
   </a>
 </div>
 
-<div ng-cloak class="navbar-header float-right" ng-if="$ctrl.userMenuIsShown">
+<div ng-cloak class="navbar-header pull-right" ng-if="$ctrl.userMenuIsShown">
   <ul class="nav oppia-navbar-nav" ng-if="$ctrl.standardNavIsShown">
     <ul ng-if="$ctrl.windowIsNarrow" class="nav oppia-navbar-tabs-narrow">
       <create-activity-button></create-activity-button>
