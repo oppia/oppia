@@ -575,7 +575,7 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     // if scrollTo is too large.
     browser.executeScript(
       '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
-      '.scrollTop(' + String(scrollTo) + ');');
+      '().scrollTop(' + String(scrollTo) + ');');
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
         .then(function(lineNumber) {
@@ -634,14 +634,14 @@ var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
     // if scrollTo is too large.
     browser.executeScript(
       '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
-      '.scrollTop(' + String(scrollTo) + ');');
+      '().scrollTop(' + String(scrollTo) + ');');
     elem.getText().then(function(text) {
       // The 'text' arg is a string 2n lines long representing n lines of text
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
       // We have an empty line in the codemirror panes which is retrived as NULL
-      // in codemirror5 getText() method hence, we needto add an empty line in
+      // in codemirror5 getText() method hence, we have to add an empty line in
       // to the textArray to match with compareDict.
       textArray[textArray.length] = '';
       for (var i = 0; i < textArray.length; i += 2) {

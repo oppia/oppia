@@ -202,11 +202,11 @@ var ExplorationEditorHistoryTab = function() {
       expectTextToMatch: function(v1StateContents, v2StateContents) {
         forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).first(),
-          'first()'
+          'first'
         ).expectTextToBe(v1StateContents);
         forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).last(),
-          'last()'
+          'last'
         ).expectTextToBe(v2StateContents);
       },
       /*
@@ -224,11 +224,11 @@ var ExplorationEditorHistoryTab = function() {
           v1StateContents, v2StateContents) {
         forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).first(),
-          'first()'
+          'first'
         ).expectTextWithHighlightingToBe(v1StateContents);
         forms.CodeMirrorChecker(
           element.all(by.css('.CodeMirror-code')).last(),
-          'last()'
+          'last'
         ).expectTextWithHighlightingToBe(v2StateContents);
       }
     };
