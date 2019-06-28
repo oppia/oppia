@@ -72,11 +72,11 @@ var oppia = angular.module(
     downgradedModule
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []))
-    .directive(
-      'serviceBootstrap',
-      downgradeComponent({
-        component: ServiceBootstrapComponent
-      }) as angular.IDirectiveFactory);
+  .directive(
+    'serviceBootstrap',
+    downgradeComponent({
+      component: ServiceBootstrapComponent
+    }) as angular.IDirectiveFactory);
 
 oppia.factory(
   'ExplorationFeaturesService',

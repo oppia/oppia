@@ -22,7 +22,7 @@ require('services/PlaythroughService.ts');
 
 describe('PlaythroughService', function() {
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.module(function($provide){
+  beforeEach(angular.mock.module(function($provide) {
     $provide.value('ExplorationFeaturesService', {
       isPlaythroughRecordingEnabled: function() {
         return false;

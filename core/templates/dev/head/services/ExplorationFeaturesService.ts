@@ -26,7 +26,7 @@ export class ExplorationFeaturesService {
     isPlaythroughRecordingEnabled: false,
     areParametersEnabled: false
   }
-  
+
   init(explorationData, featuresData) {
     ExplorationFeaturesService.settings.isImprovementsTabEnabled =
       featuresData.is_improvements_tab_enabled;
@@ -56,4 +56,4 @@ export class ExplorationFeaturesService {
   enableParameters() {
     ExplorationFeaturesService.settings.areParametersEnabled = true;
   }
-};
+}
