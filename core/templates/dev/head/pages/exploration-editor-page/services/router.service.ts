@@ -24,6 +24,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 
+require('app-services.scripts.ts');
+
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('RouterService', [
