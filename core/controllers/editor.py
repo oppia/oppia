@@ -784,19 +784,19 @@ class LearnerAnswerDetailsHandler(EditorHandler):
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_exploration
-    def get(self, exp_id):
+    def get(self, exploration_id):
         state_name = self.request.get('state_name')
         if not state_name:
             raise self.PageNotFoundException
 
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         state_reference = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) #pylint: disable=line-too-long
-        learner_answer_details_list = stats_services.get_learner_answer_details(
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exploration_id, state_name)) #pylint: disable=line-too-long
+        learner_answer_details = stats_services.get_learner_answer_details(
             entity_type, state_reference)
-        learner_answer_details_dict_list = [learner_answer_details.to_dict()
-                                            for learner_answer_details in
-                                            learner_answer_details_list]
+        learner_answer_info_dict_list = [
+            learner_answer_info.to_dict() for learner_answer_info in
+            learner_answer_details.learner_answer_info_list]
         self.render_json({
-            'learner_answer_details_dict_list': learner_answer_details_dict_list
+            'learner_answer_info_dict_list': learner_answer_info_dict_list
         })

@@ -2458,6 +2458,12 @@ class LearnerAnswerDetailsHandlerTests(BaseEditorControllerTests):
         stats_services.record_learner_answer_info(
             entity_type, state_reference, interaction_id,
             answer, answer_details)
-        learner_answer_details = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, exp_id))
-        self.assertEqual(learner_answer_details, None)
+        learner_answer_details = stats_services.get_learner_answer_details(
+            entity_type, state_reference)
+        learner_answer_info_dict_list = {'learner_answer_info_dict_list': [
+            learner_answer_info.to_dict() for learner_answer_info in
+            learner_answer_details.learner_answer_info_list]}
+        response = self.get_json(
+            '%s/%s?state_name=%s' % (
+                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, exp_id, state_name))
+        self.assertEqual(response, learner_answer_info_dict_list)
