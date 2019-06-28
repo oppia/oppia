@@ -17,3 +17,7 @@
  */
 
 oppia.constant('REVIEW_TEST_DATA_URL', '/review_test_handler/data/<story_id>');
+
+oppia.constant('REVIEW_TESTS_URL', '/review_test/<story_id>');
+
+oppia.constant('STORY_VIEWER_PAGE', '/story/<story_id>');

@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="oppia-question-player-body">
-      <conversation-skin question-player-config="$ctrl.getQuestionPlayerConfig()"></conversation-skin>
+      <conversation-skin question-player-config="$ctrl.questionPlayerConfig"></conversation-skin>
       <attribution-guide></attribution-guide>
     </div>
   </div>
@@ -17,13 +17,41 @@
   <!-- Results Page -->
   <div class="oppia-question-player-results" ng-if="resultsLoaded">
     <div class="oppia-question-player-card question-player-results-header">
-      <h3 class="oppia-question-player-header"> Test Complete. Well Done! </h3>
+      <h3 class="oppia-question-player-header" ng-if="$ctrl.passTest"> Test Complete. Well Done! </h3>
+      <h3 class="oppia-question-player-header" ng-if="!$ctrl.passTest"> Test Failed. </h3>
       <score-ring score="$ctrl.totalScore"></score-ring>
-      <h4 class="learn-more"> Learn more about your score </h4>
     </div>
+
+    <div class="oppia-question-player-card question-player-skills-results">
+      <h3 class="oppia-question-player-header"> Learn more about your score </h3>
+      <table class="skill-score-table">
+        <colgroup>
+          <col style="width: 50%;">
+          <col style="width: 50%">
+        </colgroup>
+        <tr>
+          <th class="skill-score-table-headings">
+            <p> Skill Descriptions </p>
+          </th>
+          <th class="skill-score-table-headings">
+            <p> Score </p>
+          </th>
+        </tr>
+        <tr ng-repeat="scorePerSkill in $ctrl.scorePerSkillMapping">
+          <td> {{scorePerSkill.description}} </td>
+          <td>
+            <div class="oppia-score-per-skill">
+              <div class="score-bar" style="width: <[$ctrl.getScorePercentage(scorePerSkill)]>%; background: <[$ctrl.getColorForScore(scorePerSkill)]>"></div>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <button class="btn btn-default" ng-if="!$ctrl.passTest"> Review and Retry </button>
+    </div>
+
     <div class="oppia-question-player-card question-player-results-footer"
          ng-if="$ctrl.showActionButtonsFooter()">
-      <span data-ng-repeat="actionButton in $ctrl.getQuestionPlayerConfig().resultActionButtons"
+      <span data-ng-repeat="actionButton in $ctrl.questionPlayerConfig.resultActionButtons"
             ng-click="$ctrl.performAction(actionButton)">
         <div class="action-button <[$ctrl.getActionButtonOuterClass(actionButton.type)]>">
           <div class="action-button-inner <[$ctrl.getActionButtonInnerClass(actionButton.type)]>">
@@ -151,6 +179,39 @@
 
   .oppia-question-player-container .question-player-results-header {
     height: 350px;
+  }
+
+  .oppia-question-player-container .question-player-skills-results {
+    height: auto;
+    padding-bottom: 16px;
+  }
+
+  .question-player-skills-results .skill-score-table {
+    font-size: 15px;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+
+  .skill-score-table .skill-score-table-headings {
+    padding-bottom: 0.5em;
+    text-align: center;
+  }
+
+  .skill-score-table .skill-score-table-headings p {
+    display: inline;
+  }
+
+  .skill-score-table .oppia-score-per-skill {
+    height: 10px;
+    background: #FFFFFF;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    box-sizing: border-box;
+    margin: 10px 25px 0px;
+  }
+
+  .oppia-score-per-skill .score-bar {
+    height: 8px;
   }
 
   .oppia-question-player-container .question-player-results-footer {

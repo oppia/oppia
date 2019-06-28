@@ -22,7 +22,10 @@ require(
 require(
   'components/question-directives/question-player/' +
   'question-player.directive.ts');
+
+require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
+
 require('pages/interaction-specs.constants.ts');
 require('pages/review-test-page/review-test-page.constants.ts');
 require('pages/review-test-page/review-test-engine.service.ts');
@@ -41,11 +44,13 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
     controller: [
       '$http', '$rootScope', 'AlertsService', 'ReviewTestEngineService',
       'UrlInterpolationService', 'UrlService',
-      'FATAL_ERROR_CODES', 'REVIEW_TEST_DATA_URL',
+      'FATAL_ERROR_CODES', 'REVIEW_TEST_DATA_URL', 'REVIEW_TESTS_URL',
+      'STORY_VIEWER_PAGE',
       function(
           $http, $rootScope, AlertsService, ReviewTestEngineService,
           UrlInterpolationService, UrlService,
-          FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL
+          FATAL_ERROR_CODES, REVIEW_TEST_DATA_URL, REVIEW_TESTS_URL,
+          STORY_VIEWER_PAGE
       ) {
         var ctrl = this;
         ctrl.storyId = UrlService.getStoryIdFromUrl();
@@ -54,6 +59,14 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
         var _fetchSkillDetails = function() {
           var reviewTestsDataUrl = UrlInterpolationService.interpolateUrl(
             REVIEW_TEST_DATA_URL, {
+              story_id: ctrl.storyId
+            });
+          var reviewTestsUrl = UrlInterpolationService.interpolateUrl(
+            REVIEW_TESTS_URL, {
+              story_id: ctrl.storyId
+            });
+          var storyViewerUrl = UrlInterpolationService.interpolateUrl(
+            STORY_VIEWER_PAGE, {
               story_id: ctrl.storyId
             });
           $http.get(reviewTestsDataUrl).then(function(result) {
@@ -65,6 +78,22 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
                 result.data.skills_with_description[skillId]);
             }
             var questionPlayerConfig = {
+              resultActionButtons: [
+                {
+                  type: 'BOOST_SCORE',
+                  text: 'Boost My Score'
+                },
+                {
+                  type: 'RETRY_SESSION',
+                  text: 'New Test',
+                  url: reviewTestsUrl
+                },
+                {
+                  type: 'DASHBOARD',
+                  text: 'Return To Story',
+                  url: storyViewerUrl
+                }
+              ],
               skillList: skillList,
               skillDescriptions: skillDescriptions,
               questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
