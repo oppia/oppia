@@ -16,8 +16,6 @@
  * @fileoverview RemoveDuplicatesInArray filter for Oppia.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.filter('removeDuplicatesInArray', [function() {
   return function(input) {
     if (!input.filter) {

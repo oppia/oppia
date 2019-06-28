@@ -16,6 +16,4 @@
  * @fileoverview Directives required in story viewer.
  */
 
-require('App.ts');
-
 require('pages/story-viewer-page/story-viewer-page.directive.ts');

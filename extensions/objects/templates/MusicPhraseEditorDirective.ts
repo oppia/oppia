@@ -18,8 +18,6 @@
 
 // This directive is always editable.
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('musicPhraseEditor', [
   'AlertsService', 'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(AlertsService, UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {

@@ -16,8 +16,6 @@
  * @fileoverview Factory for navigating the top navigation bar with
  * tab and shift-tab.
  */
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('NavigationService', [function() {
   var navigation = {
     activeMenuName: '',

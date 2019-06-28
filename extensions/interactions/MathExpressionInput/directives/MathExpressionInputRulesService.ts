@@ -16,8 +16,6 @@
  * @fileoverview Rules service for the interaction.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('MathExpressionInputRulesService', [function() {
   return {
     IsMathematicallyEquivalentTo: function(answer, inputs) {

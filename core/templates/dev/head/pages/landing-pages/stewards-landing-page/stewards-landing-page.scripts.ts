@@ -16,8 +16,6 @@
  * @fileoverview Directive scripts for the stewards landing page.
  */
 
-require('App.ts');
-
 require(
   'pages/landing-pages/stewards-landing-page/' +
   'stewards-landing-page.controller.ts');

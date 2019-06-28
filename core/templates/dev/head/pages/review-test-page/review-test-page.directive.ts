@@ -29,8 +29,6 @@ require('pages/review-test-page/review-test-engine.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

@@ -19,8 +19,6 @@
 
 require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('StoryPlaythroughObjectFactory', [
   'ReadOnlyStoryNodeObjectFactory', function(ReadOnlyStoryNodeObjectFactory) {
     // Stores information about a current playthrough of a story for a
