@@ -1777,7 +1777,8 @@ def can_edit_skill(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
+        skill_rights = skill_services.get_skill_rights(
+            skill_id, strict=False)
         if skill_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 

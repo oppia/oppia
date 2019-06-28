@@ -189,6 +189,16 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
+    def test_post_with_too_many_skills_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        skill_ids = [1, 2, 3, 4]
+        self.post_json(
+            '%s/%s' % (feconf.NEW_QUESTION_URL, skill_ids),
+            {}, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
 
 class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
     """Tests link and unlink question from skills."""
@@ -198,6 +208,9 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         super(QuestionSkillLinkHandlerTest, self).setUp()
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, self.editor_id,
@@ -235,14 +248,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ), {}, csrf_token=csrf_token)
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id)
         self.assertEqual(
-            skill_descriptions[0], 'Skill Description')
+            grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
     def test_post_with_topic_manager_email_allows_question_linking(self):
@@ -254,12 +267,13 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ), {}, csrf_token=csrf_token)
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(question_summaries[0].id, self.question_id)
-        self.assertEqual(skill_descriptions[0], 'Skill Description')
+        self.assertEqual(
+            grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
     def test_delete_with_non_admin_or_topic_manager_disallows_access(self):
@@ -282,14 +296,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ))
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id_2)
         self.assertEqual(
-            skill_descriptions[0], 'Skill Description')
+            grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
     def test_delete_with_topic_manager_email_allows_question_deletion(self):
@@ -303,14 +317,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ))
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id_2)
         self.assertEqual(
-            skill_descriptions[0], 'Skill Description')
+            grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
 

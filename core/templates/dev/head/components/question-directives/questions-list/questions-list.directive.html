@@ -16,17 +16,17 @@
     <th class="dashboard-table-headings">
       <p> Question Content </p>
     </th>
-    <th class="dashboard-table-headings" ng-if="!$ctrl.getSkill()">
+    <th class="dashboard-table-headings" ng-if="$ctrl.skillDescriptionsAreShown()">
       <p> Skill Description </p>
     </th>
   </tr>
-  <tr ng-repeat="question in $ctrl.questionSummaries"
+  <tr ng-repeat="questionSummary in $ctrl.questionSummaries"
       class="list-item protractor-test-question-list-item"
       style="height: 4em;"
-      ng-click="$ctrl.editQuestion(question.summary)">
+      ng-click="$ctrl.editQuestion(questionSummary.summary)">
     <td> <[$ctrl.getQuestionIndex($index)]> </td>
     <td> <[$ctrl.truncatedQuestionSummaries[$index]]> </td>
-    <td ng-if="!$ctrl.getSkill()">{{question.skill_description}}</td>
+    <td ng-if="$ctrl.skillDescriptionsAreShown()"> <[$ctrl.getSkillDescription(questionSummary.skill_descriptions)]> </td>
   </tr>
 </table>
 <h4 ng-if="$ctrl.questionSummaries.length === 0" style="color: gray;">

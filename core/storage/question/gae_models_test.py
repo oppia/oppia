@@ -17,6 +17,7 @@
 import datetime
 import types
 
+from core.domain import skill_services
 from core.domain import state_domain
 from core.platform import models
 from core.tests import test_utils
@@ -249,6 +250,89 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(len(question_skill_links), 0)
 
+    def test_get_question_skill_links_by_skill_ids(self):
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', 'Description 1')
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', 'Description 2')
+
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', skill_id_1, 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_1, 0.5)
+            )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_2, 0.8)
+            )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3])
+
+        question_skill_link_models, next_cursor_str = (
+            question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
+                1, [skill_id_1, skill_id_2], ''
+            )
+        )
+        self.assertEqual(len(question_skill_link_models), 2)
+        self.assertEqual(question_skill_link_models[0].skill_id, skill_id_2)
+        self.assertEqual(question_skill_link_models[1].skill_id, skill_id_1)
+
+        question_skill_link_models_2, next_cursor_str = (
+            question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
+                1, [skill_id_1, skill_id_2], next_cursor_str
+            )
+        )
+        self.assertEqual(len(question_skill_link_models_2), 1)
+        self.assertEqual(question_skill_link_models_2[0].skill_id, skill_id_1)
+
+        self.assertNotEqual(
+            question_skill_link_models[0], question_skill_link_models_2[0])
+
+    def test_get_question_skill_links_by_skill_ids_many_skills(self):
+        # Test the case when len(skill_ids) > constants.MAX_SKILLS_PER_QUESTION.
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, 'user', 'Description 1')
+        skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_2, 'user', 'Description 2')
+        skill_id_3 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_3, 'user', 'Description 3')
+        skill_id_4 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_4, 'user', 'Description 4')
+
+        questionskilllink_model1 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id1', skill_id_1, 0.1)
+            )
+        questionskilllink_model2 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_2, 0.5)
+            )
+        questionskilllink_model3 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_3, 0.8)
+            )
+        questionskilllink_model4 = (
+            question_models.QuestionSkillLinkModel.create(
+                'question_id2', skill_id_4, 0.3)
+            )
+        question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
+            [questionskilllink_model1, questionskilllink_model2,
+             questionskilllink_model3, questionskilllink_model4])
+
+        question_skill_link_models, _ = (
+            question_models.QuestionSkillLinkModel.get_question_skill_links_by_skill_ids( #pylint: disable=line-too-long
+                1, [skill_id_1, skill_id_2, skill_id_3, skill_id_4], ''
+            )
+        )
+        self.assertEqual(len(question_skill_link_models), 3)
+        self.assertEqual(question_skill_link_models[0].skill_id, skill_id_4)
+        self.assertEqual(question_skill_link_models[1].skill_id, skill_id_3)
+        self.assertEqual(question_skill_link_models[2].skill_id, skill_id_2)
+
     def test_get_question_skill_links_equidistributed_by_skill(self):
         questionskilllink_model1 = (
             question_models.QuestionSkillLinkModel.create(
@@ -262,11 +346,9 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
             question_models.QuestionSkillLinkModel.create(
                 'question_id3', 'skill_id2', 0.8)
             )
-
         question_models.QuestionSkillLinkModel.put_multi_question_skill_links(
             [questionskilllink_model1, questionskilllink_model2,
              questionskilllink_model3])
-
         question_skill_links = (
             question_models.QuestionSkillLinkModel.
             get_question_skill_links_equidistributed_by_skill(

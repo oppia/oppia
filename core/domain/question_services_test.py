@@ -75,6 +75,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'skill_1', self.admin_id, 'Skill Description 1')
         self.save_new_skill(
             'skill_2', self.admin_id, 'Skill Description 2')
+        self.save_new_skill(
+            'skill_3', self.admin_id, 'Skill Description 3')
 
     def test_get_question_by_id(self):
         question = question_services.get_question_by_id(self.question_id)
@@ -98,6 +100,22 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
+
+    def test_get_questions_with_multi_skill_ids(self):
+        question_id_1 = question_services.get_new_question_id()
+        question_1 = self.save_new_question(
+            question_id_1, self.editor_id,
+            self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_1, 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_1, 'skill_2', 0.5)
+        questions, _, _ = (
+            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+                2, ['skill_1', 'skill_2'], ''))
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(
+            questions[0].to_dict(), question_1.to_dict())
 
     def test_get_questions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
@@ -184,6 +202,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_3', 0.8)
+        question_services.create_new_question_skill_link(
             self.editor_id, question_id_2, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, 'skill_2', 0.2)
@@ -210,12 +230,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # Make sure the correct skill description corresponds to respective
         # question summaries.
         for index, description in enumerate(skill_descriptions):
-            if (
-                    question_ids[index] == self.question_id or
-                    question_ids[index] == question_id_2):
-                self.assertEqual('Skill Description 1', description)
+            if question_ids[index] == self.question_id:
+                self.assertEqual(
+                    ['Skill Description 3', 'Skill Description 1'], description)
+            elif question_ids[index] == question_id_2:
+                self.assertEqual(['Skill Description 1'], description)
             else:
-                self.assertEqual('Skill Description 2', description)
+                self.assertEqual(['Skill Description 2'], description)
 
         question_summaries, skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(

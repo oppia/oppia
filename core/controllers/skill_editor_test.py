@@ -14,8 +14,6 @@
 
 """Tests for the skill editor page."""
 
-from constants import constants
-from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
 from core.domain import topic_services
@@ -45,6 +43,8 @@ class BaseSkillEditorControllerTests(test_utils.GenericTestBase):
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(self.skill_id_2, self.admin_id, 'Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description',
@@ -240,6 +240,40 @@ class EditableSkillDataHandlerTest(BaseSkillEditorControllerTests):
         self.logout()
 
 
+class SkillDataHandlerTest(BaseSkillEditorControllerTests):
+    """Tests for SkillDataHandler."""
+
+    def setUp(self):
+        super(SkillDataHandlerTest, self).setUp()
+        self.url = '%s/%s,%s' % (
+            feconf.SKILL_DATA_URL_PREFIX, self.skill_id, self.skill_id_2)
+        self.put_payload = {
+            'version': 1,
+            'commit_message': 'changed description',
+            'change_dicts': [{
+                'cmd': 'update_skill_property',
+                'property_name': 'description',
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            }]
+        }
+
+    def test_skill_data_handler_get_multiple_skills(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check that admins can access two skills data at the same time.
+        json_response = self.get_json(self.url)
+        self.assertEqual(self.skill_id, json_response['skills'][0]['id'])
+        self.assertEqual(self.skill_id_2, json_response['skills'][1]['id'])
+        self.logout()
+
+    def test_skill_data_handler_get_fails(self):
+        self.login(self.ADMIN_EMAIL)
+        # Check GET returns 404 when cannot get skill by id.
+        self._delete_skill_model_and_memcache(self.admin_id, self.skill_id)
+        self.get_json(self.url, expected_status_int=404)
+        self.logout()
+
+
 class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
     """Tests for SkillPublishHandler."""
 
@@ -283,36 +317,5 @@ class SkillPublishHandlerTest(BaseSkillEditorControllerTests):
             self.put_json(
                 self.url, {'version': 1}, csrf_token=csrf_token,
                 expected_status_int=401)
-
-        self.logout()
-
-
-class SkillEditorQuestionHandlerTests(BaseSkillEditorControllerTests):
-
-    def test_skill_editor_question_handler_updates_question_summary_dicts(self):
-        self.login(self.ADMIN_EMAIL)
-
-        response = self.get_json(
-            '%s/%s' % (feconf.SKILL_EDITOR_QUESTION_URL, self.skill_id))
-        question_summary_dicts = response['question_summary_dicts']
-
-        self.assertEqual(question_summary_dicts, [])
-
-        question_id = question_services.get_new_question_id()
-        self.save_new_question(
-            question_id, self.admin_id,
-            self._create_valid_question_data('ABC'), [self.skill_id])
-        question_services.create_new_question_skill_link(
-            self.admin_id, question_id, self.skill_id,
-            constants.DEFAULT_SKILL_DIFFICULTY)
-
-        response = self.get_json(
-            '%s/%s' % (feconf.SKILL_EDITOR_QUESTION_URL, self.skill_id))
-        question_summary_dict = response['question_summary_dicts'][0]
-
-        self.assertEqual(
-            question_summary_dict['skill_description'], 'Description')
-        self.assertEqual(
-            question_summary_dict['summary']['id'], question_id)
 
         self.logout()

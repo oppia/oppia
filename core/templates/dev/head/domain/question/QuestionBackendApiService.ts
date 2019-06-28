@@ -18,9 +18,12 @@
 
 require('domain/question/question-domain.constants.ts');
 
-oppia.factory('QuestionPlayerBackendApiService', [
-  '$http', '$q', 'UrlInterpolationService', 'QUESTION_PLAYER_URL_TEMPLATE',
-  function($http, $q, UrlInterpolationService, QUESTION_PLAYER_URL_TEMPLATE) {
+oppia.factory('QuestionBackendApiService', [
+  '$http', '$q', 'UrlInterpolationService', 'QUESTIONS_LIST_URL_TEMPLATE',
+  'QUESTION_PLAYER_URL_TEMPLATE',
+  function(
+      $http, $q, UrlInterpolationService, QUESTIONS_LIST_URL_TEMPLATE,
+      QUESTION_PLAYER_URL_TEMPLATE) {
     var _fetchQuestions = function(
         skillIds, questionCount, successCallback, errorCallback) {
       if (!validateRequestParameters(skillIds, questionCount, errorCallback)) {
@@ -36,6 +39,35 @@ oppia.factory('QuestionPlayerBackendApiService', [
         var questionDicts = angular.copy(response.data.question_dicts);
         if (successCallback) {
           successCallback(questionDicts);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchQuestionSummaries = function(
+        skillIds, cursor, successCallback, errorCallback) {
+      if (!isListOfStrings(skillIds)) {
+        errorCallback('Skill ids should be a list of strings');
+        return false;
+      }
+      var questionsDataUrl = UrlInterpolationService.interpolateUrl(
+        QUESTIONS_LIST_URL_TEMPLATE, {
+          comma_separated_skill_ids: skillIds.join(','),
+          cursor: cursor ? cursor : ''
+        });
+
+      $http.get(questionsDataUrl).then(function(response) {
+        var questionSummaries = angular.copy(
+          response.data.question_summary_dicts);
+        var nextCursor = response.data.next_start_cursor;
+        if (successCallback) {
+          successCallback({
+            questionSummaries: questionSummaries,
+            nextCursor: nextCursor
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -90,6 +122,12 @@ oppia.factory('QuestionPlayerBackendApiService', [
         return $q(function(resolve, reject) {
           _fetchQuestions(
             skillIds, questionCount, resolve, reject);
+        });
+      },
+
+      fetchQuestionSummaries: function(skillIds, cursor) {
+        return $q(function(resolve, reject) {
+          _fetchQuestionSummaries(skillIds, cursor, resolve, reject);
         });
       }
     };

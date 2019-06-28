@@ -14,8 +14,8 @@
   <div class="list-group">
     <a class="list-group-item protractor-test-skill-item"
        ng-repeat="skillSummary in skillSummaries track by $index"
-       ng-click="selectOrDeselectSkill(skillSummary.getId())"
-       ng-class="{'list-group-item-success': selectedSkillId === skillSummary.getId()}">
+       ng-click="selectOrDeselectSkill(skillSummary.getId(), $index)"
+       ng-class="{'list-group-item-success': skillSummary.isSelected}">
       <label class="list-group-item-heading" style="font-size: 1em;"><[skillSummary.getDescription()]></label>
     </a>
   </div>

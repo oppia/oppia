@@ -32,6 +32,7 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-editor.service.ts');
 require('services/AlertsService.ts');
+require('services/QuestionsListService.ts');
 require('services/contextual/UrlService.ts');
 
 oppia.directive('questionsTab', [
@@ -46,22 +47,21 @@ oppia.directive('questionsTab', [
         'SkillEditorStateService', 'QuestionCreationService', 'UrlService',
         'EditableQuestionBackendApiService', 'EditableSkillBackendApiService',
         'MisconceptionObjectFactory', 'QuestionObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
-        'QuestionUndoRedoService', 'UndoRedoService', 'NUM_QUESTIONS_PER_PAGE',
-        function(
+        'QuestionsListService', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'StateEditorService', 'QuestionUndoRedoService', 'UndoRedoService',
+        'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $http, $q, $uibModal, $window, AlertsService,
             SkillEditorStateService, QuestionCreationService, UrlService,
             EditableQuestionBackendApiService, EditableSkillBackendApiService,
             MisconceptionObjectFactory, QuestionObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
-            QuestionUndoRedoService, UndoRedoService, NUM_QUESTIONS_PER_PAGE) {
+            QuestionsListService, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            StateEditorService, QuestionUndoRedoService, UndoRedoService,
+            NUM_QUESTIONS_PER_PAGE) {
           $scope.skill = SkillEditorStateService.getSkill();
-          $scope.getQuestionSummaries =
-            SkillEditorStateService.getQuestionSummaries;
-          $scope.fetchQuestionSummaries =
-            SkillEditorStateService.fetchQuestionSummaries;
+          $scope.getQuestionSummariesAsync =
+            QuestionsListService.getQuestionSummariesAsync;
           $scope.isLastQuestionBatch =
-            SkillEditorStateService.isLastQuestionBatch;
+           QuestionsListService.isLastQuestionBatch;
         }
       ]
     };

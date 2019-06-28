@@ -16,9 +16,6 @@
  * @fileoverview Controller for the questions player directive.
  */
 
-require('domain/question/QuestionPlayerBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-
 require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
@@ -101,6 +98,9 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
 
+require('domain/question/QuestionBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 require('pages/interaction-specs.constants.ts');
 
 oppia.directive('questionPlayer', [
@@ -118,9 +118,9 @@ oppia.directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', 'QuestionPlayerBackendApiService',
+        '$rootScope', '$scope', 'QuestionBackendApiService',
         function(
-            $rootScope, $scope, QuestionPlayerBackendApiService) {
+            $rootScope, $scope, QuestionBackendApiService) {
           var ctrl = this;
           $scope.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           ctrl.currentQuestion = 0;

@@ -31,6 +31,10 @@ oppia.constant(
   '/pretest_handler/<exploration_id>?story_id=<story_id>&cursor=<cursor>');
 
 oppia.constant(
+  'QUESTIONS_LIST_URL_TEMPLATE',
+  '/questions_list_handler/<comma_separated_skill_ids>?cursor=<cursor>');
+
+oppia.constant(
   'QUESTION_PLAYER_URL_TEMPLATE',
   '/question_player_handler?skill_ids=<skill_ids>&question_count' +
   '=<question_count>');

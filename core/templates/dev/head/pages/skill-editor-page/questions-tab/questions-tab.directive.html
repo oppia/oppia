@@ -1,9 +1,10 @@
 <md-card class="oppia-page-card oppia-long-text" ng-if="!questionEditorIsShown">
   <div class="questions">
     <h3 class="form-heading"> Questions linked to this skill </h3>
-    <questions-list skill="skill"
-                    get-question-summaries="getQuestionSummaries"
-                    fetch-question-summaries="fetchQuestionSummaries"
+    <questions-list skill-descriptions-are-shown="false"
+                    select-skill-modal-is-shown="false"
+                    skill-ids="[skill.getId()]"
+                    get-question-summaries-async="getQuestionSummariesAsync"
                     is-last-question-batch="isLastQuestionBatch"
                     can-edit-question="true">
     </questions-list>

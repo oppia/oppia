@@ -39,6 +39,7 @@ from core.controllers import pages
 from core.controllers import practice_sessions
 from core.controllers import profile
 from core.controllers import question_editor
+from core.controllers import questions_list
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
@@ -230,6 +231,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<comma_separated_skill_ids>' % feconf.NEW_QUESTION_URL,
         question_editor.QuestionCreationHandler),
     get_redirect_route(
+        r'%s/<comma_separated_skill_ids>' % feconf.QUESTIONS_LIST_URL_PREFIX,
+        questions_list.QuestionsListHandler),
+    get_redirect_route(
         r'%s/<topic_name>' % feconf.PRACTICE_SESSION_URL_PREFIX,
         practice_sessions.PracticeSessionsPage),
     get_redirect_route(
@@ -263,9 +267,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_name>' % feconf.TOPIC_DATA_HANDLER,
         topic_viewer.TopicPageDataHandler),
-    get_redirect_route(
-        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_QUESTION_URL,
-        topic_editor.TopicEditorQuestionHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
@@ -612,11 +613,11 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<question_id>/<skill_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
         question_editor.QuestionSkillLinkHandler),
     get_redirect_route(
+        r'%s/<comma_separated_skill_ids>' % feconf.SKILL_DATA_URL_PREFIX,
+        skill_editor.SkillDataHandler),
+    get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
-    get_redirect_route(
-        r'%s/<skill_id>' % feconf.SKILL_EDITOR_QUESTION_URL,
-        skill_editor.SkillEditorQuestionHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
