@@ -589,7 +589,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': [0, 0],
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             }
         }
 
@@ -651,7 +651,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             }
         }
         hints_list.append({
@@ -669,7 +669,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             }
         }
 
@@ -688,12 +688,12 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
 
     def test_validate_duplicate_content_id_with_answer_groups(self):
         exploration = self.save_new_valid_exploration('exp_id', 'owner_id')
-        answer_groups_dict = {
+        answer_group_dict = {
             'outcome': {
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Feedback'
+                    'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -711,13 +711,14 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         }
 
         exploration.init_state.update_interaction_answer_groups(
-            [answer_groups_dict])
+            [answer_group_dict])
         exploration.init_state.update_content({
             'content_id': 'feedback_1',
-            'html': 'Feedback'
+            'html': '<p>Feedback</p>'
         })
 
-        with self.assertRaisesRegexp(Exception, 'Found a duplicate content id'):
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id feedback_1'):
             exploration.init_state.validate(None, True)
 
     def test_validate_duplicate_content_id_with_default_outcome(self):
@@ -740,7 +741,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'html': ''
         })
 
-        with self.assertRaisesRegexp(Exception, 'Found a duplicate content id'):
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id default_outcome'):
             exploration.init_state.validate(None, True)
 
     def test_validate_duplicate_content_id_with_hints(self):
@@ -748,7 +750,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
         hints_list = [{
             'hint_content': {
                 'content_id': 'hint_1',
-                'html': 'some html'
+                'html': '<p>some html</p>'
             }
         }]
 
@@ -758,7 +760,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'html': ''
         })
 
-        with self.assertRaisesRegexp(Exception, 'Found a duplicate content id'):
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id hint_1'):
             exploration.init_state.validate(None, True)
 
     def test_validate_duplicate_content_id_with_solution(self):
@@ -773,7 +776,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'correct_answer': 'hello_world!',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'hello_world is a string'
+                'html': '<p>hello_world is a string</p>'
             }
         }
 
@@ -783,7 +786,8 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
             'html': ''
         })
 
-        with self.assertRaisesRegexp(Exception, 'Found a duplicate content id'):
+        with self.assertRaisesRegexp(
+            Exception, 'Found a duplicate content id solution'):
             exploration.init_state.validate(None, True)
 
     def test_cannot_convert_state_dict_to_yaml_with_invalid_state_dict(self):
@@ -1044,7 +1048,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Feedback'
+                    'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1098,7 +1102,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Feedback'
+                    'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1125,7 +1129,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Feedback'
+                    'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1149,7 +1153,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Feedback'
+                    'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1188,7 +1192,7 @@ class StateDomainUnitTests(test_utils.GenericTestBase):
                 'dest': exploration.init_state_name,
                 'feedback': {
                     'content_id': 'feedback_1',
-                    'html': 'Feedback'
+                    'html': '<p>Feedback</p>'
                 },
                 'labelled_as_correct': False,
                 'param_changes': [],
@@ -1429,7 +1433,7 @@ class WrittenTranslationsDomainUnitTests(test_utils.GenericTestBase):
             'translations_mapping': {
                 'content': {
                     'en': {
-                        'html': 'hello!',
+                        'html': '<p>hello!</p>',
                         'needs_update': False
                     }
                 }
