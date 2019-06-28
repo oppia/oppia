@@ -43,8 +43,8 @@ oppia.directive('questionsList', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        showSkillDescriptions: '&showSkillDescriptions',
-        showSelectSkillModal: '&showSelectSkillModal',
+        skillDescriptionsAreShown: '&skillDescriptionsAreShown',
+        selectSkillModalIsShown: '&selectSkillModalIsShown',
         getSkillIds: '&skillIds',
         getQuestionSummariesAsync: '=',
         isLastPage: '=isLastQuestionBatch',
@@ -171,7 +171,7 @@ oppia.directive('questionsList', [
           };
 
           ctrl.createQuestion = function() {
-            if (!ctrl.showSelectSkillModal()) {
+            if (!ctrl.selectSkillModalIsShown()) {
               ctrl.newQuestionSkillIds = ctrl.skillIds;
               ctrl.populateMisconceptions(ctrl.skillIds);
               if (AlertsService.warnings.length === 0) {
