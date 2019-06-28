@@ -273,6 +273,21 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_summary_by_id(
                 self.SKILL_ID, strict=False), None)
 
+    def test_get_multi_skill_rights(self):
+        skill_id_1 = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id_1, self.USER_ID, 'Description')
+        skill_rights = skill_services.get_multi_skill_rights(
+            [self.SKILL_ID, skill_id_1])
+        self.assertEqual(skill_rights[0].id, self.SKILL_ID)
+        self.assertEqual(skill_rights[1].id, skill_id_1)
+
+    def test_get_multi_skill_rights_when_skill_doesnt_exist(self):
+        skill_id_1 = skill_services.get_new_skill_id()
+        skill_rights = skill_services.get_multi_skill_rights(
+            [self.SKILL_ID, skill_id_1])
+        self.assertEqual(skill_rights[0].id, self.SKILL_ID)
+        self.assertEqual(skill_rights[1], None)
+
     def test_get_unpublished_skill_rights_by_creator(self):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
@@ -736,8 +751,9 @@ class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
             self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2]))
 
 
-# TODO: Remove this mock class and tests for the mock skill migrations
-# once the actual functions are implemented.
+# TODO(lilithxxx): Remove this mock class and tests for the mock skill
+# migrations once the actual functions are implemented.
+# See issue: https://github.com/oppia/oppia/issues/7009.
 class MockSkillObject(skill_domain.Skill):
     """Mocks Skill domain object."""
 

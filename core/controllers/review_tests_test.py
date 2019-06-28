@@ -135,12 +135,12 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     self.story_id_1))
-            self.assertEqual(len(json_response['skills_with_description']), 2)
+            self.assertEqual(len(json_response['skill_descriptions']), 2)
             self.assertEqual(
-                json_response['skills_with_description']['skill_id_1'],
+                json_response['skill_descriptions']['skill_id_1'],
                 'Skill 1')
             self.assertEqual(
-                json_response['skills_with_description']['skill_id_2'],
+                json_response['skill_descriptions']['skill_id_2'],
                 'Skill 2')
 
     def test_no_user_can_access_unpublished_story_review_sessions_data(self):

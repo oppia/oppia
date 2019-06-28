@@ -38,10 +38,6 @@ class ReviewTestsPage(base.BaseHandler):
 
         story = story_services.get_story_by_id(story_id)
 
-        if story is None:
-            raise self.PageNotFoundException(
-                Exception('The story with the given id doesn\'t exist.'))
-
         interaction_ids = feconf.ALLOWED_QUESTION_INTERACTION_IDS
 
         interaction_dependency_ids = (
@@ -85,12 +81,8 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
             story_services.get_latest_completed_node_ids(self.user_id, story_id)
         )
 
-        if story is None:
-            raise self.PageNotFoundException(
-                Exception('The story with the given id doesn\'t exist.'))
         if len(latest_completed_node_ids) == 0:
             raise self.PageNotFoundException
-
 
         try:
             skills = skill_services.get_multi_skills(
@@ -99,12 +91,12 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
                 ))
         except Exception, e:
             raise self.PageNotFoundException(e)
-        skills_with_description = {}
+        skill_descriptions = {}
         for skill in skills:
-            skills_with_description[skill.id] = skill.description
+            skill_descriptions[skill.id] = skill.description
 
 
         self.values.update({
-            'skills_with_description': skills_with_description
+            'skill_descriptions': skill_descriptions
         })
         self.render_json(self.values)

@@ -18,3 +18,4 @@
 oppia.constant('CORRECTION_RATE_TO_PASS', 0.75);
 
 oppia.constant('HASH_PARAM', 'question-player-result=');
+oppia.constant('MAX_SCORE_PER_QUESTION', 1.0);

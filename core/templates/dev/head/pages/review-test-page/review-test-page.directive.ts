@@ -22,7 +22,6 @@ require(
 require(
   'components/question-directives/question-player/' +
   'question-player.directive.ts');
-
 require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
@@ -70,12 +69,12 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
               story_id: ctrl.storyId
             });
           $http.get(reviewTestsDataUrl).then(function(result) {
-            var skillList = [];
+            var skillIdList = [];
             var skillDescriptions = [];
-            for (var skillId in result.data.skills_with_description) {
-              skillList.push(skillId);
+            for (var skillId in result.data.skill_descriptions) {
+              skillIdList.push(skillId);
               skillDescriptions.push(
-                result.data.skills_with_description[skillId]);
+                result.data.skill_descriptions[skillId]);
             }
             var questionPlayerConfig = {
               resultActionButtons: [
@@ -94,10 +93,10 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
                   url: storyViewerUrl
                 }
               ],
-              skillList: skillList,
+              skillList: skillIdList,
               skillDescriptions: skillDescriptions,
               questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
-                skillList.length)
+                skillIdList.length)
             };
             ctrl.questionPlayerConfig = questionPlayerConfig;
           });

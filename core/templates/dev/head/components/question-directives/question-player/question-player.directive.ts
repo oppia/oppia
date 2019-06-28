@@ -16,9 +16,6 @@
  * @fileoverview Controller for the questions player directive.
  */
 
-require('domain/question/QuestionPlayerBackendApiService.ts');
-require('domain/utilities/UrlInterpolationService.ts');
-
 require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
@@ -104,6 +101,9 @@ require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
 
+require('domain/question/QuestionBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 require('pages/interaction-specs.constants.ts');
 require('services/contextual/UrlService.ts');
 
@@ -122,12 +122,14 @@ oppia.directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        'HASH_PARAM', '$scope', '$sce', '$rootScope', '$location',
+        'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
+        '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$window', 'HtmlEscaperService',
         'QuestionPlayerBackendApiService', 'UrlService',
         'CORRECTION_RATE_TO_PASS',
         function(
-            HASH_PARAM, $scope, $sce, $rootScope, $location,
+            HASH_PARAM, MAX_SCORE_PER_QUESTION,
+            $scope, $sce, $rootScope, $location,
             $sanitize, $window, HtmlEscaperService,
             QuestionPlayerBackendApiService, UrlService,
             CORRECTION_RATE_TO_PASS) {
@@ -260,8 +262,6 @@ oppia.directive('questionPlayer', [
           var calculateScores = function(questionStateData) {
             createScorePerSkillMapping();
             $scope.resultsLoaded = false;
-            var totalScore = 0.0;
-            var minScore = Number.MAX_VALUE;
             var totalQuestions = Object.keys(questionStateData).length;
             for (var question in questionStateData) {
               var questionData = questionStateData[question];
@@ -275,7 +275,7 @@ oppia.directive('questionPlayer', [
                 totalHintsPenalty = (
                   questionData.usedHints.length * VIEW_HINT_PENALTY);
               }
-              var questionScore = 1.0;
+              var questionScore = MAX_SCORE_PER_QUESTION;
               if (questionData.viewedSolution) {
                 questionScore = 0.0;
               } else {

@@ -23,8 +23,7 @@ oppia.constant(
   '/practice_session/data/<topic_name>');
 
 oppia.constant(
-  'TOPIC_VIEWER_PAGE',
-  '/topic/<topic_name>');
+  'TOPIC_VIEWER_PAGE', '/topic/<topic_name>');
 
 oppia.constant(
   'PRACTICE_SESSIONS_URL',
