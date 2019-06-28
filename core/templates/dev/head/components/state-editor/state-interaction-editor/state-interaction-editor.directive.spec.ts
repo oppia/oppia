@@ -42,6 +42,13 @@ describe('State Interaction controller', function() {
   describe('StateInteraction', function() {
     beforeEach(function() {
       angular.mock.module('oppia');
+      angular.mock.module(function($provide){
+        $provide.value('ExplorationFeaturesService', {
+          isPlaythroughRecordingEnabled: function() {
+            return false;
+          }
+        });
+      });
       // Set a global value for INTERACTION_SPECS that will be used by all the
       // descendant dependencies.
       angular.mock.module(function($provide) {

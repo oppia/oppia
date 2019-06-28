@@ -55,7 +55,7 @@ maybeInstallDependencies "$@"
 # and merges them all to a single file which Karma uses to run its tests. The
 # Karma is unable to run the tests on multiple files and the DI fails in that
 # case, the reason of which is unclear.
-find . -type f \( -name "*.spec.ts" -o -name "*Spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/combined-tests.spec.ts
+find . -type f \( -name "*.spec.ts" ! -name "state-name-editor.directive.spec.ts" -o -name "*Spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/combined-tests.spec.ts
 
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"

@@ -34,6 +34,13 @@ describe('Exploration editor tab controller', function() {
     var explorationEditorTabCtrl;
 
     beforeEach(angular.mock.module('oppia'));
+    beforeEach(angular.mock.module(function($provide){
+      $provide.value('ExplorationFeaturesService', {
+        isPlaythroughRecordingEnabled: function() {
+          return false;
+        }
+      });
+    }));  
     beforeEach(angular.mock.inject(function(
         _$componentController_, $injector, $rootScope) {
       $componentController = _$componentController_;
