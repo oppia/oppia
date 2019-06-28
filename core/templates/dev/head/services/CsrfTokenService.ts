@@ -18,33 +18,39 @@
 
 oppia.factory('CsrfTokenService', [function() {
   var token = null;
+  var tokenPromise = null;
+
   return {
-    setToken: function(csrfToken) {
-      token = csrfToken;
-    },
-    getToken: function() {
-      // We use jQuery here instead of Angular's $http, since the latter
-      // creates a circular dependency.
-      return new Promise(function(resolve, reject) {
-        if (token) {
-          resolve(token);
-        } else {
-          // Fetch token if it isn't already available.
-          $.ajax({
-            url: '/csrfhandler',
-            type: 'GET',
-            dataType: 'text',
-            dataFilter: function(data) {
-              // Remove the XSSI prefix.
-              var transformedData = data.substring(5);
-              return JSON.parse(transformedData);
-            },
-          }).done(function(response) {
-            token = response.token;
-            resolve(response.token);
-          });
-        }
+    initializeToken: function() {
+      if (token !== null) {
+        throw Error('Token already set');
+      }
+      tokenPromise = new Promise(function(resolve, reject) {
+        // We use jQuery here instead of Angular's $http, since the latter
+        // creates a circular dependency.
+        $.ajax({
+          url: '/csrfhandler',
+          type: 'GET',
+          dataType: 'text',
+          dataFilter: function(data) {
+            // Remove the XSSI prefix.
+            var transformedData = data.substring(5);
+            return JSON.parse(transformedData);
+          },
+        }).done(function(response) {
+          token = response.token;
+          resolve(response.token);
+        });
       });
+    },
+
+    getToken: function() {
+      if (token) {
+        return new Promise(function(resolve, reject) {
+          resolve(token);
+        });
+      }
+      return tokenPromise;
     }
   };
 }]);

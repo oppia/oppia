@@ -22,15 +22,31 @@ describe('Csrf Token Service', function() {
   var CsrfTokenService, $httpBackend;
 
   beforeEach(angular.mock.module('oppia'));
-  beforeEach(angular.mock.inject(function($injector) {
+  beforeEach(angular.mock.inject(function($injector, $q) {
     CsrfTokenService = $injector.get('CsrfTokenService');
     $httpBackend = $injector.get('$httpBackend');
+
+    spyOn($, 'ajax').and.callFake(function() {
+      var deferred = $q.defer();
+      deferred.resolve('sample-csrf-token');
+      return deferred.promise;
+    });
   }));
 
   it('should correctly set the csrf token', function() {
-    CsrfTokenService.setToken('sample csrf token');
+    CsrfTokenService.initializeToken();
+
     CsrfTokenService.getToken().then(function(token) {
-      expect(token).toBe('sample csrf token');
+      expect(token).toBe('sample-csrf-token');
     });
   });
+
+  it('should error if initialize is called more than once',
+    function() {
+      CsrfTokenService.initializeToken();
+
+      expect(CsrfTokenService.initializeToken()).toThrowError(
+        'Token already set');
+    }
+  );
 });

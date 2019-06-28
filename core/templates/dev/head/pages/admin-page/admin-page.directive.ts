@@ -105,7 +105,7 @@ oppia.directive('adminPage', ['UrlInterpolationService',
           ctrl.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
           ctrl.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
-          CsrfTokenService.getToken();
+          CsrfTokenService.initializeToken();
 
           ctrl.setStatusMessage = function(statusMessage) {
             ctrl.statusMessage = statusMessage;

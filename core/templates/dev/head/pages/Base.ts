@@ -53,7 +53,7 @@ oppia.controller('Base', [
 
     $scope.isBackgroundMaskActive = BackgroundMaskService.isMaskActive;
 
-    CsrfTokenService.getToken();
+    CsrfTokenService.initializeToken();
 
     // Listener function to catch the change in language preference.
     $rootScope.$on('$translateChangeSuccess', function(evt, response) {
