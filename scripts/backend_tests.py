@@ -211,7 +211,20 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     """
     def _convert_to_test_target(path):
         """Remove the .py suffix and replace all slashes with periods."""
-        return os.path.relpath(path, os.getcwd())[:-3].replace('/', '.')
+        classes = []
+        with open(path, 'r') as f:
+            lines = f.readlines()
+            for line in lines:
+                if line.startswith('class'):
+                    start_index = line.find(' ') + 1
+                    end_index = line.find('Tests') + 5
+                    if end_index < 5:
+                        continue
+                    classes.append(line[start_index:end_index])
+        test_target_path = os.path.relpath(
+            path, os.getcwd())[:-3].replace('/', '.')
+        return [
+            '%s.%s' % (test_target_path, classname) for classname in classes]
 
     base_path = os.path.join(os.getcwd(), test_path or '')
     result = []
@@ -220,20 +233,20 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
         if any([s in root for s in excluded_dirs]):
             continue
         if root.endswith('_test.py'):
-            result.append(_convert_to_test_target(
-                os.path.join(base_path, root)))
+            result = result + (
+                _convert_to_test_target(os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             if _LOAD_TESTS_DIR in subroot and include_load_tests:
                 for f in files:
                     if f.endswith('_test.py'):
-                        result.append(_convert_to_test_target(
-                            os.path.join(subroot, f)))
+                        result = result + (
+                            _convert_to_test_target(os.path.join(subroot, f)))
 
             for f in files:
                 if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
-                    result.append(_convert_to_test_target(
-                        os.path.join(subroot, f)))
+                    result = result + (
+                        _convert_to_test_target(os.path.join(subroot, f)))
 
     return result
 
