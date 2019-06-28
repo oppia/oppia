@@ -23,6 +23,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('services/services.constants.ts');
 
+require('app-services.scripts.ts');
+
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('PlaythroughService', [

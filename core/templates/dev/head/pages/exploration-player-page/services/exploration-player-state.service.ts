@@ -38,6 +38,8 @@ require('services/contextual/UrlService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
+require('app-services.scripts.ts');
+
 var oppia = require('AppInit.ts').module;
 
 oppia.factory('ExplorationPlayerStateService', [

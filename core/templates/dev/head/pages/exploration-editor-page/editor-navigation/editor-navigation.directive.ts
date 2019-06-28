@@ -32,6 +32,8 @@ require('services/SiteAnalyticsService.ts');
 require('services/UserService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
+require('app-services.scripts.ts');
+
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('editorNavigation', [

@@ -19,15 +19,10 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { NgModule } from '@angular/core';
+import { NgModule, StaticProvider, Component } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { StaticProvider } from '@angular/core';
-import { downgradeInjectable } from '@angular/upgrade/static';
-
-import { Component } from '@angular/core';
-import { downgradeComponent } from '@angular/upgrade/static';
-import { ExplorationFeaturesService } from
-  'services/ExplorationFeaturesService.ts';
+import { downgradeInjectable, downgradeComponent } from
+  '@angular/upgrade/static';
 
 @Component({
   selector: 'service-bootstrap',
@@ -79,9 +74,5 @@ var oppia = angular.module(
       downgradeComponent({
         component: ServiceBootstrapComponent
       }) as angular.IDirectiveFactory);
-
-oppia.factory(
-  'ExplorationFeaturesService',
-  downgradeInjectable(ExplorationFeaturesService));
 
 exports.module = oppia;

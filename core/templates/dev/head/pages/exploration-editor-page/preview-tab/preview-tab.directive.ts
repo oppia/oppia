@@ -45,6 +45,8 @@ require(
   'state-editor.service.ts');
 require('services/ContextService.ts');
 
+require('app-services.scripts.ts');
+
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('previewTab', ['UrlInterpolationService', function(
