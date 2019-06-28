@@ -16,8 +16,6 @@
  * @fileoverview Constants for the creator dashboard.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.constant(
   'EXPLORATION_DROPDOWN_STATS', {
     OPEN_FEEDBACK: 'open_feedback'

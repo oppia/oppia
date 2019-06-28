@@ -16,8 +16,6 @@
  * @fileoverview Object factory for creating audio files.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('AudioFileObjectFactory', [
   function() {
     var AudioFile = function(filename, data) {

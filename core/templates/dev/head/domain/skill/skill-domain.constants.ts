@@ -16,8 +16,6 @@
  * @fileoverview Constants for skill domain.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.constant(
   'CONCEPT_CARD_DATA_URL_TEMPLATE', '/concept_card_handler/<skill_id>');
 

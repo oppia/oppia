@@ -16,6 +16,4 @@
  * @fileoverview Directive scripts for the creator dashboard.
  */
 
-require('App.ts');
-
 require('pages/creator-dashboard-page/creator-dashboard-page.controller.ts');

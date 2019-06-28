@@ -18,8 +18,6 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('baseInteractionValidationService', [
   '$filter', 'WARNING_TYPES', function($filter, WARNING_TYPES) {
     return {

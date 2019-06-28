@@ -18,8 +18,6 @@
 
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ItemSelectionInputValidationService', [
   '$filter', 'baseInteractionValidationService', 'WARNING_TYPES',
   function($filter, baseInteractionValidationService, WARNING_TYPES) {

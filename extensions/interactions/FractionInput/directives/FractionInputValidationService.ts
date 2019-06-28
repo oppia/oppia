@@ -19,8 +19,6 @@
 require('domain/objects/FractionObjectFactory.ts');
 require('interactions/baseInteractionValidationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('FractionInputValidationService', [
   'FractionObjectFactory', 'baseInteractionValidationService',
   'WARNING_TYPES',

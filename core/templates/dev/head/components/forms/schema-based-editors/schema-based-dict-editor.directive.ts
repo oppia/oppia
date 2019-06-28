@@ -23,8 +23,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/IdGenerationService.ts');
 require('services/NestedDirectivesRecursionTimeoutPreventionService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('schemaBasedDictEditor', [
   'NestedDirectivesRecursionTimeoutPreventionService',
   'UrlInterpolationService',

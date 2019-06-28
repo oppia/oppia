@@ -30,8 +30,6 @@ require('services/SiteAnalyticsService.ts');
 require(
   'pages/landing-pages/topic-landing-page/topic-landing-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('topicLandingPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

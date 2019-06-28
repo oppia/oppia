@@ -16,8 +16,6 @@
  * @fileoverview Directive scripts for the topic viewer.
  */
 
-require('App.ts');
-
 require(
   'pages/topic-viewer-page/navbar-breadcrumb/' +
   'topic-viewer-navbar-breadcrumb.directive.ts');

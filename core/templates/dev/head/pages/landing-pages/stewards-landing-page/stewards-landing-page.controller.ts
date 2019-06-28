@@ -23,8 +23,6 @@ require('services/SiteAnalyticsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('stewardsLandingPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

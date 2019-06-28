@@ -16,8 +16,6 @@
  * @fileoverview Constants for topic domain.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.constant(
   'TOPIC_EDITOR_STORY_URL_TEMPLATE', '/topic_editor_story_handler/<topic_id>');
 

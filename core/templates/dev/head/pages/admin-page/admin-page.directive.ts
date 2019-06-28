@@ -79,8 +79,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/admin-page/services/admin-router.service.ts');
 require('services/UtilsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('adminPage', ['UrlInterpolationService',
   function(UrlInterpolationService) {
     return {

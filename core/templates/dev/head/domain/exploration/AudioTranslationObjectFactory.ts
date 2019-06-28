@@ -17,8 +17,6 @@
  * AudioTranslation domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('AudioTranslationObjectFactory', [function() {
   var AudioTranslation = function(filename, fileSizeBytes, needsUpdate) {
     this.filename = filename;

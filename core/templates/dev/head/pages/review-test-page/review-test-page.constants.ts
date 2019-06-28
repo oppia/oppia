@@ -16,6 +16,4 @@
  * @fileoverview Constants for the review tests.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.constant('REVIEW_TEST_DATA_URL', '/review_test_handler/data/<story_id>');

@@ -19,8 +19,6 @@
 
 require('domain/objects/objects-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('FractionObjectFactory', [
   'FRACTION_PARSING_ERRORS', function(FRACTION_PARSING_ERRORS) {
     var Fraction = function(isNegative, wholeNumber, numerator, denominator) {

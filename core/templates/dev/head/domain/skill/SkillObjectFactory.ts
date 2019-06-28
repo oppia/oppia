@@ -21,8 +21,6 @@ require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/skill/MisconceptionObjectFactory.ts');
 require('services/ValidatorsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('SkillObjectFactory', [
   'ConceptCardObjectFactory', 'MisconceptionObjectFactory', 'ValidatorsService',
   function(

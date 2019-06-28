@@ -16,8 +16,6 @@
  * @fileoverview Object factory for creating image files.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ImageFileObjectFactory', [function() {
   var ImageFile = function(filename, data) {
     this.filename = filename;

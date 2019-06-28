@@ -16,8 +16,6 @@
  * @fileoverview Directive for list of sets of html strings editor.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('listOfSetsOfHtmlStringsEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {

@@ -18,8 +18,6 @@
 
 // Note: This oppia constant needs to be keep in sync with
 // AVAILABLE_LANDING_PAGES constant defined in feconf.py file.
-var oppia = require('AppInit.ts').module;
-
 oppia.constant('TOPIC_LANDING_PAGE_DATA', {
   maths: {
     fractions: {

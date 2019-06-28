@@ -20,8 +20,6 @@
 
 require('domain/exploration/ParamSpecObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ParamSpecsObjectFactory', [
   'ParamSpecObjectFactory',
   function(ParamSpecObjectFactory) {

@@ -22,8 +22,6 @@ require(
   'state-property.service.ts');
 require('services/EditabilityService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('solutionExplanationEditor', [
   'StateSolutionService', 'UrlInterpolationService',
   function(StateSolutionService, UrlInterpolationService) {

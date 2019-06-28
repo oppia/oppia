@@ -19,8 +19,6 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('SearchExplorationsBackendApiService', [
   '$http', '$q', 'AlertsService', 'UrlInterpolationService',
   'SEARCH_EXPLORATION_URL_TEMPLATE',

@@ -18,8 +18,6 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('schemaBasedIntEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

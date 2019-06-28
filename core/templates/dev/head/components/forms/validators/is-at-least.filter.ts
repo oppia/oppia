@@ -17,8 +17,6 @@
    args.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.filter('isAtLeast', [function() {
   return function(input, args) {
     return (input >= args.minValue);

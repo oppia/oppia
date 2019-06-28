@@ -16,10 +16,6 @@
  * @fileoverview Unit tests for the controller of 'State Interactions'.
  */
 
-require(
-  'pages/exploration-editor-page/editor-tab/' +
-  'exploration-editor-tab.directive.ts');
-
 require('pages/exploration-editor-page/services/change-list.service.ts');
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require(
@@ -62,8 +58,6 @@ describe('State Interaction controller', function() {
     var $httpBackend;
     var mockExplorationData;
     var outerScope, directiveScope;
-    var $componentController;
-    var stateEditorCtrl;
 
     beforeEach(angular.mock.module('directiveTemplates'));
     beforeEach(function() {
@@ -78,9 +72,7 @@ describe('State Interaction controller', function() {
     });
 
     beforeEach(angular.mock.inject(function(
-        _$componentController_, $compile, $controller, $injector, $rootScope,
-        $templateCache) {
-      $componentController = _$componentController_;
+        $compile, $controller, $injector, $rootScope, $templateCache) {
       scope = $rootScope.$new();
       ecs = $injector.get('StateEditorService');
       cls = $injector.get('ChangeListService');
@@ -196,7 +188,8 @@ describe('State Interaction controller', function() {
         }
       });
 
-      stateEditorCtrl = $componentController('explorationEditorTab', {
+      var stateEditorCtrl = $controller('ExplorationEditorTab', {
+        $scope: scope,
         StateEditorService: ecs,
         ChangeListService: cls,
         ExplorationStatesService: ess,
@@ -206,7 +199,7 @@ describe('State Interaction controller', function() {
           }
         },
         INTERACTION_SPECS: IS
-      }, {});
+      });
 
       var templateHtml = $templateCache.get(
         '/pages/exploration_editor/editor_tab/' +
@@ -235,7 +228,7 @@ describe('State Interaction controller', function() {
     it('should keep non-empty content when setting a terminal interaction',
       function() {
         ecs.setActiveStateName('First State');
-        stateEditorCtrl.initStateEditor();
+        scope.initStateEditor();
 
         var state = ess.getState('First State');
         scs.init('First State', state.content);
@@ -257,7 +250,7 @@ describe('State Interaction controller', function() {
     it('should change to default text when adding a terminal interaction',
       function() {
         ecs.setActiveStateName('End State');
-        stateEditorCtrl.initStateEditor();
+        scope.initStateEditor();
 
         var state = ess.getState('End State');
         scs.init('End State', state.content);
@@ -279,7 +272,7 @@ describe('State Interaction controller', function() {
     it('should not default text when adding a non-terminal interaction',
       function() {
         ecs.setActiveStateName('End State');
-        stateEditorCtrl.initStateEditor();
+        scope.initStateEditor();
 
         var state = ess.getState('End State');
         siis.init(

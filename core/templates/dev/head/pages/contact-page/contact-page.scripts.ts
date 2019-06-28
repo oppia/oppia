@@ -16,8 +16,6 @@
  * @fileoverview File to import necessary scripts for contact page.
  */
 
-require('App.ts');
-
 require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +

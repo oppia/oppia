@@ -16,16 +16,12 @@
  * @fileoverview Controllers for the 'thanks' page.
  */
 
-require('App.ts');
-
 require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
 
 require('domain/utilities/UrlInterpolationService.ts');
-
-var oppia = require('AppInit.ts').module;
 
 oppia.controller('Thanks', [
   '$scope', 'UrlInterpolationService',

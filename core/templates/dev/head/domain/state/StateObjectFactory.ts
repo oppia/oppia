@@ -24,8 +24,6 @@ require('domain/exploration/ParamChangesObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/exploration/WrittenTranslationsObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('StateObjectFactory', [
   'InteractionObjectFactory', 'ParamChangesObjectFactory',
   'RecordedVoiceoversObjectFactory', 'SubtitledHtmlObjectFactory',

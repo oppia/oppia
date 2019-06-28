@@ -17,8 +17,6 @@
  * status label for a thread in the feedback tab of the exploration editor.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ThreadStatusDisplayService', [function() {
   var _STATUS_CHOICES = [{
     id: 'open',

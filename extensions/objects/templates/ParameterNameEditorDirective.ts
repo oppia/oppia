@@ -19,8 +19,6 @@
 // NOTE TO DEVELOPERS: This editor requires ExplorationParamSpecsService to be
 // available in the context in which it is used.
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('parameterNameEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {

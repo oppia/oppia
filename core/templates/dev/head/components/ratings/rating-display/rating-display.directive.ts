@@ -18,8 +18,6 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('ratingDisplay', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

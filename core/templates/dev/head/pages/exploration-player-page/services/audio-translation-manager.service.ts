@@ -17,8 +17,6 @@
  * being played or paused.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('AudioTranslationManagerService', [
   function() {
     // Audio translations for the main content of a card at the top.

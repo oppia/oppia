@@ -16,8 +16,6 @@
  * @fileoverview Constants for story viewer domain.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.constant(
   'STORY_DATA_URL_TEMPLATE', '/story_data_handler/<story_id>');
 

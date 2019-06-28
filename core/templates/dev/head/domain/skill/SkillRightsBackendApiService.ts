@@ -18,8 +18,6 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('SkillRightsBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'SKILL_PUBLISH_URL_TEMPLATE', 'SKILL_RIGHTS_URL_TEMPLATE',

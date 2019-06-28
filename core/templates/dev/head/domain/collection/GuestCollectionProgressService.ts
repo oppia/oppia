@@ -27,8 +27,6 @@
 
 require('domain/collection/GuestCollectionProgressObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('GuestCollectionProgressService', [
   '$window', 'GuestCollectionProgressObjectFactory',
   function($window, GuestCollectionProgressObjectFactory) {

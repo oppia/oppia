@@ -26,8 +26,6 @@ require('services/SchemaDefaultValueService.ts');
 require('services/SchemaUndefinedLastElementService.ts');
 require('services/stateful/FocusManagerService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('schemaBasedListEditor', [
   'FocusManagerService', 'IdGenerationService',
   'NestedDirectivesRecursionTimeoutPreventionService',

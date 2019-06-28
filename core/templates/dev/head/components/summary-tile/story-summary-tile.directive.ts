@@ -18,8 +18,6 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('storySummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

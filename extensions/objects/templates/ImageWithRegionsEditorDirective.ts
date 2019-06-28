@@ -21,8 +21,6 @@
 // in via initArgs.
 
 // TODO(czx): Uniquify the labels of image regions
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('imageWithRegionsEditor', [
   '$document', '$sce', 'AlertsService', 'AssetsBackendApiService',
   'ContextService', 'UrlInterpolationService',

@@ -16,6 +16,4 @@
  * @fileoverview Directives required in terms page.
  */
 
-require('App.ts');
-
 require('base_components/BaseContentDirective.ts');

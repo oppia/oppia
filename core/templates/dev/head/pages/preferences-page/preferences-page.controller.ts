@@ -31,8 +31,6 @@ require('services/AlertsService.ts');
 require('services/UserService.ts');
 require('services/UtilsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('preferencesPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

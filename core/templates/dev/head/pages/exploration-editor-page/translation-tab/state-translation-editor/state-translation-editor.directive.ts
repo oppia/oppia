@@ -16,8 +16,6 @@
  * @fileoverview Directive for the state translation editor.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('stateTranslationEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

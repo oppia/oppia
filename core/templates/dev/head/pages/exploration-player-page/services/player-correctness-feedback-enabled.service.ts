@@ -17,8 +17,6 @@
  * feedback is enabled or not.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('PlayerCorrectnessFeedbackEnabledService', [function() {
   var _correctnessFeedbackIsEnabled = false;
 

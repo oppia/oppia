@@ -17,8 +17,6 @@
  * exploration.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ComputeGraphService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
     var _computeGraphData = function(initStateId, states) {

@@ -17,8 +17,6 @@
  * used at multiple places in the codebase.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('UtilsService', [function() {
   var utils = {
     isEmpty: function(obj) {

@@ -18,8 +18,6 @@
 
 require('domain/classifier/ClassifierObjectFactory.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('StateClassifierMappingService', [
   'ClassifierObjectFactory', function(ClassifierObjectFactory) {
     var stateClassifierMapping = null;

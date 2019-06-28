@@ -17,8 +17,6 @@
  * represents the progress of a guest playing through a collection.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('GuestCollectionProgressObjectFactory', [
   function() {
     var GuestCollectionProgress = function(completedExplorationsMap) {

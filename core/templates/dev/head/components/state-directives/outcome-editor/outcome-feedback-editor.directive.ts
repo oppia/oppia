@@ -19,8 +19,6 @@
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('outcomeFeedbackEditor', [
   'SubtitledHtmlObjectFactory', 'UrlInterpolationService',
   function(SubtitledHtmlObjectFactory, UrlInterpolationService) {

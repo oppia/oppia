@@ -22,8 +22,6 @@ require('domain/exploration/ExplorationDraftObjectFactory.ts');
 //
 // Note that the draft is only saved if localStorage exists and works
 // (i.e. has storage capacity).
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('LocalStorageService', [
   'ExplorationDraftObjectFactory',
   function(ExplorationDraftObjectFactory) {
