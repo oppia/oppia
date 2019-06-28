@@ -374,7 +374,7 @@ def get_completed_exploration_ids(user_id, collection_id):
         collection_id: str. ID of the collection.
 
     Returns:
-        list(Exploration). A list of explorations that the user with the given
+        list(str). A list of exploration ids that the user with the given
         user id has completed within the context of the provided collection with
         the given collection id. The list is empty if the user has not yet
         completed any explorations within the collection, or if either the
