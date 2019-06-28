@@ -53,6 +53,28 @@
   </table>
 </md-card>
 
+<md-card class="oppia-page-card oppia-long-text" style="max-width: 900px">
+  <h3>Audit jobs</h3>
+  <h4>Current time: <[$ctrl.HUMAN_READABLE_CURRENT_TIME]></h4>
+  <table class="table table-striped">
+    <tr ng-repeat="job_spec in $ctrl.AUDIT_JOB_SPECS">
+      <td><[job_spec.job_type]></td>
+      <td>
+        <button ng-click="$ctrl.startNewJob(job_spec.job_type)"
+                class="pull-right">
+          Start new job
+        </button>
+        <span ng-if="job_spec.is_queued_or_running"
+              class="oppia-serious-warning-text">
+          <strong>
+            (warning: an instance of this job type is already running)
+          </strong>
+        </span>
+      </td>
+    </tr>
+  </table>
+</md-card>
+
 <md-card ng-if="$ctrl.UNFINISHED_JOB_DATA.length > 0"
          class="oppia-page-card oppia-long-text" style="max-width: 900px">
   <h3>Unfinished jobs</h3>

@@ -43,7 +43,7 @@ class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
     The ID of instances of this class has the form
-    {{random_hash_of_16_chars}}
+    {{random_hash_of_12_chars}}
     """
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
@@ -63,7 +63,7 @@ class QuestionModel(base_models.VersionedModel):
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question of the form
-        {{random_hash_of_16_chars}}
+        {{random_hash_of_12_chars}}
 
         Returns:
            new_id: int. ID of the new QuestionModel instance.
