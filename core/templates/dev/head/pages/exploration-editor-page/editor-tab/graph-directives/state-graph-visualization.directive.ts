@@ -26,6 +26,8 @@ require(
   'translation-status.service.ts');
 
 /* eslint-disable angular/directive-restrict */
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('stateGraphVisualization', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

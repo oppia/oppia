@@ -20,6 +20,8 @@
  * page.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('FocusManagerService', [
   '$rootScope', '$timeout', 'DeviceInfoService', 'IdGenerationService',
   'LABEL_FOR_CLEARING_FOCUS',
