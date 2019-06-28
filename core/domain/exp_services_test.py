@@ -20,6 +20,7 @@ import StringIO
 import copy
 import datetime
 import os
+import re
 import zipfile
 
 from constants import constants
@@ -791,6 +792,56 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             state_classifier_mapping['Home']['data_schema_version'], 1)
         self.assertEqual(
             state_classifier_mapping['Home']['algorithm_id'], 'TextClassifier')
+
+    def test_cannot_get_multiple_explorations_by_version_with_invalid_handler(
+            self):
+        rights_manager.create_new_exploration_rights(
+            'exp_id_1', self.owner_id)
+
+        states_dict = {
+            feconf.DEFAULT_INIT_STATE_NAME: {
+                'content': [{'type': 'text', 'value': ''}],
+                'param_changes': [],
+                'interaction': {
+                    'customization_args': {},
+                    'id': 'Continue',
+                    'handlers': [{
+                        'name': 'invalid_handler_name',
+                        'rule_specs': [{
+                            'dest': 'END',
+                            'feedback': [],
+                            'param_changes': [],
+                            'definition': {'rule_type': 'default'}
+                        }]
+                    }]
+                },
+            }
+        }
+
+        exploration_model = exp_models.ExplorationModel(
+            id='exp_id_1',
+            category='category 1',
+            title='title 1',
+            objective='objective 1',
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
+            states_schema_version=3,
+            states=states_dict
+        )
+
+        exploration_model.commit(
+            self.owner_id, 'exploration model created',
+            [{
+                'cmd': 'create',
+                'title': 'title 1',
+                'category': 'category 1',
+            }])
+
+        with self.assertRaisesRegexp(
+            Exception,
+            re.escape(
+                'Exploration exp_id_1, versions [1] could not be converted to '
+                'latest schema version.')):
+            exp_services.get_multiple_explorations_by_version('exp_id_1', [1])
 
 
 class LoadingAndDeletionOfExplorationDemosTests(ExplorationServicesUnitTests):
