@@ -22,6 +22,8 @@
 require(
   'pages/collection-editor-page/services/collection-linearizer.service.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CollectionValidationService', [
   'CollectionLinearizerService',
   function(CollectionLinearizerService) {
