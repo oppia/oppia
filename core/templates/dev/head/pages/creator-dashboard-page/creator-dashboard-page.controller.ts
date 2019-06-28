@@ -129,6 +129,7 @@ require(
 require('components/forms/custom-forms-directives/html-select.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'sharing-links.directive.ts');
