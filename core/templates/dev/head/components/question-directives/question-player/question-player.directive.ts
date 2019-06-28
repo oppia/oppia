@@ -246,9 +246,11 @@ oppia.directive('questionPlayer', [
           var createScorePerSkillMapping = function() {
             var scorePerSkillMapping = {};
             if (ctrl.questionPlayerConfig.skillList) {
-              for (var i = 0; i < ctrl.questionPlayerConfig.skillList.length; i++) {
+              for (var i = 0;
+                i < ctrl.questionPlayerConfig.skillList.length; i++) {
                 var skillId = ctrl.questionPlayerConfig.skillList[i];
-                var description = ctrl.questionPlayerConfig.skillDescriptions[i];
+                var description =
+                  ctrl.questionPlayerConfig.skillDescriptions[i];
                 scorePerSkillMapping[skillId] = {
                   description: description,
                   score: 0.0,
@@ -328,9 +330,9 @@ oppia.directive('questionPlayer', [
           ctrl.getColorForScore = function(scorePerSkill) {
             var correctionRate = scorePerSkill.score / scorePerSkill.total;
             if (correctionRate >= CORRECTION_RATE_TO_PASS) {
-              return "rgb(0, 150, 136)";
+              return 'rgb(0, 150, 136)';
             } else {
-              return "rgb(217, 92, 12)";
+              return 'rgb(217, 92, 12)';
             }
           };
 
