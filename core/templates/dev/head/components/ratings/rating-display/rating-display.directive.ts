@@ -18,6 +18,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('ratingDisplay', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -48,7 +50,7 @@ oppia.directive('ratingDisplay', [
         var POSSIBLE_RATINGS = [1, 2, 3, 4, 5];
         $scope.stars = POSSIBLE_RATINGS.map(function(starValue) {
           return {
-            cssClass: 'fa-star-o',
+            cssClass: 'far fa-star',
             value: starValue
           };
         });
@@ -61,10 +63,10 @@ oppia.directive('ratingDisplay', [
         var displayValue = function(ratingValue) {
           for (var i = 0; i < $scope.stars.length; i++) {
             $scope.stars[i].cssClass = (
-              ratingValue === undefined ? 'fa-star-o' :
-              ratingValue < $scope.stars[i].value - 0.75 ? 'fa-star-o' :
-              ratingValue < $scope.stars[i].value - 0.25 ? 'fa-star-half-o' :
-              'fa-star');
+              ratingValue === undefined ? 'far fa-star' :
+              ratingValue < $scope.stars[i].value - 0.75 ? 'far fa-star' :
+              ratingValue < $scope.stars[i].value - 0.25 ? 'far fa-star-half' :
+              'fas fa-star');
 
             if ($scope.status === STATUS_ACTIVE &&
                 ratingValue >= $scope.stars[i].value) {

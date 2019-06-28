@@ -17,12 +17,12 @@
    thread domain objects.
  */
 
-require('domain/suggestion/QuestionSuggestionObjectFactory.ts');
 require('domain/suggestion/SuggestionObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SuggestionThreadObjectFactory', [
-  'QuestionSuggestionObjectFactory', 'SuggestionObjectFactory',
-  function(QuestionSuggestionObjectFactory, SuggestionObjectFactory) {
+  'SuggestionObjectFactory', function(SuggestionObjectFactory) {
     var SuggestionThread = function(
         status, subject, summary, originalAuthorName, lastUpdated, messageCount,
         threadId, suggestion) {
@@ -43,10 +43,7 @@ oppia.factory('SuggestionThreadObjectFactory', [
     /* eslint-enable dot-notation */
         suggestionThreadBackendDict, suggestionBackendDict) {
       var suggestion;
-      if (suggestionBackendDict.suggestion_type === 'add_question') {
-        suggestion = QuestionSuggestionObjectFactory.createFromBackendDict(
-          suggestionBackendDict);
-      } else if (suggestionBackendDict.suggestion_type ===
+      if (suggestionBackendDict.suggestion_type ===
           'edit_exploration_state_content') {
         suggestion = SuggestionObjectFactory.createFromBackendDict(
           suggestionBackendDict);

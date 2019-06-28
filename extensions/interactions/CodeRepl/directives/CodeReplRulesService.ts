@@ -16,6 +16,11 @@
  * @fileoverview Rules service for the interaction.
  */
 
+require('filters/string-utility-filters/normalize-whitespace.filter.ts');
+require('services/CodeNormalizerService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CodeReplRulesService', [
   '$filter', 'CodeNormalizerService',
   function($filter, CodeNormalizerService) {

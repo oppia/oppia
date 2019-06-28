@@ -895,13 +895,17 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
             'state_names_with_changed_answer_groups']
         state_names_with_unchanged_answer_groups = trainable_states_dict[
             'state_names_with_unchanged_answer_groups']
-        if state_names_with_changed_answer_groups:
-            classifier_services.handle_trainable_states(
-                exploration, state_names_with_changed_answer_groups)
+        state_names_to_train_classifier = state_names_with_changed_answer_groups
         if state_names_with_unchanged_answer_groups:
-            classifier_services.handle_non_retrainable_states(
-                exploration, state_names_with_unchanged_answer_groups,
-                exp_versions_diff)
+            state_names_without_classifier = (
+                classifier_services.handle_non_retrainable_states(
+                    exploration, state_names_with_unchanged_answer_groups,
+                    exp_versions_diff))
+            state_names_to_train_classifier.extend(
+                state_names_without_classifier)
+        if state_names_to_train_classifier:
+            classifier_services.handle_trainable_states(
+                exploration, state_names_to_train_classifier)
 
     # Trigger exploration issues model updation.
     stats_services.update_exp_issues_for_new_exp_version(
@@ -1090,7 +1094,7 @@ def get_exploration_snapshots_metadata(exploration_id, allow_deleted=False):
         exploration_id, version_nums, allow_deleted=allow_deleted)
 
 
-def _get_last_updated_by_human_ms(exp_id):
+def get_last_updated_by_human_ms(exp_id):
     """Return the last time, in milliseconds, when the given exploration was
     updated by a human.
 
@@ -1292,7 +1296,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
                 contributors_summary[contributor_id_to_add] = 1
 
     exploration_model_last_updated = datetime.datetime.fromtimestamp(
-        _get_last_updated_by_human_ms(exploration.id) / 1000.0)
+        get_last_updated_by_human_ms(exploration.id) / 1000.0)
     exploration_model_created_on = exploration.created_on
     first_published_msec = exp_rights.first_published_msec
     exp_summary = exp_domain.ExplorationSummary(
@@ -1978,6 +1982,7 @@ def create_or_update_draft(
     exp_user_data.draft_change_list_id = draft_change_list_id
     exp_user_data.put()
 
+
 def try_upgrading_draft_to_exp_version(exp_id, user_id):
     """Try upgrading draft change list to match the latest exploration version.
 
@@ -1987,7 +1992,7 @@ def try_upgrading_draft_to_exp_version(exp_id, user_id):
     ExplorationuserDataModel.
 
     Returns:
-        bool: if successfully upgraded draft version
+        bool: True if successfully upgraded draft version.
     """
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = get_exploration_by_id(exp_id)
@@ -2006,6 +2011,7 @@ def try_upgrading_draft_to_exp_version(exp_id, user_id):
         logging.info('successfully upgraded all drafts.')
         return True
     return False
+
 
 def get_exp_with_draft_applied(exp_id, user_id):
     """If a draft exists for the given user and exploration,

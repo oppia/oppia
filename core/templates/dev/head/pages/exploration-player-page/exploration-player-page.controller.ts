@@ -22,9 +22,6 @@ require('components/ck-editor-helpers/ck-editor-rte.directive.ts');
 require('components/ck-editor-helpers/ck-editor-widgets.initializer.ts');
 require('directives/AngularHtmlBindDirective.ts');
 require('directives/MathjaxBindDirective.ts');
-require('filters/convert-unicode-with-params-to-html.filter.ts');
-require('filters/convert-html-to-unicode.filter.ts');
-require('filters/convert-unicode-to-html.filter.ts');
 require('components/forms/validators/is-at-least.filter.ts');
 require('components/forms/validators/is-at-most.filter.ts');
 require('components/forms/validators/is-float.filter.ts');
@@ -78,8 +75,6 @@ require(
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
-require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
 require(
@@ -91,31 +86,40 @@ require(
 require(
   'pages/exploration-player-page/learner-experience/' +
   'conversation-skin.directive.ts');
-require(
-  'pages/exploration-player-page/layout-directives/' +
-  'exploration-footer.directive.ts');
-require(
-  'pages/exploration-player-page/layout-directives/' +
-  'learner-local-nav.directive.ts');
-require(
-  'pages/exploration-player-page/layout-directives/' +
-  'learner-view-info.directive.ts');
 
-require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
-
+require('interactions/interactionsRequires.ts');
 require('objects/objectComponentsRequiresForPlayers.ts');
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('services/ContextService.ts');
 require('services/PageTitleService.ts');
 
-oppia.controller('ExplorationPlayer', [
-  'ContextService', 'PageTitleService', 'ReadOnlyExplorationBackendApiService',
-  function(
-      ContextService, PageTitleService, ReadOnlyExplorationBackendApiService) {
-    var explorationId = ContextService.getExplorationId();
-    ReadOnlyExplorationBackendApiService.fetchExploration(explorationId, null)
-      .then(function(response) {
-        PageTitleService.setPageTitle(response.exploration.title + ' - Oppia');
-      });
-  }
-]);
+var oppia = require('AppInit.ts').module;
+
+oppia.directive('explorationPlayerPage', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      bindToController: {},
+      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/exploration-player-page/' +
+        'exploration-player-page.directive.html'),
+      controllerAs: '$ctrl',
+      controller: [
+        'ContextService', 'PageTitleService',
+        'ReadOnlyExplorationBackendApiService',
+        function(
+            ContextService, PageTitleService,
+            ReadOnlyExplorationBackendApiService) {
+          var explorationId = ContextService.getExplorationId();
+          ReadOnlyExplorationBackendApiService.fetchExploration(
+            explorationId, null)
+            .then(function(response) {
+              PageTitleService.setPageTitle(
+                response.exploration.title + ' - Oppia');
+            });
+        }
+      ]
+    };
+  }]);

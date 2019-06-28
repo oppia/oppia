@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import obj_services
+from core.domain import skill_services
 from core.domain import topic_services
 import feconf
 import jinja2
@@ -78,12 +79,18 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
         # Topic cannot be None as an exception will be thrown from its decorator
         # if so.
         topic = topic_services.get_topic_by_name(topic_name)
-        skills_of_topic = topic.get_all_skill_ids()
+        try:
+            skills = skill_services.get_multi_skills(topic.get_all_skill_ids())
+        except Exception, e:
+            raise self.PageNotFoundException(e)
+        skills_with_description = {}
+        for skill in skills:
+            skills_with_description[skill.id] = skill.description
 
         topic_name = topic.name
 
         self.values.update({
             'topic_name': topic.name,
-            'skill_list': skills_of_topic
+            'skills_with_description': skills_with_description
         })
         self.render_json(self.values)

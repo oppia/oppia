@@ -71,7 +71,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 ['TextInput'], category='Algebra'))
 
         self.old_content = state_domain.SubtitledHtml(
-            'content', 'old content html').to_dict()
+            'content', '<p>old content html</p>').to_dict()
 
         exploration.states['State 1'].update_content(self.old_content)
         exploration.states['State 2'].update_content(self.old_content)
@@ -84,9 +84,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
 
         self.new_content = state_domain.SubtitledHtml(
-            'content', 'new content html').to_dict()
+            'content', '<p>new content html</p>').to_dict()
         self.resubmit_change_content = state_domain.SubtitledHtml(
-            'content', 'resubmit change content html').to_dict()
+            'content', '<p>resubmit change content html</p>').to_dict()
 
         self.logout()
 
@@ -318,7 +318,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, self.editor_id)
 
         new_content = state_domain.SubtitledHtml(
-            'content', 'new content html').to_dict()
+            'content', '<p>new content html</p>').to_dict()
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -638,7 +638,8 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                 'default_state').to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
-                feconf.CURRENT_STATE_SCHEMA_VERSION)
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': [self.SKILL_ID]
         }
         self.login(self.AUTHOR_EMAIL)
         response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
@@ -750,7 +751,8 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
                 'default_state').to_dict(),
             'language_code': 'en',
             'question_state_data_schema_version': (
-                feconf.CURRENT_STATE_SCHEMA_VERSION)
+                feconf.CURRENT_STATE_SCHEMA_VERSION),
+            'linked_skill_ids': [self.skill_id]
         }
 
         self.login(self.AUTHOR_EMAIL)
@@ -804,7 +806,7 @@ class TopicSuggestionTests(test_utils.GenericTestBase):
         self.save_new_default_exploration(exp_id, self.admin_id)
 
         new_content = state_domain.SubtitledHtml(
-            'content', 'new content html').to_dict()
+            'content', '<p>new content html</p>').to_dict()
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,

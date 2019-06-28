@@ -21,10 +21,9 @@ require('domain/editor/undo_redo/QuestionUndoRedoService.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 require('domain/question/QuestionObjectFactory.ts');
 
-oppia.constant('QUESTION_PROPERTY_LANGUAGE_CODE', 'language_code');
-oppia.constant('QUESTION_PROPERTY_QUESTION_STATE_DATA', 'question_state_data');
+require('domain/question/question-domain.constants.ts');
 
-oppia.constant('CMD_UPDATE_QUESTION_PROPERTY', 'update_question_property');
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('QuestionUpdateService', [
   'ChangeObjectFactory', 'QuestionObjectFactory', 'QuestionUndoRedoService',

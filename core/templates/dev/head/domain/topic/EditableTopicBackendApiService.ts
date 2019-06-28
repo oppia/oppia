@@ -18,12 +18,9 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
-oppia.constant(
-  'TOPIC_EDITOR_STORY_URL_TEMPLATE', '/topic_editor_story_handler/<topic_id>');
+require('domain/topic/topic-domain.constants.ts');
 
-oppia.constant(
-  'TOPIC_EDITOR_QUESTION_URL_TEMPLATE',
-  '/topic_editor_question_handler/<topic_id>?cursor=<cursor>');
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',

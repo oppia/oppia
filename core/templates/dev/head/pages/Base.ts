@@ -18,9 +18,13 @@ require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/stateful/BackgroundMaskService.ts');
 
+require('app.constants.ts');
+
 /**
  * @fileoverview Oppia's base controller.
  */
+
+var oppia = require('AppInit.ts').module;
 
 oppia.controller('Base', [
   '$document', '$rootScope', '$scope', 'AlertsService', 'BackgroundMaskService',

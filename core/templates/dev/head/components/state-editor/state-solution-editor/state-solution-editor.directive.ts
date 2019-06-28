@@ -56,6 +56,10 @@ require('services/EditabilityService.ts');
 require('services/ExplorationHtmlFormatterService.ts');
 require('services/GenerateContentIdService.ts');
 
+require('components/state-editor/state-editor.constants.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

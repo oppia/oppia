@@ -16,9 +16,9 @@
  * @fileoverview Constants for the practice session.
  */
 
-oppia.constant('TOTAL_QUESTIONS', 20);
+var oppia = require('AppInit.ts').module;
 
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+oppia.constant('TOTAL_QUESTIONS', 20);
 
 oppia.constant(
   'PRACTICE_SESSIONS_DATA_URL',

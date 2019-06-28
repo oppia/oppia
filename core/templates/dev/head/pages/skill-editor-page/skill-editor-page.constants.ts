@@ -16,8 +16,8 @@
  * @fileoverview Constants for the skill editor page.
  */
 
-oppia.constant(
-  'INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
+var oppia = require('AppInit.ts').module;
+
 oppia.constant(
   'SKILL_RIGHTS_URL_TEMPLATE',
   '/skill_editor_handler/rights/<skill_id>');
@@ -28,5 +28,3 @@ oppia.constant(
   'EVENT_SKILL_INITIALIZED', 'skillInitialized');
 oppia.constant(
   'EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
-oppia.constant(
-  'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'questionSummariesInitialized');

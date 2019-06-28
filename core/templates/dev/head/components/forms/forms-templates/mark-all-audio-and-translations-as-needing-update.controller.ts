@@ -17,6 +17,8 @@
  * mark_all_audio_and_translations_as_needing_update modal.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.controller('MarkAllAudioAndTranslationsAsNeedingUpdateController', [
   '$scope', '$uibModalInstance',
   function($scope, $uibModalInstance) {

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for continue validation service.
  */
 
+require('interactions/Continue/directives/ContinueValidationService.ts');
+
 describe('ContinueValidationService', function() {
   var validatorService, WARNING_TYPES;
 

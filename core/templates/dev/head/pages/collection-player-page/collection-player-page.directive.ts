@@ -39,7 +39,7 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 
-require('pages/collection-player-page/collection-player-page.constants.ts');
+var oppia = require('AppInit.ts').module;
 
 oppia.animation('.oppia-collection-animate-slide', function() {
   return {
@@ -248,6 +248,16 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
             return (
               '/explore/' + explorationId + '?collection_id=' +
               ctrl.collectionId);
+          };
+
+          ctrl.getExplorationTitlePosition = function(index) {
+            if (index % 2 === 0 ) {
+              return '8px';
+            } else if ((index + 1) % 2 === 0 && (index + 1) % 4 !== 0) {
+              return '30px';
+            } else if ((index + 1) % 4 === 0) {
+              return '-40px';
+            }
           };
 
           $http.get('/collectionsummarieshandler/data', {

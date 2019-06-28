@@ -21,10 +21,14 @@
  * function on Oppia-ml.
  */
 
-// Minimum confidence required for a predicted answer group to be shown to user.
-// Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
-// however value need not be in those bounds.
-oppia.constant('CODE_REPL_PREDICTION_SERVICE_THRESHOLD', 0.7);
+require('classifiers/CountVectorizerService.ts');
+require('classifiers/PythonProgramTokenizer.ts');
+require('classifiers/SVMPredictionService.ts');
+require('classifiers/WinnowingPreprocessingService.ts');
+
+require('interactions/interactions-extension.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CodeReplPredictionService', [
   'CountVectorizerService', 'PythonProgramTokenType',

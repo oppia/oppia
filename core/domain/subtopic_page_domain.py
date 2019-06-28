@@ -16,9 +16,8 @@
 
 """Domain objects for the pages for subtopics, and related models."""
 
-import copy
-
 from constants import constants
+from core.domain import change_domain
 from core.domain import state_domain
 from core.platform import models
 import feconf
@@ -30,73 +29,39 @@ SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML = 'page_contents_html'
 SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO = 'page_contents_audio'
 SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS = 'page_written_translations'
 
-
-CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_CREATE_NEW = 'create_new'
-CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 
 
-class SubtopicPageChange(object):
-    """Domain object for changes made to subtopic_page object."""
+class SubtopicPageChange(change_domain.BaseChange):
+    """Domain object for changes made to subtopic_page object.
 
+    The allowed commands, together with the attributes:
+        - 'create_new' (with topic_id, subtopic_id)
+        - 'update_subtopic_page_property' (
+            with property_name, new_value, old_value, subtopic_id).
+    """
+
+    # The allowed list of subtopic page properties which can be used in
+    # update_subtopic_page_property command.
     SUBTOPIC_PAGE_PROPERTIES = (
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_HTML,
         SUBTOPIC_PAGE_PROPERTY_PAGE_CONTENTS_AUDIO,
         SUBTOPIC_PAGE_PROPERTY_PAGE_WRITTEN_TRANSLATIONS)
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'name', 'subtopic_id',
-        'topic_id'
-    ]
-
-    def __init__(self, change_dict):
-        """Initialize a SubtopicPageChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'update_topic_property' (with property_name, new_value
-                and old_value)
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.SUBTOPIC_PAGE_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-            self.id = change_dict['subtopic_id']
-        elif self.cmd == CMD_CREATE_NEW:
-            self.topic_id = change_dict['topic_id']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the SubtopicPageChange domain object.
-
-        Returns:
-            A dict, mapping all fields of SubtopicPageChange instance.
-        """
-        subtopic_page_change_dict = {}
-        subtopic_page_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                subtopic_page_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return subtopic_page_change_dict
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': ['topic_id', 'subtopic_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+        'required_attribute_names': [
+            'property_name', 'new_value', 'old_value', 'subtopic_id'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': SUBTOPIC_PAGE_PROPERTIES}
+    }]
 
 
 class SubtopicPageContents(object):
@@ -335,8 +300,8 @@ class SubtopicPage(object):
         conversion_fn = getattr(
             cls, '_convert_page_contents_v%s_dict_to_v%s_dict' % (
                 current_version, current_version + 1))
-        versioned_page_contents['skill_contents'] = conversion_fn(
-            versioned_page_contents['skill_contents'])
+        versioned_page_contents['page_contents'] = conversion_fn(
+            versioned_page_contents['page_contents'])
 
     def get_subtopic_id_from_subtopic_page_id(self):
         """Returns the id from the subtopic page id of the object.

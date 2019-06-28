@@ -14,10 +14,10 @@
 
 """Domain objects relating to skills."""
 
-import copy
-
 from constants import constants
+from core.domain import change_domain
 from core.domain import html_cleaner
+from core.domain import html_validation_service
 from core.domain import state_domain
 import feconf
 import utils
@@ -55,107 +55,83 @@ CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
 CMD_PUBLISH_SKILL = 'publish_skill'
 
 
-class SkillChange(object):
-    """Domain object for changes made to skill object."""
+class SkillChange(change_domain.BaseChange):
+    """Domain object for changes made to skill object.
+
+    The allowed commands, together with the attributes:
+        - 'add_skill_misconception' (with new_misconception_dict)
+        - 'delete_skill_misconception' (with misconception_id)
+        - 'create_new'
+        - 'update_skill_property' (with property_name, new_value
+        and old_value)
+        - 'update_skill_contents_property' (with property_name,
+        new_value and old_value)
+        - 'update_skill_misconceptions_property' (
+            with misconception_id, property_name, new_value and old_value)
+        - 'migrate_contents_schema_to_latest_version' (with
+        from_version and to_version)
+        - 'migrate_misconceptions_schema_to_latest_version' (with
+        from_version and to_version)
+    """
+
+    # The allowed list of skill properties which can be used in
+    # update_skill_property command.
     SKILL_PROPERTIES = (
         SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_LANGUAGE_CODE,
         SKILL_PROPERTY_SUPERSEDING_SKILL_ID,
         SKILL_PROPERTY_ALL_QUESTIONS_MERGED)
 
+    # The allowed list of skill contents properties which can be used in
+    # update_skill_contents_property command.
     SKILL_CONTENTS_PROPERTIES = (
         SKILL_CONTENTS_PROPERTY_EXPLANATION,
         SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES)
 
+    # The allowed list of misconceptions properties which can be used in
+    # update_skill_misconceptions_property command.
     SKILL_MISCONCEPTIONS_PROPERTIES = (
         SKILL_MISCONCEPTIONS_PROPERTY_NAME,
         SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
         SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
     )
 
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'misconception_id',
-        'from_version', 'to_version'
-    ]
-
-    def __init__(self, change_dict):
-        """Initialize a SkillChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'add_skill_misconception' (with new_misconception_dict)
-                - 'delete_skill_misconception' (with id)
-                - 'create_new'
-                - 'update_skill_property' (with property_name, new_value
-                and old_value)
-                - 'update_skill_contents_property' (with property_name,
-                new_value and old_value)
-                - 'update_skill_misconceptions_property' (with property_name,
-                new_value and old_value)
-                - 'migrate_contents_schema_to_latest_version' (with
-                from_version and to_version)
-                - 'migrate_misconceptions_schema_to_latest_version' (with
-                from_version and to_version)
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_ADD_SKILL_MISCONCEPTION:
-            self.new_value = change_dict['new_misconception_dict']
-        elif self.cmd == CMD_DELETE_SKILL_MISCONCEPTION:
-            self.misconception_id = change_dict['id']
-        elif self.cmd == CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.SKILL_MISCONCEPTIONS_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.misconception_id = change_dict['id']
-            self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
-        elif self.cmd == CMD_UPDATE_SKILL_PROPERTY:
-            if change_dict['property_name'] not in self.SKILL_PROPERTIES:
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
-            if (change_dict['property_name'] not in
-                    self.SKILL_CONTENTS_PROPERTIES):
-                raise Exception('Invalid change_dict: %s' % change_dict)
-            self.property_name = change_dict['property_name']
-            self.new_value = copy.deepcopy(change_dict['new_value'])
-            self.old_value = copy.deepcopy(change_dict['old_value'])
-        elif self.cmd == CMD_CREATE_NEW:
-            return
-        elif self.cmd == CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        elif self.cmd == CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION:
-            self.from_version = change_dict['from_version']
-            self.to_version = change_dict['to_version']
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the SkillChange domain object.
-
-        Returns:
-            A dict, mapping all fields of SkillChange instance.
-        """
-        skill_change_dict = {}
-        skill_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                skill_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return skill_change_dict
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_ADD_SKILL_MISCONCEPTION,
+        'required_attribute_names': ['new_misconception_dict'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_DELETE_SKILL_MISCONCEPTION,
+        'required_attribute_names': ['misconception_id'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+        'required_attribute_names': [
+            'misconception_id', 'property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': SKILL_MISCONCEPTIONS_PROPERTIES}
+    }, {
+        'name': CMD_UPDATE_SKILL_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': SKILL_PROPERTIES}
+    }, {
+        'name': CMD_UPDATE_SKILL_CONTENTS_PROPERTY,
+        'required_attribute_names': ['property_name', 'new_value', 'old_value'],
+        'optional_attribute_names': [],
+        'allowed_values': {'property_name': SKILL_CONTENTS_PROPERTIES}
+    }, {
+        'name': CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION,
+        'required_attribute_names': ['from_version', 'to_version'],
+        'optional_attribute_names': []
+    }]
 
 
 class Misconception(object):
@@ -177,8 +153,15 @@ class Misconception(object):
         """
         self.id = misconception_id
         self.name = name
-        self.notes = html_cleaner.clean(notes)
-        self.feedback = html_cleaner.clean(feedback)
+        # The initial clean up of html by converting it to ckeditor format
+        # is required since user may copy and paste some stuff in the rte
+        # which is not a valid ckeditor html string but can be converted
+        # to a valid ckeditor string without errors. This initial clean up
+        # ensures that validation will not fail in such cases.
+        self.notes = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(notes))
+        self.feedback = html_validation_service.convert_to_ckeditor(
+            html_cleaner.clean(feedback))
 
     def to_dict(self):
         """Returns a dict representing this Misconception domain object.
@@ -211,32 +194,45 @@ class Misconception(object):
         return misconception
 
     @classmethod
-    def create_default_misconception(cls, misconception_id):
-        """Creates a Misconception object with default values.
-
-        Args:
-            misconception_id: int. ID of the new misconception.
-
-        Returns:
-            Misconception. A misconception object with given id and default
-                values for all other fields.
-        """
-        return cls(
-            misconception_id, feconf.DEFAULT_MISCONCEPTION_NAME,
-            feconf.DEFAULT_MISCONCEPTION_NOTES,
-            feconf.DEFAULT_MISCONCEPTION_FEEDBACK)
-
-    @classmethod
     def require_valid_misconception_id(cls, misconception_id):
         """Validates the misconception id for a Misconception object.
 
         Args:
             misconception_id: int. The misconception id to be validated.
+
+        Raises:
+            ValidationError. The misconception id is invalid.
         """
         if not isinstance(misconception_id, int):
             raise utils.ValidationError(
                 'Expected misconception ID to be an integer, received %s' %
                 misconception_id)
+
+    @classmethod
+    def require_valid_html(cls, html):
+        """Validates that html passes sanitization and customization
+        args check.
+
+        Args:
+            html: str. The html string to be validated.
+
+        Raises:
+            ValidationError. The html string is invalid.
+        """
+        err_dict = html_validation_service.validate_rte_format(
+            [html], feconf.RTE_FORMAT_CKEDITOR)
+        for key in err_dict:
+            if err_dict[key]:
+                raise utils.ValidationError(
+                    'Invalid html: %s for rte with invalid tags and '
+                    'strings: %s' % (html, err_dict))
+
+        err_dict = html_validation_service.validate_customization_args([
+            html])
+        if err_dict:
+            raise utils.ValidationError(
+                'Invalid html: %s due to errors in customization_args: %s' % (
+                    html, err_dict))
 
     def validate(self):
         """Validates various properties of the Misconception object.
@@ -254,10 +250,13 @@ class Misconception(object):
             raise utils.ValidationError(
                 'Expected misconception notes to be a string, received %s' %
                 self.notes)
+        self.require_valid_html(self.notes)
+
         if not isinstance(self.feedback, basestring):
             raise utils.ValidationError(
                 'Expected misconception feedback to be a string, received %s' %
                 self.feedback)
+        self.require_valid_html(self.feedback)
 
 
 class SkillContents(object):
@@ -313,23 +312,12 @@ class SkillContents(object):
             available_content_ids.add(example.content_id)
             example.validate()
 
-        audio_content_ids = set(self.content_ids_to_audio_translations.keys())
-        if audio_content_ids != available_content_ids:
-            raise utils.ValidationError(
-                'Expected content_ids_to_audio_translations to contain only '
-                'content_ids in worked examples and explanation. '
-                'content_ids_to_audio_translations: %s. '
-                'content IDs found: %s' % (
-                    audio_content_ids, available_content_ids))
-
-        self.written_translations.validate(available_content_ids)
-
         # TODO(tjiang11): Extract content ids to audio translations out into
         # its own object to reuse throughout audio-capable structures.
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'
-                'received %s' % self.param_changes)
+                'received %s' % self.content_ids_to_audio_translations)
         for (content_id, audio_translations) in (
                 self.content_ids_to_audio_translations.iteritems()):
 
@@ -356,6 +344,17 @@ class SkillContents(object):
                         'Unrecognized language code: %s' % language_code)
 
                 translation.validate()
+
+        audio_content_ids = set(self.content_ids_to_audio_translations.keys())
+        if audio_content_ids != available_content_ids:
+            raise utils.ValidationError(
+                'Expected content_ids_to_audio_translations to contain only '
+                'content_ids in worked examples and explanation. '
+                'content_ids_to_audio_translations: %s. '
+                'content IDs found: %s' % (
+                    audio_content_ids, available_content_ids))
+
+        self.written_translations.validate(available_content_ids)
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
@@ -760,36 +759,14 @@ class Skill(object):
         written_translations = self.skill_contents.written_translations
         content_ids_to_audio_translations = (
             self.skill_contents.content_ids_to_audio_translations)
-        content_ids_for_text_translations = (
-            written_translations.get_content_ids_for_text_translation())
 
         for content_id in content_ids_to_delete:
-            if not content_id in content_ids_to_audio_translations:
-                raise Exception(
-                    'The content_id %s does not exist in '
-                    'content_ids_to_audio_translations.' % content_id)
-            elif not content_id in content_ids_for_text_translations:
-                raise Exception(
-                    'The content_id %s does not exist in written_translations.'
-                    % content_id)
-            else:
-                content_ids_to_audio_translations.pop(content_id)
-                written_translations.delete_content_id_for_translation(
-                    content_id)
+            content_ids_to_audio_translations.pop(content_id)
+            written_translations.delete_content_id_for_translation(content_id)
 
         for content_id in content_ids_to_add:
-            if content_id in content_ids_to_audio_translations:
-                raise Exception(
-                    'The content_id %s already exists in '
-                    'content_ids_to_audio_translations.' % content_id)
-            elif content_id in content_ids_for_text_translations:
-                raise Exception(
-                    'The content_id %s does not exist in written_translations.'
-                    % content_id)
-            else:
-                content_ids_to_audio_translations[content_id] = {}
-                written_translations.add_content_id_for_translation(
-                    content_id)
+            content_ids_to_audio_translations[content_id] = {}
+            written_translations.add_content_id_for_translation(content_id)
 
     def _find_misconception_index(self, misconception_id):
         """Returns the index of the misconception with the given misconception
@@ -931,6 +908,47 @@ class SkillSummary(object):
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
 
+    def validate(self):
+        """Validates various properties of the Skill Summary object.
+
+        Raises:
+            ValidationError: One or more attributes of skill summary are
+                invalid.
+        """
+        if not isinstance(self.description, basestring):
+            raise utils.ValidationError('Description should be a string.')
+
+        if self.description == '':
+            raise utils.ValidationError('Description field should not be empty')
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+        if not utils.is_valid_language_code(self.language_code):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.misconception_count, int):
+            raise utils.ValidationError(
+                'Expected misconception_count to be an int, '
+                'received \'%s\'' % self.misconception_count)
+
+        if self.misconception_count < 0:
+            raise utils.ValidationError(
+                'Expected misconception_count to be non-negative, '
+                'received \'%s\'' % self.misconception_count)
+
+        if not isinstance(self.worked_examples_count, int):
+            raise utils.ValidationError(
+                'Expected worked_examples_count to be an int, '
+                'received \'%s\'' % self.worked_examples_count)
+
+        if self.worked_examples_count < 0:
+            raise utils.ValidationError(
+                'Expected worked_examples_count to be non-negative, '
+                'received \'%s\'' % self.worked_examples_count)
+
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
 
@@ -999,43 +1017,23 @@ class SkillRights(object):
         return self.skill_is_private
 
 
-class SkillRightsChange(object):
-    """Domain object for changes made to a skill rights object."""
+class SkillRightsChange(change_domain.BaseChange):
+    """Domain object for changes made to a skill rights object.
 
-    def __init__(self, change_dict):
-        """Initialize a SkillRightsChange object from a dict.
+    The allowed commands, together with the attributes:
+        - 'create_new'
+        - 'publish_skill'.
+    """
 
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'create_new'
-                - 'publish_skill'
-
-        Raises:
-            Exception. The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_PUBLISH_SKILL:
-            pass
-        elif self.cmd == CMD_CREATE_NEW:
-            pass
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the SkillRightsChange domain object.
-
-        Returns:
-            A dict, mapping all fields of SkillRightsChange instance.
-        """
-        skill_rights_change_dict = {}
-        skill_rights_change_dict['cmd'] = self.cmd
-        return skill_rights_change_dict
+    ALLOWED_COMMANDS = [{
+        'name': CMD_CREATE_NEW,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }, {
+        'name': CMD_PUBLISH_SKILL,
+        'required_attribute_names': [],
+        'optional_attribute_names': []
+    }]
 
 
 class UserSkillMastery(object):

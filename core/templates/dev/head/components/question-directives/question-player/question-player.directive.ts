@@ -15,7 +15,6 @@
 /**
  * @fileoverview Controller for the questions player directive.
  */
-oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 
 require('domain/question/QuestionPlayerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
@@ -101,6 +100,10 @@ require(
 require(
   'pages/exploration-player-page/layout-directives/' +
   'learner-view-info.directive.ts');
+
+require('pages/interaction-specs.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',

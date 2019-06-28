@@ -22,32 +22,9 @@
 require('domain/editor/undo_redo/ChangeObjectFactory.ts');
 require('domain/editor/undo_redo/UndoRedoService.ts');
 
-// These should match the constants defined in core.domain.story_domain.
-oppia.constant('CMD_ADD_STORY_NODE', 'add_story_node');
-oppia.constant('CMD_DELETE_STORY_NODE', 'delete_story_node');
-oppia.constant(
-  'CMD_UPDATE_STORY_NODE_OUTLINE_STATUS', 'update_story_node_outline_status');
+require('domain/story/story-domain.constants.ts');
 
-oppia.constant('CMD_UPDATE_STORY_PROPERTY', 'update_story_property');
-oppia.constant('CMD_UPDATE_STORY_NODE_PROPERTY', 'update_story_node_property');
-oppia.constant(
-  'CMD_UPDATE_STORY_CONTENTS_PROPERTY', 'update_story_contents_property');
-
-oppia.constant('STORY_PROPERTY_TITLE', 'title');
-oppia.constant('STORY_PROPERTY_DESCRIPTION', 'description');
-oppia.constant('STORY_PROPERTY_NOTES', 'notes');
-oppia.constant('STORY_PROPERTY_LANGUAGE_CODE', 'language_code');
-
-oppia.constant('INITIAL_NODE_ID', 'initial_node_id');
-
-oppia.constant('STORY_NODE_PROPERTY_TITLE', 'title');
-oppia.constant('STORY_NODE_PROPERTY_OUTLINE', 'outline');
-oppia.constant('STORY_NODE_PROPERTY_EXPLORATION_ID', 'exploration_id');
-oppia.constant(
-  'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS', 'destination_node_ids');
-oppia.constant('STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS', 'acquired_skill_ids');
-oppia.constant(
-  'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS', 'prerequisite_skill_ids');
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('StoryUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',

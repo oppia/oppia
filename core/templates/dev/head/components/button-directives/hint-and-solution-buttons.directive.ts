@@ -23,7 +23,6 @@ require(
   'hints-and-solution-manager.service.ts');
 require(
   'pages/exploration-player-page/services/hint-and-solution-modal.service.ts');
-require('pages/exploration-player-page/exploration-player-page.constants.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
 require('pages/exploration-player-page/services/player-transcript.service.ts');
 require('pages/exploration-player-page/services/stats-reporting.service.ts');
@@ -31,6 +30,8 @@ require('services/ContextService.ts');
 require('services/contextual/DeviceInfoService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('hintAndSolutionButtons', [
   'UrlInterpolationService', function(UrlInterpolationService) {

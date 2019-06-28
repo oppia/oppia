@@ -16,6 +16,11 @@
  * @fileoverview Validator service for the number with units interaction.
  */
 
+require('domain/objects/NumberWithUnitsObjectFactory.ts');
+require('interactions/baseInteractionValidationService.ts');
+
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('NumberWithUnitsValidationService', [
   'NumberWithUnitsObjectFactory', 'baseInteractionValidationService',
   'WARNING_TYPES',

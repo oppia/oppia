@@ -13,8 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the learner's view of a collection.
+ * @fileoverview Requires for MathExpressionInput interaction.
  */
 
-oppia.constant(
-  'COLLECTION_DATA_URL_TEMPLATE', '/collection_handler/data/<collection_id>');
+require(
+  'interactions/MathExpressionInput/directives/' +
+  'MathExpressionInputRulesService.ts');
+require(
+  'interactions/MathExpressionInput/directives/' +
+  'MathExpressionInputValidationService.ts');
+require(
+  'interactions/MathExpressionInput/directives/' +
+  'OppiaInteractiveMathExpressionInputDirective.ts');
+require(
+  'interactions/MathExpressionInput/directives/' +
+  'OppiaResponseMathExpressionInputDirective.ts');
+require(
+  'interactions/MathExpressionInput/directives/' +
+  'OppiaShortResponseMathExpressionInputDirective.ts');

@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Numeric Input rules.
  */
 
+require('interactions/NumericInput/directives/NumericInputRulesService.ts');
+
 describe('Numeric Input service', function() {
   beforeEach(angular.mock.module('oppia'));
 
