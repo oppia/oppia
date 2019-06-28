@@ -18,9 +18,8 @@ anchor_for_restoring_cache: &restore_cache
 
 version: 2
 jobs:
-  build:
-    environment:
-      CC_TEST_REPORTER_ID: 92669ee647a6a6aea052695c6ce9677a2d6e4d7451231fd7e9eb3aa3acb8b5ca
+  environment:
+    CC_TEST_REPORTER_ID: 92669ee647a6a6aea052695c6ce9677a2d6e4d7451231fd7e9eb3aa3acb8b5ca
   setup:
     <<: *job_defaults
     steps:
