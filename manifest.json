@@ -252,10 +252,10 @@
         }
       },
       "bootstrap": {
-        "version": "3.3.4",
+        "version": "4.3.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip",
-        "rootDir": "bootstrap-3.3.4-dist",
+        "url": "https://github.com/twbs/bootstrap/releases/download/v4.3.1/bootstrap-4.3.1-dist.zip",
+        "rootDir": "bootstrap-4.3.1-dist",
         "targetDirPrefix": "bootstrap-",
         "bundle": {
           "css": ["css/bootstrap.css"],
