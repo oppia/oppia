@@ -2423,8 +2423,8 @@ class LintChecksManager(object):
 
     def _check_constants_declaration(self):
         """Checks the declaration of constants in the TS files to ensure that
-        the constants are not declared in files other than *.constants.ts and
-        that the constants are declared only single time.
+        the constants are not declared in files other than *.constants.ajs.ts
+        and *.constants.ts that the constants are declared only single time.
         """
 
         if self.verbose_mode_enabled:
