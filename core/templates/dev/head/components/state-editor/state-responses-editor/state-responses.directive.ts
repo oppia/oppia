@@ -67,8 +67,6 @@ require('services/ExplorationHtmlFormatterService.ts');
 require('services/GenerateContentIdService.ts');
 require('services/HtmlEscaperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

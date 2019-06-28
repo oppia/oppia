@@ -16,8 +16,6 @@
  * @fileoverview Service for computing the window dimensions.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('WindowDimensionsService', ['$window', function($window) {
   var onResizeHooks = [];
   angular.element($window).bind('resize', function() {

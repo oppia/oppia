@@ -29,8 +29,6 @@
 // component and use that id instead to determine whether to suppress
 // autoplaying.
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('AutoplayedVideosService', [function() {
   var autoplayedVideosDict = {};
   return {

@@ -19,8 +19,6 @@
  * answer submission process.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('CurrentInteractionService', [
   function() {
     var _submitAnswerFn = null;

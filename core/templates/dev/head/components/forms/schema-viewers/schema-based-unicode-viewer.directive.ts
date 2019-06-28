@@ -19,8 +19,6 @@
 require('filters/convert-unicode-with-params-to-html.filter.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('schemaBasedUnicodeViewer', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -39,8 +39,6 @@ require('services/contextual/UrlService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ExplorationPlayerStateService', [
   '$log', '$q', '$rootScope', 'ContextService',
   'EditableExplorationBackendApiService',

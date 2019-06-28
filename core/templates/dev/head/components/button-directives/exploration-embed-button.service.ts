@@ -19,8 +19,6 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ExplorationEmbedButtonService', [
   '$uibModal', 'SiteAnalyticsService', 'UrlInterpolationService',
   function($uibModal, SiteAnalyticsService, UrlInterpolationService) {

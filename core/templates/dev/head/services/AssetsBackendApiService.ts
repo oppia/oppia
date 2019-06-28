@@ -22,8 +22,6 @@ require('domain/utilities/FileDownloadRequestObjectFactory.ts');
 require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'FileDownloadRequestObjectFactory',
   'ImageFileObjectFactory', 'UrlInterpolationService', 'DEV_MODE',

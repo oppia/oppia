@@ -31,8 +31,6 @@ require('services/StateTopAnswersStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'ExplorationParamChangesService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'GraphDataService', 'ImprovementsService',

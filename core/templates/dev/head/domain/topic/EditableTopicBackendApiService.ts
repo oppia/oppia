@@ -20,8 +20,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/topic/topic-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_TOPIC_DATA_URL_TEMPLATE', 'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',

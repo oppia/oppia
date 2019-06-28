@@ -16,8 +16,6 @@
  * @fileoverview A service that maps IDs to Angular names.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('AngularNameService', [function() {
   var angularName = null;
 

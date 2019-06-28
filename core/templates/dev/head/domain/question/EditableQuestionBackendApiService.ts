@@ -29,8 +29,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/question/question-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('EditableQuestionBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE', 'QUESTION_CREATION_URL',
