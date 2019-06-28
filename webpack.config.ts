@@ -285,8 +285,14 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['library'],
+      chunks: ['app', 'library'],
       filename: 'library-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Looking to learn something new? Find explorations ' +
+          'created by professors, teachers and Oppia users in a subject ' +
+          'you\'re interested in, and start exploring!'
+      },
       template: commonPrefix + '/pages/library-page/library-page.mainpage.html',
       minify: htmlMinifyConfig,
       inject: false
