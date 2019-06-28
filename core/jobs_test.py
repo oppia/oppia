@@ -122,6 +122,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         expected_log_message = 'Job %s failed at' % job_id
 
+        # The first log message is ignored as it is the traceback.
         self.assertEqual(len(observed_log_messages), 2)
         self.assertTrue(
             observed_log_messages[1].startswith(expected_log_message))
@@ -983,9 +984,6 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
         return answer
 
 
-TIMES_RUN = 0
-
-
 class MockMRJobManager(jobs.BaseMapReduceJobManagerForContinuousComputations):
 
     @classmethod
@@ -998,6 +996,7 @@ class MockMRJobManager(jobs.BaseMapReduceJobManagerForContinuousComputations):
 
 
 class MockContinuousComputationManager(jobs.BaseContinuousComputationManager):
+    TIMES_RUN = 0
 
     @classmethod
     def get_event_types_listened_to(cls):
@@ -1013,13 +1012,12 @@ class MockContinuousComputationManager(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
-        global TIMES_RUN  # pylint: disable=global-statement
-        if TIMES_RUN < 2:
+        if cls.TIMES_RUN < 2:
             (
                 super(cls, MockContinuousComputationManager)
                 ._kickoff_batch_job_after_previous_one_ends()
             )
-            TIMES_RUN += 1
+            cls.TIMES_RUN = cls.TIMES_RUN + 1
 
 
 class ContinuousComputationTests(test_utils.GenericTestBase):
@@ -1039,7 +1037,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('owner_id', exploration)
         self.process_and_flush_pending_tasks()
 
-    def _process_pending_tasks(self):
+    def _run_but_do_not_flush_pending_tasks(self):
         """"Runs but not flushes pending tasks."""
         queue_names = self._get_all_queue_names()
 
@@ -1197,16 +1195,17 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         continuous_computations_data = jobs.get_continuous_computations_info(
             [StartExplorationEventCounter])
 
-        self.assertEqual(len(continuous_computations_data), 1)
-        continuous_computation_data = continuous_computations_data[0]
+        expected_continuous_computations_data = {
+            'computation_type': 'StartExplorationEventCounter',
+            'status_code': 'idle',
+            'is_startable': True,
+            'is_stoppable': False
+        }
 
-        self.assertEqual(
-            continuous_computation_data['computation_type'],
-            'StartExplorationEventCounter')
-        self.assertEqual(
-            continuous_computation_data['status_code'], 'idle')
-        self.assertTrue(continuous_computation_data['is_startable'])
-        self.assertFalse(continuous_computation_data['is_stoppable'])
+        self.assertEqual(len(continuous_computations_data), 1)
+        self.assertDictContainsSubset(
+            expected_continuous_computations_data,
+            continuous_computations_data[0])
 
     def test_failing_continuous_job(self):
         observed_log_messages = []
@@ -1224,7 +1223,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'error', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_failure()
 
-        self._process_pending_tasks()
+        self._run_but_do_not_flush_pending_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1246,7 +1245,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         with self.swap(logging, 'info', _mock_logging_function):
             StartExplorationEventCounter.on_batch_job_canceled()
 
-        self._process_pending_tasks()
+        self._run_but_do_not_flush_pending_tasks()
         StartExplorationEventCounter.stop_computation('admin_user_id')
 
         self.assertEqual(
@@ -1258,6 +1257,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS
         ):
+            self.assertEqual(MockContinuousComputationManager.TIMES_RUN, 0)
             MockContinuousComputationManager.start_computation()
             (
                 MockContinuousComputationManager  # pylint: disable=protected-access
@@ -1268,13 +1268,13 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
 
-            self._process_pending_tasks()
+            self._run_but_do_not_flush_pending_tasks()
             MockContinuousComputationManager.stop_computation('admin_user_id')
             status = MockContinuousComputationManager.get_status_code()
 
             self.assertEqual(
                 status, job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-            self.assertEqual(TIMES_RUN, 1)
+            self.assertEqual(MockContinuousComputationManager.TIMES_RUN, 1)
 
 
 # TODO(sll): When we have some concrete ContinuousComputations running in
