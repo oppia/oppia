@@ -43,8 +43,8 @@ oppia.directive('questionsList', [
       restrict: 'E',
       scope: {},
       bindToController: {
-        showSkillDescriptions: '&topicId',
-        showSelectSkillModal: '&topicId',
+        showSkillDescriptions: '&showSkillDescriptions',
+        showSelectSkillModal: '&showSelectSkillModal',
         getSkillIds: '&skillIds',
         getQuestionSummariesAsync: '=',
         isLastPage: '=isLastQuestionBatch',
