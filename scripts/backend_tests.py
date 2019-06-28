@@ -210,7 +210,15 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     containing tests.
     """
     def _get_test_target_classes(path):
-        """Returns a list of all test classes in a given test file path."""
+        """Returns a list of all test classes in a given test file path.
+
+        Args:
+            path: str. The path of the test file from which all test classes
+                are to be extracted.
+
+        Returns:
+            list. A list of all test classes in a given test file path.
+        """
         class_names = []
         with open(path, 'r') as f:
             lines = f.readlines()
