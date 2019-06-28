@@ -869,7 +869,7 @@ textarea {
 .oppia-dropdown-submenu:hover > .uib-dropdown-menu {
   display: block;
 }
-.oppia-dropdown-submenu.pull-left > .uib-dropdown-menu {
+.oppia-dropdown-submenu.float-left > .uib-dropdown-menu {
   border-radius: 6px 0 6px 6px;
   left: -100%;
   margin-left: 10px;
@@ -2369,7 +2369,7 @@ div#ng-curtain {
   border-left-color: #fff;
 }
 
-.oppia-dropdown-submenu.pull-left {
+.oppia-dropdown-submenu.float-left {
   float: none;
 }
 
