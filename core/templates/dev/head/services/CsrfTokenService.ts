@@ -22,8 +22,8 @@ oppia.factory('CsrfTokenService', [function() {
 
   return {
     initializeToken: function() {
-      if (token !== null) {
-        throw new Error('Token already set');
+      if (tokenPromise !== null) {
+        throw new Error('Token request already made');
       }
       tokenPromise = new Promise(function(resolve, reject) {
         // We use jQuery here instead of Angular's $http, since the latter

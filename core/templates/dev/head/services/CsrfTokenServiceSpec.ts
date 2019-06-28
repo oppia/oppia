@@ -46,7 +46,7 @@ describe('Csrf Token Service', function() {
       CsrfTokenService.initializeToken();
 
       expect(CsrfTokenService.initializeToken).toThrowError(
-        'Token already set');
+        'Token request already made');
     }
   );
 });
