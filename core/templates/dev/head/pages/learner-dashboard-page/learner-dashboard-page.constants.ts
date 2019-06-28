@@ -16,6 +16,8 @@
  * @fileoverview Constants for the Learner dashboard.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant('LEARNER_DASHBOARD_SECTION_I18N_IDS', {
   INCOMPLETE: 'I18N_LEARNER_DASHBOARD_INCOMPLETE_SECTION',
   COMPLETED: 'I18N_LEARNER_DASHBOARD_COMPLETED_SECTION',

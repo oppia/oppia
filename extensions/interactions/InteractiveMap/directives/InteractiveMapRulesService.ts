@@ -16,6 +16,8 @@
  * @fileoverview Rules service for the interaction.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('InteractiveMapRulesService', [
   function() {
     var RADIUS_OF_EARTH_KM = 6371.0;

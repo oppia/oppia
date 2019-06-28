@@ -18,6 +18,8 @@
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('HintsAndSolutionManagerService', [
   '$rootScope', '$timeout',
   'DELAY_FOR_HINT_FEEDBACK_MSEC', 'EVENT_NEW_CARD_AVAILABLE',

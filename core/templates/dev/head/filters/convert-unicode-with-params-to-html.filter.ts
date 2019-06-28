@@ -23,6 +23,8 @@
 
 require('filters/convert-unicode-to-html.filter.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
   var assert = function(text) {
     if (!text) {

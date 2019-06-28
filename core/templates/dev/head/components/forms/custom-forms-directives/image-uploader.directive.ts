@@ -19,6 +19,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/IdGenerationService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('imageUploader', [
   'IdGenerationService', 'UrlInterpolationService',
   function(IdGenerationService, UrlInterpolationService) {

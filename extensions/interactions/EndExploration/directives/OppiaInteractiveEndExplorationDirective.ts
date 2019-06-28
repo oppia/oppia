@@ -25,6 +25,8 @@ require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/contextual/UrlService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveEndExploration', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

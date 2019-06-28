@@ -17,6 +17,8 @@
  * backend.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CreatorDashboardBackendApiService', ['$http', function($http) {
   var _fetchDashboardData = function() {
     return $http.get('/creatordashboardhandler/data');

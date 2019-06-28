@@ -17,6 +17,8 @@
  * visible.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('BackgroundMaskService', [
   function() {
     var maskIsActive = false;

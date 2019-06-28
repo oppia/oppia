@@ -17,6 +17,8 @@
  * activities present in the learner dashboard.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('LearnerDashboardIdsBackendApiService', [
   '$http', function($http) {
     var _fetchLearnerDashboardIds = function() {

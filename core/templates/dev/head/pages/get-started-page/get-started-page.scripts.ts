@@ -16,6 +16,8 @@
  * @fileoverview File to import necessary scripts for get_started page.
  */
 
+require('App.ts');
+
 require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +

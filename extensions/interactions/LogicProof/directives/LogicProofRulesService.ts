@@ -16,6 +16,8 @@
  * @fileoverview Rules service for the interaction.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('LogicProofRulesService', [function() {
   return {
     Correct: function(answer) {

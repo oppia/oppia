@@ -17,6 +17,8 @@
    domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SuggestionObjectFactory', [function() {
   var Suggestion = function(
       suggestionType, suggestionId, targetType, targetId, status, authorName,

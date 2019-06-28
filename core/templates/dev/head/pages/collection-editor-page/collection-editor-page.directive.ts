@@ -35,6 +35,8 @@ require('services/PageTitleService.ts');
 require('pages/collection-editor-page/collection-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('collectionEditorPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

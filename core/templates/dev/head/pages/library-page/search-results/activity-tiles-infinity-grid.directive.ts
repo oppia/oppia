@@ -20,6 +20,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/SearchService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('activityTilesInfinityGrid', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

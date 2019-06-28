@@ -16,6 +16,8 @@
  * @fileoverview Service for handling microphone data and mp3 audio processing.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('VoiceoverRecordingService', ['$log', '$q', '$window',
   function($log, $q, $window) {
     var audioContextAvailable = null,

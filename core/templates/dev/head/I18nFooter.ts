@@ -18,6 +18,8 @@
  * @author milagro.teruel@gmail.com (Milagro Teruel)
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.controller('I18nFooter', [
   '$cookies', '$http', '$rootScope', '$scope', '$timeout', '$translate',
   'UserService',

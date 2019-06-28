@@ -19,6 +19,8 @@
 
 require('domain/exploration/VoiceoverObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('RecordedVoiceoversObjectFactory', [
   'VoiceoverObjectFactory', 'COMPONENT_NAME_FEEDBACK',
   function(

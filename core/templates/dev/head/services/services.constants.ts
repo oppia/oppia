@@ -16,6 +16,8 @@
  * @fileoverview Constants for shared services across Oppia.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant('PAGE_CONTEXT', {
   EXPLORATION_EDITOR: 'editor',
   EXPLORATION_PLAYER: 'learner',

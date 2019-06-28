@@ -19,6 +19,8 @@
 
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('HintObjectFactory', [
   'SubtitledHtmlObjectFactory',
   function(SubtitledHtmlObjectFactory) {

@@ -16,6 +16,8 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+require('App.ts');
+
 require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
@@ -42,6 +44,8 @@ require('services/DateTimeFormatService.ts');
 require('services/UserService.ts');
 
 require('pages/learner-dashboard-page/learner-dashboard-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {

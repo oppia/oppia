@@ -24,6 +24,8 @@ require(
   'interactions/NumberWithUnits/directives/NumberWithUnitsRulesService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveNumberWithUnits', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {

@@ -20,6 +20,8 @@
 require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
 require('domain/exploration/SubtitledHtmlObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SubtopicPageContentsObjectFactory', [
   'ContentIdsToAudioTranslationsObjectFactory', 'SubtitledHtmlObjectFactory',
   function(

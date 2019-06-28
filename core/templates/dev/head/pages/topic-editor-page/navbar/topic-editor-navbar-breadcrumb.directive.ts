@@ -20,6 +20,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/stateful/FocusManagerService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('topicEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

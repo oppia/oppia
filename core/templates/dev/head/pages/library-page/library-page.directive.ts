@@ -37,6 +37,8 @@ require('services/contextual/WindowDimensionsService.ts');
 
 require('pages/library-page/library-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('libraryPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

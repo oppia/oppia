@@ -16,6 +16,8 @@
  * @fileoverview Service that handles routing for the skill editor page.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SkillEditorRoutingService', [
   '$interval', '$location', '$rootScope', '$timeout', '$window',
   function(

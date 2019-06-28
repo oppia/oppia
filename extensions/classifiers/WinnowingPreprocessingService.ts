@@ -21,6 +21,8 @@
  * same task.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('WinnowingPreprocessingService', [function() {
   var generateHashValue = function(tokens, tokenToId) {
     var hashVal = 0;

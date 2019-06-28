@@ -16,6 +16,8 @@
  * @fileoverview CamelCaseToHyphens filter for Oppia.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.filter('camelCaseToHyphens', [function() {
   return function(input) {
     var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();

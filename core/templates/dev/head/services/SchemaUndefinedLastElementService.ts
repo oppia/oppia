@@ -17,6 +17,8 @@
  * is undefined.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SchemaUndefinedLastElementService', [function() {
   return {
     // Returns true if the input value, taken as the last element in a list,

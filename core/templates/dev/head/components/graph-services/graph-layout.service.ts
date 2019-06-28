@@ -17,6 +17,8 @@
  */
 
 // Service for computing layout of state graph nodes.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateGraphLayoutService', [
   '$filter', '$log', 'MAX_NODES_PER_ROW',
   function($filter, $log, MAX_NODES_PER_ROW) {

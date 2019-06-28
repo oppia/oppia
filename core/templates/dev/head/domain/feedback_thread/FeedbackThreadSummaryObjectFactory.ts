@@ -17,6 +17,8 @@
    domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('FeedbackThreadSummaryObjectFactory', [function() {
   var FeedbackThreadSummary = function(
       status, originalAuthorId, lastUpdated, lastMessageText, totalMessageCount,

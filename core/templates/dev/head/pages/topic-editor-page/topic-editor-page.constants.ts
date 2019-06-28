@@ -16,6 +16,8 @@
  * @fileoverview Constants for the topic editor page.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 

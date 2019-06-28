@@ -18,6 +18,8 @@
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationDiffService', [
   'INTERACTION_SPECS', function(INTERACTION_SPECS) {
     var STATE_PROPERTY_ADDED = 'added';

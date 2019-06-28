@@ -25,6 +25,8 @@ require('services/ContextService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('explorationFooter', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

@@ -31,6 +31,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 // Discuss and decide whether this is a good approach and then remove this TODO
 // after deciding and acting upon the decision (which would mean implementing
 // it if it's agreed upon).
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('EditableCollectionBackendApiService', [
   '$http', '$q', 'ReadOnlyCollectionBackendApiService',
   'UrlInterpolationService', 'COLLECTION_DATA_URL_TEMPLATE',

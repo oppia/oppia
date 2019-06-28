@@ -16,6 +16,8 @@
  * @fileoverview A data service that stores the current interaction solution.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateSolutionService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);

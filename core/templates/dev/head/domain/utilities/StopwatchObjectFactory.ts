@@ -18,6 +18,8 @@
 
 // A simple service that provides stopwatch instances. Each stopwatch can be
 // independently reset and queried for the current time.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StopwatchObjectFactory', ['$log', function($log) {
   var Stopwatch = function() {
     this.startTime = null;

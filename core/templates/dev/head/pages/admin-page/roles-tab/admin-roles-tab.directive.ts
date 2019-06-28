@@ -23,6 +23,8 @@ require('pages/admin-page/services/admin-task-manager.service.ts');
 
 require('pages/admin-page/admin-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('adminRolesTab', [
   '$http', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_ROLE_HANDLER_URL',

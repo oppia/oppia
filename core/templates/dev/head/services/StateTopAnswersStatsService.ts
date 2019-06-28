@@ -24,6 +24,8 @@ require(
   'pages/exploration-player-page/services/answer-classification.service.ts');
 require('services/ContextService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
   'AnswerStatsObjectFactory', 'ContextService', 'ExplorationStatesService',
