@@ -35,7 +35,6 @@ require('services/StateRulesStatsService.ts');
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
-require('app-services.scripts.ts');
 
 var oppia = require('AppInit.ts').module;
 

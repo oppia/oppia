@@ -30,6 +30,9 @@ import { downgradeInjectable, downgradeComponent } from
 })
 export class ServiceBootstrapComponent {}
 
+import { ExplorationFeaturesService } from
+  'services/ExplorationFeaturesService.ts';
+
 @NgModule({
   imports: [
     BrowserModule
@@ -74,5 +77,9 @@ var oppia = angular.module(
       downgradeComponent({
         component: ServiceBootstrapComponent
       }) as angular.IDirectiveFactory);
+
+oppia.factory(
+  'ExplorationFeaturesService',
+  downgradeInjectable(ExplorationFeaturesService));
 
 exports.module = oppia;
