@@ -39,7 +39,7 @@ describe('Editable question backend API service', function() {
     $httpBackend = $injector.get('$httpBackend');
     CsrfService = $injector.get('CsrfTokenService');
 
-    spyOn(CsrfService, 'getToken').and.callFake(function() {
+    spyOn(CsrfService, 'getTokenAsync').and.callFake(function() {
       var deferred = $q.defer();
       deferred.resolve('sample-csrf-token');
       return deferred.promise;

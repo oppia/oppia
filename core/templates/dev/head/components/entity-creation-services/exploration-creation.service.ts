@@ -101,7 +101,7 @@ oppia.factory('ExplorationCreationService', [
           var form = new FormData();
           form.append('yaml_file', yamlFile);
           form.append('payload', JSON.stringify({}));
-          CsrfTokenService.getToken().then(function(token) {
+          CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
               contentType: false,

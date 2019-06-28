@@ -36,7 +36,7 @@ describe('Csrf Token Service', function() {
   it('should correctly set the csrf token', function() {
     CsrfTokenService.initializeToken();
 
-    CsrfTokenService.getToken().then(function(token) {
+    CsrfTokenService.getTokenAsync().then(function(token) {
       expect(token).toBe('sample-csrf-token');
     });
   });
@@ -49,4 +49,11 @@ describe('Csrf Token Service', function() {
         'Token request already made');
     }
   );
+
+  it('should error if getTokenAsync is called before initialization',
+    function() {
+      expect(CsrfTokenService.getTokenAsync).toThrowError(
+        'Token needs to be initialized');
+    }
+  )
 });

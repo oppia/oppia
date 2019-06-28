@@ -637,7 +637,7 @@ oppia.directive('filepathEditor', [
             filename: ctrl.generateImageFilename(
               dimensions.height, dimensions.width)
           }));
-          CsrfTokenService.getToken().then(function(token) {
+          CsrfTokenService.getTokenAsync().then(function(token) {
             form.append('csrf_token', token);
             $.ajax({
               url: '/createhandler/imageupload/' + ctrl.explorationId,

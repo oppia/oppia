@@ -155,7 +155,7 @@ oppia.factory('AssetsBackendApiService', [
       form.append('payload', JSON.stringify({
         filename: filename
       }));
-      CsrfTokenService.getToken().then(function(token) {
+      CsrfTokenService.getTokenAsync().then(function(token) {
         form.append('csrf_token', token);
         $.ajax({
           url: _getAudioUploadUrl(explorationId),

@@ -111,7 +111,7 @@ oppia.config([
             if (config.data) {
               return $q(function(resolve, reject) {
                 // Get CSRF token before sending the request.
-                CsrfTokenService.getToken().then(function(token) {
+                CsrfTokenService.getTokenAsync().then(function(token) {
                   config.data = $.param({
                     csrf_token: token,
                     payload: JSON.stringify(config.data),
@@ -210,7 +210,7 @@ oppia.factory('$exceptionHandler', ['$log', 'CsrfTokenService',
         try {
           // We use jQuery here instead of Angular's $http, since the latter
           // creates a circular dependency.
-          CsrfTokenService.getToken().then(function(token) {
+          CsrfTokenService.getTokenAsync().then(function(token) {
             $.ajax({
               type: 'POST',
               url: '/frontend_errors',

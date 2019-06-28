@@ -44,13 +44,17 @@ oppia.factory('CsrfTokenService', [function() {
       });
     },
 
-    getToken: function() {
+    getTokenAsync: function() {
       if (token) {
         return new Promise(function(resolve, reject) {
           resolve(token);
         });
       }
-      return tokenPromise;
+      if (tokenPromise) {
+        return tokenPromise;
+      } else {
+        throw new Error('Token needs to be initialized');
+      }
     }
   };
 }]);
