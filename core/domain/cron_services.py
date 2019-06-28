@@ -16,6 +16,12 @@
 
 import ast
 import datetime
+import logging
+
+from core import jobs
+from core.platform import models
+
+import utils
 
 from mapreduce import model as mapreduce_model
 
