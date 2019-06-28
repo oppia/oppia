@@ -217,10 +217,14 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
             for line in lines:
                 if line.startswith('class'):
                     start_index = line.find(' ') + 1
-                    end_index = line.find('Tests') + 5
-                    if end_index < 5:
-                        continue
-                    classes.append(line[start_index:end_index])
+                    end_index = line.find('Tests(')
+                    if end_index >= 0:
+                        classes.append(line[start_index:end_index + 5])
+                    else:
+                        end_index = line.find('Test(')
+                        if end_index >= 0:
+                            classes.append(line[start_index:end_index + 4])
+
         test_target_path = os.path.relpath(
             path, os.getcwd())[:-3].replace('/', '.')
         return [
