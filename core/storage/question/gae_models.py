@@ -216,7 +216,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_question_skill_links_and_skill_descriptions(
+    def get_question_skill_links_by_skill_ids(
             cls, question_count, skill_ids, start_cursor):
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
@@ -229,12 +229,15 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 questions are to be returned. This value should be urlsafe.
 
         Returns:
-            list(QuestionSkillLinkModel), list(str), str|None. The
-                QuestionSkillLinkModels corresponding to given skill_ids, the
-                corresponding skill descriptions and the next cursor value to be
+            list(QuestionSkillLinkModel), str|None. The QuestionSkillLinkModels
+                corresponding to given skill_ids, the next cursor value to be
                 used for the next page (or None if no more pages are left). The
                 returned next cursor value is urlsafe.
         """
+        question_skill_count = min(
+            len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
+        ) * question_count
+
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(
@@ -243,23 +246,19 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # resolve conflicts, if any.
                 # Reference SO link: https://stackoverflow.com/q/12449197
             ).order(-cls.last_updated, cls.key).fetch_page(
-                question_count,
+                question_skill_count,
                 start_cursor=cursor
             )
         else:
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(-cls.last_updated, cls.key).fetch_page(
-                question_count
+                question_skill_count
             )
-        skill_ids = [model.skill_id for model in question_skill_link_models]
-        skills = skill_models.SkillModel.get_multi(skill_ids)
-        skill_descriptions = (
-            [skill.description if skill else None for skill in skills])
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
-        return question_skill_link_models, skill_descriptions, next_cursor_str
+        return question_skill_link_models, next_cursor_str
 
     @classmethod
     def get_question_skill_links_equidistributed_by_skill(

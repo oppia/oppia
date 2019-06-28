@@ -24,6 +24,10 @@ oppia.constant(
   '/skill_editor_handler/data/<skill_id>');
 
 oppia.constant(
+  'SKILL_DATA_URL_TEMPLATE',
+  '/skill_data_handler/<comma_separated_skill_ids>');
+
+oppia.constant(
   'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
   '/skill_editor_question_handler/<skill_id>?cursor=<cursor>');
 
