@@ -93,3 +93,7 @@ class OneOffReindexActivitiesJobTests(test_utils.GenericTestBase):
             self.assertIn('%s' % index, ids)
             self.assertIn('title %d' % index, titles)
             self.assertIn('category%d' % index, categories)
+
+        self.assertIsNone(
+            activity_jobs_one_off.IndexAllActivitiesJobManager.reduce(
+                'key', 'value'))

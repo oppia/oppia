@@ -13,8 +13,13 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SkillObjectFactory.
-*/
+ * @fileoverview Unit tests for SkillObjectFactory.
+ */
+
+require('App.ts');
+require('domain/skill/ConceptCardObjectFactory.ts');
+require('domain/skill/MisconceptionObjectFactory.ts');
+require('domain/skill/SkillObjectFactory.ts');
 
 describe('Skill object factory', function() {
   beforeEach(angular.mock.module('oppia'));

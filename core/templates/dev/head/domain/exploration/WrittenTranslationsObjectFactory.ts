@@ -17,6 +17,10 @@
  * WrittenTranslations domain objects.
  */
 
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/WrittenTranslationObjectFactory.ts');
+require('domain/utilities/LanguageUtilService.ts');
+
 oppia.factory('WrittenTranslationsObjectFactory', [
   'WrittenTranslationObjectFactory', function(WrittenTranslationObjectFactory) {
     var WrittenTranslations = function(translationsMapping) {

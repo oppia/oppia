@@ -16,6 +16,8 @@
  * @fileoverview Tests for ChangeObjectFactory.
  */
 
+require('domain/editor/undo_redo/ChangeObjectFactory.ts');
+
 describe('Factory for Change domain objects', function() {
   var ChangeObjectFactory = null;
 

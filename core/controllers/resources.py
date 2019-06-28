@@ -65,8 +65,7 @@ class AssetDevHandler(base.BaseHandler):
         """
         if not constants.DEV_MODE:
             raise self.PageNotFoundException
-        if asset_type not in self._SUPPORTED_TYPES:
-            raise Exception('%s is not a supported asset type.' % asset_type)
+
         try:
             filename = urllib.unquote(encoded_filename)
             file_format = filename[(filename.rfind('.') + 1):]
@@ -77,8 +76,8 @@ class AssetDevHandler(base.BaseHandler):
                 '%s/%s' % (asset_type, file_format))
 
             fs = fs_domain.AbstractFileSystem(
-                fs_domain.ExplorationFileSystem(
-                    'exploration/%s' % exploration_id))
+                fs_domain.DatastoreBackedFileSystem(
+                    fs_domain.ENTITY_TYPE_EXPLORATION, exploration_id))
             raw = fs.get('%s/%s' % (asset_type, filename))
 
             self.response.cache_control.no_cache = None

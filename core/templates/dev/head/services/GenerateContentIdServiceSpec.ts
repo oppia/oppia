@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for GenerateContentIdService.
  */
 
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('services/GenerateContentIdService.ts');
+
 describe('GenerateContentIdService', function() {
   beforeEach(angular.mock.module('oppia', function($provide) {
     $provide.value('COMPONENT_NAME_FEEDBACK', 'feedback');
@@ -23,45 +26,26 @@ describe('GenerateContentIdService', function() {
     $provide.value('COMPONENT_NAME_WORKED_EXAMPLE', 'worked_example');
   }));
   var gcis = null;
-  var scitat = null;
-  var citatof = null;
-  var citatDict = {
-    content: {},
-    default_outcome: {},
-    feedback_1: {},
-    hint_1: {},
-    solution: {}
-  };
-
-  var citatDictConceptCard = {
-    explanation: {},
-    worked_example_1: {}
-  };
 
   beforeEach(angular.mock.inject(function($injector) {
     gcis = $injector.get('GenerateContentIdService');
-    scitat = $injector.get('StateContentIdsToAudioTranslationsService');
-    citatof = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
-    scitat.displayed = citatof.createFromBackendDict(citatDict);
   }));
 
   it('should generate content id for new feedbacks', function() {
     expect(
-      gcis.getNextId(scitat.displayed.getAllContentId(), 'feedback'))
-      .toEqual('feedback_2');
+      gcis.getNextId(['feedback_1'], 'feedback')).toEqual(
+      'feedback_2');
   });
 
   it('should generate content id for new hint', function() {
     expect(
-      gcis.getNextId(scitat.displayed.getAllContentId(), 'hint'))
-      .toEqual('hint_2');
+      gcis.getNextId(['hint_1'], 'hint')).toEqual(
+      'hint_2');
   });
 
   it('should generate content id for new worked example', function() {
-    scitat.displayed = citatof.createFromBackendDict(citatDictConceptCard);
-    expect(
-      gcis.getNextId(scitat.displayed.getAllContentId(), 'worked_example'))
-      .toEqual('worked_example_2');
+    expect(gcis.getNextId(['worked_example_1'], 'worked_example')).toEqual(
+      'worked_example_2');
   });
 
   it('should throw error for unknown content id', function() {

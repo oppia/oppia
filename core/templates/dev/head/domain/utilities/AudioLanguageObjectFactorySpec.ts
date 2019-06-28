@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for AudioLanguageObjectFactory.
  */
 
+require('domain/utilities/AudioLanguageObjectFactory.ts');
+
 describe('AudioLanguage object factory', function() {
   var audioLanguage = null;
   var alof = null;

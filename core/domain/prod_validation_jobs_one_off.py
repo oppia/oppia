@@ -15,7 +15,6 @@
 # limitations under the License.
 
 """One-off jobs for validating prod models."""
-
 from core import jobs
 from core.platform import models
 
@@ -30,15 +29,22 @@ class BaseModelValidator(object):
     """Base class for validating models."""
 
     errors = {}
+    # external_models is keyed by field name. Each value consists
+    # of the model class and a list of (external_key, external_model_instance)
+    # tuples.
+    external_models = {}
 
     @classmethod
-    def _external_id_relationships(cls):
+    def _get_external_id_relationships(cls, item):
         """Defines a mapping of external id to model class.
 
+        Args:
+            item: ndb.Model. Entity to validate.
+
         Returns:
-            dict(str, ndb.Model). A dictionary whose keys are fields of the
-            model to validate, and whose values are the corresponding model
-            classes.
+            dict(str, (ndb.Model, list(str)). A dictionary whose keys are
+            field names of the model to validate, and whose values are tuples
+            that consist of the external model class and list of keys to fetch.
         """
         raise NotImplementedError
 
@@ -50,23 +56,9 @@ class BaseModelValidator(object):
         Args:
             item: ndb.Model. Entity to validate.
         """
-        multiple_models_keys_to_fetch = {}
-        for field_name, model_class in (
-                cls._external_id_relationships().iteritems()):
-            field_value = getattr(item, field_name)
-            if field_value:
-                multiple_models_keys_to_fetch[field_name] = (
-                    model_class, [field_value] if isinstance(field_value, str)
-                    else field_value)
-        fetched_model_instances = (
-            datastore_services.fetch_multiple_entities_by_ids_and_models(
-                multiple_models_keys_to_fetch.values()))
-
-        for (field_name, keys_to_fetch), model_class_models in zip(
-                multiple_models_keys_to_fetch.iteritems(),
-                fetched_model_instances):
-            model_class, model_ids = keys_to_fetch
-            for model_id, model in zip(model_ids, model_class_models):
+        for field_name, (model_class, model_id_model_tuples) in (
+                cls.external_models.iteritems()):
+            for model_id, model in model_id_model_tuples:
                 if model is None or model.deleted:
                     cls.errors['%s field check' % field_name] = (
                         'Model id %s: based on field %s having'
@@ -75,31 +67,79 @@ class BaseModelValidator(object):
                             item.id, field_name, model_id,
                             str(model_class.__name__), model_id))
 
+    @classmethod
+    def _fetch_external_models(cls, item):
+        """Fetch external models based on _get_external_id_relationships.
+
+        This should be called before we call other _validate methods.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        multiple_models_keys_to_fetch = {}
+        for field_name_debug, (model_class, keys_to_fetch) in (
+                cls._get_external_id_relationships(item).iteritems()):
+            multiple_models_keys_to_fetch[field_name_debug] = (
+                model_class, keys_to_fetch)
+        fetched_model_instances = (
+            datastore_services.fetch_multiple_entities_by_ids_and_models(
+                multiple_models_keys_to_fetch.values()))
+        for (field_name, (model_class, field_values)), external_models in zip(
+                multiple_models_keys_to_fetch.iteritems(),
+                fetched_model_instances):
+            cls.external_models[field_name] = (
+                model_class, zip(field_values, external_models))
+
+    @classmethod
+    def _get_validation_functions(cls):
+        """Returns the list of validation function to run.
+
+        Each validation function should accept only a single arg, which is the
+        model instance to validate.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def validate(cls, item):
+        """Run _fetch_external_models and all _validate functions.
+
+        Args:
+            item: ndb.Model. Entity to validate.
+        """
+        cls.errors.clear()
+        cls.external_models.clear()
+        cls._fetch_external_models(item)
+
+        cls._validate_external_id_relationships(item)
+        for func in cls._get_validation_functions():
+            func(item)
+
 
 class UserSubscriptionsModelValidator(BaseModelValidator):
     """Class for validating UserSubscriptionsModels."""
 
     @classmethod
-    def _external_id_relationships(cls):
+    def _get_external_id_relationships(cls, item):
         return {
-            'activity_ids': exp_models.ExplorationModel,
-            'collection_ids': collection_models.CollectionModel,
+            'activity_ids': (exp_models.ExplorationModel, item.activity_ids),
+            'collection_ids': (
+                collection_models.CollectionModel,
+                item.collection_ids),
             'general_feedback_thread_ids': (
-                feedback_models.GeneralFeedbackThreadModel),
-            'creator_ids': user_models.UserSettingsModel,
-            'id': user_models.UserSettingsModel,
+                feedback_models.GeneralFeedbackThreadModel,
+                item.general_feedback_thread_ids),
+            'creator_ids': (user_models.UserSettingsModel, item.creator_ids),
+            'id': (user_models.UserSettingsModel, [item.id]),
         }
 
     @classmethod
-    def validate(cls, item):
-        """Validates a UserSubscriptionsModel entity.
+    def _get_validation_functions(cls):
+        return []
 
-        Args:
-            item: UserSubscriptionsModel. Entity to validate.
-        """
-        cls.errors.clear()
 
-        cls._validate_external_id_relationships(item)
+MODEL_TO_VALIDATOR_MAPPING = {
+    user_models.UserSubscriptionsModel: UserSubscriptionsModelValidator,
+}
 
 
 class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -107,26 +147,26 @@ class ProdValidationAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [user_models.UserSubscriptionsModel]
+        return MODEL_TO_VALIDATOR_MAPPING.keys()
 
     @staticmethod
     def map(model_instance):
         if not model_instance.deleted:
-            # Check if model_instance is a UserSubscriptionsModel here because
-            # we will add more model classes to iterate over in the future.
-            # TODO(sshou) remove this comment after we add other classes.
-            if isinstance(model_instance, user_models.UserSubscriptionsModel):
-                validate_user_subs_model = UserSubscriptionsModelValidator()
-                validate_user_subs_model.validate(model_instance)
-                if len(validate_user_subs_model.errors) > 0:
+            if type(model_instance) in MODEL_TO_VALIDATOR_MAPPING:  # pylint: disable=unidiomatic-typecheck
+                model_name = model_instance.__class__.__name__
+                validator_cls = MODEL_TO_VALIDATOR_MAPPING[type(model_instance)]
+                validator = validator_cls()
+                validator.validate(model_instance)
+                if len(validator.errors) > 0:
                     for error_key, error_val in (
-                            validate_user_subs_model.errors.iteritems()):
+                            validator.errors.iteritems()):
                         yield (
-                            'failed validation check for %s of '
-                            'UserSubscriptionModel' % error_key, error_val)
+                            'failed validation check for %s of %s' % (
+                                error_key, model_name),
+                            error_val)
                 else:
                     yield (
-                        'fully-validated UserSubscriptionModels', 1)
+                        'fully-validated %s' % model_name, 1)
 
     @staticmethod
     def reduce(key, values):

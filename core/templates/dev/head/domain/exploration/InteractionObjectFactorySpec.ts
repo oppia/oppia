@@ -16,6 +16,12 @@
  * @fileoverview Unit tests for Interaction object factory.
  */
 
+require('domain/exploration/AnswerGroupObjectFactory.ts');
+require('domain/exploration/HintObjectFactory.ts');
+require('domain/exploration/InteractionObjectFactory.ts');
+require('domain/exploration/OutcomeObjectFactory.ts');
+require('domain/exploration/SolutionObjectFactory.ts');
+
 describe('Interaction object factory', function() {
   var iof = null;
   var oof = null;

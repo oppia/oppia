@@ -16,6 +16,10 @@
  * @fileoverview Unit tests for the issues backend api service.
  */
 
+require('domain/statistics/PlaythroughObjectFactory.ts');
+require('domain/statistics/PlaythroughIssueObjectFactory.ts');
+require('services/PlaythroughIssuesBackendApiService.ts');
+
 describe('PlaythroughIssuesBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));
 

@@ -19,6 +19,9 @@
  * in collection_domain.Collection and subsequent domain objects.
  */
 
+require(
+  'pages/collection-editor-page/services/collection-linearizer.service.ts');
+
 oppia.factory('CollectionValidationService', [
   'CollectionLinearizerService',
   function(CollectionLinearizerService) {

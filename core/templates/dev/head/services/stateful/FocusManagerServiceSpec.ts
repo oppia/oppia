@@ -16,6 +16,11 @@
  * @fileoverview Unit tests for the FocusManagerService.
  */
 
+require('App.ts');
+require('services/IdGenerationService.ts');
+require('services/contextual/DeviceInfoService.ts');
+require('services/stateful/FocusManagerService.ts');
+
 describe('Focus Manager Service', function() {
   var FocusManagerService;
   var DeviceInfoService;

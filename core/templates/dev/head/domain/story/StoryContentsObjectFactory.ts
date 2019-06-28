@@ -17,6 +17,9 @@
  * story contents domain objects.
  */
 
+require('domain/story/StoryNodeObjectFactory.ts');
+require('pages/story-editor-page/story-editor-page.controller.ts');
+
 oppia.factory('StoryContentsObjectFactory', [
   'StoryNodeObjectFactory', 'NODE_ID_PREFIX',
   function(StoryNodeObjectFactory, NODE_ID_PREFIX) {

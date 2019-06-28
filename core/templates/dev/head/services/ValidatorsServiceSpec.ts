@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for Validators Service.
  */
 
+require('services/ValidatorsService.ts');
+
 describe('Validators service', function() {
   beforeEach(angular.mock.module('oppia'));
 

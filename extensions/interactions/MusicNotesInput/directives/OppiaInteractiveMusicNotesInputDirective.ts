@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directives for the MusicNotesInput interaction.
+ * @fileoverview Directives for the MusicNotesInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',

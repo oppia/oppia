@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Autoplayed videos service.
+ */
+
 // About this service:
 // In the exploration player, a video should only autoplay when it is first seen
 // on a new card, and not when the learner clicks back to previous cards in

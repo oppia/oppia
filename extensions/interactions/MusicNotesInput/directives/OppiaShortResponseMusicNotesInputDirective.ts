@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directives for the MusicNotesInput short response.
+ * @fileoverview Directives for the MusicNotesInput short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -26,10 +26,13 @@ oppia.directive('oppiaShortResponseMusicNotesInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MusicNotesInput/directives/' +
         'music_notes_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
         var _answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         var _notes = [];
         for (var i = 0; i < _answer.length; i++) {
@@ -39,9 +42,9 @@ oppia.directive('oppiaShortResponseMusicNotesInput', [
         }
 
         if (_notes.length > 0) {
-          $scope.displayedAnswer = _notes.join(', ');
+          ctrl.displayedAnswer = _notes.join(', ');
         } else {
-          $scope.displayedAnswer = 'No answer given.';
+          ctrl.displayedAnswer = 'No answer given.';
         }
       }]
     };

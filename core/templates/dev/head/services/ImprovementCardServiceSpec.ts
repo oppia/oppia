@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for the ImprovementCardService.
  */
 
+require('domain/statistics/PlaythroughImprovementCardObjectFactory.ts');
+require('services/ImprovementCardService.ts');
+
 describe('ImprovementCardService', function() {
   beforeEach(angular.mock.module('oppia'));
   beforeEach(angular.mock.inject(function($injector) {

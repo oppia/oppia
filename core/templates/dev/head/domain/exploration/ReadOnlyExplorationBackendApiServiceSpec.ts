@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for ReadOnlyExplorationBackendApiService.
  */
 
+require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+
 describe('Read only exploration backend API service', function() {
   var ReadOnlyExplorationBackendApiService = null;
   var sampleDataResults = null;

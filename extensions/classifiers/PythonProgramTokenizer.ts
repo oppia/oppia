@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Tokenizer for Python code.
+ * @fileoverview Tokenizer for Python code.
  *
  * IMPORTANT NOTE: The tokenizer is built using Python's own tokenizer module.
  * These functions are simply translated from Python code to JS code and they

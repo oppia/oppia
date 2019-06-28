@@ -16,9 +16,22 @@
  * @fileoverview Service for recording and scrutinizing playthroughs.
  */
 
+require('domain/statistics/LearnerActionObjectFactory.ts');
+require('domain/statistics/PlaythroughObjectFactory.ts');
+require('domain/utilities/StopwatchObjectFactory.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/ExplorationFeaturesService.ts');
+
 oppia.constant(
   'STORE_PLAYTHROUGH_URL',
   '/explorehandler/store_playthrough/<exploration_id>');
+
+// Enables recording playthroughs from learner sessions.
+oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
+oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 3);
+oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
+oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
+oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
 
 oppia.factory('PlaythroughService', [
   '$http', 'ExplorationFeaturesService', 'LearnerActionObjectFactory',

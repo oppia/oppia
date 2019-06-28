@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for StateTopAnswersStatsBackendApiService.
  */
 
+require('services/StateTopAnswersStatsBackendApiService.ts');
+
 describe('StateTopAnswersStatsBackendApiService', function() {
   beforeEach(angular.mock.module('oppia'));
 
@@ -39,7 +41,8 @@ describe('StateTopAnswersStatsBackendApiService', function() {
             {answer: 'adios', frequency: 5},
             {answer: 'que?', frequency: 2},
           ]
-        }
+        },
+        interaction_ids: {Hola: 'TextInput'},
       };
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');

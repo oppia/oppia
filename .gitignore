@@ -3,11 +3,15 @@
 *.swp
 *.swo
 gae_runtime/*
+# We have added .git over here such that "git check-ignore" command should
+# ignore the files and dirs inside the .git dir.
+.git/*
 third_party/*
 assets/hashes.js
 backend_prod_files/*
 local_compiled_js/*
 core/templates/prod/*
+core/templates/dev/head/dist/*
 core/tests/.browserstack.env
 node_modules/*
 .coverage*

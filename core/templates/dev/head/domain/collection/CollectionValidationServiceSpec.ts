@@ -16,6 +16,10 @@
  * @fileoverview Tests for CollectionValidationService.
  */
 
+require('domain/collection/CollectionNodeObjectFactory.ts');
+require('domain/collection/CollectionObjectFactory.ts');
+require('domain/collection/CollectionValidationService.ts');
+
 describe('Collection validation service', function() {
   var CollectionValidationService = null;
   var CollectionObjectFactory = null;

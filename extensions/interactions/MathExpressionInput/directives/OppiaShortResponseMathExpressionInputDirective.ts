@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the MathExpressionInput short response.
+ * @fileoverview Directive for the MathExpressionInput short response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -26,11 +26,14 @@ oppia.directive('oppiaShortResponseMathExpressionInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MathExpressionInput/directives/' +
         'math_expression_input_short_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.latexAnswer = HtmlEscaperService.escapedJsonToObj(
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.latexAnswer = HtmlEscaperService.escapedJsonToObj(
           $attrs.answer).latex;
       }]
     };

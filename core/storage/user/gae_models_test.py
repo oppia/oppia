@@ -27,67 +27,105 @@ import feconf
 
 class UserSettingsModelTest(test_utils.GenericTestBase):
     """Tests for UserSettingsModel class."""
+    user_id = 'user_id'
     user_email = 'user@example.com'
     user_role = feconf.ROLE_ID_ADMIN
     user2_email = 'user2@example.com'
     user2_role = feconf.ROLE_ID_BANNED_USER
+    user3_email = 'user3@example.com'
+    user3_role = feconf.ROLE_ID_ADMIN
+    user3_id = 'user3_id'
+    generic_username = 'user'
+    generic_date = datetime.datetime(2019, 5, 20)
+    generic_image_url = 'www.example.com/example.png'
+    generic_user_bio = 'I am a user of Oppia!'
+    generic_subject_interests = ['Math', 'Science']
+    generic_language_codes = ['en', 'es']
 
     def setUp(self):
         super(UserSettingsModelTest, self).setUp()
         user_models.UserSettingsModel(
-            email=self.user_email, role=self.user_role).put()
+            id=self.user_id, email=self.user_email, role=self.user_role).put()
         user_models.UserSettingsModel(
             email=self.user2_email, role=self.user2_role).put()
+        user_models.UserSettingsModel(
+            email=self.user3_email, role=self.user3_role).put()
+        user_models.UserSettingsModel(
+            id=self.user3_id,
+            email=self.user3_email,
+            role=self.user3_role,
+            username=self.generic_username,
+            normalized_username=self.generic_username,
+            last_agreed_to_terms=self.generic_date,
+            last_started_state_editor_tutorial=self.generic_date,
+            last_started_state_translation_tutorial=self.generic_date,
+            last_logged_in=self.generic_date,
+            last_created_an_exploration=self.generic_date,
+            last_edited_an_exploration=self.generic_date,
+            profile_picture_data_url=self.generic_image_url,
+            default_dashboard='learner', creator_dashboard_display_pref='card',
+            user_bio=self.generic_user_bio,
+            subject_interests=self.generic_subject_interests,
+            first_contribution_msec=1,
+            preferred_language_codes=self.generic_language_codes,
+            preferred_site_language_code=(self.generic_language_codes[0]),
+            preferred_audio_language_code=(self.generic_language_codes[0])
+        ).put()
 
     def test_get_by_role(self):
         user = user_models.UserSettingsModel.get_by_role(
             feconf.ROLE_ID_ADMIN)
         self.assertEqual(user[0].role, feconf.ROLE_ID_ADMIN)
 
-    def test_export_data(self):
-        user = user_models.UserSettingsModel.get_by_role(
-            feconf.ROLE_ID_ADMIN)[0]
+    def test_export_data_trivial(self):
+        user = user_models.UserSettingsModel.get_by_id(self.user_id)
         user_data = user.export_data(user.id)
-        self.assertEqual('user@example.com', user_data['email'])
-        self.assertEqual(feconf.ROLE_ID_ADMIN, user_data['role'])
-        self.assertEqual(None, user_data['username'])
-        self.assertEqual(
-            None,
-            user_data['normalized_username'])
-        self.assertEqual(
-            None,
-            user_data['last_agreed_to_terms'])
-        self.assertEqual(
-            None,
-            user_data['last_started_state_editor_tutorial'])
-        self.assertEqual(
-            None,
-            user_data['last_started_state_translation_tutorial'])
-        self.assertEqual(None, user_data['last_logged_in'])
-        self.assertEqual(
-            None,
-            user_data['last_edited_an_exploration'])
-        self.assertEqual(
-            None,
-            user_data['profile_picture_data_url'])
-        self.assertEqual('learner', user_data['default_dashboard'])
-        self.assertEqual(
-            'card',
-            user_data['creator_dashboard_display_pref'])
-        self.assertEqual(None, user_data['user_bio'])
-        self.assertEqual([], user_data['subject_interests'])
-        self.assertEqual(
-            None,
-            user_data['first_contribution_msec'])
-        self.assertEqual(
-            [],
-            user_data['preferred_language_codes'])
-        self.assertEqual(
-            None,
-            user_data['preferred_site_language_code'])
-        self.assertEqual(
-            None,
-            user_data['preferred_audio_language_code'])
+        expected_user_data = {
+            'email': 'user@example.com',
+            'role': feconf.ROLE_ID_ADMIN,
+            'username': None,
+            'normalized_username': None,
+            'last_agreed_to_terms': None,
+            'last_started_state_editor_tutorial': None,
+            'last_started_state_translation_tutorial': None,
+            'last_logged_in': None,
+            'last_edited_an_exploration': None,
+            'profile_picture_data_url': None,
+            'default_dashboard': 'learner',
+            'creator_dashboard_display_pref': 'card',
+            'user_bio': None,
+            'subject_interests': [],
+            'first_contribution_msec': None,
+            'preferred_language_codes': [],
+            'preferred_site_language_code': None,
+            'preferred_audio_language_code': None
+        }
+        self.assertEqual(expected_user_data, user_data)
+
+    def test_export_data_nontrivial(self):
+        user = user_models.UserSettingsModel.get_by_id(self.user3_id)
+        user_data = user.export_data(user.id)
+        expected_user_data = {
+            'email': self.user3_email,
+            'role': feconf.ROLE_ID_ADMIN,
+            'username': self.generic_username,
+            'normalized_username': self.generic_username,
+            'last_agreed_to_terms': self.generic_date,
+            'last_started_state_editor_tutorial': self.generic_date,
+            'last_started_state_translation_tutorial': self.generic_date,
+            'last_logged_in': self.generic_date,
+            'last_edited_an_exploration': self.generic_date,
+            'profile_picture_data_url': self.generic_image_url,
+            'default_dashboard': 'learner',
+            'creator_dashboard_display_pref': 'card',
+            'user_bio': self.generic_user_bio,
+            'subject_interests': self.generic_subject_interests,
+            'first_contribution_msec': 1,
+            'preferred_language_codes': self.generic_language_codes,
+            'preferred_site_language_code': self.generic_language_codes[0],
+            'preferred_audio_language_code': self.generic_language_codes[0]
+        }
+        self.assertEqual(expected_user_data, user_data)
 
 
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
@@ -217,6 +255,82 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             query_model.edited_at_least_n_exps, edited_at_least_n_exps)
         self.assertEqual(
             query_model.edited_fewer_than_n_exps, edited_fewer_than_n_exps)
+
+
+def test_fetch_page(self):
+
+    submitter_id = 'submitter_1'
+    query_id = 'qid_1'
+    inactive_in_last_n_days = 5
+    created_at_least_n_exps = 1
+    created_fewer_than_n_exps = 3
+    edited_at_least_n_exps = 2
+    edited_fewer_than_n_exps = 5
+    has_not_logged_in_for_n_days = 10
+    user_models.UserQueryModel(
+        id=query_id,
+        inactive_in_last_n_days=inactive_in_last_n_days,
+        created_at_least_n_exps=created_at_least_n_exps,
+        created_fewer_than_n_exps=created_fewer_than_n_exps,
+        edited_at_least_n_exps=edited_at_least_n_exps,
+        edited_fewer_than_n_exps=edited_fewer_than_n_exps,
+        has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
+        submitter_id=submitter_id).put()
+
+    submitter_id = 'submitter_2'
+    query_id = 'qid_2'
+    inactive_in_last_n_days = 6
+    created_at_least_n_exps = 7
+    created_fewer_than_n_exps = 4
+    edited_at_least_n_exps = 3
+    edited_fewer_than_n_exps = 6
+    has_not_logged_in_for_n_days = 11
+    user_models.UserQueryModel(
+        id=query_id,
+        inactive_in_last_n_days=inactive_in_last_n_days,
+        created_at_least_n_exps=created_at_least_n_exps,
+        created_fewer_than_n_exps=created_fewer_than_n_exps,
+        edited_at_least_n_exps=edited_at_least_n_exps,
+        edited_fewer_than_n_exps=edited_fewer_than_n_exps,
+        has_not_logged_in_for_n_days=has_not_logged_in_for_n_days,
+        submitter_id=submitter_id).put()
+
+    # Fetch only one entity.
+    query_models, _, _ = user_models.UserQueryModel.fetch_page(
+        1, None)
+    self.assertEqual(len(query_models), 1)
+
+    self.assertEqual(query_models[0].submitter_id, 'submitter_2')
+    self.assertEqual(query_models[0].id, 'qid_2')
+    self.assertEqual(query_models[0].inactive_in_last_n_days, 6)
+    self.assertEqual(query_models[0].created_at_least_n_exps, 7)
+    self.assertEqual(query_models[0].created_fewer_than_n_exps, 4)
+    self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
+    self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
+    self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
+
+    # Fetch both entities.
+    query_models, _, _ = user_models.UserQueryModel.fetch_page(
+        2, None)
+    self.assertEqual(len(query_models), 2)
+
+    self.assertEqual(query_models[0].submitter_id, 'submitter_2')
+    self.assertEqual(query_models[0].id, 'qid_2')
+    self.assertEqual(query_models[0].inactive_in_last_n_days, 6)
+    self.assertEqual(query_models[0].created_at_least_n_exps, 7)
+    self.assertEqual(query_models[0].created_fewer_than_n_exps, 4)
+    self.assertEqual(query_models[0].edited_at_least_n_exps, 3)
+    self.assertEqual(query_models[0].edited_fewer_than_n_exps, 6)
+    self.assertEqual(query_models[0].has_not_logged_in_for_n_days, 11)
+
+    self.assertEqual(query_models[1].submitter_id, 'submitter_1')
+    self.assertEqual(query_models[1].id, 'qid_1')
+    self.assertEqual(query_models[1].inactive_in_last_n_days, 5)
+    self.assertEqual(query_models[1].created_at_least_n_exps, 1)
+    self.assertEqual(query_models[1].created_fewer_than_n_exps, 3)
+    self.assertEqual(query_models[1].edited_at_least_n_exps, 2)
+    self.assertEqual(query_models[1].edited_fewer_than_n_exps, 5)
+    self.assertEqual(query_models[1].has_not_logged_in_for_n_days, 10)
 
 
 class UserSkillMasteryModelTests(test_utils.GenericTestBase):

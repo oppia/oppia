@@ -47,11 +47,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
-        if len(suggestion_id.split('.')) != 3:
-            raise self.InvalidInputException('Invalid format for suggestion_id.'
-                                             ' It must contain 3 parts'
-                                             ' separated by \'.\'')
-
         if (
                 suggestion_id.split('.')[0] !=
                 suggestion_models.TARGET_TYPE_EXPLORATION):
@@ -90,9 +85,6 @@ class ResubmitSuggestionHandler(base.BaseHandler):
     @acl_decorators.can_resubmit_suggestion
     def put(self, suggestion_id):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
-        if not suggestion:
-            raise self.InvalidInputException(
-                'No suggestion found with given suggestion id')
         new_change = self.payload.get('change')
         change_cls = type(suggestion.change)
         change_object = change_cls(new_change)
@@ -112,11 +104,6 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
     def put(self, target_id, suggestion_id):
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
-
-        if len(suggestion_id.split('.')) != 3:
-            raise self.InvalidInputException(
-                'Invalid format for suggestion_id. It must contain 3 parts'
-                ' separated by \'.\'')
 
         if suggestion_id.split('.')[0] != suggestion_models.TARGET_TYPE_TOPIC:
             raise self.InvalidInputException(
@@ -167,7 +154,8 @@ class SuggestionListHandler(base.BaseHandler):
 
         for query in query_fields_and_values:
             if query[0] not in suggestion_models.ALLOWED_QUERY_FIELDS:
-                raise Exception('Not allowed to query on field %s' % query[0])
+                raise self.InvalidInputException(
+                    'Not allowed to query on field %s' % query[0])
 
         suggestions = suggestion_services.query_suggestions(
             query_fields_and_values)

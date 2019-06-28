@@ -10,9 +10,9 @@
         "targetDirPrefix": "backports.functools_lru_cache-"
       },
       "bleach": {
-        "version": "1.2.2",
+        "version": "3.1.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/jsocol/bleach/archive/v1.2.2.zip",
+        "url": "https://github.com/jsocol/bleach/archive/v3.1.0.zip",
         "rootDirPrefix": "bleach-",
         "targetDirPrefix": "bleach-"
       },
@@ -49,9 +49,9 @@
         "targetDirPrefix": "graphy-"
       },
       "html5Lib": {
-        "version": "0.95",
+        "version": "1.0.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/html5lib/html5lib-python/archive/0.95.zip",
+        "url": "https://github.com/html5lib/html5lib-python/archive/1.0.1.zip",
         "rootDirPrefix": "html5lib-python-",
         "targetDirPrefix": "html5lib-python-"
       },
@@ -64,12 +64,36 @@
         "targetDirPrefix": "requests-"
       },
       "simpleJson": {
-        "version": "3.7.1",
+        "version": "3.16.0",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/source/s/simplejson/simplejson-3.7.1.tar.gz#md5=c76c2d11b87e9fb501bd0b2b72091653",
+        "url": "https://files.pythonhosted.org/packages/e3/24/c35fb1c1c315fc0fffe61ea00d3f88e85469004713dab488dee4f35b0aff/simplejson-3.16.0.tar.gz",
         "tarRootDirPrefix": "simplejson-",
         "rootDirPrefix": "simplejson-",
         "targetDirPrefix": "simplejson-"
+      }, 
+      "six": {
+        "version": "1.12.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/dd/bf/4138e7bfb757de47d1f4b6994648ec67a51efe58fa907c1e11e350cddfca/six-1.12.0.tar.gz",
+        "tarRootDirPrefix": "six-",
+        "rootDirPrefix": "six-",
+        "targetDirPrefix": "six-"
+      },
+      "webencodings": {
+        "version": "0.5.1",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/0b/02/ae6ceac1baeda530866a85075641cec12989bd8d31af6d5ab4a3e8c92f47/webencodings-0.5.1.tar.gz",
+        "tarRootDirPrefix": "webencodings-",
+        "rootDirPrefix": "webencodings-",
+        "targetDirPrefix": "webencodings-"
+      },
+      "callbacks": {
+        "version": "0.3.0",
+        "downloadFormat": "tar",
+        "url": "https://files.pythonhosted.org/packages/eb/15/c71150189ea1cfd04a5853a40e2e074ec777755bd3924980fe51e5c6dd44/callbacks-0.3.0.tar.gz",
+        "tarRootDirPrefix": "callbacks-",
+        "rootDirPrefix": "callbacks-",
+        "targetDirPrefix": "callbacks-"
       },
       "beautifulSoup": {
         "version": "4.7.1",
@@ -88,9 +112,9 @@
         "targetDirPrefix": "mutagen-"
       },
       "soupsieve": {
-        "version": "1.8",
+        "version": "1.9.1",
         "downloadFormat": "tar",
-        "url": "https://pypi.python.org/packages/0c/52/e9088bb9b96e2d39fc3b33fcda5b4fde9d71473536ac660a1ca9a0958a2f/soupsieve-1.8.tar.gz#md5=3b3d830576e5fa5148bc154e38e63ebc",
+        "url": "https://files.pythonhosted.org/packages/fb/9e/2e236603b058daa6820193d4d95f4dcfbbbd0d3c709bec8c6ef1b1902501/soupsieve-1.9.1.tar.gz",
         "tarRootDirPrefix": "soupsieve-",
         "rootDirPrefix": "soupsieve-",
         "targetDirPrefix": "soupsieve-"
@@ -128,12 +152,12 @@
           "js": ["app/angular.audio.js"]
         }
       },
-      "angularRecorder": {
-        "version": "1.4.1",
+      "lamejs": {
+        "version": "1.2.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/logbon72/angular-recorder/archive/1.4.1.zip",
-        "rootDirPrefix": "angular-recorder-",
-        "targetDirPrefix": "angular-recorder-"
+        "url": "https://github.com/zhuker/lamejs/archive/1.2.0.zip",
+        "rootDirPrefix": "lamejs-",
+        "targetDirPrefix": "lamejs-"
       },
       "angularTest": {
         "version": "1.5.8",
@@ -340,21 +364,10 @@
           "js": []
         }
       },
-      "waveSurferJs": {
-        "version": "1.0.46",
-        "downloadFormat": "files",
-        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
-        "rootDirPrefix": "waveSurfer-js-",
-        "targetDirPrefix": "wave-surfer-js-",
-        "files": ["wavesurfer.min.js"],
-        "bundle": {
-          "js": ["wavesurfer.min.js"]
-        }
-      },
       "jquery": {
-        "version": "3.2.1",
+        "version": "3.4.1",
         "downloadFormat": "files",
-        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1",
+        "url": "https://ajax.googleapis.com/ajax/libs/jquery/3.4.1",
         "rootDirPrefix": "jquery-",
         "targetDirPrefix": "jquery-",
         "files": ["jquery.js", "jquery.min.js", "jquery.min.js.map"],
@@ -388,16 +401,16 @@
         "files": ["math-expressions.js"]
       },
       "mathJax": {
-        "version": "2.6.0",
+        "version": "2.7.5",
         "downloadFormat": "zip",
-        "url": "https://github.com/mathjax/MathJax/archive/2.6.0.zip",
+        "url": "https://github.com/mathjax/MathJax/archive/2.7.5.zip",
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
       },
       "mathJs": {
-        "version": "4.2.2",
+        "version": "5.10.3",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.2.2",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/5.10.3",
         "rootDirPrefix": "math-js-",
         "targetDirPrefix": "math-js-",
         "files": ["math.js", "math.min.js", "math.min.map"],
@@ -496,9 +509,9 @@
         "targetDirPrefix": "ui-codemirror-"
       },
       "uiSortable": {
-        "version": "0.17.1",
+        "version": "0.19.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-sortable/archive/src0.17.1.zip",
+        "url": "https://github.com/angular-ui/ui-sortable/archive/src0.19.0.zip",
         "rootDirPrefix": "ui-sortable-src",
         "targetDirPrefix": "ui-sortable-",
         "bundle": {
@@ -524,6 +537,17 @@
         "targetDirPrefix": "ui-utils-",
         "bundle": {
           "js": ["ui-utils.js"]
+        }
+      },
+      "waveSurferJs": {
+        "version": "1.0.46",
+        "downloadFormat": "files",
+        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
+        "rootDirPrefix": "waveSurfer-js-",
+        "targetDirPrefix": "wave-surfer-js-",
+        "files": ["wavesurfer.min.js"],
+        "bundle": {
+          "js": ["wavesurfer.min.js"]
         }
       }
     },

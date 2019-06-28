@@ -112,6 +112,9 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
+# Interaction IDs for which answer details cannot be solicited.
+INTERACTION_IDS_WITHOUT_ANSWER_DETAILS = ['EndExploration', 'Continue']
+
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
 
@@ -152,13 +155,11 @@ RECENTLY_PUBLISHED_QUERY_LIMIT_FULL_PAGE = 20
 # this version number must be changed.
 CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 
-# NOTE TO DEVELOPERS: This should be in sync with the constant with the same
-# name in constants.js.
 # The current version of the exploration states blob schema. If any backward-
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_STATE_SCHEMA_VERSION = 27
+CURRENT_STATE_SCHEMA_VERSION = 29
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -220,10 +221,12 @@ DEFAULT_NEW_STATE_CONTENT_ID = 'content'
 DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
 # Default content id for the explanation in the concept card of a skill.
 DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
-# Default content_ids_to_audio_translations dict for a default state template.
-DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
-    'content': {},
-    'default_outcome': {}
+# Default recorded_voiceovers dict for a default state template.
+DEFAULT_RECORDED_VOICEOVERS = {
+    'voiceovers_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
 }
 # Default written_translations dict for a default state template.
 DEFAULT_WRITTEN_TRANSLATIONS = {
@@ -601,6 +604,7 @@ EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
 EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
+EXPLORATION_STATE_ANSWER_STATS_PREFIX = '/createhandler/state_answer_stats'
 EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
@@ -637,6 +641,7 @@ NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
 PREFERENCES_URL = '/preferences'
 PRACTICE_SESSION_URL_PREFIX = '/practice_session'
+PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
@@ -672,11 +677,11 @@ TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
-TRANSLATION_DATA_PREFIX = '/createhandler/translate'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+VOICEOVER_DATA_PREFIX = '/createhandler/voiceover'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -782,12 +787,6 @@ DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
 # The following are all page descriptions for the meta tag.
-ABOUT_PAGE_DESCRIPTION = (
-    'Oppia is an open source learning platform that connects a community of '
-    'teachers and learners. You can use this site to create 1-1 learning '
-    'scenarios for others.')
-GET_STARTED_PAGE_DESCRIPTION = (
-    'Learn how to get started using Oppia.')
 CONTACT_PAGE_DESCRIPTION = (
     'Contact the Oppia team, submit feedback, and learn how to get involved '
     'with the Oppia project.')
@@ -814,18 +813,6 @@ SEARCH_PAGE_DESCRIPTION = (
     'one for the community.')
 SIGNUP_PAGE_DESCRIPTION = (
     'Sign up for Oppia and begin exploring a new subject.')
-SPLASH_PAGE_DESCRIPTION = (
-    'Oppia is a free site for sharing knowledge via interactive lessons '
-    'called \'explorations\'. Learn from user-created explorations, or teach '
-    'and create your own.')
-TEACH_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
-TERMS_PAGE_DESCRIPTION = (
-    'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
-    'platform. Learn about our terms and conditions for creating and '
-    'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
 
@@ -947,7 +934,7 @@ RTE_CONTENT_SPEC = {
 # of topics as the value.
 # Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
 # oppia constant defined in
-# core/templates/dev/head/pages/landing/TopicLandingPage.js file.
+# core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
 AVAILABLE_LANDING_PAGES = {
-    'maths': ['fractions', 'ratios']
+    'maths': ['fractions', 'negative-numbers', 'ratios']
 }

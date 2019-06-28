@@ -16,6 +16,9 @@
  * @fileoverview Service to search explorations metadata.
  */
 
+require('domain/utilities/UrlInterpolationService.ts');
+require('services/AlertsService.ts');
+
 oppia.factory('SearchExplorationsBackendApiService', [
   '$http', '$q', 'AlertsService', 'UrlInterpolationService',
   'SEARCH_EXPLORATION_URL_TEMPLATE',

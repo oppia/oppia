@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TopicRightsBackendApiService.
  */
 
+require('domain/topic/TopicRightsBackendApiService.ts');
+
 describe('Topic rights backend API service', function() {
   var TopicRightsBackendApiService = null;
   var $rootScope = null;

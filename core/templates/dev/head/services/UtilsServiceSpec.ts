@@ -16,6 +16,8 @@
  * @fileoverview Tests that the utility functions are working as expected.
  */
 
+require('services/UtilsService.ts');
+
 describe('Utils Service', function() {
   var UtilsService;
 

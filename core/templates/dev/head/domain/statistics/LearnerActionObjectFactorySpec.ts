@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the LearnerActionObjectFactory.
  */
 
+require('domain/statistics/LearnerActionObjectFactory.ts');
+
 describe('Learner Action Object Factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

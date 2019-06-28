@@ -16,6 +16,9 @@
  * @fileoverview Tests for GuestCollectionProgressObjectFactory.
  */
 
+require('domain/collection/GuestCollectionProgressObjectFactory.ts');
+
+
 describe('Guest collection progress object factory', function() {
   var GuestCollectionProgressObjectFactory = null;
   var _collectionId0 = null;

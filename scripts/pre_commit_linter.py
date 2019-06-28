@@ -69,6 +69,7 @@ import tempfile
 import threading
 import time
 
+import build # pylint: disable=relative-import
 import docstrings_checker  # pylint: disable=relative-import
 
 # pylint: enable=wrong-import-order
@@ -88,6 +89,29 @@ _PARSER.add_argument(
     '--verbose',
     help='verbose mode. All details will be printed.',
     action='store_true')
+
+EXCLUDED_PHRASES = [
+    'utf', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node']
+
+EXCLUDED_PATHS = (
+    'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
+    '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
+    'assets/scripts/*', 'core/tests/data/*', 'core/tests/build_sources/*',
+    '*.mp3', '*.mp4', 'node_modules/*', 'typings/*', 'local_compiled_js/*')
+
+GENERATED_FILE_PATHS = (
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
+    'extensions/interactions/LogicProof/static/js/generatedParser.js',
+    'core/templates/dev/head/expressions/ExpressionParserService.js')
+
+CONFIG_FILE_PATHS = (
+    'core/tests/.browserstack.env.example',
+    'core/tests/protractor.conf.js',
+    'core/tests/karma.conf.ts',
+    'core/templates/dev/head/mathjaxConfig.ts',
+    'assets/constants.js',
+    'assets/rich_text_components_definitions.js')
 
 BAD_PATTERNS = {
     '__author__': {
@@ -123,7 +147,7 @@ BAD_PATTERNS = {
         'excluded_dirs': ()}
 }
 
-BAD_PATTERNS_JS_REGEXP = [
+BAD_PATTERNS_JS_AND_TS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
         'message': 'In tests, please do not use browser.explore().',
@@ -162,10 +186,17 @@ BAD_PATTERNS_JS_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': r'\b(beforeEach\(inject\(function)\(',
+        'message': 'In tests, please use \'angular.mock.inject\' instead of '
+                   '\'inject\'',
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'templateUrl: \'',
         'message': 'The directives must be directly referenced.',
         'excluded_files': (
-            'core/templates/dev/head/pages/exploration_player/'
+            'core/templates/dev/head/pages/exploration-player-page/'
             'FeedbackPopupDirective.js'
         ),
         'excluded_dirs': (
@@ -182,6 +213,35 @@ BAD_PATTERNS_JS_REGEXP = [
                    'for this purpose.',
         'excluded_files': (),
         'excluded_dirs': ()
+    },
+    {
+        'regexp': r'require\(.*\.\..*\);',
+        'message': 'Please, don\'t use relative imports in require().',
+        'excluded_files': (),
+        'excluded_dirs': ('core/tests/')
+    },
+]
+
+MANDATORY_PATTERNS_REGEXP = [
+    {
+        'regexp': r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.',
+        'message': 'Please ensure this file should contain a proper '
+                   'copyright notice.',
+        'included_types': ('.py', '.js', '.sh', '.ts'),
+        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS + (
+            '__init__.py', ),
+        'excluded_dirs': EXCLUDED_PATHS
+    }
+]
+
+MANDATORY_PATTERNS_JS_REGEXP = [
+    {
+        'regexp': r'^\s\*\s@fileoverview\s[a-zA-Z0-9_]+',
+        'message': 'Please ensure this file should contain a file '
+                   'overview i.e. a short description of the file.',
+        'included_types': ('.js', '.ts'),
+        'excluded_files': GENERATED_FILE_PATHS + CONFIG_FILE_PATHS,
+        'excluded_dirs': EXCLUDED_PATHS
     }
 ]
 
@@ -263,12 +323,43 @@ CONFIG_FILE_PATHS = (
     'core/tests/karma.conf.ts',
     'core/templates/dev/head/mathjaxConfig.ts',
     'assets/constants.js',
-    'assets/rich_text_components_definitions.js')
+    'assets/rich_text_components_definitions.js',
+    'webpack.config.ts',
+    'webpack.dev.config.ts',
+    'webpack.prod.config.ts')
 
-CODEOWNER_DIR_PATHS = [
-    './core', './extensions', './scripts', './export', './.github']
+CODEOWNER_FILEPATH = '.github/CODEOWNERS'
 
-CODEOWNER_FILE_PATHS = ['./app.yaml', './manifest.json']
+# This list needs to be in sync with the important patterns in the CODEOWNERS
+# file.
+CODEOWNER_IMPORTANT_PATHS = [
+    '/core/controllers/acl_decorators*.py',
+    '/core/controllers/base*.py',
+    '/core/domain/dependency_registry*.py',
+    '/core/domain/html*.py',
+    '/core/domain/rights_manager*.py',
+    '/core/domain/role_services*.py',
+    '/core/domain/user*.py',
+    '/core/storage/',
+    '/export/',
+    '/manifest.json',
+    '/package*.json',
+    '/scripts/install_third_party.sh',
+    '/.github/']
+
+# This list contains the directories and files that do not follow the new
+# constant declaration rules.
+# TODO(YashJipkate) Bring these directories and files under the new constant
+# declaration rules and empty the list.
+OLD_CONVENTION_PATHS = [
+    'core/templates/dev/head/services',
+    'core/templates/dev/head/base_components',
+    'core/templates/dev/head/directives',
+    'core/templates/dev/head/domain',
+    'core/templates/dev/head/expressions',
+    'core/templates/dev/head/tests',
+    'core/templates/dev/head/App.ts',
+    'extensions/']
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -303,16 +394,19 @@ _PATHS_TO_INSERT = [
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.5.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-quotes-0.1.9'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
-    os.path.join(_PARENT_DIR, 'oppia_tools', 'PIL-1.1.7'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'PyGithub-1.43.5'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'Pillow-6.0.0'),
     os.path.join('third_party', 'backports.functools_lru_cache-1.5'),
-    os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
-    os.path.join('third_party', 'bleach-1.2.2'),
     os.path.join('third_party', 'beautifulsoup4-4.7.1'),
-    os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
-    os.path.join('third_party', 'mutagen-1.38'),
-    os.path.join('third_party', 'soupsieve-1.8'),
+    os.path.join('third_party', 'bleach-3.1.0'),
+    os.path.join('third_party', 'callbacks-0.3.0'),
     os.path.join('third_party', 'gae-cloud-storage-1.9.15.0'),
+    os.path.join('third_party', 'gae-mapreduce-1.9.17.0'),
+    os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
+    os.path.join('third_party', 'mutagen-1.38'),
+    os.path.join('third_party', 'soupsieve-1.9.1'),
+    os.path.join('third_party', 'six-1.12.0'),
+    os.path.join('third_party', 'webencodings-0.5.1'),
 ]
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
@@ -471,6 +565,56 @@ def _get_expression_from_node_if_one_exists(
     if component not in components_to_check:
         return
     return expression
+
+
+def _walk_with_gitignore(root, exclude_dirs):
+    """A walk function similar to os.walk but this would ignore the files and
+    directories which is not tracked by git. Also, this will ignore the
+    directories mentioned in exclude_dirs.
+
+    Args:
+        root: str. The path from where the function should start walking.
+        exclude_dirs: list(str). A list of dir path which should be ignored.
+
+    Yields:
+        list(str). A list of unignored files.
+    """
+    dirs, file_paths = [], []
+    for name in os.listdir(root):
+        if os.path.isdir(os.path.join(root, name)):
+            dirs.append(os.path.join(root, name))
+        else:
+            file_paths.append(os.path.join(root, name))
+
+    yield [file_path for file_path in file_paths if not _is_path_ignored(
+        file_path)]
+
+    for dir_path in dirs:
+        # Adding "/" in the end of the dir path according to the git dir path
+        # structure.
+        if (not _is_path_ignored(dir_path + '/')) and (
+                dir_path not in exclude_dirs):
+            for x in _walk_with_gitignore(dir_path, exclude_dirs):
+                yield x
+
+
+def _is_path_ignored(path_to_check):
+    """Checks whether the given path is ignored by git.
+
+    Args:
+        path_to_check: str. A path to a file or a dir.
+
+    Returns:
+        bool. Whether the given path is ignored by git.
+    """
+    command = ['git', 'check-ignore', '-q', path_to_check]
+
+    # The "git check-ignore <path>" command returns 0 when the path is ignored
+    # otherwise it returns 1. subprocess.call then returns this returncode.
+    if subprocess.call(command):
+        return False
+    else:
+        return True
 
 
 def _get_changed_filepaths():
@@ -749,8 +893,9 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
     def handle_data(self, data):
         """Handle indentation level."""
         data_lines = data.split('\n')
-        opening_block = tuple(['{% block', '{% macro', '{% if'])
-        ending_block = tuple(['{% end', '{%- end'])
+        opening_block = tuple(
+            ['{% block', '{% macro', '{% if', '% for', '% if'])
+        ending_block = tuple(['{% end', '{%- end', '% } %>'])
         for data_line in data_lines:
             data_line = data_line.lstrip()
             if data_line.startswith(opening_block):
@@ -838,7 +983,7 @@ def _lint_js_and_ts_files(
     num_js_and_ts_files = len(files_to_lint)
     if not files_to_lint:
         result.put('')
-        print 'There are no JavaScript files to lint.'
+        print 'There are no JavaScript or Typescript files to lint.'
         return
 
     print 'Total js and ts files: ', num_js_and_ts_files
@@ -965,7 +1110,6 @@ class LintChecksManager(object):
         node_path = os.path.join(os.pardir, 'oppia_tools/node-10.15.3')
         os.environ['PATH'] = '%s/bin:' % node_path + os.environ['PATH']
 
-        self.compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         self.all_filepaths = all_filepaths
         self.verbose_mode_enabled = verbose_mode_enabled
         self.parsed_js_and_ts_files = self._validate_and_parse_js_and_ts_files()
@@ -984,6 +1128,7 @@ class LintChecksManager(object):
         parsed_js_and_ts_files = dict()
         if not files_to_check:
             return parsed_js_and_ts_files
+        compiled_js_dir = tempfile.mkdtemp(dir=os.getcwd())
         if not self.verbose_mode_enabled:
             print 'Validating and parsing JS and TS files ...'
         for filepath in files_to_check:
@@ -994,23 +1139,29 @@ class LintChecksManager(object):
             try:
                 # Use esprima to parse a JS or TS file.
                 parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                    file_content)
+                    file_content, comment=True)
             except Exception as e:
                 # Compile typescript file which has syntax not valid for JS
                 # file.
                 if filepath.endswith('.js'):
+                    shutil.rmtree(compiled_js_dir)
                     raise Exception(e)
-                compiled_js_filepath = self._compile_ts_file(filepath)
-                file_content = FileCache.read(compiled_js_filepath).decode(
-                    'utf-8')
-                parsed_js_and_ts_files[filepath] = esprima.parseScript(
-                    file_content)
+                try:
+                    compiled_js_filepath = self._compile_ts_file(
+                        filepath, compiled_js_dir)
+                    file_content = FileCache.read(compiled_js_filepath).decode(
+                        'utf-8')
+                    parsed_js_and_ts_files[filepath] = esprima.parseScript(
+                        file_content)
+                except Exception as e:
+                    shutil.rmtree(compiled_js_dir)
+                    raise Exception(e)
 
-        shutil.rmtree(self.compiled_js_dir)
+        shutil.rmtree(compiled_js_dir)
 
         return parsed_js_and_ts_files
 
-    def _compile_ts_file(self, filepath):
+    def _compile_ts_file(self, filepath, dir_path):
         """Compiles a typescript file and returns the path for compiled
         js file.
         """
@@ -1024,12 +1175,11 @@ class LintChecksManager(object):
             './node_modules/typescript/bin/tsc -outDir %s -allowJS %s '
             '-lib %s -noImplicitUseStrict %s -skipLibCheck '
             '%s -target %s -typeRoots %s %s typings/*') % (
-                self.compiled_js_dir, allow_js, lib, no_implicit_use_strict,
+                dir_path, allow_js, lib, no_implicit_use_strict,
                 skip_lib_check, target, type_roots, filepath)
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         compiled_js_filepath = os.path.join(
-            self.compiled_js_dir, os.path.basename(filepath).replace(
-                '.ts', '.js'))
+            dir_path, os.path.basename(filepath).replace('.ts', '.js'))
         return compiled_js_filepath
 
     def _lint_all_files(self):
@@ -1291,12 +1441,10 @@ class LintChecksManager(object):
                 not filepath.endswith('App.ts'))]
         failed = False
         summary_messages = []
-        component_name = ''
         components_to_check = ['controller', 'directive', 'factory', 'filter']
         for filepath in files_to_check:
             component_num = 0
             # Filename without its path and extension.
-            exact_filename = filepath.split('/')[-1][:-3]
             parsed_script = self.parsed_js_and_ts_files[filepath]
             with _redirect_stdout(_TARGET_STDOUT):
                 # Parse the body of the content as nodes.
@@ -1315,35 +1463,6 @@ class LintChecksManager(object):
                             'component in the file.' % (filepath))
                         failed = True
                         break
-                    # Separate the arguments of the expression.
-                    arguments = expression.arguments
-                    # The first argument of the expression is the
-                    # name of the component.
-                    component_name = arguments[0].value
-                    component = expression.callee.property.name
-
-                    # If the component is directive or filter and its name is
-                    # xxx then the filename containing it should be
-                    # XxxDirective.js or XxxFilter.js respectively.
-                    if component == 'directive' or component == 'filter':
-                        if (component_name[0].swapcase() + component_name[1:] +
-                                component.capitalize() != (exact_filename)):
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
-                    # If the component is controller or factory, then the
-                    # component name should exactly match the filename
-                    # containing it. If the component's name is xxx then the
-                    # filename should be xxx.js.
-                    else:
-                        if component_name != exact_filename:
-                            print (
-                                '%s -> Please ensure that the %s name '
-                                'matches the filename'
-                                % (filepath, component))
-                            failed = True
 
         with _redirect_stdout(_TARGET_STDOUT):
             if failed:
@@ -1361,6 +1480,84 @@ class LintChecksManager(object):
 
             print ''
             return summary_messages
+
+    def _check_for_mandatory_pattern_in_file(
+            self, pattern_list, filepath, failed):
+        """Checks for a given mandatory pattern in a file.
+
+        Args:
+            pattern_list: list(dict). The list of the mandatory patterns list to
+                be checked for in the file.
+            filepath: str. The path to the file to be linted.
+            failed: bool. Status of failure of the check.
+
+        Returns:
+            bool. The failure status of the check.
+        """
+        # This boolean list keeps track of the regex matches
+        # found in the file.
+        pattern_found_list = []
+        file_content = FileCache.readlines(filepath)
+        for index, regexp_to_check in enumerate(
+                pattern_list):
+            if (any([filepath.endswith(
+                    allowed_type) for allowed_type in (
+                        regexp_to_check['included_types'])]) and (
+                            not any([
+                                filepath.endswith(
+                                    pattern) for pattern in (
+                                        regexp_to_check[
+                                            'excluded_files'] +
+                                        regexp_to_check[
+                                            'excluded_dirs'])]))):
+                pattern_found_list.append(False)
+                for line in file_content:
+                    if re.search(regexp_to_check['regexp'], line):
+                        pattern_found_list[index] = True
+                        break
+        if not all(pattern_found_list):
+            failed = True
+            for index, pattern_found in enumerate(
+                    pattern_found_list):
+                if not pattern_found:
+                    print '%s --> %s' % (
+                        filepath,
+                        pattern_list[index]['message'])
+        return failed
+
+    def _check_mandatory_patterns(self):
+        """This function checks that all files contain the mandatory
+        patterns.
+        """
+        if self.verbose_mode_enabled:
+            print 'Starting mandatory patterns check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            sets_of_patterns_to_match = [
+                MANDATORY_PATTERNS_REGEXP, MANDATORY_PATTERNS_JS_REGEXP]
+            for filepath in self.all_filepaths:
+                for pattern_list in sets_of_patterns_to_match:
+                    failed = self._check_for_mandatory_pattern_in_file(
+                        pattern_list, filepath, failed)
+
+            if failed:
+                summary_message = (
+                    '%s  Mandatory pattern check failed' % (
+                        _MESSAGE_TYPE_FAILED))
+            else:
+                summary_message = (
+                    '%s  Mandatory pattern check passed' % (
+                        _MESSAGE_TYPE_SUCCESS))
+            print summary_message
+
+        print ''
+
+        summary_messages.append(summary_message)
+        return summary_messages
 
     def _check_sorted_dependencies(self):
         """This function checks that the dependencies which are
@@ -1983,7 +2180,7 @@ class LintChecksManager(object):
                         total_error_count += 1
 
                 if filepath.endswith(('.js', '.ts')):
-                    for regexp in BAD_PATTERNS_JS_REGEXP:
+                    for regexp in BAD_PATTERNS_JS_AND_TS_REGEXP:
                         if _check_bad_pattern_in_file(
                                 filepath, file_content, regexp):
                             failed = True
@@ -2031,61 +2228,55 @@ class LintChecksManager(object):
 
         return summary_messages
 
-    def _check_for_copyright_notice(self):
-        """This function checks whether the copyright notice
-        is present at the beginning of files.
+    def check_for_important_patterns_at_bottom_of_codeowners(
+            self, important_patterns):
+        """Checks that the most important patterns are at the bottom
+        of the CODEOWNERS file.
+
+        Arguments:
+            important_patterns: list(str). List of the important
+                patterns for CODEOWNERS file.
+
+        Returns:
+            bool. Whether the CODEOWNERS "important pattern" check fails.
         """
-        if self.verbose_mode_enabled:
-            print 'Starting copyright notice check'
-            print '----------------------------------------'
-        js_and_ts_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith((
-                '.js', '.ts')) and (
-                    not filepath.endswith(GENERATED_FILE_PATHS)) and (
-                        not filepath.endswith(CONFIG_FILE_PATHS))]
-        py_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.py') and (not filepath.endswith('__init__.py'))]
-        sh_files_to_check = [
-            filepath for filepath in self.all_filepaths if filepath.endswith(
-                '.sh')]
-        all_files_to_check = (
-            js_and_ts_files_to_check + py_files_to_check + sh_files_to_check)
-        regexp_to_check = (
-            r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
 
         failed = False
-        summary_messages = []
 
-        with _redirect_stdout(_TARGET_STDOUT):
-            for filepath in all_files_to_check:
-                has_copyright_notice = False
-                for line in FileCache.readlines(filepath)[:5]:
-                    if re.search(regexp_to_check, line):
-                        has_copyright_notice = True
-                        break
+        # Check that there are no duplicate elements in the lists.
+        important_patterns_set = set(important_patterns)
+        codeowner_important_paths_set = set(CODEOWNER_IMPORTANT_PATHS)
+        if len(important_patterns_set) != len(important_patterns):
+            print('%s --> Duplicate pattern(s) found in critical rules'
+                  ' section.' % CODEOWNER_FILEPATH)
+            failed = True
+        if len(codeowner_important_paths_set) != len(CODEOWNER_IMPORTANT_PATHS):
+            print('scripts/pre_commit_linter.py --> Duplicate pattern(s) found '
+                  'in CODEOWNER_IMPORTANT_PATHS list.')
+            failed = True
 
-                if not has_copyright_notice:
-                    failed = True
-                    print (
-                        '%s --> Please add a proper copyright notice to this '
-                        'file.' % (filepath))
-                    print ''
+        # Check missing rules by set difference operation.
+        critical_rule_section_minus_list_set = (
+            important_patterns_set.difference(codeowner_important_paths_set))
+        list_minus_critical_rule_section_set = (
+            codeowner_important_paths_set.difference(important_patterns_set))
+        for rule in critical_rule_section_minus_list_set:
+            print('%s --> Rule %s is not present in the '
+                  'CODEOWNER_IMPORTANT_PATHS list in '
+                  'scripts/pre_commit_linter.py. Please add this rule in the '
+                  'mentioned list or remove this rule from the \'Critical files'
+                  '\' section.' % (CODEOWNER_FILEPATH, rule))
+            failed = True
+        for rule in list_minus_critical_rule_section_set:
+            print('%s --> Rule \'%s\' is not present in the \'Critical files\' '
+                  'section. Please place it under the \'Critical files\' '
+                  'section since it is an important rule. Alternatively please '
+                  'remove it from the \'CODEOWNER_IMPORTANT_PATHS\' list in '
+                  'scripts/pre_commit_linter.py if it is no longer an '
+                  'important rule.' % (CODEOWNER_FILEPATH, rule))
+            failed = True
 
-            if failed:
-                summary_message = '%s   Copyright notice check failed' % (
-                    _MESSAGE_TYPE_FAILED)
-                print summary_message
-                summary_messages.append(summary_message)
-            else:
-                summary_message = '%s  Copyright notice check passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
-                print summary_message
-                summary_messages.append(summary_message)
-
-            print ''
-
-        return summary_messages
+        return failed
 
     def _check_codeowner_file(self):
         """Checks the CODEOWNERS file for any uncovered dirs/files and also
@@ -2093,29 +2284,56 @@ class LintChecksManager(object):
         file/dir. Note that this checks the CODEOWNERS file according to the
         glob patterns supported by Python2.7 environment. For more information
         please refer https://docs.python.org/2/library/glob.html.
+        This function also ensures that the most important rules are at the
+        bottom of the CODEOWNERS file.
         """
         if self.verbose_mode_enabled:
             print 'Starting CODEOWNERS file check'
             print '----------------------------------------'
 
         with _redirect_stdout(_TARGET_STDOUT):
-            codeowner_filepath = '.github/CODEOWNERS'
             failed = False
             summary_messages = []
             # Checks whether every pattern in the CODEOWNERS file matches at
             # least one dir/file.
-            path_patterns = []
+            critical_file_section_found = False
+            important_rules_in_critical_section = []
+            file_patterns = []
+            dir_patterns = []
             for line_num, line in enumerate(FileCache.readlines(
-                    codeowner_filepath)):
+                    CODEOWNER_FILEPATH)):
                 stripped_line = line.strip()
+                if '# Critical files' in line:
+                    critical_file_section_found = True
                 if stripped_line and stripped_line[0] != '#':
                     if '@' not in line:
-                        print ('%s --> Pattern on line %s doesn\'t have'
-                               'codeowner' % (codeowner_filepath, line_num + 1))
+                        print ('%s --> Pattern on line %s doesn\'t have '
+                               'codeowner' % (CODEOWNER_FILEPATH, line_num + 1))
                         failed = True
                     else:
                         # Extract the file pattern from the line.
                         line_in_concern = line.split('@')[0].strip()
+                        # This is being populated for the important rules
+                        # check.
+                        if critical_file_section_found:
+                            important_rules_in_critical_section.append(
+                                line_in_concern)
+                        # Checks if the path is the full path relative to the
+                        # root oppia directory.
+                        if not line_in_concern.startswith('/'):
+                            print ('%s --> Pattern on line %s is invalid. Use '
+                                   'full path relative to the root directory'
+                                   % (CODEOWNER_FILEPATH, line_num + 1))
+                            failed = True
+
+                        # The double asterisks pattern is supported by the
+                        # CODEOWNERS syntax but not the glob in Python 2.
+                        # The following condition checks this.
+                        if '**' in line_in_concern:
+                            print ('%s --> Pattern on line %s is invalid. '
+                                   '\'**\' wildcard not allowed' % (
+                                       CODEOWNER_FILEPATH, line_num + 1))
+                            failed = True
                         # Adjustments to the dir paths in CODEOWNERS syntax
                         # for glob-style patterns to match correctly.
                         if line_in_concern.endswith('/'):
@@ -2126,93 +2344,40 @@ class LintChecksManager(object):
                         # full path relative to root, but python glob module
                         # does not conform to this logic and literally matches
                         # the '/' character. Therefore the leading '/' has to
-                        # be removed for glob patterns to match correctly.
-                        if not glob.glob(line_in_concern.replace('/', '', 1)):
+                        # be changed to './' for glob patterns to match
+                        # correctly.
+                        line_in_concern = line_in_concern.replace('/', './', 1)
+                        if not glob.glob(line_in_concern):
                             print ('%s --> Pattern on line %s doesn\'t match '
                                    'any file or directory' % (
-                                       codeowner_filepath, line_num + 1))
-                            failed = True
-                        # Checks if the path is the full path relative to the
-                        # root oppia directory. Patterns starting with '/' are
-                        # considered relative to root whereas patterns starting
-                        # with './' are relative to the .github directory.
-                        if (not line_in_concern.startswith('/') and
-                                not './' +
-                                line_in_concern in CODEOWNER_FILE_PATHS):
-                            print ('%s --> Pattern on line %s is invalid. Use '
-                                   'full path relative to the root directory'
-                                   % (codeowner_filepath, line_num + 1))
-                            failed = True
-                        # The double asterisks pattern is supported by the
-                        # CODEOWNERS syntax but not the glob in Python 2.
-                        # The following condition checks this.
-                        if '**' in line_in_concern:
-                            print ('%s --> Pattern on line %s is invalid. '
-                                   '\'**\' wildcard not allowed' % (
-                                       codeowner_filepath, line_num + 1))
+                                       CODEOWNER_FILEPATH, line_num + 1))
                             failed = True
                         # The following list is being populated with the
                         # paths in the CODEOWNERS file with the removal of the
                         # leading '/' to aid in the glob pattern matching in
                         # the next part of the check wherein the valid patterns
                         # are used to check if they cover the entire codebase.
-                        path_patterns.append(line_in_concern.replace(
-                            '/', '', 1))
+                        if os.path.isdir(line_in_concern):
+                            dir_patterns.append(line_in_concern)
+                        else:
+                            file_patterns.append(line_in_concern)
 
-            # Checks that every dir/file is covered under CODEOWNERS.
-            for root, _, file_names in os.walk('.'):
-                for file_name in file_names:
-                    # This bool checks if the file belongs to the root
-                    # oppia directory.
-                    is_root_file = False
-                    if os.path.join(root, file_name) in CODEOWNER_FILE_PATHS:
-                        is_root_file = True
-                    if (any(root.startswith(
-                            dir_path) for dir_path in CODEOWNER_DIR_PATHS)
-                            or is_root_file):
-                        match = False
-                        # Ignore .pyc and __init__.py files.
-                        if file_name.endswith(
-                                '.pyc') or file_name == '__init__.py':
+            # Checks that every file (except those under the dir represented by
+            # the dir_patterns) is covered under CODEOWNERS.
+            for file_paths in _walk_with_gitignore('.', dir_patterns):
+                for file_path in file_paths:
+                    match = False
+                    for file_pattern in file_patterns:
+                        if file_path in glob.glob(file_pattern):
                             match = True
-                            continue
-                        for path_to_match in path_patterns:
-                            # The level of the file in the directory
-                            # structure. For e.g. /core/controllers/
-                            # domain.py is on third level.
-                            # This condition checks if the path to check
-                            # is a directory or a file. If it is a
-                            # file, the level would be the same as found
-                            # by calculating len(path_to_match.split('/'))
-                            # but is reduced by one if it is a directory
-                            # since the split command will return an empty
-                            # string at the last of the list which will
-                            # wrongfully increase the level.
-                            if path_to_match.split('/')[-1]:
-                                level = len(path_to_match.split('/'))
-                            else:
-                                level = len(path_to_match.split('/')) - 1
-                            # This condition finally matches the file being
-                            # walked currently against the path from the
-                            # CODEOWNERS file. The level helps in matching
-                            # by considering the file name upto only the
-                            # the level of the CODEOWNERS path. For e.g.
-                            # if the file being walked upon is /core/domain
-                            # /domain.py and the path from CODEOWNERS to be
-                            # matched is /core/ then it will only consider
-                            # the file name upto level 1 i.e. just the '/core'
-                            # part of the file name since it is sufficient to
-                            # be matched.
-                            if os.path.join(*((
-                                    os.path.join(root, file_name).replace(
-                                        './', '', 1)).split(
-                                            '/')[:level])) in glob.glob(
-                                                path_to_match):
-                                match = True
-                                break
-                        if not match and self.verbose_mode_enabled:
-                            print ('WARNING! %s/%s is not covered under '
-                                   'CODEOWNERS' % (root, file_name))
+                            break
+                    if not match:
+                        print '%s is not covered under CODEOWNERS' % file_path
+                        failed = True
+
+            failed = failed or (
+                self.check_for_important_patterns_at_bottom_of_codeowners(
+                    important_rules_in_critical_section))
 
             if failed:
                 summary_message = '%s   CODEOWNERS file check failed' % (
@@ -2227,6 +2392,122 @@ class LintChecksManager(object):
 
         return summary_messages
 
+    def _check_extra_js_files(self):
+        """Checks if the changes made include extra js files in core
+        or extensions folder which are not specified in
+        build.JS_FILEPATHS_NOT_TO_BUILD.
+        """
+
+        if self.verbose_mode_enabled:
+            print 'Starting extra js files check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+        with _redirect_stdout(_TARGET_STDOUT):
+            js_files_to_check = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.js'))]
+
+            for filepath in js_files_to_check:
+                if filepath.startswith(('core/templates', 'extensions')) and (
+                        filepath not in build.JS_FILEPATHS_NOT_TO_BUILD) and (
+                            not filepath.endswith('protractor.js')):
+                    print '%s  --> Found extra .js file\n' % filepath
+                    failed = True
+
+            if failed:
+                err_msg = (
+                    'If you want the above files to be present as js files, '
+                    'add them to the list JS_FILEPATHS_NOT_TO_BUILD in '
+                    'build.py. Otherwise, rename them to .ts\n')
+                print err_msg
+
+            if failed:
+                summary_message = '%s  Extra JS files check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Extra JS files check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+            print ''
+
+        return summary_messages
+
+    def _check_constants_declaration(self):
+        """Checks the declaration of constants in the TS files to ensure that
+        the constants are not declared in files other than *.constants.ts and
+        that the constants are declared only single time.
+        """
+
+        if self.verbose_mode_enabled:
+            print 'Starting constants declaration check'
+            print '----------------------------------------'
+
+        summary_messages = []
+        failed = False
+
+        with _redirect_stdout(_TARGET_STDOUT):
+            all_ts_files = [
+                filepath for filepath in self.all_filepaths if (
+                    filepath.endswith('.ts'))]
+            ts_files_to_check = [
+                filepath for filepath in all_ts_files if not any(
+                    filepath.startswith(pattern) for pattern in (
+                        OLD_CONVENTION_PATHS))]
+            constants_to_source_filepaths_dict = {}
+            for filepath in ts_files_to_check:
+                # Check that the constants are declared only in a *.constants.ts
+                # file.
+                if not filepath.endswith('.constants.ts'):
+                    for line_num, line in enumerate(FileCache.readlines(
+                            filepath)):
+                        if 'oppia.constant(' in line:
+                            failed = True
+                            print ('%s --> Constant declaration found at line '
+                                   '%s. Please declare the constants in a '
+                                   'separate constants file.' % (
+                                       filepath, line_num))
+
+                # Check if the constant has multiple declarations which is
+                # prohibited.
+                parsed_script = self.parsed_js_and_ts_files[filepath]
+                parsed_nodes = parsed_script.body
+                components_to_check = ['constant']
+                for parsed_node in parsed_nodes:
+                    expression = _get_expression_from_node_if_one_exists(
+                        parsed_node, components_to_check)
+                    if not expression:
+                        continue
+                    else:
+                        constant_name = expression.arguments[0].raw
+                        if constant_name in constants_to_source_filepaths_dict:
+                            failed = True
+                            print ('%s --> The constant %s is already declared '
+                                   'in %s. Please import the file where the '
+                                   'constant is declared or rename the constant'
+                                   '.' % (
+                                       filepath, constant_name,
+                                       constants_to_source_filepaths_dict[
+                                           constant_name]))
+                        else:
+                            constants_to_source_filepaths_dict[
+                                constant_name] = filepath
+
+
+            if failed:
+                summary_message = '%s  Constants declaration check failed' % (
+                    _MESSAGE_TYPE_FAILED)
+            else:
+                summary_message = '%s  Constants declaration check passed' % (
+                    _MESSAGE_TYPE_SUCCESS)
+            summary_messages.append(summary_message)
+            print summary_message
+
+        return summary_messages
+
+
     def perform_all_lint_checks(self):
         """Perform all the lint checks and returns the messages returned by all
         the checks.
@@ -2236,15 +2517,15 @@ class LintChecksManager(object):
         """
 
         linter_messages = self._lint_all_files()
+        extra_js_files_messages = self._check_extra_js_files()
         js_and_ts_component_messages = (
             self._check_js_and_ts_component_name_and_count())
         directive_scope_messages = self._check_directive_scope()
+        mandatory_patterns_messages = self._check_mandatory_patterns()
         sorted_dependencies_messages = (
             self._check_sorted_dependencies())
         controller_dependency_messages = (
             self._match_line_breaks_in_controller_dependencies())
-        html_directive_name_messages = (
-            self._check_html_directive_name())
         import_order_messages = self._check_import_order()
         docstring_messages = self._check_docstrings()
         comment_messages = self._check_comments()
@@ -2254,17 +2535,16 @@ class LintChecksManager(object):
             self._check_html_tags_and_attributes())
         html_linter_messages = self._lint_html_files()
         pattern_messages = self._check_bad_patterns()
-        copyright_notice_messages = (
-            self._check_for_copyright_notice())
         codeowner_messages = self._check_codeowner_file()
+        constants_messages = self._check_constants_declaration()
         all_messages = (
-            js_and_ts_component_messages + directive_scope_messages +
-            sorted_dependencies_messages + controller_dependency_messages +
-            html_directive_name_messages + import_order_messages +
-            docstring_messages + comment_messages +
-            html_tag_and_attribute_messages +
+            extra_js_files_messages + js_and_ts_component_messages +
+            directive_scope_messages + sorted_dependencies_messages +
+            controller_dependency_messages + import_order_messages +
+            mandatory_patterns_messages + docstring_messages +
+            comment_messages + html_tag_and_attribute_messages +
             html_linter_messages + linter_messages + pattern_messages +
-            copyright_notice_messages + codeowner_messages)
+            codeowner_messages + constants_messages)
         return all_messages
 
 

@@ -16,6 +16,18 @@
  * @fileoverview Tests for Topic update service.
  */
 
+require('App.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/ContentIdsToAudioTranslationsObjectFactory.ts');
+require('domain/exploration/SubtitledHtmlObjectFactory.ts');
+require('domain/skill/SkillSummaryObjectFactory.ts');
+require('domain/topic/SubtopicObjectFactory.ts');
+require('domain/topic/SubtopicPageContentsObjectFactory.ts');
+require('domain/topic/SubtopicPageObjectFactory.ts');
+require('domain/topic/TopicObjectFactory.ts');
+require('domain/topic/TopicUpdateService.ts');
+
 describe('Topic update service', function() {
   var ContentIdsToAudioTranslationsObjectFactory = null;
   var TopicUpdateService = null;

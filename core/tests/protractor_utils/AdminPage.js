@@ -32,7 +32,7 @@ var AdminPage = function() {
   var updateFormName = element(by.css('.protractor-update-form-name'));
   var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
-  var statusMessage = element(by.css('[ng-if="statusMessage"]'));
+  var statusMessage = element(by.css('[ng-if="$ctrl.statusMessage"]'));
 
   // The reload functions are used for mobile testing
   // done via Browserstack. These functions may cause

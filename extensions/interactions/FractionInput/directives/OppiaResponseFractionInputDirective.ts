@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the FractionInput response.
+ * @fileoverview Directive for the FractionInput response.
  */
 
 oppia.directive('oppiaResponseFractionInput', [
@@ -23,12 +23,15 @@ oppia.directive('oppiaResponseFractionInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/FractionInput/directives/' +
         'fraction_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
-        $scope.answer = FractionObjectFactory.fromDict(answer).toString();
+        ctrl.answer = FractionObjectFactory.fromDict(answer).toString();
       }]
     };
   }

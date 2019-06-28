@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for SearchExplorationsBackendApiService.
  */
 
+require('domain/collection/SearchExplorationsBackendApiService.ts');
+
 describe('Exploration search backend API service', function() {
   var SearchExplorationsBackendApiService = null;
   var $rootScope = null;

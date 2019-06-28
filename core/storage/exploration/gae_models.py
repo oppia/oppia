@@ -169,8 +169,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this exploration.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to voiceover this exploration.
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
@@ -194,6 +194,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
             constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
+    # DEPRECATED in v2.8.3. Do not use.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     def save(self, committer_id, commit_message, commit_cmds):
         """Saves a new version of the exploration, updating the Exploration
@@ -389,8 +391,8 @@ class ExpSummaryModel(base_models.BaseModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
-    # The user_ids of users who are allowed to translate this exploration.
-    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to voiceover this exploration.
+    voice_artist_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
@@ -403,6 +405,8 @@ class ExpSummaryModel(base_models.BaseModel):
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
+    # DEPRECATED in v2.8.3. Do not use.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
 
     @classmethod
     def get_non_private(cls):
@@ -454,7 +458,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id,
-                   ExpSummaryModel.translator_ids == user_id,
+                   ExpSummaryModel.voice_artist_ids == user_id,
                    ExpSummaryModel.viewer_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
@@ -500,13 +504,12 @@ class ExpSummaryModel(base_models.BaseModel):
 
 
 class StateIdMappingModel(base_models.BaseModel):
-    """State ID model for Oppia explorations.
-
+    """DEPRECATED: DO NOT USE.
+    State ID model for Oppia explorations.
     This model maps each exploration version's state to a unique id.
     Note: use the state id only for derived data, but not for data that’s
     regarded as the source of truth, as the rules for assigning state id may
     change in future.
-
     The key of each instance is a combination of exploration id and version.
     """
 
@@ -525,25 +528,10 @@ class StateIdMappingModel(base_models.BaseModel):
     largest_state_id_used = ndb.IntegerProperty(indexed=True, required=True)
 
     @classmethod
-    def _generate_instance_id(cls, exp_id, exp_version):
-        """Generates ID of the state id mapping model instance.
-
-        Args:
-            exp_id: str. The exploration id whose states are mapped.
-            exp_version: int. The version of the exploration.
-
-        Returns:
-            str. A string containing exploration ID and
-                exploration version.
-        """
-        return '%s.%d' % (exp_id, exp_version)
-
-    @classmethod
     def create(
             cls, exp_id, exp_version, state_names_to_ids,
             largest_state_id_used, overwrite=False):
         """Creates a new instance of state id mapping model.
-
         Args:
             exp_id: str. The exploration id whose states are mapped.
             exp_version: int. The version of that exploration.
@@ -552,7 +540,6 @@ class StateIdMappingModel(base_models.BaseModel):
                 used as a state ID for this exploration.
             overwrite: bool. Whether overwriting of an existing model should
                 be allowed.
-
         Returns:
             StateIdMappingModel. Instance of the state id mapping model.
         """
@@ -571,14 +558,23 @@ class StateIdMappingModel(base_models.BaseModel):
         return model
 
     @classmethod
+    def _generate_instance_id(cls, exp_id, exp_version):
+        """Generates ID of the state id mapping model instance.
+        Args:
+            exp_id: str. The exploration id whose states are mapped.
+            exp_version: int. The version of the exploration.
+        Returns:
+            str. A string containing exploration ID and
+                exploration version.
+        """
+        return '%s.%d' % (exp_id, exp_version)
+
+    @classmethod
     def get_state_id_mapping_model(cls, exp_id, exp_version):
         """Retrieve state id mapping model from the datastore.
-
         Args:
             exp_id: str. The exploration id.
             exp_version: int. The exploration version.
-
-
         Returns:
             StateIdMappingModel. The model retrieved from the datastore.
         """
@@ -589,7 +585,6 @@ class StateIdMappingModel(base_models.BaseModel):
     @classmethod
     def delete_state_id_mapping_models(cls, exp_id, exp_versions):
         """Removes state id mapping models present in state_id_mapping_models.
-
         Args:
             exp_id: str. The id of the exploration.
             exp_versions: list(int). A list of exploration versions for which

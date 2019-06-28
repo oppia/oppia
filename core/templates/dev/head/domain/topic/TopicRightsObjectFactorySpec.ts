@@ -16,6 +16,8 @@
  * @fileoverview Tests for TopicRightsObjectFactory.
  */
 
+require('domain/topic/TopicRightsObjectFactory.ts');
+
 describe('Topic rights object factory', function() {
   var TopicRightsObjectFactory = null;
   var sampleTopicRights = null;

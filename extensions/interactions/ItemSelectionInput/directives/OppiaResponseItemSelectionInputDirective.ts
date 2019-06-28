@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the ItemSelectionInput response.
+ * @fileoverview Directive for the ItemSelectionInput response.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -26,11 +26,14 @@ oppia.directive('oppiaResponseItemSelectionInput', [
     return {
       restrict: 'E',
       scope: {},
+      bindToController: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ItemSelectionInput/directives/' +
         'item_selection_input_response_directive.html'),
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+      controllerAs: '$ctrl',
+      controller: ['$attrs', function($attrs) {
+        var ctrl = this;
+        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
       }]
     };
   }

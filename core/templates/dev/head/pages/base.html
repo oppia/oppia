@@ -72,7 +72,8 @@
     {% endblock base_url %}
 
     {% block header_css %}
-      {% include 'pages/header_css_libs.html' %}
+      <!-- Require head styles file using webpack -->
+      @require('header_css_libs.html')
     {% endblock header_css %}
 
     <script>
@@ -82,16 +83,14 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        isTopicManager: JSON.parse('{{is_topic_manager|js_string}}'),
-        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
     </script>
 
     {% block header_js %}
-      {% include 'pages/header_js_libs.html' %}
+      <!-- Require head javascript file using webpack -->
+      @require('header_js_libs.html')
     {% endblock header_js %}
 
-    {{BEFORE_END_HEAD_TAG_HOOK}}
   </head>
 
   <body>
@@ -163,47 +162,7 @@
       </a>
     </div>
 
-    {% include 'pages/footer_js_libs.html' %}
-
-    <script src="/templates/dev/head/App.js"></script>
-    <script src="/templates/dev/head/I18nFooter.js"></script>
-
-    <script src="/templates/dev/head/directives/FocusOnDirective.js"></script>
-
-    <script src="/templates/dev/head/pages/Base.js"></script>
-
-    <script src="/templates/dev/head/services/AlertsService.js"></script>
-    <script src="/templates/dev/head/services/ContextService.js"></script>
-    <script src="/templates/dev/head/services/NavigationService.js"></script>
-    <script src="/templates/dev/head/services/UtilsService.js"></script>
-    <script src="/templates/dev/head/services/DebouncerService.js"></script>
-    <script src="/templates/dev/head/services/DateTimeFormatService.js"></script>
-    <script src="/templates/dev/head/services/TranslationFileHashLoaderService.js"></script>
-    <script src="/templates/dev/head/services/UserService.js"></script>
-    <script src="/templates/dev/head/services/PromoBarService.js"></script>
-    <script src="/templates/dev/head/services/contextual/DeviceInfoService.js"></script>
-    <script src="/templates/dev/head/services/contextual/UrlService.js"></script>
-    <script src="/templates/dev/head/services/contextual/WindowDimensionsService.js"></script>
-    <script src="/templates/dev/head/services/stateful/BackgroundMaskService.js"></script>
-    <script src="/templates/dev/head/services/stateful/FocusManagerService.js"></script>
-    <script src="/templates/dev/head/services/SiteAnalyticsService.js"></script>
-
-    <script src="/templates/dev/head/components/alerts/AlertMessageDirective.js"></script>
-    <script src="/templates/dev/head/components/create_button/CreateActivityButtonDirective.js"></script>
-
-    <script src="/templates/dev/head/components/forms/ObjectEditorDirective.js"></script>
-    <script src="/templates/dev/head/components/promo/PromoBarDirective.js"></script>
-    <script src="/templates/dev/head/components/side_navigation_bar/SideNavigationBarDirective.js"></script>
-    <script src="/templates/dev/head/components/social_buttons/SocialButtonsDirective.js"></script>
-    <script src="/templates/dev/head/components/top_navigation_bar/TopNavigationBarDirective.js"></script>
-
-    <script src="/templates/dev/head/components/CollectionCreationService.js"></script>
-    <script src="/templates/dev/head/components/ExplorationCreationService.js"></script>
-
-    <script src="/templates/dev/head/domain/sidebar/SidebarStatusService.js"></script>
-    <script src="/templates/dev/head/domain/user/UserInfoObjectFactory.js"></script>
-    <script src="/templates/dev/head/domain/utilities/UrlInterpolationService.js"></script>
-
+    @require('footer_js_libs.html')
     {% block footer_js %}
     {% endblock footer_js %}
   </body>

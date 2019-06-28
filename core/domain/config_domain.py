@@ -79,6 +79,7 @@ class ConfigProperty(object):
     - banned_usernames.
     - banner_alt_text.
     - before_end_body_tag_hook.
+    - before_end_head_tag_hook.
     - carousel_slides_config.
     - collection_editor_whitelist.
     - contact_email_address.

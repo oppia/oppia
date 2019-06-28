@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Winnowing preprocessing functions.
+ * @fileoverview Winnowing preprocessing functions.
  *
  * IMPORTANT NOTE: The preprocessing functions are implemented according to
  * winnowing preprocessing functions used on Oppia-ml. These functions
@@ -59,7 +59,7 @@ oppia.factory('WinnowingPreprocessingService', [function() {
       }
 
       var fingerprint = [];
-      fingerprintHashesIndex.forEach(function(hashIndex) {
+      fingerprintHashesIndex.forEach(function(hashIndex: number) {
         fingerprint.push([kGramHashes[hashIndex], hashIndex]);
       });
 

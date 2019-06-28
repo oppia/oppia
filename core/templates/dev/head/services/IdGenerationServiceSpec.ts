@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for IdGenerationService.
  */
 
+require('services/IdGenerationService.ts');
+
 describe('IdGenerationService', function() {
   var IdGenerationService = null;
 

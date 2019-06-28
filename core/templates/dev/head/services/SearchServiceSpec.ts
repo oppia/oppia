@@ -16,6 +16,8 @@
  * @fileoverview Tests that average ratings are being computed correctly.
  */
 
+require('services/SearchService.ts');
+
 describe('Search service', function() {
   var SearchService;
 
@@ -215,7 +217,7 @@ describe('Search service', function() {
     }
   );
 
-  it('should only find empty string when ampersand is not escaped anywhere',
+  it('should only use correct fields when ampersand is not escaped anywhere',
     function() {
       var results = {
         categories: {
@@ -237,11 +239,14 @@ describe('Search service', function() {
       };
       var urlComponent = '?q=protractor&test&category=("Mathematics")' +
                          '&language_code=("en"%20OR%20"ar")';
-      expect(function() {
-        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results);
-      }).toThrow(new Error(
-        'Invalid search query url: protractor&test&category=("Mathematics")' +
-        '&language_code=("en"%20OR%20"ar")'));
+      expect(
+        SearchService.updateSearchFieldsBasedOnUrlQuery(urlComponent, results)
+      ).toBe('protractor');
+      expect(results.languageCodes.selections).toEqual({
+        en: true,
+        ar: true
+      });
+      expect(results.categories.selections).toEqual({Mathematics: true});
     }
   );
 

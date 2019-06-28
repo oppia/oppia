@@ -16,6 +16,10 @@
  * @fileoverview Tests for Collection update service.
  */
 
+require('domain/collection/CollectionObjectFactory.ts');
+require('domain/collection/CollectionUpdateService.ts');
+require('domain/editor/undo_redo/UndoRedoService.ts');
+
 describe('Collection update service', function() {
   var CollectionUpdateService = null;
   var CollectionObjectFactory = null;

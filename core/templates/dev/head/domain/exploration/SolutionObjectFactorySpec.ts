@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for the Solution object factory.
  */
 
+require('domain/exploration/SolutionObjectFactory.ts');
+
 describe('Solution object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 

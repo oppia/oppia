@@ -17,6 +17,9 @@
  * from the backend.
  */
 
+require('services/AlertsService.ts');
+require('services/ValidatorsService.ts');
+
 oppia.factory('ExplorationSummaryBackendApiService', [
   '$http', '$q', 'AlertsService',
   'ValidatorsService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
@@ -47,6 +50,12 @@ oppia.factory('ExplorationSummaryBackendApiService', [
       }).then(function(response) {
         var summaries = angular.copy(response.data.summaries);
         if (successCallback) {
+          if (summaries === null) {
+            var summariesError = (
+              'Summaries fetched are null for explorationIds: ' + explorationIds
+            );
+            throw new Error(summariesError);
+          }
           successCallback(summaries);
         }
       }, function(errorResponse) {

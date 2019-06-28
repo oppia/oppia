@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for ParamMetadataObjectFactory.
-*/
+ * @fileoverview Unit tests for ParamMetadataObjectFactory.
+ */
+
+require('domain/exploration/ParamMetadataObjectFactory.ts');
 
 describe('ParameterMetadata object factory', function() {
   var parameterMetadata = null;

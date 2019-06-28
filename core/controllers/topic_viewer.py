@@ -26,18 +26,13 @@ class TopicViewerPage(base.BaseHandler):
     """Renders the topic viewer page."""
 
     @acl_decorators.can_access_topic_viewer_page
-    def get(self, topic_name):
+    def get(self, _):
         """Handles GET requests."""
 
         if not constants.ENABLE_NEW_STRUCTURE_PLAYERS:
             raise self.PageNotFoundException
 
-        topic = topic_services.get_topic_by_name(topic_name)
-
-        self.values.update({
-            'topic_name': topic.name
-        })
-        self.render_template('/pages/topic_viewer/topic_viewer.html')
+        self.render_template('dist/topic-viewer-page.mainpage.html')
 
 
 class TopicPageDataHandler(base.BaseHandler):

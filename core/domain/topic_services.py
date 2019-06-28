@@ -945,22 +945,6 @@ def check_can_edit_topic(user, topic_rights):
     return False
 
 
-def check_can_edit_subtopic_page(user):
-    """Checks whether the user can edit the subtopic pages for a topic.
-
-    Args:
-        user: UserActionsInfo. Object having user_id, role and actions for
-            given user.
-
-    Returns:
-        bool. Whether the given user can edit a subtopic page.
-    """
-    if role_services.ACTION_EDIT_ANY_SUBTOPIC_PAGE in user.actions:
-        return True
-
-    return False
-
-
 def deassign_user_from_all_topics(committer, user_id):
     """Deassigns given user from all topics assigned to them.
 

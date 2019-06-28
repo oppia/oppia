@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Unit tests for set input validation service.
+ */
+
 describe('SetInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 

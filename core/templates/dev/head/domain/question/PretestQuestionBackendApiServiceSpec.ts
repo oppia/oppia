@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for PretestQuestionBackendApiService.
  */
 
+require('domain/question/PretestQuestionBackendApiService.ts');
+
 describe('Pretest question backend API service', function() {
   var PretestQuestionBackendApiService = null;
   var sampleDataResults = null;
@@ -42,7 +44,9 @@ describe('Pretest question backend API service', function() {
           content: {
             html: 'Question 1'
           },
-          content_ids_to_audio_translations: {},
+          recorded_voiceovers: {
+            voiceovers_mapping: {}
+          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],
@@ -71,7 +75,8 @@ describe('Pretest question backend API service', function() {
             },
             id: 'TextInput'
           },
-          param_changes: []
+          param_changes: [],
+          solicit_answer_details: false
         },
         language_code: 'en',
         version: 1

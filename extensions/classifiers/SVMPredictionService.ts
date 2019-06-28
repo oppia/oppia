@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * SVM predict function for SVC classifier of sklearn.
+ * @fileoverview SVM predict function for SVC classifier of sklearn.
  *
  * IMPORTANT NOTE: The predict function uses svm data that was extracted
  * after training of classifier on Oppia-ml. If there are any changes in

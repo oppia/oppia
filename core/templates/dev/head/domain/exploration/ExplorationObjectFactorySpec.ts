@@ -16,16 +16,21 @@
  * @fileoverview Unit tests for the Exploration object factory.
  */
 
+require('domain/exploration/AudioTranslationObjectFactory.ts');
+require('domain/exploration/ExplorationObjectFactory.ts');
+require('domain/exploration/VoiceoverObjectFactory.ts');
+require('domain/state/StateObjectFactory.ts');
+
 describe('Exploration object factory', function() {
   beforeEach(angular.mock.module('oppia'));
 
   describe('ExplorationObjectFactory', function() {
-    var scope, eof, atof, sof, explorationDict, exploration;
+    var scope, eof, atof, sof, explorationDict, exploration, vof;
     beforeEach(angular.mock.inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       eof = $injector.get('ExplorationObjectFactory');
       sof = $injector.get('StateObjectFactory');
-      atof = $injector.get('AudioTranslationObjectFactory');
+      vof = $injector.get('VoiceoverObjectFactory');
 
       var statesDict = {
         'first state': {
@@ -33,20 +38,22 @@ describe('Exploration object factory', function() {
             content_id: 'content',
             html: 'content'
           },
-          content_ids_to_audio_translations: {
-            content: {
-              en: {
-                filename: 'myfile1.mp3',
-                file_size_bytes: 210000,
-                needs_update: false
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                en: {
+                  filename: 'myfile1.mp3',
+                  file_size_bytes: 210000,
+                  needs_update: false
+                },
+                'hi-en': {
+                  filename: 'myfile3.mp3',
+                  file_size_bytes: 430000,
+                  needs_update: false
+                }
               },
-              'hi-en': {
-                filename: 'myfile3.mp3',
-                file_size_bytes: 430000,
-                needs_update: false
-              }
-            },
-            default_outcome: {}
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],
@@ -61,6 +68,7 @@ describe('Exploration object factory', function() {
             id: 'TextInput'
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -73,15 +81,17 @@ describe('Exploration object factory', function() {
             content_id: 'content',
             html: 'more content'
           },
-          content_ids_to_audio_translations: {
-            content: {
-              'hi-en': {
-                filename: 'myfile2.mp3',
-                file_size_bytes: 120000,
-                needs_update: false
-              }
-            },
-            default_outcome: {}
+          recorded_voiceovers: {
+            voiceovers_mapping: {
+              content: {
+                'hi-en': {
+                  filename: 'myfile2.mp3',
+                  file_size_bytes: 120000,
+                  needs_update: false
+                }
+              },
+              default_outcome: {}
+            }
           },
           interaction: {
             answer_groups: [],
@@ -96,6 +106,7 @@ describe('Exploration object factory', function() {
             id: 'TextInput'
           },
           param_changes: [],
+          solicit_answer_details: false,
           written_translations: {
             translations_mapping: {
               content: {},
@@ -126,7 +137,7 @@ describe('Exploration object factory', function() {
     }));
 
     it('should get all language codes of an exploration', function() {
-      expect(exploration.getAllAudioLanguageCodes())
+      expect(exploration.getAllVoiceoverLanguageCodes())
         .toEqual(['en', 'hi-en']);
     });
 
@@ -137,20 +148,20 @@ describe('Exploration object factory', function() {
 
     it('should correctly get audio translations from an exploration',
       function() {
-        expect(exploration.getAllAudioTranslations('hi-en')).toEqual({
-          'first state': [atof.createFromBackendDict({
+        expect(exploration.getAllVoiceovers('hi-en')).toEqual({
+          'first state': [vof.createFromBackendDict({
             filename: 'myfile3.mp3',
             file_size_bytes: 430000,
             needs_update: false
           })],
-          'second state': [atof.createFromBackendDict({
+          'second state': [vof.createFromBackendDict({
             filename: 'myfile2.mp3',
             file_size_bytes: 120000,
             needs_update: false
           })]
         });
-        expect(exploration.getAllAudioTranslations('en')).toEqual({
-          'first state': [atof.createFromBackendDict({
+        expect(exploration.getAllVoiceovers('en')).toEqual({
+          'first state': [vof.createFromBackendDict({
             filename: 'myfile1.mp3',
             file_size_bytes: 210000,
             needs_update: false

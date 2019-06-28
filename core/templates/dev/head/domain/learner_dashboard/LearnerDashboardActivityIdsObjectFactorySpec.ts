@@ -16,6 +16,8 @@
  * @fileoverview Tests for LearnerDashboardActivityIdsObjectFactory.
  */
 
+require('domain/learner_dashboard/LearnerDashboardActivityIdsObjectFactory.ts');
+
 describe('Learner dashboard activity ids object factory', function() {
   var LearnerDashboardActivityIdsObjectFactory = null;
   var learnerDashboardActivityIdsDict = null;

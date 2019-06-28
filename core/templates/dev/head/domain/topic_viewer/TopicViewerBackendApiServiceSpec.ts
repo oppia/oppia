@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for TopicViewerBackendApiService.
  */
 
+require('domain/topic_viewer/TopicViewerBackendApiService.ts');
+
 describe('Topic viewer backend API service', function() {
   var TopicViewerBackendApiService = null;
   var sampleDataResults = null;

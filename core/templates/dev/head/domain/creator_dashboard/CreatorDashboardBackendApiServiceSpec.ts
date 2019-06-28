@@ -16,6 +16,9 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
+require('domain/creator_dashboard/CreatorDashboardBackendApiService.ts');
+require('domain/utilities/UrlInterpolationService.ts');
+
 describe('Creator Dashboard backend API service', function() {
   var CreatorDashboardBackendApiService = null;
   var $httpBackend = null;

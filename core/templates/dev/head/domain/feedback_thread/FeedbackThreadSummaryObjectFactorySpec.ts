@@ -16,6 +16,8 @@
  * @fileoverview Tests for FeedbackThreadSummaryObjectFactory.
  */
 
+require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
+
 describe('Feedback thread object factory', function() {
   var FeedbackThreadSummaryObjectFactory = null;
 

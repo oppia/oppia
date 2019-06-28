@@ -40,6 +40,87 @@ title: A title
 """) % (feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
 
+class CollectionChangeTests(test_utils.GenericTestBase):
+
+    def test_collection_change_object_with_invalid_change_dict(self):
+        # Raises exception as 'cmd' command is not found in change_dict.
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict:'):
+            collection_domain.CollectionChange({'invalid_cmd': 'data'})
+
+        # Raises exception due to invalid property name.
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict:'):
+            collection_domain.CollectionChange({
+                'cmd': 'edit_collection_property',
+                'property_name': 'invalid_property_name',
+            })
+
+        # Raises exception due to invalid command.
+        with self.assertRaisesRegexp(Exception, 'Invalid change_dict:'):
+            collection_domain.CollectionChange({
+                'cmd': 'invalid_cmd'
+            })
+
+    def test_collection_change_object_with_swap_nodes(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'swap_nodes',
+            'first_index': 'first_index',
+            'second_index': 'second_index'
+        })
+
+        self.assertEqual(col_change_object.first_index, 'first_index')
+        self.assertEqual(col_change_object.second_index, 'second_index')
+
+    def test_collection_change_object_with_edit_collection_node_property(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'edit_collection_node_property',
+            'exploration_id': 'exploration_id',
+            'property_name': 'property_name',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(col_change_object.exploration_id, 'exploration_id')
+        self.assertEqual(col_change_object.property_name, 'property_name')
+        self.assertEqual(col_change_object.new_value, 'new_value')
+        self.assertEqual(col_change_object.old_value, 'old_value')
+
+    def test_collection_change_object_with_add_collection_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_collection_skill',
+            'name': 'name'
+        })
+
+        self.assertEqual(col_change_object.name, 'name')
+
+    def test_collection_change_object_with_add_question_id_to_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'add_question_id_to_skill',
+            'skill_id': 'skill_id',
+            'question_id': 'question_id'
+        })
+
+        self.assertEqual(col_change_object.skill_id, 'skill_id')
+        self.assertEqual(col_change_object.question_id, 'question_id')
+
+    def test_collection_change_object_with_remove_question_id_from_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'remove_question_id_from_skill',
+            'skill_id': 'skill_id',
+            'question_id': 'question_id'
+        })
+
+        self.assertEqual(col_change_object.skill_id, 'skill_id')
+        self.assertEqual(col_change_object.question_id, 'question_id')
+
+    def test_collection_change_object_with_delete_collection_skill(self):
+        col_change_object = collection_domain.CollectionChange({
+            'cmd': 'delete_collection_skill',
+            'skill_id': 'skill_id',
+        })
+
+        self.assertEqual(col_change_object.skill_id, 'skill_id')
+
+
 class CollectionDomainUnitTests(test_utils.GenericTestBase):
     """Test the collection domain object."""
 
@@ -156,7 +237,6 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self.collection.objective = ''
         self.collection.category = ''
         self.collection.nodes = []
-        self.collection.add_node('exp_id_1')
 
         # Having no title is fine for non-strict validation.
         self.collection.validate(strict=False)
@@ -178,6 +258,13 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'A category must be specified for the collection.')
         self.collection.category = 'A category'
+
+        # Having no exploration is fine for non-strict validation.
+        self.collection.validate(strict=False)
+        # But it's not okay for strict validation.
+        self._assert_validation_error(
+            'Expected to have at least 1 exploration in the collection.')
+        self.collection.add_node('exp_id_1')
 
         # Now the collection passes both strict and non-strict validation.
         self.collection.validate(strict=False)
@@ -254,6 +341,34 @@ class CollectionDomainUnitTests(test_utils.GenericTestBase):
 
         collection.delete_node('test_exp')
         self.assertEqual(len(collection.nodes), 0)
+
+    def test_update_collection_contents_from_model(self):
+        versioned_collection_contents = {
+            'schema_version': 1,
+            'collection_contents': {}
+        }
+
+        collection_domain.Collection.update_collection_contents_from_model(
+            versioned_collection_contents, 1)
+
+        self.assertEqual(versioned_collection_contents['schema_version'], 2)
+        self.assertEqual(
+            versioned_collection_contents['collection_contents'], {})
+
+    def test_update_collection_contents_from_model_with_invalid_schema_version(
+            self):
+        versioned_collection_contents = {
+            'schema_version': feconf.CURRENT_COLLECTION_SCHEMA_VERSION,
+            'collection_contents': {}
+        }
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Collection is version .+ but current collection schema version '
+            'is %d' % feconf.CURRENT_COLLECTION_SCHEMA_VERSION):
+            collection_domain.Collection.update_collection_contents_from_model(
+                versioned_collection_contents,
+                feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
 
 
 class ExplorationGraphUnitTests(test_utils.GenericTestBase):
@@ -415,6 +530,33 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
         # Should not be able to create a collection from no YAML content.
         with self.assertRaises(Exception):
             collection_domain.Collection.from_yaml('collection3', None)
+
+    def test_from_yaml_with_no_schema_version_specified_raises_error(self):
+        collection = collection_domain.Collection(
+            self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
+            None, [], 0)
+
+        yaml_content = collection.to_yaml()
+
+        with self.assertRaisesRegexp(
+            Exception, 'Invalid YAML file: no schema version specified.'):
+            collection_domain.Collection.from_yaml(
+                self.COLLECTION_ID, yaml_content)
+
+    def test_from_yaml_with_invalid_schema_version_raises_error(self):
+        collection = collection_domain.Collection(
+            self.COLLECTION_ID, 'title', 'category', 'objective', 'en', [],
+            0, [], 0)
+
+        yaml_content = collection.to_yaml()
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1 to .+ collection YAML files at '
+            'present.'):
+            collection_domain.Collection.from_yaml(
+                self.COLLECTION_ID, yaml_content)
+
 
 
 class SchemaMigrationMethodsUnitTests(test_utils.GenericTestBase):
@@ -620,3 +762,34 @@ title: A title
         collection = collection_domain.Collection.from_yaml(
             'cid', self.YAML_CONTENT_V6)
         self.assertEqual(collection.to_yaml(), self._LATEST_YAML_CONTENT)
+
+
+class CollectionSummaryTests(test_utils.GenericTestBase):
+
+    def test_collection_summary_gets_created(self):
+
+        collection_summary_dict = {
+            'category': 'category',
+            'status': 'status',
+            'community_owned': 'True',
+            'viewer_ids': ['viewer_id'],
+            'version': 1,
+            'editor_ids': ['editor_id'],
+            'title': 'title',
+            'collection_model_created_on': {},
+            'tags': [],
+            'collection_model_last_updated': {},
+            'contributor_ids': ['contributor_id'],
+            'language_code': 'en',
+            'objective': 'objective',
+            'contributors_summary': {},
+            'id': 'col_id',
+            'owner_ids': ['owner_id']
+        }
+
+        collection_summary = collection_domain.CollectionSummary(
+            'col_id', 'title', 'category', 'objective', 'en', [], 'status',
+            'True', ['owner_id'], ['editor_id'], ['viewer_id'],
+            ['contributor_id'], {}, 1, 1, {}, {})
+
+        self.assertEqual(collection_summary.to_dict(), collection_summary_dict)

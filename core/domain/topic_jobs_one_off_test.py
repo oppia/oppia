@@ -17,7 +17,6 @@
 """Tests for Topic-related one-off jobs."""
 import ast
 
-from constants import constants
 from core.domain import topic_domain
 from core.domain import topic_jobs_one_off
 from core.domain import topic_services
@@ -37,9 +36,6 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TopicMigrationOneOffJobTests, self).setUp()
-
-        self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True)
-
         # Setup user who will own the test topics.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
@@ -60,11 +56,10 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the topic is exactly the same after migration.
         updated_topic = (
@@ -97,14 +92,13 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
             topic_services.get_topic_by_id(self.TOPIC_ID)
 
         # Start migration job on sample topic.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
 
-            # This running without errors indicates the deleted topic is
-            # being ignored.
-            self.process_and_flush_pending_tasks()
+        # This running without errors indicates the deleted topic is
+        # being ignored.
+        self.process_and_flush_pending_tasks()
 
         # Ensure the topic is still deleted.
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -129,11 +123,10 @@ class TopicMigrationOneOffJobTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopic_schema_version, 1)
 
         # Start migration job.
-        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_EDITORS', True):
-            job_id = (
-                topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
-            topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        job_id = (
+            topic_jobs_one_off.TopicMigrationOneOffJob.create_new())
+        topic_jobs_one_off.TopicMigrationOneOffJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
         # Verify the topic migrates correctly.
         updated_topic = (

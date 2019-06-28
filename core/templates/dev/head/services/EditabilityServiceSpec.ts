@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for EditabilityService.
  */
 
+require('services/EditabilityService.ts');
+
 describe('EditabilityService', function() {
   var EditabilityService = null;
 

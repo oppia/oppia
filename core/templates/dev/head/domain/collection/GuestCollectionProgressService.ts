@@ -25,6 +25,8 @@
 // TODO(bhenning): This should be reset upon login, otherwise the progress will
 // be different depending on the user's logged in/logged out state.
 
+require('domain/collection/GuestCollectionProgressObjectFactory.ts');
+
 oppia.factory('GuestCollectionProgressService', [
   '$window', 'GuestCollectionProgressObjectFactory',
   function($window, GuestCollectionProgressObjectFactory) {

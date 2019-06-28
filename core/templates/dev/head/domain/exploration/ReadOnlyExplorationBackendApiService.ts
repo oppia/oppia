@@ -16,6 +16,11 @@
  * @fileoverview Service to retrieve read only information
  * about explorations from the backend.
  */
+
+require('domain/utilities/UrlInterpolationService.ts');
+
+require('pages/exploration-player-page/exploration-player-page.constants.ts');
+
 oppia.factory('ReadOnlyExplorationBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EXPLORATION_DATA_URL_TEMPLATE', 'EXPLORATION_VERSION_DATA_URL_TEMPLATE',

@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
-* @fileoverview Unit tests for SuggestionObjectFactory.
-*/
+ * @fileoverview Unit tests for SuggestionObjectFactory.
+ */
+
+require('domain/suggestion/SuggestionObjectFactory.ts');
 
 describe('Suggestion object factory', function() {
   beforeEach(function() {

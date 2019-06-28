@@ -16,6 +16,8 @@
  * @fileoverview Unit tests for CreatorDashboardBackendApiService.
  */
 
+require('domain/user/UserInfoObjectFactory.ts');
+
 describe('User info factory', function() {
   var UserInfoObjectFactory = null;
 

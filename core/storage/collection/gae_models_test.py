@@ -15,6 +15,9 @@
 # limitations under the License.
 
 """Tests for collection models."""
+
+import datetime
+
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -48,7 +51,7 @@ class CollectionRightsModelUnitTest(test_utils.GenericTestBase):
             id='id',
             owner_ids=['owner_ids'],
             editor_ids=['editor_ids'],
-            translator_ids=['translator_ids'],
+            voice_artist_ids=['voice_artist_ids'],
             viewer_ids=['viewer_ids'],
             community_owned=False,
             status=constants.ACTIVITY_STATUS_PUBLIC,
@@ -65,11 +68,11 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
     def test_get_all_non_private_commits(self):
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
-            '-a-', 0, 'commiter_id', 'username', 'msg',
+            'a', 0, 'committer_id', 'username', 'msg',
             'create', [{}],
             constants.ACTIVITY_STATUS_PRIVATE, False)
         public_commit = collection_models.CollectionCommitLogEntryModel.create(
-            '-b-', 0, 'commiter_id', 'username', 'msg',
+            'b', 0, 'committer_id', 'username', 'msg',
             'create', [{}],
             constants.ACTIVITY_STATUS_PUBLIC, False)
         private_commit.collection_id = 'a'
@@ -80,7 +83,41 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
             collection_models.CollectionCommitLogEntryModel
             .get_all_non_private_commits(2, None, None))
         self.assertEqual(False, commits[2])
-        self.assertEqual('collection--b--0', commits[0][0].id)
+        self.assertEqual('collection-b-0', commits[0][0].id)
+
+    def test_get_all_non_private_commits_with_invalid_max_age(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'max_age must be a datetime.timedelta instance or None.'):
+            (
+                collection_models.CollectionCommitLogEntryModel
+                .get_all_non_private_commits(2, None, 'invalid_max_age'))
+
+    def test_get_all_non_private_commits_with_max_age(self):
+        private_commit = collection_models.CollectionCommitLogEntryModel.create(
+            'a', 0, 'committer_id', 'username', 'msg',
+            'create', [{}],
+            constants.ACTIVITY_STATUS_PRIVATE, False)
+        public_commit = collection_models.CollectionCommitLogEntryModel.create(
+            'b', 0, 'committer_id', 'username', 'msg',
+            'create', [{}],
+            constants.ACTIVITY_STATUS_PUBLIC, False)
+        # We need to manually set collection_id as it is a property of
+        # CollectionCommitLogEntryModel only and create() does not accept
+        # collection_id as a parameter. This property is set in
+        # CollectionModel._trusted_commit().
+        private_commit.collection_id = 'a'
+        public_commit.collection_id = 'b'
+        private_commit.put()
+        public_commit.put()
+
+        max_age = datetime.timedelta(hours=1)
+        results, _, more = (
+            collection_models.CollectionCommitLogEntryModel
+            .get_all_non_private_commits(2, None, max_age))
+        self.assertFalse(more)
+        self.assertEqual(len(results), 1)
+        self.assertEqual('collection-b-0', results[0].id)
 
 
 class CollectionSummaryModelUnitTest(test_utils.GenericTestBase):
