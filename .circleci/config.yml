@@ -97,7 +97,7 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
-            ./cc-test-reporter format-coverage -t coverage.py
+            ./cc-test-reporter format-coverage -t coverage.py < .coverage
             ./cc-test-reporter sum-coverage coverage/codeclimate.*.json
             ./cc-test-reporter upload-coverage
           when: on_success
