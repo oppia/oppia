@@ -2517,15 +2517,15 @@ class LintChecksManager(object):
             errors = linter_stdout.lstrip().rstrip()
             if errors:
                 failed = True
-                error_lst = errors.split('\n')
-                for l in error_lst:
-                    line = l.split('\t')
+                error_list = errors.split('\n')
+                for line in error_list:
+                    line_tokens = line.split('\t')
                     print ('%s is vulnerable. Please run "%s" to update.' %
-                           (line[1], line[3]))
+                           (line_tokens[1], line_tokens[3]))
 
 
             if failed:
-                print '(%s errors found)' % len(error_lst)
+                print '(%s errors found)' % len(error_list)
                 summary_message = '%s  npm package vulnerability failed' % (
                     _MESSAGE_TYPE_FAILED)
                 summary_messages.append(summary_message)
