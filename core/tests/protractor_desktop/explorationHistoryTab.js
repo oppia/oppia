@@ -261,7 +261,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       48: {
-        text: ' ',
+        text: '',
         highlighted: false
       }
     };
@@ -390,7 +390,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       31: {
-        text: ' ',
+        text: '',
         highlighted: false
       }
     };
@@ -428,7 +428,7 @@ describe('Exploration history', function() {
       '  translations_mapping:\n' +
       '    content: {}\n' +
       '    default_outcome: {}\n' +
-      ' ';
+      '';
 
     var expectedHistoryStates = [{
       label: 'first (was: Introd...',
@@ -451,7 +451,7 @@ describe('Exploration history', function() {
     historyGraph.closeStateHistory();
 
     historyGraph.openStateHistory('second');
-    historyGraph.expectTextToMatch(STATE_2_STRING, ' ');
+    historyGraph.expectTextToMatch(STATE_2_STRING, '');
     historyGraph.closeStateHistory();
 
     // Reset all checkboxes.
@@ -486,7 +486,7 @@ describe('Exploration history', function() {
     historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
     historyGraph.openStateHistory('second');
-    historyGraph.expectTextToMatch(' ', STATE_2_STRING);
+    historyGraph.expectTextToMatch('', STATE_2_STRING);
     historyGraph.closeStateHistory();
 
     // Check renaming a state.

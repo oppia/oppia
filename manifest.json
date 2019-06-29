@@ -286,9 +286,9 @@
         }
       },
       "codemirror": {
-        "version": "3.19.0",
+        "version": "5.17.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/marijnh/CodeMirror/archive/3.19.0.zip",
+        "url": "https://github.com/codemirror/CodeMirror/archive/5.17.0.zip",
         "rootDirPrefix": "CodeMirror-",
         "targetDirPrefix": "code-mirror-",
         "bundle": {
@@ -305,6 +305,13 @@
         "bundle": {
           "js": ["d3.min.js"]
         }
+      },
+      "diff-match-patch": {
+        "version": "1.0.0",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/diff_match_patch/20121119",
+        "targetDirPrefix": "diff-match-patch-",
+        "files": ["diff_match_patch.js"]
       },
       "fontAwesome": {
         "version": "5.8.1",
@@ -507,9 +514,9 @@
         }
       },
       "uiCodemirror": {
-        "version": "0.1.2",
+        "version": "0.3.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.1.2.zip",
+        "url": "https://github.com/angular-ui/ui-codemirror/archive/src0.3.0.zip",
         "rootDirPrefix": "ui-codemirror-src",
         "targetDirPrefix": "ui-codemirror-"
       },
