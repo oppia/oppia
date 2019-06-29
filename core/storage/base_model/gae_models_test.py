@@ -49,6 +49,10 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(NotImplementedError):
             base_models.BaseModel.export_data('user_id')
 
+    def test_export_data(self):
+        with self.assertRaises(NotImplementedError):
+            base_models.BaseModel.export_data('model_id')
+
     def test_generic_query_put_get_and_delete_operations(self):
         model = base_models.BaseModel()
 
