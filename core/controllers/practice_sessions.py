@@ -83,14 +83,14 @@ class PracticeSessionsPageDataHandler(base.BaseHandler):
             skills = skill_services.get_multi_skills(topic.get_all_skill_ids())
         except Exception, e:
             raise self.PageNotFoundException(e)
-        skills_with_description = {}
+        skill_descriptions = {}
         for skill in skills:
-            skills_with_description[skill.id] = skill.description
+            skill_descriptions[skill.id] = skill.description
 
         topic_name = topic.name
 
         self.values.update({
             'topic_name': topic.name,
-            'skills_with_description': skills_with_description
+            'skill_descriptions': skill_descriptions
         })
         self.render_json(self.values)
