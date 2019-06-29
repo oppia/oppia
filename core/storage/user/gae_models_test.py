@@ -512,6 +512,7 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
     """Tests for UserSubscriptionsModel."""
     USER_ID_1 = 'user_id_1'
     USER_ID_2 = 'user_id_2'
+    USER_ID_3 = 'user_id_3'
     CREATOR_IDS = ['4', '8', '16']
     COLLECTION_IDS = ['23', '42', '4']
     ACTIVITY_IDS = ['8', '16', '23']
@@ -553,3 +554,11 @@ class UserSubscriptionsModelTests(test_utils.GenericTestBase):
             'last_checked': None
         }
         self.assertEqual(user_data, test_data)
+
+    def test_export_data_on_nonexistent_user(self):
+        """Test if exception is raised on nonexistent UserSubscriptionsModel."""
+        export_data_exception = (
+            self.assertRaisesRegexp(
+                Exception, 'UserSubscriptionsModel does not exist.'))
+        with export_data_exception:
+            user_models.UserSubscriptionsModel.export_data(self.USER_ID_3)

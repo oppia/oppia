@@ -344,7 +344,7 @@ class UserSubscriptionsModel(base_models.BaseModel):
         user_model = UserSubscriptionsModel.get(user_id, strict=False)
 
         if user_model is None:
-            user_model = UserSubscriptionsModel(id=user_id)
+            raise Exception('UserSubscriptionsModel does not exist.')
 
         user_data = {
             'activity_ids': user_model.activity_ids,
