@@ -2520,19 +2520,21 @@ class LintChecksManager(object):
                 error_list = errors.split('\n')
                 for line in error_list:
                     line_tokens = line.split('\t')
-                    print ('%s is vulnerable. Please run "%s" to update.' %
+                    print ('%s package is vulnerable. Please run "%s" to '
+                           'update.' %
                            (line_tokens[1], line_tokens[3]))
 
 
             if failed:
                 print '(%s errors found)' % len(error_list)
-                summary_message = '%s  npm package vulnerability failed' % (
-                    _MESSAGE_TYPE_FAILED)
-                summary_messages.append(summary_message)
+                summary_message = (
+                    '%s  npm package vulnerability check failed' % (
+                        _MESSAGE_TYPE_FAILED))
             else:
-                summary_message = '%s  npm package vulnerability passed' % (
-                    _MESSAGE_TYPE_SUCCESS)
-                summary_messages.append(summary_message)
+                summary_message = (
+                    '%s  npm package vulnerability check passed' % (
+                        _MESSAGE_TYPE_SUCCESS))
+            summary_messages.append(summary_message)
 
             print ''
             print summary_message
