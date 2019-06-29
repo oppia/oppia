@@ -45,12 +45,13 @@ oppia.factory('CsrfTokenService', [function() {
     },
 
     getTokenAsync: function() {
-      if (token) {
+      if (token !== null) {
         return new Promise(function(resolve, reject) {
           resolve(token);
         });
       }
-      if (tokenPromise) {
+      if (tokenPromise !== null) {
+        // The token initialization request is still pending.
         return tokenPromise;
       } else {
         throw new Error('Token needs to be initialized');

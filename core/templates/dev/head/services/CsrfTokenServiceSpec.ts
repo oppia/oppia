@@ -55,5 +55,5 @@ describe('Csrf Token Service', function() {
       expect(CsrfTokenService.getTokenAsync).toThrowError(
         'Token needs to be initialized');
     }
-  )
+  );
 });
