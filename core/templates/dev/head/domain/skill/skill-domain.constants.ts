@@ -19,12 +19,12 @@
 export class SkillDomainConstants {
   public static CONCEPT_CARD_DATA_URL_TEMPLATE =
     '/concept_card_handler/<skill_id>';
-  public static
-    EDITABLE_SKILL_DATA_URL_TEMPLATE =
+  public static EDITABLE_SKILL_DATA_URL_TEMPLATE =
     '/skill_editor_handler/data/<skill_id>';
 
-  public static
-    SKILL_EDITOR_QUESTION_URL_TEMPLATE =
+  public static SKILL_DATA_URL_TEMPLATE =
+  '/skill_data_handler/<comma_separated_skill_ids>'
+  public static SKILL_EDITOR_QUESTION_URL_TEMPLATE =
     '/skill_editor_question_handler/<skill_id>?cursor=<cursor>';
 
   public static SKILL_PROPERTY_DESCRIPTION = 'description';

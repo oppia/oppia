@@ -51,11 +51,13 @@ export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
 export DEFAULT_RUN_MINIFIED_TESTS=false
 maybeInstallDependencies "$@"
 
-# The following command finds all the spec files (except known failing files)
+# The following command finds all the spec files (except known failing files;
+# corresponding issue -> https://github.com/oppia/oppia/issues/6960)
 # and merges them all to a single file which Karma uses to run its tests. The
 # Karma is unable to run the tests on multiple files and the DI fails in that
 # case, the reason of which is unclear.
-find . -type f \( -name "*.spec.ts" -o -name "*Spec.ts" \) -exec cat {} \; > ./core/templates/dev/head/combined-tests.spec.ts
+# (related issue -> https://github.com/oppia/oppia/issues/7053).
+find . -type f \( -name "*.spec.ts" ! -name "solution-verification.service.spec.ts" ! -name "state-name-editor.directive.spec.ts" ! -name "state-content-editor.directive.spec.ts" ! -name "state-interaction-editor.directive.spec.ts" ! -name "combined-tests.spec.ts" -o -name "*Spec.ts" ! -name "MusicNotesInputSpec.ts" \) -exec cat {} \; > ./core/templates/dev/head/combined-tests.spec.ts
 
 echo ""
 echo "  View interactive frontend test coverage reports by navigating to"

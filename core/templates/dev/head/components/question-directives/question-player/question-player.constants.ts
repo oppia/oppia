@@ -13,16 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the practice session.
+ * @fileoverview Constants for the question player directive.
  */
 
-export class PracticeSessionPageConstants {
-  public static TOTAL_QUESTIONS = 20;
-
-  public static PRACTICE_SESSIONS_DATA_URL =
-    '/practice_session/data/<topic_name>';
-
-  public static TOPIC_VIEWER_PAGE = '/topic/<topic_name>';
-
-  public static PRACTICE_SESSIONS_URL = '/practice_session/<topic_name>';
+export class QuestionPlayerConstants {
+  public static HASH_PARAM = 'question-player-result=';
+  public static MAX_SCORE_PER_QUESTION = 1.0;
 }

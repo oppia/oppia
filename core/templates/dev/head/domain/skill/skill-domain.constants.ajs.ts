@@ -29,6 +29,10 @@ oppia.constant(
   SkillDomainConstants.EDITABLE_SKILL_DATA_URL_TEMPLATE);
 
 oppia.constant(
+  'SKILL_DATA_URL_TEMPLATE',
+  SkillDomainConstants.SKILL_DATA_URL_TEMPLATE);
+
+oppia.constant(
   'SKILL_EDITOR_QUESTION_URL_TEMPLATE',
   SkillDomainConstants.SKILL_EDITOR_QUESTION_URL_TEMPLATE);
 

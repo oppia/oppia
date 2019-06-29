@@ -40,6 +40,10 @@ oppia.constant(
   QuestionDomainConstants.QUESTION_PLAYER_URL_TEMPLATE);
 
 oppia.constant(
+  'QUESTIONS_LIST_URL_TEMPLATE',
+  QuestionDomainConstants.QUESTIONS_LIST_URL_TEMPLATE);
+
+oppia.constant(
   'QUESTION_PROPERTY_LANGUAGE_CODE',
   QuestionDomainConstants.QUESTION_PROPERTY_LANGUAGE_CODE);
 oppia.constant(

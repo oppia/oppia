@@ -13,16 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the practice session.
+ * @fileoverview Constants for the question player directive.
  */
 
-export class PracticeSessionPageConstants {
-  public static TOTAL_QUESTIONS = 20;
+import { QuestionPlayerConstants } from
+  'components/question-directives/question-player/question-player.constants.ts';
 
-  public static PRACTICE_SESSIONS_DATA_URL =
-    '/practice_session/data/<topic_name>';
+var oppia = require('AppInit.ts').module;
 
-  public static TOPIC_VIEWER_PAGE = '/topic/<topic_name>';
-
-  public static PRACTICE_SESSIONS_URL = '/practice_session/<topic_name>';
-}
+oppia.constant('HASH_PARAM', QuestionPlayerConstants.HASH_PARAM);
+oppia.constant(
+  'MAX_SCORE_PER_QUESTION', QuestionPlayerConstants.MAX_SCORE_PER_QUESTION);

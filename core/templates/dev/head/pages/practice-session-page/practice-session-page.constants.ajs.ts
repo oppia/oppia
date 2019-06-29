@@ -26,3 +26,10 @@ oppia.constant('TOTAL_QUESTIONS', PracticeSessionPageConstants.TOTAL_QUESTIONS);
 oppia.constant(
   'PRACTICE_SESSIONS_DATA_URL',
   PracticeSessionPageConstants.PRACTICE_SESSIONS_DATA_URL);
+
+oppia.constant(
+  'TOPIC_VIEWER_PAGE', PracticeSessionPageConstants.TOPIC_VIEWER_PAGE);
+
+oppia.constant(
+  'PRACTICE_SESSIONS_URL',
+  PracticeSessionPageConstants.PRACTICE_SESSIONS_URL);

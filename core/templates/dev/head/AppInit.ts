@@ -28,6 +28,8 @@ import { ClassifiersExtensionConstants } from
 
 import { CollectionSummaryTileConstants } from
   'components/summary-tile/collection-summary-tile.constants.ts';
+import { QuestionPlayerConstants } from
+  'components/question-directives/question-player/question-player.constants.ts';
 import { StateEditorConstants } from
   'components/state-editor/state-editor.constants.ts';
 
@@ -93,6 +95,7 @@ import { ServicesConstants } from 'services/services.constants.ts';
     AppConstants,
     ClassifiersExtensionConstants,
     CollectionSummaryTileConstants,
+    QuestionPlayerConstants,
     StateEditorConstants,
     CollectionDomainConstants,
     EditorDomainConstants,
