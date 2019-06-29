@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import interaction_registry
 from core.domain import obj_services
+from core.domain import skill_services
 from core.domain import story_services
 import feconf
 import jinja2
@@ -83,11 +84,19 @@ class ReviewTestsPageDataHandler(base.BaseHandler):
         if len(latest_completed_node_ids) == 0:
             raise self.PageNotFoundException
 
-        acquired_skill_ids = story.get_acquired_skill_ids_for_node_ids(
-            latest_completed_node_ids
-        )
+        try:
+            skills = skill_services.get_multi_skills(
+                story.get_acquired_skill_ids_for_node_ids(
+                    latest_completed_node_ids
+                ))
+        except Exception, e:
+            raise self.PageNotFoundException(e)
+        skill_descriptions = {}
+        for skill in skills:
+            skill_descriptions[skill.id] = skill.description
+
 
         self.values.update({
-            'skill_ids': acquired_skill_ids
+            'skill_descriptions': skill_descriptions
         })
         self.render_json(self.values)

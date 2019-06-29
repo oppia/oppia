@@ -63,6 +63,7 @@ require(
 require(
   'components/forms/schema-based-editors/' +
   'schema-based-unicode-editor.directive.ts');
+require('components/score-ring/score-ring.directive.ts');
 require(
   'components/forms/schema-viewers/schema-based-custom-viewer.directive.ts');
 require(
@@ -75,6 +76,8 @@ require(
   'components/forms/schema-viewers/schema-based-primitive-viewer.directive.ts');
 require(
   'components/forms/schema-viewers/schema-based-unicode-viewer.directive.ts');
+require('components/question-directives/question-player/' +
+  'question-player.constants.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
@@ -118,14 +121,91 @@ oppia.directive('questionPlayer', [
         'question-player.directive.html'),
       controllerAs: '$ctrl',
       controller: [
-        '$rootScope', '$scope', 'QuestionBackendApiService',
+        'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
+        '$scope', '$sce', '$rootScope', '$location',
+        '$sanitize', '$window', 'HtmlEscaperService',
+        'QuestionPlayerBackendApiService',
         function(
-            $rootScope, $scope, QuestionBackendApiService) {
+            HASH_PARAM, MAX_SCORE_PER_QUESTION,
+            $scope, $sce, $rootScope, $location,
+            $sanitize, $window, HtmlEscaperService,
+            QuestionPlayerBackendApiService) {
           var ctrl = this;
-          $scope.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          var questionPlayerConfig = ctrl.getQuestionPlayerConfig();
+          $scope.resultsLoaded = false;
           ctrl.currentQuestion = 0;
           ctrl.totalQuestions = 0;
           ctrl.currentProgress = 0;
+          ctrl.totalScore = 0.0;
+
+          var VIEW_HINT_PENALTY = 0.1;
+          var WRONG_ANSWER_PENALTY = 0.1;
+
+          var getStaticImageUrl = function(url) {
+            return UrlInterpolationService.getStaticImageUrl(url);
+          };
+
+          ctrl.getActionButtonOuterClass = function(actionButtonType) {
+            var className = getClassNameForType(actionButtonType);
+            if (className) {
+              return className + 'outer';
+            }
+            return '';
+          };
+
+          ctrl.getActionButtonInnerClass = function(actionButtonType) {
+            var className = getClassNameForType(actionButtonType);
+            if (className) {
+              return className + 'inner';
+            }
+            return '';
+          };
+
+          ctrl.getActionButtonIconHtml = function(actionButtonType) {
+            var iconHtml = '';
+            if (actionButtonType === 'BOOST_SCORE') {
+              iconHtml = '<img class="action-button-icon" src="' +
+              getStaticImageUrl('/icons/rocket@2x.png') + '"/>';
+            } else if (actionButtonType === 'RETRY_SESSION') {
+              iconHtml = '<i class="material-icons md-36 ' +
+              'action-button-icon">&#xE5D5</i>';
+            } else if (actionButtonType === 'DASHBOARD') {
+              iconHtml = '<i class="material-icons md-36 ' +
+              'action-button-icon">&#xE88A</i>';
+            }
+            return $sce.trustAsHtml($sanitize(iconHtml));
+          };
+
+          ctrl.performAction = function(actionButton) {
+            if (actionButton.type === 'BOOST_SCORE') {
+              boostScoreModal();
+            } else if (actionButton.url) {
+              $window.location.href = actionButton.url;
+            }
+          };
+
+          ctrl.showActionButtonsFooter = function() {
+            return (questionPlayerConfig.resultActionButtons &&
+              questionPlayerConfig.resultActionButtons.length > 0);
+          };
+
+          var boostScoreModal = function() {
+            // Will open a boost score modal that explains the worst skill
+            // and redirects to the concept card of that skill.
+          };
+
+          var getClassNameForType = function(actionButtonType) {
+            if (actionButtonType === 'BOOST_SCORE') {
+              return 'boost-score-';
+            }
+            if (actionButtonType === 'RETRY_SESSION') {
+              return 'new-session-';
+            }
+            if (actionButtonType === 'DASHBOARD') {
+              return 'my-dashboard-';
+            }
+            return null;
+          };
 
           var updateCurrentQuestion = function(currentQuestion) {
             ctrl.currentQuestion = currentQuestion;
@@ -154,11 +234,90 @@ oppia.directive('questionPlayer', [
             return ctrl.totalQuestions;
           };
 
+          var createScorePerSkillMapping = function() {
+            var scorePerSkillMapping = {};
+            if (questionPlayerConfig.skillList) {
+              for (var i = 0; i < questionPlayerConfig.skillList.length; i++) {
+                var skillId = questionPlayerConfig.skillList[i];
+                var description = questionPlayerConfig.skillDescriptions[i];
+                scorePerSkillMapping[skillId] = {
+                  description: description,
+                  score: 0.0
+                };
+              }
+            }
+            return scorePerSkillMapping;
+          };
+
+          var calculateScores = function(questionStateData) {
+            var scorePerSkillMapping = createScorePerSkillMapping();
+            $scope.resultsLoaded = false;
+            var totalQuestions = Object.keys(questionStateData).length;
+            for (var question in questionStateData) {
+              var questionData = questionStateData[question];
+              var totalHintsPenalty = 0.0;
+              var wrongAnswerPenalty = 0.0;
+              if (questionData.answers) {
+                wrongAnswerPenalty = (
+                  (questionData.answers.length - 1) * WRONG_ANSWER_PENALTY);
+              }
+              if (questionData.usedHints) {
+                totalHintsPenalty = (
+                  questionData.usedHints.length * VIEW_HINT_PENALTY);
+              }
+              var questionScore = MAX_SCORE_PER_QUESTION;
+              if (questionData.viewedSolution) {
+                questionScore = 0.0;
+              } else {
+                // If questionScore goes negative, set it to 0
+                questionScore = Math.max(
+                  0, questionScore - totalHintsPenalty - wrongAnswerPenalty);
+              }
+              // Calculate total score
+              ctrl.totalScore += questionScore;
+
+              // Calculate scores per skill
+              if (!(questionData.linkedSkillIds)) {
+                continue;
+              }
+              for (var i = 0; i < questionData.linkedSkillIds.length; i++) {
+                var skillId = questionData.linkedSkillIds[i];
+                if (!(skillId in scorePerSkillMapping)) {
+                  continue;
+                }
+                scorePerSkillMapping[skillId].score += questionScore;
+              }
+            }
+            ctrl.totalScore = Math.round(
+              ctrl.totalScore * 100 / totalQuestions);
+            $scope.resultsLoaded = true;
+          };
+
           $rootScope.$on('currentQuestionChanged', function(event, result) {
             updateCurrentQuestion(result + 1);
           });
+
           $rootScope.$on('totalQuestionsReceived', function(event, result) {
             updateTotalQuestions(result);
+          });
+
+          $rootScope.$on('questionSessionCompleted', function(event, result) {
+            $location.hash(HASH_PARAM +
+              encodeURIComponent(JSON.stringify(result)));
+          });
+
+          $scope.$on('$locationChangeSuccess', function(event) {
+            var hashContent = $location.hash();
+            if (!hashContent || hashContent.indexOf(HASH_PARAM) === -1) {
+              return;
+            }
+            var resultHashString = decodeURIComponent(
+              hashContent.substring(hashContent.indexOf(
+                HASH_PARAM) + HASH_PARAM.length));
+            if (resultHashString) {
+              var questionStateData = JSON.parse(resultHashString);
+              calculateScores(questionStateData);
+            }
           });
         }
       ]
