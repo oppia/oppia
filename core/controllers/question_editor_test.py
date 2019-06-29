@@ -181,8 +181,7 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_post_with_too_many_skills_returns_400(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
-        csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_new_csrf_token()
         skill_ids = [1, 2, 3, 4]
         self.post_json(
             '%s/%s' % (feconf.NEW_QUESTION_URL, skill_ids),
