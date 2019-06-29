@@ -14,6 +14,8 @@
 
 """Models for storing the question data models."""
 
+import math
+
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
@@ -41,7 +43,7 @@ class QuestionModel(base_models.VersionedModel):
     """Model for storing Questions.
 
     The ID of instances of this class has the form
-    {{random_hash_of_16_chars}}
+    {{random_hash_of_12_chars}}
     """
     SNAPSHOT_METADATA_CLASS = QuestionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
@@ -61,7 +63,7 @@ class QuestionModel(base_models.VersionedModel):
     @classmethod
     def _get_new_id(cls):
         """Generates a unique ID for the question of the form
-        {{random_hash_of_16_chars}}
+        {{random_hash_of_12_chars}}
 
         Returns:
            new_id: int. ID of the new QuestionModel instance.
@@ -214,7 +216,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_question_skill_links_and_skill_descriptions(
+    def get_question_skill_links_by_skill_ids(
             cls, question_count, skill_ids, start_cursor):
         """Fetches the list of QuestionSkillLinkModels linked to the skill in
         batches.
@@ -227,12 +229,15 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 questions are to be returned. This value should be urlsafe.
 
         Returns:
-            list(QuestionSkillLinkModel), list(str), str|None. The
-                QuestionSkillLinkModels corresponding to given skill_ids, the
-                corresponding skill descriptions and the next cursor value to be
+            list(QuestionSkillLinkModel), str|None. The QuestionSkillLinkModels
+                corresponding to given skill_ids, the next cursor value to be
                 used for the next page (or None if no more pages are left). The
                 returned next cursor value is urlsafe.
         """
+        question_skill_count = min(
+            len(skill_ids), constants.MAX_SKILLS_PER_QUESTION
+        ) * question_count
+
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
             question_skill_link_models, next_cursor, more = cls.query(
@@ -241,23 +246,51 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 # resolve conflicts, if any.
                 # Reference SO link: https://stackoverflow.com/q/12449197
             ).order(-cls.last_updated, cls.key).fetch_page(
-                question_count,
+                question_skill_count,
                 start_cursor=cursor
             )
         else:
             question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(-cls.last_updated, cls.key).fetch_page(
-                question_count
+                question_skill_count
             )
-        skill_ids = [model.skill_id for model in question_skill_link_models]
-        skills = skill_models.SkillModel.get_multi(skill_ids)
-        skill_descriptions = (
-            [skill.description if skill else None for skill in skills])
         next_cursor_str = (
             next_cursor.urlsafe() if (next_cursor and more) else None
         )
-        return question_skill_link_models, skill_descriptions, next_cursor_str
+        return question_skill_link_models, next_cursor_str
+
+    @classmethod
+    def get_question_skill_links_equidistributed_by_skill(
+            cls, total_question_count, skill_ids):
+        """Fetches the list of constant number of QuestionSkillLinkModels
+        linked to the skills.
+
+        Args:
+            total_question_count: int. The number of questions expected.
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+
+        Returns:
+            list(QuestionSkillLinkModel). A list of QuestionSkillLinkModels
+                corresponding to given skill_ids, with
+                total_question_count/len(skill_ids) number of questions for
+                each skill. If not evenly divisible, it will be rounded up.
+                If not enough questions for a skill, just return all questions
+                it links to. The order of questions will follow the order of
+                given skill ids, but the order of questions for the same skill
+                is random.
+        """
+        question_count_per_skill = int(
+            math.ceil(float(total_question_count) / float(len(skill_ids))))
+        question_skill_link_models = []
+        for skill_id in skill_ids:
+            question_skill_link_models.extend(
+                cls.query(cls.skill_id == skill_id).fetch(
+                    question_count_per_skill
+                )
+            )
+        return question_skill_link_models
 
     @classmethod
     def get_all_question_ids_linked_to_skill_id(cls, skill_id):

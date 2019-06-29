@@ -26,6 +26,8 @@
  * https://github.com/arnaudsj/libsvm/blob/master/svm.cpp#L2481
  */
 
+require('domain/classifier/PredictionResultObjectFactory.ts');
+
 oppia.factory('SVMPredictionService', [
   '$log', 'PredictionResultObjectFactory',
   function($log, PredictionResultObjectFactory) {

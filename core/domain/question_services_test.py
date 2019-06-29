@@ -61,10 +61,22 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'), ['skill_1'])
 
+        self.question_id_1 = question_services.get_new_question_id()
+        self.question_1 = self.save_new_question(
+            self.question_id_1, self.editor_id,
+            self._create_valid_question_data('ABC'), ['skill_2'])
+
+        self.question_id_2 = question_services.get_new_question_id()
+        self.question_2 = self.save_new_question(
+            self.question_id_2, self.editor_id,
+            self._create_valid_question_data('ABC'), ['skill_2'])
+
         self.save_new_skill(
             'skill_1', self.admin_id, 'Skill Description 1')
         self.save_new_skill(
             'skill_2', self.admin_id, 'Skill Description 2')
+        self.save_new_skill(
+            'skill_3', self.admin_id, 'Skill Description 3')
 
     def test_get_question_by_id(self):
         question = question_services.get_question_by_id(self.question_id)
@@ -79,7 +91,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'not found'):
             question_services.get_question_by_id('question_id')
 
-    def test_get_questions_by_skill_ids(self):
+    def test_get_questions_and_skill_descriptions_by_skill_ids(self):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.3)
         questions, _, _ = (
@@ -88,6 +100,46 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(len(questions), 1)
         self.assertEqual(
             questions[0].to_dict(), self.question.to_dict())
+
+    def test_get_questions_with_multi_skill_ids(self):
+        question_id_1 = question_services.get_new_question_id()
+        question_1 = self.save_new_question(
+            question_id_1, self.editor_id,
+            self._create_valid_question_data('ABC'), ['skill_1', 'skill_2'])
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_1, 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, question_id_1, 'skill_2', 0.5)
+        questions, _, _ = (
+            question_services.get_questions_and_skill_descriptions_by_skill_ids(
+                2, ['skill_1', 'skill_2'], ''))
+        self.assertEqual(len(questions), 1)
+        self.assertEqual(
+            questions[0].to_dict(), question_1.to_dict())
+
+    def test_get_questions_by_skill_ids(self):
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_1', 0.3)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_1, 'skill_2', 0.8)
+        question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id_2, 'skill_2', 0.5)
+
+        questions = question_services.get_questions_by_skill_ids(
+            4, ['skill_1', 'skill_2'])
+        questions.sort(key=lambda question: question.last_updated)
+
+        self.assertEqual(len(questions), 3)
+        self.assertEqual(questions[0].to_dict(), self.question.to_dict())
+        self.assertEqual(questions[1].to_dict(), self.question_1.to_dict())
+        self.assertEqual(questions[2].to_dict(), self.question_2.to_dict())
+
+    def test_get_questions_by_skill_ids_raise_error(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Question count is too high, please limit the question '
+            'count to %d.' % feconf.MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME):
+            question_services.get_questions_by_skill_ids(
+                25, ['skill_1', 'skill_2'])
 
     def test_create_multi_question_skill_links_for_question(self):
         self.question = self.save_new_question(
@@ -150,6 +202,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_services.create_new_question_skill_link(
             self.editor_id, self.question_id, 'skill_1', 0.5)
         question_services.create_new_question_skill_link(
+            self.editor_id, self.question_id, 'skill_3', 0.8)
+        question_services.create_new_question_skill_link(
             self.editor_id, question_id_2, 'skill_1', 0.3)
         question_services.create_new_question_skill_link(
             self.editor_id, question_id_3, 'skill_2', 0.2)
@@ -176,12 +230,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         # Make sure the correct skill description corresponds to respective
         # question summaries.
         for index, description in enumerate(skill_descriptions):
-            if (
-                    question_ids[index] == self.question_id or
-                    question_ids[index] == question_id_2):
-                self.assertEqual('Skill Description 1', description)
+            if question_ids[index] == self.question_id:
+                self.assertEqual(
+                    ['Skill Description 3', 'Skill Description 1'], description)
+            elif question_ids[index] == question_id_2:
+                self.assertEqual(['Skill Description 1'], description)
             else:
-                self.assertEqual('Skill Description 2', description)
+                self.assertEqual(['Skill Description 2'], description)
 
         question_summaries, skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
@@ -315,12 +370,30 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[2].id, question_id_2)
 
     def test_delete_question(self):
+        question_rights_model = question_models.QuestionRightsModel.get(
+            self.question_id)
+        self.assertFalse(question_rights_model is None)
+
+        question_summary_model = question_models.QuestionSummaryModel.get(
+            self.question_id)
+        self.assertFalse(question_summary_model is None)
+
         question_services.delete_question(self.editor_id, self.question_id)
 
         with self.assertRaisesRegexp(Exception, (
             'Entity for class QuestionModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionModel.get(self.question_id)
+
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class QuestionRightsModel with id %s not found' % (
+                self.question_id))):
+            question_models.QuestionRightsModel.get(self.question_id)
+
+        with self.assertRaisesRegexp(Exception, (
+            'Entity for class QuestionSummaryModel with id %s not found' % (
+                self.question_id))):
+            question_models.QuestionSummaryModel.get(self.question_id)
 
         with self.assertRaisesRegexp(
             Exception, 'Entity for class QuestionModel with id question_id '
@@ -481,12 +554,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_question_summaries_by_creator_id(
                 self.editor_id))
 
-        self.assertEqual(len(question_summaries), 1)
-        for question_summary in question_summaries:
-            self.assertEqual(question_summary.id, self.question_id)
-            self.assertEqual(
-                question_summary.question_content,
-                feconf.DEFAULT_INIT_STATE_CONTENT_STR)
+        self.assertEqual(len(question_summaries), 3)
+        question_summaries.sort(key=lambda summary: summary.last_updated)
+        question_ids = [summary.id for summary in question_summaries]
+        self.assertEqual(question_ids[0], self.question_id)
+        self.assertEqual(question_ids[1], self.question_id_1)
+        self.assertEqual(question_ids[2], self.question_id_2)
 
     def test_created_question_rights(self):
         question_rights = question_services.get_question_rights(
