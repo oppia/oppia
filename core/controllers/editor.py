@@ -778,13 +778,16 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         })
 
 
-class LearnerAnswerDetailsHandler(EditorHandler):
-    """Returns a list of learner answer details."""
+class LearnerAnswerInoHandler(EditorHandler):
+    """Handles the learner answer info for an exploration state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
     @acl_decorators.can_edit_exploration
     def get(self, exploration_id):
+        """Handles the GET requests for for learner answer info for an
+        exploration state.
+        """
         state_name = self.request.get('state_name')
         if not state_name:
             raise self.PageNotFoundException
@@ -803,6 +806,7 @@ class LearnerAnswerDetailsHandler(EditorHandler):
 
     @acl_decorators.can_edit_exploration
     def delete(self, exploration_id):
+        """Deletes the learner answer info by the given id."""
         state_name = self.request.get('state_name')
         learner_answer_info_id = self.request.get('learner_answer_info_id')
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
