@@ -128,6 +128,27 @@ class UserSettingsModelTest(test_utils.GenericTestBase):
         self.assertEqual(expected_user_data, user_data)
 
 
+class StoryProgressModelTests(test_utils.GenericTestBase):
+
+    def test_get_multi(self):
+        model = user_models.StoryProgressModel.create(
+            'user_id', 'story_id_1')
+        model.put()
+
+        model = user_models.StoryProgressModel.create(
+            'user_id', 'story_id_2')
+        model.put()
+
+        story_progress_models = user_models.StoryProgressModel.get_multi(
+            'user_id', ['story_id_1', 'story_id_2'])
+        self.assertEqual(len(story_progress_models), 2)
+        self.assertEqual(story_progress_models[0].user_id, 'user_id')
+        self.assertEqual(story_progress_models[0].story_id, 'story_id_1')
+
+        self.assertEqual(story_progress_models[1].user_id, 'user_id')
+        self.assertEqual(story_progress_models[1].story_id, 'story_id_2')
+
+
 class ExpUserLastPlaythroughModelTest(test_utils.GenericTestBase):
     """Tests for ExpUserLastPlaythroughModel class."""
 
