@@ -800,3 +800,14 @@ class LearnerAnswerDetailsHandler(EditorHandler):
         self.render_json({
             'learner_answer_info_dict_list': learner_answer_info_dict_list
         })
+
+    @acl_decorators.can_edit_exploration
+    def delete(self, exploration_id):
+        state_name = self.request.get('state_name')
+        learner_answer_info_id = self.request.get('learner_answer_info_id')
+        entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        state_reference = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exploration_id, state_name)) #pylint: disable=line-too-long
+        stats_services.delete_learner_answer_info(
+            entity_type, state_reference, learner_answer_info_id)
+        self.render_json(self.values)

@@ -2438,32 +2438,51 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
 
 class LearnerAnswerDetailsHandlerTests(BaseEditorControllerTests):
 
-    def test_get_learner_answer_details_of_exploration_states(self):
-
+    def setUp(self):
+        super(LearnerAnswerDetailsHandlerTests, self).setUp()
         self.login(self.OWNER_EMAIL)
-        exp_id = exp_services.get_new_exploration_id()
-        self.save_new_valid_exploration(exp_id, self.owner_id)
+        self.exp_id = exp_services.get_new_exploration_id()
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
 
-        entity_type = feconf.ENTITY_TYPE_EXPLORATION
-        exploration = exp_services.get_exploration_by_id(exp_id)
+        self.entity_type = feconf.ENTITY_TYPE_EXPLORATION
+        self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
-        state_name = exploration.init_state_name
-        interaction_id = exploration.states[state_name].interaction.id
-        self.assertEqual(state_name, 'Introduction')
-        self.assertEqual(interaction_id, 'TextInput')
-        answer = 'This is an answer'
-        answer_details = 'These are the answer details'
-        state_reference = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) #pylint: disable=line-too-long
+        self.state_name = self.exploration.init_state_name
+        self.interaction_id = self.exploration.states[
+            self.state_name].interaction.id
+        self.answer = 'This is an answer'
+        self.answer_details = 'These are the answer details'
+        self.state_reference = (
+            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(self.exp_id, self.state_name)) #pylint: disable=line-too-long
         stats_services.record_learner_answer_info(
-            entity_type, state_reference, interaction_id,
-            answer, answer_details)
+            self.entity_type, self.state_reference, self.interaction_id,
+            self.answer, self.answer_details)
+
+    def test_get_learner_answer_details_of_exploration_states(self):
         learner_answer_details = stats_services.get_learner_answer_details(
-            entity_type, state_reference)
+            self.entity_type, self.state_reference)
         learner_answer_info_dict_list = {'learner_answer_info_dict_list': [
             learner_answer_info.to_dict() for learner_answer_info in
             learner_answer_details.learner_answer_info_list]}
         response = self.get_json(
             '%s/%s?state_name=%s' % (
-                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, exp_id, state_name))
+                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS,
+                self.exp_id, self.state_name))
         self.assertEqual(response, learner_answer_info_dict_list)
+
+    def test_delete_learner_answer_info(self):
+        learner_answer_details = stats_services.get_learner_answer_details(
+            self.entity_type, self.state_reference)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 1)
+        learner_answer_info_id = (
+            learner_answer_details.learner_answer_info_list[0].id)
+        self.assertNotEqual(learner_answer_info_id, None)
+        self.delete_json(
+            '%s/%s?state_name=%s&learner_answer_info_id=%s' % (
+                feconf.EXPLORATION_LEARNER_ANSWER_DETAILS, self.exp_id,
+                self.state_name, learner_answer_info_id))
+        learner_answer_details = stats_services.get_learner_answer_details(
+            self.entity_type, self.state_reference)
+        self.assertEqual(
+            len(learner_answer_details.learner_answer_info_list), 0)
