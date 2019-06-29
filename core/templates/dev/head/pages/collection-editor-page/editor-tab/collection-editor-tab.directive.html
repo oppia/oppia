@@ -7,7 +7,7 @@
           No explorations have been added to this collection yet.
         </div>
         <div ng-if="$ctrl.collection.getCollectionNodeCount() > 0">
-          <div class="$ctrl.collection-editor-node-container"
+          <div class="collection-editor-node-container"
                ng-repeat="node in $ctrl.getLinearlySortedNodes() track by $index">
             <collection-node-editor collection-node="node"
                                     linear-index="$index"

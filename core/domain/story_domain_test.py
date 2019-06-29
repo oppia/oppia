@@ -14,12 +14,282 @@
 
 """Tests for story domain objects and methods defined on them."""
 
+import datetime
+
 from constants import constants
 from core.domain import story_domain
 from core.domain import story_services
 from core.tests import test_utils
 import feconf
 import utils
+
+
+class StoryChangeTests(test_utils.GenericTestBase):
+
+    def test_story_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            story_domain.StoryChange({'invalid': 'data'})
+
+    def test_story_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            story_domain.StoryChange({'cmd': 'invalid'})
+
+    def test_story_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_value, old_value')):
+            story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'title',
+            })
+
+    def test_story_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            story_domain.StoryChange({
+                'cmd': 'add_story_node',
+                'node_id': 'node_id',
+                'invalid': 'invalid'
+            })
+
+    def test_story_change_object_with_invalid_story_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_story_property: '
+                'invalid is not allowed')):
+            story_domain.StoryChange({
+                'cmd': 'update_story_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_story_change_object_with_invalid_story_node_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_story_node_property: '
+                'invalid is not allowed')):
+            story_domain.StoryChange({
+                'cmd': 'update_story_node_property',
+                'node_id': 'node_id',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_story_change_object_with_invalid_story_contents_property(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for property_name in cmd update_story_contents_property:'
+                ' invalid is not allowed')):
+            story_domain.StoryChange({
+                'cmd': 'update_story_contents_property',
+                'property_name': 'invalid',
+                'old_value': 'old_value',
+                'new_value': 'new_value',
+            })
+
+    def test_story_change_object_with_add_story_node(self):
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'add_story_node',
+            'node_id': 'node_id',
+            'title': 'title'
+        })
+
+        self.assertEqual(story_change_object.cmd, 'add_story_node')
+        self.assertEqual(story_change_object.node_id, 'node_id')
+        self.assertEqual(story_change_object.title, 'title')
+
+    def test_story_change_object_with_delete_story_node(self):
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'delete_story_node',
+            'node_id': 'node_id'
+        })
+
+        self.assertEqual(story_change_object.cmd, 'delete_story_node')
+        self.assertEqual(story_change_object.node_id, 'node_id')
+
+    def test_story_change_object_with_update_story_node_property(self):
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'update_story_node_property',
+            'node_id': 'node_id',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(story_change_object.cmd, 'update_story_node_property')
+        self.assertEqual(story_change_object.node_id, 'node_id')
+        self.assertEqual(story_change_object.property_name, 'title')
+        self.assertEqual(story_change_object.new_value, 'new_value')
+        self.assertEqual(story_change_object.old_value, 'old_value')
+
+    def test_story_change_object_with_update_story_property(self):
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'update_story_property',
+            'property_name': 'title',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(story_change_object.cmd, 'update_story_property')
+        self.assertEqual(story_change_object.property_name, 'title')
+        self.assertEqual(story_change_object.new_value, 'new_value')
+        self.assertEqual(story_change_object.old_value, 'old_value')
+
+    def test_story_change_object_with_update_story_contents_property(self):
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'update_story_contents_property',
+            'property_name': 'initial_node_id',
+            'new_value': 'new_value',
+            'old_value': 'old_value'
+        })
+
+        self.assertEqual(
+            story_change_object.cmd, 'update_story_contents_property')
+        self.assertEqual(story_change_object.property_name, 'initial_node_id')
+        self.assertEqual(story_change_object.new_value, 'new_value')
+        self.assertEqual(story_change_object.old_value, 'old_value')
+
+    def test_story_change_object_with_update_story_node_outline_status(self):
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'update_story_node_outline_status',
+            'node_id': 'node_id',
+            'old_value': 'old_value',
+            'new_value': 'new_value'
+        })
+
+        self.assertEqual(
+            story_change_object.cmd, 'update_story_node_outline_status')
+        self.assertEqual(story_change_object.node_id, 'node_id')
+        self.assertEqual(story_change_object.old_value, 'old_value')
+        self.assertEqual(story_change_object.new_value, 'new_value')
+
+    def test_story_change_object_with_create_new(self):
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'create_new',
+            'title': 'title',
+        })
+
+        self.assertEqual(story_change_object.cmd, 'create_new')
+        self.assertEqual(story_change_object.title, 'title')
+
+    def test_story_change_object_with_migrate_schema_to_latest_version(
+            self):
+        story_change_object = story_domain.StoryChange({
+            'cmd': 'migrate_schema_to_latest_version',
+            'from_version': 'from_version',
+            'to_version': 'to_version',
+        })
+
+        self.assertEqual(
+            story_change_object.cmd, 'migrate_schema_to_latest_version')
+        self.assertEqual(story_change_object.from_version, 'from_version')
+        self.assertEqual(story_change_object.to_version, 'to_version')
+
+    def test_to_dict(self):
+        story_change_dict = {
+            'cmd': 'create_new',
+            'title': 'title'
+        }
+        story_change_object = story_domain.StoryChange(story_change_dict)
+        self.assertEqual(story_change_object.to_dict(), story_change_dict)
+
+
+class StoryRightsChangeTests(test_utils.GenericTestBase):
+
+    def test_story_rights_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            story_domain.StoryRightsChange({'invalid': 'data'})
+
+    def test_story_change_rights_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            story_domain.StoryRightsChange({'cmd': 'invalid'})
+
+    def test_story_rights_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_role, old_role')):
+            story_domain.StoryRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+            })
+
+    def test_story_rights_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            story_domain.StoryRightsChange({
+                'cmd': 'publish_story',
+                'invalid': 'invalid'
+            })
+
+    def test_story_rights_change_object_with_invalid_role(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'Value for old_role in cmd change_role: '
+                'invalid is not allowed')):
+            story_domain.StoryRightsChange({
+                'cmd': 'change_role',
+                'assignee_id': 'assignee_id',
+                'old_role': 'invalid',
+                'new_role': story_domain.ROLE_MANAGER
+            })
+
+    def test_story_rights_change_object_with_create_new(self):
+        story_rights_change_object = story_domain.StoryRightsChange({
+            'cmd': 'create_new'
+        })
+
+        self.assertEqual(story_rights_change_object.cmd, 'create_new')
+
+    def test_story_rights_change_object_with_change_role(self):
+        story_rights_change_object = story_domain.StoryRightsChange({
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+            'old_role': story_domain.ROLE_NONE,
+            'new_role': story_domain.ROLE_MANAGER
+        })
+
+        self.assertEqual(story_rights_change_object.cmd, 'change_role')
+        self.assertEqual(story_rights_change_object.assignee_id, 'assignee_id')
+        self.assertEqual(
+            story_rights_change_object.old_role, story_domain.ROLE_NONE)
+        self.assertEqual(
+            story_rights_change_object.new_role, story_domain.ROLE_MANAGER)
+
+    def test_story_rights_change_object_with_publish_story(self):
+        story_rights_change_object = story_domain.StoryRightsChange({
+            'cmd': 'publish_story'
+        })
+
+        self.assertEqual(story_rights_change_object.cmd, 'publish_story')
+
+    def test_story_rights_change_object_with_unpublish_story(self):
+        story_rights_change_object = story_domain.StoryRightsChange({
+            'cmd': 'unpublish_story'
+        })
+
+        self.assertEqual(story_rights_change_object.cmd, 'unpublish_story')
+
+    def test_to_dict(self):
+        story_rights_change_dict = {
+            'cmd': 'change_role',
+            'assignee_id': 'assignee_id',
+            'old_role': story_domain.ROLE_NONE,
+            'new_role': story_domain.ROLE_MANAGER
+        }
+        story_rights_change_object = story_domain.StoryRightsChange(
+            story_rights_change_dict)
+        self.assertEqual(
+            story_rights_change_object.to_dict(), story_rights_change_dict)
 
 
 class StoryDomainUnitTests(test_utils.GenericTestBase):
@@ -43,6 +313,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID
         )
         self.story.add_node(self.NODE_ID_1, 'Node title')
+        self.story.add_node(self.NODE_ID_2, 'Node title')
+        self.story.update_node_destination_node_ids(
+            self.NODE_ID_1, [self.NODE_ID_2])
         self.signup('user@example.com', 'user')
         self.signup('user1@example.com', 'user1')
 
@@ -96,6 +369,49 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'version': 0
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
+
+    def test_get_acquired_skill_ids_for_node_ids(self):
+        self.story.story_contents.nodes[0].acquired_skill_ids = ['skill_1']
+        self.story.story_contents.nodes[1].acquired_skill_ids = ['skill_2']
+        self.assertEqual(
+            self.story.get_acquired_skill_ids_for_node_ids(
+                [self.NODE_ID_1, self.NODE_ID_2]),
+            ['skill_1', 'skill_2']
+        )
+
+    def test_get_acquired_skill_ids_for_node_ids_empty(self):
+        self.story.story_contents.nodes[0].acquired_skill_ids = []
+        self.story.story_contents.nodes[1].acquired_skill_ids = []
+        self.assertEqual(
+            self.story.get_acquired_skill_ids_for_node_ids(
+                [self.NODE_ID_1, self.NODE_ID_2]), []
+        )
+
+    def test_get_acquired_skill_ids_for_node_ids_multi_skills(self):
+        # Test cases when there are multiple acquired skill ids linked to
+        # one node.
+        self.story.story_contents.nodes[0].acquired_skill_ids = [
+            'skill_1', 'skill_2']
+        self.story.story_contents.nodes[1].acquired_skill_ids = [
+            'skill_3']
+        self.assertEqual(
+            self.story.get_acquired_skill_ids_for_node_ids(
+                [self.NODE_ID_1, self.NODE_ID_2]),
+            ['skill_1', 'skill_2', 'skill_3']
+        )
+
+    def test_get_acquired_skill_ids_for_node_ids_overlapping_skills(self):
+        # Test cases when there are and multiple nodes have overlapping
+        # skill ids.
+        self.story.story_contents.nodes[0].acquired_skill_ids = [
+            'skill_1', 'skill_2']
+        self.story.story_contents.nodes[1].acquired_skill_ids = [
+            'skill_1']
+        self.assertEqual(
+            self.story.get_acquired_skill_ids_for_node_ids(
+                [self.NODE_ID_1, self.NODE_ID_2]),
+            ['skill_1', 'skill_2']
+        )
 
     def test_get_prerequisite_skill_ids(self):
         self.story.story_contents.nodes[0].prerequisite_skill_ids = ['skill_1']
@@ -163,9 +479,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def test_add_node_validation(self):
         with self.assertRaisesRegexp(
-            Exception, 'The node id node_3 does not match the expected '
+            Exception, 'The node id node_4 does not match the expected '
             'next node id for the story'):
-            self.story.add_node('node_3', 'Title 3')
+            self.story.add_node('node_4', 'Title 4')
 
     def test_get_number_from_node_id(self):
         self.assertEqual(

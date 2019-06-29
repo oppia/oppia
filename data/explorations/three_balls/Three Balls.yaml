@@ -344,21 +344,21 @@ states:
         \ balls (where n is 1, 2, 3, ...), then Fn is the number of ways to arrange\
         \ them.<br></p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;patterns_height_643_width_670.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p><br><br>Can you see a pattern here, or a\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br><br>Can you see a pattern here, or a\
         \ systematic way to count them? Let's have a look at the 3-ball case.<br><br>--------------------------------------------------------------------------------------------<br><br>First\
         \ you pick the ball on the left. This could be red, blue or yellow. There\
         \ are three cases to consider:<br><br>If the first ball is red, then there\
         \ are two balls left to arrange in the other two slots. And there are F2 ways\
         \ to do this.</p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;startRed_height_214_width_643.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p><br><br></p><p>If the first ball is blue,\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br><br></p><p>If the first ball is blue,\
         \ then there are two balls left to ... hey, this is the same thing, it's just\
         \ F2.</p><oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
         \ filepath-with-value=\"&amp;quot;startBlue_height_219_width_633.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p><br>And, if the first ball is yellow,\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p><br>And, if the first ball is yellow,\
         \ then ... yada, yada, F2.<br></p><oppia-noninteractive-image caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;startYellow_height_200_width_635.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p><br><br>So the total number of ways to arrange\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p><br><br>So the total number of ways to arrange\
         \ 3 balls, F3, is equal to 3 * F2. And all this works out correctly, because\
         \ F2 = 2, and F3 = 3 * 2 = 6.<br><br>--------------------------------------------------------------------------------------------<br><br>Now,\
         \ can you write out a similar expression for F2, in terms of F1? Then we'll\
@@ -539,8 +539,8 @@ states:
     content:
       content_id: content
       html: "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
-        \ filepath-with-value=\"&amp;quot;3 balls_height_312_width_328.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>Suppose you were given three balls:\
+        \ filepath-with-value=\"&amp;quot;3balls_height_312_width_328.png&amp;quot;\"\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>Suppose you were given three balls:\
         \ one red, one blue, and one yellow -- and one day, you are idly playing around\
         \ with them. Soon, you discover that you can make patterns by arranging the\
         \ balls in a straight line; let's pretend you're doing this with the line\
@@ -666,7 +666,7 @@ states:
         \ the red ball on the left, the blue ball in the middle, and the yellow ball\
         \ on the right, like this:</p><oppia-noninteractive-image caption-with-value=\"\
         &amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;RBY_height_196_width_551.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p><p>Can you list all the ways you found?<br><br>\_\
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p><p>Can you list all the ways you found?<br><br>\_\
         \ \_\_</p>"
     content_ids_to_audio_translations:
       content: {}
@@ -831,7 +831,7 @@ states:
         \ one way to arrange one ball in a line.<br><br>How about 2 balls? How many\
         \ ways are there to arrange two balls, with different colours, in a line?</p><oppia-noninteractive-image\
         \ caption-with-value=\"&amp;quot;&amp;quot;\" filepath-with-value=\"&amp;quot;2balls_height_248_width_265.png&amp;quot;\"\
-        ></oppia-noninteractive-image><p>\_</p>"
+        \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p>"
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}

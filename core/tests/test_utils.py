@@ -201,7 +201,7 @@ class TestBase(unittest.TestCase):
                 'correct_answer': u'Solution',
                 'explanation': {
                     'content_id': u'solution',
-                    'html': u'Solution explanation'
+                    'html': u'<p>Solution explanation</p>'
                 },
                 'answer_is_exclusive': False
             },
@@ -226,7 +226,7 @@ class TestBase(unittest.TestCase):
             'hints': [{
                 'hint_content': {
                     'content_id': u'hint_1',
-                    'html': u'Hint 1'
+                    'html': u'<p>Hint 1</p>'
                 }
             }]
         },
@@ -270,7 +270,7 @@ class TestBase(unittest.TestCase):
                         'dest': 'END',
                         'feedback': {
                             'content_id': 'feedback_1',
-                            'html': 'Correct!'},
+                            'html': '<p>Correct!</p>'},
                         'labelled_as_correct': False,
                         'missing_prerequisite_skill_id': None,
                         'param_changes': [],
@@ -481,18 +481,6 @@ tags: []
         """
         return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
-    def setUp(self):
-        """Initializes the fixture for the test suite. Subclasses of TestBase
-        should override this method.
-        """
-        raise NotImplementedError
-
-    def tearDown(self):
-        """Cleans up the fixture after the test runs. Subclasses of
-        TestBase should override this method.
-        """
-        raise NotImplementedError
-
     def _assert_validation_error(self, item, error_substring):
         """Checks that the given item passes default validation."""
         with self.assertRaisesRegexp(utils.ValidationError, error_substring):
@@ -509,12 +497,6 @@ tags: []
         script that calls the test.
         """
         print '%s%s' % (LOG_LINE_PREFIX, line)
-
-    def _delete_all_models(self):
-        """Deletes all keys from the NDB datastore. Subclasses of TestBase
-        should override this method.
-        """
-        raise NotImplementedError
 
     def login(self, email, is_super_admin=False):
         """Sets the environment variables to simulate a login.
@@ -537,10 +519,6 @@ tags: []
         """Additional information logged during unit test invocation."""
         # Suppress default logging of docstrings.
         return None
-
-    def get_expected_login_url(self, slug):
-        """Returns the expected login URL."""
-        return current_user_services.create_login_url(slug)
 
     def _get_response(
             self, url, expected_content_type, params=None,
@@ -644,7 +622,9 @@ tags: []
             webtest.TestResponse. The test response.
         """
         if params is not None:
-            self.assertTrue(isinstance(params, dict))
+            self.assertTrue(
+                isinstance(params, dict),
+                msg='Expected params to be a dict, received %s' % params)
 
         response = self.testapp.get(url, params, expect_errors=True)
 
@@ -717,7 +697,9 @@ tags: []
     def delete_json(self, url, params='', expected_status_int=200):
         """Delete object on the server using a JSON call."""
         if params:
-            self.assertTrue(isinstance(params, dict))
+            self.assertTrue(
+                isinstance(params, dict),
+                msg='Expected params to be a dict, received %s' % params)
 
         expect_errors = False
         if expected_status_int >= 400:
@@ -933,15 +915,6 @@ tags: []
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
-
-    def get_current_logged_in_user_id(self):
-        """Gets the user_id of the current logged-in user.
-
-        Returns:
-            str. The user_id of the currently logged-in user. In tests, we
-                simulate this using a USER_ID env variable.
-        """
-        return os.environ['USER_ID']
 
     def get_user_id_from_email(self, email):
         """Gets the user_id corresponding to the given email.
@@ -1460,6 +1433,7 @@ tags: []
 
     def save_new_question(
             self, question_id, owner_id, question_state_data,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Question and saves it.
 
@@ -1467,6 +1441,8 @@ tags: []
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
             question_state_data: State. The state data for the question.
+            linked_skill_ids: list(str). List of skill IDs linked to the
+                question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -1475,12 +1451,14 @@ tags: []
         """
         question = question_domain.Question(
             question_id, question_state_data,
-            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0)
+            feconf.CURRENT_STATE_SCHEMA_VERSION, language_code, 0,
+            linked_skill_ids)
         question_services.add_question(owner_id, question)
         return question
 
     def save_new_question_with_state_data_schema_v27(
             self, question_id, owner_id,
+            linked_skill_ids,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new default question with a default version 27 state
         data dictionary.
@@ -1497,6 +1475,7 @@ tags: []
         Args:
             question_id: str. ID for the question to be created.
             owner_id: str. The id of the user creating the question.
+            linked_skill_ids: list(str). The skill IDs linked to the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
@@ -1506,7 +1485,8 @@ tags: []
             question_state_data=self.VERSION_27_STATE_DICT,
             language_code=language_code,
             version=1,
-            question_state_data_schema_version=27
+            question_state_data_schema_version=27,
+            linked_skill_ids=linked_skill_ids
         )
         question_model.commit(
             owner_id, 'New question created',
@@ -1834,7 +1814,7 @@ class AppEngineTestBase(TestBase):
                         else self.testapp)
                     response = app.post(
                         url=str(task.url), params=(task.payload or ''),
-                        headers=headers)
+                        headers=headers, expect_errors=True)
                     if response.status_code != 200:
                         raise RuntimeError(
                             'MapReduce task to URL %s failed' % task.url)
@@ -1861,7 +1841,7 @@ class AppEngineTestBase(TestBase):
             'correct_answer': 'Solution',
             'explanation': {
                 'content_id': 'solution',
-                'html': 'This is a solution.'
+                'html': '<p>This is a solution.</p>'
             }
         }
         hints_list = [{
@@ -2008,8 +1988,8 @@ class FailingFunction(FunctionWrapper):
 
         if not (self._num_tries_before_success >= 0 or self._always_fail):
             raise ValueError(
-                'num_tries_before_success should either be an'
-                'integer greater than or equal to 0,'
+                'num_tries_before_success should either be an '
+                'integer greater than or equal to 0, '
                 'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):

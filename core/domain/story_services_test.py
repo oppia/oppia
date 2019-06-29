@@ -14,12 +14,17 @@
 
 """Tests the methods defined in story services."""
 
+import logging
+
+from core.domain import exp_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+
+import feconf
 
 (story_models, user_models) = models.Registry.import_models(
     [models.NAMES.story, models.NAMES.user])
@@ -303,6 +308,7 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.STORY_1_ID = 'story_id'
         self.STORY_ID_1 = 'story_id_1'
         self.NODE_ID_3 = 'node_3'
+        self.NODE_ID_4 = 'node_4'
 
         self.owner_id = 'owner'
         self.TOPIC_ID = topic_services.get_new_topic_id()
@@ -325,6 +331,26 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.node_2 = {
             'id': self.NODE_ID_2,
             'title': 'Title 2',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.node_3 = {
+            'id': self.NODE_ID_3,
+            'title': 'Title 3',
+            'destination_node_ids': ['node_4'],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': None
+        }
+        self.node_4 = {
+            'id': self.NODE_ID_4,
+            'title': 'Title 4',
             'destination_node_ids': [],
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': [],
@@ -334,11 +360,13 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         }
         story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(self.node_1),
-            story_domain.StoryNode.from_dict(self.node_2)
+            story_domain.StoryNode.from_dict(self.node_2),
+            story_domain.StoryNode.from_dict(self.node_3),
+            story_domain.StoryNode.from_dict(self.node_4)
         ]
         self.nodes = story.story_contents.nodes
         story.story_contents.initial_node_id = 'node_1'
-        story.story_contents.next_node_id = 'node_3'
+        story.story_contents.next_node_id = 'node_5'
         story_services.save_new_story(self.USER_ID, story)
         topic_services.add_canonical_story(
             self.USER_ID, self.TOPIC_ID, story.id)
@@ -370,6 +398,48 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
                 self.owner_id, self.STORY_1_ID),
             [self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
 
+    def test_get_latest_completed_node_ids(self):
+        self.assertIsNone(
+            self._get_progress_model(self.owner_id, self.STORY_1_ID))
+        self.assertEqual(story_services.get_latest_completed_node_ids(
+            self.owner_id, self.STORY_1_ID), [])
+
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+        self.assertEqual(
+            story_services.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID),
+            [self.NODE_ID_1])
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
+        self.assertEqual(
+            story_services.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID),
+            [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
+
+    def test_get_latest_completed_node_ids_different_completion_order(self):
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+
+        self.assertEqual(
+            story_services.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID),
+            [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
+
+    def test_get_latest_completed_node_ids_multiple_completions(self):
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_3)
+        self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_4)
+
+        self.assertEqual(
+            story_services.get_latest_completed_node_ids(
+                self.owner_id, self.STORY_1_ID),
+            [self.NODE_ID_2, self.NODE_ID_3, self.NODE_ID_4])
+
     def test_get_completed_nodes_in_story(self):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_2)
@@ -383,11 +453,31 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
     def test_get_pending_nodes_in_story(self):
         self._record_completion(self.owner_id, self.STORY_1_ID, self.NODE_ID_1)
 
-        for _, pending_node in enumerate(
+        # The starting index is 1 because the first story node is completed,
+        # and the pending nodes will start from the second node.
+        for index, pending_node in enumerate(
                 story_services.get_pending_nodes_in_story(
-                    self.owner_id, self.STORY_1_ID)):
+                    self.owner_id, self.STORY_1_ID), start=1):
             self.assertEqual(
-                pending_node.to_dict(), self.nodes[1].to_dict())
+                pending_node.to_dict(), self.nodes[index].to_dict())
+
+    def test_get_node_index_by_story_id_and_node_id(self):
+        # Tests correct node index should be returned when story and node exist.
+        node_index = story_services.get_node_index_by_story_id_and_node_id(
+            self.STORY_1_ID, self.NODE_ID_1)
+        self.assertEqual(node_index, 0)
+
+        # Tests error should be raised if story or node doesn't exist.
+        with self.assertRaisesRegexp(
+            Exception,
+            'Story node with id node_5 does not exist in this story.'):
+            story_services.get_node_index_by_story_id_and_node_id(
+                self.STORY_1_ID, 'node_5')
+
+        with self.assertRaisesRegexp(
+            Exception, 'Story with id story_id_2 does not exist.'):
+            story_services.get_node_index_by_story_id_and_node_id(
+                'story_id_2', self.NODE_ID_1)
 
     def test_record_completed_node_in_story_context(self):
         # Ensure that node completed within the context of a story are
@@ -450,3 +540,40 @@ class StoryProgressUnitTests(StoryServicesUnitTests):
         self.assertEqual(
             completion_model.completed_node_ids, [
                 self.NODE_ID_1, self.NODE_ID_2, self.NODE_ID_3])
+
+
+# TODO: Remove this mock class and the StoryContentsMigrationTests class
+# once the actual functions for story_contents migrations are implemented.
+class MockStoryObject(story_domain.Story):
+    """Mocks Story domain object."""
+
+    @classmethod
+    def _convert_story_contents_v1_dict_to_v2_dict(cls, story_contents):
+        """Converts v1 story_contents dict to v2."""
+        return story_contents
+
+
+class StoryContentsMigrationTests(test_utils.GenericTestBase):
+
+    def test_migrate_story_contents_to_latest_schema(self):
+        story_id = story_services.get_new_story_id()
+        topic_id = topic_services.get_new_topic_id()
+        user_id = 'user_id'
+        self.save_new_topic(
+            topic_id, user_id, 'Topic', 'A new topic', [], [], [], [],
+            0)
+        self.save_new_story(
+            story_id, user_id, 'Title', 'Description', 'Notes',
+            topic_id)
+
+        story_model = story_models.StoryModel.get(story_id)
+        self.assertEqual(story_model.story_contents_schema_version, 1)
+
+        swap_story_object = self.swap(story_domain, 'Story', MockStoryObject)
+        current_schema_version_swap = self.swap(
+            feconf, 'CURRENT_STORY_CONTENTS_SCHEMA_VERSION', 2)
+
+        with swap_story_object, current_schema_version_swap:
+            story = story_services.get_story_from_model(story_model)
+
+        self.assertEqual(story.story_contents_schema_version, 2)

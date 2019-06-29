@@ -22,6 +22,15 @@ import os
 
 from constants import constants  # pylint: disable=relative-import
 
+# The datastore model ID for the list of featured activity references. This
+# value should not be changed.
+ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
+ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
+
+# The values which a post_commit_status can have: public, private.
+POST_COMMIT_STATUS_PUBLIC = 'public'
+POST_COMMIT_STATUS_PRIVATE = 'private'
+
 # Whether to unconditionally log info messages.
 DEBUG = False
 
@@ -38,6 +47,9 @@ SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
 CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
+# backend_prod_files contain processed JS and HTML files that are served by
+# Jinja, we are moving away from Jinja so this folder might not be needed later
+# (#6964)
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not constants.DEV_MODE else '')
 ACTIONS_DIR = (
@@ -45,7 +57,7 @@ ACTIONS_DIR = (
 ISSUES_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
-    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
+    os.path.join('extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
 RTE_EXTENSIONS_DEFINITIONS_PATH = (
@@ -112,11 +124,9 @@ ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
     TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
 }
 
-# Interaction IDs for which answer details cannot be solicited.
-INTERACTION_IDS_WITHOUT_ANSWER_DETAILS = ['EndExploration', 'Continue']
-
 ENTITY_TYPE_EXPLORATION = 'exploration'
 ENTITY_TYPE_TOPIC = 'topic'
+ENTITY_TYPE_QUESTION = 'question'
 
 # The maximum number of activities allowed in the playlist of the learner. This
 # limit applies to both the explorations playlist and the collections playlist.
@@ -188,6 +198,10 @@ CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema of LearnerAnswerInfo
+# dict schema changes.
+CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -468,6 +482,9 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
 
+# The maximum number of questions to be fetched at one time.
+MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
+
 # The minimum score required for a user to review suggestions of a particular
 # category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
@@ -648,13 +665,17 @@ PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
+QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
 QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
+REVIEW_TEST_URL_PREFIX = '/review_test'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SKILL_DATA_URL_PREFIX = '/skill_data_handler'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
@@ -664,6 +685,7 @@ SPLASH_URL = '/splash'
 STORY_DATA_HANDLER = '/story_data_handler'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
 STORY_VIEWER_URL_PREFIX = '/story'
 SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
@@ -675,7 +697,6 @@ TOPIC_VIEWER_URL_PREFIX = '/topic'
 TOPIC_DATA_HANDLER = '/topic_data_handler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
-TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
 TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
 TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
 TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
@@ -791,17 +812,12 @@ DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
 # The following are all page descriptions for the meta tag.
-CONTACT_PAGE_DESCRIPTION = (
-    'Contact the Oppia team, submit feedback, and learn how to get involved '
-    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
 CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
-DONATE_PAGE_DESCRIPTION = (
-    'Donate to The Oppia Foundation.')
 LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
@@ -810,15 +826,9 @@ LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
     'exploring!')
-PREFERENCES_PAGE_DESCRIPTION = (
-    'Change your Oppia profile settings and preferences')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')
-SIGNUP_PAGE_DESCRIPTION = (
-    'Sign up for Oppia and begin exploring a new subject.')
-THANKS_PAGE_DESCRIPTION = (
-    'Thank you for donating to The Oppia Foundation.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'

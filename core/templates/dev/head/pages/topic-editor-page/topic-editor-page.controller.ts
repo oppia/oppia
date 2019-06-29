@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Primary controller for the topic editor page.
+ * @fileoverview Directive for the topic editor page.
  */
 
 // TODO(vojtechjelinek): this block of requires should be removed after we
@@ -105,19 +105,17 @@ require(
   'components/state-directives/solution-editor/' +
   'solution-explanation-editor.directive.ts');
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
-require('services/AutoplayedVideosService.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('interactions/interactionsQuestionsRequires.ts');
 require('objects/objectComponentsRequires.ts');
 
-require(
-  'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');
-require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');
 require('pages/topic-editor-page/editor-tab/topic-editor-tab.directive.ts');
 require('pages/topic-editor-page/questions-tab/questions-tab.directive.ts');
 require(
   'pages/topic-editor-page/subtopics-list-tab/subtopics-list-tab.directive.ts');
 
+require('pages/topic-editor-page/services/topic-editor-routing.service.ts');
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
@@ -125,18 +123,33 @@ require('services/contextual/UrlService.ts');
 require('pages/topic-editor-page/topic-editor-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
-oppia.controller('TopicEditor', [
-  '$scope', 'PageTitleService', 'TopicEditorStateService', 'UrlService',
-  'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-  function($scope, PageTitleService, TopicEditorStateService, UrlService,
-      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
-    TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
+oppia.directive('topicEditorPage', ['UrlInterpolationService', function(
+    UrlInterpolationService) {
+  return {
+    restrict: 'E',
+    scope: {},
+    bindToController: {},
+    templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+      '/pages/topic-editor-page/topic-editor-page.directive.html'),
+    controllerAs: '$ctrl',
+    controller: [
+      '$scope', 'PageTitleService', 'TopicEditorRoutingService',
+      'TopicEditorStateService', 'UrlService',
+      'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+      function($scope, PageTitleService, TopicEditorRoutingService,
+          TopicEditorStateService, UrlService,
+          EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+        var ctrl = this;
+        ctrl.getActiveTabName = TopicEditorRoutingService.getActiveTabName;
+        TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
 
-    var setPageTitle = function() {
-      PageTitleService.setPageTitle(
-        TopicEditorStateService.getTopic().getName() + ' - Oppia');
-    };
-    $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
-    $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
-  }
-]);
+        var setPageTitle = function() {
+          PageTitleService.setPageTitle(
+            TopicEditorStateService.getTopic().getName() + ' - Oppia');
+        };
+        $scope.$on(EVENT_TOPIC_INITIALIZED, setPageTitle);
+        $scope.$on(EVENT_TOPIC_REINITIALIZED, setPageTitle);
+      }
+    ]
+  };
+}]);

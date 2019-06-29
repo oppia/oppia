@@ -51,20 +51,19 @@ class BaseQuestionEditorControllerTests(test_utils.GenericTestBase):
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+
         self.question_id = question_services.get_new_question_id()
         self.question = self.save_new_question(
-            self.question_id, self.editor_id,
-            self._create_valid_question_data('ABC'))
+            self.question_id,
+            self.editor_id,
+            self._create_valid_question_data('ABC'),
+            [self.skill_id])
 
 
 class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
     """Tests returning of new question ids and creating questions."""
-
-    def setUp(self):
-        """Completes the setup for QuestionSkillLinkHandlerTest."""
-        super(QuestionCreationHandlerTest, self).setUp()
-        self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
 
     def test_post_with_non_admin_or_topic_manager_email_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)
@@ -95,6 +94,26 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
         self.post_json(
             '%s/%s' % (feconf.NEW_QUESTION_URL, incorrect_skill_id),
             {}, csrf_token=csrf_token, expected_status_int=404)
+        self.logout()
+
+    def test_post_with_incorrect_list_of_skill_ids_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        incorrect_skill_id = [1, 2]
+        self.post_json(
+            '%s/%s' % (feconf.NEW_QUESTION_URL, incorrect_skill_id),
+            {}, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
+    def test_post_with_incorrect_type_of_skill_ids_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        incorrect_skill_id = 1
+        self.post_json(
+            '%s/%s' % (feconf.NEW_QUESTION_URL, incorrect_skill_id),
+            {}, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
     def test_post_with_incorrect_question_id_returns_400(self):
@@ -170,6 +189,16 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTests):
             }, csrf_token=csrf_token, expected_status_int=400)
         self.logout()
 
+    def test_post_with_too_many_skills_returns_400(self):
+        self.login(self.ADMIN_EMAIL)
+        response = self.get_html_response(feconf.CREATOR_DASHBOARD_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        skill_ids = [1, 2, 3, 4]
+        self.post_json(
+            '%s/%s' % (feconf.NEW_QUESTION_URL, skill_ids),
+            {}, csrf_token=csrf_token, expected_status_int=400)
+        self.logout()
+
 
 class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
     """Tests link and unlink question from skills."""
@@ -179,10 +208,13 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
         super(QuestionSkillLinkHandlerTest, self).setUp()
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.question_id_2 = question_services.get_new_question_id()
         self.save_new_question(
             self.question_id_2, self.editor_id,
-            self._create_valid_question_data('ABC'))
+            self._create_valid_question_data('ABC'), [self.skill_id])
 
     def test_post_with_non_admin_or_topic_manager_email_disallows_access(self):
         self.login(self.NEW_USER_EMAIL)
@@ -216,14 +248,14 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ), {}, csrf_token=csrf_token)
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id)
         self.assertEqual(
-            skill_descriptions[0], 'Skill Description')
+            grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
     def test_post_with_topic_manager_email_allows_question_linking(self):
@@ -235,12 +267,13 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ), {}, csrf_token=csrf_token)
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(question_summaries[0].id, self.question_id)
-        self.assertEqual(skill_descriptions[0], 'Skill Description')
+        self.assertEqual(
+            grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
     def test_delete_with_non_admin_or_topic_manager_disallows_access(self):
@@ -254,58 +287,49 @@ class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTests):
 
     def test_delete_with_admin_email_allows_question_deletion(self):
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id, 0.3)
+            self.editor_id, self.question_id, self.skill_id, 0.3)
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id, 0.3)
+            self.editor_id, self.question_id_2, self.skill_id, 0.3)
         self.login(self.ADMIN_EMAIL)
         self.delete_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ))
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id_2)
         self.assertEqual(
-            skill_descriptions[0], 'Skill Description')
+            grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
     def test_delete_with_topic_manager_email_allows_question_deletion(self):
         question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id, 0.5)
+            self.editor_id, self.question_id, self.skill_id, 0.5)
         question_services.create_new_question_skill_link(
-            self.question_id_2, self.skill_id, 0.5)
+            self.editor_id, self.question_id_2, self.skill_id, 0.5)
         self.login(self.TOPIC_MANAGER_EMAIL)
         self.delete_json(
             '%s/%s/%s' % (
                 feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
                 self.skill_id
             ))
-        question_summaries, skill_descriptions, _ = (
+        question_summaries, grouped_skill_descriptions, _ = (
             question_services.get_question_summaries_and_skill_descriptions(
                 5, [self.skill_id], ''))
         self.assertEqual(len(question_summaries), 1)
         self.assertEqual(
             question_summaries[0].id, self.question_id_2)
         self.assertEqual(
-            skill_descriptions[0], 'Skill Description')
+            grouped_skill_descriptions[0], ['Skill Description'])
         self.logout()
 
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTests):
     """Tests get, put and delete methods of editable questions data handler."""
-
-    def setUp(self):
-        """Completes the setup for QuestionSkillLinkHandlerTest."""
-        super(EditableQuestionDataHandlerTest, self).setUp()
-        self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(
-            self.skill_id, self.admin_id, 'Skill Description')
-        question_services.create_new_question_skill_link(
-            self.question_id, self.skill_id, 0.7)
 
     def test_get_can_not_access_handler_with_invalid_question_id(self):
         self.login(self.ADMIN_EMAIL)
