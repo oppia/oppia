@@ -38,22 +38,18 @@ oppia.factory('EditableQuestionBackendApiService', [
       EDITABLE_QUESTION_DATA_URL_TEMPLATE, QUESTION_CREATION_URL,
       QUESTION_SKILL_LINK_URL_TEMPLATE) {
     var _createQuestion = function(
-        skillId, questionDict, successCallback, errorCallback) {
-      // Note: We are passing only a single skillId for now because the
-      // frontend doesn't support multiple ids.
-      // The backend however can take in 1-n skill ids (comma separated)
-      // TODO(vinitamurthi): Pass a list of skill ids (comma separated)
-      // as part of the question_dict to the backend.
+        skillIds, questionDict, successCallback, errorCallback) {
       var questionCreationUrl = UrlInterpolationService.interpolateUrl(
         QUESTION_CREATION_URL, {
-          comma_separated_skill_ids: skillId
+          comma_separated_skill_ids: skillIds.join(',')
         });
       var postData = {
         question_dict: questionDict
       };
       $http.post(questionCreationUrl, postData).then(function(response) {
+        var questionId = response.data.question_id;
         if (successCallback) {
-          successCallback();
+          successCallback(questionId);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -110,10 +106,28 @@ oppia.factory('EditableQuestionBackendApiService', [
       });
     };
 
+    var _addQuestionSkillLink = function(
+        questionId, skillId, successCallback, errorCallback) {
+      var addQuestionSkillLinkUrl = UrlInterpolationService.interpolateUrl(
+        QUESTION_SKILL_LINK_URL_TEMPLATE, {
+          question_id: questionId,
+          skill_id: skillId
+        });
+      $http.post(addQuestionSkillLinkUrl).then(function(response) {
+        if (successCallback) {
+          successCallback();
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     return {
-      createQuestion: function(skillId, questionDict) {
+      createQuestion: function(skillIds, questionDict) {
         return $q(function(resolve, reject) {
-          _createQuestion(skillId, questionDict, resolve, reject);
+          _createQuestion(skillIds, questionDict, resolve, reject);
         });
       },
 
@@ -139,6 +153,13 @@ oppia.factory('EditableQuestionBackendApiService', [
           _updateQuestion(
             questionId, questionVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      addQuestionSkillLink: function(
+          questionId, skillId) {
+        return $q(function(resolve, reject) {
+          _addQuestionSkillLink(questionId, skillId, resolve, reject);
         });
       }
     };

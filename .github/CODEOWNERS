@@ -259,6 +259,7 @@
 /core/templates/dev/head/domain/question/ @aks681
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6
+/core/templates/dev/head/services/QuestionsListService.ts @sophiewu6
 /core/templates/dev/head/components/question-directives/question-editor/ @aks681
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681
 /core/templates/dev/head/components/question-directives/modal-templates/ @aks681
@@ -330,6 +331,7 @@
 /core/controllers/__init__.py @DubeySandeep
 /core/domain/__init__.py @DubeySandeep
 /core/domain/config*.py @seanlip
+/core/domain/change_domain.py @seanlip
 /core/templates/dev/head/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
 /schema_utils*.py @seanlip
@@ -426,6 +428,7 @@
 /core/templates/dev/head/pages/profile-page/ @kevinlee12
 /core/templates/dev/head/services/UserService*.ts @kevinlee12
 
+/core/templates/dev/head/services/services.constants.ts @kevinlee12
 
 # Critical files.
 #

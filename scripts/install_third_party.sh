@@ -174,17 +174,17 @@ fi
 
 # Python API for browsermob-proxy.
 echo Checking if browsermob-proxy is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
+if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.8.0" ]; then
   echo Installing browsermob-proxy
 
-  pip_install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip_install browsermob-proxy==0.8.0 --target="$TOOLS_DIR/browsermob-proxy-0.8.0"
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
+if [ ! -d "$TOOLS_DIR/selenium-3.13.0" ]; then
   echo Installing selenium
 
-  pip_install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip_install selenium==3.13.0 --target="$TOOLS_DIR/selenium-3.13.0"
 fi
 
 echo Checking if PyGithub is installed in $TOOLS_DIR
