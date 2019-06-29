@@ -794,7 +794,8 @@ class LearnerAnswerInfoHandler(EditorHandler):
 
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         state_reference = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exploration_id, state_name)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel
+            .get_state_reference_for_exploration(exploration_id, state_name))
         learner_answer_details = stats_services.get_learner_answer_details(
             entity_type, state_reference)
         learner_answer_info_dict_list = [
@@ -811,7 +812,8 @@ class LearnerAnswerInfoHandler(EditorHandler):
         learner_answer_info_id = self.request.get('learner_answer_info_id')
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         state_reference = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exploration_id, state_name)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel
+            .get_state_reference_for_exploration(exploration_id, state_name))
         stats_services.delete_learner_answer_info(
             entity_type, state_reference, learner_answer_info_id)
         self.render_json(self.values)

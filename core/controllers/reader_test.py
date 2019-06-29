@@ -1903,7 +1903,8 @@ class LearnerAnswerInfoSubmissionHandlerTests(test_utils.GenericTestBase):
         interaction_id = exploration_dict['exploration'][
             'states'][state_name]['interaction']['id']
         state_reference = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exp_id, state_name)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel
+            .get_state_reference_for_exploration(exp_id, state_name))
 
         self.assertEqual(state_name, 'Sentence')
         self.assertEqual(interaction_id, 'TextInput')

@@ -1058,7 +1058,8 @@ class LearnerAnswerInfoSubmissionHandler(base.BaseHandler):
         answer_details = self.payload.get('answer_details')
         entity_type = feconf.ENTITY_TYPE_EXPLORATION
         state_reference = (
-            stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration(exploration_id, state_name)) #pylint: disable=line-too-long
+            stats_models.LearnerAnswerDetailsModel
+            .get_state_reference_for_exploration(exploration_id, state_name))
         stats_services.record_learner_answer_info(
             entity_type, state_reference,
             interaction_id, answer, answer_details)

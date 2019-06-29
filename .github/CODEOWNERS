@@ -111,6 +111,7 @@
 /core/templates/dev/head/components/version-diff-visualization/version-diff-visualization.directive.ts @DubeySandeep
 /core/templates/dev/head/domain/editor/ @DubeySandeep
 /core/templates/dev/head/domain/exploration/ @DubeySandeep
+/core/templates/dev/head/domain/learner_answer_details/ @seanlip
 /core/templates/dev/head/domain/state/ @aks681
 /core/templates/dev/head/domain/summary/ @aks681
 /core/templates/dev/head/domain/state_card/ @aks681
