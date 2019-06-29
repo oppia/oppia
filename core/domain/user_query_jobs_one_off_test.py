@@ -363,34 +363,3 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             messages[0].html.decode(), expected_email_html_body)
         self.assertEqual(
             messages[0].body.decode(), expected_email_text_body)
-
-    def test_job_raises_error_with_invalid_param_name(self):
-        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
-
-        query_id = user_query_services.save_new_query_model(
-            self.submitter_id, edited_fewer_than_n_exps=1)
-
-        params = {
-            'invalid_param_name': query_id
-        }
-        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
-            job_id, additional_job_params=params)
-
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'MapReduce task to URL .+ failed')
-        send_emails_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-
-        with assert_raises_regexp_context_manager, send_emails_swap:
-            self.process_and_flush_pending_tasks()
-
-    def test_job_raises_error_with_invalid_query_id(self):
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'MapReduce task to URL .+ failed')
-        send_emails_swap = self.swap(feconf, 'CAN_SEND_EMAILS', True)
-
-        with assert_raises_regexp_context_manager, send_emails_swap:
-            self._run_one_off_job('invalid_query_id')

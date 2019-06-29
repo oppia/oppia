@@ -633,6 +633,67 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
         yield (key, sum([int(value) for value in values]))
 
 
+class MapReduceJobForCheckingParamNames(jobs.BaseMapReduceOneOffJobManager):
+    """Test job that checks correct param_name."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        jobs.BaseMapReduceOneOffJobManager.get_mapper_param('exp_id')
+
+
+class ParamNameTests(test_utils.GenericTestBase):
+
+    def test_job_raises_error_with_invalid_param_name(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id_1')
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        job_id = MapReduceJobForCheckingParamNames.create_new()
+        params = {
+            'invalid_param_name': 'exp_id_1'
+        }
+
+        MapReduceJobForCheckingParamNames.enqueue(
+            job_id, additional_job_params=params)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'MapReduce task to URL .+ failed')
+
+        with assert_raises_regexp_context_manager:
+            self.process_and_flush_pending_tasks()
+
+    def test_job_with_correct_param_name(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id_1')
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        job_id = MapReduceJobForCheckingParamNames.create_new()
+        params = {
+            'exp_id': 'exp_id_1'
+        }
+
+        MapReduceJobForCheckingParamNames.enqueue(
+            job_id, additional_job_params=params)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 0)
+
+
 class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
     """Tests MapReduce jobs end-to-end."""
 
@@ -1195,17 +1256,19 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         continuous_computations_data = jobs.get_continuous_computations_info(
             [StartExplorationEventCounter])
 
-        expected_continuous_computations_data = {
+        expected_continuous_computations_data = [{
+            'active_realtime_layer_index': 0,
             'computation_type': 'StartExplorationEventCounter',
             'status_code': 'idle',
             'is_startable': True,
-            'is_stoppable': False
-        }
+            'is_stoppable': False,
+            'last_finished_msec': None,
+            'last_started_msec': None,
+            'last_stopped_msec': None
+        }]
 
-        self.assertEqual(len(continuous_computations_data), 1)
-        self.assertDictContainsSubset(
-            expected_continuous_computations_data,
-            continuous_computations_data[0])
+        self.assertEqual(
+            expected_continuous_computations_data, continuous_computations_data)
 
     def test_failing_continuous_job(self):
         observed_log_messages = []
