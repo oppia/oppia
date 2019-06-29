@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utility service for the pretests for an exploration.
+ * @fileoverview Utility service for the question player for an exploration.
  */
 
 require('domain/question/QuestionObjectFactory.ts');
@@ -47,7 +47,7 @@ oppia.factory('QuestionPlayerEngineService', [
 
     var answerIsBeingProcessed = false;
 
-    var pretestQuestions = [];
+    var questions = [];
 
     var currentIndex = null;
     var nextIndex = null;
@@ -84,7 +84,7 @@ oppia.factory('QuestionPlayerEngineService', [
 
     // This should only be called when 'exploration' is non-null.
     var _loadInitialQuestion = function(successCallback) {
-      var initialState = pretestQuestions[0].getStateData();
+      var initialState = questions[0].getStateData();
 
       var questionHtml = makeQuestion(initialState, []);
       if (questionHtml === null) {
@@ -115,11 +115,11 @@ oppia.factory('QuestionPlayerEngineService', [
     };
 
     var _getCurrentStateData = function() {
-      return pretestQuestions[currentIndex].getStateData();
+      return questions[currentIndex].getStateData();
     };
 
     var _getNextStateData = function() {
-      return pretestQuestions[nextIndex].getStateData();
+      return questions[nextIndex].getStateData();
     };
 
     var _getNextInteractionHtml = function(labelForFocusTarget) {
@@ -134,21 +134,21 @@ oppia.factory('QuestionPlayerEngineService', [
 
     return {
       /**
-       * Initializes the pretests for an exploration, passing the data for the
-       * first question to successCallback.
+       * Initializes the question player for an exploration,
+       * passing the data for the first question to successCallback.
        *
        *
        * @param {function} successCallback - The function to execute after the
-       *   pretest question data is successfully loaded. This function will
+       *   question data is successfully loaded. This function will
        *   be passed two arguments:
        *   - initHtml {string}, an HTML string representing the content of the
        *       first state.
        */
-      init: function(pretestQuestionDicts, successCallback) {
+      init: function(questionDicts, successCallback) {
         answerIsBeingProcessed = false;
-        for (var i = 0; i < pretestQuestionDicts.length; i++) {
-          pretestQuestions.push(
-            QuestionObjectFactory.createFromBackendDict(pretestQuestionDicts[i])
+        for (var i = 0; i < questionDicts.length; i++) {
+          questions.push(
+            QuestionObjectFactory.createFromBackendDict(questionDicts[i])
           );
         }
         _loadInitialQuestion(successCallback);
@@ -156,8 +156,14 @@ oppia.factory('QuestionPlayerEngineService', [
       recordNewCardAdded: function() {
         currentIndex = nextIndex;
       },
-      getPretestQuestionCount: function() {
-        return pretestQuestions.length;
+      getCurrentQuestion: function() {
+        return questions[currentIndex];
+      },
+      getCurrentQuestionId: function() {
+        return questions[currentIndex].getId();
+      },
+      getQuestionCount: function() {
+        return questions.length;
       },
       getExplorationId: function() {
         return _explorationId;
@@ -166,7 +172,7 @@ oppia.factory('QuestionPlayerEngineService', [
         return version;
       },
       getLanguageCode: function() {
-        return pretestQuestions[currentIndex].getLanguageCode();
+        return questions[currentIndex].getLanguageCode();
       },
       isInPreviewMode: function() {
         return false;
@@ -206,8 +212,8 @@ oppia.factory('QuestionPlayerEngineService', [
         }
 
         var newState = null;
-        if (answerIsCorrect && (currentIndex < pretestQuestions.length - 1)) {
-          newState = pretestQuestions[currentIndex + 1].getStateData();
+        if (answerIsCorrect && (currentIndex < questions.length - 1)) {
+          newState = questions[currentIndex + 1].getStateData();
         } else {
           newState = oldState;
         }
@@ -231,7 +237,7 @@ oppia.factory('QuestionPlayerEngineService', [
           answerIsCorrect || interactionIsInline);
 
         nextIndex = currentIndex + 1;
-        var isFinalQuestion = (nextIndex === pretestQuestions.length);
+        var isFinalQuestion = (nextIndex === questions.length);
         var onSameCard = !answerIsCorrect;
 
         var _nextFocusLabel = FocusManagerService.generateFocusLabel();
