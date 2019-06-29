@@ -63,6 +63,9 @@ class BaseReviewTestsControllerTests(test_utils.GenericTestBase):
             'exploration_id': self.exp_id
         }
 
+        self.save_new_skill('skill_id_1', self.admin_id, 'Skill 1')
+        self.save_new_skill('skill_id_2', self.admin_id, 'Skill 2')
+
         self.story = story_domain.Story.create_default_story(
             self.story_id_1, 'Public Story Title', self.topic_id)
         self.story.story_contents.nodes = [
@@ -132,15 +135,51 @@ class ReviewTestsPageDataHandlerTests(BaseReviewTestsControllerTests):
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX,
                     self.story_id_1))
-            self.assertEqual(len(json_response['skill_ids']), 2)
-            self.assertEqual(json_response['skill_ids'][0], 'skill_id_1')
-            self.assertEqual(json_response['skill_ids'][1], 'skill_id_2')
+            self.assertEqual(len(json_response['skill_descriptions']), 2)
+            self.assertEqual(
+                json_response['skill_descriptions']['skill_id_1'],
+                'Skill 1')
+            self.assertEqual(
+                json_response['skill_descriptions']['skill_id_2'],
+                'Skill 2')
 
     def test_no_user_can_access_unpublished_story_review_sessions_data(self):
         with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
             self.get_json(
                 '%s/%s' % (
                     feconf.REVIEW_TEST_DATA_URL_PREFIX, self.story_id_2),
+                expected_status_int=404)
+
+    def test_get_fails_when_acquired_skills_dont_exist(self):
+        story_id = 'story_id_3'
+        node_id = 'node_1'
+        node = {
+            'id': node_id,
+            'title': 'Title 1',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_id_3'],
+            'prerequisite_skill_ids': [],
+            'outline': '',
+            'outline_is_finalized': False,
+            'exploration_id': self.exp_id
+        }
+        story = story_domain.Story.create_default_story(
+            story_id, 'Public Story Title', self.topic_id)
+        story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node)
+        ]
+        story.story_contents.initial_node_id = node_id
+        story.story_contents.next_node_id = self.node_id_2
+        story_services.save_new_story(self.admin_id, story)
+
+        story_services.publish_story(story_id, self.admin_id)
+
+        with self.swap(constants, 'ENABLE_NEW_STRUCTURE_PLAYERS', True):
+            story_services.record_completed_node_in_story_context(
+                self.viewer_id, story_id, node_id)
+            self.get_json(
+                '%s/%s' % (
+                    feconf.REVIEW_TEST_DATA_URL_PREFIX, story_id),
                 expected_status_int=404)
 
     def test_get_fails_when_story_doesnt_exist(self):
