@@ -163,9 +163,9 @@ oppia.directive('questionsList', [
             }
           };
 
-          ctrl.initializeNewQuestionCreation = function() {
+          ctrl.initializeNewQuestionCreation = function(skillIds) {
             ctrl.question =
-              QuestionObjectFactory.createDefaultQuestion();
+              QuestionObjectFactory.createDefaultQuestion(skillIds);
             ctrl.questionId = ctrl.question.getId();
             ctrl.questionStateData = ctrl.question.getStateData();
             ctrl.questionIsBeingUpdated = false;
@@ -177,7 +177,7 @@ oppia.directive('questionsList', [
               ctrl.newQuestionSkillIds = ctrl.skillIds;
               ctrl.populateMisconceptions(ctrl.skillIds);
               if (AlertsService.warnings.length === 0) {
-                ctrl.initializeNewQuestionCreation();
+                ctrl.initializeNewQuestionCreation(ctrl.skillIds);
               }
               return;
             }
@@ -226,7 +226,7 @@ oppia.directive('questionsList', [
               ctrl.newQuestionSkillIds = skillIds;
               ctrl.populateMisconceptions(skillIds);
               if (AlertsService.warnings.length === 0) {
-                ctrl.initializeNewQuestionCreation();
+                ctrl.initializeNewQuestionCreation(skillIds);
               }
             });
           };
