@@ -20,7 +20,7 @@
 require('domain/exploration/EditableExplorationBackendApiService.ts');
 require('domain/exploration/ReadOnlyExplorationBackendApiService.ts');
 require('domain/question/PretestQuestionBackendApiService.ts');
-require('domain/question/QuestionPlayerBackendApiService.ts');
+require('domain/question/QuestionBackendApiService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('pages/exploration-player-page/services/number-attempts.service.ts');
 require('pages/exploration-player-page/services/player-position.service.ts');
@@ -48,10 +48,10 @@ oppia.factory('ExplorationPlayerStateService', [
   'ExplorationFeaturesService', 'NumberAttemptsService',
   'PlayerCorrectnessFeedbackEnabledService', 'PlayerPositionService',
   'PlayerTranscriptService', 'PlaythroughIssuesService', 'PlaythroughService',
-  'PretestQuestionBackendApiService', 'QuestionPlayerBackendApiService',
-  'QuestionPlayerEngineService', 'ReadOnlyExplorationBackendApiService',
-  'StateClassifierMappingService', 'StatsReportingService',
-  'UrlService', 'EXPLORATION_MODE',
+  'PretestQuestionBackendApiService',
+  'QuestionBackendApiService', 'QuestionPlayerEngineService',
+  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlService', 'EXPLORATION_MODE',
   function(
       $log, $q, $rootScope, ContextService,
       EditableExplorationBackendApiService,
@@ -59,10 +59,10 @@ oppia.factory('ExplorationPlayerStateService', [
       ExplorationFeaturesService, NumberAttemptsService,
       PlayerCorrectnessFeedbackEnabledService, PlayerPositionService,
       PlayerTranscriptService, PlaythroughIssuesService, PlaythroughService,
-      PretestQuestionBackendApiService, QuestionPlayerBackendApiService,
-      QuestionPlayerEngineService, ReadOnlyExplorationBackendApiService,
-      StateClassifierMappingService, StatsReportingService,
-      UrlService, EXPLORATION_MODE) {
+      PretestQuestionBackendApiService,
+      QuestionBackendApiService, QuestionPlayerEngineService,
+      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
+      StatsReportingService, UrlService, EXPLORATION_MODE) {
     var currentEngineService = null;
     var explorationMode = EXPLORATION_MODE.OTHER;
     var editorPreviewMode = ContextService.isInExplorationEditorPage();
@@ -139,7 +139,7 @@ oppia.factory('ExplorationPlayerStateService', [
 
     var initQuestionPlayer = function(questionPlayerConfig, callback) {
       setQuestionPlayerMode();
-      QuestionPlayerBackendApiService.fetchQuestions(
+      QuestionBackendApiService.fetchQuestions(
         questionPlayerConfig.skillList,
         questionPlayerConfig.questionCount).then(function(questionData) {
         $rootScope.$broadcast('totalQuestionsReceived', questionData.length);
