@@ -52,7 +52,7 @@ export DEFAULT_RUN_MINIFIED_TESTS=false
 maybeInstallDependencies "$@"
 
 # The following command finds all the spec files (except known failing files;
-# corresponding issue -> https://github.com/oppia/oppia/issues/6975)
+# corresponding issue -> https://github.com/oppia/oppia/issues/6960)
 # and merges them all to a single file which Karma uses to run its tests. The
 # Karma is unable to run the tests on multiple files and the DI fails in that
 # case, the reason of which is unclear.
