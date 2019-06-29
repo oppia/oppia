@@ -241,8 +241,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['exploration_player'],
+      chunks: ['app', 'exploration_player'],
       filename: 'exploration-player-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Oppia is a free, open-source learning platform. Join ' +
+          'the community to create or try an exploration today!'
+      },
       template:
         commonPrefix + '/pages/exploration-player-page/' +
         'exploration-player-page.mainpage.html',

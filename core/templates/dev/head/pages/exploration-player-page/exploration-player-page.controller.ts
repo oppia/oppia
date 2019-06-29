@@ -77,6 +77,7 @@ require(
 require('components/forms/schema-viewers/schema-based-viewer.directive.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'attribution-guide.directive.ts');
