@@ -403,10 +403,10 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         weekly_stats = user_model.weekly_creator_stats_list
         weekly_stats_constructed = []
         for weekly_stat in weekly_stats:
-            for date_key in weekly_stat.keys():
+            for date_key in weekly_stat:
                 stat_dict = weekly_stat[date_key]
                 constructed_stat = {
-                    (date_key): {
+                    date_key: {
                         'average_ratings': stat_dict['average_ratings'],
                         'total_plays': stat_dict['total_plays']
                     }
