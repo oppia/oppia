@@ -474,10 +474,6 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
 
         ctrl.showSuggestionModal = function(
             newContent, oldContent, description) {
-          console.log("in learner dashboard");
-          console.log(newContent);
-          console.log(oldContent);
-          console.log(description);
           SuggestionModalForLearnerDashboardService.showSuggestionModal(
             'edit_exploration_state_content',
             {
