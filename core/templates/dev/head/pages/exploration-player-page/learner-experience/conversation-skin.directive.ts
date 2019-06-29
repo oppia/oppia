@@ -608,12 +608,12 @@ oppia.directive('conversationSkin', [
           if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
             $rootScope.$on('hintConsumed', function(evt) {
               QuestionPlayerStateService.hintUsed(
-                QuestionPlayerEngineService.getCurrentQuestionId());
+                QuestionPlayerEngineService.getCurrentQuestion());
             });
 
             $rootScope.$on('solutionViewed', function(evt, timestamp) {
               QuestionPlayerStateService.solutionViewed(
-                QuestionPlayerEngineService.getCurrentQuestionId());
+                QuestionPlayerEngineService.getCurrentQuestion());
             });
           }
 
@@ -865,7 +865,7 @@ oppia.directive('conversationSkin', [
                     'playerStateChange', nextCard.getStateName());
                 } else {
                   QuestionPlayerStateService.answerSubmitted(
-                    QuestionPlayerEngineService.getCurrentQuestionId(),
+                    QuestionPlayerEngineService.getCurrentQuestion(),
                     !remainOnCurrentCard);
                 }
                 // Do not wait if the interaction is supplemental -- there's
