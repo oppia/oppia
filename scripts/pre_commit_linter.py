@@ -2524,7 +2524,6 @@ class LintChecksManager(object):
                            'update.' %
                            (line_tokens[1], line_tokens[3]))
 
-
             if failed:
                 print '(%s errors found)' % len(error_list)
                 summary_message = (
