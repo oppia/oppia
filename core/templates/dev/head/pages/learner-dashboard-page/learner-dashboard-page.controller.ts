@@ -27,6 +27,7 @@ require('components/summary-tile/collection-summary-tile.directive.ts');
 require('components/summary-tile/exploration-summary-tile.directive.ts');
 require('filters/string-utility-filters/truncate.filter.ts');
 
+require('directives/AngularHtmlBindDirective.ts');
 require('domain/feedback_message/FeedbackMessageSummaryObjectFactory.ts');
 require('domain/feedback_thread/FeedbackThreadSummaryObjectFactory.ts');
 require('domain/learner_dashboard/LearnerDashboardBackendApiService.ts');
@@ -473,6 +474,10 @@ oppia.directive('learnerDashboardPage', ['UrlInterpolationService', function(
 
         ctrl.showSuggestionModal = function(
             newContent, oldContent, description) {
+          console.log("in learner dashboard");
+          console.log(newContent);
+          console.log(oldContent);
+          console.log(description);
           SuggestionModalForLearnerDashboardService.showSuggestionModal(
             'edit_exploration_state_content',
             {
