@@ -41,6 +41,7 @@ require('domain/question/PretestQuestionBackendApiService.ts');
 require('domain/skill/ConceptCardBackendApiService.ts');
 require('domain/skill/ConceptCardObjectFactory.ts');
 require('domain/state_card/StateCardObjectFactory.ts');
+require('domain/story_viewer/ReadOnlyStoryNodeObjectFactory.ts');
 require('domain/story_viewer/StoryViewerBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require(
@@ -334,13 +335,15 @@ oppia.directive('conversationSkin', [
         'EditableExplorationBackendApiService', 'PlayerTranscriptService',
         'QuestionPlayerStateService', 'LearnerParamsService',
         'ExplorationRecommendationsService',
-        'ReadOnlyExplorationBackendApiService', 'PlayerPositionService',
+        'ReadOnlyExplorationBackendApiService',
+        'ReadOnlyStoryNodeObjectFactory', 'PlayerPositionService',
         'StatsReportingService', 'SiteAnalyticsService',
         'PretestQuestionBackendApiService', 'StateCardObjectFactory',
         'StoryViewerBackendApiService',
         'CONTENT_FOCUS_LABEL_PREFIX', 'TWO_CARD_THRESHOLD_PX',
         'CONTINUE_BUTTON_FOCUS_LABEL', 'EVENT_ACTIVE_CARD_CHANGED',
         'EVENT_NEW_CARD_AVAILABLE', 'FEEDBACK_POPOVER_PATH',
+        'NUM_EXPLORATIONS_PER_REVIEW_TEST',
         'FatigueDetectionService', 'GuestCollectionProgressService',
         'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
         'ContextService', 'ConceptCardBackendApiService',
@@ -363,13 +366,15 @@ oppia.directive('conversationSkin', [
             EditableExplorationBackendApiService, PlayerTranscriptService,
             QuestionPlayerStateService, LearnerParamsService,
             ExplorationRecommendationsService,
-            ReadOnlyExplorationBackendApiService, PlayerPositionService,
+            ReadOnlyExplorationBackendApiService,
+            ReadOnlyStoryNodeObjectFactory, PlayerPositionService,
             StatsReportingService, SiteAnalyticsService,
             PretestQuestionBackendApiService, StateCardObjectFactory,
             StoryViewerBackendApiService,
             CONTENT_FOCUS_LABEL_PREFIX, TWO_CARD_THRESHOLD_PX,
             CONTINUE_BUTTON_FOCUS_LABEL, EVENT_ACTIVE_CARD_CHANGED,
             EVENT_NEW_CARD_AVAILABLE, FEEDBACK_POPOVER_PATH,
+            NUM_EXPLORATIONS_PER_REVIEW_TEST,
             FatigueDetectionService, GuestCollectionProgressService,
             NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
             ContextService, ConceptCardBackendApiService,
@@ -603,12 +608,12 @@ oppia.directive('conversationSkin', [
           if (ExplorationPlayerStateService.isInQuestionPlayerMode()) {
             $rootScope.$on('hintConsumed', function(evt) {
               QuestionPlayerStateService.hintUsed(
-                QuestionPlayerEngineService.getCurrentQuestionId());
+                QuestionPlayerEngineService.getCurrentQuestion());
             });
 
             $rootScope.$on('solutionViewed', function(evt, timestamp) {
               QuestionPlayerStateService.solutionViewed(
-                QuestionPlayerEngineService.getCurrentQuestionId());
+                QuestionPlayerEngineService.getCurrentQuestion());
             });
           }
 
@@ -760,6 +765,33 @@ oppia.directive('conversationSkin', [
                 var nodeId = UrlService.getUrlParams().node_id;
                 StoryViewerBackendApiService.recordStoryNodeCompletion(
                   storyId, nodeId);
+
+                StoryViewerBackendApiService.fetchStoryData(storyId).then(
+                  function(storyDataDict) {
+                    var storyNodes = storyDataDict.story_nodes.map(
+                      function(storyNodeDict) {
+                        return ReadOnlyStoryNodeObjectFactory
+                          .createFromBackendDict(storyNodeDict);
+                      });
+                    var completedStoryNodes = [];
+                    storyNodes.forEach(function(storyNode) {
+                      if (storyNode.isCompleted) {
+                        completedStoryNodes.push(storyNode);
+                      }
+                    });
+                    if (completedStoryNodes.length %
+                      NUM_EXPLORATIONS_PER_REVIEW_TEST === 0 ||
+                      completedStoryNodes.length === storyNodes.length) {
+                      var REVIEW_TEST_URL_TEMPLATE = (
+                        '/review_test/<story_id>');
+                      $window.location =
+                        UrlInterpolationService.interpolateUrl(
+                          REVIEW_TEST_URL_TEMPLATE, {
+                            story_id: storyId
+                          });
+                    }
+                  }
+                );
               }
 
               // For single state explorations, when the exploration reaches the
@@ -833,7 +865,7 @@ oppia.directive('conversationSkin', [
                     'playerStateChange', nextCard.getStateName());
                 } else {
                   QuestionPlayerStateService.answerSubmitted(
-                    QuestionPlayerEngineService.getCurrentQuestionId(),
+                    QuestionPlayerEngineService.getCurrentQuestion(),
                     !remainOnCurrentCard);
                 }
                 // Do not wait if the interaction is supplemental -- there's
