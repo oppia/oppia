@@ -2436,10 +2436,10 @@ class StateAnswerStatisticsHandlerTests(BaseEditorControllerTests):
             })
 
 
-class LearnerAnswerDetailsHandlerTests(BaseEditorControllerTests):
+class LearnerAnswerInfoHandlerTests(BaseEditorControllerTests):
 
     def setUp(self):
-        super(LearnerAnswerDetailsHandlerTests, self).setUp()
+        super(LearnerAnswerInfoHandlerTests, self).setUp()
         self.login(self.OWNER_EMAIL)
         self.exp_id = exp_services.get_new_exploration_id()
         self.save_new_valid_exploration(self.exp_id, self.owner_id)

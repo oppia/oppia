@@ -778,7 +778,7 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         })
 
 
-class LearnerAnswerInoHandler(EditorHandler):
+class LearnerAnswerInfoHandler(EditorHandler):
     """Handles the learner answer info for an exploration state."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
