@@ -28,7 +28,6 @@ require(
 require(
   'pages/exploration-editor-page/statistics-tab/issues/' +
   'cyclic-transitions-issue.directive.ts');
-
 require('domain/utilities/UrlInterpolationService.ts');
 
 oppia.directive('playthroughIssues', [
