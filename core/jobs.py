@@ -16,7 +16,6 @@
 
 """Common classes and methods for managing long running jobs."""
 
-import ast
 import collections
 import copy
 import datetime
@@ -33,7 +32,6 @@ from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
-from mapreduce import model as mapreduce_model
 from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
@@ -753,10 +751,6 @@ class BaseMapReduceJobManager(BaseJobManager):
         Raises:
             Exception: The parameter is not associated to this job type.
         """
-        mapper_params = context.get().mapreduce_spec.mapper.params
-        if param_name not in mapper_params:
-            raise Exception(
-                'Could not find %s in %s' % (param_name, mapper_params))
         return context.get().mapreduce_spec.mapper.params[param_name]
 
     @classmethod
@@ -887,7 +881,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
     @staticmethod
-    def _entity_created_before_job_queued(entity):
+    def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
 
@@ -1045,7 +1039,7 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
 
     @staticmethod
-    def _entity_created_before_job_queued(entity):
+    def entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was
         queued.
 
@@ -1411,11 +1405,6 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _kickoff_batch_job(cls):
         """Create and enqueue a new batch job."""
-        if job_models.JobModel.do_unfinished_jobs_exist(cls.__name__):
-            logging.error(
-                'Tried to start a new batch job of type %s while an existing '
-                'job was still running ' % cls.__name__)
-            return
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
         job_manager.enqueue(
@@ -1792,97 +1781,6 @@ def get_continuous_computations_info(cc_classes):
         result.append(cc_dict)
 
     return result
-
-
-def get_stuck_jobs(recency_msecs):
-    """Returns a list of jobs which were last updated at most recency_msecs
-    milliseconds ago and have experienced more than one retry.
-
-    Returns:
-        list(job_models.JobModel). Jobs which have retried at least once and
-            haven't finished yet.
-    """
-    threshold_time = (
-        datetime.datetime.utcnow() -
-        datetime.timedelta(0, 0, 0, recency_msecs))
-    shard_state_model_class = mapreduce_model.ShardState
-
-    # TODO(sll): Clean up old jobs so that this query does not have to iterate
-    # over so many elements in a full table scan.
-    recent_job_models = shard_state_model_class.all()
-
-    stuck_jobs = []
-    for job_model in recent_job_models:
-        if job_model.update_time > threshold_time and job_model.retries > 0:
-            stuck_jobs.append(job_model)
-
-    return stuck_jobs
-
-
-class JobCleanupManager(BaseMapReduceOneOffJobManager):
-    """One-off job for cleaning up old auxiliary entities for MR jobs."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        """The entity types this job will handle."""
-        return [
-            mapreduce_model.MapreduceState,
-            mapreduce_model.ShardState
-        ]
-
-    @staticmethod
-    def map(item):
-        """Implements the map function which will clean up jobs that have not
-        finished.
-
-        Args:
-            item: mapreduce_model.MapreduceState or mapreduce_model.ShardState.
-                A shard or job which may still be running.
-        Yields:
-            tuple(str, int). Describes the action taken for the item, and the
-                number of items this action was applied to.
-        """
-        max_start_time_msec = JobCleanupManager.get_mapper_param(
-            MAPPER_PARAM_MAX_START_TIME_MSEC)
-
-        if isinstance(item, mapreduce_model.MapreduceState):
-            if (item.result_status == 'success' and
-                    utils.get_time_in_millisecs(item.start_time) <
-                    max_start_time_msec):
-                item.delete()
-                yield ('mr_state_deleted', 1)
-            else:
-                yield ('mr_state_remaining', 1)
-
-        if isinstance(item, mapreduce_model.ShardState):
-            if (item.result_status == 'success' and
-                    utils.get_time_in_millisecs(item.update_time) <
-                    max_start_time_msec):
-                item.delete()
-                yield ('shard_state_deleted', 1)
-            else:
-                yield ('shard_state_remaining', 1)
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        """Implements the reduce function which logs the results of the mapping
-        function.
-
-        Args:
-            key: str. Describes the action taken by a map call. One of:
-                'mr_state_deleted', 'mr_state_remaining', 'shard_state_deleted',
-                'shard_state_remaining'.
-            stringified_values: list(str). A list where each element is a
-                stringified number, counting the mapped items sharing the key.
-        """
-        values = [ast.literal_eval(v) for v in stringified_values]
-        if key.endswith('_deleted'):
-            logging.warning(
-                'Delete count: %s entities (%s)' % (sum(values), key))
-        else:
-            logging.warning(
-                'Entities remaining count: %s entities (%s)' %
-                (sum(values), key))
 
 
 ABSTRACT_BASE_CLASSES = frozenset([

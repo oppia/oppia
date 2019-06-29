@@ -72,7 +72,7 @@ class InteractionAnswerSummariesMRJobManager(
         Yields:
             dict(str, str). The submitted answer in dict format.
         """
-        if InteractionAnswerSummariesMRJobManager._entity_created_before_job_queued( # pylint: disable=line-too-long
+        if InteractionAnswerSummariesMRJobManager.entity_created_before_job_queued( # pylint: disable=line-too-long
                 item):
             # Output answers submitted to the exploration for this exp version.
             versioned_key = u'%s:%s:%s' % (

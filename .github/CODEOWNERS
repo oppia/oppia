@@ -306,6 +306,7 @@
 
 # Infrastructure.
 /core/controllers/cron*.py @seanlip
+/core/domain/cron_services*.py @seanlip
 /main_cron.py @seanlip
 /main_mail.py @aks681
 /main.py @seanlip @nithusha21
