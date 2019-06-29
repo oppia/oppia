@@ -390,7 +390,12 @@ class DataExtractionQueryHandler(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
         exp_id = self.request.get('exp_id')
-        exp_version = int(self.request.get('exp_version'))
+        exp_version = self.request.get('exp_version')
+        if exp_version == 'None':
+            exp_version = None
+        else:
+            exp_version = int(exp_version)
+
         state_name = self.request.get('state_name')
         num_answers = int(self.request.get('num_answers'))
 
