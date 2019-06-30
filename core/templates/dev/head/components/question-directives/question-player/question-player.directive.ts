@@ -105,7 +105,6 @@ require('domain/question/QuestionBackendApiService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 require('pages/interaction-specs.constants.ts');
-require('services/contextual/UrlService.ts');
 
 oppia.directive('questionPlayer', [
   '$http', 'UrlInterpolationService',
@@ -125,12 +124,12 @@ oppia.directive('questionPlayer', [
         'HASH_PARAM', 'MAX_SCORE_PER_QUESTION',
         '$scope', '$sce', '$rootScope', '$location',
         '$sanitize', '$window', 'HtmlEscaperService',
-        'QuestionBackendApiService', 'UrlService',
+        'QuestionBackendApiService',
         function(
             HASH_PARAM, MAX_SCORE_PER_QUESTION,
             $scope, $sce, $rootScope, $location,
             $sanitize, $window, HtmlEscaperService,
-            QuestionBackendApiService, UrlService) {
+            QuestionBackendApiService) {
           var ctrl = this;
           ctrl.questionPlayerConfig = ctrl.getQuestionPlayerConfig();
           $scope.resultsLoaded = false;
@@ -330,6 +329,10 @@ oppia.directive('questionPlayer', [
           };
 
           ctrl.getColorForScore = function(scorePerSkill) {
+            if (!isInPassOrFailMode()) {
+              // return color green when not in pass or fail mode.
+              return 'rgb(0, 150, 136)';
+            }
             var correctionRate = scorePerSkill.score / scorePerSkill.total;
             if (correctionRate >=
               ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {

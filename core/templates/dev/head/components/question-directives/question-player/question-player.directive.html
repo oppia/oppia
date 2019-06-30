@@ -18,7 +18,7 @@
   <div class="oppia-question-player-results" ng-if="resultsLoaded">
     <div class="oppia-question-player-card question-player-results-header">
       <h3 class="oppia-question-player-header" ng-if="$ctrl.isTestPassed"> Test Complete. Well Done! </h3>
-      <h3 class="oppia-question-player-header" ng-if="!$ctrl.isTestPassed"> Test Failed. </h3>
+      <h3 class="oppia-question-player-header" ng-if="!$ctrl.isTestPassed"> Test Failed. Please Review And Retry. </h3>
       <score-ring score="$ctrl.totalScore"
                   is-test-passed="$ctrl.isTestPassed">
       </score-ring>
@@ -33,10 +33,10 @@
         </colgroup>
         <tr>
           <th class="skill-score-table-headings">
-            <p> Skill Descriptions </p>
+            Skill Descriptions
           </th>
           <th class="skill-score-table-headings">
-            <p> Score </p>
+            Score
           </th>
         </tr>
         <tr ng-repeat="scorePerSkill in $ctrl.scorePerSkillMapping">
@@ -198,10 +198,6 @@
   .oppia-question-player-container .skill-score-table .skill-score-table-headings {
     padding-bottom: 0.5em;
     text-align: center;
-  }
-
-  .oppia-question-player-container .skill-score-table .skill-score-table-headings p {
-    display: inline;
   }
 
   .oppia-question-player-container .skill-score-table .oppia-skill-score-container {
