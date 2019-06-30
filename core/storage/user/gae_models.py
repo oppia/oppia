@@ -94,6 +94,41 @@ class UserSettingsModel(base_models.BaseModel):
         default=None, choices=[
             language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES])
 
+    @staticmethod
+    def export_data(user_id):
+        """Exports the data from UserSettingsModel into dict format for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of the data from UserSettingsModel.
+        """
+        user = UserSettingsModel.get(user_id)
+        return {
+            'email': user.email,
+            'role': user.role,
+            'username': user.username,
+            'normalized_username': user.normalized_username,
+            'last_agreed_to_terms': user.last_agreed_to_terms,
+            'last_started_state_editor_tutorial': (
+                user.last_started_state_editor_tutorial),
+            'last_started_state_translation_tutorial': (
+                user.last_started_state_translation_tutorial),
+            'last_logged_in': user.last_logged_in,
+            'last_edited_an_exploration': user.last_edited_an_exploration,
+            'profile_picture_data_url': user.profile_picture_data_url,
+            'default_dashboard': user.default_dashboard,
+            'creator_dashboard_display_pref': (
+                user.creator_dashboard_display_pref),
+            'user_bio': user.user_bio,
+            'subject_interests': user.subject_interests,
+            'first_contribution_msec': user.first_contribution_msec,
+            'preferred_language_codes': user.preferred_language_codes,
+            'preferred_site_language_code': user.preferred_site_language_code,
+            'preferred_audio_language_code': user.preferred_audio_language_code
+        }
+
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
         """Returns whether or not a given normalized_username is taken.
@@ -296,6 +331,32 @@ class UserSubscriptionsModel(base_models.BaseModel):
     # When the user last checked notifications. May be None.
     last_checked = ndb.DateTimeProperty(default=None)
 
+    @staticmethod
+    def export_data(user_id):
+        """Export UserSubscriptionsModel data as dict for Takeout.
+
+        Args:
+            user_id: str. The ID of the user whose data should be exported.
+
+        Returns:
+            dict. Dictionary of data from UserSubscriptionsModel.
+        """
+        user_model = UserSubscriptionsModel.get(user_id, strict=False)
+
+        if user_model is None:
+            raise Exception('UserSubscriptionsModel does not exist.')
+
+        user_data = {
+            'activity_ids': user_model.activity_ids,
+            'collection_ids': user_model.collection_ids,
+            'general_feedback_thread_ids': (
+                user_model.general_feedback_thread_ids),
+            'creator_ids': user_model.creator_ids,
+            'last_checked': user_model.last_checked
+        }
+
+        return user_data
+
 
 class UserSubscribersModel(base_models.BaseModel):
     """The list of subscribers of the user."""
@@ -383,6 +444,45 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
         if not entity:
             entity = cls(id=user_id)
         return entity
+
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export the user-relevant properties of UserStatsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+                If the user_id is not valid, this method returns None.
+
+        Returns:
+            dict. The user-relevant properties of UserStatsModel in a python
+                dict format.
+        """
+        user_model = UserStatsModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        weekly_stats = user_model.weekly_creator_stats_list
+        weekly_stats_constructed = []
+        for weekly_stat in weekly_stats:
+            for date_key in weekly_stat:
+                stat_dict = weekly_stat[date_key]
+                constructed_stat = {
+                    date_key: {
+                        'average_ratings': stat_dict['average_ratings'],
+                        'total_plays': stat_dict['total_plays']
+                    }
+                }
+                weekly_stats_constructed.append(constructed_stat)
+
+        user_data = {
+            'impact_score': user_model.impact_score,
+            'total_plays': user_model.total_plays,
+            'average_ratings': user_model.average_ratings,
+            'num_ratings': user_model.num_ratings,
+            'weekly_creator_stats_list': weekly_stats_constructed
+        }
+
+        return user_data
 
 
 class ExplorationUserDataModel(base_models.BaseModel):
