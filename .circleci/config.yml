@@ -92,7 +92,7 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
-            cat pwd
+            pwd
             ./cc-test-reporter format-coverage -t coverage.py --prefix .
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
             ./cc-test-reporter upload-coverage
