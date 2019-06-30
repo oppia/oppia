@@ -259,6 +259,7 @@
 /core/templates/dev/head/domain/question/ @aks681
 /core/templates/dev/head/pages/practice-session-page/ @vinitamurthi
 /core/templates/dev/head/pages/review-test-page/ @sophiewu6
+/core/templates/dev/head/services/QuestionsListService.ts @sophiewu6
 /core/templates/dev/head/components/question-directives/question-editor/ @aks681
 /core/templates/dev/head/components/question-directives/questions-list/ @aks681
 /core/templates/dev/head/components/question-directives/modal-templates/ @aks681
@@ -305,6 +306,7 @@
 
 # Infrastructure.
 /core/controllers/cron*.py @seanlip
+/core/domain/cron_services*.py @seanlip
 /main_cron.py @seanlip
 /main_mail.py @aks681
 /main.py @seanlip @nithusha21

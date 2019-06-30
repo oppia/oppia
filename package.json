@@ -31,7 +31,7 @@
     "@types/leaflet": "^1.4.0",
     "@types/mathjax": "0.0.35",
     "@types/mathjs": "^5.0.0",
-    "@types/mousetrap": "^1.6.1",
+    "@types/mousetrap": "^1.6.2",
     "@types/node": "^10.14.6",
     "@types/q": "^1.5.1",
     "@types/select2": "^4.0.48",
