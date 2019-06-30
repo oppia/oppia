@@ -73,7 +73,7 @@ jobs:
       - run:
           name: Generate frontend coverage report
           command: |
-            cat ../karma_coverage_reports/coverage-final.json
+            echo "" >> .coverage
             ./cc-test-reporter sum-coverage ../karma_coverage_reports/coverage-final.json
             ./cc-test-reporter upload-coverage
           when: on_success
