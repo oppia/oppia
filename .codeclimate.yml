@@ -1,0 +1,2 @@
+exclude_patterns:
+- "third_party/*"
