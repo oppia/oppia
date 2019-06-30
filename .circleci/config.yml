@@ -73,9 +73,9 @@ jobs:
       - run:
           name: Generate frontend coverage report
           command: |
-            pip install codeclimate-test-reporter --user
-            ./cc-test-reporter sum-coverage ../karma_coverage_reports/coverage-final.json -d
-            codeclimate-test-reporter --file .coverage
+            sudo pip install codecov
+            codecov --file ../karma_coverage_reports/coverage-final.json
+            cat ../karma_coverage_reports/coverage-final.json
           when: on_success
 
   backend_tests:
@@ -98,8 +98,7 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
-            pip install codeclimate-test-reporter --user
-            codeclimate-test-reporter --file .coverage
+            ./cc-test-reporter format-coverage -t coverage.py -d
             ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -d
             ./cc-test-reporter upload-coverage -d
           when: on_success
