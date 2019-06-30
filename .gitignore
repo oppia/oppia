@@ -15,6 +15,7 @@ core/templates/dev/head/dist/*
 core/tests/.browserstack.env
 node_modules/*
 .coverage*
+coverage.xml
 .viminfo
 .vscode/*
 libpeerconnection.log

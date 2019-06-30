@@ -85,7 +85,7 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     If the cmd fails, raises Exception. Otherwise, returns a string containing
     the concatenation of the stdout and stderr logs.
     """
-    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
+    p = subprocess.Popen(exe, stdout=stdout, stderr=stderr, shell=True)
     last_stdout_str, last_stderr_str = p.communicate()
     last_stdout = last_stdout_str.split('\n')
 
@@ -146,13 +146,13 @@ class TestingTaskSpec(object):
         test_target_flag = '--test_target=%s' % self.test_target
 
         if self.generate_coverage_report:
-            exc_list = [
-                'python', COVERAGE_PATH, 'run', '-p', TEST_RUNNER_PATH,
-                test_target_flag]
+            exe = (
+                'python %s run -p %s %s; python %s xml'
+                % (COVERAGE_PATH, TEST_RUNNER_PATH, test_target_flag, COVERAGE_PATH))
         else:
-            exc_list = ['python', TEST_RUNNER_PATH, test_target_flag]
+            exe = 'python %s %s' % (TEST_RUNNER_PATH, test_target_flag)
 
-        return run_shell_cmd(exc_list)
+        return run_shell_cmd(exe)
 
 
 def _check_all_tasks(tasks):
