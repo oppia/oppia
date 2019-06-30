@@ -12,11 +12,3 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * @fileoverview Constants for learner answer info constants.
- */
-
-
-oppia.constant(
-  'SUBMIT_LEARNER_ANSWER_INFO_URL',
-  '/explorehandler/learner_answer_details/<exploration_id>');
