@@ -1865,24 +1865,25 @@ def is_version_of_draft_valid(exp_id, version):
 def get_user_exploration_data(
         user_id, exploration_id, apply_draft=False, version=None):
     """Returns a description of the given exploration."""
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
     if apply_draft:
-        exploration = get_exp_with_draft_applied(exploration_id, user_id)
+        is_valid_draft_version, exploration = (
+            get_exp_with_draft_applied(exploration_id, user_id))
     else:
         exploration = get_exploration_by_id(exploration_id, version=version)
+        is_valid_draft_version = (
+            is_version_of_draft_valid(
+                exploration_id, exp_user_data.draft_change_list_exp_version)
+            if exp_user_data and exp_user_data.draft_change_list_exp_version
+            else None)
 
     states = {}
     for state_name in exploration.states:
         state_dict = exploration.states[state_name].to_dict()
         states[state_name] = state_dict
-    exp_user_data = user_models.ExplorationUserDataModel.get(
-        user_id, exploration_id)
     draft_changes = (exp_user_data.draft_change_list if exp_user_data
                      and exp_user_data.draft_change_list else None)
-    is_valid_draft_version = (
-        is_version_of_draft_valid(
-            exploration_id, exp_user_data.draft_change_list_exp_version)
-        if exp_user_data and exp_user_data.draft_change_list_exp_version
-        else None)
     draft_change_list_id = (exp_user_data.draft_change_list_id
                             if exp_user_data else 0)
     exploration_email_preferences = (
@@ -1983,39 +1984,6 @@ def create_or_update_draft(
     exp_user_data.put()
 
 
-def try_upgrading_draft_to_exp_version(exp_id, user_id):
-    """Try upgrading draft change list to match the latest exploration version.
-
-    If successful (all changes successfully upgraded), we commit the upgraded
-    draft change list to the ExplorationUserDataModel and increment
-    draft_change_list_exp_version. If not, we do not make any changes to the
-    ExplorationUserDataModel.
-
-    Returns:
-        bool: True if successfully upgraded draft version.
-    """
-    exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
-    exploration = get_exploration_by_id(exp_id)
-    logging.info(
-        'Trying upgrading draft from version %s to version %s.' %
-        (exp_user_data.draft_change_list_exp_version, exploration.version))
-    draft_change_list = [
-        exp_domain.ExplorationChange(change)
-        for change in exp_user_data.draft_change_list]
-    new_draft_change_list = (
-        draft_upgrade_services.try_upgrade_from_version_to_version(
-            draft_change_list,
-            exp_user_data.draft_change_list_exp_version, exploration.version,
-            exp_id))
-    if new_draft_change_list is not None:
-        exp_user_data.draft_change_list = [
-            change.to_dict() for change in new_draft_change_list]
-        exp_user_data.draft_change_list_exp_version = exploration.version
-        exp_user_data.put()
-        return True
-    return False
-
-
 def get_exp_with_draft_applied(exp_id, user_id):
     """If a draft exists for the given user and exploration,
     apply it to the exploration.
@@ -2025,30 +1993,39 @@ def get_exp_with_draft_applied(exp_id, user_id):
         user_id: str. The id of the user whose draft is to be applied.
 
     Returns:
+        bool. True if the draft version is valid.
         Exploration. The exploration domain object.
     """
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = get_exploration_by_id(exp_id)
+    draft_change_list_exp_version = exp_user_data.draft_change_list_exp_version
     if exp_user_data:
         if exp_user_data.draft_change_list:
+            draft_change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in exp_user_data.draft_change_list]
             if (
                     exploration.version >
                     exp_user_data.draft_change_list_exp_version):
                 logging.info(
                     'Exploration and draft versions out of sync, trying '
                     'to upgrade draft version to match exploration\'s.')
-                try_upgrading_draft_to_exp_version(exp_id, user_id)
-                exp_user_data = user_models.ExplorationUserDataModel.get(
-                    user_id, exp_id)
-            draft_change_list = [
-                exp_domain.ExplorationChange(change)
-                for change in exp_user_data.draft_change_list]
+                new_draft_change_list = (
+                    draft_upgrade_services.try_upgrading_draft_to_exp_version(
+                        draft_change_list,
+                        exp_user_data.draft_change_list_exp_version,
+                        exploration.version, exp_id))
+                if new_draft_change_list is not None:
+                    draft_change_list = new_draft_change_list
+                    draft_change_list_exp_version = exploration.version
+    is_version_of_draft_valid_result = is_version_of_draft_valid(
+        exp_id, draft_change_list_exp_version),
+
     return (
+        is_version_of_draft_valid_result,
         apply_change_list(exp_id, draft_change_list)
         if exp_user_data and exp_user_data.draft_change_list and
-        is_version_of_draft_valid(
-            exp_id, exp_user_data.draft_change_list_exp_version)
-        else exploration)
+        is_version_of_draft_valid_result else exploration)
 
 
 def discard_draft(exp_id, user_id):

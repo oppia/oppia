@@ -3655,7 +3655,7 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_get_exp_with_draft_applied_when_draft_exists(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID1)
         self.assertEqual(exploration.init_state.param_changes, [])
-        updated_exp = exp_services.get_exp_with_draft_applied(
+        _, updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID1, self.USER_ID)
         param_changes = updated_exp.init_state.param_changes[0]
         self.assertEqual(param_changes._name, 'myParam')
@@ -3667,14 +3667,14 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
     def test_get_exp_with_draft_applied_when_draft_does_not_exist(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID3)
         self.assertEqual(exploration.init_state.param_changes, [])
-        updated_exp = exp_services.get_exp_with_draft_applied(
+        _, updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID3, self.USER_ID)
         self.assertEqual(updated_exp.init_state.param_changes, [])
 
     def test_get_exp_with_draft_applied_when_draft_version_is_invalid(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID2)
         self.assertEqual(exploration.init_state.param_changes, [])
-        updated_exp = exp_services.get_exp_with_draft_applied(
+        _, updated_exp = exp_services.get_exp_with_draft_applied(
             self.EXP_ID2, self.USER_ID)
         self.assertEqual(updated_exp.init_state.param_changes, [])
 

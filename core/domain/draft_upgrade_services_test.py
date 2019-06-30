@@ -48,7 +48,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
 
     def test_try_upgrade_with_no_version_difference(self):
         self.assertIsNone(
-            draft_upgrade_services.try_upgrade_from_version_to_version(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, 1, self.EXP_ID))
 
     def test_try_upgrade_failure_due_to_unsupported_commit_type(self):
@@ -58,7 +58,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
-            draft_upgrade_services.try_upgrade_from_version_to_version(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
     def test_try_upgrade_failure_due_to_unimplemented_upgrade_methods(self):
@@ -68,7 +68,7 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 2)
         self.assertIsNone(
-            draft_upgrade_services.try_upgrade_from_version_to_version(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID))
 
     def test_try_upgrade_success(self):
@@ -81,6 +81,6 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
             classmethod(lambda cls, changelist: changelist))
         self.assertEqual(exploration.version, 2)
         self.assertEqual(
-            draft_upgrade_services.try_upgrade_from_version_to_version(
+            draft_upgrade_services.try_upgrading_draft_to_exp_version(
                 self.DRAFT_CHANGELIST, 1, exploration.version, self.EXP_ID),
             self.DRAFT_CHANGELIST)
