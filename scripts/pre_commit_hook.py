@@ -78,7 +78,7 @@ def _does_diff_include_package_lock_file_and_no_package_file():
 
     if not err:
         files_changed = out.split('\n')
-        return 'package-lock.json' in files_changed && (
+        return 'package-lock.json' in files_changed and (
             'package.json' not in files_changed)
     else:
         raise ValueError(err)
