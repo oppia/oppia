@@ -1868,8 +1868,13 @@ def get_user_exploration_data(
     exp_user_data = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
     if apply_draft:
-        is_valid_draft_version, exploration = (
+        exploration = (
             get_exp_with_draft_applied(exploration_id, user_id))
+        if exploration is None:
+            exploration = get_exploration_by_id(exploration_id, version=version)
+            is_valid_draft_version = False
+        else:
+            is_valid_draft_version = True
     else:
         exploration = get_exploration_by_id(exploration_id, version=version)
         is_valid_draft_version = (
@@ -1993,8 +1998,8 @@ def get_exp_with_draft_applied(exp_id, user_id):
         user_id: str. The id of the user whose draft is to be applied.
 
     Returns:
-        bool. True if the draft version is valid.
-        Exploration. The exploration domain object.
+        Exploration or None. Returns the exploration domain object with draft
+        applied, or None if draft can not be applied.
     """
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = get_exploration_by_id(exp_id)
@@ -2018,14 +2023,12 @@ def get_exp_with_draft_applied(exp_id, user_id):
                 if new_draft_change_list is not None:
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
-    is_version_of_draft_valid_result = is_version_of_draft_valid(
-        exp_id, draft_change_list_exp_version)
 
     return (
-        is_version_of_draft_valid_result,
         apply_change_list(exp_id, draft_change_list)
         if exp_user_data and exp_user_data.draft_change_list and
-        is_version_of_draft_valid_result else exploration)
+        is_version_of_draft_valid(exp_id, draft_change_list_exp_version)
+        else None)
 
 
 def discard_draft(exp_id, user_id):
