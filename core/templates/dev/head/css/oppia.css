@@ -734,7 +734,7 @@ textarea {
   color: #fff;
 }
 
-.nav > li > a:hover, .nav > li > a:focus {
+.nav-link:hover, .nav-link:focus {
   background: white;
 }
 
@@ -788,9 +788,10 @@ textarea {
   color: #fff;
 }
 
-.navbar-light .container {
+.navbar-light .navbar-container  {
   background: #009688;
   height: 56px;
+  width: 100%;
 }
 
 .navbar-light .uib-dropdown-menu {
@@ -869,7 +870,7 @@ textarea {
 .oppia-dropdown-submenu:hover > .uib-dropdown-menu {
   display: block;
 }
-.oppia-dropdown-submenu.pull-left > .uib-dropdown-menu {
+.oppia-dropdown-submenu.float-left > .uib-dropdown-menu {
   border-radius: 6px 0 6px 6px;
   left: -100%;
   margin-left: 10px;
@@ -1002,7 +1003,7 @@ textarea {
   }
 }
 @media (max-width: 1023px) {
-  div.container .oppia-navbar-hide-on-medium-width {
+  div.navbar-container  .oppia-navbar-hide-on-medium-width {
     display: none;
   }
 }
@@ -2219,8 +2220,8 @@ div#ng-curtain {
   font-size: 0;
 }
 
-.nav > li > a.oppia-navbar-tab,
-.nav > li > div.oppia-navbar-tab {
+.nav-link.oppia-navbar-tab,
+.nav-item > div.oppia-navbar-tab {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 14px;
   padding: 17px 12px 10px 12px;
@@ -2369,7 +2370,7 @@ div#ng-curtain {
   border-left-color: #fff;
 }
 
-.oppia-dropdown-submenu.pull-left {
+.oppia-dropdown-submenu.float-left {
   float: none;
 }
 
