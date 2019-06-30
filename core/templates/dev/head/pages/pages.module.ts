@@ -23,13 +23,16 @@ import { AdminPageModule } from 'pages/admin-page/admin-page.module.ts';
 import { CreatorDashboardPageModule } from
   'pages/creator-dashboard-page/creator-dashboard-page.module.ts';
 import { DonatePageModule } from 'pages/donate-page/donate-page.module.ts';
+import { EmailDashboardPagesModule } from
+  'pages/email-dashboard-pages/email-dashboard-pages.module.ts';
 
 @NgModule({
   imports: [
     AboutPageModule,
     AdminPageModule,
     CreatorDashboardPageModule,
-    DonatePageModule
+    DonatePageModule,
+    EmailDashboardPagesModule
   ]
 })
 export class PagesModule {}
@@ -38,10 +41,12 @@ require('pages/about-page/about-page.module.ts');
 require('pages/admin-page/admin-page.module.ts');
 require('pages/creator-dashboard-page/creator-dashboard-page.module.ts');
 require('pages/donate-page/donate-page.module.ts');
+require('pages/email-dashboard-pages/email-dashboard-pages.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
   'adminPageModule',
   'creatorDashboardPageModule',
-  'donatePageModule'
+  'donatePageModule',
+  'emailDashboardPagesModule'
 ]);
