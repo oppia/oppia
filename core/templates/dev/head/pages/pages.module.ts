@@ -26,6 +26,8 @@ import { DonatePageModule } from 'pages/donate-page/donate-page.module.ts';
 import { EmailDashboardPagesModule } from
   'pages/email-dashboard-pages/email-dashboard-pages.module.ts';
 import { ErrorPageModule } from 'pages/error-pages/error-page.module.ts';
+import { LearnerDashboardPageModule } from
+  'pages/learner-dashboard-page/learner-dashboard-page.module.ts';
 import { StewardsLandingPageModule } from
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts';
 import { TopicLandingPageModule } from
@@ -39,6 +41,7 @@ import { TopicLandingPageModule } from
     DonatePageModule,
     EmailDashboardPagesModule,
     ErrorPageModule,
+    LearnerDashboardPageModule,
     StewardsLandingPageModule,
     TopicLandingPageModule
   ]
@@ -54,6 +57,7 @@ require('pages/error-pages/error-page.module.ts');
 require(
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts');
 require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
+require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
@@ -62,6 +66,7 @@ angular.module('pages', [
   'donatePageModule',
   'emailDashboardPagesModule',
   'errorPageModule',
+  'learnerDashboardPageModule',
   'stewardsLandingPageModule',
   'topicLandingPageModule'
 ]);

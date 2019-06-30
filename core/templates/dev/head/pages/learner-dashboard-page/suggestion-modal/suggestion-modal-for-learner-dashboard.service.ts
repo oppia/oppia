@@ -19,58 +19,57 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/SuggestionModalService.ts');
 
-var oppia = require('AppInit.ts').module;
+angular.module('learnerDashboardPageModule').factory(
+  'SuggestionModalForLearnerDashboardService', [
+    '$rootScope', '$uibModal', 'UrlInterpolationService',
+    function($rootScope, $uibModal, UrlInterpolationService) {
+      var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
+        '/pages/learner-dashboard-page/suggestion-modal/' +
+        'learner-dashboard-suggestion-modal.directive.html'
+      );
 
-oppia.factory('SuggestionModalForLearnerDashboardService', [
-  '$rootScope', '$uibModal', 'UrlInterpolationService',
-  function($rootScope, $uibModal, UrlInterpolationService) {
-    var _templateUrl = UrlInterpolationService.getDirectiveTemplateUrl(
-      '/pages/learner-dashboard-page/suggestion-modal/' +
-      'learner-dashboard-suggestion-modal.directive.html'
-    );
-
-    var _showEditStateContentSuggestionModal = function(
-        newContent, oldContent, description) {
-      $uibModal.open({
-        templateUrl: _templateUrl,
-        backdrop: true,
-        resolve: {
-          newContent: function() {
-            return newContent;
+      var _showEditStateContentSuggestionModal = function(
+          newContent, oldContent, description) {
+        $uibModal.open({
+          templateUrl: _templateUrl,
+          backdrop: true,
+          resolve: {
+            newContent: function() {
+              return newContent;
+            },
+            oldContent: function() {
+              return oldContent;
+            },
+            description: function() {
+              return description;
+            }
           },
-          oldContent: function() {
-            return oldContent;
-          },
-          description: function() {
-            return description;
-          }
-        },
-        controller: [
-          '$scope', '$uibModalInstance', 'SuggestionModalService',
-          'description', 'newContent', 'oldContent',
-          function($scope, $uibModalInstance, SuggestionModalService,
-              description, newContent, oldContent) {
-            $scope.newContent = newContent;
-            $scope.oldContent = oldContent;
-            $scope.description = description;
-            $scope.cancel = function() {
-              SuggestionModalService.cancelSuggestion($uibModalInstance);
-            };
-          }
-        ]
-      });
-    };
+          controller: [
+            '$scope', '$uibModalInstance', 'SuggestionModalService',
+            'description', 'newContent', 'oldContent',
+            function($scope, $uibModalInstance, SuggestionModalService,
+                description, newContent, oldContent) {
+              $scope.newContent = newContent;
+              $scope.oldContent = oldContent;
+              $scope.description = description;
+              $scope.cancel = function() {
+                SuggestionModalService.cancelSuggestion($uibModalInstance);
+              };
+            }
+          ]
+        });
+      };
 
-    return {
-      showSuggestionModal: function(suggestionType, extraParams) {
-        if (suggestionType === 'edit_exploration_state_content') {
-          _showEditStateContentSuggestionModal(
-            extraParams.newContent,
-            extraParams.oldContent,
-            extraParams.description
-          );
+      return {
+        showSuggestionModal: function(suggestionType, extraParams) {
+          if (suggestionType === 'edit_exploration_state_content') {
+            _showEditStateContentSuggestionModal(
+              extraParams.newContent,
+              extraParams.oldContent,
+              extraParams.description
+            );
+          }
         }
-      }
-    };
-  }
-]);
+      };
+    }
+  ]);
