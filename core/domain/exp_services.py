@@ -2019,7 +2019,7 @@ def get_exp_with_draft_applied(exp_id, user_id):
                     draft_change_list = new_draft_change_list
                     draft_change_list_exp_version = exploration.version
     is_version_of_draft_valid_result = is_version_of_draft_valid(
-        exp_id, draft_change_list_exp_version),
+        exp_id, draft_change_list_exp_version)
 
     return (
         is_version_of_draft_valid_result,
