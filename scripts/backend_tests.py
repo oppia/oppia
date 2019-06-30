@@ -304,6 +304,8 @@ def main():
 
     import dev_appserver
     dev_appserver.fix_sys_path()
+    print sys.executable
+    print "\n".join(sys.path)
 
     parsed_args = _PARSER.parse_args()
     if parsed_args.test_target and parsed_args.test_path:
