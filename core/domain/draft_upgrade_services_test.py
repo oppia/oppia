@@ -36,11 +36,11 @@ class DraftUpgradeUnitTests(test_utils.GenericTestBase):
         'from_version': '0',
         'to_version': '1'
     })]
-    DRAFT_CHANGELIST = [{
+    DRAFT_CHANGELIST = [exp_domain.ExplorationChange({
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
         'old_value': None,
-        'new_value': 'Updated title'}]
+        'new_value': 'Updated title'})]
 
     def setUp(self):
         super(DraftUpgradeUnitTests, self).setUp()

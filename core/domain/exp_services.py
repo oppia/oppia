@@ -1987,9 +1987,9 @@ def try_upgrading_draft_to_exp_version(exp_id, user_id):
     """Try upgrading draft change list to match the latest exploration version.
 
     If successful (all changes successfully upgraded), we commit the upgraded
-    draft change list to the ExplorationuserDataModel and increment
+    draft change list to the ExplorationUserDataModel and increment
     draft_change_list_exp_version. If not, we do not make any changes to the
-    ExplorationuserDataModel.
+    ExplorationUserDataModel.
 
     Returns:
         bool: True if successfully upgraded draft version.
@@ -1999,16 +1999,19 @@ def try_upgrading_draft_to_exp_version(exp_id, user_id):
     logging.info(
         'Trying upgrading draft from version %s to version %s.' %
         (exp_user_data.draft_change_list_exp_version, exploration.version))
+    draft_change_list = [
+        exp_domain.ExplorationChange(change)
+        for change in exp_user_data.draft_change_list]
     new_draft_change_list = (
         draft_upgrade_services.try_upgrade_from_version_to_version(
-            exp_user_data.draft_change_list,
+            draft_change_list,
             exp_user_data.draft_change_list_exp_version, exploration.version,
             exp_id))
-    if new_draft_change_list:
-        exp_user_data.draft_change_list = new_draft_change_list
+    if new_draft_change_list is not None:
+        exp_user_data.draft_change_list = [
+            change.to_dict() for change in new_draft_change_list]
         exp_user_data.draft_change_list_exp_version = exploration.version
         exp_user_data.put()
-        logging.info('successfully upgraded all drafts.')
         return True
     return False
 

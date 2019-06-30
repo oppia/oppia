@@ -16,6 +16,7 @@
 
 """Commands that can be used to upgrade draft to newer Exploration versions."""
 import logging
+import utils
 
 from core.domain import exp_domain
 from core.platform import models
@@ -26,31 +27,38 @@ from core.platform import models
 
 
 def try_upgrade_from_version_to_version(
-        draft_change_list, from_version, to_version, exp_id):
-    """Try upgrading an ExplorationChange domain object by calling convert
-    functions for a list of commits.
+        draft_change_list, current_draft_version, to_exp_version, exp_id):
+    """Try upgrading a list of ExplorationChange domain objects.
 
-    For now, this handles only the scenario where commits_list contains a
-    single commit that migrates the state schema.
+    For now, this handles only the scenario where all commits between
+    current_draft_version and to_exp_version are that migrate the state schema.
 
     Args:
-        draft_change_list: list(dict). Each dict can be parsed as an
-            ExplorationChange domain object.
-        from_version: int. Current draft version.
-        to_version: int. Target exploration version.
-        exp_id: string. Exploration id.
+        draft_change_list: list(ExplorationChange). The list of
+            ExplorationChange domain objects to upgrade.
+        current_draft_version: int. Current draft version.
+        to_exp_version: int. Target exploration version.
+        exp_id: str. Exploration id.
+
     Returns:
-        draft_change_list: list(dict). Upgraded change list. None if upgrade
-        failed.
+        list(ExplorationChange) or None. A list of ExplorationChange domain
+        objects after upgrade or None if upgrade fails.
+
+    Raises:
+        InvalidInputException.
     """
-    if from_version >= to_version:
+    if current_draft_version > to_exp_version:
+        raise utils.InvalidInputException(
+            'Current draft version is greater than the exploration version.')
+    if current_draft_version == to_exp_version:
         return
-    exp_versions = range(from_version + 1, to_version + 1)
-    commits_list = [
-        exp_models.ExplorationCommitLogEntryModel.get_commit(
-            exp_id, exp_version) for exp_version in exp_versions]
+
+    exp_versions = range(current_draft_version + 1, to_exp_version + 1)
+    commits_list = (
+        exp_models.ExplorationCommitLogEntryModel.get_multi(
+            exp_id, exp_versions))
     upgrade_times = 0
-    while from_version + upgrade_times < to_version:
+    while current_draft_version + upgrade_times < to_exp_version:
         commit = commits_list[upgrade_times]
         if (
                 len(commit.commit_cmds) == 1 and
@@ -58,23 +66,17 @@ def try_upgrade_from_version_to_version(
                 exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION):
 
             conversion_fn_name = '_convert_v%s_dict_to_v%s_dict' % (
-                (from_version + upgrade_times),
-                (from_version + upgrade_times + 1))
+                (current_draft_version + upgrade_times),
+                (current_draft_version + upgrade_times + 1))
             if not hasattr(DraftUpgradeUtil, conversion_fn_name):
                 logging.warning('%s is not implemented' % conversion_fn_name)
-                return None
+                return
             conversion_fn = getattr(DraftUpgradeUtil, conversion_fn_name)
             draft_change_list = conversion_fn(draft_change_list)
-            if not draft_change_list:
-                logging.warning(
-                    'Cannot upgrade due to %s is not defined' %
-                    conversion_fn_name)
-                return
         else:
             return
         upgrade_times += 1
-    if from_version + upgrade_times >= to_version:
-        return draft_change_list
+    return draft_change_list
 
 
 class DraftUpgradeUtil(object):
