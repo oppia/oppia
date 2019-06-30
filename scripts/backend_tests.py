@@ -368,11 +368,6 @@ def main():
         raise Exception(
             '%s errors, %s failures' % (total_errors, total_failures))
 
-    # Generate xml.
-    if parsed_args.generate_coverage_report:
-        generate_xml = 'python %s xml' % COVERAGE_PATH
-        run_shell_cmd(generate_xml.split())
-
 
 if __name__ == '__main__':
     main()
