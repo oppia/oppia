@@ -34,7 +34,9 @@ import sys
 
 
 def _install_hook():
-    """Installs the pre_commit_hook script. It ensures that oppia is root."""
+    """Installs the pre_commit_hook script. It ensures that oppia/ is the
+    root folder.
+    """
     oppia_dir = os.getcwd()
     hooks_dir = os.path.join(oppia_dir, '.git', 'hooks')
     pre_commit_file = os.path.join(hooks_dir, 'pre-commit')
@@ -118,12 +120,12 @@ def main():
         _install_hook()
         sys.exit(0)
 
-    print 'Running pre-commit check for package-lock.json ..'
+    print 'Running pre-commit check for package-lock.json ...'
     if _does_diff_include_package_lock_file_and_no_package_file():
         print ('This commit only changes package-lock.json without '
                'any change in package.json. Therefore changes in '
                'package-lock.json will be automatically reverted.')
-        print 'Reverting changes in package-lock.json ..'
+        print 'Reverting changes in package-lock.json ...'
         _revert_changes_in_package_lock_file()
     sys.exit(0)
 
