@@ -16,7 +16,5 @@
  * @fileoverview Directive scripts for the Oppia profile page.
  */
 
-require('App.ts');
-
 require('pages/OppiaFooterDirective.ts');
 require('pages/profile-page/profile-page.controller.ts');

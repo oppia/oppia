@@ -17,8 +17,6 @@
  *               help tab in the navbar.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.constant(
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL',
   'explorationTitleInputFocusLabel');

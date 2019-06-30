@@ -16,8 +16,6 @@
  * @fileoverview Directive scripts for the donate page.
  */
 
-require('App.ts');
-
 require('pages/OppiaFooterDirective.ts');
 
 require('pages/donate-page/donate-page.controller.ts');

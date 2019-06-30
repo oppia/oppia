@@ -21,8 +21,6 @@ require('rich_text_components/richTextComponentsRequires.ts');
 require('services/HtmlEscaperService.ts');
 require('services/RteHelperService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
   'HtmlEscaperService',

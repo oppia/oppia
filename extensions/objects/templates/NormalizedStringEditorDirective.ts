@@ -18,8 +18,6 @@
 
 // This is a copy of the UnicodeStringEditor.
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('normalizedStringEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {

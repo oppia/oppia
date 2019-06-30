@@ -16,10 +16,10 @@
 
 """Commands that can be used to upgrade draft to newer Exploration versions."""
 import logging
-import utils
 
 from core.domain import exp_domain
 from core.platform import models
+import utils
 
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user

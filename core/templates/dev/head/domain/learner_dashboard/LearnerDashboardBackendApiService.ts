@@ -17,8 +17,6 @@
  * backend.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('LearnerDashboardBackendApiService', ['$http', function($http) {
   var _fetchLearnerDashboardData = function() {
     return $http.get('/learnerdashboardhandler/data');

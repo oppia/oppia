@@ -34,8 +34,7 @@ require(
 require('pages/topic-editor-page/services/topic-editor-state.service.ts');
 require('services/AlertsService.ts');
 require('services/contextual/UrlService.ts');
-
-var oppia = require('AppInit.ts').module;
+require('services/QuestionsListService.ts');
 
 oppia.directive('questionsTab', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -48,26 +47,24 @@ oppia.directive('questionsTab', [
         '$scope', '$q', '$uibModal', '$window',
         'AlertsService', 'TopicEditorStateService', 'QuestionCreationService',
         'UrlService', 'EditableQuestionBackendApiService',
-        'EditableSkillBackendApiService',
-        'MisconceptionObjectFactory', 'QuestionObjectFactory',
+        'EditableSkillBackendApiService', 'MisconceptionObjectFactory',
+        'QuestionObjectFactory', 'QuestionsListService',
         'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'StateEditorService',
         'QuestionUndoRedoService', 'UndoRedoService',
         'NUM_QUESTIONS_PER_PAGE', function(
             $scope, $q, $uibModal, $window,
             AlertsService, TopicEditorStateService, QuestionCreationService,
             UrlService, EditableQuestionBackendApiService,
-            EditableSkillBackendApiService,
-            MisconceptionObjectFactory, QuestionObjectFactory,
+            EditableSkillBackendApiService, MisconceptionObjectFactory,
+            QuestionObjectFactory, QuestionsListService,
             EVENT_QUESTION_SUMMARIES_INITIALIZED, StateEditorService,
             QuestionUndoRedoService, UndoRedoService,
             NUM_QUESTIONS_PER_PAGE) {
           $scope.currentPage = 0;
-          $scope.getQuestionSummaries =
-            TopicEditorStateService.getQuestionSummaries;
-          $scope.fetchQuestionSummaries =
-            TopicEditorStateService.fetchQuestionSummaries;
+          $scope.getQuestionSummariesAsync =
+            QuestionsListService.getQuestionSummariesAsync;
           $scope.isLastQuestionBatch =
-            TopicEditorStateService.isLastQuestionBatch;
+            QuestionsListService.isLastQuestionBatch;
 
           var _initTab = function() {
             $scope.question = null;

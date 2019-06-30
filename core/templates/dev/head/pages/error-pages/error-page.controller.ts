@@ -19,8 +19,6 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PageTitleService.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('errorPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

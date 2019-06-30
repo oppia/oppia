@@ -17,8 +17,6 @@
  */
 
 // Rules Service for DragAndDropSortInput interaction.
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('DragAndDropSortInputRulesService', [function() {
   var checkEquality = function(answer, inputs) {
     for (var i = 0; i < answer.length; i++) {

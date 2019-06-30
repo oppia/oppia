@@ -17,8 +17,6 @@
  * domain objects.
  */
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('ExplorationDraftObjectFactory', [
   function() {
     var ExplorationDraft = function(draftChanges, draftChangeListId) {

@@ -19,8 +19,6 @@
 // Individual value generator directives can be found in
 // extensions/value_generators/templates.
 
-var oppia = require('AppInit.ts').module;
-
 oppia.directive('valueGeneratorEditor', ['$compile', function($compile) {
   return {
     restrict: 'E',

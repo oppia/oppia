@@ -20,8 +20,6 @@ require('domain/utilities/UrlInterpolationService.ts');
 
 require('domain/topic/topic-domain.constants.ts');
 
-var oppia = require('AppInit.ts').module;
-
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'UrlInterpolationService',
   'EDITABLE_TOPIC_DATA_URL_TEMPLATE', 'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
@@ -68,31 +66,6 @@ oppia.factory('EditableTopicBackendApiService', [
           response.data.canonical_story_summary_dicts);
         if (successCallback) {
           successCallback(canonicalStorySummaries);
-        }
-      }, function(errorResponse) {
-        if (errorCallback) {
-          errorCallback(errorResponse.data);
-        }
-      });
-    };
-
-    var _fetchQuestions = function(
-        topicId, cursor, successCallback, errorCallback) {
-      var questionsDataUrl = UrlInterpolationService.interpolateUrl(
-        TOPIC_EDITOR_QUESTION_URL_TEMPLATE, {
-          topic_id: topicId,
-          cursor: cursor ? cursor : ''
-        });
-
-      $http.get(questionsDataUrl).then(function(response) {
-        var questionSummaries = angular.copy(
-          response.data.question_summary_dicts);
-        var nextCursor = response.data.next_start_cursor;
-        if (successCallback) {
-          successCallback({
-            questionSummaries: questionSummaries,
-            nextCursor: nextCursor
-          });
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -178,12 +151,6 @@ oppia.factory('EditableTopicBackendApiService', [
       fetchStories: function(topicId) {
         return $q(function(resolve, reject) {
           _fetchStories(topicId, resolve, reject);
-        });
-      },
-
-      fetchQuestions: function(topicId, cursor) {
-        return $q(function(resolve, reject) {
-          _fetchQuestions(topicId, cursor, resolve, reject);
         });
       },
 

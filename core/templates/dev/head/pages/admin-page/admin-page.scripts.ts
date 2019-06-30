@@ -16,6 +16,4 @@
  * @fileoverview Directives required in admin panel.
  */
 
-require('App.ts');
-
 require('pages/admin-page/admin-page.directive.ts');
