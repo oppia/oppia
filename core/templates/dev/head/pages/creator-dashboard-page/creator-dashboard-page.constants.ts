@@ -16,15 +16,13 @@
  * @fileoverview Constants for the creator dashboard.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('creatorDashboardPageModule').constant(
   'EXPLORATION_DROPDOWN_STATS', {
     OPEN_FEEDBACK: 'open_feedback'
   }
 );
 
-oppia.constant(
+angular.module('creatorDashboardPageModule').constant(
   'EXPLORATIONS_SORT_BY_KEYS', {
     TITLE: 'title',
     RATING: 'ratings',
@@ -34,7 +32,7 @@ oppia.constant(
   }
 );
 
-oppia.constant(
+angular.module('creatorDashboardPageModule').constant(
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', {
     TITLE: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TITLE',
     RATING: 'I18N_DASHBOARD_EXPLORATIONS_SORT_BY_AVERAGE_RATING',
@@ -44,14 +42,14 @@ oppia.constant(
   }
 );
 
-oppia.constant(
+angular.module('creatorDashboardPageModule').constant(
   'SUBSCRIPTION_SORT_BY_KEYS', {
     USERNAME: 'subscriber_username',
     IMPACT: 'subscriber_impact'
   }
 );
 
-oppia.constant(
+angular.module('creatorDashboardPageModule').constant(
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS', {
     USERNAME: 'Username',
     IMPACT: 'Impact'

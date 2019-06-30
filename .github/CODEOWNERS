@@ -335,6 +335,7 @@
 /core/domain/change_domain.py @seanlip
 /core/templates/dev/head/tests/ @seanlip
 /core/templates/dev/head/domain/utilities/ @DubeySandeep
+/core/templates/dev/head/pages/pages.module.ts @vojtechjelinek
 /schema_utils*.py @seanlip
 /utils*.py @aks681
 

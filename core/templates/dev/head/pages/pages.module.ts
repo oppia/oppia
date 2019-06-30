@@ -20,19 +20,24 @@ import { NgModule } from '@angular/core';
 
 import { AboutPageModule } from 'pages/about-page/about-page.module.ts';
 import { AdminPageModule } from 'pages/admin-page/admin-page.module.ts';
+import { CreatorDashboardPageModule } from
+  'pages/creator-dashboard-page/creator-dashboard-page.module.ts';
 
 @NgModule({
   imports: [
     AboutPageModule,
-    AdminPageModule
+    AdminPageModule,
+    CreatorDashboardPageModule
   ]
 })
 export class PagesModule {}
 
 require('pages/about-page/about-page.module.ts');
 require('pages/admin-page/admin-page.module.ts');
+require('pages/creator-dashboard-page/creator-dashboard-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
-  'adminPageModule'
+  'adminPageModule',
+  'creatorDashboardPageModule'
 ]);
