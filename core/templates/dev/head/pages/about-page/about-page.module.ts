@@ -13,11 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the about page.
+ * @fileoverview Module for the about page.
  */
 
-require('App.ts');
+import { NgModule } from '@angular/core';
 
-require('base_components/BaseContentDirective.ts');
-require('pages/about-page/about-page.module.ts');
-require('pages/about-page/about-page.controller.ts');
+@NgModule({})
+export class AboutPageModule {}
+
+angular.module('aboutPageModule', []);
