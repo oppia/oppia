@@ -69,11 +69,10 @@
          ng-class="{'oppia-learner-dashboard-mobile-mode': $ctrl.checkMobileView()}"
          style="min-width: 200px;">
       <md-card class="oppia-learner-dashboard-main-menu">
-        <h4 class="oppia-learner-dashboard-menu"
+        <h4 class="oppia-learner-dashboard-menu dropdown-toggle"
             ng-class="{'oppia-learner-dashboard-section-active': $ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST}"
             ng-click="$ctrl.setActiveSection($ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST)">
           <span translate="<[$ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST]>"></span>
-          <span class="caret"></span>
         </h4>
         <div ng-show="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.PLAYLIST" class="menu-sub-section">
           <div class="oppia-learner-dashboard-submenu"
@@ -87,11 +86,11 @@
                translate="I18N_DASHBOARD_COLLECTIONS">
           </div>
         </div>
-        <h4 class="oppia-learner-dashboard-menu protractor-test-incomplete-section"
+        <h4 class="oppia-learner-dashboard-menu protractor-test-incomplete-section dropdown-toggle"
             ng-class="{'oppia-learner-dashboard-section-active': $ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE}"
             ng-click="$ctrl.setActiveSection($ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE)">
           <span translate="<[$ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE]>"></span>
-          <span class="caret"></span>
+
         </h4>
         <div ng-show="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE" class="menu-sub-section">
           <div class="oppia-learner-dashboard-submenu protractor-test-incomplete-exp-section"
@@ -105,11 +104,11 @@
                translate="I18N_DASHBOARD_COLLECTIONS">
           </div>
         </div>
-        <h4 class="oppia-learner-dashboard-menu protractor-test-completed-section"
+        <h4 class="oppia-learner-dashboard-menu protractor-test-completed-section dropdown-toggle"
             ng-class="{'oppia-learner-dashboard-section-active': $ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED}"
             ng-click="$ctrl.setActiveSection($ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED)">
           <span translate="<[$ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED]>"></span>
-          <span class="caret"></span>
+
         </h4>
         <div ng-show="$ctrl.activeSection === $ctrl.LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED" class="menu-sub-section">
           <div class="oppia-learner-dashboard-submenu protractor-test-completed-exp-section"

@@ -986,6 +986,11 @@ textarea {
   margin-right: 5px;
   margin-left: 5px;
   text-transform: uppercase;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-radius: 4px;
 }
 .btn.oppia-navbar-button:hover,
 .btn.oppia-navbar-button:focus {
@@ -2187,6 +2192,7 @@ div#ng-curtain {
   height: 56px;
   line-height: 20px;
   margin-left: -10px;
+  padding: 0px;
 }
 
 .oppia-logo {
@@ -2219,6 +2225,16 @@ div#ng-curtain {
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
 }
+
+.nav-link {
+  padding-left: 20px;
+  padding-right:  20px;
+  padding-top:  3px;
+  padding-bottom: 3px;
+  font-size: 14px;
+
+}
+
 
 .nav-link.oppia-navbar-tab,
 .nav-item > div.oppia-navbar-tab {
@@ -2708,7 +2724,7 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
 }
 
-.oppia-info-card-exploration-contributors-profile li a:focus .img-circle {
+.oppia-info-card-exploration-contributors-profile li a:focus .rounded-circle {
   outline: 1px dotted #212121;
   outline: auto 5px -webkit-focus-ring-color;
 }

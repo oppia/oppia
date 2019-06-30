@@ -38,12 +38,11 @@
             <div class="oppia-navbar-profile-picture-container" ng-cloak>
               <div ng-if="$ctrl.profilePictureDataUrl">
                 <img ng-src="<[$ctrl.profilePictureDataUrl]>"
-                     class="oppia-navbar-profile-picture img-circle">
-                <span class="caret" style="margin-top: 10px;"></span>
+                     class="oppia-navbar-profile-picture img-circle dropdown-toggle">
+
               </div>
-              <div ng-if="!$ctrl.profilePictureDataUrl">
+              <div ng-if="!$ctrl.profilePictureDataUrl" class="dropdown-toggle">
                 <i class="material-icons md-40" style="margin-top: -1px;">&#xE853;</i>
-                <span class="caret" style="margin-top: -26px;"></span>
               </div>
 
               <div style="display: none;" class="oppia-user-email">
