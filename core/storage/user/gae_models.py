@@ -445,6 +445,45 @@ class UserStatsModel(base_models.BaseMapReduceBatchResultsModel):
             entity = cls(id=user_id)
         return entity
 
+    @staticmethod
+    def export_data(user_id):
+        """(Takeout) Export the user-relevant properties of UserStatsModel.
+
+        Args:
+            user_id: str. The user_id denotes which user's data to extract.
+                If the user_id is not valid, this method returns None.
+
+        Returns:
+            dict. The user-relevant properties of UserStatsModel in a python
+                dict format.
+        """
+        user_model = UserStatsModel.get(user_id, strict=False)
+        if not user_model:
+            return None
+
+        weekly_stats = user_model.weekly_creator_stats_list
+        weekly_stats_constructed = []
+        for weekly_stat in weekly_stats:
+            for date_key in weekly_stat:
+                stat_dict = weekly_stat[date_key]
+                constructed_stat = {
+                    date_key: {
+                        'average_ratings': stat_dict['average_ratings'],
+                        'total_plays': stat_dict['total_plays']
+                    }
+                }
+                weekly_stats_constructed.append(constructed_stat)
+
+        user_data = {
+            'impact_score': user_model.impact_score,
+            'total_plays': user_model.total_plays,
+            'average_ratings': user_model.average_ratings,
+            'num_ratings': user_model.num_ratings,
+            'weekly_creator_stats_list': weekly_stats_constructed
+        }
+
+        return user_data
+
 
 class ExplorationUserDataModel(base_models.BaseModel):
     """User-specific data pertaining to a specific exploration.
