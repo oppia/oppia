@@ -312,7 +312,7 @@ oppia.directive('questionPlayer', [
               Object.keys(ctrl.scorePerSkillMapping).forEach(function(skillId) {
                 var correctionRate = ctrl.scorePerSkillMapping[skillId].score /
                   ctrl.scorePerSkillMapping[skillId].total;
-                if (correctionRate < 
+                if (correctionRate <
                   ctrl.questionPlayerConfig.questionPlayerMode.passCutoff) {
                   isTestPassed = false;
                 }
