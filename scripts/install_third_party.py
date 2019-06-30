@@ -14,21 +14,20 @@
 
 """Installation script for Oppia third-party libraries."""
 
+import StringIO
 import contextlib
 import json
 import os
-import shutil
-import StringIO
 import sys
 import tarfile
 import urllib
 import urllib2
 import zipfile
 
-import common
+import common  # pylint: disable=relative-import
 
-#These two lines prevent a "IOError: [Errno socket error]
-#[Errno -2] Name or service not known" error
+# These two lines prevent a "IOError: [Errno socket error]
+# [Errno -2] Name or service not known" error
 # in urllib.urlretrieve, if the user is behind a proxy.
 if 'VAGRANT' in os.environ:
     os.environ['http_proxy'] = ''
@@ -75,6 +74,7 @@ DOWNLOAD_FORMATS_TO_MANIFEST_KEYS = {
     }
 }
 
+
 def download_files(source_url_root, target_dir, source_filenames):
     """Downloads a group of files and saves them to a given directory.
 
@@ -92,10 +92,12 @@ def download_files(source_url_root, target_dir, source_filenames):
     common.ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
-            print 'Downloading file %s to %s' % (filename, target_dir)
+            print 'Downloading file %s to %s ...' % (filename, target_dir)
             urllib.urlretrieve(
                 '%s/%s' % (source_url_root, filename),
-                os.path.join(target_dir, filename))
+                filename=os.path.join(target_dir, filename))
+
+            print 'Download of %s succeeded.' % filename
 
 
 def download_and_unzip_files(
@@ -116,15 +118,15 @@ def download_and_unzip_files(
         in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print 'Downloading and unzipping file %s to %s' % (
+        print 'Downloading and unzipping file %s to %s ...' % (
             zip_root_name, target_parent_dir)
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
+        urllib.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
-                zfile.extractall(target_parent_dir)
+                zfile.extractall(path=target_parent_dir)
             os.remove(TMP_UNZIP_PATH)
         except Exception:
             if os.path.exists(TMP_UNZIP_PATH):
@@ -137,12 +139,14 @@ def download_and_unzip_files(
             # by zipfile.ZipFile.
             file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
-                zfile.extractall(target_parent_dir)
+                zfile.extractall(path=target_parent_dir)
 
         # Rename the target directory.
         os.rename(
             os.path.join(target_parent_dir, zip_root_name),
             os.path.join(target_parent_dir, target_root_name))
+
+        print 'Download of %s succeeded.' % zip_root_name
 
 
 def download_and_untar_files(
@@ -163,12 +167,13 @@ def download_and_untar_files(
         in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print 'Downloading and untarring file %s to %s' % (
+        print 'Downloading and untarring file %s to %s ...' % (
             tar_root_name, target_parent_dir)
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
-        with contextlib.closing(tarfile.open(TMP_UNZIP_PATH, 'r:gz')) as tfile:
+        urllib.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        with contextlib.closing(tarfile.open(
+            name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
 
@@ -176,6 +181,8 @@ def download_and_untar_files(
         os.rename(
             os.path.join(target_parent_dir, tar_root_name),
             os.path.join(target_parent_dir, target_root_name))
+
+        print 'Download of %s succeeded.' % tar_root_name
 
 
 def get_file_contents(filepath, mode='r'):
@@ -189,7 +196,7 @@ def return_json(filepath):
     Args:
         filepath: the path to the json file.
     Return:
-        a parsed json objects
+        a parsed json objects.
     """
     response = get_file_contents(filepath)
     return json.loads(response)
@@ -200,14 +207,14 @@ def test_manifest_syntax(dependency_type, dependency_dict):
 
     Display warning message when there is an error and terminate the program.
     Args:
-      dependency_type: dependency download format.
-      dependency_dict: manifest.json dependency dict
+      dependency_type: str. Dependency download format.
+      dependency_dict: dict. manifest.json dependency dict.
     """
     keys = dependency_dict.keys()
     mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['mandatory_keys']
     # Optional keys requires exactly one member of the pair
-    # to be available as a key in the dependency_dict
+    # to be available as a key in the dependency_dict.
     optional_key_pairs = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:
@@ -316,26 +323,10 @@ def download_manifest_files(filepath):
                     dependency_tar_root_name, dependency_target_root_name)
 
 
-MATHJAX_REV = '2.6.0'
-MATHJAX_ROOT_NAME = 'MathJax-%s' % MATHJAX_REV
-MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
-MATHJAX_DIR_PREFIX = os.path.join(
-    THIRD_PARTY_STATIC_DIR, MATHJAX_TARGET_ROOT_NAME)
-MATHJAX_SUBDIRS_TO_REMOVE = [
-    'unpacked', os.path.join('fonts', 'HTML-CSS', 'TeX', 'png')]
-
-
 def _install_third_party_libs():
+    """Installs all the third party libraries."""
     download_manifest_files(MANIFEST_FILE_PATH)
 
-    # MathJax is too big. Remove many unneeded files by following these
-    # instructions:
-    # https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation pylint: disable=line-too-long
-    for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
-        full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)
-        if os.path.isdir(full_dir):
-            print 'Removing unnecessary MathJax directory \'%s\'' % subdir
-            shutil.rmtree(full_dir)
 
 if __name__ == '__main__':
     _install_third_party_libs()

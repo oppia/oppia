@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html ng-app="oppia" lang="<[currentLang]>" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
+  <head>
+    @require('../../base_components/header.html', {"title": "Teach - Oppia"})
+  </head>
+
+  <body>
+    <base-content>
+      <navbar-breadcrumb>
+        <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+          <li>
+            <span class="oppia-navbar-breadcrumb-separator"></span>
+            Teach with Oppia
+          </li>
+        </ul>
+      </navbar-breadcrumb>
+
+      <content>
+        <teach-page></teach-page>
+      </content>
+    </base-content>
+
+    @require('../footer_js_libs.html')
+  </body>
+</html>

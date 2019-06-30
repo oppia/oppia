@@ -1,4 +1,110 @@
 var ScreenShotReporter = require('protractor-screenshot-reporter');
+var glob = require('glob')
+var path = require('path')
+
+var suites = {
+    // The tests on Travis are run individually to parallelize
+    // them. Therefore, we mention the complete directory
+    // in 'full'.
+    full: [
+      'protractor/*.js',
+      'protractor_desktop/*.js'
+    ],
+
+    // Unfortunately, adding more than one file to a test suite results in
+    // severe instability as of Chromedriver 2.38 (Chrome 66).
+    accessibility: [
+      'protractor/accessibility.js'
+    ],
+
+    additionalEditorAndPlayerFeatures: [
+      'protractor_desktop/additionalEditorAndPlayerFeatures.js'
+    ],
+
+    collections: [
+      'protractor_desktop/collections.js'
+    ],
+
+    coreEditorAndPlayerFeatures: [
+      'protractor_desktop/coreEditorAndPlayerFeatures.js'
+    ],
+
+    embedding: [
+      'protractor_desktop/embedding.js'
+    ],
+
+    explorationFeedbackTab: [
+      'protractor_desktop/explorationFeedbackTab.js'
+    ],
+
+    explorationHistoryTab: [
+      'protractor_desktop/explorationHistoryTab.js'
+    ],
+
+    explorationStatisticsTab: [
+      'protractor_desktop/explorationStatisticsTab.js'
+    ],
+
+    explorationTranslationTab: [
+      'protractor_desktop/explorationTranslationTab.js'
+    ],
+
+    extensions: [
+      'protractor_desktop/extensions.js'
+    ],
+
+    learnerDashboard: [
+      'protractor_desktop/learnerDashboard.js'
+    ],
+
+    learner: [
+      'protractor/learnerFlow.js'
+    ],
+
+    library: [
+      'protractor/libraryFlow.js'
+    ],
+
+    navigation: [
+      'protractor_desktop/navigation.js'
+    ],
+
+    preferences: [
+      'protractor_desktop/preferences.js'
+    ],
+
+    profileFeatures: [
+      'protractor_desktop/profileFeatures.js'
+    ],
+
+    profileMenu: [
+      'protractor/profileMenuFlow.js'
+    ],
+
+    publication: [
+      'protractor_desktop/publicationAndLibrary.js'
+    ],
+
+    subscriptions: [
+      'protractor/subscriptionsFlow.js'
+    ],
+
+    topicAndStoryEditor: [
+      'protractor_desktop/topicAndStoryEditor.js'
+    ],
+
+    topicsAndSkillsDashboard: [
+      'protractor_desktop/topicsAndSkillsDashboard.js'
+    ],
+
+    skillEditor: [
+      'protractor_desktop/skillEditor.js'
+    ],
+
+    users: [
+      'protractor_desktop/userJourneys.js',
+    ],
+  };
 
 // A reference configuration file.
 exports.config = {
@@ -36,7 +142,25 @@ exports.config = {
   // if you need to change the browser timeout, use
   // seleniumArgs: ['-browserTimeout=60'],
   seleniumArgs: [],
-
+  beforeLaunch: function() {
+    Object.keys(suites).forEach(function(key) {
+      var patterns = suites[key];
+      for (var pattern of patterns) {
+        var fullPattern = path.resolve(__dirname, pattern);
+        var files = glob.sync(fullPattern);
+        if (files.length == 0) {
+          var errorMessage = '';
+          if (glob.hasMagic(pattern)) {
+            errorMessage = 'There are no files with the following pattern: ' + (
+              pattern);
+          } else {
+            errorMessage = pattern + ' does not exist.';
+          }
+          throw Error(errorMessage)
+        }
+      }
+    });
+  },
   // If sauceUser and sauceKey are specified, seleniumServerJar will be ignored.
   // The tests will be run remotely using SauceLabs.
   sauceUser: null,
@@ -49,52 +173,14 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 120000,
+  // (Note that the hint tooltip has a 60-second timeout.)
+  allScriptsTimeout: 180000,
 
   // ----- What tests to run -----
   //
   // When run without a command line parameter, all suites will run. If run
   // with --suite=smoke, only the patterns matched by that suite will run.
-  suites: {
-    full: [
-      'protractor/*.js'
-    ],
-
-    mainEditor: [
-      'protractor/editorAndPlayer.js',
-      'protractor/stateEditor.js'
-    ],
-
-    editorFeatures: [
-      'protractor/gadgetEditor.js',
-      'protractor/fallbacks.js',
-      'protractor/historyTab.js'
-    ],
-
-    extensions: [
-      'protractor/richTextComponents.js',
-      'protractor/interactions.js'
-    ],
-
-    library: [
-      'protractor/explorationRating.js',
-      'protractor/privileges.js',
-      'protractor/publicationAndLibrary.js'
-    ],
-
-    misc: [
-      'protractor/userManagement.js',
-      'protractor/embedding.js',
-      'protractor/preferences.js',
-      'protractor/cacheSlugs.js',
-      'protractor/staticPagesTour.js',
-      'protractor/loginFlow.js'
-    ],
-
-    i18n: [
-      'protractor/i18n.js'
-    ]
-  },
+  suites: suites,
 
   // ----- Capabilities to be passed to the webdriver instance ----
   //
@@ -105,11 +191,11 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['lang=en-EN'],
-      prefs: {
-        intl: {
-          accept_languages: 'en-EN'
-        }
+      args: ['--lang=en-EN', '--window-size=1285x1000']
+    },
+    prefs: {
+      intl: {
+        accept_languages: 'en-EN'
       }
     },
     loggingPrefs: {
@@ -138,6 +224,7 @@ exports.config = {
   // You can specify a file containing code to run by setting onPrepare to
   // the filename string.
   onPrepare: function() {
+    browser.isMobile = false;
     // At this point, global 'protractor' object will be set up, and jasmine
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
@@ -164,7 +251,7 @@ exports.config = {
       }));
     }
 
-    var SpecReporter = require('jasmine-spec-reporter');
+    var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'all',
       displaySpecDuration: true

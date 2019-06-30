@@ -18,14 +18,17 @@
 
 import datetime
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import user_query_jobs_one_off
 from core.domain import user_query_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -56,8 +59,27 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
             job_id, additional_job_params=params)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 1)
-        self.process_and_flush_pending_tasks()
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            self.process_and_flush_pending_tasks()
+
+    def _run_one_off_job_resulting_in_failure(self, query_id):
+        """Runs the one-off MapReduce job and fails it. After failing the job,
+        a failure email is sent to the initiator of the query. To achieve this,
+        we need to turn feconf.CAN_SEND_EMAILS True.
+        """
+        job_id = user_query_jobs_one_off.UserQueryOneOffJob.create_new()
+        params = {
+            'query_id': query_id,
+        }
+        user_query_jobs_one_off.UserQueryOneOffJob.enqueue(
+            job_id, additional_job_params=params)
+        user_query_jobs_one_off.UserQueryOneOffJob.register_start(job_id)
+
+        # This swap is required so that query failure email can be sent.
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            user_query_jobs_one_off.UserQueryOneOffJob.register_failure(
+                job_id, 'error')
 
     def setUp(self):
         super(UserQueryJobOneOffTests, self).setUp()
@@ -84,20 +106,22 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
-        exp_services.update_exploration(self.user_c_id, self.EXP_ID_1, [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }], 'Test edit')
+        exp_services.update_exploration(
+            self.user_c_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
 
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_d_id, end_state_name='End')
 
-        exp_services.update_exploration(self.user_d_id, self.EXP_ID_2, [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }], 'Test edit')
+        exp_services.update_exploration(
+            self.user_d_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
 
         self.save_new_valid_exploration(
             self.EXP_ID_3, self.user_e_id, end_state_name='End')
@@ -249,3 +273,93 @@ class UserQueryJobOneOffTests(test_utils.GenericTestBase):
         self.assertEqual(
             sorted(query_combined.user_ids),
             sorted(qualifying_user_ids_combined))
+
+    def test_that_correct_email_is_sent_upon_completion(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, edited_fewer_than_n_exps=1)
+
+        self._run_one_off_job(query_id)
+        query = user_models.UserQueryModel.get(query_id)
+        self.assertEqual(
+            query.query_status, feconf.USER_QUERY_STATUS_COMPLETED)
+
+        expected_email_html_body = (
+            'Hi submit,<br>'
+            'Your query with id %s has succesfully completed its '
+            'execution. Visit the result page '
+            '<a href="https://www.oppia.org/emaildashboardresult/%s">'
+            'here</a> '
+            'to see result of your query.<br><br>'
+            'Thanks!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.'
+        ) % (query_id, query_id)
+
+        expected_email_text_body = (
+            'Hi submit,\n'
+            'Your query with id %s has succesfully completed its '
+            'execution. Visit the result page here '
+            'to see result of your query.\n\n'
+            'Thanks!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the '
+            'Preferences page.'
+        ) % query_id
+
+        messages = self.mail_stub.get_sent_messages(
+            to=self.USER_SUBMITTER_EMAIL)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(
+            messages[0].body.decode(), expected_email_text_body)
+
+    def test_that_correct_email_is_sent_upon_failure(self):
+        query_id = user_query_services.save_new_query_model(
+            self.submitter_id, edited_fewer_than_n_exps=1)
+
+        self._run_one_off_job_resulting_in_failure(query_id)
+        query = user_models.UserQueryModel.get(query_id)
+
+        self.assertEqual(
+            query.query_status, feconf.USER_QUERY_STATUS_FAILED)
+
+        expected_email_html_body = (
+            'Hi submit,<br>'
+            'Your query with id %s has failed due to error '
+            'during execution. '
+            'Please check the query parameters and submit query again.<br><br>'
+            'Thanks!<br>'
+            '<br>'
+            'Best wishes,<br>'
+            'The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.'
+        ) % query_id
+
+        expected_email_text_body = (
+            'Hi submit,\n'
+            'Your query with id %s has failed due to error '
+            'during execution. '
+            'Please check the query parameters and submit query again.\n\n'
+            'Thanks!\n'
+            '\n'
+            'Best wishes,\n'
+            'The Oppia Team\n'
+            '\n'
+            'You can change your email preferences via the Preferences page.'
+        ) % query_id
+
+        messages = self.mail_stub.get_sent_messages(
+            to=self.USER_SUBMITTER_EMAIL)
+        self.assertEqual(
+            messages[0].html.decode(), expected_email_html_body)
+        self.assertEqual(
+            messages[0].body.decode(), expected_email_text_body)

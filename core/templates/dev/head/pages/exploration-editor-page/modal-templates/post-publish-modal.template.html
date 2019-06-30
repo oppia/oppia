@@ -1,0 +1,83 @@
+<style>
+  .oppia-share-publish-modal .oppia-share-publish-body,
+  .oppia-share-publish-body p {
+    text-align: center;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-close {
+    background-color: #015c53;
+    border-radius: 0;
+    color: #fff;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 14px;
+    margin-top: 10px;
+    text-transform: uppercase;
+    width: 200px;
+    text-align: center;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-close:hover {
+    background-color: #05beb2;
+    color: #fff;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-header {
+    text-align: center;
+    background: #009688;
+    border-radius: 5px 5px 0 0;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-header h3 {
+    color: #FFF;
+    font-size: 1.3em;
+  }
+
+  .oppia-share-publish-modal .oppia-share-publish-header img {
+    width: 40%;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link{
+    display: inline-grid;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link div {
+    background-color: #fcfcfc;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 10px;
+    margin-bottom: 2px;
+    cursor: pointer;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link div:hover {
+    background-color: #f9f9f9;
+  }
+</style>
+
+<div class="oppia-share-publish-modal protractor-test-share-publish-modal">
+  <div class="modal-header oppia-share-publish-header">
+    <img ng-src="<[congratsImgUrl]>">
+    <h3>Awesome!</h3>
+  </div>
+
+  <div class="modal-body oppia-long-text oppia-share-publish-body">
+    <p>
+      Now that you're a published Oppia teacher, you can share your creation.
+    </p>
+    <div class="oppia-share-publish-link">
+      Here's your exploration link:
+      <div ng-click="selectText($event)"><[explorationLink]></div>
+    </div>
+    <sharing-links flex="100" layout-type="row"
+                   layout-align-type="center center"
+                   twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"
+                   share-type="exploration"
+                   exploration-id="explorationId">
+    </sharing-links>
+    <button class="btn btn-default oppia-share-publish-close protractor-test-share-publish-close"
+            ng-click="close()">
+      Close
+    </button>
+  </div>
+</div>

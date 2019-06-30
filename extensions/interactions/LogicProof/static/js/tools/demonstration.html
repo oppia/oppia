@@ -7,11 +7,11 @@
     <script src="teacher2.js"></script>
     <script src="../student.js"></script>
     <script src="../data.js"></script>
-    <script src="demonstration.js"></script>
+    <script src="LogicDemoTestController.js"></script>
     <script src="strings.js"></script>
   </head>
 
-  <body ng-controller="TestCtrl">
+  <body ng-controller="LogicDemoTestController">
     <h4>Demonstration of the oppia logic interaction.</h4>
 
     <p><center><u>Student's section </u></center></p>
@@ -32,7 +32,7 @@
 
 
 
-    line <input type="text" ng-model="line"> mistake <input type="text" ng-model=mistakeName>
+    line <input type="text" ng-model="line"> mistake <input type="text" ng-model="mistakeName">
     <button ng-click="doLocalCheck()">Check</button> {{localCheck}}
 
     <hr>
@@ -83,7 +83,7 @@
           <td> Name </td>
           <td> Occurs </td>
           <td> Message 1 </td>
-        <tr>
+        </tr>
         <tr ng-repeat="j in mistakeSectionIndexer[i]">
           <td> <input type="text" ng-model="mistakeStrings[i].entries[j].name"></td>
           <td> <input type="text" ng-model="mistakeStrings[i].entries[j].occurs" size="50"></td>
@@ -120,7 +120,7 @@
         <td> <input type="text" ng-model="controlFunctionStrings[i].description" size="60"></td>
         <td> <font color="red"> {{controlFunctionErrors[i]}} </font> </td>
       </tr>
-    <table>
+    </table>
 
     <p></p>
     <button ng-click="requestJavascript()">Request Javascript</button>

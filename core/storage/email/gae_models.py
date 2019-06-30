@@ -42,7 +42,7 @@ class SentEmailModel(base_models.BaseModel):
     # The email address of the recipient.
     recipient_email = ndb.StringProperty(required=True)
     # The user ID of the email sender. For site-generated emails this is equal
-    # to feconf.SYSTEM_COMMITTER_ID.
+    # to SYSTEM_COMMITTER_ID.
     sender_id = ndb.StringProperty(required=True)
     # The email address used to send the notification.
     sender_email = ndb.StringProperty(required=True)
@@ -53,11 +53,15 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_DAILY_BATCH,
         feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION,
         feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
+        feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
         feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
-        feconf.EMAIL_INTENT_PUBLICIZE_EXPLORATION,
         feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION,
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
         feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
+        feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
+        feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
+        feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
+        feconf.BULK_EMAIL_INTENT_TEST
     ])
     # The subject line of the email.
     subject = ndb.TextProperty(required=True)
@@ -70,6 +74,19 @@ class SentEmailModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, intent):
+        """Generates an ID for a new SentEmailModel instance.
+
+        Args:
+            intent: str. The intent string, i.e. the purpose of the email.
+                Valid intent strings are defined in feconf.py.
+
+        Returns:
+            str. The newly-generated ID for the SentEmailModel instance.
+
+        Raises:
+            Exception: The id generator for SentEmailModel is producing
+                too many collisions.
+        """
         id_prefix = '%s.' % intent
 
         for _ in range(base_models.MAX_RETRIES):
@@ -89,7 +106,19 @@ class SentEmailModel(base_models.BaseModel):
     def create(
             cls, recipient_id, recipient_email, sender_id, sender_email,
             intent, subject, html_body, sent_datetime):
-        """Creates a new SentEmailModel entry."""
+        """Creates a new SentEmailModel entry.
+
+        Args:
+            recipient_id: str. The user ID of the email recipient.
+            recipient_email: str. The email address of the recipient.
+            sender_id: str. The user ID of the email sender.
+            sender_email: str. The email address used to send the notification.
+            intent: str. The intent string, i.e. the purpose of the email.
+            subject: str. The subject line of the email.
+            html_body: str. The HTML content of the email body.
+            sent_datetime: datetime.datetime. The datetime the email was sent,
+                in UTC.
+        """
         instance_id = cls._generate_id(intent)
         email_model_instance = cls(
             id=instance_id, recipient_id=recipient_id,
@@ -100,6 +129,7 @@ class SentEmailModel(base_models.BaseModel):
         email_model_instance.put()
 
     def put(self):
+        """Saves this SentEmailModel instance to the datastore."""
         email_hash = self._generate_hash(
             self.recipient_id, self.subject, self.html_body)
         self.email_hash = email_hash
@@ -113,14 +143,28 @@ class SentEmailModel(base_models.BaseModel):
         which is a datetime instance. If this is given, only
         SentEmailModel instances sent after sent_datetime_lower_bound
         should be returned.
+
+        Args:
+            email_hash: str. The hash value of the email.
+            sent_datetime_lower_bound: datetime.datetime. The lower bound on
+                sent_datetime of the email to be searched.
+
+        Returns:
+            list(SentEmailModel). A list of emails which have the given hash
+                value and sent more recently than sent_datetime_lower_bound.
+
+        Raises:
+            Exception: sent_datetime_lower_bound is not a valid
+                datetime.datetime.
         """
 
         if sent_datetime_lower_bound is not None:
             if not isinstance(sent_datetime_lower_bound, datetime.datetime):
                 raise Exception(
                     'Expected datetime, received %s of type %s' %
-                    (sent_datetime_lower_bound,
-                     type(sent_datetime_lower_bound)))
+                    (
+                        sent_datetime_lower_bound,
+                        type(sent_datetime_lower_bound)))
 
         query = cls.query().filter(cls.email_hash == email_hash)
 
@@ -135,6 +179,14 @@ class SentEmailModel(base_models.BaseModel):
     def _generate_hash(cls, recipient_id, email_subject, email_body):
         """Generate hash for a given recipient_id, email_subject and cleaned
         email_body.
+
+        Args:
+            recipient_id: str. The user ID of the email recipient.
+            email_subject: str. The subject line of the email.
+            email_body: str. The HTML content of the email body.
+
+        Returns:
+            str. The generated hash value of the given email.
         """
         hash_value = utils.convert_to_hash(
             recipient_id + email_subject + email_body,
@@ -147,6 +199,15 @@ class SentEmailModel(base_models.BaseModel):
         """Check for a given recipient_id, email_subject and cleaned
         email_body, whether a similar message has been sent in the last
         DUPLICATE_EMAIL_INTERVAL_MINS.
+
+         Args:
+            recipient_id: str. The user ID of the email recipient.
+            email_subject: str. The subject line of the email.
+            email_body: str. The HTML content of the email body.
+
+        Returns:
+            bool. Whether a similar message has been sent to the same recipient
+                in the last DUPLICATE_EMAIL_INTERVAL_MINS.
         """
 
         email_hash = cls._generate_hash(
@@ -168,3 +229,187 @@ class SentEmailModel(base_models.BaseModel):
                 return True
 
         return False
+
+
+class BulkEmailModel(base_models.BaseModel):
+    """Records the content of an email sent from Oppia to multiple users.
+
+    This model is read-only; entries cannot be modified once created. The
+    id/key of instances of this model is randomly generated string of
+    length 12.
+    """
+
+    # The user IDs of the email recipients.
+    recipient_ids = ndb.JsonProperty(default=[], compressed=True)
+    # The user ID of the email sender. For site-generated emails this is equal
+    # to SYSTEM_COMMITTER_ID.
+    sender_id = ndb.StringProperty(required=True)
+    # The email address used to send the notification.
+    sender_email = ndb.StringProperty(required=True)
+    # The intent of the email.
+    intent = ndb.StringProperty(required=True, indexed=True, choices=[
+        feconf.BULK_EMAIL_INTENT_MARKETING,
+        feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION,
+        feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION,
+        feconf.BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT,
+        feconf.BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT
+    ])
+    # The subject line of the email.
+    subject = ndb.TextProperty(required=True)
+    # The HTML content of the email body.
+    html_body = ndb.TextProperty(required=True)
+    # The datetime the email was sent, in UTC.
+    sent_datetime = ndb.DateTimeProperty(required=True, indexed=True)
+
+    @classmethod
+    def create(
+            cls, instance_id, recipient_ids, sender_id, sender_email,
+            intent, subject, html_body, sent_datetime):
+        """Creates a new BulkEmailModel entry.
+
+        Args:
+            instance_id: str. The ID of the instance.
+            recipient_ids: list(str). The user IDs of the email recipients.
+            sender_id: str. The user ID of the email sender.
+            sender_email: str. The email address used to send the notification.
+            intent: str. The intent string, i.e. the purpose of the email.
+            subject: str. The subject line of the email.
+            html_body: str. The HTML content of the email body.
+            sent_datetime: datetime.datetime. The date and time the email
+                was sent, in UTC.
+        """
+        email_model_instance = cls(
+            id=instance_id, recipient_ids=recipient_ids, sender_id=sender_id,
+            sender_email=sender_email, intent=intent, subject=subject,
+            html_body=html_body, sent_datetime=sent_datetime)
+        email_model_instance.put()
+
+
+REPLY_TO_ID_LENGTH = 84
+
+
+class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
+    """This model stores unique_id for each <user, thread>
+    combination.
+
+    This unique_id is used in reply-to email address in outgoing feedback and
+    suggestion emails. The id/key of instances of this model has form of
+    [USER_ID].[THREAD_ID]
+    """
+    # The reply-to ID that is used in the reply-to email address.
+    reply_to_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def _generate_id(cls, user_id, thread_id):
+        """Returns the unique id corresponding to the given user and thread ids.
+
+        Args:
+            user_id: str. The user id.
+            thread_id: str. The thread id.
+
+        Returns:
+            str. The unique id used in the reply-to email address in outgoing
+                feedback and suggestion emails.
+        """
+        return '.'.join([user_id, thread_id])
+
+    @classmethod
+    def _generate_unique_reply_to_id(cls):
+        """Generates the unique reply-to id.
+
+        Raises:
+            Exception. When unique id generator produces too many collisions.
+
+        Returns:
+            str. The unique reply-to id if there are no collisions.
+        """
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = utils.convert_to_hash(
+                '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
+                REPLY_TO_ID_LENGTH)
+            if not cls.get_by_reply_to_id(new_id):
+                return new_id
+
+        raise Exception('Unique id generator is producing too many collisions.')
+
+    @classmethod
+    def create(cls, user_id, thread_id):
+        """Creates a new FeedbackEmailReplyToIdModel instance.
+
+        Args:
+            user_id: str. ID of the corresponding user.
+            thread_id: str. ID of the corresponding thread.
+
+        Returns:
+            FeedbackEmailReplyToIdModel. The created instance
+            with the unique reply_to_id generated.
+
+        Raises:
+            Exception: Model instance for given user_id and
+                thread_id already exists.
+        """
+
+        instance_id = cls._generate_id(user_id, thread_id)
+        if cls.get_by_id(instance_id):
+            raise Exception('Unique reply-to ID for given user and thread'
+                            ' already exists.')
+
+        reply_to_id = cls._generate_unique_reply_to_id()
+        return cls(id=instance_id, reply_to_id=reply_to_id)
+
+    @classmethod
+    def get_by_reply_to_id(cls, reply_to_id):
+        """Fetches the FeedbackEmailReplyToIdModel instance corresponding to the
+        given 'reply-to' id.
+
+        Args:
+            reply_to_id: str. The unique 'reply-to' id.
+
+        Returns:
+            FeedbackEmailReplyToIdModel or None. The instance corresponding to
+            the given 'reply_to_id' if it is present in the datastore,
+            else None.
+        """
+        model = cls.query(cls.reply_to_id == reply_to_id).get()
+        return model
+
+    @classmethod
+    def get(cls, user_id, thread_id, strict=True):
+        """Gets the FeedbackEmailReplyToIdModel instance corresponding to the
+        unique instance id.
+
+        Args:
+            user_id: str. The user id.
+            thread_id: str. The thread id.
+            strict: bool. Whether to fail noisily if no entry with the given
+                instance id exists in the datastore. Default is True.
+
+        Returns:
+            A FeedbackEmailReplyToIdModel instance that corresponds to the given
+                instance id if it is present in the datastore. Otherwise, None.
+        """
+        instance_id = cls._generate_id(user_id, thread_id)
+        return super(
+            GeneralFeedbackEmailReplyToIdModel, cls).get(
+                instance_id, strict=strict)
+
+    @classmethod
+    def get_multi_by_user_ids(cls, user_ids, thread_id):
+        """Returns the FeedbackEmailReplyToIdModel instances corresponding to
+        the given user ids in dict format.
+
+        Args:
+            user_ids: list(str). A list of user ids.
+            thread_id: str. The thread id.
+
+        Returns:
+            dict. The FeedbackEmailReplyToIdModel instances corresponding to the
+                given list of user ids in dict format. The key is the unique
+                user id, and the corresponding value is the list of
+                FeedbackEmailReplyToIdModel instances.
+        """
+        instance_ids = [cls._generate_id(user_id, thread_id)
+                        for user_id in user_ids]
+        user_models = cls.get_multi(instance_ids)
+        return {
+            user_id: model for user_id, model in zip(user_ids, user_models)}

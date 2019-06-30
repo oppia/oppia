@@ -3388,7 +3388,8 @@ var logicProofParser = (function(){
     },
 
     /* Returns the parser source code. */
-    toSource: function() { return this._source; }
+    toSource: function() { return this._source; },
+    SyntaxError: null
   };
 
   /* Thrown when a parser encounters a syntax error. */

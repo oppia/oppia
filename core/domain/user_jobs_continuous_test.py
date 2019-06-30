@@ -16,7 +16,7 @@
 
 """Tests for user dashboard computations."""
 
-from collections import defaultdict
+import collections
 
 from core import jobs_registry
 from core.domain import collection_services
@@ -27,8 +27,10 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import rights_manager
-from core.domain import stats_jobs_continuous
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import user_jobs_continuous
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -58,26 +60,26 @@ USER_B_EMAIL = 'user_b@example.com'
 USER_B_USERNAME = 'b'
 
 
-class ModifiedRecentUpdatesAggregator(
+class MockRecentUpdatesAggregator(
         user_jobs_continuous.DashboardRecentUpdatesAggregator):
     """A modified DashboardRecentUpdatesAggregator that does not start a new
      batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedRecentUpdatesMRJobManager
+        return MockRecentUpdatesMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedRecentUpdatesMRJobManager(
+class MockRecentUpdatesMRJobManager(
         user_jobs_continuous.RecentUpdatesMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedRecentUpdatesAggregator
+        return MockRecentUpdatesAggregator
 
 
 class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
@@ -85,12 +87,12 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
     the user dashboard.
     """
 
-    ALL_CC_MANAGERS_FOR_TESTS = [
-        ModifiedRecentUpdatesAggregator]
+    ALL_CC_MANAGERS_FOR_TESTS = [MockRecentUpdatesAggregator]
 
     def _get_expected_activity_created_dict(
             self, user_id, activity_id, activity_title, activity_type,
             commit_type, last_updated_ms):
+        """Returns the dict containing expected activity details."""
         return {
             'activity_id': activity_id,
             'activity_title': activity_title,
@@ -103,18 +105,27 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
         }
 
     def _get_most_recent_exp_snapshot_created_on_ms(self, exp_id):
+        """Returns the most recent snapshot of the exploration corresponding to
+        the given exploration id.
+        """
         most_recent_snapshot = exp_services.get_exploration_snapshots_metadata(
             exp_id)[-1]
         return most_recent_snapshot['created_on_ms']
 
     def _get_most_recent_collection_snapshot_created_on_ms(
             self, collection_id):
+        """Returns the most recent snapshot of the collection corresponding to
+        the given collection id.
+        """
         most_recent_snapshot = (
             collection_services.get_collection_snapshots_metadata(
                 collection_id)[-1])
         return most_recent_snapshot['created_on_ms']
 
     def _get_test_context(self):
+        """Swaps ALL_CONTINUOUS_COMPUTATION_MANAGERS with
+        ALL_CC_MANAGERS_FOR_TESTS in jobs registry.
+        """
         return self.swap(
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS)
@@ -126,15 +137,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             expected_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
@@ -169,16 +179,15 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
             # Run the aggregator.
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
-            ModifiedRecentUpdatesAggregator.stop_computation(USER_ID)
+            MockRecentUpdatesAggregator.stop_computation(USER_ID)
 
             recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
@@ -196,15 +205,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             v3_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
@@ -227,15 +235,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             expected_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
@@ -245,39 +252,6 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'author_id': ANOTHER_USER_ID,
                 'subject': 'Update exploration',
             }], recent_notifications)
-
-    def test_basic_computation_works_if_exploration_is_deleted(self):
-        with self._get_test_context():
-            self.save_new_valid_exploration(
-                EXP_ID, USER_ID, title=EXP_TITLE, category='Category')
-            last_updated_ms_before_deletion = (
-                self._get_most_recent_exp_snapshot_created_on_ms(EXP_ID))
-            exp_services.delete_exploration(USER_ID, EXP_ID)
-
-            ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(
-                self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
-            self.process_and_flush_pending_tasks()
-
-            recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
-                    USER_ID)[1])
-            self.assertEqual(len(recent_notifications), 1)
-            self.assertEqual(sorted(recent_notifications[0].keys()), [
-                'activity_id', 'activity_title', 'author_id',
-                'last_updated_ms', 'subject', 'type'])
-            self.assertDictContainsSubset({
-                'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
-                'activity_id': EXP_ID,
-                'activity_title': EXP_TITLE,
-                'author_id': USER_ID,
-                'subject': feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
-            }, recent_notifications[0])
-            self.assertLess(
-                last_updated_ms_before_deletion,
-                recent_notifications[0]['last_updated_ms'])
 
     def test_multiple_exploration_commits_and_feedback_messages(self):
         with self._get_test_context():
@@ -294,11 +268,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User gives feedback on it.
             feedback_services.create_thread(
-                EXP_1_ID, None, editor_id, FEEDBACK_THREAD_SUBJECT,
+                'exploration', EXP_1_ID, editor_id, FEEDBACK_THREAD_SUBJECT,
                 'text')
             thread_id = feedback_services.get_all_threads(
-                EXP_1_ID, False)[0].get_thread_id()
-            message = feedback_services.get_messages(EXP_1_ID, thread_id)[0]
+                'exploration', EXP_1_ID, False)[0].id
+            message = feedback_services.get_messages(thread_id)[0]
 
             # User creates another exploration.
             self.save_new_valid_exploration(
@@ -307,15 +281,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             exp2_last_updated_ms = (
                 self._get_most_recent_exp_snapshot_created_on_ms(EXP_2_ID))
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     editor_id)[1])
             self.assertEqual([(
                 self._get_expected_activity_created_dict(
@@ -352,25 +325,24 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
+                'exploration', EXP_ID, user_b_id, FEEDBACK_THREAD_SUBJECT,
+                'text')
             thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0].get_thread_id()
+                'exploration', EXP_ID, False)[0].id
 
-            message = feedback_services.get_messages(
-                EXP_ID, thread_id)[0]
+            message = feedback_services.get_messages(thread_id)[0]
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     user_a_id)[1])
             recent_notifications_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     user_b_id)[1])
             expected_thread_notification = {
                 'activity_id': EXP_ID,
@@ -388,14 +360,16 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_a, [
-                expected_thread_notification,
-                expected_creation_notification
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_a, [
+                    expected_thread_notification,
+                    expected_creation_notification
+                ])
             # User B sees only her feedback thread, but no commits.
-            self.assertEqual(recent_notifications_for_user_b, [
-                expected_thread_notification,
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_b, [
+                    expected_thread_notification,
+                ])
 
     def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
             self):
@@ -404,6 +378,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
             self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
+            user_a = user_services.UserActionsInfo(user_a_id)
+
 
             # User A creates an exploration.
             self.save_new_valid_exploration(
@@ -413,28 +389,27 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
+                'exploration', EXP_ID, user_b_id, FEEDBACK_THREAD_SUBJECT,
+                'text')
             thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0].get_thread_id()
-            message = feedback_services.get_messages(
-                EXP_ID, thread_id)[0]
+                'exploration', EXP_ID, False)[0].id
+            message = feedback_services.get_messages(thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
-                user_a_id, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
+                user_a, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     user_a_id)[1])
             recent_notifications_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     user_b_id)[1])
             expected_thread_notification = {
                 'activity_id': EXP_ID,
@@ -452,15 +427,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_a, [
-                expected_thread_notification,
-                expected_creation_notification
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_a, [
+                    expected_thread_notification,
+                    expected_creation_notification
+                ])
             # User B sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_b, [
-                expected_thread_notification,
-                expected_creation_notification,
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_b, [
+                    expected_thread_notification,
+                    expected_creation_notification,
+                ])
 
     def test_basic_computation_for_collections(self):
         with self._get_test_context():
@@ -470,15 +447,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 self._get_most_recent_collection_snapshot_created_on_ms(
                     COLLECTION_ID))
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(
@@ -504,15 +480,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 self._get_most_recent_collection_snapshot_created_on_ms(
                     COLLECTION_ID))
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_COLLECTION_COMMIT,
@@ -532,15 +507,14 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     COLLECTION_ID))
             collection_services.delete_collection(USER_ID, COLLECTION_ID)
 
-            ModifiedRecentUpdatesAggregator.start_computation()
+            MockRecentUpdatesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
-                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-                1)
+                    taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
             self.process_and_flush_pending_tasks()
 
             recent_notifications = (
-                ModifiedRecentUpdatesAggregator.get_recent_notifications(
+                MockRecentUpdatesAggregator.get_recent_notifications(
                     USER_ID)[1])
             self.assertEqual(len(recent_notifications), 1)
             self.assertEqual(sorted(recent_notifications[0].keys()), [
@@ -558,30 +532,30 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 recent_notifications[0]['last_updated_ms'])
 
 
-class ModifiedUserStatsAggregator(
+class MockUserStatsAggregator(
         user_jobs_continuous.UserStatsAggregator):
     """A modified UserStatsAggregator that does not start a new
      batch job when the previous one has finished.
     """
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return ModifiedUserStatsMRJobManager
+        return MockUserStatsMRJobManager
 
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
 
 
-class ModifiedUserStatsMRJobManager(
+class MockUserStatsMRJobManager(
         user_jobs_continuous.UserStatsMRJobManager):
 
     @classmethod
     def _get_continuous_computation_class(cls):
-        return ModifiedUserStatsAggregator
+        return MockUserStatsAggregator
 
 
 class UserStatsAggregatorTest(test_utils.GenericTestBase):
-    """ Tests the calculation of a user's statistics -
+    """Tests the calculation of a user's statistics -
     impact score, average ratings, total plays
     from the continuous computation of UserStatsAggregator.
     """
@@ -598,79 +572,63 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     USER_B_USERNAME = 'b'
 
     MIN_NUM_COMPLETIONS = 2
-    EXPONENT = 2.0/3
+    EXPONENT = 2.0 / 3
 
     def setUp(self):
         super(UserStatsAggregatorTest, self).setUp()
-        self.num_completions = defaultdict(int)
-        self.num_starts = defaultdict(int)
+        self.num_completions = collections.defaultdict(int)
+        self.num_starts = collections.defaultdict(int)
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
 
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
 
-    def _mock_get_statistics(self, exp_id, unused_version):
+        self.user_a = user_services.UserActionsInfo(self.user_a_id)
+
+    def mock_get_statistics(self, exp_id, unused_version):
         current_completions = {
-            self.EXP_ID_1: {
-                'complete_exploration_count': (
-                    self.num_completions[self.EXP_ID_1]),
-                'start_exploration_count': (
-                    self.num_starts[self.EXP_ID_1]),
-                'state_hit_counts': {
-                    'state1': {
-                        'first_entry_count': 3,
-                        'no_answer_count': 1
-                    },
-                    'state2': {
-                        'first_entry_count': 7,
-                        'no_answer_count': 1
-                    },
+            self.EXP_ID_1: stats_domain.ExplorationStats(
+                self.EXP_ID_1, self.EXP_DEFAULT_VERSION, 5, 2, 0, 0, 0, 0, {
+                    'state1': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0),
+                    'state2': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 7, 1, 0, 0, 0),
                 }
-            },
-            self.EXP_ID_2: {
-                'complete_exploration_count': (
-                    self.num_completions[self.EXP_ID_2]),
-                'start_exploration_count': (
-                    self.num_starts[self.EXP_ID_2]),
-                'state_hit_counts': {
-                    'state1': {
-                        'first_entry_count': 3,
-                        'no_answer_count': 1
-                    },
-                    'state2': {
-                        'first_entry_count': 7,
-                        'no_answer_count': 1
-                    },
+            ),
+            self.EXP_ID_2: stats_domain.ExplorationStats(
+                self.EXP_ID_2, self.EXP_DEFAULT_VERSION, 5, 2, 0, 0, 0, 0, {
+                    'state1': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 0),
+                    'state2': stats_domain.StateStats(
+                        0, 0, 0, 0, 0, 0, 7, 1, 0, 0, 0),
                 }
-            },
-            self.EXP_ID_3: {
-                'start_exploration_count': (
-                    self.num_starts[self.EXP_ID_3]),
-                'state_hit_counts': {}
-            }
+            ),
+            self.EXP_ID_3: stats_domain.ExplorationStats(
+                self.EXP_ID_3, self.EXP_DEFAULT_VERSION, 0, 0, 0, 0, 0, 0, {})
         }
         return current_completions[exp_id]
 
     @classmethod
-    def _mock_get_zero_impact_score(cls, unused_exploration_id):
+    def mock_get_zero_impact_score(cls, unused_exploration_id):
         return 0
 
     @classmethod
-    def _mock_get_below_zero_impact_score(cls, unused_exploration_id):
+    def mock_get_below_zero_impact_score(cls, unused_exploration_id):
         return -1
 
     @classmethod
-    def _mock_get_positive_impact_score(cls, unused_exploration_id):
+    def mock_get_positive_impact_score(cls, unused_exploration_id):
         return 1
 
     def _run_computation(self):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
-        completion events."""
-        with self.swap(stats_jobs_continuous.StatisticsAggregator,
-                       'get_statistics', self._mock_get_statistics):
-            ModifiedUserStatsAggregator.start_computation()
+        completion events.
+        """
+        with self.swap(
+            stats_services, 'get_exploration_stats', self.mock_get_statistics):
+            MockUserStatsAggregator.start_computation()
             self.process_and_flush_pending_tasks()
 
     def _generate_user_ids(self, count):
@@ -680,6 +638,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         return ['user%d' % i for i in range(count)]
 
     def _create_exploration(self, exp_id, user_id):
+        """Creates the default exploration with the given exploration id and
+        then, returns its instance.
+        """
         exploration = exp_domain.Exploration.create_default_exploration(exp_id)
         exp_services.save_new_exploration(user_id, exploration)
         return exploration
@@ -705,6 +666,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
                 user_id, exp_id, rating)
 
     def _record_exploration_rating(self, exp_id, ratings):
+        """Records the exploration rating corresponding to the given exploration
+        id.
+        """
         user_ids = self._generate_user_ids(len(ratings))
         self.process_and_flush_pending_tasks()
         for ind, user_id in enumerate(user_ids):
@@ -714,6 +678,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def _record_exploration_rating_for_user(
             self, exp_id, user_id, rating, old_rating=None):
+        """Records the exploration rating provided by the user corresponding to
+        the given user id.
+        """
         self.process_and_flush_pending_tasks()
         event_services.RateExplorationEventHandler.record(
             exp_id, user_id, rating, old_rating)
@@ -730,12 +697,13 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_standard_user_stats_calculation_one_exploration(self):
         exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
-        # Give this exploration an average rating of 4
+        # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
 
-        # See state counts in _mock_get_statistics(), above.
-        expected_answer_count = 8
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
+        expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         expected_user_impact_score = round(
             ((avg_rating - 2) * reach) ** self.EXPONENT)
@@ -748,13 +716,14 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_exploration_multiple_contributors(self):
         exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
-        # Give this exploration an average rating of 4
+        # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
         exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '')
 
-        # See state counts in _mock_get_statistics(), above.
-        expected_answer_count = 8
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
+        expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         contrib = 0.5
         expected_user_impact_score = round(
@@ -776,8 +745,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         self._rate_exploration(exploration_1.id, 2, avg_rating)
         self._rate_exploration(exploration_2.id, 2, avg_rating)
 
-        # See state counts in _mock_get_statistics(), above.
-        expected_answer_count = 8
+        # The expected answer count is the sum of the first hit counts in the
+        # statistics defined in _get_mock_statistics() method above.
+        expected_answer_count = 15
         reach = expected_answer_count ** self.EXPONENT
         impact_per_exp = ((avg_rating - 2) * reach) # * 1 for contribution
         expected_user_impact_score = round(
@@ -791,7 +761,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_only_yield_when_rating_greater_than_two(self):
         """Tests that map only yields an impact score for an
-        exploration when the impact score is greater than 0."""
+        exploration when the impact score is greater than 0.
+        """
         self._create_exploration(self.EXP_ID_1, self.user_a_id)
 
         # Give two ratings of 1.
@@ -800,7 +771,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats_model = user_models.UserStatsModel.get(
             self.user_a_id, strict=False)
         self.assertEqual(user_stats_model.impact_score, 0)
-        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
+        MockUserStatsAggregator.stop_computation(self.user_a_id)
 
         # Give two ratings of 2.
         self._rate_exploration(self.EXP_ID_1, 2, 2)
@@ -808,7 +779,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats_model = user_models.UserStatsModel.get(
             self.user_a_id, strict=False)
         self.assertEqual(user_stats_model.impact_score, 0)
-        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
+        MockUserStatsAggregator.stop_computation(self.user_a_id)
 
         # Give two ratings of 3. The impact score should now be nonzero.
         self._rate_exploration(self.EXP_ID_1, 2, 3)
@@ -843,11 +814,11 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(
+        self.assertEqual(
             user_stats['total_plays'], 0)
-        self.assertEquals(
+        self.assertEqual(
             user_stats['num_ratings'], 0)
-        self.assertEquals(
+        self.assertEqual(
             user_stats['average_ratings'], None)
 
     def test_realtime_layer_batch_job_single_rating(self):
@@ -858,9 +829,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 0)
-        self.assertEquals(user_stats['num_ratings'], 1)
-        self.assertEquals(user_stats['average_ratings'], 4)
+        self.assertEqual(user_stats['total_plays'], 0)
+        self.assertEqual(user_stats['num_ratings'], 1)
+        self.assertEqual(user_stats['average_ratings'], 4)
 
     def test_realtime_layer_batch_job_single_exploration_one_owner(self):
         exploration = self._create_exploration(
@@ -877,16 +848,16 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 2)
-        self.assertEquals(user_stats['num_ratings'], 2)
-        self.assertEquals(user_stats['average_ratings'], 3.5)
+        self.assertEqual(user_stats['total_plays'], 2)
+        self.assertEqual(user_stats['num_ratings'], 2)
+        self.assertEqual(user_stats['average_ratings'], 3.5)
 
     def test_realtime_layer_batch_job_single_exploration_multiple_owners(self):
         exploration = self._create_exploration(
             self.EXP_ID_1, self.user_a_id)
 
         rights_manager.assign_role_for_exploration(
-            self.user_a_id, self.EXP_ID_1, self.user_b_id,
+            self.user_a, self.EXP_ID_1, self.user_b_id,
             rights_manager.ROLE_OWNER)
 
         exp_version = self.EXP_DEFAULT_VERSION
@@ -901,28 +872,28 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 2,
             'num_ratings': 6,
-            'average_ratings': 22/6.0
+            'average_ratings': 22 / 6.0
         }
 
         user_stats_1 = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(
+        self.assertEqual(
             user_stats_1['total_plays'], expected_results['total_plays'])
-        self.assertEquals(
+        self.assertEqual(
             user_stats_1['num_ratings'], expected_results['num_ratings'])
-        self.assertEquals(
+        self.assertEqual(
             user_stats_1['average_ratings'],
             expected_results['average_ratings'])
 
         user_stats_2 = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_b_id))
-        self.assertEquals(
+        self.assertEqual(
             user_stats_2['total_plays'], expected_results['total_plays'])
-        self.assertEquals(
+        self.assertEqual(
             user_stats_2['num_ratings'], expected_results['num_ratings'])
-        self.assertEquals(
+        self.assertEqual(
             user_stats_2['average_ratings'],
             expected_results['average_ratings'])
 
@@ -938,9 +909,9 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 0)
-        self.assertEquals(user_stats['num_ratings'], 5)
-        self.assertEquals(user_stats['average_ratings'], 18/5.0)
+        self.assertEqual(user_stats['total_plays'], 0)
+        self.assertEqual(user_stats['num_ratings'], 5)
+        self.assertEqual(user_stats['average_ratings'], 18 / 5.0)
 
     def test_realtime_layer_batch_job_user_rate_same_exp_multiple_times(self):
         self._create_exploration(
@@ -952,18 +923,18 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 0)
-        self.assertEquals(user_stats['num_ratings'], 1)
-        self.assertEquals(user_stats['average_ratings'], 5)
+        self.assertEqual(user_stats['total_plays'], 0)
+        self.assertEqual(user_stats['num_ratings'], 1)
+        self.assertEqual(user_stats['average_ratings'], 5)
 
         self._record_exploration_rating_for_user(
             exp_id_1, self.user_b_id, 3, old_rating=5)
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 0)
-        self.assertEquals(user_stats['num_ratings'], 1)
-        self.assertEquals(user_stats['average_ratings'], 3)
+        self.assertEqual(user_stats['total_plays'], 0)
+        self.assertEqual(user_stats['num_ratings'], 1)
+        self.assertEqual(user_stats['average_ratings'], 3)
 
     def test_both_realtime_layer_and_batch_data(self):
         exploration_1 = self._create_exploration(self.EXP_ID_1, self.user_a_id)
@@ -981,13 +952,16 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # Run the computation and check data from batch job.
         self._run_computation()
         user_stats_model = user_models.UserStatsModel.get(self.user_a_id)
-        self.assertEqual(user_stats_model.total_plays, 0)
+        # The total plays is the sum of the number of starts of both the
+        # exploration_1 and exploration_2 as defined in the
+        # mock_get_statistics() method above.
+        self.assertEqual(user_stats_model.total_plays, 14)
         self.assertEqual(user_stats_model.num_ratings, 6)
-        self.assertEqual(user_stats_model.average_ratings, 20/6.0)
+        self.assertEqual(user_stats_model.average_ratings, 20 / 6.0)
 
         # Stop the batch job. Fire up a few events and check data from realtime
         # job.
-        ModifiedUserStatsAggregator.stop_computation(self.user_a_id)
+        MockUserStatsAggregator.stop_computation(self.user_a_id)
         self._record_start(exp_id_1, exp_version, state_1)
         self._record_start(exp_id_2, exp_version, state_2)
         self._record_exploration_rating(exp_id_1, [2, 5])
@@ -996,6 +970,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         user_stats = (
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.user_a_id))
-        self.assertEquals(user_stats['total_plays'], 2)
-        self.assertEquals(user_stats['num_ratings'], 10)
-        self.assertEquals(user_stats['average_ratings'], 32/10.0)
+        # After recording two start events, the total plays is now increased by
+        # two.
+        self.assertEqual(user_stats['total_plays'], 16)
+        self.assertEqual(user_stats['num_ratings'], 10)
+        self.assertEqual(user_stats['average_ratings'], 32 / 10.0)

@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python configuration for ItemSelectionInput interaction."""
+
 from extensions.interactions import base
 
 
@@ -26,6 +28,12 @@ class ItemSelectionInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     answer_type = 'SetOfHtmlString'
+    # Radio buttons get unselected when specifying a solution. This needs to be
+    # fixed before solution feature can support this interaction.
+    can_have_solution = False
+    # ItemSelectionInput's submit button is dynamic and is handled
+    # separately.
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'minAllowableSelectionCount',
@@ -66,4 +74,15 @@ class ItemSelectionInput(base.BaseInteraction):
             }
         },
         'default_value': [''],
+    }]
+
+    _answer_visualization_specs = [{
+        # Table with keyed answer counts for top N answers.
+        'id': 'EnumeratedFrequencyTable',
+        'options': {
+            'column_headers': ['Answer (click to expand/collapse)', 'Count'],
+            'title': 'Top answers',
+        },
+        'calculation_id': 'Top10AnswerFrequencies',
+        'addressed_info_is_supported': True,
     }]

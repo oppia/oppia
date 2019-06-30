@@ -17,12 +17,8 @@
 """Classes for interpreting typed objects in Oppia."""
 
 import copy
-import os
 
-import feconf
-import jinja_utils
 import schema_utils
-import utils
 
 
 class BaseObject(object):
@@ -39,7 +35,6 @@ class BaseObject(object):
 
     # These values should be overridden in subclasses.
     description = ''
-    edit_html_filename = None
     edit_js_filename = None
     # This should be non-null if the object class is used when specifying a
     # rule.
@@ -49,46 +44,23 @@ class BaseObject(object):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object.
 
+        Args:
+            raw: *. A normalized Python object to be normalized.
+
         Returns:
-          a normalized Python object describing the Object specified by this
-          class.
+            *. A normalized Python object describing the Object specified by
+                this class.
 
         Raises:
-          TypeError: if the Python object cannot be normalized.
+          TypeError: The Python object cannot be normalized.
         """
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
-
-    @classmethod
-    def has_editor_js_template(cls):
-        return cls.edit_js_filename is not None
-
-    @classmethod
-    def get_editor_js_template(cls):
-        if cls.edit_js_filename is None:
-            raise Exception(
-                'There is no editor template defined for objects of type %s' %
-                cls.__name__)
-        return utils.get_file_contents(os.path.join(
-            os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
-            '%s.js' % cls.edit_js_filename))
-
-    @classmethod
-    def get_editor_html_template(cls):
-        if cls.edit_html_filename is None:
-            raise Exception(
-                'There is no editor template defined for objects of type %s' %
-                cls.__name__)
-        html_templates = utils.get_file_contents(os.path.join(
-            os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
-            '%s.html' % cls.edit_html_filename))
-        return jinja_utils.interpolate_cache_slug('%s' % html_templates)
 
 
 class Boolean(BaseObject):
     """Class for booleans."""
 
     description = 'A boolean.'
-    edit_html_filename = 'boolean_editor'
     edit_js_filename = 'BooleanEditor'
 
     SCHEMA = {
@@ -97,7 +69,15 @@ class Boolean(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            bool. The normalized object (or False if the input is None or '').
+        """
         if raw is None or raw == '':
             raw = False
 
@@ -108,8 +88,6 @@ class Real(BaseObject):
     """Real number class."""
 
     description = 'A real number.'
-    edit_html_filename = 'real_editor'
-    edit_js_filename = 'RealEditor'
     default_value = 0.0
 
     SCHEMA = {
@@ -121,8 +99,6 @@ class Int(BaseObject):
     """Integer class."""
 
     description = 'An integer.'
-    edit_html_filename = 'int_editor'
-    edit_js_filename = 'IntEditor'
     default_value = 0
 
     SCHEMA = {
@@ -134,8 +110,6 @@ class UnicodeString(BaseObject):
     """Unicode string class."""
 
     description = 'A unicode string.'
-    edit_html_filename = 'unicode_string_editor'
-    edit_js_filename = 'UnicodeStringEditor'
     default_value = ''
 
     SCHEMA = {
@@ -147,8 +121,6 @@ class Html(BaseObject):
     """HTML string class."""
 
     description = 'An HTML string.'
-    edit_html_filename = 'html_editor'
-    edit_js_filename = 'HtmlEditor'
 
     SCHEMA = {
         'type': 'html',
@@ -159,8 +131,6 @@ class NonnegativeInt(BaseObject):
     """Nonnegative integer class."""
 
     description = 'A non-negative integer.'
-    edit_html_filename = 'nonnegative_int_editor'
-    edit_js_filename = 'NonnegativeIntEditor'
     default_value = 0
 
     SCHEMA = {
@@ -172,14 +142,27 @@ class NonnegativeInt(BaseObject):
     }
 
 
+class PositiveInt(BaseObject):
+    """Nonnegative integer class."""
+
+    description = 'A positive integer.'
+    default_value = 1
+
+    SCHEMA = {
+        'type': 'int',
+        'validators': [{
+            'id': 'is_at_least',
+            'min_value': 1
+        }]
+    }
+
+
 class CodeString(BaseObject):
     """Code string class. This is like a normal string, but it should not
     contain tab characters.
     """
 
     description = 'A code string.'
-    edit_html_filename = 'code_string_editor'
-    edit_js_filename = 'CodeStringEditor'
     default_value = ''
 
     SCHEMA = {
@@ -191,6 +174,15 @@ class CodeString(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            unicode. The normalized object containing string in unicode format.
+        """
         if '\t' in raw:
             raise TypeError(
                 'Unexpected tab characters in code string: %s' % raw)
@@ -224,6 +216,7 @@ class ListOfCodeEvaluation(BaseObject):
     """Class for lists of CodeEvaluations."""
 
     description = 'A list of code and its evaluation results.'
+    default_value = []
 
     SCHEMA = {
         'type': 'list',
@@ -235,8 +228,6 @@ class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
     description = 'A two-dimensional coordinate (a pair of reals).'
-    edit_html_filename = 'coord_two_dim_editor'
-    edit_js_filename = 'CoordTwoDimEditor'
     default_value = [0.0, 0.0]
 
     SCHEMA = {
@@ -262,8 +253,6 @@ class ListOfUnicodeString(BaseObject):
     """List class."""
 
     description = 'A list.'
-    edit_html_filename = 'list_editor'
-    edit_js_filename = 'ListOfUnicodeStringEditor'
 
     SCHEMA = {
         'type': 'list',
@@ -275,8 +264,6 @@ class SetOfUnicodeString(BaseObject):
     """Class for sets of UnicodeStrings."""
 
     description = 'A set (a list with unique elements) of unicode strings.'
-    edit_html_filename = 'list_editor'
-    edit_js_filename = 'SetOfUnicodeStringEditor'
     default_value = []
 
     SCHEMA = {
@@ -292,8 +279,6 @@ class NormalizedString(BaseObject):
     """Unicode string with spaces collapsed."""
 
     description = 'A unicode string with adjacent whitespace collapsed.'
-    edit_html_filename = 'unicode_string_editor'
-    edit_js_filename = 'NormalizedStringEditor'
     default_value = ''
 
     SCHEMA = {
@@ -321,11 +306,9 @@ class SetOfNormalizedString(BaseObject):
 
 
 class MathLatexString(BaseObject):
-    """Math LaTeX string class"""
+    """Math LaTeX string class."""
 
     description = 'A LaTeX string.'
-    edit_html_filename = 'math_latex_string_editor'
-    edit_js_filename = 'MathLatexStringEditor'
 
     SCHEMA = UnicodeString.SCHEMA
 
@@ -334,11 +317,15 @@ class SanitizedUrl(BaseObject):
     """HTTP or HTTPS url string class."""
 
     description = 'An HTTP or HTTPS url.'
-    edit_html_filename = 'unicode_string_editor'
-    edit_js_filename = 'SanitizedUrlEditor'
 
     SCHEMA = {
         'type': 'unicode',
+        'validators': [{
+            'id': 'is_nonempty'
+        }],
+        'ui_config': {
+            'placeholder': 'https://www.example.com'
+        },
         'post_normalizers': [{
             'id': 'sanitize_url'
         }]
@@ -350,8 +337,6 @@ class MusicPhrase(BaseObject):
 
     description = ('A musical phrase that contains zero or more notes, rests, '
                    'and time signature.')
-    edit_html_filename = 'music_phrase_editor'
-    edit_js_filename = 'MusicPhraseEditor'
     default_value = []
 
     # The maximum number of notes allowed in a music phrase.
@@ -399,6 +384,41 @@ class MusicPhrase(BaseObject):
     }
 
 
+class ListOfTabs(BaseObject):
+    """Class for tab contents."""
+
+    description = 'Tab content that contains list of tabs.'
+
+    SCHEMA = {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'title',
+                'description': 'Tab title',
+                'schema': {
+                    'type': 'unicode',
+                    'validators': [{
+                        'id': 'is_nonempty'
+                    }]
+                }
+            }, {
+                'name': 'content',
+                'description': 'Tab content',
+                'schema': {
+                    'type': 'html',
+                    'ui_config': {
+                        'hide_complex_extensions': True
+                    }
+                }
+            }]
+        },
+        'ui_config': {
+            'add_element_text': 'Add new tab'
+        }
+    }
+
+
 class Filepath(BaseObject):
     """A string representing a filepath.
 
@@ -406,8 +426,6 @@ class Filepath(BaseObject):
     """
 
     description = 'A string that represents a filepath'
-    edit_html_filename = 'filepath_editor'
-    edit_js_filename = 'FilepathEditor'
 
     SCHEMA = UnicodeString.SCHEMA
 
@@ -419,7 +437,29 @@ class CheckedProof(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            dict. The normalized object containing the following key-value
+                pairs:
+                    assumptions_string: basestring. The string containing the
+                        assumptions.
+                    target_string: basestring. The target string of the proof.
+                    proof_string: basestring. The proof string.
+                    correct: bool. Whether the proof is correct.
+                    error_category: basestring. The category of the error.
+                    error_code: basestring. The error code.
+                    error_message: basestring. The error message.
+                    error_line_number: basestring. The line number at which the
+                        error has occurred.
+
+        Raises:
+            TypeError: Cannot convert to the CheckedProof schema.
+        """
         try:
             assert isinstance(raw, dict)
             assert isinstance(raw['assumptions_string'], basestring)
@@ -437,17 +477,56 @@ class CheckedProof(BaseObject):
 
 
 class LogicQuestion(BaseObject):
-    """A question giving a formula to prove"""
+    """A question giving a formula to prove."""
 
     description = 'A question giving a formula to prove.'
-    edit_html_filename = 'logic_question_editor'
-    edit_js_filename = 'LogicQuestionEditor'
 
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
+        """Validates and normalizes a raw Python object.
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            dict. The normalized object containing the following key-value
+                pairs:
+                    assumptions: list(dict(str, *)). The list containing all the
+                        assumptions in the dict format containing following
+                        key-value pairs:
+                            top_kind_name: basestring. The top kind name in the
+                                expression.
+                            top_operator_name: basestring. The top operator name
+                                in the expression.
+                            arguments: list. A list of arguments.
+                            dummies: list. A list of dummy values.
+                    results: list(dict(str, *)). The list containing the final
+                        results of the required proof in the dict format
+                        containing following key-value pairs:
+                            top_kind_name: basestring. The top kind name in the
+                                expression.
+                            top_operator_name: basestring. The top operator name
+                                in the expression.
+                            arguments: list. A list of arguments.
+                            dummies: list. A list of dummy values.
+                    default_proof_string: basestring. The default proof string.
+
+        Raises:
+            TypeError: Cannot convert to LogicQuestion schema.
+        """
 
         def _validate_expression(expression):
+            """Validates the given expression.
+
+            Args:
+                expression: dict(str, *). The expression to be verified in the
+                    dict format.
+
+            Raises:
+                AssertionError: The specified expression is not in the correct
+                    format.
+            """
             assert isinstance(expression, dict)
             assert isinstance(expression['top_kind_name'], basestring)
             assert isinstance(expression['top_operator_name'], basestring)
@@ -455,6 +534,15 @@ class LogicQuestion(BaseObject):
             _validate_expression_array(expression['dummies'])
 
         def _validate_expression_array(array):
+            """Validates the given expression array.
+
+            Args:
+                array: list(dict(str, *)). The expression array to be verified.
+
+            Raises:
+                AssertionError: The specified expression array is not in the
+                    list format.
+            """
             assert isinstance(array, list)
             for item in array:
                 _validate_expression(item)
@@ -471,11 +559,9 @@ class LogicQuestion(BaseObject):
 
 
 class LogicErrorCategory(BaseObject):
-    """A string from a list of possible categories"""
+    """A string from a list of possible categories."""
 
     description = 'One of the possible error categories of a logic proof.'
-    edit_html_filename = 'logic_error_category_editor'
-    edit_js_filename = 'LogicErrorCategoryEditor'
     default_value = 'mistake'
 
     SCHEMA = {
@@ -488,11 +574,9 @@ class LogicErrorCategory(BaseObject):
 
 
 class Graph(BaseObject):
-    """A (mathematical) graph with edges and vertices"""
+    """A (mathematical) graph with edges and vertices."""
 
     description = 'A (mathematical) graph'
-    edit_html_filename = 'graph_editor'
-    edit_js_filename = 'GraphEditor'
     default_value = {
         'edges': [],
         'isDirected': False,
@@ -561,6 +645,16 @@ class Graph(BaseObject):
         Checks that unlabeled graphs have all labels empty.
         Checks that unweighted graphs have all weights set to 1.
         TODO(czx): Think about support for multigraphs?
+
+        Args:
+            raw: *. A Python object to be validated against the schema,
+                normalizing if necessary.
+
+        Returns:
+            dict. The normalized object containing the Graph schema.
+
+        Raises:
+            TypeError. Cannot convert to the Graph schema.
         """
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
@@ -591,11 +685,9 @@ class Graph(BaseObject):
 
 
 class GraphProperty(BaseObject):
-    """A string from a list of possible graph properties"""
+    """A string from a list of possible graph properties."""
 
     description = 'One of the possible properties possessed by a graph.'
-    edit_html_filename = 'graph_property_editor'
-    edit_js_filename = 'GraphPropertyEditor'
     default_value = 'strongly_connected'
 
     SCHEMA = {
@@ -637,17 +729,37 @@ class NormalizedRectangle2D(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        # Moves cur_value to the nearest available value in the range
-        # [min_value, max_value].
-        def clamp(min_value, current_value, max_value):
-            return min(max_value, max(min_value, current_value))
+        """Returns the normalized coordinates of the rectangle.
+
+        Args:
+            raw: *. An object to be validated against the schema, normalizing if
+                necessary.
+
+        Returns:
+            list(list(float)). The normalized object containing list of lists of
+                float values as coordinates of the rectangle.
+
+        Raises:
+            TypeError: Cannot convert to the NormalizedRectangle2D schema.
+        """
+        def clamp(value):
+            """Clamps a number to range [0, 1].
+
+            Args:
+                value: float. A number to be clamped.
+
+            Returns:
+                float. The clamped value.
+            """
+            return min(0.0, max(value, 1.0))
+
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
-            raw[0][0] = clamp(0.0, raw[0][0], 1.0)
-            raw[0][1] = clamp(0.0, raw[0][1], 1.0)
-            raw[1][0] = clamp(0.0, raw[1][0], 1.0)
-            raw[1][1] = clamp(0.0, raw[1][1], 1.0)
+            raw[0][0] = clamp(raw[0][0])
+            raw[0][1] = clamp(raw[0][1])
+            raw[1][0] = clamp(raw[1][0])
+            raw[1][1] = clamp(raw[1][1])
 
         except Exception:
             raise TypeError('Cannot convert to Normalized Rectangle %s' % raw)
@@ -680,8 +792,6 @@ class ImageWithRegions(BaseObject):
     """An image overlaid with labeled regions."""
 
     description = 'An image overlaid with regions.'
-    edit_html_filename = 'image_with_regions_editor'
-    edit_js_filename = 'ImageWithRegionsEditor'
 
     SCHEMA = {
         'type': 'dict',
@@ -710,7 +820,7 @@ class ImageWithRegions(BaseObject):
 class ClickOnImage(BaseObject):
     """A click on an image and the clicked regions."""
 
-    description = "Position of a click and a list of regions clicked."
+    description = 'Position of a click and a list of regions clicked.'
 
     SCHEMA = {
         'type': 'dict',
@@ -738,8 +848,6 @@ class ParameterName(BaseObject):
     """
 
     description = 'A string representing a parameter name.'
-    edit_html_filename = 'parameter_name_editor'
-    edit_js_filename = 'ParameterNameEditor'
 
     SCHEMA = {
         'type': 'unicode',
@@ -747,11 +855,9 @@ class ParameterName(BaseObject):
 
 
 class SetOfHtmlString(BaseObject):
-    """A Set of Html Strings"""
+    """A Set of Html Strings."""
 
-    description = "A list of Html strings."
-    edit_html_filename = 'set_of_html_string_editor'
-    edit_js_filename = 'SetOfHtmlStringEditor'
+    description = 'A list of Html strings.'
     default_value = []
 
     SCHEMA = {
@@ -778,3 +884,131 @@ class MathExpression(BaseObject):
             'schema': UnicodeString.SCHEMA,
         }]
     }
+
+
+class Fraction(BaseObject):
+    """Fraction class."""
+
+    description = 'A fraction type'
+    default_value = {
+        'isNegative': False,
+        'wholeNumber': 0,
+        'numerator': 0,
+        'denominator': 1
+    }
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'isNegative',
+            'schema': {
+                'type': 'bool'
+            }
+        }, {
+            'name': 'wholeNumber',
+            'schema': NonnegativeInt.SCHEMA
+        }, {
+            'name': 'numerator',
+            'schema': NonnegativeInt.SCHEMA
+        }, {
+            'name': 'denominator',
+            'schema': PositiveInt.SCHEMA
+        }]
+    }
+
+
+class Units(BaseObject):
+    """Units class."""
+    # Validation of the units is performed only in the frontend using math.js.
+    # math.js is not available in the backend.
+
+    description = 'A list of unit dict components.'
+    default_value = []
+
+    SCHEMA = {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'unit',
+                'schema': {
+                    'type': 'unicode'
+                }
+            }, {
+                'name': 'exponent',
+                'schema': {
+                    'type': 'int'
+                }
+            }]
+        }
+    }
+
+
+class NumberWithUnits(BaseObject):
+    """Number with units class."""
+
+    description = 'A number with units expression.'
+    default_value = {
+        'type': 'real',
+        'real': 0.0,
+        'fraction': Fraction.default_value,
+        'units': Units.default_value
+    }
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'type',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'real',
+            'schema': {
+                'type': 'float'
+            }
+        }, {
+            'name': 'fraction',
+            'schema': Fraction.SCHEMA
+        }, {
+            'name': 'units',
+            'schema': Units.SCHEMA
+        }]
+    }
+
+
+class ListOfSetsOfHtmlStrings(BaseObject):
+    """List of sets of Html strings class."""
+
+    description = 'A list of sets of Html strings.'
+    default_value = []
+
+    SCHEMA = {
+        'type': 'list',
+        'items': SetOfHtmlString.SCHEMA,
+    }
+
+
+class DragAndDropHtmlString(BaseObject):
+    """A specific drag and drop Html string class."""
+
+    description = (
+        'A specific drag and drop item from collection of drag and drop items.')
+    default_value = ''
+
+    SCHEMA = {
+        'type': 'html'
+    }
+
+
+class DragAndDropPositiveInt(BaseObject):
+    """A drag and drop positive int class representing the rank(position) of a
+    drag and drop item.
+    """
+
+    description = (
+        'The rank(position) of a drag and drop item in the given list of sets' +
+        'of drag and drop items.')
+    default_value = 1
+
+    SCHEMA = PositiveInt.SCHEMA

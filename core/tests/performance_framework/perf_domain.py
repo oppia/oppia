@@ -173,6 +173,18 @@ class PageSessionMetrics(object):
         return total_size
 
     def _get_duration_millisecs(self, event_end, event_initial):
+        """Get page load duration.
+
+        Args:
+            event_end: str. The event up to which duration measurement is
+                required.
+            event_initial: str. The event from which duration measurement
+                starts.
+
+        Returns:
+            int. The calculated time duration between event_initial and
+                event_end in milliseconds.
+        """
         # Timestamps are in milliseconds.
         initial_timestamp = self.page_load_timings[event_initial]
         end_timestamp = self.page_load_timings[event_end]
@@ -266,11 +278,13 @@ class MultiplePageSessionMetrics(object):
     different page load sessions. This may happen due to various factors like
     background processes.
     """
-    def  __init__(self, page_session_metrics):
+
+    def __init__(self, page_session_metrics):
         self.page_metrics = page_session_metrics
         self._validate()
 
     def _validate(self):
+        """Checks whether the page metrics are in the list format."""
         if not isinstance(self.page_metrics, list):
             raise utils.ValidationError(
                 'Expected page_session_metrics to be a list, '

@@ -38,14 +38,25 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
         email_jobs_one_off.EmailHashRegenerationOneOffJob.enqueue(job_id)
         self.assertEqual(
             self.count_jobs_in_taskqueue(
-                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
-            1)
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
     def test_hashes_get_generated(self):
         # pylint: disable=unused-argument
         def _generate_hash_for_tests(
                 cls, recipient_id, email_subject, email_body):
+            """Generates hash for tests.
+
+            Args:
+                recipient_id: str. ID of the recipient.
+                email_subject: str. Subject of the email.
+                email_body: str. Body of the email.
+
+            Returns:
+                str. Empty if recipient_id is 'recipient_id2', None if
+                    'recipient_id1' and 'Email Hash' otherwise.
+            """
+
             if recipient_id == 'recipient_id1':
                 return None
             elif recipient_id == 'recipient_id2':
@@ -54,8 +65,9 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
 
         generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
-            types.MethodType(_generate_hash_for_tests,
-                             email_models.SentEmailModel))
+            types.MethodType(
+                _generate_hash_for_tests,
+                email_models.SentEmailModel))
 
         with generate_constant_hash_ctx:
             email_models.SentEmailModel.create(

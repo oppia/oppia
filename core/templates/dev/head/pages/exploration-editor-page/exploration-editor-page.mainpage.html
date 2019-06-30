@@ -1,0 +1,77 @@
+{% extends 'dist/base.html' %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.can_publish = JSON.parse('{{can_publish|js_string}}');
+    GLOBALS.can_voiceover = JSON.parse('{{can_voiceover|js_string}}');
+    GLOBALS.DEFAULT_OBJECT_VALUES = JSON.parse(
+      '{{DEFAULT_OBJECT_VALUES|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR|js_string}}');
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
+    GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse(
+      '{{INVALID_PARAMETER_NAMES|js_string}}');
+    GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = JSON.parse(
+      '{{SHOW_TRAINABLE_UNRESOLVED_ANSWERS|js_string}}');
+    GLOBALS.TAG_REGEX = JSON.parse('{{TAG_REGEX|js_string}}');
+    GLOBALS.canDelete = JSON.parse('{{can_delete|js_string}}');
+    GLOBALS.canModifyRoles = JSON.parse('{{can_modify_roles|js_string}}');
+    GLOBALS.canReleaseOwnership = JSON.parse(
+      '{{can_release_ownership|js_string}}');
+    GLOBALS.canUnpublish = JSON.parse('{{can_unpublish|js_string}}');
+  </script>
+
+  <!-- Updated previous version to current version of google charts
+  https://developers.google.com/chart/interactive/docs/basic_load_libs#update-library-loader-code -->
+  <script type="text/javascript"  src="https://www.gstatic.com/charts/loader.js"></script>
+  <script type="text/javascript">
+    if (window.google && window.google.charts) {
+      google.charts.load('current', {packages: ['corechart']});
+    } else {
+      throw 'error: Could not load google visualization library. Are you offline?';
+    }
+  </script>
+
+  <style>
+    html, body {
+      background-color: #eee;
+    }
+  </style>
+
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <editor-navbar-breadcrumb></editor-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <editor-navigation></editor-navigation>
+
+  <exploration-save-and-publish-buttons></exploration-save-and-publish-buttons>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <exploration-editor-page></exploration-editor-page>
+{% endblock content %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="/third_party/static/ckeditor-4.9.2/ckeditor.js"></script>
+  <script src="/third_party/static/d3js-5.9.2/d3.min.js"></script>
+  <script src="/templates/dev/head/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+  {{ interaction_templates }}
+  {{ dependencies_html }}
+{% endblock footer_js %}

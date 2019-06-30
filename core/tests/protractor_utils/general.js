@@ -17,21 +17,9 @@
  * with protractor.
  */
 
-var editor = require('./editor.js');
-
-// Time (in ms) to wait when the system needs time for some computations.
-var WAIT_TIME = 4000;
-
-// Optionally accepts a waitTime integer in milliseconds.
-var waitForSystem = function() {
-  var waitTime;
-  if (arguments.length === 1) {
-    waitTime = arguments[0];
-  } else {
-    waitTime = WAIT_TIME;
-  }
-  browser.sleep(waitTime);
-};
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
+var waitFor = require('./waitFor.js');
 
 var scrollToTop = function() {
   browser.executeScript('window.scrollTo(0,0);');
@@ -45,6 +33,14 @@ var checkForConsoleErrors = function(errorsToIgnore) {
   var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   browser.manage().logs().get('browser').then(function(browserLogs) {
     var fatalErrors = [];
+    // The mobile tests run on the latest version of Chrome.
+    // The newer versions report 'Slow Network' as a console error.
+    // This causes the tests to fail, therefore, we remove such logs.
+    if (browser.isMobile) {
+      browserLogs = browserLogs.filter(function(browserLog) {
+        return !(browserLog.message.includes(' Slow network is detected.'));
+      });
+    }
     for (var i = 0; i < browserLogs.length; i++) {
       if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
         var errorFatal = true;
@@ -62,14 +58,19 @@ var checkForConsoleErrors = function(errorsToIgnore) {
   });
 };
 
+var isInDevMode = function() {
+  browser.get('/library');
+  waitFor.pageToFullyLoad();
+  var devModeElement = element(by.css('.oppia-dev-mode'));
+  return devModeElement.isPresent();
+};
+
 var SERVER_URL_PREFIX = 'http://localhost:9001';
-var LIBRARY_URL_SUFFIX = '/library';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
+var USER_PREFERENCES_URL = '/preferences';
 var LOGIN_URL_SUFFIX = '/_ah/login';
-var ADMIN_URL_SUFFIX = '/admin';
 var MODERATOR_URL_SUFFIX = '/moderator';
-var DONATION_THANK_URL_SUFFIX = '/thanks';
 // Note that this only works in dev, due to the use of cache slugs in prod.
 var SCRIPTS_URL_SLICE = '/assets/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
@@ -104,13 +105,15 @@ var getExplorationIdFromPlayer = function() {
 // The explorationId here should be a string, not a promise.
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
-  browser.waitForAngular();
-  editor.exitTutorialIfNecessary();
+  waitFor.pageToFullyLoad();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.exitTutorial();
 };
 
 var openPlayer = function(explorationId) {
   browser.get(PLAYER_URL_SLICE + explorationId);
-  browser.waitForAngular();
+  waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
@@ -133,28 +136,67 @@ var expect404Error = function() {
 var ensurePageHasNoTranslationIds = function() {
   // The use of the InnerHTML is hacky, but is faster than checking each
   // individual component that contains text.
-  element(by.css('.oppia-base-container')).getInnerHtml().then(
+  element(by.css('.oppia-base-container')).getAttribute('innerHTML').then(
     function(promiseValue) {
       // First remove all the attributes translate and variables that are
       // not displayed
       var REGEX_TRANSLATE_ATTR = new RegExp('translate="I18N_', 'g');
       var REGEX_NG_VARIABLE = new RegExp('<\\[\'I18N_', 'g');
+      var REGEX_NG_TOP_NAV_VISIBILITY =
+        new RegExp('ng-show="\\$ctrl.navElementsVisibilityStatus.I18N_', 'g');
       expect(promiseValue.replace(REGEX_TRANSLATE_ATTR, '')
-        .replace(REGEX_NG_VARIABLE, '')).not.toContain('I18N');
+        .replace(REGEX_NG_VARIABLE, '')
+        .replace(REGEX_NG_TOP_NAV_VISIBILITY, '')).not.toContain('I18N');
     });
 };
 
-exports.waitForSystem = waitForSystem;
+var acceptAlert = function() {
+  waitFor.alertToBePresent();
+  browser.switchTo().alert().accept();
+  waitFor.pageToFullyLoad();
+};
+
+var _getUniqueLogMessages = function(logs) {
+  // Returns unique log messages.
+  var logsDict = {};
+  for (var i = 0; i < logs.length; i++) {
+    if (!logsDict.hasOwnProperty(logs[i].message)) {
+      logsDict[logs[i].message] = true;
+    }
+  }
+  return Object.keys(logsDict);
+};
+
+var checkConsoleErrorsExist = function(expectedErrors) {
+  // Checks that browser logs match entries in expectedErrors array.
+  browser.manage().logs().get('browser').then(function(browserLogs) {
+    // Some browsers such as chrome raise two errors for a missing resource.
+    // To keep consistent behaviour across browsers, we keep only the logs
+    // that have a unique value for their message attribute.
+    var uniqueLogMessages = _getUniqueLogMessages(browserLogs);
+    expect(uniqueLogMessages.length).toBe(expectedErrors.length);
+    for (var i = 0; i < expectedErrors.length; i++) {
+      var errorPresent = false;
+      for (var j = 0; j < uniqueLogMessages.length; j++) {
+        if (uniqueLogMessages[j].match(expectedErrors[i])) {
+          errorPresent = true;
+        }
+      }
+      expect(errorPresent).toBe(true);
+    }
+  });
+};
+
+exports.acceptAlert = acceptAlert;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
+exports.isInDevMode = isInDevMode;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
-exports.LIBRARY_URL_SUFFIX = LIBRARY_URL_SUFFIX;
+exports.USER_PREFERENCES_URL = USER_PREFERENCES_URL;
 exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.MODERATOR_URL_SUFFIX = MODERATOR_URL_SUFFIX;
-exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
-exports.DONATION_THANK_URL_SUFFIX = DONATION_THANK_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;
 
@@ -167,3 +209,5 @@ exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
 
 exports.ensurePageHasNoTranslationIds = ensurePageHasNoTranslationIds;
+
+exports.checkConsoleErrorsExist = checkConsoleErrorsExist;

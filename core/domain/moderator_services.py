@@ -22,8 +22,8 @@ import feconf
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
-def enqueue_flag_exploration_email_task(exploration_id, report_text,
-                                        reporter_id):
+def enqueue_flag_exploration_email_task(
+        exploration_id, report_text, reporter_id):
     """Adds a 'send flagged exploration email' task into taskqueue."""
     payload = {
         'exploration_id': exploration_id,
@@ -32,5 +32,5 @@ def enqueue_flag_exploration_email_task(exploration_id, report_text,
     }
 
     # Emails about flagged explorations are sent immediately to moderators.
-    taskqueue_services.enqueue_task(
+    taskqueue_services.enqueue_email_task(
         feconf.TASK_URL_FLAG_EXPLORATION_EMAILS, payload, 0)

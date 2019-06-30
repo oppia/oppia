@@ -20,8 +20,10 @@ source $(dirname $0)/setup.sh || exit 1
 rm -rf $TOOLS_DIR
 rm -rf $NODE_MODULE_DIR
 rm -rf third_party
-rm -rf core/templates/prod
+rm -rf build
+rm -rf backend_prod_files
 rm -f .coverage
+rm -rf local_compiled_js
 rm -f .viminfo
 
 echo Temporary and installed files deleted.

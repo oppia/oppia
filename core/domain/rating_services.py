@@ -22,6 +22,7 @@ from core.domain import event_services
 from core.domain import exp_services
 from core.platform import models
 import feconf
+
 (exp_models, user_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
@@ -56,6 +57,9 @@ def assign_rating_to_exploration(user_id, exploration_id, new_rating):
         raise Exception('Invalid exploration id %s' % exploration_id)
 
     def _update_user_rating():
+        """Updates the user rating of the exploration. Returns the old rating
+        before updation.
+        """
         exp_user_data_model = user_models.ExplorationUserDataModel.get(
             user_id, exploration_id)
         if exp_user_data_model:

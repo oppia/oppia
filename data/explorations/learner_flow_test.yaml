@@ -1,0 +1,67 @@
+author_notes: ''
+blurb: ''
+category: Astronomy
+init_state_name: Start
+language_code: en
+objective: To expand the horizon of the minds!
+param_changes: []
+param_specs: {}
+schema_version: 17
+states:
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  Mid:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Hello, I am Oppia!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: END
+        feedback: []
+        param_changes: []
+      hints: []
+      id: Continue
+      solution: null
+    param_changes: []
+  Start:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Test exploration
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: Mid
+        feedback: []
+        param_changes: []
+      hints: []
+      id: Continue
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: Dummy Exploration

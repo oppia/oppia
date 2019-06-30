@@ -1,0 +1,91 @@
+/* The following is needed so that the radio button does not show. */
+.item-selection-input-radio-button {
+  display: none;
+}
+
+.item-selection-input-checkbox {
+  font-weight: normal;
+  margin: 2px;
+}
+
+md-checkbox.item-selection-input-checkbox.md-default-theme .md-icon {
+  border-color: #0d48a1;
+  top: 2px;
+}
+md-checkbox.item-selection-input-checkbox.md-default-theme.md-checked .md-icon {
+  background-color: rgba(102, 187, 106, 0.87);
+}
+md-checkbox.item-selection-input-checkbox .md-label {
+  vertical-align: top;
+}
+
+.item-selection-input-form-container {
+  margin-top: -5px;
+}
+.item-selection-input-item {
+  background: none;
+  border: none;
+  color: #0d48a1;
+  margin: 0;
+  padding-left: 0;
+  text-align: left;
+  /* This is needed so that images stay bounded by the container in Firefox. */
+  width: 100%;
+}
+.item-selection-input-container {
+  padding-bottom: 5px;
+}
+
+.item-selection-input-container md-input-group.md-default-theme label {
+  border-bottom: 0px;
+}
+
+.item-selection-input-container img {
+  max-height: 200px;
+}
+
+.multiple-choice-option-container {
+  padding: 4px 0;
+}
+
+.multiple-choice-option {
+  background: none;
+  border: none;
+  color: #0D48A1;
+  text-align: left;
+  /* This is needed so that images stay bounded by the container in Firefox. */
+  width: 100%;
+}
+
+.multiple-choice-radio-button-container,
+.multiple-choice-content-container {
+  display: table-cell;
+}
+
+.multiple-choice-option:hover {
+  color: #115FD4;
+}
+
+.multiple-choice-option:hover .multiple-choice-inner-radio-button,
+.multiple-choice-option:focus .multiple-choice-inner-radio-button {
+  background-color: #115FD4;
+  border-radius: 50%;
+  display: block;
+  height: 8px;
+  margin: 2px;
+  width: 8px;
+}
+
+.multiple-choice-option:hover .multiple-choice-outer-adio-button {
+  border-color: #115FD4;
+}
+
+.multiple-choice-outer-radio-button {
+  border: 2px solid #0D48A1;
+  border-radius: 50%;
+  display: inline-block;
+  height: 16px;
+  margin-bottom: -7px;
+  margin-right: 12px;
+  width: 16px;
+}

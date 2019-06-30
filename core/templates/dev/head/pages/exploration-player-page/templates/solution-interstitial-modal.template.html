@@ -1,0 +1,43 @@
+<div class="oppia-learner-solution-interstitial-modal-title">Warning!</div>
+
+<div class="modal-body">
+  <span class="oppia-learner-solution-interstitial-modal-body">
+    This will show the full solution. Are you sure?
+  </span>
+</div>
+
+<button class="oppia-learner-got-it-button md-button md-default-theme pull-right protractor-test-continue-to-solution-btn"
+        ng-click="continueToSolution()">
+  Show Solution
+</button>
+<button class="oppia-modal-cancel-button md-button md-default-theme pull-right" ng-click="cancel()">
+  Cancel
+</button>
+
+<span class="clearfix"></span>
+
+<style>
+  .oppia-learner-solution-interstitial-modal-title {
+    color: #00786D;
+    font-family: 'Capriola', 'Roboto', 'Arial', sans-serif;
+    font-size: 1.75em;
+    font-weight: bold;
+    padding-top: 20px;
+    text-align: center;
+  }
+
+  .oppia-learner-solution-interstitial-modal-body {
+    word-wrap: break-word;
+  }
+
+  .md-button.oppia-modal-cancel-button {
+    background: #9a9a9a;
+    color: #ffffff;
+    margin-right: 12px;
+    padding: 6px 12px;
+  }
+  .md-button.md-default-theme.oppia-modal-cancel-button:focus,
+  .md-button.md-default-theme.oppia-modal-cancel-button:hover {
+    background: #7a7a7a;
+  }
+</style>

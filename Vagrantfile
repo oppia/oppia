@@ -8,6 +8,13 @@
 
 # The recommended method for short, multi-line shell scripts in Vagrant.
 # Usage: http://stackoverflow.com/questions/2500436/how-does-cat-eof-work-in-bash
+$env_script = <<SCRIPT
+# General-purpose env var to let scripts know we are in Vagrant.
+echo "export VAGRANT=true" >> /etc/profile
+# Create file (if it does not exist already) to let scripts know we are in Vagrant.
+touch /etc/is_vagrant_vm
+SCRIPT
+
 $script = <<SCRIPT
 cd /home/vagrant/oppia
 bash ./scripts/install_prerequisites.sh
@@ -19,12 +26,12 @@ Vagrant.configure(2) do |config|
     v.customize ["setextradata", :id, "VBoxInternal2/SharedFoldersEnableSymlinksCreate/v-root", "1"]
     v.memory = 2048
   end
-  # General-purpose env var to let scripts know we are in Vagrant.
-  config.vm.provision "shell", inline: 'echo "export VAGRANT=true" >> /etc/profile'
+
+  config.vm.provision "shell", inline: $env_script
   # Tell apt to default to "yes" when installing packages. Necessary for unattended installs.
   config.vm.provision "shell", inline: 'echo \'APT::Get::Assume-Yes "true";\' > /etc/apt/apt.conf.d/90yes'
-  config.vm.network "forwarded_port", guest: 8000, host: 8000
-  config.vm.network "forwarded_port", guest: 8181, host: 8181
+  config.vm.network "forwarded_port", guest: 8000, host: 8000, host_ip: "127.0.0.1"
+  config.vm.network "forwarded_port", guest: 8181, host: 8181, host_ip: "127.0.0.1"
   config.vm.box = "ubuntu/trusty64"
   config.vm.synced_folder ".", "/home/vagrant/oppia"
   config.vm.provision "shell", inline: $script

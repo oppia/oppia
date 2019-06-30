@@ -1,0 +1,4 @@
+dispatch:
+  # Send requests for exports to the cloud datastore admin service.
+  - url: "*/cloud_datastore_export"
+    service: cloud-datastore-admin

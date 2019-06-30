@@ -1,0 +1,14 @@
+<div class="modal-header">
+  <h3>Select topic(s) to which the skill is to be assigned</h3>
+</div>
+
+<div class="modal-body">
+  <select-topics topic-summaries="topicSummaries"
+                 selected-topic-ids="selectedTopicIds">
+  </select-topics>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success protractor-test-confirm-move-button" ng-click="done()">Save</button>
+</div>

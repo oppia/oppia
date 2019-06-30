@@ -21,7 +21,6 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
-var general = require('./general.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -34,23 +33,102 @@ var DictionaryEditor = function(elem) {
   };
 };
 
+var GraphEditor = function(graphInputContainer) {
+  if (!graphInputContainer) {
+    throw Error('Please provide Graph Input Container element');
+  }
+  var vertexElement = function(index) {
+    // Would throw incorrect element error if provided incorrect index number.
+    // Node index starts at 0.
+    return graphInputContainer.element(by.css(
+      '.protractor-test-graph-vertex-' + index));
+  };
+
+  var createVertex = function(xOffset, yOffset) {
+    var addNodeButton = graphInputContainer.element(
+      by.css('.protractor-test-Add-Node-button'));
+    addNodeButton.click();
+    // Offsetting from the graph container.
+    browser.actions()
+      .mouseMove(graphInputContainer, {x: xOffset, y: yOffset})
+      .click()
+      .perform();
+  };
+
+  var createEdge = function(vertexIndex1, vertexIndex2) {
+    var addEdgeButton = graphInputContainer.element(
+      by.css('.protractor-test-Add-Edge-button'));
+    addEdgeButton.click();
+    browser.actions()
+      .dragAndDrop(vertexElement(vertexIndex1), vertexElement(vertexIndex2))
+      .perform();
+  };
+  return {
+    setValue: function(graphDict) {
+      var nodeCoordinatesList = graphDict.vertices;
+      var edgesList = graphDict.edges;
+      if (nodeCoordinatesList) {
+        expect(nodeCoordinatesList.length).toBeGreaterThan(0);
+        // Assume x-coord is at index 0.
+        nodeCoordinatesList.forEach(function(coordinateElement) {
+          createVertex(coordinateElement[0], coordinateElement[1]);
+        });
+      }
+      if (edgesList) {
+        edgesList.forEach(function(edgeElement) {
+          createEdge(edgeElement[0], edgeElement[1]);
+        });
+      }
+    },
+    clearDefaultGraph: function() {
+      var deleteButton = graphInputContainer.element(
+        by.css('.protractor-test-Delete-button'));
+      deleteButton.click();
+      // Sample graph comes with 3 vertices.
+      for (var i = 2; i >= 0; i--) {
+        vertexElement(i).click();
+      }
+    },
+    expectCurrentGraphToBe: function(graphDict) {
+      var nodeCoordinatesList = graphDict.vertices;
+      var edgesList = graphDict.edges;
+      if (nodeCoordinatesList) {
+        // Expecting total no. of vertices on the graph matches with the given
+        // dict's vertices.
+        nodeCoordinatesList.forEach(function(node, index) {
+          expect(vertexElement(index).isDisplayed()).toBe(true);
+        });
+      }
+      if (edgesList) {
+        // Expecting total no. of edges on the graph matches with the given
+        // dict's edges.
+        var allEdgesElement = element.all(by.css(
+          '.protractor-test-graph-edge'));
+        allEdgesElement.then(function(allEdges) {
+          expect(allEdges.length).toEqual(edgesList.length);
+        });
+      }
+    }
+  };
+};
+
 var ListEditor = function(elem) {
   // NOTE: this returns a promise, not an integer.
   var _getLength = function() {
-    return elem.all(by.repeater('item in localValue track by $index')).
-        then(function(items) {
-      return items.length;
-    });
+    return elem.all(by.repeater('item in localValue track by $index'))
+      .then(function(items) {
+        return items.length;
+      });
   };
   // If objectType is specified this returns an editor for objects of that type
   // which can be used to make changes to the newly-added item (for example
   // by calling setValue() on it). Clients should ensure the given objectType
   // corresponds to the type of elements in the list.
   // If objectType is not specified, this function returns nothing.
-  var addItem = function(objectType) {
+  var addItem = function(objectType = null) {
     var listLength = _getLength();
     elem.element(by.css('.protractor-test-add-list-entry')).click();
-    if (objectType) {
+    if (objectType !== null) {
       return getEditor(objectType)(
         elem.element(
           by.repeater('item in localValue track by $index').row(listLength)));
@@ -66,7 +144,7 @@ var ListEditor = function(elem) {
     editItem: function(index, objectType) {
       var item = elem.element(
         by.repeater('item in localValue track by $index'
-      ).row(index));
+        ).row(index));
       var editor = getEditor(objectType);
       return editor(item);
     },
@@ -79,8 +157,8 @@ var ListEditor = function(elem) {
           for (var i = startingLength; i < desiredLength; i++) {
             addItem();
           }
-          for (var i = startingLength - 1; i >= desiredLength; i--) {
-            deleteItem(i);
+          for (var j = startingLength - 1; j >= desiredLength; j--) {
+            deleteItem(j);
           }
         }
       );
@@ -99,17 +177,17 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = function(elem) {
   // Set focus in the RTE.
-  elem.all(by.model('html')).first().click();
+  elem.all(by.css('.oppia-rte')).first().click();
 
   var _appendContentText = function(text) {
-    elem.all(by.model('html')).first().sendKeys(text);
+    elem.all(by.css('.oppia-rte')).first().sendKeys(text);
   };
   var _clickToolbarButton = function(buttonName) {
-    elem.element(by.css('[name="' + buttonName + '"]')).click();
+    elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = function() {
-    expect(elem.all(by.model('html')).first().isPresent()).toBe(true);
-    elem.all(by.model('html')).first().clear();
+    expect(elem.all(by.css('.oppia-rte')).first().isPresent()).toBe(true);
+    elem.all(by.css('.oppia-rte')).first().clear();
   };
 
   return {
@@ -124,36 +202,36 @@ var RichTextEditor = function(elem) {
       _appendContentText(text);
     },
     appendBoldText: function(text) {
-      _clickToolbarButton('bold');
+      _clickToolbarButton('cke_button__bold');
       _appendContentText(text);
-      _clickToolbarButton('bold');
+      _clickToolbarButton('cke_button__bold');
     },
     appendItalicText: function(text) {
-      _clickToolbarButton('italics');
+      _clickToolbarButton('cke_button__italic');
       _appendContentText(text);
-      _clickToolbarButton('italics');
+      _clickToolbarButton('cke_button__italic');
     },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
-      _clickToolbarButton('ol');
+      _clickToolbarButton('cke_button__numberedlist');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickToolbarButton('ol');
+      _clickToolbarButton('cke_button__numberedlist');
     },
     appendUnorderedList: function(textArray) {
       _appendContentText('\n');
-      _clickToolbarButton('ul');
+      _clickToolbarButton('cke_button__bulletedlist');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickToolbarButton('ul');
+      _clickToolbarButton('cke_button__bulletedlist');
     },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: function(componentName) {
-      _clickToolbarButton(componentName.toLowerCase());
+      _clickToolbarButton('cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
@@ -168,10 +246,15 @@ var RichTextEditor = function(elem) {
         null, args);
       modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
-      general.waitForSystem();
+
+      // Ensure that focus is not on added component once it is added so that
+      // the component is not overwritten by some other element.
+      if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
+        elem.all(by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+      }
 
       // Ensure that the cursor is at the end of the RTE.
-      elem.all(by.model('html')).first().sendKeys(
+      elem.all(by.css('.oppia-rte')).first().sendKeys(
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -191,14 +274,14 @@ var AutocompleteDropdownEditor = function(elem) {
     setValue: function(text) {
       elem.element(by.css('.select2-container')).click();
       // NOTE: the input field is top-level in the DOM, and is outside the
-      // context of 'elem'. The 'select2-drop' id is assigned to the input
+      // context of 'elem'. The 'select2-dropdown' id is assigned to the input
       // field when it is 'activated', i.e. when the dropdown is clicked.
-      element(by.id('select2-drop')).element(by.css('.select2-input')).
-        sendKeys(text + '\n');
+      element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input')).sendKeys(text + '\n');
     },
     expectOptionsToBe: function(expectedOptions) {
       elem.element(by.css('.select2-container')).click();
-      element(by.id('select2-drop')).all(by.tagName('li')).map(
+      element(by.css('.select2-dropdown')).all(by.tagName('li')).map(
         function(optionElem) {
           return optionElem.getText();
         }
@@ -206,8 +289,8 @@ var AutocompleteDropdownEditor = function(elem) {
         expect(actualOptions).toEqual(expectedOptions);
       });
       // Re-close the dropdown.
-      element(by.id('select2-drop')).element(by.css('.select2-input')).
-        sendKeys('\n');
+      element(by.css('.select2-dropdown')).element(
+        by.css('.select2-search input')).sendKeys('\n');
     }
   };
 };
@@ -216,33 +299,35 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   return {
     setValues: function(texts) {
       // Clear all existing choices.
-      elem.element(by.css('.select2-choices'))
-          .all(by.tagName('li')).map(function(choiceElem) {
-        return choiceElem.element(by.css('.select2-search-choice-close'));
-      }).then(function(deleteButtons) {
-        // We iterate in descending order, because clicking on a delete button
-        // removes the element from the DOM. We also omit the last element
-        // because it is the field for new input.
-        for (var i = deleteButtons.length - 2; i >= 0; i--) {
-          deleteButtons[i].click();
-        }
-      });
+      elem.element(by.css('.select2-selection__rendered'))
+        .all(by.tagName('li')).map(function(choiceElem) {
+          return choiceElem.element(
+            by.css('.select2-selection__choice__remove'));
+        }).then(function(deleteButtons) {
+          // We iterate in descending order, because clicking on a delete button
+          // removes the element from the DOM. We also omit the last element
+          // because it is the field for new input.
+          for (var i = deleteButtons.length - 2; i >= 0; i--) {
+            deleteButtons[i].click();
+          }
+        });
 
       for (var i = 0; i < texts.length; i++) {
         elem.element(by.css('.select2-container')).click();
-        elem.element(by.css('.select2-input')).sendKeys(texts[i] + '\n');
+        elem.element(by.css('.select2-search__field')).sendKeys(
+          texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
-      elem.element(by.css('.select2-choices'))
-          .all(by.tagName('li')).map(function(choiceElem) {
-        return choiceElem.getText();
-      }).then(function(actualSelection) {
-        // Remove the element corresponding to the last <li>, which actually
-        // corresponds to the field for new input.
-        actualSelection.pop();
-        expect(actualSelection).toEqual(expectedCurrentSelection);
-      });
+      elem.element(by.css('.select2-selection__rendered'))
+        .all(by.tagName('li')).map(function(choiceElem) {
+          return choiceElem.getText();
+        }).then(function(actualSelection) {
+          // Remove the element corresponding to the last <li>, which actually
+          // corresponds to the field for new input.
+          actualSelection.pop();
+          expect(actualSelection).toEqual(expectedCurrentSelection);
+        });
     }
   };
 };
@@ -253,34 +338,31 @@ var MultiSelectEditor = function(elem) {
   var _toggleElementStatusesAndVerifyExpectedClass = function(
       texts, expectedClassBeforeToggle) {
     // Open the dropdown menu.
-    elem.element(by.css('.dropdown-toggle')).click();
+    elem.element(by.css('.protractor-test-search-bar-dropdown-toggle')).click();
 
-    elem.element(by.css('.dropdown-menu')).all(by.tagName('span')).filter(
-      function(choiceElem) {
+    elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
+      .all(by.tagName('span')).filter(function(choiceElem) {
         return choiceElem.getText().then(function(choiceText) {
           return texts.indexOf(choiceText) !== -1;
         });
-      }
-    ).then(function(filteredElements) {
-      if (filteredElements.length !== texts.length) {
-        throw (
-          'Could not toggle element selection. Values requested: ' + texts +
+      }).then(function(filteredElements) {
+        if (filteredElements.length !== texts.length) {
+          throw (
+            'Could not toggle element selection. Values requested: ' + texts +
           '. Found ' + filteredElements.length + ' matching elements.');
-      }
+        }
 
-      for (var i = 0; i < filteredElements.length; i++) {
+        for (var i = 0; i < filteredElements.length; i++) {
         // Check that, before toggling, the element is in the correct state.
-        expect(filteredElements[i].getAttribute('class')).toMatch(
-          expectedClassBeforeToggle);
-        filteredElements[i].click();
-        // Reopen the dropdown menu, since it closes after an item is
-        // toggled.
-        elem.element(by.css('.dropdown-toggle')).click();
-      }
+          expect(filteredElements[i].getAttribute('class')).toMatch(
+            expectedClassBeforeToggle);
+          filteredElements[i].click();
+        }
 
-      // Close the dropdown menu at the end.
-      elem.element(by.css('.dropdown-toggle')).click();
-    });
+        // Close the dropdown menu at the end.
+        elem.element(by.css(
+          '.protractor-test-search-bar-dropdown-toggle')).click();
+      });
   };
 
   return {
@@ -294,18 +376,20 @@ var MultiSelectEditor = function(elem) {
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
       // Open the dropdown menu.
-      elem.element(by.css('.dropdown-toggle')).click();
+      elem.element(by.css(
+        '.protractor-test-search-bar-dropdown-toggle')).click();
 
       // Find the selected elements.
-      elem.element(by.css('.dropdown-menu'))
-          .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
-        return selectedElem.getText();
-      }).then(function(actualSelection) {
-        expect(actualSelection).toEqual(expectedCurrentSelection);
+      elem.element(by.css('.protractor-test-search-bar-dropdown-menu'))
+        .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
+          return selectedElem.getText();
+        }).then(function(actualSelection) {
+          expect(actualSelection).toEqual(expectedCurrentSelection);
 
-        // Close the dropdown menu at the end.
-        elem.element(by.css('.dropdown-toggle')).click();
-      });
+          // Close the dropdown menu at the end.
+          elem.element(by.css(
+            '.protractor-test-search-bar-dropdown-toggle')).click();
+        });
     }
   };
 };
@@ -315,7 +399,7 @@ var MultiSelectEditor = function(elem) {
 // <div>
 //   plain
 //   <b>bold</b>
-//   <oppia-nointeractive-math> ... </oppia-noninteractive-math>
+//   <oppia-noninteractive-math> ... </oppia-noninteractive-math>
 // <div>
 // The richTextInstructions function will be supplied with a 'handler' argument
 // which it should then use to read through the rich-text area using the
@@ -331,7 +415,6 @@ var expectRichText = function(elem) {
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
     // altogether.)
     var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
-
     elem.all(by.xpath(XPATH_SELECTOR)).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
@@ -385,7 +468,9 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
-    expect(arrayOfElems[arrayPointer].getInnerHtml()).toBe(text);
+    expect(
+      arrayOfElems[arrayPointer].getAttribute('innerHTML')
+    ).toBe(text);
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
@@ -402,10 +487,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       justPassedRteComponent = false;
     },
     readBoldText: function(text) {
-      _readFormattedText(text, 'b');
+      _readFormattedText(text, 'strong');
     },
     readItalicText: function(text) {
-      _readFormattedText(text, 'i');
+      _readFormattedText(text, 'em');
     },
     // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
@@ -464,7 +549,7 @@ var toRichText = function(text) {
  * CodeMirror loads a part of the text at once, and scrolling in the element
  * loads more divs.
  */
-var CodeMirrorChecker = function(elem) {
+var CodeMirrorChecker = function(elem, codeMirrorPaneToScroll) {
   // The number of pixels to scroll between reading different sections of
   // CodeMirror's text. 400 pixels is about 15 lines, which will work if
   // codemirror's buffer (viewportMargin) is set to at least 10 (the default).
@@ -475,6 +560,8 @@ var CodeMirrorChecker = function(elem) {
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
+   * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
+   * which is to be scrolled.
    * compareDict is an object whose keys are line numbers and whose values are
    * objects corresponding to that line with the following key-value pairs:
    *  - 'text': the exact string of text expected on that line
@@ -483,32 +570,32 @@ var CodeMirrorChecker = function(elem) {
    */
   var _compareTextAndHighlightingFromLine = function(
       currentLineNumber, scrollTo, compareDict) {
-    // This is used to scroll the text in codemirror to a point scrollTo pixels
-    // from the top of the text or the bottom of the text if scrollTo is too
-    // large.
+    // This is used to match and scroll the text in codemirror to a point
+    // scrollTo pixels from the top of the text or the bottom of the text
+    // if scrollTo is too large.
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
-      ');');
-    general.waitForSystem();
+      '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
+      '().scrollTop(' + String(scrollTo) + ');');
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
-          .then(function(lineNumber) {
-        // Note: the last line in codemirror will have an empty string for line
-        // number and for text. This is to skip that line.
-        if (lineNumber === '') {
+        .then(function(lineNumber) {
+          // Note: the last line in codemirror will have an empty string for
+          // line number and for text. This is to skip that line.
+          if (lineNumber === '') {
+            return lineNumber;
+          }
+          if (!compareDict.hasOwnProperty(lineNumber)) {
+            throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+          }
+          expect(lineElement.element(by.xpath('./pre')).getText())
+            .toEqual(compareDict[lineNumber].text);
+          expect(
+            lineElement.element(
+              by.css('.CodeMirror-linebackground')).isPresent())
+            .toEqual(compareDict[lineNumber].highlighted);
+          compareDict[lineNumber].checked = true;
           return lineNumber;
-        }
-        if (!compareDict.hasOwnProperty(lineNumber)) {
-          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
-        }
-        expect(lineElement.element(by.xpath('./pre')).getText())
-          .toEqual(compareDict[lineNumber].text);
-        expect(
-          lineElement.element(by.css('.CodeMirror-linebackground')).isPresent())
-          .toEqual(compareDict[lineNumber].highlighted);
-        compareDict[lineNumber].checked = true;
-        return lineNumber;
-      });
+        });
     }).then(function(lineNumbers) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
       if (largestLineNumber !== currentLineNumber) {
@@ -533,6 +620,8 @@ var CodeMirrorChecker = function(elem) {
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
+   * codeMirrorPaneToScroll specifies the CodeMirror's left or right pane
+   * which is to be scrolled.
    * compareDict is an object whose keys are line numbers and whose values are
    * objects corresponding to that line with the following key-value pairs:
    *  - 'text': the exact string of text expected on that line
@@ -540,14 +629,22 @@ var CodeMirrorChecker = function(elem) {
    */
   var _compareTextFromLine = function(
       currentLineNumber, scrollTo, compareDict) {
+    // This is used to match and scroll the text in codemirror to a point
+    // scrollTo pixels from the top of the text or the bottom of the text
+    // if scrollTo is too large.
     browser.executeScript(
-      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
-      ');');
+      '$(\'.CodeMirror-vscrollbar\').' + codeMirrorPaneToScroll +
+      '().scrollTop(' + String(scrollTo) + ');');
     elem.getText().then(function(text) {
       // The 'text' arg is a string 2n lines long representing n lines of text
       // codemirror has loaded. The (2i)th line contains a line number and the
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
+      // We have an empty line in the codemirror panes which is retrived as NULL
+      // in codemirror5's getText() method. Therefore, we need to add an empty
+      // string at the end of the textArray to match with compareDict.
+
+      textArray[textArray.length] = '';
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
@@ -564,10 +661,11 @@ var CodeMirrorChecker = function(elem) {
           scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS,
           compareDict);
       } else {
-        for (var lineNumber in compareDict) {
-          if (compareDict[lineNumber].checked !== true) {
+        for (var dictLineNumber in compareDict) {
+          if (compareDict[dictLineNumber].checked !== true) {
             throw Error('Expected line ' + lineNumber + ': \'' +
-              compareDict[lineNumber].text + '\' to be found in CodeMirror');
+              compareDict[dictLineNumber].text + '\' to be found in CodeMirror'
+            );
           }
         }
       }
@@ -598,7 +696,7 @@ var CodeMirrorChecker = function(elem) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length;
-           lineNumber++) {
+        lineNumber++) {
         expectedDict[lineNumber] = {
           text: expectedTextArray[lineNumber - 1],
           checked: false
@@ -613,6 +711,7 @@ var CodeMirrorChecker = function(elem) {
 // their entries dynamically.
 var FORM_EDITORS = {
   Dictionary: DictionaryEditor,
+  Graph: GraphEditor,
   List: ListEditor,
   Real: RealEditor,
   RichText: RichTextEditor,
@@ -637,6 +736,7 @@ exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 exports.MultiSelectEditor = MultiSelectEditor;
+exports.GraphEditor = GraphEditor;
 
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;

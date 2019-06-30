@@ -1,0 +1,52 @@
+<div class="subtopic-editor">
+  <div class="modal-header">
+    <h3>
+      Edit Subtopic
+    </h3>
+  </div>
+  <div class="modal-body">
+    <div class="subtopic-title">
+      <p>
+        <strong style="font-size: 1.2em;">Subtopic Title</strong>
+      </p>
+      <form class="form-horizontal" role="form">
+        <input class="form-control protractor-test-subtopic-title-field" type="text" ng-blur="updateSubtopicTitle(editableTitle)" ng-model="editableTitle" maxlength="80" ng-change="resetErrorMsg()">
+      </form>
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="errorMsg">
+        <em><[errorMsg]></em>
+      </span>
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableTitle.length === 80">
+        <em>The maximum length of subtopic title is 80 characters.</em>
+      </span>
+    </div>
+    <div class="subtopic-page-editor">
+      <p>
+        <strong style="font-size: 1.2em;">Subtopic Page</strong>
+      </p>
+      <div class="oppia-editor-card-body">
+        <schema-based-editor schema="SUBTOPIC_PAGE_SCHEMA"
+                             class="protractor-test-subtopic-page-contents"
+                             local-value="htmlData">
+        </schema-based-editor>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+    <button class="btn btn-success protractor-test-save-subtopic-button" ng-disabled="editableTitle === ''" ng-click="save()"> Save & Exit </button>
+  </div>
+</div>
+
+<style>
+  .subtopic-editor .subtopic-page-editor {
+    min-height: 20vh;
+  }
+
+  .subtopic-editor .modal-body .subtopic-title {
+    margin-bottom: 3%;
+  }
+
+  .subtopic-editor .modal-footer {
+    margin-top: 50px;
+  }
+</style>

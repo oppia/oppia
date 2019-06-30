@@ -14,6 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for utils.py."""
+
+import copy
 import datetime
 
 # pylint: disable=relative-import
@@ -108,6 +111,21 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 utils.camelcase_to_hyphenated(test_case[0]), test_case[1])
 
+    def test_camelcase_to_snakecase(self):
+        """Test camelcase_to_hyphenated method."""
+        test_cases = [
+            ('AbcDef', 'abc_def'),
+            ('Abc', 'abc'),
+            ('abc_def', 'abc_def'),
+            ('Abc012Def345', 'abc012_def345'),
+            ('abcDef', 'abc_def'),
+            ('abc-def', 'abc-def'),
+        ]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                utils.camelcase_to_snakecase(test_case[0]), test_case[1])
+
     def test_set_url_query_parameter(self):
         """Test set_url_query_parameter method."""
         self.assertEqual(
@@ -140,6 +158,7 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(len(full_hash), 28)
         self.assertEqual(len(abbreviated_hash), 5)
         self.assertEqual(full_hash[:5], abbreviated_hash)
+        self.assertTrue(full_hash.isalnum())
 
     def test_vfs_construct_path(self):
         """Test vfs_construct_path method."""
@@ -181,36 +200,22 @@ class UtilsTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(utils.capitalize_string(datum[0]), datum[1])
 
+    def test_generate_random_string(self):
+        # Generate a random string of length 12.
+        random_string = utils.generate_random_string(12)
+        self.assertTrue(isinstance(random_string, basestring))
+        self.assertEqual(len(random_string), 12)
+
     def test_get_thumbnail_icon_url_for_category(self):
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Architecture'),
-            '%s/assets/images/subjects/Architecture.svg'
-            % utils.get_asset_dir_prefix())
+            '/subjects/Architecture.svg')
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Graph Theory'),
-            '%s/assets/images/subjects/GraphTheory.svg'
-            % utils.get_asset_dir_prefix())
+            '/subjects/GraphTheory.svg')
         self.assertEqual(
             utils.get_thumbnail_icon_url_for_category('Nonexistent'),
-            '%s/assets/images/subjects/Lightbulb.svg'
-            % utils.get_asset_dir_prefix())
-
-    def test_get_asset_dir_prefix_returns_correct_slug(self):
-
-        with self.swap(feconf, 'DEV_MODE', True):
-            utils.ASSET_DIR_PREFIX = None
-            asset_dir_prefix = utils.get_asset_dir_prefix()
-            self.assertEqual('', asset_dir_prefix)
-
-        with self.swap(feconf, 'DEV_MODE', False):
-            utils.ASSET_DIR_PREFIX = None
-            asset_dir_prefix = utils.get_asset_dir_prefix()
-            self.assertTrue(asset_dir_prefix.startswith('/build'))
-
-        with self.swap(feconf, 'IS_MINIFIED', True):
-            utils.ASSET_DIR_PREFIX = None
-            asset_dir_prefix = utils.get_asset_dir_prefix()
-            self.assertTrue(asset_dir_prefix.startswith('/build'))
+            '/subjects/Lightbulb.svg')
 
     def test_are_datetimes_close(self):
         initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
@@ -221,3 +226,29 @@ class UtilsTests(test_utils.GenericTestBase):
             self.assertFalse(utils.are_datetimes_close(
                 datetime.datetime(2016, 12, 1, 0, 0, 3),
                 initial_time))
+
+    def test_convert_to_str(self):
+        string1 = 'Home'
+        string2 = u'Лорем'
+        self.assertEqual(utils.convert_to_str(string1), string1)
+        self.assertEqual(
+            utils.convert_to_str(string2), string2.encode(encoding='utf-8'))
+
+    def test_get_hashable_value(self):
+        json1 = ['foo', 'bar', {'baz': 3}]
+        json2 = ['fee', {'fie': ['foe', 'fum']}]
+        json1_deepcopy = copy.deepcopy(json1)
+        json2_deepcopy = copy.deepcopy(json2)
+
+        test_set = {utils.get_hashable_value(json1)}
+        self.assertIn(utils.get_hashable_value(json1_deepcopy), test_set)
+        test_set.add(utils.get_hashable_value(json2))
+        self.assertEqual(
+            test_set, {
+                utils.get_hashable_value(json1_deepcopy),
+                utils.get_hashable_value(json2_deepcopy),
+            })
+
+    def test_is_valid_language_code(self):
+        self.assertTrue(utils.is_valid_language_code('en'))
+        self.assertFalse(utils.is_valid_language_code('unknown'))

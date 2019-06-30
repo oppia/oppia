@@ -41,22 +41,23 @@ class BaseValueGenerator(object):
 
     @property
     def id(self):
+        """Returns the Class name as a string, i.e "BaseValueGenerator".
+
+        Returns:
+            str. Class name i.e "BaseValueGenerator".
+        """
         return self.__class__.__name__
 
     @classmethod
     def get_html_template(cls):
+        """Returns the HTML template for the class.
+
+        Returns:
+            str. The HTML template corresponding to the class.
+        """
         return utils.get_file_contents(os.path.join(
             os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
             '%s.html' % cls.__name__))
-
-    @classmethod
-    def get_js_template(cls):
-        # NB: These generators should use only Angular templating. The
-        # variables they have access to are generatorId, initArgs,
-        # customizationArgs and objType.
-        return utils.get_file_contents(os.path.join(
-            os.getcwd(), feconf.VALUE_GENERATORS_DIR, 'templates',
-            '%s.js' % cls.__name__))
 
     def generate_value(self, *args, **kwargs):
         """Generates a new value, using the given customization args.
@@ -67,13 +68,19 @@ class BaseValueGenerator(object):
 
 
 class Registry(object):
-    """Registry of all value generators."""
+    """Maintains a registry of all the value generators.
 
-    # Dict mapping value generator class names to their classes.
+    Attributes:
+        value_generators_dict: dict(str : BaseValueGenerator). Dictionary
+            mapping value generator class names to their classes.
+    """
     value_generators_dict = {}
 
     @classmethod
     def _refresh_registry(cls):
+        """Refreshes the dictionary mapping between generator_id and the
+        corresponding generator classes.
+        """
         cls.value_generators_dict.clear()
 
         # Assemble all generators in
@@ -88,13 +95,9 @@ class Registry(object):
             if name.endswith('_test'):
                 continue
             module = loader.find_module(name).load_module(name)
-            for name, clazz in inspect.getmembers(module, inspect.isclass):
+            for _, clazz in inspect.getmembers(
+                    module, predicate=inspect.isclass):
                 if issubclass(clazz, BaseValueGenerator):
-                    if clazz.__name__ in cls.value_generators_dict:
-                        raise Exception(
-                            'Duplicate value generator name %s'
-                            % clazz.__name__)
-
                     cls.value_generators_dict[clazz.__name__] = clazz
 
     @classmethod
@@ -108,7 +111,18 @@ class Registry(object):
         """Gets a generator class by its id.
 
         Refreshes once if the generator is not found; subsequently, throws an
-        error."""
+        error.
+
+        Args:
+            generator_id: str. An id corresponding to a generator class.
+
+        Returns:
+            class(BaseValueGenerator). A generator class mapping to the
+                generator id given.
+
+        Raises:
+            KeyError: The given generator_id is invalid.
+        """
         if generator_id not in cls.value_generators_dict:
             cls._refresh_registry()
         return cls.value_generators_dict[generator_id]

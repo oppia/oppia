@@ -21,9 +21,11 @@ from core.domain import email_manager
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import suggestion_services
 from core.platform import models
 
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(job_models, email_models) = models.Registry.import_models(
+    [models.NAMES.job, models.NAMES.email])
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -44,11 +46,10 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         messages = {}
         for reference in references:
             message = feedback_services.get_message(
-                reference.exploration_id, reference.thread_id,
-                reference.message_id)
+                reference.thread_id, reference.message_id)
 
             exploration = exp_services.get_exploration_by_id(
-                reference.exploration_id)
+                reference.entity_id)
 
             message_text = message.text
             if len(message_text) > 200:
@@ -79,7 +80,7 @@ class SuggestionEmailHandler(base.BaseHandler):
         exploration_rights = (
             rights_manager.get_exploration_rights(exploration_id))
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        suggestion = suggestion_services.get_suggestion_by_id(thread_id)
 
         email_manager.send_suggestion_email(
             exploration.title, exploration.id, suggestion.author_id,
@@ -95,22 +96,25 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         reference_dict = payload['reference_dict']
 
         message = feedback_services.get_message(
-            reference_dict['exploration_id'], reference_dict['thread_id'],
-            reference_dict['message_id'])
+            reference_dict['thread_id'], reference_dict['message_id'])
         exploration = exp_services.get_exploration_by_id(
-            reference_dict['exploration_id'])
-        thread = feedback_services.get_thread(
-            reference_dict['exploration_id'], reference_dict['thread_id'])
+            reference_dict['entity_id'])
+        thread = feedback_services.get_thread(reference_dict['thread_id'])
+        model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+            user_id, reference_dict['thread_id'])
+        reply_to_id = model.reply_to_id
 
         subject = 'New Oppia message in "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, message.text, subject,
-            exploration.title, reference_dict['exploration_id'], thread.subject)
+            exploration.title, reference_dict['entity_id'],
+            thread.subject, reply_to_id=reply_to_id)
 
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
     """Handles task of sending email instantly when feedback thread status is
-    changed."""
+    changed.
+    """
 
     def post(self):
         payload = json.loads(self.request.body)
@@ -120,18 +124,16 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
         new_status = payload['new_status']
 
         message = feedback_services.get_message(
-            reference_dict['exploration_id'], reference_dict['thread_id'],
-            reference_dict['message_id'])
+            reference_dict['thread_id'], reference_dict['message_id'])
         exploration = exp_services.get_exploration_by_id(
-            reference_dict['exploration_id'])
-        thread = feedback_services.get_thread(
-            reference_dict['exploration_id'], reference_dict['thread_id'])
+            reference_dict['entity_id'])
+        thread = feedback_services.get_thread(reference_dict['thread_id'])
 
         text = 'changed status from %s to %s' % (old_status, new_status)
         subject = 'Oppia thread status change: "%s"' % thread.subject
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, text, subject, exploration.title,
-            reference_dict['exploration_id'], thread.subject)
+            reference_dict['entity_id'], thread.subject)
 
 
 class FlagExplorationEmailHandler(base.BaseHandler):

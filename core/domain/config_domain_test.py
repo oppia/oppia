@@ -17,9 +17,66 @@
 """Tests for the config property registry."""
 
 from core.domain import config_domain
-from core.domain import config_services
+from core.platform import models
 from core.tests import test_utils
+import feconf
 import schema_utils_test
+import utils
+
+(config_models,) = models.Registry.import_models([models.NAMES.config])
+
+
+class ConfigPropertyChangeTests(test_utils.GenericTestBase):
+
+    def test_config_property_change_object_with_missing_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Missing cmd key in change dict'):
+            config_domain.ConfigPropertyChange({'invalid': 'data'})
+
+    def test_config_property_change_object_with_invalid_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, 'Command invalid is not allowed'):
+            config_domain.ConfigPropertyChange({'cmd': 'invalid'})
+
+    def test_config_property_change_object_with_missing_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following required attributes are missing: '
+                'new_value')):
+            config_domain.ConfigPropertyChange({
+                'cmd': 'change_property_value'
+            })
+
+    def test_config_property_change_object_with_extra_attribute_in_cmd(self):
+        with self.assertRaisesRegexp(
+            utils.ValidationError, (
+                'The following extra attributes are present: invalid')):
+            config_domain.ConfigPropertyChange({
+                'cmd': 'change_property_value',
+                'new_value': 'new_value',
+                'invalid': 'invalid'
+            })
+
+    def test_config_property_change_object_with_change_property_value(self):
+        config_property_change_object = config_domain.ConfigPropertyChange({
+            'cmd': 'change_property_value',
+            'new_value': 'new_value'
+        })
+
+        self.assertEqual(
+            config_property_change_object.cmd, 'change_property_value')
+        self.assertEqual(config_property_change_object.new_value, 'new_value')
+
+    def test_to_dict(self):
+        config_property_change_dict = {
+            'cmd': 'change_property_value',
+            'new_value': 'new_value'
+        }
+        config_property_change_object = config_domain.ConfigPropertyChange(
+            config_property_change_dict)
+        self.assertEqual(
+            config_property_change_object.to_dict(),
+            config_property_change_dict)
 
 
 class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
@@ -31,36 +88,17 @@ class ConfigPropertyRegistryTests(test_utils.GenericTestBase):
                 property_name).schema
             schema_utils_test.validate_schema(schema)
 
-
-class DerivedConfigPropertyTests(test_utils.GenericTestBase):
-    """Tests for derived config properties (i.e., those that are not directly
-    settable)."""
-
-    def test_derived_config_properties_cannot_be_set_directly(self):
-        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-
+    def test_get_exception_creating_new_config_property_with_existing_name(
+            self):
         with self.assertRaisesRegexp(
-            Exception,
-            'Cannot modify value of config property moderator_ids directly'
-            ):
-            config_services.set_property(
-                self.MODERATOR_EMAIL, config_domain.MODERATOR_IDS.name,
-                [self.get_user_id_from_email(self.MODERATOR_EMAIL)])
+            Exception, 'Property with name promo_bar_enabled already exists'):
+            config_domain.ConfigProperty(
+                'promo_bar_enabled', 'schema', 'description', 'default_value')
 
-    def test_setting_derived_config_properties(self):
-        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
-
-        self.assertEqual(config_domain.MODERATOR_USERNAMES.value, [])
-        self.assertEqual(config_domain.MODERATOR_IDS.value, [])
-
-        self.set_moderators([self.MODERATOR_USERNAME])
-        self.assertEqual(
-            config_domain.MODERATOR_USERNAMES.value,
-            [self.MODERATOR_USERNAME])
-        self.assertEqual(
-            config_domain.MODERATOR_IDS.value,
-            [self.get_user_id_from_email(self.MODERATOR_EMAIL)])
-
-        self.set_moderators([])
-        self.assertEqual(config_domain.MODERATOR_USERNAMES.value, [])
-        self.assertEqual(config_domain.MODERATOR_IDS.value, [])
+    def test_config_property_with_new_config_property_model(self):
+        config_model = config_models.ConfigPropertyModel(
+            id='config_model', value='new_value')
+        config_model.commit(feconf.SYSTEM_COMMITTER_ID, [])
+        retrieved_model = config_domain.ConfigProperty(
+            'config_model', config_domain.BOOL_SCHEMA, 'description', False)
+        self.assertEqual(retrieved_model.value, 'new_value')

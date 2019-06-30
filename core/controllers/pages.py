@@ -12,11 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for simple, mostly-static pages (like About, Forum, etc.)."""
+"""Controllers for simple, mostly-static pages (like About, Splash, etc.)."""
 
-import urllib
-import urlparse
-
+from core.controllers import acl_decorators
 from core.controllers import base
 import feconf
 
@@ -24,19 +22,15 @@ import feconf
 class SplashPage(base.BaseHandler):
     """Landing page for Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         c_value = self.request.get('c')
-        self.values.update({
-            'meta_description': feconf.SPLASH_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_SPLASH,
-        })
-
         if not c_value:
-            self.render_template('pages/splash/splash.html')
+            self.render_template('dist/splash-page.mainpage.html')
         else:
             try:
-                self.render_template('pages/splash/splash_%s.html' % c_value)
+                self.render_template('dist/splash_%s.html' % c_value)
             except Exception:
                 # Old c values may have been deprecated, in which case we
                 # revert to the default splash page URL. When redirecting,
@@ -56,129 +50,105 @@ class SplashPage(base.BaseHandler):
 class AboutPage(base.BaseHandler):
     """Page with information about Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.ABOUT_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_ABOUT,
-        })
-        self.render_template('pages/about/about.html')
+        self.render_template('dist/about-page.mainpage.html')
+
+
+class GetStartedPage(base.BaseHandler):
+    """Page with information about how to get started using Oppia."""
+
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.render_template('dist/get-started-page.mainpage.html')
 
 
 class TeachPage(base.BaseHandler):
     """Page with information about how to teach on Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.TEACH_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_TEACH,
-        })
-        self.render_template('pages/teach/teach.html')
-
-
-class BlogPage(base.BaseHandler):
-    """Page embedding the Oppia blog."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.BLOG_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_BLOG,
-        })
-        self.render_template('pages/blog/blog.html')
+        self.render_template('dist/teach-page.mainpage.html')
 
 
 class ContactPage(base.BaseHandler):
     """Page with information about how to contact Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.CONTACT_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_CONTACT,
-        })
-        self.render_template('pages/contact/contact.html')
+        self.render_template('dist/contact-page.mainpage.html')
 
 
 class DonatePage(base.BaseHandler):
     """Page with information about how to donate to Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.DONATE_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_DONATE,
-        })
-        self.render_template('pages/donate/donate.html')
+        self.render_template('dist/donate-page.mainpage.html')
 
 
 class ThanksPage(base.BaseHandler):
     """Page that thanks people who donate to Oppia."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.THANKS_PAGE_DESCRIPTION,
-            'nav_mode': feconf.NAV_MODE_THANKS,
-        })
-        self.render_template('pages/thanks/thanks.html')
+        self.render_template('dist/thanks-page.mainpage.html')
 
 
-class ForumPage(base.BaseHandler):
-    """Page with an embedded forum."""
-
+class ForumRedirectPage(base.BaseHandler):
+    """A handler to redirect to Oppia's Google group."""
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        # Note: if you are working in the development environment and
-        # are accessing this page at localhost, please replace
-        # 'localhost' with '127.0.0.1'.
-        _, netloc, _, _, _ = urlparse.urlsplit(self.request.uri)
-
-        self.values.update({
-            'full_google_group_url': (
-                '%s&showtabs=false&hideforumtitle=true&parenturl=%s' % (
-                    feconf.EMBEDDED_GOOGLE_GROUP_URL,
-                    urllib.quote(self.request.uri, safe=''),
-                )
-            ),
-            'meta_description': feconf.FORUM_PAGE_DESCRIPTION,
-            'on_localhost': netloc.startswith('localhost'),
-        })
-        self.render_template('pages/forum/forum.html')
+        self.redirect(feconf.GOOGLE_GROUP_URL)
 
 
 class TermsPage(base.BaseHandler):
     """Page with terms and conditions."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.values.update({
-            'meta_description': feconf.TERMS_PAGE_DESCRIPTION,
-        })
-
-        self.render_template('pages/terms/terms.html')
+        self.render_template('dist/terms-page.mainpage.html')
 
 
 class PrivacyPage(base.BaseHandler):
     """Page with privacy policy."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/privacy/privacy.html')
+        self.render_template('dist/privacy-page.mainpage.html')
 
 
 class AboutRedirectPage(base.BaseHandler):
     """A page that redirects to the main About page."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.redirect('/about')
 
 
+class FoundationRedirectPage(base.BaseHandler):
+    """A page that redirects to the separate Oppia Foundation site."""
+    @acl_decorators.open_access
+    def get(self):
+        """Handles GET requests."""
+        self.redirect(feconf.FOUNDATION_SITE_URL)
+        return
+
+
 class TeachRedirectPage(base.BaseHandler):
     """A page that redirects to the main Teach page."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
         self.redirect('/teach')
@@ -187,6 +157,16 @@ class TeachRedirectPage(base.BaseHandler):
 class ConsoleErrorPage(base.BaseHandler):
     """Page with missing resources to test cache slugs."""
 
+    @acl_decorators.open_access
     def get(self):
         """Handles GET requests."""
-        self.render_template('pages/tests/console_errors.html')
+        self.render_template('dist/console_errors.html')
+
+
+class MaintenancePage(base.BaseHandler):
+    """Page describing that Oppia is down for maintenance mode."""
+
+    @acl_decorators.open_access
+    def get(self, *args, **kwargs):
+        """Handles GET requests."""
+        self.render_template('dist/maintenance-page.mainpage.html')

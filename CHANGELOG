@@ -1,6 +1,2515 @@
-This file contains a summary of changes to the Oppia code base. For a full changelog, please see
+This file contains a summary of changes to the Oppia code base.
 
-    https://github.com/oppia/oppia/commits/master
+v2.8.2 (23 May 2019)
+------------------------
+Improvements to editors and players
+* Fix #6468: Fix the improper alignment of tick mark in the library page (#6552)
+* Fix #6200: Fix inconsistent spacing with the lists (#6554)
+* Fix #6542: Add card name to the title of the exploration feedback (#6580)
+* Fix #6623: Add title to sharing link icons (#6624)
+
+New structures
+* Modify topic viewer page and few UI changes on topic editor page (#6455)
+
+Bug fixes
+* Fix #6418: Add validation checks to avoid infinite loops explained in issue and comments (#6520)
+* Fix #3819: Fix strange dragging behaviour of play later list in learner dashboard (#6544)
+* Fix #6229: Reordering Hints and Worked Examples in Safari  (#6547)
+* Fix #6561: Corrected the "About-->Get Involved" link on the top navigation bar (#6567)
+* Fix part of #6159: Fix revert exploration method (#6575)
+* Fix broken interaction previews in the exploration editor (#6627)
+* Fix lint issue by adding a space after colon (#6631)
+* Fix #6667: Renamed e2e test file to fix the issue. (#6668)
+
+Updates to static pages
+* Add NOTICE file, per Section 4(d) of the Apache license. (#6568)
+* Fix #6562: Removed G+ from the footer and Readme.md (#6569)
+* Fix #6581: Remove alternative versions of splash page (#6594)
+* Add a checkpoint to check for codeowners to the PR checklist (#6603)
+* Add a note regarding changelog labels to PR checklist (#6608)
+
+Translations
+* Add proper validation for written translations to allow translation in hinglish (#6588)
+
+Infrastructural changes
+* Migrate codebase to typescript (#6530)
+* Add a new one off job for validating production models. (#6541)
+* Fix part of #5914: Adds unimplemented extract_data method in the BaseModel (#6573)
+
+Code health
+* Fix part of #6387: Remove globals ALLOWED_INTERACTIONS_CATEGORIES (#6472)
+* Rename states_schema_version to state_schema_version. (#6589)
+* Fix part of #6565: Made error page and library page to use PageTitleService (#6595)
+* Update pylint to version 1.9.4 (#6626)
+* Update pycodestyle to version 2.5.0 (#6637)
+* Use package.json to install node modules; upgrade node module versions. (#6659)
+
+Development workflow
+* Adds codeowner to core.domain files (#6545)
+* Removing the timeout multiplier, to get in sync with linting files (#6559)
+* Fix part of #6555: Fix existing lint issues in develop branch (#6563)
+* Add removal of app.yaml version field to deploy script (#6564)
+* Fix release info script: fix imports, and sort PRs in descending order (#6607)
+* Moves lint test from CircleCI to Travis CI.  (#6647)
+* Introduce `linter_utils` module (#6650)
+* Add a comment to explain setting of node path (#6681)
+
+Testing coverage
+* Fix part of #5134: Increase coverage from 82% to 100% for core.platform.email.gae_email_services.py (#6335)
+* Fix part of #6240: Add e2e test for adding user bio in preferences page (#6512)
+* Fix Part of #6240: Add e2e tests for editing exploration properties in coreEditorAndPlayerFeatures.js (#6557)
+* Fix part of #6550: Raise code coverage of core.storage.question.gae_models to 100% (#6558)
+* Fix part of #6550: Increase backend test coverage to 100% in multiple files. (#6648)
+
+
+v2.8.1 (26 April 2019)
+------------------------
+Improvements to editors and players
+* Fix #6285: Fixes issues while selecting an answer in the editor feedback tab. (#6532)
+* Fixed minor issue in story editor (#6529)
+* UI related to the written translation project.  (#6503)
+* Add send mail functionality for reviewing topics (#6501)
+* Fix #2125: Fix alignment of Exploration Graph legend in history tab. (#6402)
+* Fix #5802, #5590: Introduce Playthrough Improvements Cards (#6400)
+* Fix #6370: Fix Title and Goal label alignment (#6372)
+* Fix #5530: Update collection title after save and refresh (#6362)
+* Fix #6322: Add IsProperSubsetOf to item-selection interaction (#6350)
+
+New structures
+* Support question difficulty per skill (#6502)
+* Fix #6377: Create Practice Sessions Page Skeleton (#6381)
+* Question Player Backend API Service (#6373)
+
+Translations
+* Fix #5921: Adds e2e test for uploading audio in translation tab (#6340)
+* Fix #6248 : Prevent guest and unauthorized users from drag-and-drop audio in translation tab. (#6304)
+* Fix part of #5898: Aria model with test case (#6290)
+* Add written translation property in skillContents and subtopic. (#6241)
+* Fix part of #5898: Added Google Analytics for translation tab (#6166)
+* Add proper validation for written translations to allow translation in hinglish. (#6588)
+
+Infrastructural changes
+* Fix release info script: fix imports, and sort PRs in descending order (#6607)
+* Add removal of app.yaml version field to deploy script. (#6564)
+* Fix the backend issues with some new structure models (#6514)
+* Change the name of the schema_version field in story models. (#6420)
+* Make new model IDs only contain alphanumeric characters. (#6408)
+* Update release script to use SSH Git URL instead of HTTPS (#6382)
+* Fix #6294: Upgrade BeautifulSoup version from 4.6.0 to 4.7.1 (#6355)
+* Fix part of #6343: Update js files to remove typescript compile errors (#6344)
+
+Bug fixes
+* Fix broken interaction previews in the exploration editor (#6627)
+* Fix part of #6159: Fix revert exploration method (#6575)
+* Fix few translation tab related issues. (#6571)
+* Fix #6538: Adds a proper title for landing pages. (#6539)
+* Fix #6181:Removed the exception which occured during clearing search index (#6518)
+* Fix issues with New Structures (#6506)
+* Fix #6383: Added regex to validate return_url in signup page (#6498)
+* Fix #6426: Added regex check for exploration id & nodes now can be saved with null exploration ids. (#6470)
+* Fix #6461: Changing error status for missing csrf_token from 500 to 401. (#6463)
+* Fix #6452: Fix server errors (#6454)
+* Fix #4931: Fixes frozen editor tour (#6450)
+* Fix #4632: Fixes learn again-continue button (#6448)
+* Fix #6206: Fix enlargement of text in RTE (#6447)
+* Fix #6436: Adds removeDuplicatesInArray filter in exploration_player. (#6437)
+* Fix #6414: REQUIRE_PAYLOAD_CSRF_CHECK Flag Flipped in Error404Handler class. (#6435)
+* Remove unwanted validation check and related tests from exploration. (#6407)
+* Fix #6205 : Disabled the reject button, enabled only when some review is entered. (#6384)
+* Fix #6325 : modify style of active and inactive submenus on learner dashboard (#6358)
+* Fix #6199: Hint tabs failed to open when active hint deleted (#6243)
+* Fix #2306: Fixes signup issue when a new tab is opened (#6235)
+
+Code health
+* Fix #6494: Added check for style properties to have a space between the colon and the property value. (#6516)
+* Fix part of #6387: Email constant fix (#6467)
+* Fix part of issue #6316: Remove some scripts from base.html which were not needed in it. (#6466)
+* Fix part of #6343: Adds custom type definitions (#6430)
+* Fix part of #6387: Remove globals from library.html and preferences.html (#6415)
+* Fix part of #5002:  Removed iframed from GLOBALS (#6410)
+* Fix part of #5002: Remove logoutUrl from HTML (#6401)
+* Fix #6316: Refactor base.html (#6399)
+* Fix part of #5002: Moved SITE_FEEDBACK_FORM_URL from GLOBALS to constants.js. (#6365)
+* Fix part of #6254: Refactor for directives.js and filters.js (#6275)
+
+Development workflow
+* Fix #6534: make MR jobs runnable on localhost. (#6543)
+* Update pip and Skulpt installations for newer versions of Ubuntu (#6464)
+* Move lint tests to CircleCI from Travis (#6453)
+* Reorder CODEOWNERS to ensure that the most important rules are at the end. (#6438)
+* Add webhook links for Travis, CircleCI & Codecov (#6398)
+* Automate changelog generation in the release_info script (#6395)
+* Fix #6321: Added checks to validate patterns in CODEOWNERS file. (#6386)
+* Add option not to start browser window to start.sh (#6363)
+* Add issue template for server errors (#6308)
+* Add a script for updating indexes. Move gcloud functions into a separate module. (#6305)
+* Port back-end tests from Travis to CircleCI (#6234)
+* Fix #5426: Lint check to ensure that each Angular file contains exactly one service/directive/etc. inside it. (#6202)
+* Fix #6100 : Added verbose and non verbose mode in the pre submit check (#6146)
+
+Testing coverage
+* Fix part of #5134: Make test coverage of core.storage.exploration.gae_models 100% (#6540)
+* Fix part of #5134, more robust testing to schema_utils.py (#6432)
+* Fix part of #4057: Increase test coverage to 100% for HintObjectFactory.js and InteractionObjectFactory.js. (#6428)
+* Fix part of #5134: Make test coverage of core.controllers.collection_viewer 100% (#6427)
+* Add pending New Structures e2e tests (#6385)
+* Fix part of #5134 : Increasing the test coverage of subtopic_page_services.py from 64% to 100%. (#6360)
+* Fix part of #5134: Increased Coverage from 89% to 100% for core.domain.email_manager.py (#6306)
+* Add unit test for translation_tab/TranslationStatusService.js (#6261)
+
+
+v2.8.0 (30 March 2019)
+------------------------
+New structures
+* Fixed the backend issues with some new structure models (#6514)
+* Fixed issues with New Structures (#6506)
+* Support question difficulty per skill (#6502)
+* Added subtopic_viewer (SubtopicPageDataHandler), which returns page contents for a subtopic. (#6327)
+* Fixed issues from intuitiveness testing on New Structures (#6314)
+* Added story viewer backend handler  (#6237)
+* Updated the topic backend handler (#6185)
+
+Improvements to editors and players
+* Replace google-map with openStreetMap in map interaction. (#6309)
+* Fix #2584: Replace default text while inserting links with placeholder (#6286)
+
+Translations
+* Adds written translations domain object in frontend for state and question. (#6320)
+* Fixes #5784: unhandled promise in the ng-audio library. (#6280)
+* Adds written translation property in skillContents and subtopic. (#6241)
+* Added active content id service to fix translation tab issues. (#6211)
+* Fix #4278: Re-introduce 3-letter language codes for explorations and collections. (#6182)
+* Adds functionality to internally manage to add and delete content ids into assets dict. (#6171)
+* Translation Script: Adds TranslationScript and ContentTranslation object in state domain. (#6121)
+* Fix #5572: added translation help explaining translation features (#5796)
+
+Bug fixes
+* Fix #6426: Added regex check for exploration id & nodes now can be saved with null exploration ids. (#6470)
+* Fix #6436: Adds removeDuplicatesInArray filter in exploration_player. (#6437)
+* Fix #6205: Disabled the reject button, enabled only when some review is entered. (#6384)
+* Fix #6301: fixes Dev-mode label showing up for a brief amount of time on page load. (#6356)
+* Fix #6174: Address 'Promise is undefined' server error. (#6281)
+* Fix #6214: Audio bar hides for auto-generated audio (#6265)
+* Fix #6244: Fixing the cancel button in hint editor (#6250)
+* Fix #2306: Fixes signup issue when a new tab is opened (#6235)
+* Fix #5508: Feedback threads in feedback tab reorder now in real time. (#6183)
+* Fix #5487: Fix load issue with multiple same images (#6170)
+* Fix #6140: Learner answer overflow (#6154)
+* Fix #6111: Aligned checkmarks on learner's dashboard (#6147)
+* Fix part of #4231: Make the add response modal scroll visible at all times, via css (#6116)
+* Refactor for suggestion modal display (#6093)
+
+Code health
+* Moved state related components in a separate dir. (#6334)
+* Fixes #6316: Refactor base.html (#6319)
+* Fixes #6226: Moves generating CKEditor widgets from app.js to separate file. (#6288)
+* Delete old one-off jobs. (#6283)
+* Fix part of #6254: Refactor for directives.js and filters.js (#6275)
+* Removing scripts and include statements for popovers (#6270)
+* Fix #6194: Remove extraneous file. (#6196)
+
+Development workflow
+* Update pip and Skulpt installations for newer versions of Ubuntu (#6464)
+* Fix frontend tests failing occasionally. (#6371)
+* Adds QA team as a codeowner for test files. (#6352)
+* Adds codeowners related to frontend pages. (#6332)
+* Run lint tests on Travis until fixed on CircleCI (#6328)
+* Add issue template for server errors (#6308)
+* Add a script for updating indexes. Move gcloud functions into a separate module. (#6305)
+* Update deployment script to check for indexes in advance. (#6300)
+* Fix #6282: Run front-end tests in pre-push hook, only if changes are made in JS files. (#6289)
+* Add some additional pre-release checks. (#6284)
+* Fix CODEOWNER wrong dir issue. (#6277)
+* Adds code-owners for teams/projects. (#6266)
+* Fixes #6233 : Improved the error message for match line breaks controller (#6246)
+* Port back-end tests from Travis to CircleCI (#6234)
+* Fix part of #5476: Add checks to detect spaces in docstring (#6231)
+* Fix #5465: Added check for prohibited imports (#6180)
+* Fix part of #5939: Custom pylint extension for checking single character files and newline characters. (#6172)
+* Fix #6103: Add summary of errors for lint checks on Travis (#6165)
+* Fix #6004: Added a presubmit check to ensure imports of JS files are sorted (#6125)
+
+Infrastructural changes
+* Change the name of the schema_version field in story models. (#6420)
+* Make new model IDs only contain alphanumeric characters. (#6408)
+* Generalized landing page based on subject and topic. (#6357)
+* Remove google forum link. (#6333)
+* Correct comment string in UserSubscriptionsModel (#6310)
+* Adds codeowners for other projects. (#6287)
+* Fix part of #6254: Refactor to implement rule of 1 (#6267)
+* Fix #6251: Add basic typescript configuration (#6256)
+* Fix #6210: Added an exploration whitelist (#6255)
+* One off job to validate exploration migration can be carried out successfully. (#6249)
+* Fix #6213: Add application_readable to directive htmls handler (#6216)
+* Remove Open Sans and Rubik fonts (#6208)
+* Update app.yaml to improve caching (#6184)
+* Translation Script: Exploration migration including services for handling translation script.  (#6175)
+* Fix part of #5002: Remove promo bar from globals (#6169)
+
+Testing coverage
+* Added pending New Structures e2e tests (#6385)
+* New Structures e2e tests (#6315)
+* Fix part of #5134: learner_playlist_services - fix grammar and whitespace (#6291)
+* Fix part of #5134: 100% coverage for core.platform.models (#6263)
+* Fix part of #4057 Make PlayerPositionService.js 100% test coverage (#6258)
+* Fix part of #5134: Increased coverage to 100% for question_editor (#6217)
+* Added topics and skills dashboard e2e tests (#6204)
+* Fix part of #5134: Increased coverage to 100% for mailgun_email_services.py (#6133)
+* Fix #5134: Improve coverage to 89% by implementing anonymous feedback (#6086)
+* Fix part of #5134: Added test for exp one off jobs (#5972)
+* Fix part of #5134: Added test for core.storage.file.gae_models (#5960)
+
+
+v2.7.3 (16 February 2019)
+------------------------
+Infrastructural changes
+* Improvements to PlaythroughAudit (#6239)
+* Add None/deleted checks to DeleteIllegalPlaythroughsOneOffJob (#6195)
+* Fix Content-Disposition headers being unicode instead of str (#6192)
+* Fix check for clean working tree in common.py (#6191)
+* Fix #4666: Fixes correctness test for Text Input Prediction Service  (#6120)
+* Fix #5975: Create One-off Job to Remove Invalid Playthroughs (#6131)
+* Fix #5371: One Off Job to populate message_count in GeneralFeedbackThreadModel (#5999)
+* Fix #6104: Use sub-process in pre_push_hook (#6114)
+* Fix part of #5591: Migrate Playthrough Feature Data into ExplorationFeaturesService (#6044)
+* Fix part of #5002: Move ALLOW_YAML_FILE_UPLOAD from feconf to constants (#5989)
+* Fix part of #5002: Remove GLOBALS from HTML (#6050)
+* Add audio translation schema for subtopic pages (#5823)
+* Remove automatic backups script. (#5956)
+* Fix classifier models when exploration is reverted and add test case for auto migrations (#5888)
+
+Improvements to the editors and players
+* Fix #6188: Fix word-break in explorations (#6187)
+* Changed word-break to word-wrap (#6189)
+* Fix #5745: Redesign audio bar of the translation tab. (#6167)
+* Fix #5822: Add customization option to allow multiple sort items in the same position in Drag and drop interaction (#6177)
+* UI changes to topic and skill editor (#6091)
+* Fix #5019: The continue button is now visible with long feedback (#6136)
+* Fix #6122: Add $log service to prevent the error arising on rejecting suggestions (#6124)
+* Fix #4407: KaTeX text no longer goes outside text container in MathExpressionInput (#6130)
+* Fix #4833: Prevents text overflow  in answer statistics page (#6137)
+* Fix #6078: Updating publish button after modal is dismissed (#6096)
+* Fix #5729: Adds a numerical progress status in the translation tab (#6097)
+* Fix #6055: Prevents content overflow in save draft modal (#6079)
+* Fix #5771: Ensure that the active tab of translation tab is maintained every time save draft/publish changes is clicked (#6076)
+* Fix #3074: Added height limit warning for card content (#5997)
+* Fix bugs in new structure editors (#6084)
+* Fix #6064: Changes backdrop controls to static for exploration publish modal (#6071)
+
+Improvements to testing suites
+* Reorder e2e test suites into more logical categorization (#6036)
+* Fix part of #5134: Adding tests for core.domain.collection_jobs_one_off (#6061)
+* Fix part of #4057: Adding tests to increase coverage of OutcomeObjectFactory.js (#6098)
+* Fix part of #5134: Making the coverage of email_jobs_one_off to 100% (#6026)
+* Fix #5839: Filter slow network logs for mobile tests on Browserstack (#6090)
+* Fix #5923: Refactoring and clean up backend tests (#6074)
+* Fix part of #5134: Added test for fs_domain.py (#5988)
+* Fix #4829: Reduce code redundancy in backend testing (#5838)
+* Fixes error in backend tests redirection when trying to test a specific module within a test file (#6054)
+
+Documentation and development workflow
+* Fixes part of #4374: Update docstrings in the python backend code (#6028)
+* Enable missing docstrings check (#6073)
+
+Miscellaneous bug fixes and updates
+* Fix #6128: Successfully load mobile view in '/parents' page (#6259)
+* Fix #6118: Improved spacing between reload buttons on admin page (#6123)
+* Fix #6089: Moved common css to oppia.css and removed extra comments for sync (#6107)
+* Fix #6117: The Role tab tooltip on the admin page is now placed correctly (#6119)
+* Fix #5678: Add swipeable carousel to Library page in mobile view (#6087)
+* Fix #5751: Remove G+ from the sharing icons. (#6058)
+* Fix #6056: Makes the resize of text box vertical (#6057)
+* Routine update to translations. (#6164)
+
+
+v2.7.2 (14 January 2019)
+------------------------
+Updates to landing pages
+* Small landing page changes based on feedback from Kefeh (#5951)
+* Fix #5978: Stewards page content alignment (#6042)
+
+Analytics for creators
+* Hide playthrough issues on exploration editor stats tab if exploration isn't whitelisted (#5947)
+* Fixes #5860: Fix fraction display in statistics tab (#5976)
+* Rename playthrough-related issues services/directives/factories (#5990)
+* Fix #5798: Introduce Improvements tab to exploration editor (#5991)
+* Introduce FetchPlaythroughWhitelistHandler (#5966)
+
+Generalized review system
+* Fix #4995: Remove complex logic from the storage layer, and add domain/service layer for emails (#5940)
+* Fix error while displaying suggestion threads on learner dashboard page (#5965)
+
+Development workflow
+* Fix #5761: --test_target flag redirects to the corresponding test file if needed (#6014)
+* Fix #5885: Only run front end tests when front end files are changed (#5936)
+* Fix #5782: Added custom check to remove backslash continuation (#5964)
+* Fix #5529: Print python lint errors at the end of the check (#6005)
+* Add try/except block in pre-commit linter (#6019)
+* Enforce variables to be in snake case (#5943)
+* Fix #5876: Check that cls arguments come first in function args (#5919)
+* Fix part of #6024: Consolidate file access in the pre-commit linter (#6023)
+* Fix #5938: Lint checks should run only for files changed by the user (#6033)
+* Introduce eslint: space-before-blocks rule (#6048)
+* Fix max-len error (#5994)
+* Fix false positive Travis build in pre-commit linter (#6002)
+* Fix #6040: Fix issues in develop which led to lint test failures (#6038)
+
+New structures
+* Implement editing of questions (#5614)
+* Allow admins to assign topic managers to topics (#5971)
+* Split ENABLE_NEW_STRUCTURES flag to 2 flags for editors and players (#5987)
+
+Test coverage
+* Fix part of #5134: Add more tests to increase coverage of core.controllers.classifier (#5926)
+* Fix part of #5134: Add tests for core.controllers.custom_landing_pages. (#5925)
+* Fix part of #5134: Add core.platform.models tests (#5944)
+
+Code health and documentation
+* Upgrade pylint to 1.9.3 and fix some docstring issues (#5935)
+* Fix code duplication in ExplorationPlayerStateService (#6000)
+* Fix #4968: Move customization args method from state_domain to customization_args_util (#6015)
+* Fix parts of #4374: Add docstrings to Python files. (#5928, #5969, #5977, #6006, #6013, #6027, #6035, #6041)
+
+Improvements to editor features
+* Fix #5933: Changed code editor prompt in test exploration to be more explicit (#5941)
+* Fix #5853: Remove weird image artifact in rich-text editor (#5954)
+* Fix #5039: Add continue button in preview mode (#5962)
+* Fix #5949: Make RTE spacing uniform (#5953)
+* Fix #5701: Alert user to save changes before publishing (#5948)
+* Fix #5980: Make line-spacing consistent within a paragraph (#5981)
+* Add questions list tab and create question functionality to skill editor (#5920)
+* Fix #5973: Fix the changed space when the text is added just below the image (#5996)
+* Fix #5982: Fix modal overflow issue by using word-break property (#5983)
+* Fix #3972: Fix the faulty vertical offset (#6030)
+* Fix #6016: Limited the selection area of multiple choice option (#6029)
+* Fix #6056: Prevent the text box in the Save Draft modal from flowing out of the modal boundaries (#6057)
+* Fix #6064: Change backdrop controls to static for exploratoin publication modal (#6071)
+
+Updates to the library and splash pages
+* Fix #4936: The drop down menus work similar to the keyboard behavior for the About and Profile dropdowns (#5974)
+* Fix #3972: Fix the faulty vertical offset (#6030)
+* Fix #5755: Add padding to cards to fix alignment issue on mobile view (#5968)
+
+Infrastructure changes
+* Fix part of #3950: Remove Jinja ifs from exploration_player.html (#5958)
+* Fix part of #3950: Remove Jinja ifs from collection player (#5869)
+* Add more debugging info to help identify cause of undefined states (#5827)
+* Fix part of #5002: Remove NAV_MODE from side navigation bar (#6008)
+
+
+v2.7.1 (20 December 2018)
+-------------------------
+Updates to landing pages:
+* Updates to the text on the stewards page. (#5912)
+* Add landing page for parents and teachers. (#5905)
+
+Development workflow:
+* Fix #5466: Added check to enforce that all name of controllers end with "Handler" or "Page" (#5878)
+* Fix part of #5476: Enforce docstring arg order (#5844)
+* Fix #5843: Changes _check_comment to check for spaces and capitals (#5852)
+* Fix #5809: Add check to match line breaks in controller dependencies (#5833)
+* Fix docstrings tests, Swapped if blocks for _check_docstrings (#5752)
+* Remove mobile tests env var for PR builds and add a job for it (#5835)
+* Update bug_report.md (#5866)
+* Fix #5896: Set threads' daemon property to False (#5897)
+
+New Structures:
+* Add paging for questions in topic editor and story editor modifications (#5892)
+* UI modifications to story editor. (#5724)
+* Add functionality to Publish stories (#5709)
+* Revert some changes in #5810. (#5841)
+
+Improving test coverage:
+* Fix #5861: Updated Test for Email Truncation (#5915)
+* Fix part of #5134: Added missing tests for question domain. (#5887)
+* Fix part of #5134: Added backend tests for `core.domain.learner_progress_domain` (#5859)
+* Fix part of #5134: Backend test for core.controllers.tasks (#5840)
+* Fix #5787: Add a unit test to check blob type for uploaded audio. (#5858)
+
+Code health and documentation:
+* Added comment to Image Uploader fix (#5895)
+* Fix part of #4374: Add docstrings to python files (#5871)
+* Some follow-up fixes to style issues in #5730. (#5842)
+* Added missing docstrings in scripts/common.py and scripts/docstrings_checker.py (#5870)
+* Added missing docstrings in scripts/build.py (#5808)
+* Fix part of #4374: Add docstrings to the python files. (#5849)
+* Added docstring for clamp method and simplified usage. (#5834)
+
+Improvements to editor features
+* Fix #3691: Implements email functionality for failed ML training job (#5902)
+* Fix #5606: Logic Proof Truncation and Display (#5864)
+* Change 'compliment' feedback to use a green background colour. (#5865)
+* Fix #5746: Added saving log and disabled buttons while saving (#5764)
+* Fix #5777: Add statename in translation tab (#5830)
+* Fix #5821: Adjust placement of accessibility tooltips in the exploration editor. (#5824)
+
+Updates to the library and splash pages
+* Fix #5907: Increase width of search input box such that whole text is visible (#5910)
+* Swap the order of the browse/create buttons on the splash page. (#5828)
+
+Infrastructure changes
+* Consolidate image and audio handlers to use one AssetDevHandler that handles all assets (#5857)
+* Fix part of #3950: Remove Jinja ifs from collection player (#5869)
+* Add more debugging info to help identify cause of undefined states (#5827)
+
+
+v2.7.0 (29 November 2018)
+-------------------------
+Bug fixes:
+* Fix video on fractions landing (#5906)
+* Fix profile picture modal not showing picture when we add it again after discard it (#5891)
+* Fix #5862: fixes preferred audio language doesn't display options in preferences page. (#5882)
+* Added automaticTextToSpeech check for audio bar. (#5880)
+* Added a "_directive" suffix to "view_suggestion_edit_exploration_state_content_modal.html" file. (#5848)
+* Fix #5814: Double edit button in exploration player navbar (#5815)
+* Remove code duplication for calculating answer choices (#5779)
+
+New structures:
+* Remove skills from a topic (#5804)
+* URL decode topic name using urllib.unquote_plus (#5810)
+* Add field canonical_name for Topic and TopicSummary (#5775)
+* Add audio translation schema for concept card (#5677)
+* Fix #5052: Create one-off schema migration jobs for topics, skills, questions and stories (#5660)
+* Fix #5671: Create success message toasts for topics and skills (#5705)
+* Fix #5712: Display an appropriate message when creating questions in topic editor with no skills (#5736)
+
+Infrastructure:
+* Fix #5310: Added a size check to third party folder to prevent breaching the 10k files limit on AppEngine (#5743)
+* Fix #4973: Add minify_only option to build.py (#5758)
+* Fix #5713: Change asset handler url to make it clearer that it's used in dev mode (#5721)
+
+Developer workflow and code health:
+* Fix part of #4374: Add docstrings to the Python files. (#5734)
+* Fix part of #5002: Move user related variables form GLOBALS (#5659)
+* Fix part of #5529: print CSS and JS lint check error messages at the end of the check (#5748)
+* Fix part of #4374: Add acl decorator docstrings (#5803)
+* Fix #5243: Set ignore_whitespace to true in .isort.cfg (#5789)
+* Fix part of #4057: Remove TriggerObjectFactory code (#5770)
+* Fix part of #5134: Added AnswerSubmittedEventHandlerTest (#5778)
+* Fix part of #4374: Added missing docstrings to scripts (#5723)
+* Fix part of #5134: Improve test coverage of core.controllers.topics_and_skills_dashboard (#5741)
+* Fix part of #5134: Improve test coverage of core.controllers.concept_card_viewer (#5762)
+* Fix part of #5134: Improve test coverage of core.controllers.topic_viewer (#5742)
+* Fix typo in constants.py (#5754)
+* Fix part of #4374: Add docstrings for docstring_checker (#5744)
+* Fix part of #4374: Add docstrings for main.py (#5704)
+
+Investigation work:
+* Add more debugging info to help identify cause of undefined states (#5827)
+
+Miscellaneous:
+* Fixes #5687: Allow resubmission of rejected suggestions. (#5730)
+* Fix #5553: Enable audio translations for Safari (#5780)
+* Fix broken SkillMigrationOneOffJobTest (#5781)
+
+
+v2.6.9 (30 Oct 2018)
+--------------------
+Bug fixes:
+* Fixes prod bug by preventing populating old_content value of suggestion when state doesn't exist (#5772)
+* Fix #5691: Fix bug in translation tab resulting from answer choices not being calculated for the short answer summaries (#5756)
+* Fix #5749: Incorrect get-involved link (#5750)
+* Fix #5688: Added users to user condition if only 1 user has reviewed an exploration (#5708)
+
+New structures:
+* Filter skills (#5635)
+* UI and controller to add functionality to merge untriaged skills (#5632)
+
+Infrastructure:
+* Add deployment of export service to deploy.py (#5773)
+* Fix Karma test to use older version of URL.
+* Fix erroneous image path in production. (#5788)
+* Fix broken image region #5765 (#5768)
+* Throttle error reporting to at most once every 5 seconds. (#5767)
+* Fix deployment script to update DEV_MODE value which is now read from constants.js instead of feconf.py. (#5763)
+
+Developer workflow and code clean-up:
+* (Dead code) Remove check 'topic is None', which is already covered by core.domain.acl_decorators.can_access_topic_viewer_page (#5737)
+* Fix part of #4374: Added docstrings to scripts.cut_release_branch and scripts.pylint_extensions (#5728)
+* Fix part of #4374: Update docstrings in the python backend code (#5680)
+* Fix part of #5134: Add tests to core_storage_story (#5644)
+* Add CSS lint rules: Space before curly braces for HTML files (#5732)
+* Added test to core.storage.topic.gae_models (#5727)
+* Extract extensionTagAssemblerService and siteAnalyticsService from app.js - Issue 3826 (#5711)
+* Space before and after CSS classes's curly braces (#5725)
+* Add additional instructions for prefixing PR title for partial fixes (#5718)
+
+
+v2.6.8 (2 Oct 2018)
+-------------------
+Bug fixes:
+* Fix persistent answer even after submit bug (#5696)
+* Add sitemap and remove i18n from title. (#5647)
+* Added one off job and validation job to populate last_updated field. (#5681)
+* Cleanup for the feedback framework (#5631)
+* Fix #5600: correctly align the translation progress label in Firefox (#5622)
+* Update Teach with Oppia form link. (#5619)
+* Only Force Answer Resolution for Whitelisted Interaction IDs (#5626)
+* Remove unnecessary interpolation in logic proof answer display. (#5604)
+* URL fix for topic viewer page (#5602)
+* Fix #4893 The navigation bar in portfolio page is now clearly visible in 612 to 1050px screens. (#5588)
+* Fix unicode errors in VerifyAllUrlsMatchGcsIdRegexJob which make it (#5598)
+* Fix #4978 : change JSON response on user not logged in (#5589)
+* Fix demo exploration--- Modelling_graphs, Solar System, Test_interactions, All_interactions, Three balls, binary_Search (#5543)
+* Added the exceptions in the copytodirectoryJob (#5560)
+* Fix #5535:  Share buttons on info card (#5540)
+
+Development workflow and build process improvements
+* Start selenium server using a specific chromedriver (#5648)
+* Run travis builds on release branches (#5645)
+* Fix #5620: Add check for git conflict markers (#5624)
+* Build process refactorization + increasing coverage for build.py (#5580)
+* Fix creator dashboard tests. (#5579)
+* Moved git related files in .github directory (#5519)
+
+Testing and documentation:
+* Remaining backend tests for jinja_utils (#5582)
+* Fix part of #4374 : Update docstrings in the python backend code (#5593)
+* Fix #5134: Write backend tests for core.storage.skill.gae_models (#5599)
+* Backend tests for core.platform.users.gae_current_user_services (#5563)
+* Fix part of #5134: Add test for core.storage.config.gae_models (#5565)
+* Fix #5134: Write backend tests for core.storage.exploration.gae_models (#5552)
+* Fix #4830: Create and use delete_json in tests (#5568)
+* Add test class for gae_app_identity_services (#5439)
+* Fix part of #5134 Backend test for audit models (#5512)
+* Fix #5134: Write backend tests for core.storage.controllers.recent_commits_test (#5551)
+* Forbidding browser.sleep by adding lint rule and fixing an e2e flake in editorFeatures (#5536)
+
+Infrastructure improvements
+* Removed unwanted file and added css in state translation (#5658)
+* Introduce IssuesService (#5630)
+* Add some additional headers to all pages for privacy/security. (#5596)
+* Deduplicate skill migrate questions (#5376)
+* Fix #4386: Implement a CurrentInteractionService (#5440)
+* Add skill deletion. (#5375)
+* Added StoryProgressModel (#5396)
+* Fully remove state-id-mapping flag. (#5562)
+* Refactor exploration player: Cleaned up the engine services (#5533)
+* Create Topic Viewer Page. (#5323)
+* Fix #5256: Separate validation and parsing from directive scope check function (#5541)
+* Fixes #5402: State domain refactor (#5505)
+* Removed the ValidationOfImagesOnGCSJob (#5538)
+* Fix dependency ordering, and prevent questions from showing up on the common suggestions view (#5531)
+* Question suggestions UI (#5486)
+* Remove Dead Changes (#5528)
+* Generalised Review System: Common suggestion view (#5419)
+* Add functionality for pretests to explorations in a story. (#5479)
+* Fixed #5425: Redesign fractions landing page (#5527)
+
+Miscellaneous
+* "Update version number to 2.6.8"
+* Routine update to translations. (#5608)
+* Add apb7 and seanlip as codeowners for core/tests and scripts directory (#5578)
+
+
+v2.6.7 (3 Sep 2018)
+-------------------
+Rich-text editor
+* Add one-off job to validate customization args for rich text components (#5362)
+* Removed extra blank lines in RTE (#5401)
+* Removed previews for rich text components (#5352)
+* Removed indentblock to allow indentation only for list elements (#5318)
+* Remove the text that comes when cursor is moved over editor (#5288)
+* Fixed issues that popped up due to migration to CKEditor (#5255)
+* Added CKEditor as current RTE and conversion function (#5229)
+* Fix issue #5423 (#5424)
+
+Statistics
+* Permamently flip ENABLE_STATE_ID_MAPPING to true (#5523).
+* Disable modify training data button until ML is enabled. (#5328)
+* Convert all floating point numbers back to float from strings in received classifier data (#5291)
+* Fix cast and improve output messages in stats job. (#5312)
+* Allow machine learning classification in editor preview mode of exploration (#5239)
+
+New structures
+* Suggestions for questions part 1: Backend domain class and controllers (#5361)
+* Create reusable question editor directive: Part 2 (#5406)
+* Create reusable question editor directive: Part 1 (#5367)
+* Replace jinja with directives in state_editor.html (#5353)
+* Create question editor (Part 2): Created backend controllers (#5321)
+* Dedup skill schema changes (#5283)
+* Added concept card viewer in the exploration player (#5265)
+* Add skill rights and unpublished skills (#5277)
+* Create question editor (Part 1): Added frontend domain objects (#5309)
+* Modified the questions backend (#5293)
+* Tag prerequisite skill to answer group (#5238)
+* Added untriaged skills section to the topics and skills dashboard (#5219)
+
+Image pipeline
+* Misc fixes to image GAE/GCS migration (#5609)
+* Fix unicode errors in VerifyAllUrlsMatchGcsIdRegexJob which make it (#5598)
+* Fix remaining issues in migration job. (#5595)
+* Fixes to CopyToNewDirectoryJob (#5594)
+* Encode the filename by utf-8 (#5584)
+* Added the exceptions (#5560)
+* Corrected an error in html_validation_service.py (#5534)
+* Fix issue in html_validation_service (#5522)
+* Corrected the FILE_ID_MODEL regex to support deletion of images from datastore. (#5521)
+* Implement exploration migration to update image references. (#5509)
+* Shifting images/audio to the new exploration folder, which involves compressing and renaming the images as well. (#5490)
+* Fix: #5407 changed to click to reload image (#5449)
+* Removed the ENABLE_GCS_STORAGE_FLAG, and add develop condition for PIL in appengine_config (#5492)
+* Added the PR for the Mac os troubleshoot and inside gae_suite.py in test (#5480)
+* Delete image from gae (#5393)
+* Create compressed versions of images. (#5450)
+* Fixes ImageDataMigration JOB (#5405)
+* Fixes the comments in ImageDataMigration PR (#5271)
+* Fixes #5209 Removing preloading completely from preview mode. (#5237)
+
+Development workflow
+* Fix part of #5399: Comparing MD5 hash to prevent unnecessary files rebuilding (#5468)
+* Change print check regexp (#5474)
+* Fix #5106: Changed startup script to open browser after starting server (#5431)
+* Improving the dev workflow: Setup browserstack, add necessary configuration files and tests for mobile  (#5340)
+* Get rid of TEMPLATE_DIR_PREFIX and ASSET_DIR_PREFIX (#5397)
+* Fix #5337: Parallelize build minification (#5379)
+* Add comment to .travis.yml (#5383)
+* Attempt to fix Chrome on Travis (#5382)
+* Fix #5004: Modify keyword arguments checker (#5305)
+* Improving the dev workflow: Add check for double quotes for values of attributes of html tags (#5246)
+* Improving the dev workflow: Enable indent rule for CSS (#5242)
+* Fix part of #3905: Add check to match line breaks between stringfied dependencies and controller function parameters (#5225)
+* Add forceLocal argument to browserstack local instance (#5435)
+
+Interactions
+* Fixed code editor issue (#5615)
+* Fix #5494: Fix second item selection issue in CKEditor for Drag and drop interaction. (#5513)
+* Fix #5280: Fix auto-scrolling mechanism in Drag and drop sorting interaction. (#5499)
+* Fix hola exploration (#5498)
+* Add ui-tree to app.js (#5473)
+* Enable drag and drop sorting interaction. (#5429)
+* Fix #5172: TextInput learner response display should preserve line breaks (#5430)
+* Drag and drop interaction: Milestone 3.2 (#5338)
+* Fix #5301: Disabled required spacing in the currency units in Number with Units interaction (#5320)
+* Fix #5253: Fixed hiding of Continue button when correctness footer is present (#5276)
+* Drag and drop interaction: Milestone 2.3 (#5162)
+* Adding pip cache directory (#5281)
+
+Generalised review system
+* Bug fixes for the feedback framework (#5467)
+* Generalised Review System, complete email functionality (#5387)
+* Carry forward last updated and created on fields to the new models (#5495)
+* Generalised Review System - Email notification functionality (#5245)
+* Remove invalid status codes (#5460)
+* Fix ordering of suggestions on feedback tab. (#5404)
+* Generalised review system - Feedback thread generalisation (#5235)
+* Generalised review system: Milestone 2 - Changes to permissions of users who can review suggestions (#5170)
+* Fix suggestions subject not displayed (#5273)
+* Generalised Review System - A generalised function to query suggestions  (#5164)
+* Fix build (#5269)
+* Generalised Review System Milestone 2: Cron job to automatically accept suggestions after a threshold  (#5155)
+* Fix a backend test after switching the flag (#5206)
+
+Translation dashboard
+* Fix #5558: Fixed translator email functionality. (#5559)
+* Milestone 3.5: Lesson translation dashboard. (#5506)
+* Milestone 3.4: Lesson translation dashboard. (#5483)
+* Milestone 3.1 & 3.2: Lesson Translation Dashboard. (#5378)
+* Milestone 2.5: Lesson Translation Dashboard (#5279)
+* Removes audio translation editor from editor tab and enables translation tab. (#5413)
+* Milestone 2.4: Lesson translation dashboard (#5210)
+* Fixed publish button (#5227)
+
+Playthroughs and issues
+* Added recorder config (#5496)
+* Playthrough Visualisation: Milestone 3.2 (Part 6) (#5428)
+* Playthrough Visualisation: Milestone 3.2 (Part 4) (#5421)
+* Playthrough Visualisation: Milestone 3.2 (Part 5) (#5422)
+* Playthrough Visualisation: Milestone 3.2 (Part 3) (#5373)
+* Playthrough Visualisation: Milestone 3.1 (#5167)
+* Playthrough Visualisation: Milestone 3.2 (Part 2) (#5364)
+* Unique session IDs for starts and quits (#5392)
+* Fix errors in the RegenerateMissingStatsModelsOneOffJob. (#5388)
+* Handle incoming None version events (#5372)
+* More fixes to stats jobs from running on test server. (#5366)
+* Handle exploration reverts for ExplorationStatsModel (#5356)
+* Fix exploration ID field bug (#5360)
+* Add CSS for Hexagon (#5168)
+* Fix variable declaration error (#5351)
+* Fix #5274: Open modal window only once (#5346)
+* Fix playthroughs bug (#5339)
+
+Bug fixes
+* Remove unnecessary dependency. (#5610)
+* Added volume to the speechUtterance (#5561)
+* Fix #5535:  Share buttons on info card (#5540)
+* Fixed borders around feedback headers (#5532)
+* No object assign (#5444)
+* Fix #5386: start.sh produces an error when using VirtualBox "no method available for opening 'http://localhost8181/'" (#5391)
+* Fixes #5299: Reduce font-weight to render consistently across browsers (#5331)
+* Fix #5287: Deletes feedback content id while deleting interaction. (#5294)
+* Remove some files that were skipped and caused math expression input to break. (#5284)
+* Fixing PieChartDirective console error (#5282)
+* Fixating position of preview tab's reset button to bottom right corner. (#5272)
+* Fixing Fraction Input weird padding. (#5267)
+* Fix #5071: Replace closeSubmenu with closeSubmenuIfNotMobile to make dropdown menu work (#5261)
+* Stop submit button for MultipleChoiceInput from firing ng-click twice (#5266)
+* Replacing Youtube video link (#5264)
+* Updated last update coloumn (#5564)
+
+Miscellaneous
+* Add Code of Conduct (#5475)
+* Replaced Static images with Font awesome (#5443)
+* Address some learner view errors found in production. (#5459)
+* Display Cards with many Unresolved Answers (#5442)
+* Fix #5398: remove UrlInterpolationService's whitelist check. (#5410)
+* Only log when versions are actually regenerated. (#5394)
+* Caching Chrome to prevent test timing out by Travis failing to download Chrome. (#5385)
+* Readme updated. (#5384)
+* Production fixes for the stats job. (#5377)
+* Routine update of translations (#5359)
+* Remove unused test_util_jobs.py file. (#5358)
+* Remove unused feconf constants (#5350)
+* Fix #5336: Added brackets to valid url characters (#5354)
+* Refactor the delete-state-callback test. (#5349)
+* Manually Construct URL (#5345)
+* Fixes #5298: Add Oppia Foundation to sidebar (#5332)
+* Fix part of #5002: Get rid of profilePictureDataUrl global (#5290)
+* Downloading file(s) dependency instead of entire Github folder. (#5313)
+* Add codeownership control for html_cleaner.py (#5327)
+* Add Vojta and Viet as code owners for manifest.json. (#5306)
+* Fixes #5260: Unable to type anything in the Math expression input box in mobile (#5289)
+* Fix #4838: Ternary operator scope creation (#5262)
+* Extensions: Removing unconsumed console error entries (#5250)
+* Remove app.js from excluded_files (#5248)
+* Adding pip cache to Travis config. (#5244)
+* Only append to the general error log for non-404 errors. (#5241)
+* Downgrade 404 logs to warnings. (#5233)
+* Update deploy script. (#5231)
+
+Testing, documentation, and code health
+* Fix part of #5134 Backend test for collection models (#5357)
+* core.platform.taskqueue.gae_taskqueue_services: Add tests (#5451)
+* Refactor exploration player (#5437)
+* Fixed backend test fail issue (#5448)
+* Fix part of #5134: Add test for core.domain.calculation_registry (#5381)
+* Create backend services and controllers for exploration pretests (#5418)
+* Fix #5134: Write backend tests for core.storage.job.gae_models (#5433)
+* Fixed part of #5134: core.domain.user_domain_test file! (#5380)
+* Fix part of #5134.: Added tests for memcache services (#5355)
+* Fix #5314: Reinstate failing Karma test. (#5347)
+* Fixed part of #4057: FormBuilder tests (#5322)
+* Fix docstrings for acl_decorators (#5311)
+* Math Expression Input e2e (#5292)
+* Refactored ExplorationContextService (#5278)
+* Migrate the remaining waits to use the waitFor library. (#5270)
+* Fix part of #5002: Moved some constants from GLOBALS to other places. (#5191)
+* Some initial changes to use the new waitFor utility. (#5258)
+* Add check for browser.waitForAngular calls (#5249)
+* E2e refactor follow-up for PR#5139 (#5224)
+* E2e testing: Introducing waitFor utility file. (#5240)
+* Graph Interaction e2e Test (#5230)
+
+
+v2.6.6 (1 Aug 2018)
+-------------------
+Rich-text editor
+* Added CKEditor as current RTE and conversion function (#5229)
+* Added try catch in MigrationValidation for CKEditor (#5198)
+* CKEditor Integration - Milestone 2  (#5150)
+* Updated ol-ul migration - Milestone 2 (#5192)
+* Updated Migration process on the basis of cases obtained from test server (#5185)
+* Added MigrationValidation one-off job for CKEditor - Milestone 2 (#5169)
+* Added validation one-off job for CKEditor - Milestone 2 (#5161)
+* Added migration function for Textangular - Milestone 1 (part 2) (#4985)
+* Fixed errors based on cases in dump from server (#5213)
+* Updated the Migration function for CKEditor (#5228)
+* Fixed issues that popped up due to migration to CKEditor (#5255)
+* Remove the text that comes when cursor is moved over editor (#5288)
+* Removed indentblock to allow indentation only for list elements (#5318)
+
+Statistics
+* Fix part of #3836: Milestone 1, introduce new calculation to aggregate top unresolved answers. (#5006)
+* Introduce StateTopAnswerStatisticsFactory (Part 1) (#5026)
+* Split Backend Call API from the StateTopAnswerStatisticsService (#5079)
+* Hide unresolved student answers when the exploration is private, since there is no data to show. (#5080)
+* Add hooks to StateTopAnswerStatsService to keep it fresh and make IssuesOverview card use it (#5089)
+* Fix #3836: Upgrade training interface to show unresolved answers. (#5098)
+* Add comment to describe conflict with libsvm's prediction function. (#5215)
+* Remove protractor-add-test-answer css class from modify training data (#5216)
+* Disable modify training data button until ML is enabled. (#5328)
+
+New structures
+* Added validations to topic editor (#5178)
+* Added validations to story editor (#5195)
+* Create Topic Editor (Part 1): Added frontend domain objects for topics. (#5090)
+* Create Topic Editor (Part 2): Created Topics and Skills dashboard (#5094)
+* Create Topic Editor (Part 3): Create the editor UI (#5112)
+* Create Topic Editor (Part 4): Added more functions to edit topics (#5119)
+* Create Topic Editor (Part 5): Added subtopic page editor (#5142)
+* Create Topic Editor (Part 6): Added skill id management for subtopics (#5166)
+* Create Story Editor (Part 1): Added frontend domain objects (#5131)
+* Create Story Editor (Part 2): Add create and delete story functionalities (#5148)
+* Create Story Editor (Part 3): Create Story Editor UI (#5152)
+* Create Story Editor (Part 4): Create story node editor (#5159)
+* Added SubtopicPage model (#5053)
+* Modified topic and story models (#5049)
+* Modified add_node function in stories (#5035)
+* Added skills mastery model (#4997)
+* Implementing QuestionSkillLink Model and Domain (#5025)
+* Added deepcopy to Change objects (#5038)
+* Added controllers for topics, skills and stories: Part 1 (#5013)
+* Added update and delete for stories. (#4988)
+* Exploration Migration to add skill_id and tagged_misconception_id fields (#5031)
+* Add core skill editor (#5154)
+* Fixed lint error in #5154 (#5217)
+* Fix #5202: Moved topic and story validations to their respective objects (#5211)
+
+Image pipeline
+* Remove the code that uploaded the filepath as an object (#5173)
+* Fix #5177: Added migration function to ensure caption in images (#5179)
+* Extract relevant commits from change list in ExplorationStateIdMapping (#5189)
+* Fixed preview error in ImageRegions interaction (#5149)
+* Added try again button. (#5087)
+* Added a loading indicator gif. (#5029)
+* PR2: Images get uploaded to GCS in production mode and GAE in dev mode (#5160)
+* One-off Job for shifting images from GAE to GCS (#5153)
+* Fixes #5209 Removing preloading completely from preview mode. (#5237)
+* Fixes ImageDataMigration job (#5405)
+
+Development workflow
+* Fix part of #5134: Add tests for activity domain (#5194)
+* Reduce daysUntilStale to 7 (#5187)
+* Add arg name to arg with default values. (#5180)
+* Modify html indent function (#5171)
+* Upgraded coverage version (#5127)
+* Fix package installation on Travis (#5146)
+* Removed exception from templateUrl linter (#5135)
+* Improving the dev workflow: Add restrict check for directives (#5068)
+* Added notes to run single e2e and unit tests. (#5116)
+* Add node path to stylelint cmd args (#5117)
+* Fix #5009: Add wait for suggestions e2e test (#5109)
+* Improving the dev workflow: Milestone 1.2.3 Enable checks for directive scope (#4980)
+* Improving the dev workflow: Custom import check for modules (#5078)
+* Move .oppia-creator-dashboard-main-content to creator_dashboard.html and remove padding property (#5022)
+* Improving the dev workflow: Separate CSS selectors from oppia.css (#5018)
+* Improving the dev workflow: Setup lint check for CSS and fix corresponding errors (#4643)
+* Fix part of #4347 Included docstrings in various functions in scrips/custom_lint_checks.py (#5034)
+* Add bad_patterns_python_regexp (#5042)
+* Fix #5157: Add check for copyright notice (#5197)
+* Modify stale config (#5214)
+
+Interactions
+* Add currency units to the Number with Units interaction (#5175)
+* Drag and Drop Interaction: Milestone 2.2 (#5137)
+* Drag and drop interaction: Milestone 2.1 (#5118)
+* Added help table for Number with Units Interaction (#5124)
+* Number with Units Interaction: Milestone 1.3 (#5028)
+* Add angular-ui-tree dependency. (#5110)
+* Stop submit button for MultipleChoiceInput from firing ng-click twice (#5266)
+* Fixing Fraction Input weird padding. (#5267)
+* Remove some files that were skipped and caused math expression input to break. (#5284)
+* Fixes #5260: Unable to type anything in the Math expression input box in mobile (#5289)
+* Fix #5301: Disabled required spacing in the currency units in Number with Units interaction (#5320)
+
+Generalised review system
+* Generalised review system: Validation job for the suggestion migration (#5174)
+* Generalized Review System - Milestone 1.1 (Part 3): Suggestion services (#4982)
+* Generalized Review System - Milestone 1.2 : Suggestion controllers and wiring up to frontend (#5093)
+* Generalized Review System Milestone 1.3 - Migration job for suggestion framework (#5043)
+* Generalised Review System Milestone 2: Add user contribution scoring models (#5128)
+* Added test for unique model names and renamed SuggestionModel to GeneralSuggestionModel (#5016)
+* Removed assigned reviewer field (#5203)
+* Fix a backend test after switching the flag (#5206)
+* Generalised Review System Milestone 2: Cron job to automatically accept suggestions after a threshold  (#5155)
+* Fix suggestions subject not displayed (#5273)
+* Fix ordering of suggestions on feedback tab. (#5404)
+
+Translation dashboard
+* Milestone 2.3: Lesson translation dashboard. (#5163)
+* Milestone 2.1 & 2.2: Lesson translation dashboard. (#5122)
+* Minor fix in getNeedsUpdateTooltipMessag. (#5136)
+* Milestone 1.2: Lesson translation dashboard. (#5099)
+* New state structure. (#5007)
+* Fix #5287: Deletes feedback content id while deleting interaction.  (#5294)
+
+Playthroughs and issues
+* Rename flag for enabling playthroughs (#5165)
+* Playthrough Visualisation: Milestone 2.2 (Part 3) (#5156)
+* Playthrough Visualisation: Milestone 2.2 (Part 2) (#5058)
+* Playthrough Visualisation: Milestone 2.2 (Part 1) (#5133)
+* Added unit test for exploration reverts effect on exploration issues model (#5147)
+* Set ENABLE_PLAYTHROUGHS to True (#5132)
+* Playthrough Visualisation: Milestone 1.2 (Part 3) (#4952)
+* Playthrough Visualisation: Milestone 2.1 (#5015)
+* Only enable Playthrough recording for Fractions collection (#5190)
+* Fix exploration ID field bug (#5360)
+
+Bug fixes
+* Fix #5063: Hint button should not appear for terminal or linear interactions (#5125)
+* Fix #5111: remove notification preferences card from non-editors.
+* Fixed publish button (#5227)
+* Fix #5071: Replace closeSubmenu with closeSubmenuIfNotMobile to make dropdown menu work (#5261)
+* Fixating position of preview tab's reset button to bottom right corner. (#5272)
+* Fix #5398: remove UrlInterpolationService's whitelist check. (#5410)
+* Fix #5336: Added brackets to valid url characters (#5354)
+* Manually Construct URL (#5345)
+* Fix #5274: Open modal window only once (#5346)
+* Fix playthroughs bug (#5339)
+* Fix #5253: Fixed hiding of Continue button when correctness footer is present (#5276)
+
+Miscellaneous
+* Create CODEOWNERS (#5032)
+* Update CODEOWNERS to include all storage models & add Sean as an owner (#5186)
+* Fix #5000 add check for response status in get_json (#5001)
+* Routine translations update. (#5101)
+* Fix part of #3950: Replace DEV_MODE and feedback URL Jinja Template in base.html (#5048)
+* Added a few new skipped folders (#5196)
+* Reduce the number of files that are uploaded to production. (#5181)
+* Only append to the general error log for non-404 errors. (#5241)
+* Update deploy script. (#5231)
+* Downgrade 404 logs to warnings. (#5233)
+* Fix build (#5269)
+* Only log when versions are actually regenerated. (#5394)
+* Unique session IDs for starts and quits (#5392)
+* Fix errors in the RegenerateMissingStatsModelsOneOffJob. (#5388)
+* Production fixes for the stats job. (#5377)
+* More fixes to stats jobs from running on test server. (#5366)
+* Handle exploration reverts for ExplorationStatsModel (#5356)
+* Fix variable declaration error (#5351)
+* Fix cast and improve output messages in stats job. (#5312)
+
+Testing, documentation and code health
+* Readability Improvements to save_new_linear_exp_with_state_names_and_interactions (#5023)
+* Adds YouTube error logs as expected error for e2e test. (#5046)
+* Fix part of #4057: Adding tests for audio language objects (#5061)
+* Break up factories (#5073)
+* Fixed docstring (#5096)
+* Fix #5044: Added a named constant for revert commit command (#5102)
+* Fix part of #3968: ParamMetadataObjectFactory domain object (#5082)
+* Fix backend load test (#5120)
+* Reference directive templates directly in /extensions/objects (#5121)
+* Rename AudioLanguage's "text" attribute to "description" and update e2e documentation for running individual suite (#5126)
+* Remove jquery themes (#5207)
+* Removed the fileInfoObject (#5205)
+* Add e2e functions patterns to BAD_PATTERNS_JS_REGEXP (#5208)
+* Fix #5105: GraphInput Viewbox console errors (#5212)
+* Fix part of #3954: Exploration Editor Page Object (#5139)
+* Refactor the delete-state-callback test. (#5349)
+
+
+v2.6.5 (18 June 2018)
+--------------------
+Miscellaneous user-facing:
+* Fix #4882: Moved subscribe button to profile card (#4892)
+* Fix #4781: Fixed Code editor zoom in problem (#4921)
+* Minor improvements to html_cleaner.convert_to_text_angular for readability. (#5070)
+* Fix #5041 and #5033: Hide unresolved student answers when the exploration is private, since there is no data to show. (#5080)
+* Fix #5083: Audio needs update span disable for guest users. (#5091)
+* Fix #5088: Removed refresh option from the create view (#5100)
+
+Infrastructure and testing
+* Fix #2255: Remove commons folder and transform toast icons to material (#4898)
+* Added the enable_console flag (#4949)
+* Add build before frontend tests (#4972)
+* Fix e2e tests on accepting a suggestion on a published exploration (#4917)
+* Change visibility of two protected methods in exp_domain (#4933)
+* Fixes backend tests (#5014)
+* Fixes part of #4057: Added spec for InteractionDetailsCacheService (#4889)
+* Fix travis build (#5003)
+* Fix change dict list in ExplorationStateIdMapping job (#5027)
+* Added MigrationValidation one-off-job (#5050)
+* Fix for error in migration validation testing (#5054)
+* Update chromedriver version from 2.39 to 2.40 (#5059)
+* Final Checking for the migration (#5065)
+
+Statistics:
+* Introduce get_state_answer_stats for StateAnswersStatisticsService (#4963)
+* Handler hook (#4964)
+* Fix #2249: E2e tests for exploration statistics (#4357)
+* Fix part of #4666: Fix code classifier prediction service and correct frontend tests. (#4922)
+* Modify the interval calls for storing stats (#4994)
+* Fix #4190: Fix ExplorationStateIdMapping MR job. (#4914)
+
+Translation Dashboard:
+* Add translator role for the exploration (M1.1 Lesson translation dashboard) (#4959)
+
+RTE Upgrade:
+* Content validation script to validate TextAngular content : Milestone 1 (part 1) (#4947)
+* Follow-up PR for the content validation one-off job (#4969)
+* Include html strings in the output of Content Validation job (#5020)
+
+New interactions:
+* Number with Units Interaction: Milestone 1.1 (#4941)
+* Add math.js dependency (#4950)
+* Number with Units Interaction: Milestone 1.2 (#4979)
+
+Improve image loading pipeline:
+* Ml1.1 Improve the image loading pipeline (#4954)
+* PR 2.1 : Added ExtractImageFilenamesFromStateService (#4965)
+* Added the ImagePreloaderService and edited the ImageDirective (#4990)
+* Moved the ExplorationDict back to the ExtractImageFilenamesFromStateSpec.js and added documentattion to ExtractImageFilenamesService.js (#4993)
+* Ammendments to image preloading. (#5030)
+* Amendments to the image Preloading( error case) (#5062)
+
+Generalized review system:
+* Generalized Review System: Milestone 1 (part 1) (#4943)
+* Generalized Review System - Milestone 1.1 (Part 2): Add Suggestion domain class (#4966)
+* Remove ambiguous definitions of thread_id in various places in the feedback and suggestion framework (#4971)
+
+Skills, topics and stories:
+* Fix #4847: Add a new role for topic manager and create TopicRightsModel (#4871)
+* Add Functionality for Skills: Milestone 1.1 (#4953)
+* Added domain objects and services for Topics: Milestone 1.2 (Part 1) (#4981)
+* Added domain objects and services for Skills: Milestone 1.2 (Part 2) (#4983)
+* Fix #4904: Update questions backend to align with Skills construct (#4920)
+* Added update and delete for Skills (#4992)
+* Added update and delete for topics (#4991)
+
+Development Workflow:
+* Improving the dev workflow: Milestone 1.1.1 Enable Pycodestyle rules and fix errors (#4937)
+* Modify _lint_html_files function and enable rules (#4910)
+* Add Email to Travis recipients (#4938)
+* Create stale config for oppiabot (#4940)
+* Improving the dev workflow: Milestone 1.1.2 Update Pylint (#4939)
+* Fix part of #3905: Add checks for directive scope (Part 1)  (#4848)
+* Fixes #4956: Change Pylint version (#4957)
+* Improving the dev workflow: Milestone 1.2.2 Enable in-built JS rules (#4948)
+* Improving the dev workflow: Milestone 1.2.1 Enable in-built angular rules (#4945)
+* Improving the dev workflow: Milestone 1.1.3 Custom pylint checks (#4967)
+* Improving the dev workflow: Separate CSS selectors from oppia.css (#5012)
+* Improving the dev workflow: Setup custom HTML indent function (#4987)
+* Improving the dev workflow: Separate About selectors from oppia.css (#5011)
+
+Playthrough Visualisation:
+* Playthrough Visualisation: Milestone 1.3 (#4984)
+* Validity for issues instead of playthroughs (#4977)
+* Playthrough Visualisation: Milestone 1.2 (Part 2) (#4946)
+* Playthrough Visualisation: Milestone 1.2 (Part 1) (#4944)
+* Playthrough Visualisation: Milestone 1.1 (Part 6) (#4935)
+* Playthrough Visualisation: Milestone 1.1 (Part 5) (#4934)
+* Playthrough Visualisation: Milestone 1.1 (Part 4) (#4928)
+* Playthrough Visualisation: Milestone 1.1 (Part 3) (#4927)
+* Playthrough Visualisation: Milestone 1.1 (Part 1) (#4918)
+* Playthrough Visualisation: Milestone 1.1 (Part 2) (#4919)
+
+Docstrings:
+* Replaced Content in docstrings (#4929)
+
+
+v2.6.4 (24 May 2018)
+--------------------
+Creator View:
+* Fix part of #3446: Add frontend validators to End Exploration. (#4828)
+
+Library & Learner Dashboard:
+* Fix #3977: Added tooltip for Collections in Learner Dashboard (#4850)
+* Fixes #4323: Fixed creator's option to add to playlist (#4863)
+* Fix #4924: Fixed exploration count error. (#4960)
+
+UI (General):
+* Partial Fix #3025: A keyboard user should be able to expand dropdown menus. (#4844)
+* Fix #4756: Duplicate cookies issue fix. (#4903)
+
+Linting:
+* Add check for parens (#4849)
+* Setup htmllint (#4900)
+* Enable lint checks for pre-commit script (#4869)
+
+Docstrings:
+* Fix part of #4374: Add docstrings to python files. (#4856)
+* Fix part of #4374: update docstrings for jobs (#4851)
+
+Skills project:
+* Fix #4846: Remove "Collection Skills" (#4862)
+
+Infrastructure and Refactoring:
+* Fix part of #4057: Add spec file of AutoplayedVideosService (#4805)
+* Fix nit comments in ExplorationStateIdMappingJob (#4860)
+
+ML:
+* Fix #3287: Enable training data classification in answer classification service (#4824)
+* Exploration states dict migration: Migrate training data to answer group and remove it from rule specs. (#4890)
+* Print stack trace of exceptions in ExplorationStateIdMappingJob (#4861)
+
+
+v2.6.3 (23 Apr 2018)
+--------------------
+Creator View:
+* Fix #4693: Changed timeout for "solution error" popup to 4 seconds. (#4706)
+* Fix #4530: Removes extra lines and spaces at the end of string in RTE (#4799)
+* Show "issues overview" card on state editor (#4744)
+* Fix part of #3446: Add frontend validators to CodeRepl Interaction (#4832)
+* Fix #4663: Added CSS to fix overflowing content out of stats modal. (#4664)
+* Fix #4714: Fix alignment of button and text in exploration settings tab. (#4811)
+* Fix #3982: Added 'open' in the open feedback thread summary. (#4767)
+* Fix #4872: Fix overflowing feedback thread count for large numbers. (#4873)
+* Fix #4857: Fixed feedback message status displaying incorrectly (#4865)
+
+Learner and Creator Dashboards:
+* Fix #2620: Remove the dead zone and hardcoded height in card view on dashboard (#4791)
+* Fix #3971: Add activity indicator to feedback updates (#4785)
+* Fix #3983: Reorder tabs in Learner Dashboard to make them more intuitive. (#4809)
+* Fix #4875: Removed dead zone in card view of creator dashboard (#4878)
+
+Library:
+* Fix #4056: There is no way to add an exploration/collection into play-later list for mobile users. (#4709)
+* Fix #4813: Fix icon positioning in search category dropdown (#4817)
+* Fix #4422: Add search option in library for mobile users (#4807)
+* Fix #4864: On mobile, two icons are visible on the exploration/collection cards at the same time. (#4879)
+
+Learner View:
+* Fix #4367: Prevent null-submission for MathExpressionInput interaction (#4753)
+* Fix #4055: Removes redundant CSS selector from conversation_skin_directive.html (#4790)
+* Fix part of #4364: Add sprinkles to the correctness footer (#4770)
+* Fix #4884: Remove correctness footer when navigating (#4899)
+
+Fractions Landing Page:
+* Update content and change font-size for tablet view for the Fractions landing page. (#4897, #4908)
+
+Questions project
+* Fix #3009: Final milestone of questions project (#4574)
+
+Dependencies and build process
+* Fix #4519: Move third-party build process into python. (#4831)
+* Remove reference to master branch from CHANGELOG (#4852)
+* Remove unused angular dependencies injected into controllers (#4792)
+* Fix git push error when branch has same name as directory. (#4834)
+* Upgrade ESLint to 4.19.0 (#4825)
+* Upgrade guppy version to b5055b (#4709)
+* Upgrade GAE version to 1.9.67. (#4786)
+* Remove numpy as a dependency. (#4808)
+
+Infrastructure:
+* Removed create_classifier_training_job and updated the unit tests. (#4827)
+* Add more detailed logging for StateIdMapping one off job. Add realtime logging to build script when deploying. (#4853)
+* Allow ExplorationStateIdMappingJob to overwrite StateIdMapping models (#4854)
+* Handle schema migration from exp schema v1 to exp schema v2 in ExplorationStateIdMappingJob (#4858)
+* Address issues with e2e tests by having each suite contain only one test file. (#4896)
+* Linting checks added:
+  * Fix part of #3905: Add check for keyword arguments (#4752)
+  * Fix part of #3905: Add check for period at ends of comments and docstrings (#4759)
+  * Fix part of #3905: Add check to ensure all HTML directives end with _directive.html (#4839)
+  * Merge _check_spacing function with _lint_py_files function and remove redundant code (#4840)
+
+Karma tests:
+* Fix part of #4057: Add test for EditabilityService (#4806)
+* Fix part of #4057: Add test for AnswerGroupsCacheService (#4843)
+
+Docstrings
+* Fix part of #4374: Add docstrings to core.domain.feedback_jobs_continuous (#4855)
+* Fix part of #4374: Add docstrings to core.storage files. (#4841)
+* Fix part of #4374: Add docstrings to value_generators_domain.py (#4826)
+* Fix part of #4374: Add docstrings to user_query_services.py and user_services.py (#4796)
+* Fix part of #4374: Add docstrings to core/domain/stats_jobs_one_off.py (#4757)
+* Fix part of #4374: Add docstrings to core.domain.stats_domain. (#4731)
+* Fix part of #4374: Add docstring to core.platform.email.gae_email_services (#4795)
+* Fix part of #4374: Add docstrings to test_utils.py (#4845)
+
+
+v2.6.2 (20 Mar 2018)
+--------------------
+Learner View:
+* Fix #4639: Changed the ending for refresher explorations (#4644)
+* Fix #4627: hides tooltip after new card available. (#4637)
+* Interactions:
+  * Fix #4641: Added new fractions rule to check if fractional part exactly equals (#4648)
+  * Fix #4640: Added customization args to write custom placeholders for fractions interaction (#4645)
+  * Fix #4409: Interactions not working on mobile. (#4672)
+  * Block console error message in pencil code editor (#4741)
+  * Fixes issue #4562 : Overlapping line numbers and text in Code Editor (#4745)
+  * Fix part of #4367: Added null submit checks for set input interaction (#4710)
+  * Fix #4430: fixed weird graph edge weight input (#4707)
+  * Fix:#4634: Deleting imageInteraction should delete the responses. (#4711)
+  * Fix #4549: Fixed the position of code editor (#4674)
+  * Fix #4530: Fixed extra new lines and whitespaces in Multiple choice Options (#4739)
+  * Fix #2827: GraphInput not visible in mobile view. (#4698)
+
+Exploration Editor:
+* Fix #4566: Dollar formatting issue (#4633)
+* Fix #4676: Updated exploration search validator. (#4687)
+* Fix #4481: Adds a link to the exploration in the publication modal  (#4647)
+* Fix #4701: fixes rule descriptor for ListOfCodeEvaluation and SetOfNormalizedStrings (#4703)
+* Fix #4656: Fix spacing around links in rte (#4694)
+* Fixed issue #4692: Fixed styling for input text field. (#4715)
+* Fix #4635 Make the Advanced feature settings(in creator mode) more intuitive (#4695)
+* Fix #3906: Add link which takes you to State Editor from Statistics Tab Modals (#4655)
+* Fix #3478: Added functionality to sort nodes list. (#4708)
+* Fixes #4530: Removes spaces and new lines from end of string in RTE. (#4748)
+* Fix #4072 : Uses Initial few words as a feedback's subject (#4257)
+* Fix #4712:Unaligned radio-button with corresponding text. (#4718)
+
+Audio:
+* Fix #4621: Add modal for flagging audio translations on feedback, hints, and solutions. (#4623)
+* Fix #4295: Added slider for audio bar (#4659)
+* Fix #4528:Sets default language to the last selected language for audio translations in creator view. (#4673)
+* Only attach onended property of audio if current track is not null. (#4685)
+* Allow audio translations to be stripped away when creating new explorations using the upload YAML button (#4378)
+* Fix #4293: Add slide animation to audio bar directive (#4636)
+* Fix #4497 Fix console errors for audio on card with no text (#4726)
+* Fix #4680: Pauses the audio being played when preview button is clicked  (#4725)
+* Fix #4292: Upgraded font-awesome and play/pause icons (#4750)
+
+Miscellaneous fixes:
+* Fixes #4410: Fixed info modal for private explorations (#4754)
+* Fix #4590: Fixes dropdown overlap with feedback editor (#4629)
+* Fixes #4660 - Fixed dropdown menu (#4671)
+* Fix #4587: Item Selection input boxes are top-aligned (#4607)
+* Fix #4683: Altered positioning of help card to make it appropriate (#4696)
+* Fix #3606: For public explorations, default to the feedback page in the exploration editor if feedback exists. (#4716)
+* Fix #1494: Can't see videos in Tabs. (#4736)
+* Fix part of #3550: Move translation check from footer to header (#4738)
+* Fix #2915: fixes sidebar breaking on mobile (#4749)
+* Fix:#4721:The text in the tooltip is not completely visible in case of the leftmost collection. (#4733)
+* Added a new Fractions landing page (#4758)
+* Fixes bug #4746 (#4747)
+
+Statistics:
+* Fix #3797: Deprecate old classification framework (#4653)
+* Deprecate the old stats framework and StatsAggregator job. (#4762)
+* TextInput classifer bug fixes (#4700)
+* Consolidated Change list mapping method (#4729)
+* Add try and except blocks at probable error generating lines. (#4755)
+
+Infrastructure and Refactoring:
+* Fixed part of #4057: ThreadStatusDisplayService (#4606)
+* Fix Travis build fail (#4679)
+* Fix #4295: addresses review comments in #4659 (#4670)
+* Updated PULL_REQUEST_TEMPLATE to include #bugnum in explanation. (#4681)
+* Add comment to explain null value in AudioPlayerService. (#4735)
+* Linting checks added:
+  * Fix part of #3905: Added eqeqeq rule (#4573)
+  * Add check for keyword spacing (#4697)
+  * Add check for consistent comma spacing (#4720)
+  * Enable isort diff to debug import-order errors (#4684)
+  * Add check for consistent brace style (#4727)
+  * Space check for Python files (#4728)
+  * Add check for trailing whitespaces (#4699)
+  * Fix part of #3905: Add lint checks for common coding issues arising in code reviews  (#4724)
+
+Docstrings:
+* Fix part of #4374: Add docstring to file core.storage.job.gae_models.py (#4705)
+* Fixed part of issue #4374 :Added docstring for cron.py (#4722)
+* Fixed Part of #3954: Added CollectionEditorPage  (#4678)
+* Fix part of #4374: Documented core.platform.models (#4596)
+
+
+v2.6.1 (18 Feb 2018)
+--------------------
+Exploration Player:
+* Hints and Solutions:
+  * Fix state schema migration for hints (#4638)
+  * Prevent hints from being released after correct answer is submitted. (#4580)
+  * Change fraction placeholder when no integer part is allowed. (#4581)
+  * Fix #4512: Changes in hint's tooltip waiting and closing time. (#4513)
+  * Fix #4465: Clear the tooltip timeout on-reset, or once a hint or solution is viewed. (#4471)
+  * Fix #4412: Improved presentation of solutions (#4434)
+* UI:
+  * Fix help card cut off bug. (#4630)
+  * Ensure 'Return to Library' button always shows for explorations (#4561)
+  * hides the back button if a help window with a continue button is shown (#4552)
+  * Fix #4472: Auto scroll in ItemSelection input interaction (#4523)
+  * Fix #4509:  Line spacing in bulleted lists seems to be different from line spacing in standard text (#4535)
+  * Fix cut-off ratings at end of exploration. (#4540)
+  * Fix #4433: made radio buttons align to top of div (#4446)
+  * Fix #4461: Learn Again button appearing when not intended (#4479)
+  * Fix #4427: Show previous answer for map interaction (#4478)
+  * Fix #1251: Set cursor color to black in MathExpressionInput. (#4424)
+  * Fix #1251: Set cursor color to black for MathExpressionInput. (#4408)
+* Correctness Footer:
+  * Fix Correct footer showing even when no response is input (#4550)
+  * Fix #4468: Animate 'Correct Answer' feedback (#4526)
+  * Disable correctness feedback for linear interactions (#4456)
+  * Fix #4460: Correctness Footer should hide when learner moves backward from the last card (#4464)
+  * Updated the correctness banner (#4463)
+* Refresher Explorations:
+  * Fix error due to refresher exps possibly being outside a collection. (#4624)
+  * Fixed url error when redirecting to refresher exploration (#4611)
+  * Update text of refresher exp modal. (#4584)
+* Audio:
+  * Add check for initialization of speechSynthesis. (#4601)
+  * Chance cancel property in SpeechSynthesisChunkerService into its own variable. (#4591)
+  * Add check to prevent 'SpeechSynthesisUtterance is undefined' error. (#4571)
+  * Fix #4488: Make audio bar expand button bigger on mobile, and hide on scroll down. (#4541)
+  * Fix #4486: Changed width of audio selection dropdown to not cut out text on phones (#4527)
+  * Optimize audiobar behavior on mobile (#4515)
+  * Include mobile speech synthesis code. (#4462)
+  * Replace _isPlaying in AutogeneratedAudioPlayerService with speaking property of speech synthesis; Fix bug with duplicate utterances being generated by autogenerated audio; Fix bug where submitting a feedback before a previous feedback response has finished speaking results in the highlighting of the card content. (#4436)
+* Fraction Input:
+  * Fix #4567: Changed condition to check range enclosed criteria, edited existing test (#4575)
+  * Add placeholder in fractions input (#4514)
+  * Change rule description for HasNoFractionalPart (#4505)
+  * Fix #4474: Updated solution getSummary to support fractions (#4475)
+  * Minor style fix in fractionInputValidationService.js (#4469)
+  * Fix #4444, #4452: Added appropriate filter for Fractions. (#4454)
+  * Fix #4443: Changed some check conditions for answer groups in fractions. (#4449)
+  * Added validity checks for the newly added customization args for Fractions Interaction (#4400)
+Exploration Editor:
+* Fix #4617: Fixed the weird behaviour of red dot in editor mode (#4619)
+* Add a dot to mark previous answer in ImageRegion when no highlighting (#4614)
+* Fix of #2533: Modified the stripFormatting filter to preserve newlines in RTE cut-and-paste (#4568)
+* Fix #1542: RTE Components correctly displayed in answer group header (#4565)
+* Fix #4555: Address review comments for #4536. (#4556)
+* Fix #4503: Fixed RTE element view in hint editor (#4536)
+* Fix #4542: Moves the position of NodeErrorMessage tooltip.  (#4544)
+* Fix part of #3826: Change and rename graphDataService in pages/exploration_editor/EditorServices.js (#4490)
+* Fix #4480: Hide Page selector from history tab if only one page (#4495)
+* Fix #4470: Fixed The ticks/crosses in the editor are misaligned (#4473)
+* Fix part of #3826: Extract and rename 'changeListService' from EditorServices.js (#4379)
+Collections:
+* Fix missing collection ID in exploration redirection ID. (#4626)
+* Adds proper message for validation error in skill ID. (#4577)
+* Fix #4494: Return to collection when finished by guests when explorations have recommendations (#4554)
+* Update collection_player.html to properly pass along collection ID to (#4524)
+* Exploration search validator (for new node) modification. (#4510)
+Statistics:
+* Add visualization stats for fractions input interaction. (#4598)
+* Fix #4349: Record leave for refresher exp events (#4557)
+UI:
+* Fix #4533: Fix word wrap property (#4608)
+* Fix #4459: Removes attribution guide in mobile view (#4508)
+* Set error page footer to relative position (#4498)
+Tests:
+* Fix #4612: organised promises (#4631)
+* Fix #4559: Write an e2e test to prevent users from getting stuck in non inline interactions (#4622)
+* Fix part of #4057: Unit test for SidebarStatusService (#4520)
+* Fix part of #4057 - Test frontend services in domain/classifier (#4305)
+* Ignore youtube embedding error while e2e test on Travis. (#4603)
+* Shrink Protractor timeout. (#4597)
+* Fix #4275: Embedding e2e test creation (#4482)
+* Add test to HintAndSolutionManagerService to check that hints aren't released after a correct answer is submitted. (#4585)
+* fixed flaky protractor test (#4445)
+* fix for #4432 (#4435)
+Speed:
+* Extensions refactor (#4620)
+* Fix part of #3950: replace Jinja in state_editor_responses.html (#4548)
+Misc:
+* "Update version number to 2.6.1"
+* Fix #3753: Remove IS_MINIFIED variable (#4613)
+* Fix #3826 -Extracted services to ExplorationPropertyService.js (#4589)
+* Fix issue with URL loading (and 404-ing) before it is interpolated. (#4610)
+* Routine update of translations. (#4595)
+* Update content-type for JSON responses. (#4583)
+* Change Java prerequisite to v8 (#4570)
+* Update changelog, AUTHORS, CONTRIBUTORS and credits. (#4560)
+* Fix part of #3826: Extracted  recursionHelper-> NestedDirectivesRecursionTimeoutPreventionService into separate file. (#4518)
+* Fix part of #3826: Extracted schemaUndefinedLastElementService into a separate file. (#4476)
+* Extracted SchemaDefaultValueService (#4457)
+* Fix part of #3826 and #4413: Included the service in the definition of the function and extracted AutosaveInfoModalsService into individual file (#4414)
+* Fix part of #3826: Extracts rteHelperService into separate file. (#4392)
+Docstrings:
+* Add docstrings. (#4616)
+* Fix part of #4374: Update docstrings to core.domain.email_manager (#4593)
+* Fix part of #4374: Add docstrings to core.domain.collection_domain. (#4569)
+* Fix part of #4374: Add docstrings to core.domain.param_domain (#4551)
+* Fixes #2394 : Added docstring to functions in utils.py (#4330)
+* Fix part of #4374: Add docstrings to core.domain.config_domain (#4506)
+* Fix part of #4374: Add docstrings to core.domain.classifier_domain (#4458)
+* Fix part of #4374: Added Doc string for core.domain.email_subscription_services (#4451)
+* Fix part of #4374: Added docstring for core.controller.pages
+* Fix #4374 partially: Adding missing docstrings. (#4419)
+* Fix part of #4374: Add docstrings to core.controllers.collection_editor (#4402)
+* Fix part of #4374: Added docstrings to core.controllers.base (#4404)
+Linter:
+* Enable indent for func-expr (#4588)
+* Fix part of #3905: Added semi-rule (#4576)
+* Fix part of #3905: Add checks for correct docstring style. (#4572)
+* Fix part of #3905: Add check for console.log statement (#4564)
+* Added check for Python files in _check_import_order function (#4547)
+* Fix part of #3905: Add space checks for definitions (#4522)
+* Fix import-order check (#4499)
+Splash page:
+* fixed #4415 - Fix display bug in splash page (#4416)
+
+
+v2.6.0 (18 Jan 2018)
+--------------------
+Exploration player:
+* Hints and solutions
+  * Fix #4285: New design for Hints and Solution (#4286, #4203, #4338, #4358, #4383, #4393, #4471, #4513)
+  * Fix #4298: Introduce tooltip functionality for hints (#4375, #4396)
+  * Fix #4412: Improve presentation of solutions (#4434)
+* Audio
+  * Audio redesign (#4271, #4332, #4515, #4527)
+  * Add audio playback for feedback, hints, and solutions to learner view (#4346)
+  * Highlight components while audio is playing (#4382)
+  * Fix #4290: temporary fix for audio bar when audio is not available (#4337)
+  * Fix #4302, #4340: Removes audio option from unsupported browsers.
+  * Auto-download audio at the outset of an exploration (#4149)
+  * Replace _isPlaying in AutogeneratedAudioPlayerService with speaking property of speech synthesis (#4436)
+  * Fix bug with duplicate utterances being generated by autogenerated audio  (#4436)
+  * Fix bug where submitting a feedback before a previous feedback response has finished speaking results in the highlighting of the card content (#4436)
+  * Include mobile speech synthesis code (#4462)
+  * Fix #4488: Make audio bar expand button bigger on mobile, and hide on scroll down. (#4541)
+* Correctness feedback
+  * Fix part of #4356: Added Correctness Footer in exploration view. (#4363, #4389, #4385, #4463, #4464, #4526, #4550)
+  * Fix #4354: Add learn again button (#4391, #4479)
+* Progress navigation
+  * Remove progress dots and replace with arrows for lesson playback (#4265, #4288, #4365)
+  * Fix #4350, #4217, #4361: Enable progress-nav on desktop (and some other interaction fixes) (#4365)
+  * Fix #4342: Added null submit checks for various interactions (#4359)
+  * Fix part of #3712: Created Continue Button Directive (#4273)
+  * Fix #4317: Hide the back button if a help window with a continue button is shown (#4552)
+* FractionInput interaction
+  * Fix #4180: Bug with the fractions interaction checking integer parts. (#4181)
+  * Fix #4443: Update the validation criteria for FractionInput rules. (#4449, #4469)
+  * Fix #4501: Change rule description for HasNoFractionalPart rule (#4505)
+  * Fix #4511: Add placeholder text in fractions input (#4514)
+* Other
+  * Fix #4355: Added refresher exploration redirection in player view (#4344, #4373, #4435, #4445, #4524)
+  * Fix #1270: Earlier non-inline interactions are still interactive (#4232, #4281, #4427)
+  * Do a migration for the correctness property and fractions customization args. (#4390, #4400)
+  * Fix #4459: Remove attribution guide in mobile view (#4508)
+  * Fix #4091: Set max-height for ItemSelectionInputResponse images (#4229)
+  * Fix #4433: correct alignment of radio buttons in MultipleChoiceInput interaction (#4446)
+  * Fix #4455: Fix cut-off ratings at end of exploration. (#4540)
+  * Fix #4509:  Line spacing in bulleted lists seems to be different from line spacing in standard text (#4535)
+  * Fix #4494: Return to collection when finished by guests when explorations have recommendations (#4554)
+  * Fix #4472: Fix auto scroll in ItemSelection input interaction (#4523)
+
+Exploration editor:
+* Hints and solutions
+  * Fix #4047: Abbreviated Solution Explanation (#4269)
+  * Fix #3773: hints ui-sortable not functioning as expected (#4316)
+  * Fix #4287: solution updates are not handled correctly. (#4289)
+  * Fix #4152: fix bug in solution verification service. (#4154)
+  * Fix #4503: Fixed RTE element summaries in hint editor (#4536)
+* Audio
+  * Add audio translations to feedback, hint, and solution in editor (#4312, #4233)
+  * Added styling for audio-controls (#4310)
+  * Fix #4311: major bug in editor due to using subtitled HTML for default outcome. (#4313)
+* Correctness feedback
+  * Introduce a correctness_feedback_enabled field at the exploration level and make corresponding updates to the states dict. (#4235, #4270, #4456, #4473)
+* Other
+  * Allow editing of refresher exploration ID. (#4320, #4336)
+  * Always show something in the lost changes modal, even if the data cannot be parsed. (#4394)
+  * Fix dropdown issue in multiple choice interaction (#4315)
+  * Fix #310: Add Pagination to exploration history tab  (#4212, #4495)
+  * Fix of #4253: Stopped weird flickering in the editor content card (#4284)
+  * Fix #4065: New editor logout handler (#4211)
+  * Fix #4444, #4452, #4474: Add an appropriate filter for FractionInput rules. (#4454, #4475)
+  * Fixes 3741: Remove action parameter when moderator unpublishes exploration. (#4213)
+
+Collection player
+* Fix #4249: Add local storage support for collections played by guests. (#4250)
+* Fix #3787 and #3788: Clicking outside the preview card in the collection learner view should close the preview card; when the preview card shows in the small-width collection learner view, the background should be darkened. (#4185)
+* Fix #4141: Removed console error and added tests for error with three nodes in collection player view (#4197)
+
+Collection editor
+* Modify the validator for the new node field when searching for explorations (#4510)
+
+Learner dashboard
+* Fix #4178: "add to playlist" tooltip appears after coming back only. (#4319)
+* Fix #3978: Added correct message for no incomplete explorations. (#4264)
+
+Library
+* Fix #4279: Deselecting languages in the search area of the library page does not work correctly. (#4283)
+* Prevent 3-letter language codes from being used as the language code for an exploration, otherwise this breaks App Engine's search service. (#4277)
+
+UI (general):
+* Upgrade ui bootstrap (#4230, #4248, #4262, #4324, #4372)
+* Fix #4174: nav and footer for user journey (#4242)
+* Fix #4291: Moderator badge is placed correct. (#4306)
+* Fix #4224: Set Admin Badge in place. (#4236)
+* Fix #4143: Align buttons on splash page properly (#4241)
+* Fix #4144: The data displayed on the creator dashboard is not aligned properly on mobile devices (#4205)
+* Fix #4415: The splash page buttons are not aligned correctly in production (#4416)
+
+Analytics
+* Fix #4153: Optional addressed column (#4186)
+* UI fixes to the stats tab (#4150)
+* Fix #3868: Create job to recompute statistics from event models in datastore (#3933)
+* Add a GenerateAllStats job to generate statistics models for all explorations (#4228, #4326)
+* Fix part of #4195: Modify the references to the continuous stats aggregator (#4201)
+* Modified recording of useful feedback count for both v1 and v2 stats (#4198)
+* Fix #4179: update calculation for 'addressed' status; make some UI fixes. (#4196)
+* Fix #4167: Update answer summarizers job to properly handle answers corresponding to deleted explorations (#4168)
+* Fix #4182 and #4188: Fixes for the GenerateV1StatisticsJob (#4172, #4183, #4184, #4189, #4193, #4208, #4210, #4215)
+* Fix #4164: error with running ExplorationStateIdMappingJob (#4165, #4157)
+* Fix #4349: Record leave-for-refresher-exp events (#4557)
+
+Questions
+* Fix #3008: implement Questions project p2 (#3907)
+
+ML
+* Add front-end prediction service for TextInput interaction. (#3861)
+
+Infrastructure
+* Extend Protractor timeout to cover hints. (#4395)
+* Run only the production e2e tests. (#4239)
+* Stabilize search page protractor tests by giving Protractor a bit more time to load the page. (#4192)
+* Fix the e2e error in the search page. (#4199)
+* Fix #4216 and #4218: link correctly to static assets in interactions. (#4219)
+* Fix #3891: pattern check for directly referenced directives implemented. (#4187)
+* Fix part of #3905: Add lint checks for alphabetical import order (#4343)
+* Update deploy script (#4156)
+* Fix #4327: Corrected `collection_domain.py` for syntax error.
+* Fix #4223: Corrected variable name collection summary_dicts (#4256)
+* Change http to https in various places. (#4268)
+* Migrate next_skill_id to next_skill_index. (#4237)
+* Fix a bunch of issues related to the maintenance.html page not loading Angular properly. (#4227)
+* Simplify patterns for using promises in the codebase. (#4204)
+* Fix import-order check (#4499, #4547)
+
+
+v2.5.7 (17 Dec 2017)
+--------------------
+Learner View:
+* Fix #4076: Update end exploration (within collection) headers to better illustrate that the user should return to the collection (#4130)
+* Fix #4090: limit number of progress dots for narrow window (#4129)
+* Fix #4102: Auto Hide of Navbar (#4108)
+* Scroll down to latest Oppia response in learner card when in mobile view (#4110)
+* Remove feedback button from mobile learner view. (#4093)
+* Added underline to 'Back to collection' link (#4096)
+* Prevent hint tooltip from going offscreen on mobile (#4087)
+* Various learner view improvements for ItemSelectionInput. (#4083)
+* Stop cards from going offscreen in mobile learner view. (#4084)
+
+Exploration Editor:
+* Fix #3906: Show Addressed column in State Stats Modal (#4147)
+* Check for empty change_list before proceeding. (#4136)
+* Fixed part of #3826 - editorFirstTimeEventsService (#4124)
+* Log error when ExplorationCommitLogEntry model instance is not found for (#4126)
+* Fix exploration graph directive URL. (#4098)
+* Fix #4055: Replaced redundant CSS selectors. (#4059)
+* Fixed #3146 : Reset Button functionality in preview mode (#4078)
+
+Learner Dashboard:
+* Fix #4001: Learner Dashboard Unpublished exploration issue fixed (#4039)
+
+Library:
+* Remove globe from exploration summary cards. (#4132)
+* Fixed Adjust the tooltip displayed when a user hovers over the globe icon on the library page (#4043)
+
+Infrastructure and Refactoring:
+* Move isInteger polyfill to app.js. (#4134)
+* Fix part of #3826: Extract stateEditorTutorialFirstTimeService into individual file (#4137)
+* Fix part of #3826: Extract services from i18n.js  (#4118)
+* Fix part of #3826: Extract ExplorationWarningsService into individual file. (#4106)
+* Fix part of #3826: extract from EditorServices.js (#3970)
+* Fix part of #3826: Extract services from app.js (#4079)
+* Fix part of #3825: Rename angular services in Group 5 (#4111)
+* Renamed RTC_specs to RTC_definitions and removed useless __init__.py file. (#4101)
+* Remove dead code. (#4064)
+* Fix part of #2394: Add docstrings to core.domain.subscription_services.py (#4054)
+
+Statistics:
+* Fix bugs in GenerateV1StatisticsJob (#4125)
+* Fix error in GenerateV1StatisticsJob (#4120)
+* Fix ExplorationStateIdMapping job: Yield errors rather than raising Exception in ExplorationStateIdMapping (#4128)
+* Fix ExplorationStateIdMapping MapReduce job. (#4113)
+* Refactor extensions.answer_summarizers.models logic (#4092)
+* Fix 3946: Add visualization for Item selection inputs (#4080)
+* Fix #3289: Introduce domain objects for answer calculation output (#4036)
+* Fix error in one off stats migration job. (#4068)
+* Add state id mapping mapreduce job to the job registry (#4099)
+* Implement one off MapRreduce job to generate state id mapping model for explorations. (#4088)
+* Implement state id mapping model. (#3963)
+* Fixed #3288: Add tests for stats_visualizations_info (#4035)
+* Fix errors in the one-off job for stats migration (#4061)
+* Fix one last error in the GenerateStatsV1Job (#4215)
+* Convert str versions to int (#4210)
+* Fix error in GenerateV1StatisticsJob (#4208)
+* Fix part of #4195: Modify the references to the continuous stats aggregator (#4201)
+* Modified recording of useful feedback count for both v1 and v2 stats (#4198)
+* Fix #4179: update calculation for 'addressed' status; make some UI fixes. (#4196)
+* Fix #4167: Update answer summarizers job to properly handle answers corresponding to deleted explorations (#4168)
+* Handle state migrations in GenerateV1StatisticsJobV1 (#4193)
+* Fix #4153: Optional addressed column (#4186)
+* Fix #4188: Fixes for the GenerateV1StatisticsJob (#4189)
+* Fix part of #4182: make yielded value in map a tuple. (#4183)
+* Fix part of #4182: Handle None version events (#4184)
+* Fix #4169: Fixes Key error due to plus sign replacements (#4172)
+* Catch Exception when failing to retrieve explorations. (#4157)
+* Fix #4152: fix bug in solution verification service. (#4154)
+* UI fixes to the stats tab (#4150)
+
+Speed:
+* Fixed part of #3950: Replace Jinja templates in feedback_tab.html with Angular (#4123)
+
+Interactions:
+* Fix remainder of #3794: Add a fraction input interaction (#4100)
+* Fix part of #2575: Interactions refactor first milestone (#4115)
+* Fix part of #3794: Complete milestone 2 of fraction interaction (#4067)
+* Fix #4216 and #4218: link correctly to static assets in interactions. (#4219)
+* Fixed error with Clickable image (#4207)
+* Fix #4180: bug with the fractions interaction checking integer parts. (#4181)
+* Fix #4180: bug with the fractions interaction checking integer parts.
+
+Misc:
+* Fix #4140: correctly generalize permissions for creating collections. (#4142)
+* Update PULL_REQUEST_TEMPLATE.md (#4117)
+* Minor updates to CHANGELOG v2.5.6 after proofreading (#4097)
+* Update Authors, Contributors, Changelog, Credits for Release 2.5.6. (#4095)
+* Routine update of translations. (#4082)
+* Fix part of #3954: Created a Page Object for Thanks Page (#4085)
+* Upgrade SSL library version; remove obsolete challenge-response handler. (#4081)
+* Simplify karma coverage specification. (#4066)
+* Update deploy script (#4156)
+
+
+v2.5.6 (20 Nov 2017)
+--------------------
+Learner View:
+* Have the tutor card appear directly above the supplemental card on mobile (#3936)
+
+Exploration Editor:
+* Fix #3794: Complete milestone one of introducing the new fraction interaction. (#3967)
+* Replaced the correct CSS styling for md-checkbox
+* Fix #3997: Added proper css for CodeRepl preview (#4053)
+* Shorten answer group header summaries so that the existence of multiple rules can be seen. (#4030)
+* Fix #3975: Removed repeated warnings for non-alphanumeric strings.
+
+Creator Dashboard:
+* Fix #3257: Remember list/grid display preference in the creator dashboard.(#3803)
+
+Site Navigation:
+* Text tweak for Teach page. (#4032)
+* Fix typo in Donations paragraph (#4040)
+
+Embedding:
+* Fix #3976: Show supplemental interactions in embedded explorations (#4052)
+
+Infrastructure and Refactoring:
+* Fix part of #3950: Replace Jinja templates in frontend with Angular (#4050)
+* Fix part of #3950: Replace Jinja templates in frontend with Angular (#4019)
+* Fix part of #3950: Replace Jinja templates in frontend with Angular (#4037)
+* Fix #3954: Add AdminPage page object (#3974)
+* Fix #3891: Changes made for remaining directives.
+
+Statistics:
+* Fix #3987: Reworked Stats tab (#3992)
+* Fix #3958: One-off job to use existing stats data to create new ExplorationStatsModels (#3959)
+* Only record stats for solutions if not in preview mode. (#4049)
+* Fix #3422: Fix answer summarizer job interaction updating (#3955)
+* Introduce event model schema version and modify ExplorationStatsModel (#3960)
+* Fix #3912: Introduce incremental statistics update and event recording functionality (#3916)
+
+Audio:
+* Add fallback for browsers which do not support speech synthesis. (#4028)
+* Add fallback to blob-builder on low-end devices (#3937)
+* Allow creators to optionally disable automatic text-to-speech for an exploration. (#3918)
+* Fix #3993: Standardize check for whether autogenerated translations are shown. (#4002)
+
+Hints:
+* Show a tooltip over hint button to suggest that the learner use a hint after a few attempts.
+* Fix #4015: Added e2e tests for hints/solutions (#4033)
+* Fix #3805: On mobile, the tooltip for the hint button is cutoff on the right edge of the screen.
+
+Speed:
+* Fix #3254: Load MathJax only where needed (#4042)
+
+Misc:
+* Fix #3791: Paragraph spacing fix (#4048)
+* Reformat frontend error message so that StackDriver hopefully catches it. (#4045)
+* Fix #4046: SITE_NAME replacement error fixed in license explanation page (#4051)
+* Fix part of #2575: Remove load errors from the frontend tests (#4041)
+* Fix errors in production due to parameters not working correctly. (#4029)
+* Fix issue with lastComputedArrangement occasionally being undefined when calculating the destination state lists.
+
+
+v2.5.5 (20 Oct 2017)
+--------------------
+Learner View:
+* Have the tutor card appear directly above the supplemental card on mobile (#3936)
+* Fix #3993: Standardize the check for whether autogenerated translations are shown. (#4002)
+* Fix #3790: Add automatic text-to-speech audio to explorations (#3818)
+* Add all supported audio languages (#3903)
+* Disable the save button while uploading audio to server; add Spanish support to audio languages; add audio loading message to learner view (#3856)
+* Fix #3807: Center the info icon in the footer vertically (#3859)
+* Fix #3812: Auto-adjust the size of buttons to fit within small screen widths (#3858)
+
+Learner Dashboard:
+* Add timestamps to individual messages (#3873)
+* Disable the "feedback updates" send button when there is no text entered. (#3860)
+* Fix #3404: Add default placeholder text for mobile devices (#3845)
+* Add I18N to “give up” button, and change the tooltip text. (#3844)
+
+Collections:
+* Fix issue with the exploration tile in a collection being unclickable on mobile devices. (#3900)
+
+Exploration Editor:
+* Replace "source" element with in-line "audio" element in the audio translations editor, to prevent the same audio source persisting incorrectly across multiple states. (#3908)
+* Fix #3295: Save a draft of the exploration editor’s change list to local storage, to guard against loss of Internet connectivity while editing. (#3584)
+* Fix part of #3400: make the Objective field directives in the exploration settings tab and the publish modal match each other (#3740)
+
+Site Navigation:
+* Update the Oppia blog link, and rewrite the Teach with Oppia page. (#3945)
+* Add external Foundation links (#3934)
+* Fix #3800: Fix hover issue for dropdown menu buttons in the About page (#3855)
+* Fix #3828: fix warning erroneously showing up in registration page on Safari (#3833)
+
+Embedding:
+* Add v0.0.3 version of embed script, which adds explorationTitle data to messengerServices (#3935)
+
+Infrastructure and Refactoring:
+* Fix #3691 Add a config property to add notification emails for failing ML tasks (#3871)
+* Fix #2553: Change the "index all explorations" job in the admin dashboard to index all activities (#3831)
+* Fix #3687: Batch calls for retrieving the exploration and exploration rights objects. (#3815)
+* Enforce the one-service-per-frontend-file rule and frontend naming conventions in more places.
+* Fix part of #3891: Refactor directives to use template URLs (#3942)
+* Fix part of #2575: Refactor rich-text component directives to use template URLs (#3921)
+* Fix part of #2863: Introduce ParamType domain object in the frontend (#3870)
+* Introduce Creator Dashboard page object for Protractor tests (#3949)
+
+Misc:
+* Fix #3721: Update the release_info script to use LCA and the most recent release tag in order to compile the list of changes, rather than relying on git describe. (#3838)
+* Update deploy scripts to match new release process (#3952)
+* Update the automatic backup script to automatically split up URLs if needed (#3956)
+* Update the backups script to ignore reconstitutable models (#3876)
+* Update the release info script to output both new and old authors to Oppia (#3878)
+* Add the release script to the codebase (#3839)
+* Add script for cutting a new release branch. (#3919)
+
+
+v2.5.4 (22 Sep 2017)
+--------------------
+Learner Dashboard:
+* Learner dashboard 3.2 (#3759)
+* Handle anonymous feedback usernames. Learner Dashboard Hotfix. (#3762)
+* Address the bugs in learner dashboard. (#3720)
+* Fix #3695: Pull the load tests apart from the main test. (#3729)
+* Assign the default dashboard to all the users of the site. (#3760)
+* Add user default dashboards job to job registry (#3779)
+* Set default dashboard for users and fix a bug in preferences for default dashboard. (#3781)
+
+Site-Wide ACL refactor (new roles/permissions system):
+* Fixes #3742: function added for fetching list of exploration rights based on ids. (#3796)
+* SiteWide ACl: removing the old system for authorization. (#3696)
+
+Hints:
+* Fix #3645: Introduce new Solution Editor and Learner View (#3703)
+* Fix #3771: Remove fallbacks (#3772)
+* Fixes '0' issue for solutions (#3770)
+
+Machine Learning:
+* Fixes for end to end working between Oppia and Oppia-ml. (#3824)
+* Enable code classifier for code interaction. (#3767)
+* Make answer classification work synchronously. (#3765)
+* Code classifier frontend prediction API services. (#3719)
+* Fix #3469: Introduce PredictionAlgorithmRegistryService and a sample prediction service. (#3716)
+* Fix #3693: Deprecate ClassifierDataModel and update ClassifierTrainingJobModel (#3734)
+* Fix #3514: Next job controller (#3658)
+
+Learner View:
+* Fix #3612: In embedded explorations, the learner avatars are too large. (#3736)
+* Fix #3725: Message bubble triangle (#3749)
+* Fix #3258: Add share-to-classroom Button (#3743)
+
+Audio:
+* Add audio language preferences (#3766)
+* Test uploading audio file with an mpeg container. (#3752)
+* Handle audio files with MPEG container with mutagen (#3735)
+* Preloading of audio and bandwidth confirmation (#3727)
+* Fix issue with inter-paragraph spacing in content field being unintentionally reduced. (#3775)
+
+Editor:
+* Remove gadgets functionality and update the exploration schema version accordingly. (#3801)
+* Fix part of #3400: Update title field in Publish Modal (#3690)
+
+Collections:
+* Fix 'Empty path passed in method' error on the collection page. (#3827)
+* Fix #3707 Change the start text of collection learner view (#3816)
+
+Misc:
+* Deprecate splash page experiment (#3829)
+* Remove extraneous period (#3780)
+* Routine update of translations. (#3785)
+* Fix #3558: Browser specific alignment (#3768)
+* Removed I18N_PLAYER_CONTINUE_NEXT_CARD from the translation files (#3737)
+* Eliminates stray tick mark (#3731)
+* Fix #3726: prevent graph SVG from overlapping modal footer buttons. (#3728)
+* remove data-toggle Fixes #3750 (#3754)
+* Fix #3789: Space out the profile drop down icons (#3789). (#3817)
+
+Infrastructure:
+* Make the range used for generating IDs much larger. (#3799)
+* Derive GCS bucket name automatically. (#3798)
+* Simple fix to prevent the last updated field on running the count job. (#3761)
+* Fix #2036: Introduces and uses configuration point for assigning a job to a specific queue. (#3745)
+* Fix call to base class (#3751)
+* Add a one-off job to list which explorations use gadgets; remove old fallbacks job. (#3717)
+* Improvements and bug fixes to changes introduced by PR #3671 (#3684)
+
+Code health:
+* Fixes #3748 - Changed file names of EmailDashboardService according t… (#3758)
+* Code refactor: removed publicize status. (#3739)
+
+Speed:
+* Fix part of #3453: Removed jinja template in editor_navigation_directive (#3732)
+* Fix #3453: Removed jinja template in collection editor navigation bar directive (#3723)
+* Removed jinja template logics in search_results_directive (#3733)
+* Remove jinja template in create_activity_modal_directive (#3724)
+* Fix #3453: remove Jinja template in create activity button directive (#3722)
+
+Questions:
+* Fix #2998 implement collection skills update commands (#3710)
+
+
+v2.5.3 (15 Aug 2017)
+--------------------
+Learner dashboard:
+* Learner dashboard project milestone 2.1 (#3591)
+* Introduce the learner dashboard partially. (#3654)
+* Milestone 2.3 of the learner dashboard project. (#3670)
+* The fourth milestone of the Learner Dashboard project. (#3659)
+* The sixth milestone of the learner dashboard. (#3680)
+
+Site-Wide ACL refactor (new roles/permissions system):
+* Site Wide ACL: Milestone 2.1 (#3582)
+* Removed super admin role from admin interface. (#3621)
+* SiteWide ACL Refactor: Milestone 2.2 (#3641)
+* SiteWide ACL: Milestone 2.3 (#3661)
+* SiteWide ACL Refactor: implemented test to check that all handlers have decorators. (#3679)
+* SiteWide ACL Refactor: Milestone 3.1 (#3682)
+* Fix #3698: Shift exception handling for NotLoggedInException so that it does not generate log errors. (#3714)
+* Fix #3688: refactoring ExplorationStatusHandler to remove unpublish and publicize functionality as it is not called from frontend. (#3715)
+
+Hints:
+* Fix #3595: Hint button should not show for card which do not have hints specified. (#3596)
+* Fix #3615: Hint Editor should not allow blank hints. (#3616)
+* Fix #3644: Handles empty hint in hint editor by showing a message and deleting it (#3648)
+* Move hint button to left corner for supplemental cards (#3702)
+
+Machine learning:
+* Storage, Domain classes and helper functions for ClassifierExplorationMapping (#3583)
+* Fix #3467: Introduce re-training and add_to_training_queue methods (#3650)
+
+Audio:
+* Add audio file upload handler (#3624)
+* Create shared audio frontend services (#3647)
+* Refactor AudioTranslations so that they are stored as a dict keyed by language code, rather than a list. (#3673)
+* Learner view audio translations (#3681)
+* Add editor for audio translations (#3692)
+* Audio fixes: make audio download URL safe; don't show flagging modal if all translations are flagged; use templateUrl for modals. (#3709)
+* Learner audio updates (#3705)
+
+Learner view:
+* Fix #3585: Corrected arrows in exploration progress nav (#3605)
+* Change 'style' to 'ng-attr-style' in an attempt to fix IE bug in collection viewer. (#3636)
+* Fix #3618: stop user icons in learner view from overlapping (#3642)
+* Standardize button colors and styles in the learner view (#3662)
+* Make the representation of the learner's 'Continue' answer more conversational. (#3675)
+
+Editor:
+* Adding warning about license terms of images (#3603)
+* Fix #3505: Implement crop on filepath editor (#3597)
+* Fix #3446: Text Input Validation (#3580)
+* Close customize interaction modal window if user clicks outside (#3623)
+* Minor changes to editor text (#3627)
+* Improve image uploader warning message. (#3674)
+* Refactor state content editor into a directive. Establish pattern for testing directives. (#3683)
+
+Collections:
+* Introduce Skills in collections (#3376)
+* Deprecate SkillListObjectFactory. Remove unneeded skill methods from the frontend. Use skill IDs throughout where possible. (#3676)
+
+Misc:
+* Fix translations on creator dashboard page (#3625)
+* Fix #3249: Bio in the profile page has to be limited to certain length (#3639)
+* Fix #3665: select2 placeholder width (#3667)
+* Fix #3551: Manually set cookie value during language change (#3622)
+* Fix #3686: fixed text overflow for contributors list (#3697)
+ Fix #3701: Fixed inconsistent Continue button name in exploration learner view (#3711)
+
+Infrastructure:
+* Add config property to admin page for SSL config. (#3600)
+* Fix user bios job in the case that user_bio is None (#3632)
+* Fix #2639: Updated Google chart/visualization Library loader code and use async to load the library (#3614)
+* Add backend functionality to correctly handle needs_update part of subtitled HTML. (#3620)
+* Part of #2447: Upgrade select2 library (#3626)
+* Remove erroneous clause in app.yaml. (#3643)
+* Fix #3515: Implement StoreJobResult controller, a preliminary handler for storing job results. (#3559)
+* Introduce output list formatting method to core.jobs.BaseJobManager (#3671)
+* Fix #2394: Clean up core.jobs documentation (#3519)
+* Fix #2447: Caching should be done on a per-file basis (#3454)
+
+Code health:
+* Fix #2394: Add docstring to core.domain.user_jobs_continous.py (#3569)
+* Fix part of #2394: Added docstrings in exp_domain.py (#3578)
+* Pull exceptions classes out of base handler class in base.py. (#3651)
+* Fix #2394: update docstring for core.domain.stats_services (#3586)
+
+Dev tools:
+* Fix #2508: Automatically generate dummy explorations  (#3568)
+* Fix #3655: Dummy explorations are published but not indexed in library page (#3656)
+
+
+v2.5.2 (9 Jul 2017)
+-------------------
+Fallbacks/hints:
+* Fix #3537: Handles empty feedbacks for fallback outcomes (#3538)
+* Fix #3532: Implement back-end for Hints and Solution feature (#3533)
+* Fix #3554: Migration of Fallbacks to Hints (#3555)
+* Fix #3571: Introduce first version of Hints UI for learners  (#3577)
+
+Learner Dashboard:
+* Fixed a part of the second milestone of the learner dashboard project. (#3482)
+* Fetch all entities for the learner dashboard in a single RPC call. (#3536)
+
+Permissions:
+* Milestone 1 of sitewide ACL refactor (PRs #3493, #3517, #3543)
+* Default role added to role field in user settings model. (#3587)
+
+Machine Learning:
+* Fix #3465: Updated and renamed to ClassifierDataModel (#3504)
+* Fix #3466: Add storage, domain classes and tests for TrainClassifierJobModel. (#3511)
+* Fix #3528: Add helper functions for ClassifierTrainingJobModel (#3529)
+
+Explorations and Interactions:
+* Fix a bug in the LogicProof interaction where operators were not being included in the student language, causing operators like 'A(x)' to be rejected even if they occur in the question. (#3545)
+* Remove warning sign in interaction save button; make some warnings more user-friendly. (#3525)
+* Fix #3446: Numeric input validator (#3470)
+* Fix #3295 Add backend support for draft change list id (#3560)
+* Fix #3295 Integrate draft change list id with front-end (#3565)
+
+Answers:
+* Add a function for getting some sample answers for a given state. (#3530)
+* Implement data extraction query controller and form. (#3581)
+
+Collections:
+* Fix #3438: Alternative to indicate next lesson in collection (#3523)
+* Fix a couple of UI issues in the collection editor. (#3524)
+* Add "back to collection" link to reduce potential confusion for users (#3544)
+
+UI tweaks:
+* Add two new splash page variants; update which splash pages users see (#3589)
+* Fix part of #3505: Improve image upload interface (#3552)
+* Allow user to resize images before uploading them in filepath editor (#3574)
+* Fix responsiveness of feedback button in navbar. (#3527)
+* Fix part of last tile showing in library (#3539)
+* Fix bugs related to feedback button visibility. (#3540)
+
+Utilities and infrastructure:
+* Fix #3249: Create MR Job to calculate length of User bio (#3510)
+* Allow list type schema value to be empty (#3542)
+* Fix #3502: Extract components from HTML string (#3549)
+* Fix #3521 Moved constants to improve rendering performance  (#3570)
+* Add a test to prevent HTML errors in translations, and fix existing errors. (#3579)
+* Refactor content property to include audio translations. (#3590)
+* Fix issue with files being converted to wrong type; re-harden backend validation. (#3593)
+
+Dev tools:
+* Fix #3557: make http://localhost:8181 open in default browser (#3566)
+* Remove .jscsrc (#3561)
+
+Code health:
+* Fix #2394: docstring for rights_manager domain (#3500)
+* Remove hybrid get_or_create_user() function. (#3513)
+* Fix #2254: Move embedded scripts into controllers, use ng-click (#3534)
+* Fix #2394: added docstrings to core.domain.value_generators_domain (#3564)
+* Move embedding tests to a separate file to avoid contention. (#3594)
+
+
+v2.5.1 (11 Jun 2017)
+--------------------
+Editor:
+* Fix #2994: fix bug with alert message showing up in collection editor when invalid exploration IDs are entered. (#3383)
+* Fix #3342: Add a "Cancel" button to the "Add Interaction / End Exploration" window. (#3384)
+* Prevent regions to be dragged outside the parent image's area (#3388)
+* Fix #3344: Have the UI automatically identify draw mode vs drag mode vs resize mode, etc. (#3389)
+* Fix #3417: Make region names editable in-place (#3449)
+* Fix #3495: Implement a one-off job to list all current fallbacks  (#3496)
+* Minor changes to improve the display of visualizations in the stats tab. (#3489)
+* Fix #3406: Allow adding an image to the Continue button (#3425)
+
+Accessibility:
+* Fix #2978: Add a skip navigation link (#3183)
+* Update donate video URL to force English captions (#3463)
+
+Learner Dashboard:
+* First milestone of the Learner Dashboard Project. (#3423)
+
+Learner view:
+* Fix #3402: Detect learner fatigue (#3474)
+* Fix #3430: Fix Oppia avatar placement in help cards in learner view (#3475)
+* Fix part of #2869: Add mobile feedback button to exploration player. (#3398)
+* Fix #3456: Full exploration title on mobile visible as info icon (#3476)
+* Fix #3269: Use responsive min-width in exploration player, add viewport styles to CSS (#3494)
+
+Machine Learning:
+* Fix #3363: Implement training conditions for classification (#3450)
+* Added mapping for classifier_data_schema_version (#3501)
+
+Infrastructure:
+* Upgrade GAE version to 1.9.50. (#3386)
+* Upgrade pylint-1.7.1 and ensure __init__.py file is present. (#3385)
+* Fix PipelineSetupError when MR jobs are run on the dev server. (#3393)
+* Fix #3455: Fix bugs with installation process on Vagrant. (#3460)
+* Rebalance protractor tests so that the misc suite has less chance of timing out. (#3479)
+* Add config property for VMID and shared secret key mapping. (#3484)
+* Remove 'set -e' from .travis.yml (#3488)
+
+Collections:
+* Fix #3365: Landing page for fractions has been implemented. (#3378)
+* Fix bugs causing the collection editor not to load. (#3410)
+* Fix #3062: Open-in-new-tab for small screen widths in collection learner view  (#3416)
+* Fix part of #2569: Add e2e tests for collection editor  (#3428)
+* Fix #3411 fix button classes on collection editor (#3414)
+* Fix #3324: adjustments to collection learner view (#3443)
+* Fix part of #2030: Add exploration search in collection editor. (#3477)
+
+I18N:
+* Fix #3372: Hindi Language Translation for 'Sign In with Google' (#3380)
+* Fix part of #3132: Added i18n support for Contact, Get Started and Teach pages (#3374)
+* Update I18_PREFERENCES_EMAIL_EXPLAIN explanation text for clarity (#3436)
+* Updates to translations
+
+Code health and refactoring:
+* Fix #3198: Remove FormBuilder.js from base.html
+* Fix remainder of #2700: Update directives to directly reference templates (#3371)
+* Fix part of #2863: States object factory update (#3358)
+* Fix #2536: Adds tests for gadget cmds and ensures tests actually do something (#2721)
+* Add missing dependency to autosaveInfoModalService. (#3420)
+* Fix #2925: Refactor exploration data handlers into ReadOnlyExplorationBackendApiService and EditableExplorationBackendApiService (#2999)
+* Expose getCustomizationArgsWarnings in all validators (#3445)
+* Delete obsolete reader_view_load_test.py file. (#3451)
+* Fix #3286: Remove all temporary code and models introduced as part of the answer migration (#3452)
+* Fix part of #2394: Add docstrings to collection_domain.py (#3447)
+* Fix part of #2394: Add docstrings to core/storage/file/gae_models.py (#3457)
+* Fix part of #2394: Doc Strings for controllers/base.py (#3448)
+* Renamed validator.js files to {Interaction}ValidationService.js (#3483)
+* Move suggestions.js back to misc test suite to see whether that alleviates Protractor test failures. (#3486)
+* Rename dashboard to creator dashboard to make way for the learner dashboard. (#3497)
+* Part fix for #2394: Add docstrings to core.domain.feedback_domain (#3499)
+* Fix #2394: add docstrings to core/domain/stats_jobs_one_off.py (#3461)
+* Fix #3485: Added e2e test for exploration search in collection editor. (#3507)
+* Fix #2394: Update docstrings in feedback_jobs_continuous (#3498)
+
+UI tweaks:
+* Fix #3328: Change the triangle icon in learner view when a user clicks on it (#3379)
+* Better account for overflowing text on summary cards (#3381)
+* Fix #1782: tooltip placement issues (#3409)
+* Ensure that footer doesn't cover content with lower resolution on error message (#3458)
+* Fix #3427: Make social icons in creator dashboard aligned flush left with row above. (#3441)
+
+Other:
+* Fix #3296: MR job to get the distribution of username lengths. (#3375)
+* Fix #3259: the number of feedback items in the dashboard is incorrect. (#3391)
+* Fix responsiveness of donate page (#3492)
+* Fix #3471: Remove Recently published section from library page (#3481)
+
+
+v2.5.0 (14 May 2017)
+--------------------
+Infrastructure:
+* Fix #1442: Provide a new framework for visualizing answer statistics (PR #3294)
+* Fix #3292: Migrate all answers to a new storage system (PR #1205)
+* Fix part of #2700: Update directives to directly reference templates (PR #3346)
+* Fix #3283: fix the interactionRulesService error in trainUnresolvedAnswerModal. (PR #3325)
+
+Learner view:
+* Fix #3332: Rescale Lesson Avatar Image (PR #3337)
+* Fix #2482: Make learner's answers contained within card in mobile view. (PR #3248)
+* Fix #3362: Improve responsiveness of navbar (PR #3364)
+
+Interactions:
+* Fix #3343: Add trash icon for deleting regions (PR #3373)
+
+Other UI:
+* Fix #3329: 'Error 404: Page not found' has broken footer (PR #3354)
+* Fix #3355: Change of Font Awesome Icons for relevancy (PR #3367)
+* Fixed #3327 Changed text from 'highlight' to 'hover over' (PR #3335)
+
+Misc:
+* Allow admins to edit private activities (PR #3359)
+* Fixes open in new tab bug for Firefox (PR #3348)
+
+I18N:
+* Fix part of #3132: add i18n keys to About and Profile pages; minor Hindi translations for the search bar (PR #3299)
+
+Code health:
+* Fix #3064: Pull directive-specific CSS into the corresponding directives (PR #3352)
+
+
+v2.4.2 (22 Apr 2017)
+--------------------
+Collection player:
+* Fix #3327: Changed text in collection player card from 'highlight' to 'hover over' (#3335)
+* Fix open in new tab bug for Firefox (#3348)
+* Only show 'return to collection' when there are no other recommendations to show, so that the learner is not confused about what to do next. (#3312)
+* Fix #2985: Introduce collection learner view mobile version (#3197)
+* Convert GLOBALS to AJAX for collection editor permissions (#3126)
+* Fix #3131: collection footer and sharing directive added to collection player (#3216)
+
+Editor:
+* Fix #3028: Add confirmation modal dialog for clearing image and regions (#3339)
+* Fix #1774: Changed color combination required for visibility of reminder bubble in editor. (#3277)
+* Fix #3093: Popover of Userhelp button remains constant when the user creates the exploration for the first time. (#3267)
+* Add dependencies to collection editor (#3261)
+* Fix #3094: Fix license terms link in image interaction (#3236)
+* Fix #2813: Customization arg model is bypassed for interactions that have no arg to customize. (#3176)
+* Fix #3101: Discard-draft Tooltip (#3205)
+* Fix #3099: Clarify error message for Item Selection and Multiple Choice interaction (#3184)
+* Fixes #3051: Image regions can be resized by clicking and dragging (#3144)
+* Fix #3122: Number Fields Bring Up Numeric Mobile Keyboards (#3167)
+* Fix #2039: Allow editors to preview summary tiles (#3069)
+
+I18N:
+* Fix part of #3132: Add i18n keys to About and Profile pages; minor Hindi translations for the search bar (#3299)
+* Fix part of #3132: Add missing i18n keys and Hindi translations for creator dashboard (#3235)
+* Fix part of #3132: Add missing translation keys to preferences page (#3231)
+* Fix #2734: Add i18n keys to preferences (#3219)
+
+Creator Dashboard:
+* Fix #2160: Introduce first version of tests involving deleting explorations for creator dashboard (#3196)
+* Fix #3318: Style fixes for collection card in creator dashboard (#3330)
+* Fix overflowing of names in the subscription card. (#3270)
+
+Machine Learning system:
+* Fix #3283: Fix the interactionRulesService error in trainUnresolvedAnswerModal. (#3325)
+* Fix #3282: Fixes the validate() function for LDAStringClassifier (#3322)
+* Fix #3297: Renaming Classifier Registry method (#3298)
+* Fix #3045: Introduce end to end test for classifyHandler (#3255)
+* Fix #2986: Add helper functions to classifier_services.py (#3070)
+* Updated tests with assertRaisesRegexp and test to test type of elements in LDAStringClassifier
+* Added tests to LDAStringClassifier and added comments in classifier_domain_tests
+* Fix #3180: Fix the "interactionRulesService" not found error in teachOppiaModal. (#3181)
+* Fix #3169: Fix the alignment of the submit button in teachOppiaModal (#3171)
+
+Splash, About, Donation pages:
+* Fix #3319: Oppia video at the donation page no longer shows "Related videos" after the video finishes (#3321)
+* Update donation page statistics. (#3313)
+* Introduce a promo bar (#3262)
+* Fix #3097: Make splash page buttons non-constant width to accommodate different languages. (#3191)
+* Fix #2400: Oppia-donation card margin corrections (#3214)
+* Add a check that user contributions for logged in users exist on the home page redirect check (#3213)
+
+Code health:
+* Fix #3064: Refactor CSS into corresponding directives (#3352)
+* Refactoring: removed 'role' variable from GET request used in editor.py in delete method (#3275)
+* Fix part of #2863: Create ParamChange object factory (#3302)
+* Fix part of #2394: Added docstrings in summary_services.py (#3263)
+* Fix part of #2863: Create trigger object (#3273)
+* Fix part of #2863: Create outcome object factory (#3260)
+* Fix part of #2863: Create front-end domain object for Rules (#3229)
+* Fix part of #2394: add docstrings for core/platform/models.py (#3226)
+* Fix part of #2863: Create front-end content object factory (#3224)
+* Fix #2394: Add useful docstrings to core/storage/job/gae_models.py  (#3195)
+* Fix #3192: shifted back css of oppia-sidebar-menu-open back to oppia.css (#3211)
+* Fix part of #2863: Create front-end fallback domain object (#3207)
+* Fix part of #2863: Create front-end domain object for Interactions (#3049)
+* Fix part of #2394: Added docstrings in cron.py (#3182)
+* Fixes part of #3064: pull the directive specific css in corresponding files from oppia.css (#3077)
+
+Infrastructure:
+* Fix #3199: Refactor constants loading to avoid synchronous XMLHttpRequest (#3323)
+* Fix #1852: Transition to ESLint (#3264)
+* Add installation of peer dependency: jasmine-core. (#3266)
+* Upgrade protractor, karma and karma-jasmine (#3251)
+* Fix #3047: Collection contents migration (#3209)
+* Fix #3232: Generate source maps into separate files (#3233)
+* Add e2e test to visit the links in the about dropdown (#3223)
+* Add e2e tests for suggestion acceptance on explorations (#3202)
+* Fix #3162: set expiration explicitly for files in the build directory. (#3203)
+* Remove remaining extraneous js files from base.html #3137
+* Fix #2828: Add IE9 support for sidebar. (#3178)
+
+Other UI fixes:
+* Fix #2018: make toast z-index lower than navbar z-index (#3320)
+* Fix #2870: Limit exploration cards to screen width to maintain centering. (#3250)
+
+Misc:
+* Fix #2936: Limit the length of goal description in explorations. (#3274)
+* Fix #3293: Introduction of a static maintenance page (#3308)
+* Fix #3135: Switch from Static Image Resources By Using Existing Font Awesome Icons (#3193)
+* Fixes: footer padding on mobile, #3121 (#3186)
+* Localisation updates from https://translatewiki.net.
+
+
+v2.4.1 (12 Mar 2017)
+--------------------
+Interactions:
+* Fix #3027: Update Add Vertex functionality in GraphInput, when vertex is added mode is changed to "MOVE". (#3115)
+* Fix #3102: Update Guppy to 260da66 to enable better compatibility with non-US keyboards (#3103)
+* Fix #2964: remove reset icon and add undo reset functionality in pencil code editor (#3055)
+
+Accessibility:
+* Add span text with special class  for several icon buttons and links; fix focus styles issue for seach bar; no focus style fix required for language select element
+* Update icon button text width to address spacing issue in Chrome; Add ARIA role to About, Profile, and exploration Author profile to offer screenreaders some indication that these are menus; Update delete icon on select input to have icon button text; Remove aria-label from item selection to allow for clearer labels
+* Add aria-label to user menu so that it is properly read as user menu instead of as user avatar; add role to author profile dropup menu so that it is recognized as a menu; update icon accessibility span class name to be more descriptive and add more to the comment above the style in oppia.css
+* Fix #2955: add alt tag equal to value of getCategory() (#3023)
+
+UI tweaks:
+* Fix #2814: Add new items button visibility in the SetInput interaction on mobile (#2951)
+* Fix #3120: Buttons on About page have text overflow on mobile. (#3123)
+* Fix #3037: changed the height of the dropdown save button and width of the discard draft button. (#3100)
+* Fix #3063: change the default confirmation box in "discard draft" to modal (#3068)
+* Remove word-break so that lesson titles don't break unnecessarily across lines. Reverts part of #2971. (#3130)
+* Fix #3129: Make navbar text items visible again by changing to rem. (#3150)
+* Fix #3066: fixed summary tiles to show the full objective. (#3128)
+* Fixes #3136 alignment of oppia meaning text in about page after doing required changes (#3153)
+
+Code health:
+* Convert state dictionary data in FeedbackTab to State objects (#3125)
+* Add docstrings for core.domain.param_domain.py (#3078)
+* remove image uploader directive from base.html (#3090)
+* Remove more js files from base.html (#3087)
+* Fixes #1695: Way to automatically provide backend constants to the frontend. (#3033)
+* Fix #1858 Added source-maps for better debugging (#3086)
+
+Other:
+* Fix #3094: Change the license terms URL link to go to foundation tab of about page. (#3105)
+* Fix part of #3073: Add exploration link to feedback email. (#3108)
+* Change http to https in some places in setup.sh, particularly for downloading node. (#3133)
+* Add analytics tracking for card-transition and completion in the player. (#3088)
+* Fix #2987: add a "correct" field to each answer group (#3084)
+* Fix #2966: modified the the redirection rules when the user goes to root url (#3034)
+
+
+v2.4.0 (18 Feb 2017)
+--------------------
+Collection Player
+* Fix #3031: track user progress and minor UI changes to match original mocks (#3054)
+* Fix bugs and improve UI
+
+Subscribers
+* Fix part of #2287: Display subscribers and subscriptions and send emails on publishing. (#3036)
+
+Creator Dashboard
+* Standardize truncation of objectives and display of titles on summary tiles. (#3067)
+
+Accessibility
+* Standardize focus styles across site
+
+Other
+* Fix #2990: Implement workaround to make MathExpressionInput usable on mobile devices. (#3039)
+* Fix #2989: Check if all files end with exactly one newline character. (#3005)
+* Added docstring to "core.domain.exp_services" (#2924)
+* Add Classifier model id (#2961)
+
+
+v2.3.9 (14 Feb 2017)
+--------------------
+Collection Learner View
+* Fix #2526: Path version of the collection learner view (PR #2979)
+
+UI Tweaks
+* Fix #2874: Show the exploration name in the mobile view (PR #2888)
+* Fix #2894: Align the footer properly for exploration player in mobile view (PR #2897)
+* Fix #2893: Modify buttons on Teach page to make width uniform (PR #2898)
+* Fix #2817: Move Call to action buttion in Teach Page and fixes on about page bar on small screens
+* Fix #2816: Add call to action buttons to the Foundation page (PR #2903)
+* Fix #2817, Move Call to action buttion in Teach Page and fixes on about page bar on small screens (PR #2911)
+* Fix alphabetical ordering of authors (PR #2912)
+* Fix #2821: Fixed vertical alignment of headers (PR #2909)
+* Fix #2914: Improve spacing of buttons on Teach and About pages
+* Fix #2868: Fix social icons positioning in hamburger menu (PR #2932 and PR #2949)
+* Fix #2551: Add full objective in the library tiles as tooltip (PR #2934)
+* Remove links from collection page objectives in table and capitalize first letter of first word in objective
+* Fix #2944: Changed z-index on splash button container so browse button is clickable. (PR #2970)
+* Fix button text size on splash page (PR #2928)
+* Merge branch 'develop' into translatewiki
+* Fix #2620 : Fix exploration card height and deadzone (PR #2971)
+* Fix #2918: Fix collection tile in creator dashboard. (PR #2973)
+* Fix #2975 Adds full objective in the library tiles as popovers
+
+Site Reliability/Assessibility
+* Add -L for curl redirect (PR #3021)
+* Fix #3010: Replace nodelist.forEach use with for loop for better compatability. (PR #3019)
+* Fix #3003: Use Angular's debouncer for Library search. (PR #3006)
+* Fix #2830: update styles in footer sharing links to allow them to show in IE (PR #2917)
+* Add h1 on collection page and add ARIA role to footer tag (PR #2959)
+* Refactor capitalizing the exploration objectives on the collection page to remove javascript from the html.
+* Fix #2922: Hide hamburger menu >768px, add function to handle navbar overflow (PR #2927)
+* Fixes #2956: Images in explorations have descriptive alt attributes (PR #2972)
+* Fix part of #2862: Add alt attributes to images (PR #2957)
+* Fix #2954: add appropriate lang attribute to site pages (PR #3004)
+* Fix #2919: Fix the loading of the editor page. (PR #2958)
+
+Emails
+* Fix part of #2557:  Refactoring of email preferences and add functionality to incorporate user's preferences of feedback / suggestions  (PR #2892)
+* FIx #2768: Implement email receiving functionality for feedback messages. (PR #3029)
+* Rename userExplorationEmailsHandler service to UserEmailPreferencesService (PR #3040)
+
+Frontend Refactor
+* Fix #2722: Split exploration save and publish button to directive (PR #2896)
+* Fix part of #2863: Create AnswerGroup domain object (PR #2883)
+* Add dependencies to collection editor html (PR #2996)
+
+Subscriptions
+* Fix part of #2287: Email preferences for subscriptions
+* Fix part of #2287: Add handlers for subscription and unsubscription (PR #2886)
+* Fix part of #2287: Add subscribe and unsubscribe button to profile of authors
+
+Machine Learning
+* Fix #2726: Create domain & storage classes for classifier model & tests (PR #2846)
+* Fix #2728: Add AlgorithmRegistry and test class. (PR #2926)
+* Fix #2950: Moved classifier methods and test from reader to classifier_services (PR #2974)
+
+Dev tools/code health
+* Add travis retry all tests except for backend and linting (PR #2890)
+* Add Docstrings in exploration/gae_models.py (PR #2889)
+* Fix #2455: Add lockfile functionality to fix inconsistent directory permissions in Vagrant (PR #2749)
+* Update release info output to fit format of changelog (PR #2908)
+* Fix #2857: Added excluded_dirs in Lint pattern matching (PR #2905)
+* Fix #2064: Add a test for keys present in source code and not in en.json (PR #2933)
+* Fix #2394: Add docstring to core/storage/user/gae_models.py (PR #2962)
+* Docstrings added in the file core/storage/email/gae_models.py (PR #2900)
+* Fix part of #2394: Update docstrings in core.storage.collection.gae_models (PR #2982)
+
+Other
+* Update translations from translatewiki
+* Fix translatewiki attirbution in credits (PR #2916)
+* Fix #2662: Upgrade math-expressions to 370a77. (PR #2984)
+* Update guppy to the version f6e0bbf in order to prevent a startsWith() error in IE. (PR #3041)
+
+
+v2.3.8 (10 Jan 2017)
+--------------------
+Learner view:
+* Fix tutor card icon not clickable in learner view (PR #2824)
+* Fix #2832: Add space between footer and summary explorations container (PR #2833)
+* Fix #2842: do not submit an answer or clear the help card if there is already a destination card defined. (PR #2843)
+* Fix #2800: Style the author profile pop-up like about dropdown (PR #2864)
+* Fix #2680: Ensure that the the help card can be seen (PR #2835)
+* Fix #2588: Make LATEX smaller in learner view (PR #2854)
+
+Splash and donations pages:
+* Add call to action links on English default splash page (PR #2818)
+* Fix #2855: Fix showing help text when javascript is not enabled (PR #2856)
+* Fix #2128: Add alt tags to about page (PR #2858)
+* Fix #2877: splash page banner should not be able to scroll horizontally. (PR #2879)
+* Add 'Get Started' link to the sidebar. (PR #2836)
+* Fix #2815:add third button for credit card payment (PR #2881)
+* Fix #2128: Add alt tags to donate, library, and splash pages (PR #2882)
+
+Dashboard:
+* Fix #2764: Enable right clickability for all explorations in the dashboard (PR #2823)
+* Remove the 'total number of feedback threads' statistic from the dashboard. (PR #2837)
+* Fix #2548: Make sorting in the dashboard more intuitive. (PR #2838)
+
+Other pages:
+* Fix #2716: Show only simple editor tools on medium screens (PR #2850)
+* Fix #2789: Remove white panel behind exploration cards in profile page. Remove 'Portfolio' text. (PR #2810)
+* Fix #2026: Add panel to show collection owner and permissions (PR #2865)
+* Fix #2801: Change collection style in library and remove shadows from carousel scrolling. (PR #2876)
+
+I18N:
+* Update various translations
+
+Emails:
+* Initial work on email muting (PR #2851)
+* Initial work on email subscription preferences (PR #2849, #2878, #2886)
+
+Code health:
+* Fix #2248: Add e2e tests for feedback on explorations (PR #2753)
+* Fix #2251: Add e2e tests for parameters (PR #2834)
+* Add tests to make sure that test email is not sent to query recipients. (#2848)
+* Update docstrings in user_services.py (PR #2622)
+* Remove unused images in assets/common (PR #2847)
+* Fix #2727: Refactor classifier so a BaseClassificationAlgorithm class can be used as a base for classification algorithms (PR #2743)
+* Fix #2722: Split exploration editor into several files (PR #2844)
+
+
+v2.3.7 (4 Dec 2016)
+-------------------
+Learner view:
+* Fix #2686: make autofocus behave correctly in the player view (PR #2805)
+* Do not wrap mathematical formulae that are less than 500px wide (PR #2772)
+* Fix some janky animations in the learner view (PR #2809)
+* Fix #1924: rename the button at the end of an exploration from 'return to library' to 'go to library' (PR #2771)
+
+Editor:
+* Fix #2626: in the exploration editor, gray out the screen immediately after a draft is discarded (PR #2663)
+* Move exploration save/publish functionality to a new explorationSaveService (PR #2718)
+* Reword the 'share' invitation after a creator publishes an exploration.
+
+Library page:
+* Remove thumbnail images that show up in exploration summary tiles on the search page (PR #2756)
+* Increase the debounce time for executing a search query.
+
+Other pages:
+* Update the copy across the site (PR #2793)
+* Fix #2735: standardize the backgrounds for the collection player, exploration player and various static pages (PRs #2758, #2763, #2782)
+* Fix #2788: Make all the background colors consistent throughout the site (PR #2794)
+* Remove functionality for opening the sidebar on swipe (PR #2769)
+* Fix a bug where the navbar overflowed off the right side of the screen (PR #2795)
+* Fix an incorrect navbar breakpoint (PR #2795)
+* Fix #2787: eliminate blue outlines on focused buttons (PR #2797)
+* Fix the color of collection descriptions in the creator dashboard (PR #2765)
+* Fix part of #2665: split up directives in FormBuilder.js into separate files (PR #2666)
+
+Interactions:
+* Add a benchmark test for the string classifier (PR #2697)
+* Fix #2754: make the math expression input field clearer (PR #2785)
+* Fix #2755: allow the math expression input field to accept fractions.
+* Add a 'submit' button to the NumericInput interaction.
+
+I18N:
+* Add Turkish translations.
+
+Emails:
+* Fix #2269: complete the functionality for sending emails to all users returned via a query (PR #2717)
+* Fix #2790: add functionality for testing a bulk email prior to sending it out (PR #2799)
+
+Dev tools:
+* Update node.js to v6.9.1.
+* Update guppy to v1.1.0 (PR #2786)
+* Fix #2611: update protractor to v4.0.11 (PR #2777)
+* Add e2e tests for collections
+* Remove the flaky performance test from the regular Travis build (PR #2757)
+* Fix an issue where Travis was broken because it could not detect the location of the Java executable (PR #2796)
+* Fix #2773: remove some flakiness in the interactions e2e test.
+* Fix a YouTube console error in the e2e tests (PR #2742)
+
+Code health:
+* Add docstrings to email_manager.py (PR #2720)
+* Add docstrings to html_cleaner.py (PR #2779)
+
+
+v2.3.6 (14 Nov 2016)
+--------------------
+Learner view:
+* Update learner view design by adjusting spacing at top of cards, augmenting card shadows, updating background images, and removing the share icons at the end.
+* Hide continue button when pagging back through the cards
+* Add Math component while suggesting changes
+* Fixed footer in learner view
+* Update the backgrounds of both players to use a solid blue background
+* Change font color from white to green at end of exploration
+* Fix color of progress dots in learner view
+* Fix tutor card position when viewport is narrow
+* Fix jittering help card at a certain size
+* Fix formatting error in item selection interaction display of learner answers
+* Add automatic line breaking for LaTeX expressions
+
+Editor:
+* Update the warning labels for changing the objective to be more clear
+* Upgrade math-expressions library and interpret the creator-defined string as LaTeX instead of text
+* Fix a bug where customization arg attributes are saved in the wrong order, leading to the item selection input interaction not recognizing HTML snippets with images
+* Add focusing functionality to the rich-text editor
+
+Collections:
+* Add option to go to collection view after finishing an exploration
+* Use collection-summary-tile for collections on small screens
+* Ensure explorations of a single state are properly recorded when completed
+* Remove 'Collection >' breadcrumb from collection player navbar
+
+Library page:
+* Make library carousel title links more obvious and remove "View All" button
+* Add protractor tests for visiting library pages
+* Change the mouse cursor to a pointer when the scroll button appears in the library
+
+Other pages:
+* Add a "Get Started" page.
+* Fix splash content alignment
+* Hide site feedback message text on smaller devices
+* Allow right clicking on dashboard tiles
+* Display a success toast when a new featured exploration is added
+
+I18N:
+* Fix Indonesian translation
+
+Emails:
+* Add functionality for sending emails to existing users in bulk.
+
+Dev tools:
+* Determine Vagrant env by checking existence of a file and env var
+* Fix flakiness when accepting alerts in Protractor tests
+
+Code health:
+* Refactor learner view
+* Minimize calls to is_admin, static site_name and feedback_url
+* Remove 'ALTERNATE' tag on translations
+* Refactor ID generation procedure into a separate service.
+* Separate the top navigation bar into its own directive
+* Split up the admin page controller
+* Update stripFormatting filter to preserve bold and italics
+* Improve docstrings for gae_models.py
+* Add docstrings for core.domain.stats_domain
+* Add docstrings for core.domain.stats_jobs_continuous
+* Add docstrings to gae_models.py
+
 
 v2.3.5 (17 Oct 2016)
 --------------------
@@ -883,7 +3392,7 @@ Security:
 Infrastructure:
 * Adjust backend tests to not use datetime.datetime.now(), since it gives different results in different locales.
 * Add a hook for inserting custom HTML before the end of the 'body' tag.
-* Broadcast parameter values to the messengerService for explorationCompleted and stateTransition events.
+* Broadcast parameter values to the MessengerService for explorationCompleted and stateTransition events.
 * Speed up the recommendations job by making fewer calls to the datastore.
 * Update FontAwesome to version 4.4.0.
 * Add created_on and last_updated fields to reconstituted version snapshots.
@@ -1913,4 +4422,3 @@ v1.0.1 (29 Mar 2013)
 v1.0 (22 Mar 2013)
 ------------------
 * Initial release
-

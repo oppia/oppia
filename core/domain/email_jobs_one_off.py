@@ -20,7 +20,7 @@ from core.platform import models
 (email_models,) = models.Registry.import_models([models.NAMES.email])
 
 
-class EmailHashRegenerationOneOffJob(jobs.BaseMapReduceJobManager):
+class EmailHashRegenerationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for re-generating hash for all Sent Email Models.
     For every instance we call the put() method. The put() method
     results in a hash value (new hash value in case the hash
@@ -35,7 +35,8 @@ class EmailHashRegenerationOneOffJob(jobs.BaseMapReduceJobManager):
     @staticmethod
     def map(email_model):
         email_model.put()
+        yield ('SUCCESS', 1)
 
     @staticmethod
-    def reduce(email_model_id, value):
-        pass
+    def reduce(key, values):
+        yield (key, len(values))

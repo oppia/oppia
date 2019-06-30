@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python configuration for ImageClickInput interaction."""
+
 from extensions.interactions import base
 
 
@@ -28,6 +30,11 @@ class ImageClickInput(base.BaseInteraction):
     instructions = 'Click on the image'
     narrow_instructions = 'View image'
     needs_summary = False
+    # It is required to show which region is being clicked on while specifying
+    # a solution. Once this issue is fixed, ImageClickInput interaction can be
+    # supported by the solution feature.
+    can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'imageAndRegions',
@@ -47,4 +54,18 @@ class ImageClickInput(base.BaseInteraction):
             'type': 'bool',
         },
         'default_value': False
+    }]
+
+    _answer_visualization_specs = [{
+        # Bar chart with answer counts.
+        'id': 'BarChart',
+        'options': {
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count',
+        },
+        'calculation_id': 'AnswerFrequencies',
+        # Bar charts don't have any useful way to display which answers are
+        # addressed yet. By setting this option to False, we consequentially
+        # avoid doing extra computation.
+        'addressed_info_is_supported': False,
     }]

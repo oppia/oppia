@@ -17,20 +17,27 @@
 import copy
 import json
 import logging
-import os
 import math
+import os
+
+import utils  # pylint: disable=relative-import
 
 import jinja2
 from jinja2 import meta
 
-import utils # pylint: disable=relative-import
-
 
 def _js_string_filter(value):
-    """Converts a value to a JSON string for use in JavaScript code."""
+    """Converts a value to a JSON string for use in JavaScript code.
+
+    Args:
+        value: *. The specified value to be coverted to JSON string.
+
+    Returns:
+        str. The resulting JSON string.
+    """
     string = json.dumps(value)
 
-    replacements = [('\\', '\\\\'), ('"', '\\"'), ("'", "\\'"),
+    replacements = [('\\', '\\\\'), ('"', '\\"'), ('\'', '\\\''),
                     ('\n', '\\n'), ('\r', '\\r'), ('\b', '\\b'),
                     ('<', '\\u003c'), ('>', '\\u003e'), ('&', '\\u0026')]
 
@@ -40,7 +47,14 @@ def _js_string_filter(value):
 
 
 def _log2_floor_filter(value):
-    """Returns the logarithm base 2 of the given value, rounded down."""
+    """Returns the logarithm base 2 of the given value, rounded down.
+
+    Args:
+        value: int|float. The specified value.
+
+    Returns:
+        int. The rounded off value of logarithm base 2 of the given value.
+    """
     return int(math.log(value, 2))
 
 
@@ -53,26 +67,34 @@ JINJA_FILTERS = {
 
 
 def get_jinja_env(dir_path):
+    """Loads the correct jinja2 template environment.
+
+    Args:
+        dir_path: str. The directory path where the loader looks up the
+            templates.
+
+    Returns:
+        Environment. The template environment.
+    """
     loader = jinja2.FileSystemLoader(os.path.join(
         os.path.dirname(__file__), dir_path))
     env = jinja2.Environment(autoescape=True, loader=loader)
 
-    def get_static_resource_url(resource_suffix):
-        """Returns the relative path for the resource, appending it to the
-        corresponding cache slug. resource_suffix should have a leading
-        slash.
-        """
-        return '%s%s' % (utils.get_asset_dir_prefix(), resource_suffix)
-
     def get_complete_static_resource_url(domain_url, resource_suffix):
         """Returns the relative path for the resource, appending it to the
-        corresponding cache slug. resource_suffix should have a leading
-        slash.
+        corresponding cache slug.
+
+        Args:
+            domain_url: str. The url of the domain.
+            resource_suffix: str. The resource suffix to get the relative path
+                for the resource. It should have a leading slash.
+
+        Returns:
+            str. The relative path for the resource.
         """
         return '%s%s%s' % (
             domain_url, utils.get_asset_dir_prefix(), resource_suffix)
 
-    env.globals['get_static_resource_url'] = get_static_resource_url
     env.globals['get_complete_static_resource_url'] = (
         get_complete_static_resource_url)
     env.filters.update(JINJA_FILTERS)
@@ -83,12 +105,16 @@ def parse_string(string, params, autoescape=True):
     """Parses a string using Jinja templating.
 
     Args:
-      string: the string to be parsed.
-      params: the parameters to parse the string with.
-      autoescape: whether to enable autoescaping when parsing.
+        string: str. The string to be parsed.
+        params: dict(str, *). The parameters to parse the string with.
+        autoescape: bool. Whether to enable autoescaping when parsing.
 
     Returns:
-      the parsed string, or None if the string could not be parsed.
+        str. The string parsed using Jinja templating. Returns an error string
+            in case of error in parsing.
+
+    Raises:
+        Exception: Unable to parse string with Jinja.
     """
     env = jinja2.Environment(autoescape=autoescape)
 
@@ -112,7 +138,15 @@ def parse_string(string, params, autoescape=True):
 
 
 def evaluate_object(obj, params):
-    """Returns a copy of `obj` after parsing strings in it using `params`."""
+    """Returns a copy of `obj` after parsing strings in it using `params`.
+
+    Args:
+        obj: *. An object containing strings that need to be parsed.
+        params: dict(str, *). The parameters to parse the string with.
+
+    Returns:
+        *. The copy of `obj` after parsing strings in it.
+    """
 
     if isinstance(obj, basestring):
         return parse_string(obj, params)
@@ -128,13 +162,3 @@ def evaluate_object(obj, params):
         return new_dict
     else:
         return copy.deepcopy(obj)
-
-
-def interpolate_cache_slug(string):
-    """Parses the cache slug in the input string.
-
-    Returns:
-      the parsed string, or None if the string could not be parsed.
-    """
-    cache_slug = utils.get_asset_dir_prefix()
-    return parse_string(string, {'cache_slug': cache_slug})

@@ -20,7 +20,7 @@
 
 function maybeInstallDependencies {
   # Parse additional command line arguments.
-  # Credit: http://stackoverflow.com/questions/192249
+  # Credit: https://stackoverflow.com/questions/192249
   export SKIP_INSTALLING_THIRD_PARTY_LIBS=$DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS
   export RUN_MINIFIED_TESTS=$DEFAULT_RUN_MINIFIED_TESTS
   for i in "$@"; do
@@ -57,37 +57,7 @@ function maybeInstallDependencies {
     echo "  Running build task with concatenation only "
     echo ""
 
-    $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build
-
-    install_node_module karma 0.12.16
-    install_node_module karma-jasmine 0.1.0
-    install_node_module karma-jasmine-jquery 0.1.1
-    install_node_module karma-json-fixtures-preprocessor 0.0.6
-    install_node_module karma-coverage 0.5.2
-    install_node_module karma-ng-html2js-preprocessor 0.1.0
-    install_node_module karma-chrome-launcher 0.1.4
-    install_node_module protractor 4.0.9
-    install_node_module protractor-screenshot-reporter 0.0.5
-    install_node_module jasmine-spec-reporter 2.2.2
-
-    $NODE_MODULE_DIR/.bin/webdriver-manager update
-
-    # WARNING: THIS IS A HACK WHICH SHOULD BE REMOVED AT THE EARLIEST OPPORTUNITY,
-    # PROBABLY WHEN PROTRACTOR IS UPGRADED BEYOND v4.0.9.
-    # Chromedriver v2.22 fails on Travis with an "unexpected alert open" error.
-    # Attempt to replace it with v2.24, but rename it to 2.22 so as not to trigger
-    # a version check error.
-    if [ ${OS} == "Linux" ]; then
-      if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-        echo "  Replacing chromedriver with a newer version..."
-        curl --silent https://chromedriver.storage.googleapis.com/2.24/chromedriver_linux64.zip -o chromedriver_2.22linux64.zip
-        mkdir -p $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/
-        mv -f ./chromedriver_2.22linux64.zip $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/
-        unzip -q $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.22linux64.zip -d $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium
-        mv -f $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium/chromedriver_2.22
-        ls $NODE_MODULE_DIR/protractor/node_modules/webdriver-manager/selenium
-      fi
-    fi
+    $PYTHON_CMD scripts/build.py
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
@@ -95,7 +65,7 @@ function maybeInstallDependencies {
     echo "  Running build task with concatenation and minification"
     echo ""
 
-    $NODE_PATH/bin/node $NODE_MODULE_DIR/gulp/bin/gulp.js build --minify=True
+    $PYTHON_CMD scripts/build.py --prod_env
   fi
 }
 
@@ -143,7 +113,7 @@ export OPPIA_DIR=`pwd`
 export COMMON_DIR=$(cd $OPPIA_DIR/..; pwd)
 export TOOLS_DIR=$COMMON_DIR/oppia_tools
 export THIRD_PARTY_DIR=$OPPIA_DIR/third_party
-export NODE_MODULE_DIR=$COMMON_DIR/node_modules
+export NODE_MODULE_DIR=$OPPIA_DIR/node_modules
 export ME=$(whoami)
 
 mkdir -p $TOOLS_DIR
@@ -151,7 +121,7 @@ mkdir -p $THIRD_PARTY_DIR
 mkdir -p $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
-export NODE_PATH=$TOOLS_DIR/node-4.2.1
+export NODE_PATH=$TOOLS_DIR/node-10.15.3
 export PATH=$NODE_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
@@ -182,19 +152,19 @@ if [ ! -d "$NODE_PATH" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v4.2.1-darwin-x64
+      NODE_FILE_NAME=node-v10.15.3-darwin-x64
     else
-      NODE_FILE_NAME=node-v4.2.1-darwin-x86
+      NODE_FILE_NAME=node-v10.15.3-darwin-x86
     fi
   elif [ ${OS} == "Linux" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v4.2.1-linux-x64
+      NODE_FILE_NAME=node-v10.15.3-linux-x64
     else
-      NODE_FILE_NAME=node-v4.2.1-linux-x86
+      NODE_FILE_NAME=node-v10.15.3-linux-x86
     fi
   fi
 
-  curl --silent http://nodejs.org/dist/v4.2.1/$NODE_FILE_NAME.tar.gz -o node-download.tgz
+  curl -o node-download.tgz https://nodejs.org/dist/v10.15.3/$NODE_FILE_NAME.tar.gz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
@@ -206,9 +176,9 @@ if [ ! -d "$NODE_PATH" ]; then
 fi
 
 # Adjust path to support the default Chrome locations for Unix, Windows and Mac OS.
-if [ "$TRAVIS" = true ]; then
+if [ "$TRAVIS" == true ]; then
   export CHROME_BIN="/usr/bin/chromium-browser"
-elif [ "$VAGRANT" = true ]; then
+elif [ "$VAGRANT" == true ] || [ -f "/etc/is_vagrant_vm" ]; then
   # XVFB is required for headless testing in Vagrant
   sudo apt-get install xvfb chromium-browser
   export CHROME_BIN="/usr/bin/chromium-browser"
@@ -268,40 +238,12 @@ if ! test_python_version $PYTHON_CMD; then
         echo "If you have two versions of Python (ie, Python 2.7 and 3), specify 2.7 before other versions of Python when setting the PATH."
         echo "Here are some helpful articles:"
         echo "http://docs.python-guide.org/en/latest/starting/install/win/"
-        echo "http://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
+        echo "https://stackoverflow.com/questions/3701646/how-to-add-to-the-pythonpath-in-windows-7"
     fi
     # Exit when no suitable Python environment can be found.
     return 1
   fi
 fi
 export PYTHON_CMD
-
-# List all node modules that are currently installed. The "npm list" command is
-# slow, so we precompute this here and refer to it as needed.
-echo "Generating list of installed node modules..."
-NPM_INSTALLED_MODULES="$($NPM_CMD list)"
-export NPM_INSTALLED_MODULES
-echo "Generation completed."
-
-install_node_module() {
-  # Usage: install_node_module [module_name] [module_version]
-  #
-  # module_name: the name of the node module
-  # module_version: the expected version of the module
-
-  echo Checking whether $1 is installed
-  if [ ! -d "$NODE_MODULE_DIR/$1" ]; then
-    echo installing $1
-    $NPM_INSTALL $1@$2
-  else
-    if [[ $NPM_INSTALLED_MODULES != *"$1@$2"* ]]; then
-      echo Version of $1 does not match $2. Reinstalling $1...
-      $NPM_INSTALL $1@$2
-      # Regenerate the list of installed modules.
-      NPM_INSTALLED_MODULES="$($NPM_CMD list)"
-    fi
-  fi
-}
-export -f install_node_module
 
 export SETUP_DONE=true

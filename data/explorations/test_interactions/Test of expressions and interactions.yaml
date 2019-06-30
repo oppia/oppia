@@ -1,6 +1,8 @@
 author_notes: ''
+auto_tts_enabled: true
 blurb: ''
 category: Test
+correctness_feedback_enabled: false
 init_state_name: Continue
 language_code: en
 objective: check all the interactions work
@@ -12,25 +14,34 @@ param_specs:
     obj_type: UnicodeString
   c:
     obj_type: UnicodeString
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 30
 states:
   Code REPL:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Write a program the prints 12.<br>
+      content_id: content
+      html: <p>Write a program the prints 12.<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: Music notes input
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: '12'
           rule_type: OutputEquals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         language:
@@ -44,27 +55,34 @@ states:
       default_outcome:
         dest: Code REPL
         feedback:
-        - Wrong.
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: CodeRepl
+      solution: null
     param_changes: []
   Continue:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Click continue.<br><div><br></div><div><b>Parameters</b></div><div>{{a}}\
-        \ should be 1.</div><div><div>{{c}} should be 2.</div></div><div><span>{{b}}\
-        \ should be 0.5.</span><br></div><div>{{a*b}} should be 0.5.</div><div><span>{{-a*b}}\
-        \ should be -0.5.</span><br></div><div><span>{{a \_ * b \_}} should be 0.5.</span></div><div>{{abs(-a*b)}}\
-        \ should be 0.5.</div><div>{{if a + a == c then 'yes' else 'no'}} should be\
-        \ 'yes'</div><div><div><span>{{if a == c then 'yes' else 'no'}} should be\
-        \ 'no'</span><br></div><div><span>{{floor(a*b)}} should be 0.</span></div></div><div><div><span>{{log(2,\
-        \ 10)}} should be around 0.3.</span><br></div><div><div><span>{{pow(2, 10)}}\
-        \ should be 1024.</span></div><div><span>{{3 &lt; 4}} should be true.</span></div><div><span>{{3\
-        \ &gt; 4}} should be false.</span></div><div><span>{{4 &lt;= 4}} should be\
-        \ true.</span></div><div><span>{{4 &gt;= 3}} should be true.</span></div><div><span>&lt;\
-        \ should be an unescaped 'less-than' sign.</span></div><div><span>&gt; should\
-        \ be an unescaped 'greater-than' sign.</span></div></div></div>"
+      content_id: content
+      html: "<p>Click continue.<br></p><p>\_</p><p><strong>Parameters</strong></p><p>{{a}}\
+        \ should be 1.</p><p>{{c}} should be 2.</p><p>{{b}} should be 0.5.<br></p><p>{{a*b}}\
+        \ should be 0.5.</p><p>{{-a*b}} should be -0.5.<br></p><p>{{a \_ * b \_}}\
+        \ should be 0.5.</p><p>{{abs(-a*b)}} should be 0.5.</p><p>{{if a + a == c\
+        \ then 'yes' else 'no'}} should be 'yes'</p><p>{{if a == c then 'yes' else\
+        \ 'no'}} should be 'no'<br></p><p>{{floor(a*b)}} should be 0.</p><p>{{log(2,\
+        \ 10)}} should be around 0.3.<br></p><p>{{pow(2, 10)}} should be 1024.</p><p>{{3\
+        \ &lt; 4}} should be true.</p><p>{{3 &gt; 4}} should be false.</p><p>{{4 &lt;=\
+        \ 4}} should be true.</p><p>{{4 &gt;= 3}} should be true.</p><p>&lt; should\
+        \ be an unescaped 'less-than' sign.</p><p>&gt; should be an unescaped 'greater-than'\
+        \ sign.</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -73,10 +91,16 @@ states:
           value: Continue
       default_outcome:
         dest: Multiple choice input
-        feedback: []
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: Continue
+      solution: null
     param_changes:
     - customization_args:
         parse_with_jinja: false
@@ -99,9 +123,12 @@ states:
       generator_id: Copier
       name: b
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -109,39 +136,59 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Multiple choice input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Choose option B.<br><div><br></div><div><b>Parameters</b></div><div><div>{{a}}
-        should be 1.</div><div><span>{{b}} should be 3.</span><br></div><div><div>{{c}}
-        should be 2.</div></div><div><span>{{a*b}} should be 3.</span></div></div>
+      content_id: content
+      html: "<p>Choose option B.<br></p><p>\_</p><p><strong>Parameters</strong></p><p>{{a}}\
+        \ should be 1.</p><p>{{b}} should be 3.<br></p><p>{{c}} should be 2.</p><p>{{a*b}}\
+        \ should be 3.</p>"
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: Text input
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 1
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         choices:
           value:
-          - <oppia-noninteractive-image filepath-with-value="&amp;quot;A.png&amp;quot;"></oppia-noninteractive-image><br>
-          - Option B<br>
-          - <span class=""></span><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br>
+          - "<oppia-noninteractive-image caption-with-value=\"&amp;quot;&amp;quot;\"\
+            \ filepath-with-value=\"&amp;quot;A_height_24_width_24.png&amp;quot;\"\
+            \ alt-with-value=\"&amp;quot;&amp;quot;\"></oppia-noninteractive-image><p>\_</p>"
+          - <p>Option B<br></p>
+          - <p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br></p>
       default_outcome:
         dest: Multiple choice input
         feedback:
-        - Wrong.
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -149,15 +196,25 @@ states:
       generator_id: Copier
       name: b
   Music notes input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Enter two E4 notes (bottom line).<br>
+      content_id: content
+      html: <p>Enter two E4 notes (bottom line).<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: World map
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
@@ -170,6 +227,8 @@ states:
                 num: 1
               readableNoteName: E4
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         initialSequence:
@@ -187,24 +246,38 @@ states:
       default_outcome:
         dest: Music notes input
         feedback:
-        - Wrong.
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Network Graph:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Do the following step by step:<br><br>1. Delete Node labelled B<span></span><div>2.
-        Add Node labelled Z</div><div>3. Add Edge of weight 150 connecting A to Z</div><div>4.
-        Delete Edge between A and F</div>
+      content_id: content
+      html: <p>Do the following step by step:<br><br>1. Delete Node labelled B</p><p>2.
+        Add Node labelled Z</p><p>3. Add Edge of weight 150 connecting A to Z</p><p>4.
+        Delete Edge between A and F</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: Code REPL
           feedback:
-          - Correct
+            content_id: feedback_1
+            html: <p>Correct</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             g:
@@ -226,6 +299,8 @@ states:
                 x: 155.0
                 y: 125.0
           rule_type: IsIsomorphicTo
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         canAddEdge:
@@ -253,87 +328,137 @@ states:
             isWeighted: true
             vertices:
             - label: A
-              x: 212
-              y: 45
+              x: 212.0
+              y: 45.0
             - label: B
-              x: 379
-              y: 44
+              x: 379.0
+              y: 44.0
             - label: F
-              x: 215
+              x: 215.0
               y: 155.5
       default_outcome:
         dest: Network Graph
         feedback:
-        - Incorrect
+          content_id: default_outcome
+          html: <p>Incorrect</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: GraphInput
+      solution: null
     param_changes: []
   Numeric input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Enter a number larger than 6.<br>
+      content_id: content
+      html: <p>Enter a number larger than 6.<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: Set input
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 6.0
           rule_type: IsGreaterThan
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Numeric input
         feedback:
-        - Wrong.
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Set input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Enter the set {abc, xyz}<br>
+      content_id: content
+      html: <p>Enter the set {abc, xyz}<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: Network Graph
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x:
             - abc
             - xyz
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args: {}
       default_outcome:
         dest: Set input
         feedback:
-        - Wrong.
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: SetInput
+      solution: null
     param_changes: []
   Text Area Input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Please type hello.
+      content_id: content
+      html: <p>Please type hello.</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: Numeric input
           feedback:
-          - Correct
+            content_id: feedback_1
+            html: <p>Correct</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: hello
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -343,25 +468,42 @@ states:
       default_outcome:
         dest: Text Area Input
         feedback:
-        - Wrong
+          content_id: default_outcome
+          html: <p>Wrong</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   Text input:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Enter the string rrrrr<br>
+      content_id: content
+      html: <p>Enter the string rrrrr<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: Text Area Input
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: rrrrr
           rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -371,21 +513,36 @@ states:
       default_outcome:
         dest: Text input
         feedback:
-        - Wrong.
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   World map:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Click on the USA.<br>
+      content_id: content
+      html: <p>Click on the USA.<br></p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
     interaction:
       answer_groups:
       - outcome:
           dest: END
-          feedback: []
+          feedback:
+            content_id: feedback_1
+            html: ''
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
+          refresher_exploration_id: null
         rule_specs:
         - inputs:
             d: 3300.0
@@ -393,22 +550,29 @@ states:
             - 40.0
             - -105.0
           rule_type: Within
+        tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         latitude:
-          value: 0
+          value: 0.0
         longitude:
-          value: 0
+          value: 0.0
         zoom:
-          value: 0
+          value: 0.0
       default_outcome:
         dest: World map
         feedback:
-        - Wrong.
+          content_id: default_outcome
+          html: <p>Wrong.</p>
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
-      fallbacks: []
+        refresher_exploration_id: null
+      hints: []
       id: InteractiveMap
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 25
 tags: []
 title: Test of expressions and interactions

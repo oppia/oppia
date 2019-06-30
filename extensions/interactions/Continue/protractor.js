@@ -18,6 +18,7 @@
  */
 
 var objects = require('../../objects/protractor.js');
+var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = function(elem, buttonText) {
   if (buttonText) {
@@ -29,13 +30,15 @@ var customizeInteraction = function(elem, buttonText) {
 
 var expectInteractionDetailsToMatch = function(elem, buttonText) {
   expect(
-    elem.element(by.tagName('oppia-interactive-continue')).
-      element(by.tagName('button')).getText()
+    element(by.css('.protractor-test-continue-button')).getText()
   ).toBe(buttonText.toUpperCase());
 };
 
-var submitAnswer = function(elem) {
-  elem.element(by.tagName('oppia-interactive-continue')).click();
+var submitAnswer = function() {
+  var continueButton = element(by.css('.protractor-test-continue-button'));
+  waitFor.elementToBeClickable(
+    continueButton, 'Continue button is not clickable');
+  continueButton.click();
 };
 
 var testSuite = [];

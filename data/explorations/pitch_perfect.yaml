@@ -6,18 +6,17 @@ language_code: en
 objective: practice listening to and transcribing musical pitches
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   Choice from Interval-1:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Where would you like to go next?
+      audio_translations: {}
+      html: Where would you like to go next?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback: []
           param_changes: []
@@ -25,7 +24,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback: []
           param_changes: []
@@ -33,7 +33,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback: []
           param_changes: []
@@ -41,7 +42,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback: []
           param_changes: []
@@ -62,16 +64,19 @@ states:
         feedback:
         - Let's keep matching intervals for now.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Choice from Interval-2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Where would you like to go from here?
+      audio_translations: {}
+      html: Where would you like to go from here?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-3
           feedback:
           - Practice makes perfect!
@@ -80,7 +85,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - Now it's getting interesting!
@@ -90,7 +96,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - I already miss you...
@@ -99,7 +106,8 @@ states:
         - inputs:
             x: 3
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Sounds good to me!
@@ -121,16 +129,19 @@ states:
         feedback:
         - Let's keep matching intervals for now.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Choice from Interval-3:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You've really come a long way. Where would you like to go next?
+      audio_translations: {}
+      html: You've really come a long way. Where would you like to go next?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - I think you can handle this. You ears are definitely warmed up now.
@@ -139,7 +150,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Good choice. It's always smart to review what you've learned.
@@ -148,7 +160,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - Good choice. It's always smart to review what you've learned.
@@ -157,7 +170,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - So long, farewell, auf Wiedersehen, good night!
@@ -179,16 +193,19 @@ states:
         feedback:
         - Let's move on to the Melody Trainer.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Choice from Melody-1:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Where would you like to go?
+      audio_translations: {}
+      html: Where would you like to go?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-2
           feedback:
           - Now we're cookin!
@@ -198,7 +215,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - "Good choice. It never hurts to do a recap.\_"
@@ -207,7 +225,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Good choice. It never hurts to do a recap.
@@ -216,7 +235,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - You should be proud. You've come a long way from where we started. Come
@@ -239,20 +259,23 @@ states:
         feedback:
         - Let's keep matching melodies.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Choice from Melody-2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Great job! That's as far as we're going to go with this exploration,
-        but there's still a lot more you can learn. Next time you hear a song on the
-        radio, try to pick out intervals that sound familiar. Just remember, ear training
+      audio_translations: {}
+      html: Great job! That's as far as we're going to go with this exploration, but
+        there's still a lot more you can learn. Next time you hear a song on the radio,
+        try to pick out intervals that sound familiar. Just remember, ear training
         is a life long journey and you'll get significantly better at it with just
         a little effort. Thanks for playing!
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - Good choice. It's always a good idea to go over things you've learned.
@@ -261,7 +284,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Good choice. It's always a good idea to go over things you've learned.
@@ -270,7 +294,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice from Melody-2
           feedback:
           - Good choice. It's always a good idea to go over things you've learned.
@@ -279,7 +304,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - Thanks for hanging around and flexing your ear muscles. See you next time!
@@ -301,17 +327,20 @@ states:
         feedback:
         - Let's review some intervals.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Choice from Pitch-2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You're getting the hang of this! The world is your oyster, where do you
+      audio_translations: {}
+      html: You're getting the hang of this! The world is your oyster, where do you
         want to go?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Sounds like a plan.
@@ -320,7 +349,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - Now your ears are getting warmed up!
@@ -329,7 +359,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - Bold move. I like your style.
@@ -338,7 +369,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - Thanks for stopping by! Come back anytime.
@@ -352,7 +384,7 @@ states:
         choices:
           value:
           - Continue with Pitch Trainer.
-          - Move on to Interval Trainer.&nbsp;
+          - "Move on to Interval Trainer.\_"
           - Go to Melody Trainer.
           - No thanks, I'm done for now.
       default_outcome:
@@ -360,16 +392,19 @@ states:
         feedback:
         - Let's keep matching pitches for now.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Choice from Pitch-3:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Alright you've got that down pretty well. What do you want to try next?
+      audio_translations: {}
+      html: Alright you've got that down pretty well. What do you want to try next?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - Sounds good to me. This is getting exciting!
@@ -378,7 +413,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - I think you can handle this now. Your ears are all warmed up.
@@ -387,7 +423,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Sounds good to me. Practice makes perfect!
@@ -396,7 +433,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - Thanks for playing. We look forward to seeing you next time!
@@ -418,20 +456,23 @@ states:
         feedback:
         - Let's move on to the Interval Trainer.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Choice-1:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Now that you have an idea of how this is going to work, where do you
-        want to go with it? I think its best to start with individual pitches, then
-        move to intervals, and work with melodies last after your ears have warmed
-        up. You, however, are a free thinking individual, and should go wherever your
+      audio_translations: {}
+      html: Now that you have an idea of how this is going to work, where do you want
+        to go with it? I think its best to start with individual pitches, then move
+        to intervals, and work with melodies last after your ears have warmed up.
+        You, however, are a free thinking individual, and should go wherever your
         heart desires. Where would you like to boldly go?
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - "Sounds good to me.\_"
@@ -440,7 +481,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - Let's do this!
@@ -449,7 +491,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - Bold move. I like your style.
@@ -458,7 +501,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: END
           feedback:
           - Thanks for playing! Come back anytime.
@@ -480,13 +524,15 @@ states:
         feedback:
         - Let's keep matching pitches for now.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -494,19 +540,22 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   Interval Trainer-1:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Great job! If you can match one note, it shouldn't be hard to match\
-        \ two, right? Two notes make up what is called an interval. There are a few\
-        \ different kinds but you don't have to worry about remembering them all just\
-        \ yet. Let's just start with a few common ones.\_"
+      audio_translations: {}
+      html: "Great job! If you can match one note, it shouldn't be hard to match two,\
+        \ right? Two notes make up what is called an interval. There are a few different\
+        \ kinds but you don't have to worry about remembering them all just yet. Let's\
+        \ just start with a few common ones.\_"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice from Interval-1
           feedback:
           - Perfect! In fact, this interval is called a Perfect Fifth. I like to use
@@ -525,7 +574,8 @@ states:
                 num: 1
               readableNoteName: B4
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - Oops! There are too many notes on the staff. Melodies are just around
@@ -537,7 +587,8 @@ states:
         - inputs:
             k: 2
           rule_type: IsLongerThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - You're getting close. One of the notes in your sequence is incorrect.
@@ -557,7 +608,8 @@ states:
                 num: 1
               readableNoteName: B4
           rule_type: IsEqualToExceptFor
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - This is the right interval, just not the right pitches. We call this a
@@ -577,7 +629,8 @@ states:
               readableNoteName: B4
             y: -4
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - This is the right interval, just not the right pitches. We call this a
@@ -597,7 +650,8 @@ states:
               readableNoteName: B4
             y: -2
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - This is the right interval, just not the right pitches. We call this a
@@ -617,7 +671,8 @@ states:
               readableNoteName: B4
             y: 1
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - This is the right interval, just not the right pitches. We call this a
@@ -637,7 +692,8 @@ states:
               readableNoteName: B4
             y: 3
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - This is the right interval, just not the right pitches. We call this a
@@ -657,7 +713,8 @@ states:
               readableNoteName: B4
             y: 5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - This is the right interval, just not the right pitches. We call this a
@@ -676,7 +733,8 @@ states:
               readableNoteName: B4
             y: 8
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-1
           feedback:
           - This is the right interval, just not the right pitches. We call this a
@@ -718,17 +776,20 @@ states:
         - "Try again. Listen to the desired sequence and make your selection.\_"
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Interval Trainer-2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: You've come a long way! Let's keep it up and see where it takes us. Listen
+      audio_translations: {}
+      html: You've come a long way! Let's keep it up and see where it takes us. Listen
         to the desired interval and try to match it on the staff.
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice from Interval-2
           feedback:
           - Very good, you'll be a pro in no time! This interval is called a Perfect
@@ -747,7 +808,8 @@ states:
                 num: 1
               readableNoteName: D5
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - Oops! There are too many notes on the staff. Remember, an interval is
@@ -759,7 +821,8 @@ states:
         - inputs:
             k: 2
           rule_type: IsLongerThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - You're getting close. One of the notes in your sequence is incorrect.
@@ -779,7 +842,8 @@ states:
                 num: 1
               readableNoteName: D5
           rule_type: IsEqualToExceptFor
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -799,7 +863,8 @@ states:
               readableNoteName: D5
             y: -9
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -819,7 +884,8 @@ states:
               readableNoteName: D5
             y: -7
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -839,7 +905,8 @@ states:
               readableNoteName: D5
             y: -5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -859,7 +926,8 @@ states:
               readableNoteName: D5
             y: -2
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -879,7 +947,8 @@ states:
               readableNoteName: D5
             y: 2
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -899,7 +968,8 @@ states:
               readableNoteName: D5
             y: 3
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-2
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -941,18 +1011,21 @@ states:
           \ selection. You can compare it with your note as many times as you like\
           \ using the play buttons.\_"
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Interval Trainer-3:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Great! Now that we have a good feel for the Perfect intervals, let's
-        try something a bit more challenging. Listen to the desired interval and try
-        to match it on the staff.
+      audio_translations: {}
+      html: Great! Now that we have a good feel for the Perfect intervals, let's try
+        something a bit more challenging. Listen to the desired interval and try to
+        match it on the staff.
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice from Interval-3
           feedback:
           - "Well done! That interval is called a Major Sixth. Some people remember\
@@ -971,7 +1044,8 @@ states:
                 num: 1
               readableNoteName: A4
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-3
           feedback:
           - Oops! There are too many notes on the staff. Remember, an interval is
@@ -983,7 +1057,8 @@ states:
         - inputs:
             k: 2
           rule_type: IsLongerThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-3
           feedback:
           - You've very close. One of the notes in your sequence is still off. Listen
@@ -1005,7 +1080,8 @@ states:
                 num: 1
               readableNoteName: A4
           rule_type: IsEqualToExceptFor
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-3
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -1025,7 +1101,8 @@ states:
               readableNoteName: A4
             y: 2
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-3
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -1045,7 +1122,8 @@ states:
               readableNoteName: A4
             y: 5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-3
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -1065,7 +1143,8 @@ states:
               readableNoteName: A4
             y: 7
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Interval Trainer-3
           feedback:
           - You're ear is pretty good! This is the right interval, just not the right
@@ -1109,18 +1188,21 @@ states:
         - Try again. Listen to the desired sequence and make your selection.
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Melody Trainer-1:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Well you've traveled far, haven't you? Let's try our ears at a few melodies.
+      audio_translations: {}
+      html: Well you've traveled far, haven't you? Let's try our ears at a few melodies.
         Don't worry about the rhythm for now, we're just going to focus on matching
         the pitches. Listen to the desired sequence and match them on the staff.
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice from Melody-1
           feedback:
           - You got it! This is the first phrase of the "Simpson's Theme" or "Maria",
@@ -1144,7 +1226,8 @@ states:
                 num: 1
               readableNoteName: C5
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - There are too many notes on the staff. Compare your sequence with the
@@ -1154,7 +1237,8 @@ states:
         - inputs:
             k: 3
           rule_type: IsLongerThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - There aren't enough notes on the staff yet. Compare your sequence with
@@ -1165,7 +1249,8 @@ states:
             a: 1
             b: 2
           rule_type: HasLengthInclusivelyBetween
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - "You're very close. One of the notes in your sequence is not correct.\
@@ -1189,7 +1274,8 @@ states:
                 num: 1
               readableNoteName: C5
           rule_type: IsEqualToExceptFor
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - "You've got quite an ear on you. That is the right melody but it's been\
@@ -1212,7 +1298,8 @@ states:
               readableNoteName: C5
             y: -5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-1
           feedback:
           - "You've got quite an ear on you. That is almost the right melody but it's\
@@ -1265,17 +1352,20 @@ states:
           \ using the play buttons.\_"
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Melody Trainer-2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "You've got the hang of it! Let's try another melody. Listen to the desired\
+      audio_translations: {}
+      html: "You've got the hang of it! Let's try another melody. Listen to the desired\
         \ sequence and try to match it on the staff. \_"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice from Melody-2
           feedback:
           - Well done! This is the first five notes of Beethoven's 3rd symphony. The
@@ -1306,7 +1396,8 @@ states:
                 num: 1
               readableNoteName: C5
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-2
           feedback:
           - There are too many notes on the staff. Compare your sequence with the
@@ -1318,7 +1409,8 @@ states:
         - inputs:
             k: 5
           rule_type: IsLongerThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-2
           feedback:
           - There aren't enough notes on the staff yet. Compare your sequence with
@@ -1329,7 +1421,8 @@ states:
             a: 1
             b: 4
           rule_type: HasLengthInclusivelyBetween
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-2
           feedback:
           - You're very close. One of the notes in your sequence is still off. Listen
@@ -1361,7 +1454,8 @@ states:
                 num: 1
               readableNoteName: C5
           rule_type: IsEqualToExceptFor
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-2
           feedback:
           - That's some ear you've got on you! This is the right melody, just not
@@ -1394,7 +1488,8 @@ states:
               readableNoteName: C5
             y: -5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-2
           feedback:
           - That's some ear you've got on you! This is the right melody, just not
@@ -1427,7 +1522,8 @@ states:
               readableNoteName: C5
             y: -7
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Melody Trainer-2
           feedback:
           - That's some ear you've got on you! This is almost the right melody, just
@@ -1497,13 +1593,15 @@ states:
           \ selection. You can compare it with your note as many times as you like\
           \ using the play buttons.\_"
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Pitch Trainer-1:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "In this exploration, we're going to learn the basics of music theory.\
+      audio_translations: {}
+      html: "In this exploration, we're going to learn the basics of music theory.\
         \ Now don't be afraid, it's not all that hard, and the good thing is, you've\
         \ been training your ear for it your whole life.\_<div><br></div><div>Music\
         \ is made up of notes and rests. Listen to the desired sequence of notes by\
@@ -1513,7 +1611,8 @@ states:
         \ the first time. Your ears will grow with time.</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice-1
           feedback:
           - That's right! That note is D5.
@@ -1527,7 +1626,8 @@ states:
                 num: 1
               readableNoteName: D5
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - <div>Oops! There are too many notes on the staff. Let's not get ahead
@@ -1539,7 +1639,8 @@ states:
         - inputs:
             k: 1
           rule_type: IsLongerThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Your ear is pretty good! This is the right note, just the wrong octave.
@@ -1555,7 +1656,8 @@ states:
               readableNoteName: D5
             y: -12
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - You're very close, just a little too high. Give it another shot!<br>
@@ -1569,7 +1671,8 @@ states:
               readableNoteName: D5
             y: 2
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - You're very close, just a little too high. Give it another shot!<br>
@@ -1583,7 +1686,8 @@ states:
               readableNoteName: D5
             y: 3
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Your choice is a bit too high. Give it another go!<br>
@@ -1597,7 +1701,8 @@ states:
               readableNoteName: D5
             y: 5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Your choice is a bit too high. Give it another go!<br>
@@ -1611,7 +1716,8 @@ states:
               readableNoteName: D5
             y: 7
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - You're very close, just a little too low. Give it another try!
@@ -1625,7 +1731,8 @@ states:
               readableNoteName: D5
             y: -2
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - You're very close, just a little too low. Give it another try!
@@ -1639,7 +1746,8 @@ states:
               readableNoteName: D5
             y: -3
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Your choice is a bit too low. Give it another shot!
@@ -1653,7 +1761,8 @@ states:
               readableNoteName: D5
             y: -5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Your choice is a bit too low. Give it another shot!
@@ -1667,7 +1776,8 @@ states:
               readableNoteName: D5
             y: -7
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Your choice is a bit too low. Give it another shot!
@@ -1681,7 +1791,8 @@ states:
               readableNoteName: D5
             y: -9
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Your choice is much too low. Give it another shot!
@@ -1695,7 +1806,8 @@ states:
               readableNoteName: D5
             y: -10
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-1
           feedback:
           - Your choice is much too low. Give it another shot!
@@ -1728,17 +1840,20 @@ states:
         - Try again. Listen to the desired note and make your selection.<br>
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Pitch Trainer-2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Listen to the desired note and make your selection. You can compare\
-        \ your note with the desired one as many times as you like before submitting.\_"
+      audio_translations: {}
+      html: "Listen to the desired note and make your selection. You can compare your\
+        \ note with the desired one as many times as you like before submitting.\_"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice from Pitch-2
           feedback:
           - Very good! You've done this before, haven't you?
@@ -1752,7 +1867,8 @@ states:
                 num: 1
               readableNoteName: F4
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Oops! There are too many notes on the staff. I can tell you're excited,
@@ -1764,7 +1880,8 @@ states:
         - inputs:
             k: 1
           rule_type: IsLongerThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Your ear is pretty good! This is the right note, just the wrong octave.
@@ -1780,7 +1897,8 @@ states:
               readableNoteName: F4
             y: 12
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Very close, you're just a bit too low. Give it another try!
@@ -1794,7 +1912,8 @@ states:
               readableNoteName: F4
             y: -1
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Very close, you're just a bit too low. Give it another try!
@@ -1808,7 +1927,8 @@ states:
               readableNoteName: F4
             y: -3
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Your choice is just a bit too low. Give it another shot!
@@ -1822,7 +1942,8 @@ states:
               readableNoteName: F4
             y: -5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Very close, your choice is just a bit too high. Give it another go!
@@ -1836,7 +1957,8 @@ states:
               readableNoteName: F4
             y: 2
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Very close, your choice is just a bit too high. Give it another shot!
@@ -1850,7 +1972,8 @@ states:
               readableNoteName: F4
             y: 4
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Your choice is just a bit too high. Give it another go!
@@ -1864,7 +1987,8 @@ states:
               readableNoteName: F4
             y: 6
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Your choice is just a bit too high. Give it another shot!
@@ -1878,7 +2002,8 @@ states:
               readableNoteName: F4
             y: 7
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Your choice is just a bit too high. Give it another go!
@@ -1892,7 +2017,8 @@ states:
               readableNoteName: F4
             y: 9
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Your choice is much too high. Give it another shot!
@@ -1906,7 +2032,8 @@ states:
               readableNoteName: F4
             y: 11
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Your choice is much too high. Give it another go!
@@ -1920,7 +2047,8 @@ states:
               readableNoteName: F4
             y: 14
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-2
           feedback:
           - Your choice is much too high. Give it another go!
@@ -1953,18 +2081,21 @@ states:
         - "Try again. Listen to the desired note and make your selection.\_"
         - It's okay, practice makes perfect. Try as many times as you like.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
   Pitch Trainer-3:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Let's match one last pitch before we move on. Listen to the desired note
+      audio_translations: {}
+      html: Let's match one last pitch before we move on. Listen to the desired note
         and make your selection. You may want to think outside of the box for this
         one.
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Choice from Pitch-3
           feedback:
           - You got it! When a note goes above or below the staff, the staff is extended
@@ -1978,7 +2109,8 @@ states:
                 num: 1
               readableNoteName: A5
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Oops! There are too many notes on the staff. I can tell you're excited,
@@ -1990,7 +2122,8 @@ states:
         - inputs:
             k: 1
           rule_type: IsLongerThan
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your ear is pretty good! this is the right note, just the wrong octave.
@@ -2006,7 +2139,8 @@ states:
               readableNoteName: A5
             y: -12
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Very close, your choice is just a bit too low. Give it another shot!
@@ -2020,7 +2154,8 @@ states:
               readableNoteName: A5
             y: -2
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Very close, your choice is just a bit too low. Give it another go!
@@ -2034,7 +2169,8 @@ states:
               readableNoteName: A5
             y: -4
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is just a bit too low. Give it another shot!
@@ -2048,7 +2184,8 @@ states:
               readableNoteName: A5
             y: -5
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is just a bit too low. Give it another go!
@@ -2062,7 +2199,8 @@ states:
               readableNoteName: A5
             y: -7
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is a bit too low. Give it another shot!
@@ -2076,7 +2214,8 @@ states:
               readableNoteName: A5
             y: -9
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is much too low. Give it another try!
@@ -2090,7 +2229,8 @@ states:
               readableNoteName: A5
             y: -10
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is much too low. Give it another shot!
@@ -2104,7 +2244,8 @@ states:
               readableNoteName: A5
             y: -14
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is much too low. Give it another try!
@@ -2118,7 +2259,8 @@ states:
               readableNoteName: A5
             y: -16
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is much too low. Give it another shot!
@@ -2132,7 +2274,8 @@ states:
               readableNoteName: A5
             y: -17
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is much too low. Give it another try!
@@ -2146,7 +2289,8 @@ states:
               readableNoteName: A5
             y: -19
           rule_type: IsTranspositionOf
-      - outcome:
+      - correct: false
+        outcome:
           dest: Pitch Trainer-3
           feedback:
           - Your choice is much too low. Give it another shot!
@@ -2179,9 +2323,10 @@ states:
           \ using the play buttons.\_"
         - Try again. Listen to the desired note and make your selection.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MusicNotesInput
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Pitch Perfect

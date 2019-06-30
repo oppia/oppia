@@ -22,15 +22,10 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
-install_node_module gulp 3.9.0
-install_node_module through2 2.0.0
-install_node_module yargs 3.29.0
-install_node_module gulp-concat 2.6.0
-install_node_module gulp-clean-css 2.0.2
-install_node_module gulp-util 3.0.7
-install_node_module jscs 2.3.0
-install_node_module gulp-sourcemaps 1.6.0
-install_node_module gulp-minify 0.0.5
+$NPM_INSTALL --only=dev
+# This line removes the "npm ERR! missing:" messages. For reference, see this
+# thread: https://github.com/npm/npm/issues/19393#issuecomment-374076889
+$NPM_CMD dedupe
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -63,7 +58,12 @@ if [ ! "$NO_SKULPT" -a ! -d "$THIRD_PARTY_DIR/static/skulpt-0.10.0" ]; then
     # third party commands. These are only used for unit tests and generating
     # documentation and are not necessary when building Skulpt.
     sed -e "s/ret = test()/ret = 0/" $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py |\
-    sed -e "s/  doc()/  pass#doc()/" > $TMP_FILE
+    sed -e "s/  doc()/  pass#doc()/" |\
+    # This and the next command disable unit and compressed unit tests for the
+    # compressed distribution of Skulpt. These tests don't work on some
+    # Ubuntu environments and cause a libreadline dependency issue.
+    sed -e "s/ret = os.system(\"{0}/ret = 0 #os.system(\"{0}/" |\
+    sed -e "s/ret = rununits(opt=True)/ret = 0/" > $TMP_FILE
     mv $TMP_FILE $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py
     $PYTHON_CMD $TOOLS_DIR/skulpt-0.10.0/skulpt/skulpt.py dist
 
@@ -97,44 +97,101 @@ if ! type pip > /dev/null 2>&1 ; then
     exit 1
 fi
 
-# Note that numpy needs to be built after downloading.
-echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
-  echo Installing numpy
+function pip_install {
+  # Attempt standard pip install, or pass in --system if the local environment requires it.
+  # See https://github.com/pypa/pip/issues/3826 for context on when this situation may occur.
+  pip install "$@" || pip install --system "$@"
+}
 
-  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
-fi
-
-echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/pylint-1.5.2" ]; then
+echo Checking if pylint is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/pylint-1.9.4" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.5.2 --target="$TOOLS_DIR/pylint-1.5.2"
+  pip_install pylint==1.9.4 --target="$TOOLS_DIR/pylint-1.9.4"
+fi
+
+echo Checking if Pillow is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/Pillow-6.0.0" ]; then
+  echo Installing Pillow
+
+  pip_install Pillow==6.0.0 --target="$TOOLS_DIR/Pillow-6.0.0"
+
+  if [[ $? != 0 && ${OS} == "Darwin" ]]; then
+    echo "  Pillow install failed. See troubleshooting instructions at:"
+    echo "    https://github.com/oppia/oppia/wiki/Troubleshooting#mac-os"
+  fi
+
+fi
+
+echo Checking if pylint-quotes is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/pylint-quotes-0.2.1" ]; then
+  echo Installing pylint-quotes
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o pylint-quotes-0.2.1.tar.gz -L https://github.com/edaniszewski/pylint-quotes/archive/0.2.1.tar.gz
+  tar xzf pylint-quotes-0.2.1.tar.gz -C $TOOLS_DIR
+  rm pylint-quotes-0.2.1.tar.gz
 fi
 
 # Install webtest.
 echo Checking if webtest is installed in third_party
-if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
+if [ ! -d "$TOOLS_DIR/webtest-2.0.33" ]; then
   echo Installing webtest framework
   # Note that the github URL redirects, so we pass in -L to tell curl to follow the redirect.
-  curl --silent -L https://github.com/Pylons/webtest/archive/1.4.2.zip -o webtest-download.zip
-  unzip webtest-download.zip -d $TOOLS_DIR
-  rm webtest-download.zip
+  curl -o webtest-2.0.33.zip -L https://github.com/Pylons/webtest/archive/2.0.33.zip
+  unzip webtest-2.0.33.zip -d $TOOLS_DIR
+  rm webtest-2.0.33.zip
+fi
+
+# Install isort.
+echo Checking if isort is installed in third_party
+if [ ! -d "$TOOLS_DIR/isort-4.3.20" ]; then
+  echo Installing isort
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o isort-4.3.20.tar.gz -L https://files.pythonhosted.org/packages/f1/84/5d66ddbe565e36682c336c841e51430384495b272c622ac229029f671be2/isort-4.3.20.tar.gz
+  tar xzf isort-4.3.20.tar.gz -C $TOOLS_DIR
+  rm isort-4.3.20.tar.gz
+fi
+
+# Install pycodestyle.
+echo Checking if pycodestyle is installed in third_party
+if [ ! -d "$TOOLS_DIR/pycodestyle-2.5.0" ]; then
+  echo Installing pycodestyle
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o pycodestyle-2.5.0.tar.gz -L https://files.pythonhosted.org/packages/1c/d1/41294da5915f4cae7f4b388cea6c2cd0d6cd53039788635f6875dfe8c72f/pycodestyle-2.5.0.tar.gz
+  tar xzf pycodestyle-2.5.0.tar.gz -C $TOOLS_DIR
+  rm pycodestyle-2.5.0.tar.gz
+fi
+
+# Install esprima.
+echo Checking if esprima is installed in third_party
+if [ ! -d "$TOOLS_DIR/esprima-4.0.1" ]; then
+  echo Installing esprima
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o esprima-4.0.1.tar.gz -L https://files.pythonhosted.org/packages/cc/a1/50fccd68a12bcfc27adfc9969c090286670a9109a0259f3f70943390b721/esprima-4.0.1.tar.gz
+  tar xzf esprima-4.0.1.tar.gz -C $TOOLS_DIR
+  rm esprima-4.0.1.tar.gz
 fi
 
 # Python API for browsermob-proxy.
-echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
+echo Checking if browsermob-proxy is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.8.0" ]; then
   echo Installing browsermob-proxy
 
-  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  pip_install browsermob-proxy==0.8.0 --target="$TOOLS_DIR/browsermob-proxy-0.8.0"
 fi
 
-echo Checking if selenium is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
+echo Checking if selenium is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/selenium-3.13.0" ]; then
   echo Installing selenium
 
-  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  pip_install selenium==3.13.0 --target="$TOOLS_DIR/selenium-3.13.0"
+fi
+
+echo Checking if PyGithub is installed in $TOOLS_DIR
+if [ ! -d "$TOOLS_DIR/PyGithub-1.43.7" ]; then
+  echo Installing PyGithub
+
+  pip_install PyGithub==1.43.7 --target="$TOOLS_DIR/PyGithub-1.43.7"
 fi
 
 # install pre-push script

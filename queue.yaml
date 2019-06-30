@@ -1,10 +1,16 @@
 total_storage_limit: 120M
 queue:
-- name: default
-  rate: 2/m
-- name: events
-  rate: 5/s
 - name: backups
   rate: 5/s
+- name: continuous-jobs
+  rate: 2/m
+- name: default
+  rate: 2/m
 - name: emails
   rate: 5/s
+- name: events
+  rate: 5/s
+- name: one-off-jobs
+  rate: 10/s
+- name: stats
+  rate: 10/m

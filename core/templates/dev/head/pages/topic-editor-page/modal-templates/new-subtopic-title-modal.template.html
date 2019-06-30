@@ -1,0 +1,31 @@
+<div class="modal-header">
+  <h3>
+    Enter Subtopic Title
+  </h3>
+</div>
+<form ng-submit="save(subtopicTitle)">
+  <div class="modal-body new-subtopic-title-editor">
+    <p>
+      Enter the title for the subtopic
+    </p>
+    <input class="form-control protractor-test-new-subtopic-title-field" style="font-size: 12px;"
+           placeholder="Enter a brief description for the subtopic that students can easily understand, e.g. 'Adding Fractions'"
+           ng-model="subtopicTitle" ng-change="resetErrorMsg()" autofocus>
+    <span class="help-block" style="font-size: smaller; color: red;" ng-if="errorMsg">
+      <em><[errorMsg]></em>
+    </span>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-success protractor-test-confirm-subtopic-creation-button"
+            type="submit" ng-disabled="isSubtopicTitleEmpty(subtopicTitle)">
+      <span>Create Subtopic</span>
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  </div>
+</form>
+<style>
+  .new-subtopic-title-editor .help-block {
+    margin-left: 37.5%;
+    margin-top: -3%;
+  }
+</style>

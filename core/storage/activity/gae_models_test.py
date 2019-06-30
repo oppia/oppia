@@ -14,9 +14,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.storage.activity.gae_models."""
+
+from constants import constants
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (activity_models,) = models.Registry.import_models([models.NAMES.activity])
 
@@ -42,7 +44,7 @@ class ActivityListModelTest(test_utils.GenericTestBase):
         self.assertEqual(featured_model_instance.activity_references, [])
 
         featured_model_instance.activity_references = [{
-            'type': feconf.ACTIVITY_TYPE_EXPLORATION,
+            'type': constants.ACTIVITY_TYPE_EXPLORATION,
             'id': '0',
         }]
         featured_model_instance.put()
@@ -50,7 +52,8 @@ class ActivityListModelTest(test_utils.GenericTestBase):
         featured_model_instance = (
             activity_models.ActivityReferencesModel.get_or_create('featured'))
         self.assertEqual(featured_model_instance.id, 'featured')
-        self.assertEqual(featured_model_instance.activity_references, [{
-            'type': feconf.ACTIVITY_TYPE_EXPLORATION,
-            'id': '0',
-        }])
+        self.assertEqual(
+            featured_model_instance.activity_references, [{
+                'type': constants.ACTIVITY_TYPE_EXPLORATION,
+                'id': '0',
+            }])

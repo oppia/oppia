@@ -16,11 +16,12 @@
 
 from core.domain import collection_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.tests import test_utils
 import feconf
 
 
-class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
+class CollectionViewerPermissionsTests(test_utils.GenericTestBase):
     """Test permissions for learners to view collections."""
 
     COLLECTION_ID = 'cid'
@@ -28,10 +29,11 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
 
     def setUp(self):
         """Before each individual test, create a dummy collection."""
-        super(CollectionViewerPermissionsTest, self).setUp()
+        super(CollectionViewerPermissionsTests, self).setUp()
 
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
@@ -39,17 +41,15 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.save_new_valid_collection(self.COLLECTION_ID, self.editor_id)
 
     def test_unpublished_collections_are_invisible_to_logged_out_users(self):
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
 
     def test_unpublished_collections_are_invisible_to_unconnected_users(self):
         self.login(self.NEW_USER_EMAIL)
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
         self.logout()
 
     def test_unpublished_collections_are_invisible_to_other_editors(self):
@@ -58,44 +58,44 @@ class CollectionViewerPermissionsTest(test_utils.GenericTestBase):
         self.save_new_valid_collection('cid2', self.OTHER_EDITOR_EMAIL)
 
         self.login(self.OTHER_EDITOR_EMAIL)
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 404)
+            expected_status_int=404)
         self.logout()
 
     def test_unpublished_collections_are_visible_to_their_editors(self):
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_unpublished_collections_are_visible_to_admins(self):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.get(
+        self.get_html_response(
             '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
-        self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_published_collections_are_visible_to_logged_out_users(self):
-        rights_manager.publish_collection(self.editor_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
-        response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response(
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
 
     def test_published_collections_are_visible_to_logged_in_users(self):
-        rights_manager.publish_collection(self.editor_id, self.COLLECTION_ID)
+        rights_manager.publish_collection(self.editor, self.COLLECTION_ID)
 
         self.login(self.NEW_USER_EMAIL)
-        response = self.testapp.get(
-            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID),
-            expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        self.get_html_response(
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, self.COLLECTION_ID))
+
+    def test_invalid_collection_error(self):
+        self.login(self.EDITOR_EMAIL)
+        self.get_html_response(
+            '%s/%s' % (feconf.COLLECTION_URL_PREFIX, 'none'),
+            expected_status_int=404)
+        self.logout()
 
 
 class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
@@ -114,6 +114,11 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         # Login as the user who will play the collection.
         self.login(self.VIEWER_EMAIL)
 
+        # Request invalid collection from data handler.
+        response_dict = self.get_json(
+            '%s/1' % feconf.COLLECTION_DATA_URL_PREFIX,
+            expected_status_int=404)
+
         # Request the collection from the data handler.
         response_dict = self.get_json(
             '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
@@ -127,17 +132,56 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         self.assertEqual(
             collection_dict['title'], 'Introduction to Collections in Oppia')
 
-        # Verify there are 5 explorations in this collection, the initial
+        # Verify there are 4 explorations in this collection, the initial
         # explorations to be completed, and that there are no explorations
         # currently completed within the context of this collection.
-        self.assertEqual(len(collection_dict['nodes']), 5)
+        self.assertEqual(len(collection_dict['nodes']), 4)
 
         playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(playthrough_dict['next_exploration_ids'], ['0'])
+        self.assertEqual(playthrough_dict['next_exploration_id'], '19')
         self.assertEqual(playthrough_dict['completed_exploration_ids'], [])
 
-        # 'Complete' the first exploration. This should lead to 3 more being
+        # 'Complete' the first exploration. This should lead to 1 new one being
         # suggested to the learner.
+        collection_services.record_played_exploration_in_collection_context(
+            self.viewer_id, '0', '19')
+        response_dict = self.get_json(
+            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
+        collection_dict = response_dict['collection']
+
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(
+            playthrough_dict['next_exploration_id'], '20')
+        self.assertEqual(playthrough_dict['completed_exploration_ids'], ['19'])
+
+        # Completing the next exploration results in a third suggested exp.
+        collection_services.record_played_exploration_in_collection_context(
+            self.viewer_id, '0', '20')
+        response_dict = self.get_json(
+            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
+        collection_dict = response_dict['collection']
+
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(
+            playthrough_dict['next_exploration_id'], '21')
+        self.assertEqual(
+            playthrough_dict['completed_exploration_ids'], ['19', '20'])
+
+        # Completing the next exploration results in a fourth and final
+        # suggested exp.
+        collection_services.record_played_exploration_in_collection_context(
+            self.viewer_id, '0', '21')
+        response_dict = self.get_json(
+            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
+        collection_dict = response_dict['collection']
+
+        playthrough_dict = collection_dict['playthrough_dict']
+        self.assertEqual(
+            playthrough_dict['next_exploration_id'], '0')
+        self.assertEqual(
+            playthrough_dict['completed_exploration_ids'], ['19', '20', '21'])
+
+        # Completing the final exploration should result in no new suggestions.
         collection_services.record_played_exploration_in_collection_context(
             self.viewer_id, '0', '0')
         response_dict = self.get_json(
@@ -145,48 +189,7 @@ class CollectionViewerControllerEndToEndTests(test_utils.GenericTestBase):
         collection_dict = response_dict['collection']
 
         playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['13'])
-        self.assertEqual(playthrough_dict['completed_exploration_ids'], ['0'])
-
-        # Completing the 'Solar System' exploration results in no branching.
-        collection_services.record_played_exploration_in_collection_context(
-            self.viewer_id, '0', '13')
-        response_dict = self.get_json(
-            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
-        collection_dict = response_dict['collection']
-
-        playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['4'])
-        self.assertEqual(
-            playthrough_dict['completed_exploration_ids'], ['0', '13'])
-
-        # Completing the 'About Oppia' exploration results in another
-        # exploration being suggested.
-        collection_services.record_played_exploration_in_collection_context(
-            self.viewer_id, '0', '14')
-        response_dict = self.get_json(
-            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
-        collection_dict = response_dict['collection']
-
-        playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(
-            playthrough_dict['next_exploration_ids'], ['4'])
-        self.assertEqual(
-            playthrough_dict['completed_exploration_ids'], ['0', '13', '14'])
-
-        # Completing all explorations should lead to no other suggestions.
-        collection_services.record_played_exploration_in_collection_context(
-            self.viewer_id, '0', '15')
-        collection_services.record_played_exploration_in_collection_context(
-            self.viewer_id, '0', '4')
-        response_dict = self.get_json(
-            '%s/0' % feconf.COLLECTION_DATA_URL_PREFIX)
-        collection_dict = response_dict['collection']
-
-        playthrough_dict = collection_dict['playthrough_dict']
-        self.assertEqual(playthrough_dict['next_exploration_ids'], [])
+        self.assertEqual(playthrough_dict['next_exploration_id'], None)
         self.assertEqual(
             playthrough_dict['completed_exploration_ids'],
-            ['0', '13', '14', '15', '4'])
+            ['19', '20', '21', '0'])

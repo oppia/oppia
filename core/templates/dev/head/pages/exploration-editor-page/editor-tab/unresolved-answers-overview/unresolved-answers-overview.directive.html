@@ -1,0 +1,37 @@
+<style>
+  unresolved-answers-overview .answer-container {
+    vertical-align: text-bottom;
+  }
+  unresolved-answers-overview .refresh-container {
+    font-size: 0.8em;
+    text-align: right;
+  }
+  unresolved-answers-overview .refresh-container a {
+    font-weight: bold;
+  }
+</style>
+
+<div ng-if="isUnresolvedAnswersOverviewShown()">
+  <span style="font-size: 16px;">
+    <strong>Improvements Overview</strong>
+  </span>
+  <md-card style="background-color: white; margin: 20px 0; padding: 8px;">
+    <strong>Unresolved Student Answers</strong>
+    <ul>
+      <li ng-repeat="data in getUnresolvedStateStats()" class="answer-container">
+        <strong>(<[data.frequency]> times)</strong>: <span ng-bind-html="data.answerHtml"></span>
+      </li>
+      <li ng-if="getUnresolvedStateStats().length === 0">
+        <em>No outstanding answers require attention.</em>
+      </li>
+    </ul>
+  </md-card>
+
+  <md-card style="margin: 20px 0px; padding: 0px;" ng-if="SHOW_TRAINABLE_UNRESOLVED_ANSWERS && isCurrentInteractionTrainable()">
+    <div ng-if="isEditableOutsideTutorialMode() && !isCurrentInteractionLinear()">
+      <button type="button" class="btn btn-default btn-lg oppia-add-response-button protractor-test-open-teach-modal" ng-click="openTeachOppiaModal()">
+        Train Oppia
+      </button>
+    </div>
+  </md-card>
+</div>

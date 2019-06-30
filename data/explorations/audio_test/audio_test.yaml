@@ -1,0 +1,199 @@
+author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Art
+correctness_feedback_enabled: false
+init_state_name: Introduction
+language_code: en
+objective: Try out playing audio on Oppia
+param_changes: []
+param_specs: {}
+schema_version: 21
+states:
+  Finish:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        en:
+          file_size_bytes: 59289
+          filename: test_audio_2_en.mp3
+          needs_update: false
+        hi-en:
+          file_size_bytes: 88905
+          filename: test_audio_2_hi_en.mp3
+          needs_update: true
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  Introduction:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        en:
+          file_size_bytes: 95426
+          filename: test_audio_1_en.mp3
+          needs_update: false
+        hi-en:
+          file_size_bytes: 132719
+          filename: test_audio_1_hi_en.mp3
+          needs_update: false
+      html: <p>Try clicking on the speaker! After listening, click continue.</p>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        buttonText:
+          value: Continue
+      default_outcome:
+        dest: Second
+        feedback:
+          audio_translations: {}
+          html: ''
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: Continue
+      solution: null
+    param_changes: []
+  Second:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        hi-en:
+          file_size_bytes: 59613
+          filename: test_audio_3_hi_en.mp3
+          needs_update: true
+      html: <p>Try typing some code.</p>
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: Third
+          feedback:
+            audio_translations: {}
+            html: <p>Nice!</p>
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: x
+          rule_type: CodeEquals
+      confirmed_unclassified_answers: []
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '# Type your code here.'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      default_outcome:
+        dest: Third
+        feedback:
+          audio_translations: {}
+          html: <p>Nice work.</p>
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: CodeRepl
+      solution: null
+    param_changes: []
+  Third:
+    classifier_model_id: null
+    content:
+      audio_translations:
+        en:
+          file_size_bytes: 57996
+          filename: content-en-3iibmhu8je2.mp3
+          needs_update: false
+      html: <p>Are you a cat or dog person?</p>
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: Finish
+          feedback:
+            audio_translations:
+              en:
+                file_size_bytes: 41549
+                filename: feedback-en-kt33y1e2rwg.mp3
+                needs_update: false
+            html: <p>I like cats too.</p>
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: cat
+          rule_type: Contains
+      - labelled_as_correct: false
+        outcome:
+          dest: Finish
+          feedback:
+            audio_translations:
+              en:
+                file_size_bytes: 38524
+                filename: feedback-en-vvixng5ajds.mp3
+                needs_update: false
+            html: <p>I like dogs too.</p>
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: dog
+          rule_type: Contains
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: Are you a cat or dog person?
+        rows:
+          value: 1
+      default_outcome:
+        dest: Third
+        feedback:
+          audio_translations:
+            en:
+              file_size_bytes: 55733
+              filename: feedback-en-s0w3v9gslr9.mp3
+              needs_update: false
+          html: <p>I'm not sure what that animal is.</p>
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          audio_translations:
+            en:
+              file_size_bytes: 47188
+              filename: hint-en-jca2lxjibh.mp3
+              needs_update: false
+          html: <p>There's no wrong answer.</p>
+      id: TextInput
+      solution:
+        answer_is_exclusive: false
+        correct_answer: cat
+        explanation:
+          audio_translations:
+            en:
+              file_size_bytes: 79822
+              filename: solution-en-t0xc2qtuf0j.mp3
+              needs_update: false
+          html: <p>I'm a cat person.</p>
+    param_changes: []
+states_schema_version: 16
+tags: []
+title: Audio Test

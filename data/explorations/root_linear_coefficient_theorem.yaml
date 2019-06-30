@@ -6,15 +6,13 @@ language_code: en
 objective: discover the Root Linear Coefficient Theorem
 param_changes: []
 param_specs: {}
-schema_version: 10
-skin_customizations:
-  panels_contents:
-    bottom: []
+schema_version: 17
 states:
   Coefficient Signs:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<span>Here's that expression again:</span><div><oppia-noninteractive-math\
+      audio_translations: {}
+      html: "<span>Here's that expression again:</span><div><oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
         ></oppia-noninteractive-math><span><br></span><br>If\_<oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
@@ -24,7 +22,8 @@ states:
         \ \_What's the sign of the linear term?</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Quotient of terms
           feedback:
           - Good.  As a side note, what do you think the sign is of the x^i term given
@@ -34,7 +33,8 @@ states:
         - inputs:
             x: 0
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Coefficient signs WA1
           feedback:
           - Hmm... that's a bit weird isn't it?  The expression had only negative
@@ -44,7 +44,8 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Coefficient signs WA1
           feedback:
           - That looks correct, but let's try a sample case just to make sure.
@@ -53,7 +54,8 @@ states:
         - inputs:
             x: 2
           rule_type: Equals
-      - outcome:
+      - correct: false
+        outcome:
           dest: Coefficient signs WA2
           feedback:
           - That looks a little fishy... let's try a sample case just to be sure...
@@ -75,13 +77,15 @@ states:
         feedback:
         - Oops, if you have reached this case, something has gone wrong...
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Coefficient signs WA1:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<div>If we tried a simple case, like:<br><br></div><div><oppia-noninteractive-math\
+      audio_translations: {}
+      html: "<div>If we tried a simple case, like:<br><br></div><div><oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(x - 3)(x - 4)(x - 1)&amp;quot;\"></oppia-noninteractive-math></div><div><br></div><div>where\_\
         <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;a_1 = 3&amp;quot;\"\
         ></oppia-noninteractive-math>,\_<oppia-noninteractive-math raw_latex-with-value=\"\
@@ -91,7 +95,8 @@ states:
         \ is the constant term?</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Coefficient Signs
           feedback:
           - Right!  But wait-- that's not positive.  Let's try the previous question
@@ -108,13 +113,15 @@ states:
         feedback:
         - Try again.  We want the constant term.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   Coefficient signs WA2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "You said \"-,+,-,+\" meaning if you expand:<div><oppia-noninteractive-math\
+      audio_translations: {}
+      html: "You said \"-,+,-,+\" meaning if you expand:<div><oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(x - a_1) (x - a_2) (x - a_3) ... (x -\
         \ a_n)&amp;quot;\"></oppia-noninteractive-math>,<br>and\_<oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
@@ -124,7 +131,8 @@ states:
         \ is the coefficient of the constant term?</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Coefficient Signs
           feedback:
           - Right.  And that's not negative.  Let's try the previous question again...
@@ -140,13 +148,15 @@ states:
         feedback:
         - Nope!  Try again.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: NumericInput
+      solution: null
     param_changes: []
   END:
+    classifier_model_id: null
     content:
-    - type: text
-      value: Congratulations, you have finished!
+      audio_translations: {}
+      html: Congratulations, you have finished!
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -154,17 +164,20 @@ states:
         recommendedExplorationIds:
           value: []
       default_outcome: null
-      fallbacks: []
+      hints: []
       id: EndExploration
+      solution: null
     param_changes: []
   More General Expansion:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "What about\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x-a)(x-b)(x-c)&amp;quot;\"\
+      audio_translations: {}
+      html: "What about\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x-a)(x-b)(x-c)&amp;quot;\"\
         ></oppia-noninteractive-math>?"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Particular coefficients (part 1)
           feedback:
           - Great!
@@ -190,20 +203,23 @@ states:
         feedback:
         - Nope!  Try again.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Particular coefficients (part 1):
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Did you notice something about the previous answer? \_What happens if\
+      audio_translations: {}
+      html: "Did you notice something about the previous answer? \_What happens if\
         \ we consider an even more general expression:<br><oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
         ></oppia-noninteractive-math><br><br>What is the absolute value of the constant\
         \ term (the term with no x's)?"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Particular coefficients (part 2)
           feedback:
           - That's correct!
@@ -227,20 +243,23 @@ states:
         feedback:
         - Nope!  Try again.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Particular coefficients (part 2):
+    classifier_model_id: null
     content:
-    - type: text
-      value: "<span>Again, consider the expression:</span><br><oppia-noninteractive-math\
+      audio_translations: {}
+      html: "<span>Again, consider the expression:</span><br><oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3)...(x - a_n)&amp;quot;\"\
         ></oppia-noninteractive-math><br><br><span>What is the absolute value of the\
         \ linear term (the\_</span><oppia-noninteractive-math raw_latex-with-value=\"\
         &amp;quot;x^1&amp;quot;\"></oppia-noninteractive-math>\_<span>term)?</span><br>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Coefficient Signs
           feedback:
           - Yep!  Admit it, you just chose the longest answer...
@@ -267,23 +286,26 @@ states:
           <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;(x - a_1) (x\
           \ - a_2) (x - a_3)&amp;quot;\"></oppia-noninteractive-math>"
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Quotient of terms:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Here's the general expression again:<div><oppia-noninteractive-math\
-        \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3) ... (x - a_n)&amp;quot;\"\
-        ></oppia-noninteractive-math><br><br>When\_<oppia-noninteractive-math raw_latex-with-value=\"\
-        &amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_is even, the constant\
-        \ and linear terms have opposite signs...</div><div><br>when\_<oppia-noninteractive-math\
-        \ raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
-        is odd, the constant and linear terms also have opposite signs...<br><br>What,\
-        \ then, is the sign of the quotient:<br>[linear coefficient] / [constant term]<br>?</div>"
+      audio_translations: {}
+      html: "Here's the general expression again:<div><oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;(x - a_1)(x - a_2)(x - a_3) ... (x - a_n)&amp;quot;\"></oppia-noninteractive-math><br><br>When\_\
+        <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;n&amp;quot;\"\
+        ></oppia-noninteractive-math>\_is even, the constant and linear terms have\
+        \ opposite signs...</div><div><br>when\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_is odd, the constant\
+        \ and linear terms also have opposite signs...<br><br>What, then, is the sign\
+        \ of the quotient:<br>[linear coefficient] / [constant term]<br>?</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Quotient part 2
           feedback:
           - Yep.  For example, 5 / (-3) is negative, and -3 / 5 is negative, but 3
@@ -304,13 +326,15 @@ states:
         feedback:
         - Try again!
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Quotient part 2:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Now for the fun part. \_Do you remember how the linear coefficient was:<div><oppia-noninteractive-math\
+      audio_translations: {}
+      html: "Now for the fun part. \_Do you remember how the linear coefficient was:<div><oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(-1)^{n+1}(a_1 a_2 ... a_{n-1} + a_1 a_2\
         \ ... a_{n-2} a_n + ... + a_2 a_3 ... a_n)&amp;quot;\"></oppia-noninteractive-math><br><br>and\
         \ the constant term was:</div><div><oppia-noninteractive-math raw_latex-with-value=\"\
@@ -319,7 +343,8 @@ states:
         \ divide the linear coefficient by the constant term?</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: Theorem
           feedback:
           - Yep... that leads us to the statement of the theorem...
@@ -344,13 +369,15 @@ states:
         feedback:
         - Oops, that's not right.  Careful; signs can be tricky!
         param_changes: []
-      fallbacks: []
+      hints: []
       id: MultipleChoiceInput
+      solution: null
     param_changes: []
   Simple Expansion:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "What about something a little harder? \_Can you tell me what the terms\
+      audio_translations: {}
+      html: "What about something a little harder? \_Can you tell me what the terms\
         \ are in the expansion of this:<div><oppia-noninteractive-math raw_latex-with-value=\"\
         &amp;quot;(x-3)(x+2)(x-5)&amp;quot;\"></oppia-noninteractive-math><br><br>If\
         \ a, b, c, and d are the coefficients of\_<oppia-noninteractive-math raw_latex-with-value=\"\
@@ -362,7 +389,8 @@ states:
         \ your answer as the string: a,b,c,d (without spaces).</div>"
     interaction:
       answer_groups:
-      - outcome:
+      - correct: false
+        outcome:
           dest: More General Expansion
           feedback:
           - Good!  Now let's look at a slightly more general expansion.
@@ -382,13 +410,15 @@ states:
         feedback:
         - Sorry, try again.  Remember to format it exactly as shown.
         param_changes: []
-      fallbacks: []
+      hints: []
       id: TextInput
+      solution: null
     param_changes: []
   Start:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "Do you remember FOIL? \_It goes something like this:\_<oppia-noninteractive-math\
+      audio_translations: {}
+      html: "Do you remember FOIL? \_It goes something like this:\_<oppia-noninteractive-math\
         \ raw_latex-with-value=\"&amp;quot;(a + b)(c + d) = ac + ad + bc + bd&amp;quot;\"\
         ></oppia-noninteractive-math>.<br>"
     interaction:
@@ -401,13 +431,15 @@ states:
         dest: Simple Expansion
         feedback: []
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
   Theorem:
+    classifier_model_id: null
     content:
-    - type: text
-      value: "The Root Linear Coefficient Theorem is...<br><br>Given the polynomial\_\
+      audio_translations: {}
+      html: "The Root Linear Coefficient Theorem is...<br><br>Given the polynomial\_\
         <oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;x^n + c_{n-1}\
         \ x^{n-1} + ... + c_2 x^2 + c_1 x^1 + c_0&amp;quot;\"></oppia-noninteractive-math><br>with\
         \ roots\_<oppia-noninteractive-math raw_latex-with-value=\"&amp;quot;a_1&amp;quot;\"\
@@ -432,9 +464,10 @@ states:
         - Congrats!  We may use this theorem later on to prove something even more
           interesting...
         param_changes: []
-      fallbacks: []
+      hints: []
       id: Continue
+      solution: null
     param_changes: []
-states_schema_version: 7
+states_schema_version: 13
 tags: []
 title: Root Linear Coefficient Theorem

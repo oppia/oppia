@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python configuration for EndExploration interaction."""
+
 from extensions.interactions import base
 
 
@@ -35,6 +37,9 @@ class EndExploration(base.BaseInteraction):
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    # Linear interactions are not supposed to have a solution.
+    can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'recommendedExplorationIds',

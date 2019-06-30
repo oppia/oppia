@@ -14,22 +14,51 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Unit tests for core.domain.user_services."""
+
 import datetime
 import logging
 import os
 
+from constants import constants
 from core.domain import collection_services
 from core.domain import event_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_jobs_continuous
-from core.domain import user_jobs_continuous_test
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
 import feconf
 import utils
 
 from google.appengine.api import urlfetch
+
+(user_models,) = models.Registry.import_models([models.NAMES.user])
+
+
+class MockUserStatsAggregator(
+        user_jobs_continuous.UserStatsAggregator):
+    """A modified UserStatsAggregator that does not start a new
+     batch job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return MockUserStatsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class MockUserStatsMRJobManager(
+        user_jobs_continuous.UserStatsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return MockUserStatsAggregator
+
 
 class UserServicesUnitTests(test_utils.GenericTestBase):
     """Test the user services methods."""
@@ -40,18 +69,47 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.set_username(user_id, username)
 
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
 
         user_services.set_username(user_id, username)
-        self.assertEquals(username, user_services.get_username(user_id))
+        self.assertEqual(username, user_services.get_username(user_id))
+
+    def test_get_username_for_system_user(self):
+        self.assertEqual(
+            feconf.SYSTEM_COMMITTER_ID,
+            user_services.get_username(feconf.SYSTEM_COMMITTER_ID))
+        self.assertEqual(
+            feconf.MIGRATION_BOT_USERNAME,
+            user_services.get_username(feconf.MIGRATION_BOT_USER_ID))
+
+    def test_get_usernames(self):
+        user_ids = ['test1', feconf.SYSTEM_COMMITTER_ID, 'test2']
+        usernames = ['name1', feconf.SYSTEM_COMMITTER_ID, 'name2']
+        user_emails = [
+            'test1@email.com', feconf.SYSTEM_EMAIL_ADDRESS, 'test2@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, usernames):
+            if uid != feconf.SYSTEM_COMMITTER_ID:
+                user_services.create_new_user(uid, email)
+                user_services.set_username(uid, name)
+        # Handle usernames that exists.
+        self.assertEqual(usernames, user_services.get_usernames(user_ids))
+
+        # Return empty list when no user id passed.
+        self.assertEqual([], user_services.get_usernames([]))
+
+        # Return None for usernames that don't exists.
+        self.assertEqual(
+            [None, 'name1'],
+            user_services.get_usernames(['fakeUser', 'test1']))
 
     def test_get_username_for_nonexistent_user(self):
         with self.assertRaisesRegexp(Exception, 'User not found.'):
             user_services.get_username('fakeUser')
 
     def test_get_username_none(self):
-        user_services.get_or_create_user('fakeUser', 'user@example.com')
-        self.assertEquals(None, user_services.get_username('fakeUser'))
+        user_services.create_new_user('fakeUser', 'user@example.com')
+        self.assertEqual(None, user_services.get_username('fakeUser'))
 
     def test_is_username_taken_false(self):
         self.assertFalse(user_services.is_username_taken('fakeUsername'))
@@ -59,20 +117,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
     def test_is_username_taken_true(self):
         user_id = 'someUser'
         username = 'newUsername'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken(username))
 
     def test_is_username_taken_different_case(self):
         user_id = 'someUser'
         username = 'camelCase'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         user_services.set_username(user_id, username)
         self.assertTrue(user_services.is_username_taken('CaMeLcAsE'))
 
     def test_set_invalid_usernames(self):
         user_id = 'someUser'
-        user_services.get_or_create_user(user_id, 'user@example.com')
+        user_services.create_new_user(user_id, 'user@example.com')
         bad_usernames = [
             ' bob ', '@', '', 'a' * 100, 'ADMIN', 'admin', 'AdMiN2020']
         for username in bad_usernames:
@@ -83,7 +141,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         bad_email_addresses = ['@', '@@', 'abc', '', None, ['a', '@', 'b.com']]
         for email in bad_email_addresses:
             with self.assertRaises(utils.ValidationError):
-                user_services.get_or_create_user('user_id', email)
+                user_services.create_new_user('user_id', email)
 
     def test_email_truncation(self):
         email_addresses = [
@@ -94,7 +152,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
             ('abcdefgh@efg.h', 'abcde..@efg.h'),
         ]
         for ind, (actual_email, expected_email) in enumerate(email_addresses):
-            user_settings = user_services.get_or_create_user(
+            user_settings = user_services.create_new_user(
                 str(ind), actual_email)
             self.assertEqual(user_settings.truncated_email, expected_email)
 
@@ -103,16 +161,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
-        self.assertEquals(user_services.get_username(user_id), username)
+        self.assertEqual(user_services.get_username(user_id), username)
 
         # Handle usernames that exist.
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_email_from_username(username), user_email)
 
         # Handle usernames in the same equivalence class correctly.
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_email_from_username('USERNAME'), user_email)
 
         # Return None for usernames which don't exist.
@@ -124,16 +182,16 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
-        self.assertEquals(user_services.get_username(user_id), username)
+        self.assertEqual(user_services.get_username(user_id), username)
 
         # Handle usernames that exist.
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_user_id_from_username(username), user_id)
 
         # Handle usernames in the same equivalence class correctly.
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_user_id_from_username('USERNAME'), user_id)
 
         # Return None for usernames which don't exist.
@@ -155,14 +213,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_fetch_gravatar_failure_404(self):
         user_email = 'user@example.com'
+
         error_messages = []
-        def log_mock(message):
+        def mock_log_function(message):
             error_messages.append(message)
 
         gravatar_url = user_services.get_gravatar_url(user_email)
         expected_error_message = (
             '[Status 404] Failed to fetch Gravatar from %s' % gravatar_url)
-        logging_error_mock = test_utils.CallCounter(log_mock)
+        logging_error_mock = test_utils.CallCounter(mock_log_function)
         urlfetch_counter = test_utils.CallCounter(urlfetch.fetch)
         urlfetch_mock_ctx = self.urlfetch_mock(status_code=404)
         log_swap_ctx = self.swap(logging, 'error', logging_error_mock)
@@ -177,14 +236,15 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
 
     def test_fetch_gravatar_failure_exception(self):
         user_email = 'user@example.com'
+
         error_messages = []
-        def log_mock(message):
+        def mock_log_function(message):
             error_messages.append(message)
 
         gravatar_url = user_services.get_gravatar_url(user_email)
         expected_error_message = (
             'Failed to fetch Gravatar from %s' % gravatar_url)
-        logging_error_mock = test_utils.CallCounter(log_mock)
+        logging_error_mock = test_utils.CallCounter(mock_log_function)
         urlfetch_fail_mock = test_utils.FailingFunction(
             urlfetch.fetch, urlfetch.InvalidURLError,
             test_utils.FailingFunction.INFINITY)
@@ -211,19 +271,19 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         username = 'username'
         user_email = 'user@example.com'
 
-        user_services.get_or_create_user(user_id, user_email)
+        user_services.create_new_user(user_id, user_email)
         user_services.set_username(user_id, username)
 
         # When UserEmailPreferencesModel is yet to be created,
         # the value returned by get_email_preferences() should be True.
         email_preferences = user_services.get_email_preferences(user_id)
-        self.assertEquals(
-            email_preferences['can_receive_editor_role_email'],
+        self.assertEqual(
+            email_preferences.can_receive_editor_role_email,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
 
         email_preferences = user_services.get_email_preferences(user_id)
-        self.assertEquals(
-            email_preferences['can_receive_feedback_message_email'],
+        self.assertEqual(
+            email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         # The user retrieves their email preferences. This initializes
@@ -231,26 +291,178 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         user_services.update_email_preferences(
             user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE,
-            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
+            feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE,
+            feconf.DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE)
 
         email_preferences = user_services.get_email_preferences(user_id)
-        self.assertEquals(
-            email_preferences['can_receive_editor_role_email'],
+        self.assertEqual(
+            email_preferences.can_receive_editor_role_email,
             feconf.DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE)
-        self.assertEquals(
-            email_preferences['can_receive_feedback_message_email'],
+        self.assertEqual(
+            email_preferences.can_receive_feedback_message_email,
             feconf.DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE)
 
         # The user sets their membership email preference to False.
         user_services.update_email_preferences(
-            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False,
+            user_id, feconf.DEFAULT_EMAIL_UPDATES_PREFERENCE, False, False,
             False)
 
         email_preferences = user_services.get_email_preferences(user_id)
-        self.assertEquals(
-            email_preferences['can_receive_editor_role_email'], False)
-        self.assertEquals(
-            email_preferences['can_receive_feedback_message_email'], False)
+
+        self.assertFalse(email_preferences.can_receive_editor_role_email)
+        self.assertFalse(email_preferences.can_receive_feedback_message_email)
+        self.assertFalse(email_preferences.can_receive_subscription_email)
+
+    def test_set_and_get_user_email_preferences_for_exploration(self):
+        user_id = 'someUser'
+        exploration_id = 'someExploration'
+        username = 'username'
+        user_email = 'user@example.com'
+
+        user_services.create_new_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        # When ExplorationUserDataModel is yet to be created, the value
+        # of mute_feedback_notifications and mute_suggestion_notifications
+        # should match the default values.
+        exploration_user_model = (
+            user_services.user_models.ExplorationUserDataModel.get(
+                user_id, exploration_id))
+        self.assertIsNone(exploration_user_model)
+        email_preferences = user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)
+        self.assertEqual(
+            email_preferences.mute_feedback_notifications,
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+        self.assertEqual(
+            email_preferences.mute_suggestion_notifications,
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+
+        # This initializes a ExplorationUserDataModel instance with
+        # the default mute values.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exploration_id,
+            mute_feedback_notifications=(
+                feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
+            mute_suggestion_notifications=(
+                feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE))
+
+        email_preferences = user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)
+        self.assertEqual(
+            email_preferences.mute_feedback_notifications,
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+        self.assertEqual(
+            email_preferences.mute_suggestion_notifications,
+            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+
+        # This sets only mute_suggestion_notifications property to True.
+        # mute_feedback_notifications should remain same as before.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exploration_id, mute_suggestion_notifications=True)
+
+        email_preferences = user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)
+        self.assertEqual(
+            email_preferences.mute_feedback_notifications,
+            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
+        self.assertTrue(email_preferences.mute_suggestion_notifications)
+
+        # This sets only mute_feedback_notifications property to True.
+        # mute_suggestion_notifications should remain same as before.
+        user_services.set_email_preferences_for_exploration(
+            user_id, exploration_id, mute_feedback_notifications=True)
+
+        email_preferences = user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id)
+        self.assertTrue(email_preferences.mute_feedback_notifications)
+        self.assertTrue(email_preferences.mute_suggestion_notifications)
+
+    def test_get_usernames_by_role(self):
+        user_ids = ['test1', 'test2', 'test3', 'test4']
+        usernames = ['name1', 'name2', 'name3', 'name4']
+        user_emails = [
+            'test1@email.com', 'test2@email.com',
+            'test3@email.com', 'test4@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, usernames):
+            user_services.create_new_user(uid, email)
+            user_services.set_username(uid, name)
+
+        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
+        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            set(user_services.get_usernames_by_role(feconf.ROLE_ID_MODERATOR)),
+            set(['name1', 'name2']))
+
+        self.assertEqual(
+            set(user_services.get_usernames_by_role(
+                feconf.ROLE_ID_BANNED_USER)),
+            set(['name3', 'name4']))
+
+    def test_get_user_ids_by_role(self):
+        user_ids = ['test1', 'test2', 'test3', 'test4']
+        usernames = ['name1', 'name2', 'name3', 'name4']
+        user_emails = [
+            'test1@email.com', 'test2@email.com',
+            'test3@email.com', 'test4@email.com']
+
+        for uid, email, name in zip(user_ids, user_emails, usernames):
+            user_services.create_new_user(uid, email)
+            user_services.set_username(uid, name)
+
+        user_services.update_user_role(user_ids[0], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[1], feconf.ROLE_ID_MODERATOR)
+        user_services.update_user_role(user_ids[2], feconf.ROLE_ID_BANNED_USER)
+        user_services.update_user_role(user_ids[3], feconf.ROLE_ID_BANNED_USER)
+
+        self.assertEqual(
+            set(user_services.get_user_ids_by_role(feconf.ROLE_ID_MODERATOR)),
+            set(['test1', 'test2']))
+
+        self.assertEqual(
+            set(user_services.get_user_ids_by_role(
+                feconf.ROLE_ID_BANNED_USER)),
+            set(['test3', 'test4']))
+
+    def test_update_user_creator_dashboard_display(self):
+        user_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_services.create_new_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        user_setting = user_services.get_user_settings(user_id)
+        self.assertEqual(
+            user_setting.creator_dashboard_display_pref,
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['CARD'])
+
+        user_services.update_user_creator_dashboard_display(
+            user_id, constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
+        user_setting = user_services.get_user_settings(user_id)
+        self.assertEqual(
+            user_setting.creator_dashboard_display_pref,
+            constants.ALLOWED_CREATOR_DASHBOARD_DISPLAY_PREFS['LIST'])
+
+    def test_update_user_role(self):
+        user_id = 'test_id'
+        username = 'testname'
+        user_email = 'test@email.com'
+
+        user_services.create_new_user(user_id, user_email)
+        user_services.set_username(user_id, username)
+
+        self.assertEqual(user_services.get_user_role_from_id(user_id),
+                         feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+        user_services.update_user_role(
+            user_id, feconf.ROLE_ID_COLLECTION_EDITOR)
+        self.assertEqual(user_services.get_user_role_from_id(user_id),
+                         feconf.ROLE_ID_COLLECTION_EDITOR)
 
     def test_get_current_date_as_string(self):
         custom_datetimes = [
@@ -300,6 +512,20 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(ValueError):
             user_services.parse_date_from_string(test_datetime_strings[3])
 
+    def test_record_user_started_state_translation_tutorial(self):
+        # Testing of the user translation tutorial firsttime state storage.
+        user_id = 'someUser'
+        username = 'username'
+        user_services.create_new_user(user_id, 'user@example.com')
+        user_services.set_username(user_id, username)
+        user_services.record_user_started_state_translation_tutorial(user_id)
+        user_settings = user_services.get_user_settings(user_id)
+        self.assertIsInstance(
+            user_settings.last_started_state_translation_tutorial,
+            datetime.datetime)
+        self.assertTrue(
+            user_settings.last_started_state_translation_tutorial is not None)
+
 
 class UpdateContributionMsecTests(test_utils.GenericTestBase):
     """Test whether contribution date changes with publication of
@@ -325,12 +551,15 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
     def test_contribution_msec_updates_on_published_explorations(self):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         init_state_name = exploration.init_state_name
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         # Test all owners and editors of exploration after publication have
         # updated first contribution times in msecs.
@@ -339,15 +568,15 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
 
         # Test editor of published exploration has updated contribution time.
         rights_manager.release_ownership_of_exploration(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         exp_services.update_exploration(
-            self.editor_id, self.EXP_ID, [{
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
-            }], 'commit')
+            })], 'commit')
 
         self.assertIsNotNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
@@ -365,32 +594,32 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that commit to unpublished exploration does not update
         # contribution time.
         exp_services.update_exploration(
-            self.admin_id, self.EXP_ID, [{
+            self.admin_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
-            }], '')
+            })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
 
         # Test that another user who commits to unpublished exploration does not
         # have updated first contribution time.
         rights_manager.assign_role_for_exploration(
-            self.admin_id, self.EXP_ID, self.editor_id, 'editor')
+            self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.update_exploration(
-            self.editor_id, self.EXP_ID, [{
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'rename_state',
                 'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
                 'new_state_name': u'¡Hola! αβγ',
-            }], '')
+            })], '')
         self.assertIsNone(user_services.get_user_settings(
             self.editor_id).first_contribution_msec)
 
         # Test that after an exploration is published, all contributors have
         # updated first contribution time.
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
         self.assertIsNotNone(user_services.get_user_settings(
@@ -400,9 +629,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.EXP_ID, self.admin_id, end_state_name='End')
         rights_manager.assign_role_for_exploration(
-            self.admin_id, self.EXP_ID, self.editor_id, 'editor')
+            self.admin, self.EXP_ID, self.editor_id, 'editor')
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         # Test that contribution time is not given to an editor that has not
         # contributed.
@@ -416,8 +645,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             self.EXP_ID, self.owner_id, end_state_name='End')
 
         exp_services.publish_exploration_and_update_user_profiles(
-            self.owner_id, self.EXP_ID)
-        rights_manager.unpublish_exploration(self.admin_id, self.EXP_ID)
+            self.owner, self.EXP_ID)
+        rights_manager.unpublish_exploration(self.admin, self.EXP_ID)
 
         # Test that contribution time is not eliminated if exploration is
         # unpublished.
@@ -432,9 +661,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             exploration_id=self.EXP_ID)
 
         collection_services.publish_collection_and_update_user_profiles(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
         exp_services.publish_exploration_and_update_user_profiles(
-            self.admin_id, self.EXP_ID)
+            self.admin, self.EXP_ID)
 
         # Test all owners and editors of collection after publication have
         # updated first contribution times.
@@ -444,7 +673,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test editor of published collection has updated
         # first contribution time.
         rights_manager.release_ownership_of_collection(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
 
         collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
@@ -483,7 +712,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that another user who commits to unpublished collection does not
         # have updated first contribution time.
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COL_ID, self.editor_id, 'editor')
+            self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.update_collection(
             self.editor_id, self.COL_ID, [{
                 'cmd': 'edit_collection_property',
@@ -496,7 +725,7 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
         # Test that after an collection is published, all contributors have
         # updated first contribution times.
         collection_services.publish_collection_and_update_user_profiles(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
         self.assertIsNotNone(user_services.get_user_settings(
             self.admin_id).first_contribution_msec)
         self.assertIsNotNone(user_services.get_user_settings(
@@ -510,9 +739,9 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
         rights_manager.assign_role_for_collection(
-            self.admin_id, self.COL_ID, self.editor_id, 'editor')
+            self.admin, self.COL_ID, self.editor_id, 'editor')
         collection_services.publish_collection_and_update_user_profiles(
-            self.admin_id, self.COL_ID)
+            self.admin, self.COL_ID)
 
         # Test that contribution time is not given to an editor that has not
         # contributed.
@@ -528,8 +757,8 @@ class UpdateContributionMsecTests(test_utils.GenericTestBase):
             objective=self.COLLECTION_OBJECTIVE,
             exploration_id=self.EXP_ID)
         collection_services.publish_collection_and_update_user_profiles(
-            self.owner_id, self.COL_ID)
-        rights_manager.unpublish_collection(self.admin_id, self.COL_ID)
+            self.owner, self.COL_ID)
+        rights_manager.unpublish_collection(self.admin, self.COL_ID)
 
         # Test that first contribution msec is not eliminated if collection is
         # unpublished.
@@ -555,7 +784,7 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
 
-    def _mock_get_current_date_as_string(self):
+    def mock_get_current_date_as_string(self):
         return self.CURRENT_DATE_AS_STRING
 
     def test_get_user_dashboard_stats(self):
@@ -565,7 +794,14 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        self.assertEquals(
+        event_services.StatsEventsHandler.record(
+            self.EXP_ID, 1, {
+                'num_starts': 1,
+                'num_actual_starts': 0,
+                'num_completions': 0,
+                'state_stats_mapping': {}
+            })
+        self.assertEqual(
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.owner_id),
             {
@@ -573,10 +809,9 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
                 'num_ratings': 0,
                 'average_ratings': None
             })
-        (user_jobs_continuous_test.ModifiedUserStatsAggregator
-         .start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
-        self.assertEquals(
+        self.assertEqual(
             user_jobs_continuous.UserStatsAggregator.get_dashboard_stats(
                 self.owner_id),
             {
@@ -592,17 +827,17 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
-        with self.swap(user_services,
-                       'get_current_date_as_string',
-                       self._mock_get_current_date_as_string):
+        with self.swap(
+            user_services, 'get_current_date_as_string',
+            self.mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
 
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
                     'total_plays': 0,
@@ -618,26 +853,33 @@ class UserDashboardStatsTests(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             self.EXP_ID, 1, init_state_name, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
-        self.assertEquals(
+        event_services.StatsEventsHandler.record(
+            self.EXP_ID, 1, {
+                'num_starts': 1,
+                'num_actual_starts': 0,
+                'num_completions': 0,
+                'state_stats_mapping': {}
+            })
+
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
-        (user_jobs_continuous_test.ModifiedUserStatsAggregator
-         .start_computation())
+        MockUserStatsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
 
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), None)
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_last_week_dashboard_stats(self.owner_id), None)
 
-        with self.swap(user_services,
-                       'get_current_date_as_string',
-                       self._mock_get_current_date_as_string):
+        with self.swap(
+            user_services, 'get_current_date_as_string',
+            self.mock_get_current_date_as_string):
             user_services.update_dashboard_stats_log(self.owner_id)
 
-        self.assertEquals(
+        self.assertEqual(
             user_services.get_weekly_dashboard_stats(self.owner_id), [{
                 self.CURRENT_DATE_AS_STRING: {
                     'total_plays': 1,
@@ -656,7 +898,7 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
         self.username = 'username'
         self.user_email = 'user@example.com'
 
-        user_services.get_or_create_user(self.user_id, self.user_email)
+        user_services.create_new_user(self.user_id, self.user_email)
         user_services.set_username(self.user_id, self.username)
 
     def test_invalid_subject_interests_are_not_accepted(self):
@@ -698,11 +940,14 @@ class SubjectInterestsUnitTests(test_utils.GenericTestBase):
             self.user_id, ['singleword', 'has spaces'])
 
 
-class LastLoginIntegrationTest(test_utils.GenericTestBase):
+class LastLoginIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for testing that the last login time for a user updates
+    correctly.
+    """
 
     def setUp(self):
-        """Create exploration with two versions"""
-        super(LastLoginIntegrationTest, self).setUp()
+        """Create exploration with two versions."""
+        super(LastLoginIntegrationTests, self).setUp()
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
@@ -720,7 +965,7 @@ class LastLoginIntegrationTest(test_utils.GenericTestBase):
         # After logging in and requesting a URL, the last_logged_in property is
         # set.
         self.login(self.VIEWER_EMAIL)
-        self.testapp.get(feconf.LIBRARY_INDEX_URL)
+        self.get_html_response(feconf.LIBRARY_INDEX_URL)
         self.assertIsNotNone(
             user_services.get_user_settings(self.viewer_id).last_logged_in)
         self.logout()
@@ -738,34 +983,40 @@ class LastLoginIntegrationTest(test_utils.GenericTestBase):
         # Without explicitly defining the type of the patched datetimes, NDB
         # validation checks for datetime.datetime instances fail.
         class PatchedDatetimeType(type):
+            """Validates the datetime instances."""
             def __instancecheck__(cls, other):
+                """Validates whether the given instance is a datatime
+                instance.
+                """
                 return isinstance(other, original_datetime_type)
 
-        class PatchedDatetime11Hours(datetime.datetime):
+        class MockDatetime11Hours(datetime.datetime):
             __metaclass__ = PatchedDatetimeType
 
             @classmethod
             def utcnow(cls):
+                """Returns the current date and time 11 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=11)
 
-        class PatchedDatetime13Hours(datetime.datetime):
+        class MockDatetime13Hours(datetime.datetime):
             __metaclass__ = PatchedDatetimeType
 
             @classmethod
             def utcnow(cls):
+                """Returns the current date and time 13 hours ahead of UTC."""
                 return current_datetime + datetime.timedelta(hours=13)
 
-        with self.swap(datetime, 'datetime', PatchedDatetime11Hours):
+        with self.swap(datetime, 'datetime', MockDatetime11Hours):
             self.login(self.VIEWER_EMAIL)
-            self.testapp.get(feconf.LIBRARY_INDEX_URL)
+            self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertEqual(
                 user_services.get_user_settings(self.viewer_id).last_logged_in,
                 previous_last_logged_in_datetime)
             self.logout()
 
-        with self.swap(datetime, 'datetime', PatchedDatetime13Hours):
+        with self.swap(datetime, 'datetime', MockDatetime13Hours):
             self.login(self.VIEWER_EMAIL)
-            self.testapp.get(feconf.LIBRARY_INDEX_URL)
+            self.get_html_response(feconf.LIBRARY_INDEX_URL)
             self.assertGreater(
                 user_services.get_user_settings(self.viewer_id).last_logged_in,
                 previous_last_logged_in_datetime)
@@ -773,6 +1024,9 @@ class LastLoginIntegrationTest(test_utils.GenericTestBase):
 
 
 class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for testing the time the user last edited an
+    exploration updates correctly.
+    """
     EXP_ID = 'exp'
 
     def setUp(self):
@@ -798,21 +1052,23 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNone(editor_settings.last_edited_an_exploration)
 
-        exp_services.update_exploration(self.editor_id, self.EXP_ID, [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }], 'Test edit')
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
 
         editor_settings = user_services.get_user_settings(self.editor_id)
         self.assertIsNotNone(editor_settings.last_edited_an_exploration)
 
     def test_last_exp_edit_time_gets_updated(self):
-        exp_services.update_exploration(self.editor_id, self.EXP_ID, [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }], 'Test edit')
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
 
         # Decrease last exploration edited time by 13 hours.
         user_settings = user_services.get_user_settings(self.editor_id)
@@ -827,11 +1083,12 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNotNone(previous_last_edited_an_exploration)
 
         # The editor edits the exploration 13 hours after it was created.
-        exp_services.update_exploration(self.editor_id, self.EXP_ID, [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'new objective'
-        }], 'Test edit 2')
+        exp_services.update_exploration(
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'new objective'
+            })], 'Test edit 2')
 
         # Make sure last exploration edited time gets updated.
         editor_settings = user_services.get_user_settings(self.editor_id)
@@ -841,6 +1098,9 @@ class LastExplorationEditedIntegrationTests(test_utils.GenericTestBase):
 
 
 class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests for the time the user last created an exploration
+    updates correctly.
+    """
     EXP_ID_A = 'exp_a'
     EXP_ID_B = 'exp_b'
 
@@ -893,3 +1153,181 @@ class LastExplorationCreatedIntegrationTests(test_utils.GenericTestBase):
         self.assertGreater(
             (owner_settings.last_created_an_exploration),
             previous_last_created_an_exploration)
+
+
+class UserSettingsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserSettingsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+
+        self.user_settings = user_services.get_user_settings(self.owner_id)
+        self.user_settings.validate()
+        self.assertEqual(self.owner.role, feconf.ROLE_ID_EXPLORATION_EDITOR)
+
+    def test_validate_non_str_user_id(self):
+        self.user_settings.user_id = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected user_id to be a string'):
+            self.user_settings.validate()
+
+    def test_validate_empty_user_id(self):
+        self.user_settings.user_id = ''
+        with self.assertRaisesRegexp(Exception, 'No user id specified.'):
+            self.user_settings.validate()
+
+    def test_validate_non_str_role(self):
+        self.user_settings.role = 0
+        with self.assertRaisesRegexp(Exception, 'Expected role to be a string'):
+            self.user_settings.validate()
+
+    def test_validate_role(self):
+        self.user_settings.role = 'invalid_role'
+        with self.assertRaisesRegexp(
+            Exception, 'Role invalid_role does not exist.'):
+            self.user_settings.validate()
+
+    def test_validate_non_str_creator_dashboard_display_pref(self):
+        self.user_settings.creator_dashboard_display_pref = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected dashboard display preference to be a string'):
+            self.user_settings.validate()
+
+    def test_validate_creator_dashboard_display_pref(self):
+        self.user_settings.creator_dashboard_display_pref = (
+            'invalid_creator_dashboard_display_pref')
+        with self.assertRaisesRegexp(
+            Exception, 'invalid_creator_dashboard_display_pref is not a valid '
+            'value for the dashboard display preferences.'):
+            self.user_settings.validate()
+
+    def test_guest_has_not_fully_registered(self):
+        self.assertFalse(user_services.has_fully_registered(None))
+
+    def test_cannot_create_new_user_with_existing_user_id(self):
+        with self.assertRaisesRegexp(
+            Exception, 'User %s already exists.' % self.owner_id):
+            user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+
+    def test_cannot_set_existing_username(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, the username \"%s\" is already taken! Please pick '
+            'a different one.' % self.OWNER_USERNAME):
+            user_services.set_username(self.owner_id, self.OWNER_USERNAME)
+
+    def test_cannot_update_user_role_with_invalid_role(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Role invalid_role does not exist.'):
+            user_services.update_user_role(self.owner_id, 'invalid_role')
+
+    def test_cannot_get_human_readable_user_ids_with_invalid_user_ids(self):
+        observed_log_messages = []
+
+        def _mock_logging_function(msg, *args):
+            """Mocks logging.error()."""
+            observed_log_messages.append(msg % args)
+
+        logging_swap = self.swap(logging, 'error', _mock_logging_function)
+        assert_raises_user_not_found = self.assertRaisesRegexp(
+            Exception, 'User not found.')
+
+        with logging_swap, assert_raises_user_not_found:
+            user_services.get_human_readable_user_ids(['invalid_user_id'])
+
+        self.assertEqual(
+            observed_log_messages,
+            [
+                'User id invalid_user_id not known in list of user_ids '
+                '[\'invalid_user_id\']'
+            ])
+
+    def test_get_human_readable_user_ids(self):
+        # Create an unregistered user who has no username.
+        user_models.UserSettingsModel(
+            id='unregistered_user_id', email='user@example.com',
+            username='').put()
+
+        user_ids = user_services.get_human_readable_user_ids(
+            [self.owner_id, feconf.SYSTEM_COMMITTER_ID, 'unregistered_user_id'])
+        expected_user_ids = [
+            'owner', 'admin',
+            '[Awaiting user registration: u..@example.com]']
+
+        self.assertEqual(user_ids, expected_user_ids)
+
+
+class UserContributionsTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserContributionsTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_contributions = user_services.get_user_contributions(
+            self.owner_id)
+        self.user_contributions.validate()
+
+    def test_validate_non_str_user_id(self):
+        self.user_contributions.user_id = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected user_id to be a string'):
+            self.user_contributions.validate()
+
+    def test_validate_user_id(self):
+        self.user_contributions.user_id = ''
+        with self.assertRaisesRegexp(Exception, 'No user id specified.'):
+            self.user_contributions.validate()
+
+    def test_validate_non_list_created_exploration_ids(self):
+        self.user_contributions.created_exploration_ids = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected created_exploration_ids to be a list'):
+            self.user_contributions.validate()
+
+    def test_validate_created_exploration_ids(self):
+        self.user_contributions.created_exploration_ids = [0]
+        with self.assertRaisesRegexp(
+            Exception, 'Expected exploration_id in created_exploration_ids '
+            'to be a string'):
+            self.user_contributions.validate()
+
+    def test_validate_non_list_edited_exploration_ids(self):
+        self.user_contributions.edited_exploration_ids = 0
+        with self.assertRaisesRegexp(
+            Exception, 'Expected edited_exploration_ids to be a list'):
+            self.user_contributions.validate()
+
+    def test_validate_edited_exploration_ids(self):
+        self.user_contributions.edited_exploration_ids = [0]
+        with self.assertRaisesRegexp(
+            Exception, 'Expected exploration_id in edited_exploration_ids '
+            'to be a string'):
+            self.user_contributions.validate()
+
+    def test_cannot_create_user_contributions_with_existing_user_id(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'User contributions model for user %s already exists.'
+            % self.owner_id):
+            user_services.create_user_contributions(self.owner_id, [], [])
+
+    def test_cannot_update_user_contributions_with_invalid_user_id(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'User contributions model for user invalid_user_id does not exist'):
+            user_services.update_user_contributions('invalid_user_id', [], [])
+
+    def test_cannot_update_dashboard_stats_log_with_invalid_schema_version(
+            self):
+        model = user_models.UserStatsModel.get_or_create(self.owner_id)
+        model.schema_version = 0
+        model.put()
+
+        self.assertIsNone(user_services.get_user_impact_score(self.owner_id))
+        with self.assertRaisesRegexp(
+            Exception,
+            'Sorry, we can only process v1-v%d dashboard stats schemas at '
+            'present.' % feconf.CURRENT_DASHBOARD_STATS_SCHEMA_VERSION):
+            user_services.update_dashboard_stats_log(self.owner_id)

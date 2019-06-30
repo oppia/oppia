@@ -1,0 +1,23 @@
+<span ng-model="localValue" ui-validate="'validate($value)'">
+  <span ng-form="floatForm">
+    <span ng-if="!expressionMode">
+      <input type="number" step="any" ng-model="$parent.localValue" class="form-control protractor-test-float-form-input"
+             name="floatValue" ng-attr-placeholder="<['I18N_FORMS_TYPE_NUMBER' | translate]>" ng-disabled="isDisabled()"
+             require-is-float apply-validation="validators()"
+             focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
+             ng-blur="onBlur()" ng-focus="onFocus()" style="display: inline;">
+
+      <span ng-if="hasLoaded && !isUserCurrentlyTyping && hasFocusedAtLeastOnce"
+            style="font-size: 0.85em; position: absolute;"
+            tabindex="-1" focus-on="<[labelForErrorFocusTarget]>">
+        <span ng-if="floatForm.floatValue.$error.isFloat && floatForm.floatValue.$viewValue" class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_INVALID_DECIMAL"></span>
+        <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
+              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_LEAST" translate-values="{minValue: <[minValue]>}">
+        </span>
+        <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost"
+              class="oppia-form-error" aria-live="assertive" translate="I18N_FORMS_TYPE_NUMBER_AT_MOST" translate-values="{maxValue: <[maxValue]>}">
+        </span>
+      </span>
+    </span>
+  </span>
+</span>

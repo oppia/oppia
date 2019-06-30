@@ -19,9 +19,11 @@ from core.controllers import cron
 from core.platform import models
 import feconf
 import main
-# pylint: enable=relative-import
 
 import webapp2
+
+# pylint: enable=relative-import
+
 
 transaction_services = models.Registry.import_transaction_services()
 
@@ -36,9 +38,15 @@ URLS = [
         cron.CronExplorationRecommendationsHandler),
     main.get_redirect_route(
         r'/cron/explorations/search_rank',
-        cron.CronExplorationSearchRankHandler),
+        cron.CronActivitySearchRankHandler),
     main.get_redirect_route(
         r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler),
+    main.get_redirect_route(
+        r'/cron/suggestions/accept_stale_suggestions',
+        cron.CronAcceptStaleSuggestionsHandler),
+    main.get_redirect_route(
+        '/cron/suggestions/notify_reviewers',
+        cron.CronMailReviewersInRotationHandler)
 ]
 
 app = transaction_services.toplevel_wrapper(  # pylint: disable=invalid-name

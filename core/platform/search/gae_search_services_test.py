@@ -14,19 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the appengine search api wrapper. """
+"""Tests for the appengine search api wrapper."""
 
 import datetime
+import logging
 import time
-
-from google.appengine.api import search
 
 from core.platform.search import gae_search_services
 from core.tests import test_utils
 
+from google.appengine.api import search
+
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
-    """Test inserting documents into search indexes"""
+    """Test inserting documents into search indexes."""
 
     def test_insert_document_with_id(self):
         date = datetime.date(year=2015, month=3, day=14)
@@ -123,9 +124,10 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def _get_put_error(self, num_res, transient=None):
         """returns a PutError. with num_res results.
-           If transient is given, it should be an index in the
-           results array. The result at that index will have a transient
-           error code."""
+        If transient is given, it should be an index in the
+        results array. The result at that index will have a transient
+        error code.
+        """
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
@@ -136,7 +138,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_use_default_num_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = self._get_put_error(1, 0)
+        exception = self._get_put_error(1, transient=0)
         failing_put = test_utils.FailingFunction(
             search.Index.put,
             exception,
@@ -164,7 +166,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_use_custom_number_of_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = self._get_put_error(1, 0)
+        exception = self._get_put_error(1, transient=0)
         failing_put = test_utils.FailingFunction(
             search.Index.put,
             exception,
@@ -179,13 +181,14 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with put_ctx, add_docs_ctx, assert_raises_ctx:
-            gae_search_services.add_documents_to_index([doc], 'my_index', 42)
+            gae_search_services.add_documents_to_index(
+                [doc], 'my_index', retries=42)
 
         self.assertEqual(add_docs_counter.times_called, 42)
 
     def test_arguments_are_preserved_in_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = self._get_put_error(1, 0)
+        exception = self._get_put_error(1, transient=0)
         failing_put = test_utils.FailingFunction(
             search.Index.put,
             exception,
@@ -202,7 +205,8 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
             add_docs_counter)
 
         with put_ctx, add_docs_ctx:
-            gae_search_services.add_documents_to_index([doc], 'my_index', 4)
+            gae_search_services.add_documents_to_index(
+                [doc], 'my_index', retries=4)
 
         self.assertEqual(add_docs_counter.times_called, 4)
         result = search.Index('my_index').get('doc')
@@ -212,7 +216,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         docs = [{'id': 'doc1', 'prop': 'val1'},
                 {'id': 'doc2', 'prop': 'val2'},
                 {'id': 'doc3', 'prop': 'val3'}]
-        error = self._get_put_error(3, 1)
+        error = self._get_put_error(3, transient=1)
         failing_put = test_utils.FailingFunction(
             search.Index.put,
             error,
@@ -227,7 +231,8 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
             add_docs_counter)
 
         with put_ctx, add_docs_ctx:
-            gae_search_services.add_documents_to_index(docs, 'my_index', 5)
+            gae_search_services.add_documents_to_index(
+                docs, 'my_index', retries=5)
 
         self.assertEqual(add_docs_counter.times_called, 5)
         for i in xrange(1, 4):
@@ -254,10 +259,15 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         with add_docs_ctx, put_ctx, assert_raises_ctx as e:
             gae_search_services.add_documents_to_index(docs, 'my_index')
 
-        # assert that the method only gets called once, since the error is not
+        # Assert that the method only gets called once, since the error is not
         # transient.
         self.assertEqual(add_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
+
+    def test_raise_error_when_document_type_is_invalid(self):
+        doc = {'abc': set('xyz')}
+        with self.assertRaises(ValueError):
+            gae_search_services.add_documents_to_index([doc], 'my_index')
 
 
 class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
@@ -295,9 +305,10 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
     def _get_delete_error(self, num_res, transient=None):
         """returns a DeleteError. with num_res results.
-           If transient is given, it should be an index in the
-           results array. The result at that index will have a transient
-           error code."""
+        If transient is given, it should be an index in the
+        results array. The result at that index will have a transient
+        error code.
+        """
         non_trans_code = search.OperationResult.INVALID_REQUEST
         trans_code = search.OperationResult.TRANSIENT_ERROR
         results = [
@@ -307,7 +318,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         return search.DeleteError('lol', results=results)
 
     def test_use_default_num_retries(self):
-        exception = self._get_delete_error(1, 0)
+        exception = self._get_delete_error(1, transient=0)
         failing_delete = test_utils.FailingFunction(
             search.Index.delete,
             exception,
@@ -335,7 +346,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             gae_search_services.DEFAULT_NUM_RETRIES)
 
     def test_use_custom_number_of_retries(self):
-        exception = self._get_delete_error(1, 0)
+        exception = self._get_delete_error(1, transient=0)
         failing_delete = test_utils.FailingFunction(
             search.Index.delete, exception, 42)
 
@@ -351,7 +362,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             gae_search_services.SearchFailureError)
         with delete_ctx, delete_docs_ctx, assert_raises_ctx:
             gae_search_services.delete_documents_from_index(
-                ['id'], 'index', 42)
+                ['id'], 'index', retries=42)
 
         self.assertEqual(delete_docs_counter.times_called, 42)
 
@@ -360,7 +371,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         index.put([search.Document(doc_id='doc', fields=[
             search.TextField(name='prop', value='val')
         ])])
-        exception = self._get_delete_error(1, 0)
+        exception = self._get_delete_error(1, transient=0)
         failing_delete = test_utils.FailingFunction(
             search.Index.delete, exception, 3)
 
@@ -374,7 +385,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             delete_docs_counter)
         with index_ctx, delete_docs_ctx:
             gae_search_services.delete_documents_from_index(
-                ['doc'], 'index', 4)
+                ['doc'], 'index', retries=4)
 
         self.assertEqual(delete_docs_counter.times_called, 4)
         result = search.Index('my_index').get('doc')
@@ -427,8 +438,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
                 ['a', 'b', 'c'],
                 'my_index')
 
-        # assert that the method only gets called once, since the error is not
-        # transient
+        # Assert that the method only gets called once, since the error is not
+        # transient.
         self.assertEqual(delete_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
 
@@ -455,6 +466,36 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertIn({
             'id': 'doc3', 'k': 'abc jkl ghi', 'rank': 3, 'language_code': 'en'
         }, result)
+
+    def test_search_when_query_string_is_invalid(self):
+        # The search result would be ([], None) if query strings contain "NOT"
+        # or a string with backslashes.
+        observed_log_messages = []
+
+        def mock_logging_function(msg, *_):
+            observed_log_messages.append(msg)
+
+        with self.swap(logging, 'exception', mock_logging_function):
+            doc = {'id': 'doc1', 'NOT': 'abc', 'rank': 3, 'language_code': 'en'}
+            gae_search_services.add_documents_to_index([doc], 'index')
+            result = gae_search_services.search('NOT:abc', 'my_index')
+            self.assertEqual(result, ([], None))
+            result = gae_search_services.search(r'\k:abc', 'my_index')
+            self.assertEqual(result, ([], None))
+
+            self.assertEqual(len(observed_log_messages), 2)
+            self.assertEqual(
+                observed_log_messages[0],
+                (
+                    'Could not parse query string NOT:abc'
+                )
+            )
+            self.assertEqual(
+                observed_log_messages[1],
+                (
+                    r'Could not parse query string \k:abc'
+                )
+            )
 
     def test_respect_search_query(self):
         doc1 = search.Document(doc_id='doc1', rank=1, language='en', fields=[
@@ -579,6 +620,21 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(result[1].get('id'), 'doc1')
         self.assertEqual(result[2].get('id'), 'doc2')
 
+    def test_raise_error_when_sort_starts_with_invalid_character(self):
+        doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
+        gae_search_services.add_documents_to_index([doc], 'index')
+        # Fields in the sort expression need to start with '+' or '-'
+        # to indicate sort direction. If no such indicator is there, it will
+        # raise ValueError.
+        sort_expression = 'invalid_sort_symbol'
+        with self.assertRaisesRegexp(
+            ValueError,
+            r'Fields in the sort expression must start with "\+"'
+            ' or "-" to indicate sort direction. The field %s has no such '
+            'indicator in expression "%s".'
+            % (sort_expression, sort_expression)):
+            gae_search_services.search('k:abc', 'index', sort=sort_expression)
+
     def test_search_using_multiple_sort_expressions(self):
         doc1 = {'id': 'doc1', 'k1': 2, 'k2': 'abc ghi'}
         doc2 = {'id': 'doc2', 'k1': 1, 'k2': 'abc def'}
@@ -684,18 +740,29 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(search_counter.times_called, 4)
         self.assertEqual(result, ['doc2', 'doc1'])
 
-        # also check that the cursor is preserved
+        # Also check that the cursor is preserved.
         self.assertEqual(search_counter2.times_called, 4)
         self.assertEqual(result2, ['doc0'])
 
 
 class SearchGetFromIndexTests(test_utils.GenericTestBase):
     def test_get_document_from_index(self):
-        document = search.Document(doc_id="my_doc", fields=[
-            search.TextField(name="my_field", value="value")
+        document = search.Document(doc_id='my_doc', fields=[
+            search.TextField(name='my_field', value='value')
         ])
         search.Index('my_index').put(document)
         result = gae_search_services.get_document_from_index(
             'my_doc', 'my_index')
         self.assertEqual(result.get('id'), 'my_doc')
         self.assertEqual(result.get('my_field'), 'value')
+
+
+class ClearIndexTests(test_utils.GenericTestBase):
+    def test_clear_index(self):
+        doc = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
+        gae_search_services.add_documents_to_index([doc], 'index')
+        result = gae_search_services.search('k:abc', index='index')[0]
+        self.assertEqual(result, [doc])
+        gae_search_services.clear_index('index')
+        result = gae_search_services.search('k:abc', index='index')[0]
+        self.assertEqual(result, [])

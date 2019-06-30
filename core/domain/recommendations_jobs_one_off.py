@@ -23,6 +23,7 @@ from core.domain import exp_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
 from core.platform import models
+
 (exp_models, recommendations_models,) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.recommendations])
 
@@ -32,7 +33,7 @@ MAX_RECOMMENDATIONS = 10
 SIMILARITY_SCORE_THRESHOLD = 3.0
 
 
-class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceJobManager):
+class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job that computes a list of recommended explorations to play
     after completing an exploration.
     """
@@ -42,7 +43,7 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        # Only process the exploration if it is not private
+        # Only process the exploration if it is not private.
         if item.status == rights_manager.ACTIVITY_STATUS_PRIVATE:
             return
 
@@ -71,10 +72,11 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceJobManager):
                         compared_exp_summary.owner_ids,
                         compared_exp_summary.status))
                 if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
-                    yield (exp_summary_id, {
-                        'similarity_score': similarity_score,
-                        'exp_id': compared_exp_id
-                    })
+                    yield (
+                        exp_summary_id, {
+                            'similarity_score': similarity_score,
+                            'exp_id': compared_exp_id
+                        })
 
     @staticmethod
     def reduce(key, stringified_values):

@@ -22,6 +22,8 @@
 #   bash scripts/run_e2e_tests.sh
 #
 # Optional arguments:
+#   --browserstack Run the tests on browserstack using the
+#         protractor-browserstack.conf.js file.
 #   --skip-install=true/false If true, skips installing dependencies. The
 #         default value is false.
 #   --sharding=true/false Disables/Enables parallelization of protractor tests.
@@ -30,23 +32,23 @@
 #   --prod_env Run the tests in prod mode. Static resources are served from
 #         build directory and use cache slugs.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
-# --sharding-instances) if running any tests in isolation (iit or ddescribe).
-#   --suite=suite_name Performs test for different suites.
-#   For performing a full test, no argument is required.
-#   For performing tests on editors, use --suite=editor
-#   For performing tests on extensions, use --suite=extensions
-#   For performing tests on library, use --suite=library
-#   For performing miscellaneous tests, use --suite=misc
+# --sharding-instances) if running any tests in isolation (fit or fdescribe).
+#   --suite=suite_name Performs test for different suites, here suites are the
+#         name of the test files present in core/tests/protractor_desktop/ and
+#         core/test/protractor/ dirs. e.g. for the file
+#         core/tests/protractor/accessibility.js use --suite=accessibility.
+#         For performing a full test, no argument is required.
 #
 # The root folder MUST be named 'oppia'.
+#
+# Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
+# single test or test suite.
 
 function cleanup {
-  # Send a kill signal to the dev server.
+  # Send a kill signal to the dev server and Selenium server. The awk command
+  # gets just the process ID from the grepped line.
   kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=9001" | awk '{print $2}'`
-
-  # The [Pp] is to avoid the grep finding the 'grep protractor/node_modules/webdriver-manager/selenium' process
-  # as well. The awk command gets just the process ID from the grepped line.
-  kill `ps aux | grep [Pp]rotractor/node_modules/webdriver-manager/selenium | awk '{print $2}'`
+  kill `ps aux | grep node_modules/webdriver-manager/selenium | awk '{print $2}'`
 
   # Wait for the servers to go down; suppress "connection refused" error output
   # from nc since that is exactly what we are expecting to happen.
@@ -77,6 +79,9 @@ fi
 set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
+if [ "$TRAVIS" == 'true' ]; then
+  source $(dirname $0)/install_chrome_on_travis.sh || exit 1
+fi
 
 export DEFAULT_SKIP_INSTALLING_THIRD_PARTY_LIBS=false
 export DEFAULT_RUN_MINIFIED_TESTS=false
@@ -97,22 +102,42 @@ fi
 # the top of the file is run.
 trap cleanup EXIT
 
-
-# Argument passed to gulpfile.js to help build with minification.
-MINIFICATION=false
+# Argument passed to feconf.py to help choose production templates folder.
+FORCE_PROD_MODE=False
+RUN_ON_BROWSERSTACK=False
 for arg in "$@"; do
   # Used to emulate running Oppia in a production environment.
   if [ "$arg" == "--prod_env" ]; then
-    MINIFICATION=true
+    FORCE_PROD_MODE=True
     echo "  Generating files for production mode..."
-    $PYTHON_CMD scripts/build.py
+  fi
+
+  # Used to run the e2e tests on browserstack.
+  if [ "$arg" == "--browserstack" ]; then
+    RUN_ON_BROWSERSTACK=True
+    echo "  Running the tests on browserstack..."
   fi
 done
 
-yaml_env_variable="MINIFICATION: $MINIFICATION"
-sed -i.bak -e s/"MINIFICATION: .*"/"$yaml_env_variable"/ app.yaml
-# Delete the modified yaml file(-i.bak)
-rm app.yaml.bak
+if [[ "$FORCE_PROD_MODE" == "True" ]]; then
+  constants_env_variable="\"DEV_MODE\": false"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  $PYTHON_CMD scripts/build.py --prod_env
+else
+  constants_env_variable="\"DEV_MODE\": true"
+  sed -i.bak -e s/"\"DEV_MODE\": .*"/"$constants_env_variable"/ assets/constants.js
+  $PYTHON_CMD scripts/build.py
+fi
+
+# Delete the modified feconf.py file(-i.bak)
+rm assets/constants.js.bak
+
+# Start a selenium server using chromedriver 2.41.
+# The 'detach' option continues the flow once the server is up and runnning.
+# The 'quiet' option prints only the necessary information about the server start-up
+# process.
+$NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.41
+$NODE_MODULE_DIR/.bin/webdriver-manager start --versions.chrome 2.41 --detach --quiet
 
 # Start a selenium process. The program sends thousands of lines of useless
 # info logs to stderr so we discard them.
@@ -165,6 +190,10 @@ for j in "$@"; do
     shift
     ;;
 
+    --browserstack*)
+    shift
+    ;;
+
     *)
     echo "Error: Unknown command line option: $j"
     ;;
@@ -176,8 +205,16 @@ done
 # Isolated tests do not work properly unless no sharding parameters are passed
 # in at all.
 # TODO(bhenning): Figure out if this is a bug with protractor.
-if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
+if [ "$RUN_ON_BROWSERSTACK" == "False" ]; then
+  if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
+  else
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  fi
 else
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-browserstack.conf.js --suite "$SUITE"
+  else
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-browserstack.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  fi
 fi

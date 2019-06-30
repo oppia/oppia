@@ -20,53 +20,126 @@ import copy
 import datetime
 import os
 
+from constants import constants  # pylint: disable=relative-import
+
+# The datastore model ID for the list of featured activity references. This
+# value should not be changed.
+ACTIVITY_REFERENCE_LIST_FEATURED = 'featured'
+ALL_ACTIVITY_REFERENCE_LIST_TYPES = [ACTIVITY_REFERENCE_LIST_FEATURED]
+
+# The values which a post_commit_status can have: public, private.
+POST_COMMIT_STATUS_PUBLIC = 'public'
+POST_COMMIT_STATUS_PRIVATE = 'private'
 
 # Whether to unconditionally log info messages.
 DEBUG = False
 
-# The platform for the storage backend. This is used in the model-switching
-# code in core/platform.
-PLATFORM = 'gae'
+# When DEV_MODE is true check that we are running in development environment.
+# The SERVER_SOFTWARE environment variable does not exist in Travis, hence the
+# need for an explicit check.
+if (constants.DEV_MODE and os.getenv('SERVER_SOFTWARE') and
+        not os.getenv('SERVER_SOFTWARE', default='').startswith('Development')):
+    raise Exception('DEV_MODE can\'t be true on production.')
 
-# This should be string comparison, since all environment variables
-# are converted to string
-IS_MINIFIED = os.environ.get('MINIFICATION') == 'True'
-
-# Whether we should serve the development or production experience.
-# DEV_MODE should only be changed to False in the production environment.
-# To use minified resources in the development environment,
-# change the MINIFICATION env variable in app.yaml to True.
-# When DEV_MODE is True, this indicates that we are not running in
-# the production App Engine environment, which affects things like
-# login/logout URLs,as well as third-party libraries
-# that App Engine normally provides.
-if PLATFORM == 'gae':
-    DEV_MODE = (
-        not os.environ.get('SERVER_SOFTWARE')
-        or os.environ['SERVER_SOFTWARE'].startswith('Development'))
-else:
-    raise Exception('Invalid platform: expected one of [\'gae\']')
-
+CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
-INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
-GADGETS_DIR = os.path.join('extensions', 'gadgets')
-RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
+CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
+
+# backend_prod_files contain processed JS and HTML files that are served by
+# Jinja, we are moving away from Jinja so this folder might not be needed later
+# (#6964)
+EXTENSIONS_DIR_PREFIX = (
+    'backend_prod_files' if not constants.DEV_MODE else '')
+ACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
+ISSUES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
+INTERACTIONS_DIR = (
+    os.path.join('extensions', 'interactions'))
+RTE_EXTENSIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'rich_text_components'))
+RTE_EXTENSIONS_DEFINITIONS_PATH = (
+    os.path.join('assets', 'rich_text_components_definitions.js'))
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 
-# Choose production template if minification flag is used or
-# if in production mode
-TEMPLATES_DIR_PREFIX = 'prod' if (IS_MINIFIED or not DEV_MODE) else 'dev'
-FRONTEND_TEMPLATES_DIR = os.path.join(
-    'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
-DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
+# Choose production templates folder when we are in production mode.
+if not constants.DEV_MODE:
+    FRONTEND_TEMPLATES_DIR = (
+        os.path.join('backend_prod_files', 'templates', 'head'))
+else:
+    FRONTEND_TEMPLATES_DIR = os.path.join('core', 'templates', 'dev', 'head')
+DEPENDENCIES_TEMPLATES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'dependencies'))
+
+VALUE_GENERATORS_DIR_FOR_JS = os.path.join(
+    'local_compiled_js', 'extensions', 'value_generators')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
+
+VISUALIZATIONS_DIR = os.path.join(
+    'extensions', 'visualizations')
+VISUALIZATIONS_DIR_FOR_JS = os.path.join(
+    'local_compiled_js', 'extensions', 'visualizations')
+
 OBJECT_DEFAULT_VALUES_FILE_PATH = os.path.join(
-    'extensions', 'interactions', 'object_defaults.json')
+    'extensions', 'objects', 'object_defaults.json')
 RULES_DESCRIPTIONS_FILE_PATH = os.path.join(
-    os.getcwd(), 'extensions', 'interactions', 'rules.json')
+    os.getcwd(), 'extensions', 'interactions', 'rule_templates.json')
+
+# A mapping of interaction ids to classifier properties.
+INTERACTION_CLASSIFIER_MAPPING = {
+    'TextInput': {
+        'algorithm_id': 'TextClassifier',
+        'current_data_schema_version': 1
+    },
+    'CodeRepl': {
+        'algorithm_id': 'CodeClassifier',
+        'current_data_schema_version': 1
+    }
+}
+# Classifier job time to live (in mins).
+CLASSIFIER_JOB_TTL_MINS = 5
+TRAINING_JOB_STATUS_COMPLETE = 'COMPLETE'
+TRAINING_JOB_STATUS_FAILED = 'FAILED'
+TRAINING_JOB_STATUS_NEW = 'NEW'
+TRAINING_JOB_STATUS_PENDING = 'PENDING'
+
+ALLOWED_TRAINING_JOB_STATUSES = [
+    TRAINING_JOB_STATUS_COMPLETE,
+    TRAINING_JOB_STATUS_FAILED,
+    TRAINING_JOB_STATUS_NEW,
+    TRAINING_JOB_STATUS_PENDING
+]
+
+# The maximum number of characters allowed for userbio length.
+MAX_BIO_LENGTH_IN_CHARS = 2000
+
+ALLOWED_TRAINING_JOB_STATUS_CHANGES = {
+    TRAINING_JOB_STATUS_COMPLETE: [],
+    TRAINING_JOB_STATUS_NEW: [TRAINING_JOB_STATUS_PENDING],
+    TRAINING_JOB_STATUS_PENDING: [TRAINING_JOB_STATUS_COMPLETE,
+                                  TRAINING_JOB_STATUS_FAILED],
+    TRAINING_JOB_STATUS_FAILED: [TRAINING_JOB_STATUS_NEW]
+}
+
+ENTITY_TYPE_EXPLORATION = 'exploration'
+ENTITY_TYPE_TOPIC = 'topic'
+ENTITY_TYPE_QUESTION = 'question'
+
+# The maximum number of activities allowed in the playlist of the learner. This
+# limit applies to both the explorations playlist and the collections playlist.
+MAX_LEARNER_PLAYLIST_ACTIVITY_COUNT = 10
+
+# The minimum number of training samples required for training a classifier.
+MIN_TOTAL_TRAINING_EXAMPLES = 50
+
+# The minimum number of assigned labels required for training a classifier.
+MIN_ASSIGNED_LABELS = 2
+
+# Default label for classification algorithms.
+DEFAULT_CLASSIFIER_LABEL = '_default'
 
 # The maximum number of results to retrieve in a datastore query.
 DEFAULT_QUERY_LIMIT = 1000
@@ -96,13 +169,36 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 7
+CURRENT_STATE_SCHEMA_VERSION = 29
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 2
+CURRENT_COLLECTION_SCHEMA_VERSION = 6
+
+# The current version of story contents dict in the story schema.
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+
+# The current version of skill contents dict in the skill schema.
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
+
+# The current version of misconceptions dict in the skill schema.
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
+
+# The current version of subtopics dict in the topic schema.
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
+
+# The current version of page_contents dict in the subtopic page schema.
+CURRENT_SUBTOPIC_PAGE_CONTENTS_SCHEMA_VERSION = 1
+
+# This value should be updated in the event of any
+# StateAnswersModel.submitted_answer_list schema change.
+CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
+
+# This value should be updated if the schema of LearnerAnswerInfo
+# dict schema changes.
+CURRENT_LEARNER_ANSWER_INFO_SCHEMA_VERSION = 1
 
 # The default number of exploration tiles to load at a time in the search
 # results page.
@@ -116,6 +212,10 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
+# The maximum number of top unresolved answers which should be aggregated
+# from all of the submitted answers.
+TOP_UNRESOLVED_ANSWERS_LIMIT = 20
+
 # Default title for a newly-minted exploration.
 DEFAULT_EXPLORATION_TITLE = ''
 # Default category for a newly-minted exploration.
@@ -123,10 +223,38 @@ DEFAULT_EXPLORATION_CATEGORY = ''
 # Default objective for a newly-minted exploration.
 DEFAULT_EXPLORATION_OBJECTIVE = ''
 
+# NOTE TO DEVELOPERS: If any of the 5 constants below are modified, the
+# corresponding field in NEW_STATE_TEMPLATE in constants.js also has to be
+# modified.
+
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
+# Default content id for the state's content.
+DEFAULT_NEW_STATE_CONTENT_ID = 'content'
+# Default content id for the interaction's default outcome.
+DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
+# Default content id for the explanation in the concept card of a skill.
+DEFAULT_EXPLANATION_CONTENT_ID = 'explanation'
+# Default recorded_voiceovers dict for a default state template.
+DEFAULT_RECORDED_VOICEOVERS = {
+    'voiceovers_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
+}
+# Default written_translations dict for a default state template.
+DEFAULT_WRITTEN_TRANSLATIONS = {
+    'translations_mapping': {
+        'content': {},
+        'default_outcome': {}
+    }
+}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
+
+# Whether new explorations should have automatic text-to-speech enabled
+# by default.
+DEFAULT_AUTO_TTS_ENABLED = True
 
 # Default title for a newly-minted collection.
 DEFAULT_COLLECTION_TITLE = ''
@@ -135,29 +263,51 @@ DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
 
-# A dict containing the accepted image formats (as determined by the imghdr
+# Default description for a newly-minted story.
+DEFAULT_STORY_DESCRIPTION = ''
+# Default notes for a newly-minted story.
+DEFAULT_STORY_NOTES = ''
+
+# Default explanation for a newly-minted skill.
+DEFAULT_SKILL_EXPLANATION = ''
+# Default name for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NAME = ''
+# Default notes for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NOTES = ''
+# Default feedback for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_FEEDBACK = ''
+# Default content_id for explanation subtitled html.
+DEFAULT_SKILL_EXPLANATION_CONTENT_ID = 'explanation'
+
+# Default description for a newly-minted topic.
+DEFAULT_TOPIC_DESCRIPTION = ''
+# Default content id for the subtopic page's content.
+DEFAULT_SUBTOPIC_PAGE_CONTENT_ID = 'content'
+
+# Default ID of VM which is used for training classifier.
+DEFAULT_VM_ID = 'vm_default'
+# Shared secret key for default VM.
+DEFAULT_VM_SHARED_SECRET = '1a2b3c4e'
+
+# An array containing the accepted image formats (as determined by the imghdr
 # module) and the corresponding allowed extensions in the filenames of uploaded
-# files.
+# images.
 ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'jpeg': ['jpg', 'jpeg'],
     'png': ['png'],
-    'gif': ['gif']
+    'gif': ['gif'],
 }
 
-# A string containing the disallowed characters in state or exploration names.
-# The underscore is needed because spaces in names must be converted to
-# underscores when displayed as part of a URL or key. The other conventions
-# here are derived from the Wikipedia guidelines for naming articles.
-INVALID_NAME_CHARS = u':#/|_%<>[]{}\ufffd\\' + chr(127)
-for ind in range(32):
-    INVALID_NAME_CHARS += chr(ind)
+# An array containing the accepted audio extensions for uploaded files and
+# the corresponding MIME types.
+ACCEPTED_AUDIO_EXTENSIONS = {
+    'mp3': ['audio/mp3']
+}
+
 # Prefix for data sent from the server to the client via JSON.
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
-# A regular expression for alphanumeric words separated by single spaces.
-# Ex.: 'valid name', 'another valid name', 'invalid   name'.
-ALPHANUMERIC_SPACE_REGEX = r'^[0-9A-Za-z]+(?:[ ]?[0-9A-Za-z]+)*$'
 # A regular expression for tags.
 TAG_REGEX = r'^[a-z ]+$'
 
@@ -171,8 +321,17 @@ INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
 # circularities with exp_services.
 # TODO (Jacob) Refactor exp_services to remove this problem.
 _EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+
+
 def get_empty_ratings():
+    """Returns a copy of the empty ratings object.
+
+    Returns:
+        dict. Copy of the '_EMPTY_RATINGS' dict object which contains the empty
+            ratings.
+    """
     return copy.deepcopy(_EMPTY_RATINGS)
+
 
 # Empty scaled average rating as a float.
 EMPTY_SCALED_AVERAGE_RATING = 0.0
@@ -189,9 +348,13 @@ MAILGUN_API_KEY = None
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
+
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
+# Domain name for email address.
+INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
+SYSTEM_EMAIL_NAME = '.'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
 # Ensure that SYSTEM_EMAIL_ADDRESS and ADMIN_EMAIL_ADDRESS are both valid and
@@ -205,12 +368,23 @@ CAN_SEND_EMAILS = False
 CAN_SEND_EDITOR_ROLE_EMAILS = False
 # If enabled then emails will be sent to creators for feedback messages.
 CAN_SEND_FEEDBACK_MESSAGE_EMAILS = False
+# If enabled subscription emails will be sent to that user.
+CAN_SEND_SUBSCRIPTION_EMAILS = False
 # Time to wait before sending feedback message emails (currently set to 1
 # hour).
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_COUNTDOWN_SECS = 3600
 # Whether to send an email when new feedback message is received for
 # an exploration.
 DEFAULT_FEEDBACK_MESSAGE_EMAIL_PREFERENCE = True
+# Whether to send an email to all the creator's subscribers when he/she
+# publishes an exploration.
+DEFAULT_SUBSCRIPTION_EMAIL_PREFERENCE = True
+# Whether exploration feedback emails are muted,
+# when the user has not specified a preference.
+DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE = False
+# Whether exploration suggestion emails are muted,
+# when the user has not specified a preference.
+DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE = False
 # Whether to send email updates to a user who has not specified a preference.
 DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 # Whether to send an invitation email when the user is granted
@@ -218,26 +392,59 @@ DEFAULT_EMAIL_UPDATES_PREFERENCE = False
 DEFAULT_EDITOR_ROLE_EMAIL_PREFERENCE = True
 # Whether to require an email to be sent, following a moderator action.
 REQUIRE_EMAIL_ON_MODERATOR_ACTION = False
-# Whether to allow custom event reporting to Google Analytics.
-CAN_SEND_ANALYTICS_EVENTS = False
 # Timespan in minutes before allowing duplicate emails.
 DUPLICATE_EMAIL_INTERVAL_MINS = 2
 # Number of digits after decimal to which the average ratings value in the
 # dashboard is rounded off to.
 AVERAGE_RATINGS_DASHBOARD_PRECISION = 2
+# Whether to enable maintenance mode on the site. For non-admins, this redirects
+# all HTTP requests to the maintenance page. This is the only check which
+# determines whether the site is in maintenance mode to avoid queries to the
+# database by non-admins.
+ENABLE_MAINTENANCE_MODE = False
+
+# The interactions permissible for a question.
+ALLOWED_QUESTION_INTERACTION_IDS = [
+    'TextInput', 'MultipleChoiceInput', 'NumericInput']
+
+# Flag to disable sending emails related to reviews for suggestions. To be
+# flipped after deciding (and implementing) whether a user should be scored
+# only for curated lessons.
+SEND_SUGGESTION_REVIEW_RELATED_EMAILS = False
+# To prevent recording scores for users until details like whether to score
+# users for only curated lessons is confirmed.
+ENABLE_RECORDING_OF_SCORES = False
+
+# No. of pretest questions to display.
+NUM_PRETEST_QUESTIONS = 3
+
+# Whether to automatically accept suggestions after a threshold time.
+ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
 EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION = 'feedback_message_notification'
+EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION = 'subscription_notification'
 EMAIL_INTENT_SUGGESTION_NOTIFICATION = 'suggestion_notification'
 EMAIL_INTENT_REPORT_BAD_CONTENT = 'report_bad_content'
 EMAIL_INTENT_MARKETING = 'marketing'
-EMAIL_INTENT_PUBLICIZE_EXPLORATION = 'publicize_exploration'
 EMAIL_INTENT_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 EMAIL_INTENT_DELETE_EXPLORATION = 'delete_exploration'
+EMAIL_INTENT_QUERY_STATUS_NOTIFICATION = 'query_status_notification'
+EMAIL_INTENT_ONBOARD_REVIEWER = 'onboard_reviewer'
+EMAIL_INTENT_REVIEW_SUGGESTIONS = 'review_suggestions'
+# Possible intents for email sent in bulk.
+BULK_EMAIL_INTENT_MARKETING = 'bulk_email_marketing'
+BULK_EMAIL_INTENT_IMPROVE_EXPLORATION = 'bulk_email_improve_exploration'
+BULK_EMAIL_INTENT_CREATE_EXPLORATION = 'bulk_email_create_exploration'
+BULK_EMAIL_INTENT_CREATOR_REENGAGEMENT = 'bulk_email_creator_reengagement'
+BULK_EMAIL_INTENT_LEARNER_REENGAGEMENT = 'bulk_email_learner_reengagement'
+BULK_EMAIL_INTENT_TEST = 'bulk_email_test'
 
-MODERATOR_ACTION_PUBLICIZE_EXPLORATION = 'publicize_exploration'
+MESSAGE_TYPE_FEEDBACK = 'feedback'
+MESSAGE_TYPE_SUGGESTION = 'suggestion'
+
 MODERATOR_ACTION_UNPUBLISH_EXPLORATION = 'unpublish_exploration'
 DEFAULT_SALUTATION_HTML_FN = (
     lambda recipient_username: 'Hi %s,' % recipient_username)
@@ -246,15 +453,6 @@ DEFAULT_SIGNOFF_HTML_FN = (
         'Thanks!<br>%s (Oppia moderator)' % sender_username))
 
 VALID_MODERATOR_ACTIONS = {
-    MODERATOR_ACTION_PUBLICIZE_EXPLORATION: {
-        'email_config': 'publicize_exploration_email_html_body',
-        'email_subject_fn': (
-            lambda exp_title: (
-                'Your Oppia exploration "%s" has been featured!' % exp_title)),
-        'email_intent': EMAIL_INTENT_PUBLICIZE_EXPLORATION,
-        'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
-        'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
-    },
     MODERATOR_ACTION_UNPUBLISH_EXPLORATION: {
         'email_config': 'unpublish_exploration_email_html_body',
         'email_subject_fn': (
@@ -265,18 +463,6 @@ VALID_MODERATOR_ACTIONS = {
         'email_salutation_html_fn': DEFAULT_SALUTATION_HTML_FN,
         'email_signoff_html_fn': DEFAULT_SIGNOFF_HTML_FN,
     },
-}
-
-# Panel properties and other constants for the default skin.
-GADGET_PANEL_AXIS_HORIZONTAL = 'horizontal'
-PANELS_PROPERTIES = {
-    'bottom': {
-        'width': 350,
-        'height': 100,
-        'stackable_axis': GADGET_PANEL_AXIS_HORIZONTAL,
-        'pixels_between_gadgets': 80,
-        'max_gadgets': 1
-    }
 }
 
 # When the site terms were last updated, in UTC.
@@ -290,12 +476,15 @@ DASHBOARD_STATS_DATETIME_STRING_FORMAT = '%Y-%m-%d'
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
-# The default language code for an exploration.
-DEFAULT_LANGUAGE_CODE = 'en'
+# The maximum playback length of an audio file, in seconds.
+MAX_AUDIO_FILE_LENGTH_SEC = 300
 
-# The id of the default skin.
-# TODO(sll): Deprecate this; it is no longer used.
-DEFAULT_SKIN_ID = 'conversation_v1'
+# The maximum number of questions to be fetched at one time.
+MAX_QUESTIONS_FETCHABLE_AT_ONE_TIME = 20
+
+# The minimum score required for a user to review suggestions of a particular
+# category.
+MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
@@ -305,6 +494,11 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 # exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
+
+# User id and username for suggestion bot. This bot will be used to accept
+# suggestions automatically after a threshold time.
+SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
+SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
@@ -328,53 +522,11 @@ ALLOWED_RTE_EXTENSIONS = {
     },
 }
 
-# These categories and interactions are displayed in the order in which they
-# appear in the interaction selector.
-ALLOWED_INTERACTION_CATEGORIES = [{
-    'name': 'General',
-    'interaction_ids': [
-        'Continue',
-        'EndExploration',
-        'ImageClickInput',
-        'ItemSelectionInput',
-        'MultipleChoiceInput',
-        'TextInput'
-    ],
-}, {
-    'name': 'Math',
-    'interaction_ids': [
-        'GraphInput',
-        'LogicProof',
-        'NumericInput',
-        'SetInput',
-        'MathExpressionInput',
-    ]
-}, {
-    'name': 'Programming',
-    'interaction_ids': [
-        'CodeRepl',
-        'PencilCodeEditor',
-    ],
-}, {
-    'name': 'Music',
-    'interaction_ids': [
-        'MusicNotesInput'
-    ],
-}, {
-    'name': 'Geography',
-    'interaction_ids': [
-        'InteractiveMap'
-    ],
-}]
-
-ALLOWED_GADGETS = {
-    'ScoreBar': {
-        'dir': os.path.join(GADGETS_DIR, 'ScoreBar')
-    },
-}
-
-# Gadgets subclasses must specify a valid panel option from this list.
-ALLOWED_GADGET_PANELS = ['bottom']
+# The list of interaction IDs which correspond to interactions that set their
+# is_linear property to true. Linear interactions do not support branching and
+# thus only allow for default answer classification. This value is guarded by a
+# test in extensions.interactions.base_test.
+LINEAR_INTERACTION_IDS = ['Continue']
 
 # Demo explorations to load through the admin panel. The id assigned to each
 # exploration is based on the key of the exploration in this dict, so ensure it
@@ -402,22 +554,32 @@ DEMO_EXPLORATIONS = {
     u'14': 'about_oppia.yaml',
     u'15': 'classifier_demo_exploration.yaml',
     u'16': 'all_interactions',
+    u'17': 'audio_test',
+    u'18': 'code_classifier_test.yaml',
+    u'19': 'example_exploration_in_collection1.yaml',
+    u'20': 'example_exploration_in_collection2.yaml',
+    u'21': 'example_exploration_in_collection3.yaml',
+    u'22': 'protractor_mobile_test_exploration.yaml',
+    u'23': 'rating_test.yaml',
+    u'24': 'learner_flow_test.yaml',
+    u'25': 'exploration_player_test.yaml',
 }
 
 DEMO_COLLECTIONS = {
-    u'0': 'welcome_to_collections.yaml'
+    u'0': 'welcome_to_collections.yaml',
+    u'1': 'learner_flow_test_collection.yaml'
 }
 
 # IDs of explorations which should not be displayable in either the learner or
 # editor views.
 DISABLED_EXPLORATION_IDS = ['5']
 
-# Google Group embed URL for the Forum page.
-EMBEDDED_GOOGLE_GROUP_URL = (
-    'https://groups.google.com/forum/embed/?place=forum/oppia')
+# Oppia Google Group URL.
+GOOGLE_GROUP_URL = (
+    'https://groups.google.com/forum/?place=forum/oppia#!forum/oppia')
 
-# Whether to allow YAML file uploads.
-ALLOW_YAML_FILE_UPLOAD = False
+# External URL for the Foundation site.
+FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
 # Prefix for all taskqueue-related URLs.
 TASKQUEUE_URL_PREFIX = '/task'
@@ -434,28 +596,50 @@ TASK_URL_SUGGESTION_EMAILS = (
 
 # TODO(sll): Add all other URLs here.
 ADMIN_URL = '/admin'
+ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
-EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
+COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
+COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
+COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
+COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
-DASHBOARD_URL = '/dashboard'
-DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % DASHBOARD_URL
-DASHBOARD_DATA_URL = '/dashboardhandler/data'
-DASHBOARD_EXPLORATION_STATS_PREFIX = '/dashboardhandler/explorationstats'
+CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
+CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
+CREATOR_DASHBOARD_URL = '/creator_dashboard'
+CUSTOM_NONPROFITS_LANDING_PAGE_URL = '/nonprofits'
+CUSTOM_PARENTS_LANDING_PAGE_URL = '/parents'
+CUSTOM_PARTNERS_LANDING_PAGE_URL = '/partners'
+CUSTOM_TEACHERS_LANDING_PAGE_URL = '/teachers'
+CUSTOM_VOLUNTEERS_LANDING_PAGE_URL = '/volunteers'
+DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
+EXPLORATION_FEATURES_PREFIX = '/explorehandler/features'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_METADATA_SEARCH_URL = '/exploration/metadata_search'
+EXPLORATION_PRETESTS_URL_PREFIX = '/pretest_handler'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
+EXPLORATION_STATE_ANSWER_STATS_PREFIX = '/createhandler/state_answer_stats'
+EXPLORATION_STATUS_PREFIX = '/createhandler/status'
 EXPLORATION_SUMMARIES_DATA_URL = '/explorationsummarieshandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_URL_EMBED_PREFIX = '/embed/exploration'
 FEEDBACK_STATS_URL_PREFIX = '/feedbackstatshandler'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
+FEEDBACK_THREADLIST_URL_PREFIX_FOR_TOPICS = '/threadlisthandlerfortopic'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
+FRACTIONS_LANDING_PAGE_URL = '/fractions'
+TOPIC_LANDING_PAGE_URL = '/learn/<subject>/<topic>'
+LEARNER_DASHBOARD_URL = '/learner_dashboard'
+LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
+LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
+LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL = '/learnerdashboardthreadhandler'
+LEARNER_PLAYLIST_DATA_URL = '/learnerplaylistactivityhandler'
+LEARNER_INCOMPLETE_ACTIVITY_DATA_URL = '/learnerincompleteactivityhandler'
 LIBRARY_GROUP_DATA_URL = '/librarygrouphandler'
 LIBRARY_INDEX_URL = '/library'
 LIBRARY_INDEX_DATA_URL = '/libraryindexhandler'
@@ -463,60 +647,97 @@ LIBRARY_RECENTLY_PUBLISHED_URL = '/library/recently_published'
 LIBRARY_SEARCH_URL = '/search/find'
 LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
+MERGE_SKILLS_URL = '/merge_skills_handler'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_QUESTION_URL = '/question_editor_handler/create_new'
+NEW_SKILL_URL = '/skill_editor_handler/create_new'
+TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
+TOPIC_EDITOR_QUESTION_URL = '/topic_editor_question_handler'
+NEW_TOPIC_URL = '/topic_editor_handler/create_new'
+NOTIFICATIONS_DASHBOARD_URL = '/notifications_dashboard'
+PREFERENCES_URL = '/preferences'
+PRACTICE_SESSION_URL_PREFIX = '/practice_session'
+PRACTICE_SESSION_DATA_URL_PREFIX = '/practice_session/data'
+PREFERENCES_DATA_URL = '/preferenceshandler/data'
+QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
+QUESTION_SKILL_LINK_URL_PREFIX = '/manage_question_skill_link'
+QUESTIONS_LIST_URL_PREFIX = '/questions_list_handler'
+QUESTIONS_URL_PREFIX = '/question_player_handler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+REVIEW_TEST_DATA_URL_PREFIX = '/review_test_handler/data'
+REVIEW_TEST_URL_PREFIX = '/review_test'
 ROBOTS_TXT_URL = '/robots.txt'
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SKILL_DATA_URL_PREFIX = '/skill_data_handler'
+SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
+SKILL_EDITOR_URL_PREFIX = '/skill_editor'
+SKILL_EDITOR_QUESTION_URL = '/skill_editor_question_handler'
+SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
+STORY_DATA_HANDLER = '/story_data_handler'
+STORY_EDITOR_URL_PREFIX = '/story_editor'
+STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
+STORY_NODE_COMPLETION_URL_PREFIX = '/story_node_completion_handler'
+STORY_VIEWER_URL_PREFIX = '/story'
+SUBTOPIC_DATA_HANDLER = '/subtopic_data_handler'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
+SUBSCRIBE_URL_PREFIX = '/subscribehandler'
+SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
+TOPIC_VIEWER_URL_PREFIX = '/topic'
+TOPIC_DATA_HANDLER = '/topic_data_handler'
+TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
+TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
+TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
+TOPIC_SEND_MAIL_URL_PREFIX = '/rightshandler/send_topic_publish_mail'
+TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
+TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
+TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
+UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
+USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-
-NAV_MODE_ABOUT = 'about'
-NAV_MODE_BLOG = 'blog'
-NAV_MODE_COLLECTION = 'collection'
-NAV_MODE_CONTACT = 'contact'
-NAV_MODE_CREATE = 'create'
-NAV_MODE_DASHBOARD = 'dashboard'
-NAV_MODE_DONATE = 'donate'
-NAV_MODE_EXPLORE = 'explore'
-NAV_MODE_LIBRARY = 'library'
-NAV_MODE_PROFILE = 'profile'
-NAV_MODE_SIGNUP = 'signup'
-NAV_MODE_SPLASH = 'splash'
-NAV_MODE_TEACH = 'teach'
-NAV_MODE_THANKS = 'thanks'
+VOICEOVER_DATA_PREFIX = '/createhandler/voiceover'
 
 # Event types.
+EVENT_TYPE_ALL_STATS = 'all_stats'
 EVENT_TYPE_STATE_HIT = 'state_hit'
+EVENT_TYPE_STATE_COMPLETED = 'state_complete'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
 EVENT_TYPE_NEW_THREAD_CREATED = 'feedback_thread_created'
 EVENT_TYPE_THREAD_STATUS_CHANGED = 'feedback_thread_status_changed'
 EVENT_TYPE_RATE_EXPLORATION = 'rate_exploration'
+EVENT_TYPE_SOLUTION_HIT = 'solution_hit'
+EVENT_TYPE_LEAVE_FOR_REFRESHER_EXP = 'leave_for_refresher_exp'
 # The values for these event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'
+EVENT_TYPE_ACTUAL_START_EXPLORATION = 'actual_start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
-ACTIVITY_STATUS_PRIVATE = 'private'
-ACTIVITY_STATUS_PUBLIC = 'public'
-ACTIVITY_STATUS_PUBLICIZED = 'publicized'
-
-# Play type constants
+# Play type constants.
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
 
 # Predefined commit messages.
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
+COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
+COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
+COMMIT_MESSAGE_STORY_DELETED = 'Story deleted.'
+COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
+COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
+
+# Max number of playthroughs for an issue.
+MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -525,10 +746,25 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with base.js
-ENABLE_STRING_CLASSIFIER = False
+# NOTE TO DEVELOPERS: This should be synchronized with App.js.
+ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
+
+# The regular expression used to identify whether a string contains float value.
+# The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
+# If this regex needs to be modified then first of all shutdown Oppia-ml VM.
+# Then update the regex constant in here and Oppia both.
+# Run any migration job that is required to migrate existing trained models
+# before starting Oppia-ml again.
+FLOAT_VERIFIER_REGEX = (
+    '^([-+]?\\d*\\.\\d+)$|^([-+]?(\\d*\\.?\\d+|\\d+\\.?\\d*)e[-+]?\\d*)$')
+
+# Current event models schema version. All event models with an
+# event_schema_version of 1 are the events collected before the rework of the
+# statistics framework which brought about the recording of new event models;
+# these models include all models recorded before Feb 2018.
+CURRENT_EVENT_MODELS_SCHEMA_VERSION = 2
 
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
@@ -541,7 +777,7 @@ UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
 # Possible values for user query status.
 # Valid status transitions are: processing --> completed --> archived
-# Or processing --> failed.
+# or processing --> failed.
 USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
@@ -550,93 +786,6 @@ USER_QUERY_STATUS_FAILED = 'failed'
 # The time difference between which to consider two login events "close". This
 # is taken to be 12 hours.
 PROXIMAL_TIMEDELTA_SECS = 12 * 60 * 60
-
-DEFAULT_COLOR = '#a33f40'
-DEFAULT_THUMBNAIL_ICON = 'Lightbulb'
-
-# List of supported default categories. For now, each category has a specific
-# color associated with it. Each category also has a thumbnail icon whose
-# filename is "{{CategoryName}}.svg".
-CATEGORIES_TO_COLORS = {
-    'Mathematics': '#cd672b',
-    'Algebra': '#cd672b',
-    'Arithmetic': '#d68453',
-    'Calculus': '#b86330',
-    'Logic': '#d68453',
-    'Combinatorics': '#cf5935',
-    'Graph Theory': '#cf5935',
-    'Probability': '#cf5935',
-    'Statistics': '#cd672b',
-    'Geometry': '#d46949',
-    'Trigonometry': '#d46949',
-
-    'Algorithms': '#d0982a',
-    'Computing': '#bb8b2f',
-    'Programming': '#d9aa53',
-
-    'Astronomy': '#879d6c',
-    'Biology': '#97a766',
-    'Chemistry': '#aab883',
-    'Engineering': '#8b9862',
-    'Environment': '#aba86d',
-    'Medicine': '#97a766',
-    'Physics': '#879d6c',
-
-    'Architecture': '#6e3466',
-    'Art': '#895a83',
-    'Music': '#6a3862',
-    'Philosophy': '#613968',
-    'Poetry': '#7f507f',
-
-    'English': '#193a69',
-    'Languages': '#1b4174',
-    'Latin': '#3d5a89',
-    'Reading': '#193a69',
-    'Spanish': '#405185',
-    'Gaulish': '#1b4174',
-
-    'Business': '#387163',
-    'Economics': '#5d8b7f',
-    'Geography': '#3c6d62',
-    'Government': '#538270',
-    'History': '#3d6b52',
-    'Law': '#538270',
-
-    'Education': '#942e20',
-    'Puzzles': '#a8554a',
-    'Sport': '#893327',
-    'Welcome': '#992a2b',
-}
-
-# Types of activities that can be created with Oppia.
-ACTIVITY_TYPE_EXPLORATION = 'exploration'
-ACTIVITY_TYPE_COLLECTION = 'collection'
-ALL_ACTIVITY_TYPES = [ACTIVITY_TYPE_EXPLORATION, ACTIVITY_TYPE_COLLECTION]
-
-# A sorted list of default categories for which icons and background colours
-# exist.
-ALL_CATEGORIES = sorted(CATEGORIES_TO_COLORS.keys())
-
-# These categories are shown in the library navbar.
-SEARCH_DROPDOWN_CATEGORIES = sorted([
-    'Mathematics',
-    'Statistics',
-    'Algorithms',
-    'Programming',
-    'Biology',
-    'Chemistry',
-    'Physics',
-    'Medicine',
-    'English',
-    'Architecture',
-    'Art',
-    'Music',
-    'Reading',
-    'Business',
-    'Economics',
-    'Geography',
-    'History',
-])
 
 # The i18n id for the header of the "Featured Activities" category in the
 # library index page.
@@ -655,151 +804,17 @@ LIBRARY_GROUP_RECENTLY_PUBLISHED = 'recently_published'
 # The group name that appears at the end of the url for the top rated page.
 LIBRARY_GROUP_TOP_RATED = 'top_rated'
 
-# NOTE TO DEVELOPERS: The LIBRARY_PAGE_MODE constants defined below should have
-# the same value as the ones defined in LIBRARY_PAGE_MODES in Library.js. For
-# example LIBRARY_PAGE_MODE_GROUP should have the same value as
-# LIBRARY_PAGE_MODES.GROUP.
-# Page mode for the group pages such as top rated and recently published
-# explorations.
-LIBRARY_PAGE_MODE_GROUP = 'group'
-# Page mode for the main library page.
-LIBRARY_PAGE_MODE_INDEX = 'index'
-# Page mode for the search results page.
-LIBRARY_PAGE_MODE_SEARCH = 'search'
-
-# List of supported language codes. Each description has a
-# parenthetical part that may be stripped out to give a shorter
-# description.
-ALL_LANGUAGE_CODES = [{
-    'code': 'en', 'description': u'English',
-}, {
-    'code': 'ar', 'description': u'العربية (Arabic)',
-}, {
-    'code': 'bg', 'description': u'български (Bulgarian)',
-}, {
-    'code': 'ca', 'description': u'català (Catalan)',
-}, {
-    'code': 'zh', 'description': u'中文 (Chinese)',
-}, {
-    'code': 'hr', 'description': u'hrvatski (Croatian)',
-}, {
-    'code': 'cs', 'description': u'čeština (Czech)',
-}, {
-    'code': 'da', 'description': u'dansk (Danish)',
-}, {
-    'code': 'nl', 'description': u'Nederlands (Dutch)',
-}, {
-    'code': 'tl', 'description': u'Filipino (Filipino)',
-}, {
-    'code': 'fi', 'description': u'suomi (Finnish)',
-}, {
-    'code': 'fr', 'description': u'français (French)',
-}, {
-    'code': 'de', 'description': u'Deutsch (German)',
-}, {
-    'code': 'el', 'description': u'ελληνικά (Greek)',
-}, {
-    'code': 'he', 'description': u'עברית (Hebrew)',
-}, {
-    'code': 'hi', 'description': u'हिन्दी (Hindi)',
-}, {
-    'code': 'hu', 'description': u'magyar (Hungarian)',
-}, {
-    'code': 'id', 'description': u'Bahasa Indonesia (Indonesian)',
-}, {
-    'code': 'it', 'description': u'italiano (Italian)',
-}, {
-    'code': 'ja', 'description': u'日本語 (Japanese)',
-}, {
-    'code': 'ko', 'description': u'한국어 (Korean)',
-}, {
-    'code': 'lv', 'description': u'latviešu (Latvian)',
-}, {
-    'code': 'lt', 'description': u'lietuvių (Lithuanian)',
-}, {
-    'code': 'no', 'description': u'Norsk (Norwegian)',
-}, {
-    'code': 'fa', 'description': u'فارسی (Persian)',
-}, {
-    'code': 'pl', 'description': u'polski (Polish)',
-}, {
-    'code': 'pt', 'description': u'português (Portuguese)',
-}, {
-    'code': 'ro', 'description': u'română (Romanian)',
-}, {
-    'code': 'ru', 'description': u'русский (Russian)',
-}, {
-    'code': 'sr', 'description': u'српски (Serbian)',
-}, {
-    'code': 'sk', 'description': u'slovenčina (Slovak)',
-}, {
-    'code': 'sl', 'description': u'slovenščina (Slovenian)',
-}, {
-    'code': 'es', 'description': u'español (Spanish)',
-}, {
-    'code': 'sv', 'description': u'svenska (Swedish)',
-}, {
-    'code': 'th', 'description': u'ภาษาไทย (Thai)',
-}, {
-    'code': 'tr', 'description': u'Türkçe (Turkish)',
-}, {
-    'code': 'uk', 'description': u'українська (Ukrainian)',
-}, {
-    'code': 'vi', 'description': u'Tiếng Việt (Vietnamese)',
-}]
-
-# Defaults for topic similarities
+# Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
-# NOTE TO DEVELOPERS: While adding another language, please ensure that the
-# languages are in alphabetical order.
-SUPPORTED_SITE_LANGUAGES = [{
-    'id': 'id',
-    'text': 'Bahasa Indonesia'
-}, {
-    'id': 'en',
-    'text': 'English'
-}, {
-    'id': 'es',
-    'text': 'Español'
-}, {
-    'id': 'pt',
-    'text': 'Português'
-}, {
-    'id': 'pt-br',
-    'text': 'Português (Brasil)'
-}, {
-    'id': 'vi',
-    'text': 'Tiếng Việt'
-}, {
-    'id': 'hi',
-    'text': 'हिन्दी'
-}]
-SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
-SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
-
 # The following are all page descriptions for the meta tag.
-ABOUT_PAGE_DESCRIPTION = (
-    'Oppia is an open source learning platform that connects a community of '
-    'teachers and learners. You can use this site to create 1-1 learning '
-    'scenarios for others.')
-BLOG_PAGE_DESCRIPTION = (
-    'Keep up to date with Oppia news and updates via our blog.')
-CONTACT_PAGE_DESCRIPTION = (
-    'Contact the Oppia team, submit feedback, and learn how to get involved '
-    'with the Oppia project.')
 CREATE_PAGE_DESCRIPTION = (
     'Help others learn new things. Create lessons through explorations and '
     'share your knowledge with the community.')
-DASHBOARD_PAGE_DESCRIPTION = (
+CREATOR_DASHBOARD_PAGE_DESCRIPTION = (
     'Keep track of the lessons you have created, as well as feedback from '
     'learners.')
-DONATE_PAGE_DESCRIPTION = (
-    'Donate to The Oppia Foundation.')
-FORUM_PAGE_DESCRIPTION = (
-    'Engage with the Oppia community by discussing questions, bugs and '
-    'explorations in the forum.')
 LIBRARY_GROUP_PAGE_DESCRIPTION = (
     'Discover top-rated or recently-published explorations on Oppia. Learn '
     'from these explorations or help improve an existing one for the '
@@ -808,28 +823,129 @@ LIBRARY_PAGE_DESCRIPTION = (
     'Looking to learn something new? Find explorations created by professors, '
     'teachers and Oppia users in a subject you\'re interested in, and start '
     'exploring!')
-PREFERENCES_PAGE_DESCRIPTION = (
-    'Change your Oppia profile settings and preferences')
 SEARCH_PAGE_DESCRIPTION = (
     'Discover a new exploration to learn from, or help improve an existing '
     'one for the community.')
-SIGNUP_PAGE_DESCRIPTION = (
-    'Sign up for Oppia and begin exploring a new subject.')
-SPLASH_PAGE_DESCRIPTION = (
-    'Oppia is a free site for sharing knowledge via interactive lessons '
-    'called \'explorations\'. Learn from user-created explorations, or teach '
-    'and create your own.')
-TEACH_PAGE_DESCRIPTION = (
-    'The Oppia library is full of user-created lessons called \'explorations\'.'
-    ' Read about how to participate in the community and begin creating '
-    'explorations.')
-TERMS_PAGE_DESCRIPTION = (
-    'Oppia is a 501(c)(3) registered non-profit open-source e-learning '
-    'platform. Learn about our terms and conditions for creating and '
-    'distributing learning material.')
-THANKS_PAGE_DESCRIPTION = (
-    'Thank you for donating to The Oppia Foundation.')
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'
 HANDLER_TYPE_JSON = 'json'
+HANDLER_TYPE_DOWNLOADABLE = 'downloadable'
+
+# Following are the constants for the role IDs.
+ROLE_ID_GUEST = 'GUEST'
+ROLE_ID_BANNED_USER = 'BANNED_USER'
+ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
+ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
+ROLE_ID_MODERATOR = 'MODERATOR'
+ROLE_ID_ADMIN = 'ADMIN'
+
+# Intent of the User making query to role structure via admin interface. Used
+# to store audit data regarding queries to role IDs.
+ROLE_ACTION_UPDATE = 'update'
+ROLE_ACTION_VIEW_BY_USERNAME = 'view_by_username'
+ROLE_ACTION_VIEW_BY_ROLE = 'view_by_role'
+
+VIEW_METHOD_ROLE = 'role'
+VIEW_METHOD_USERNAME = 'username'
+
+QUESTION_BATCH_SIZE = 10
+
+STATE_ANSWER_STATS_MIN_FREQUENCY = 2
+
+RTE_FORMAT_TEXTANGULAR = 'text-angular'
+
+RTE_FORMAT_CKEDITOR = 'ck-editor'
+
+# RTE content specifications according to the type of the editor.
+RTE_CONTENT_SPEC = {
+    'RTE_TYPE_TEXTANGULAR': {
+        # Valid parent-child relation in TextAngular.
+        'ALLOWED_PARENT_LIST': {
+            'p': ['blockquote', 'div', 'pre', '[document]', 'ol', 'ul', 'li'],
+            'b': ['i', 'li', 'p', 'pre'],
+            'br': ['b', 'i', 'li', 'p'],
+            'i': ['b', 'li', 'p', 'pre'],
+            'li': ['ol', 'ul'],
+            'ol': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
+            'ul': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
+            'pre': ['ol', 'ul', 'blockquote', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+        },
+        # Valid html tags in TextAngular.
+        'ALLOWED_TAG_LIST': [
+            'p',
+            'b',
+            'br',
+            'i',
+            'li',
+            'ol',
+            'ul',
+            'pre',
+            'blockquote',
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
+        ]
+    },
+    'RTE_TYPE_CKEDITOR': {
+        # Valid parent-child relation in CKEditor.
+        'ALLOWED_PARENT_LIST': {
+            'p': ['blockquote', '[document]', 'li'],
+            'strong': ['em', 'li', 'p', 'pre'],
+            'em': ['strong', 'li', 'p', 'pre'],
+            'br': ['strong', 'em', 'li', 'p'],
+            'li': ['ol', 'ul'],
+            'ol': ['li', 'blockquote', 'pre', '[document]'],
+            'ul': ['li', 'blockquote', 'pre', '[document]'],
+            'pre': ['ol', 'ul', 'blockquote', 'li', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-collapsible': [
+                'blockquote', 'li', '[document]'
+            ],
+            'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
+        },
+        # Valid html tags in CKEditor.
+        'ALLOWED_TAG_LIST': [
+            'p',
+            'strong',
+            'br',
+            'em',
+            'li',
+            'ol',
+            'ul',
+            'pre',
+            'blockquote',
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
+        ]
+
+    }
+}
+
+# A dict representing available landing pages, having subject as a key and list
+# of topics as the value.
+# Note: This dict needs to be keep in sync with frontend TOPIC_LANDING_PAGE_DATA
+# oppia constant defined in
+# core/templates/dev/head/pages/landing-pages/TopicLandingPage.js file.
+AVAILABLE_LANDING_PAGES = {
+    'maths': ['fractions', 'negative-numbers', 'ratios']
+}

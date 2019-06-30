@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python configuration for PencilCodeEditor interaction."""
+
 from extensions.interactions import base
 
 
@@ -29,6 +31,8 @@ class PencilCodeEditor(base.BaseInteraction):
     instructions = 'Edit the code. Click \'Play\' to check it!'
     narrow_instructions = 'Show code editor'
     needs_summary = True
+    can_have_solution = True
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'initial_code',

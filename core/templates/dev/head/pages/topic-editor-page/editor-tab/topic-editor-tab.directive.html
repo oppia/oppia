@@ -1,0 +1,74 @@
+<div role="form" class="form-horizontal topic-editor">
+  <md-card class="oppia-page-card oppia-long-text">
+    <div class="topic-name">
+      <label for="topicName" class="form-heading">Topic Name</label>
+      <input id="topicName" type="text" class="form-control protractor-test-topic-name-field"
+             ng-disabled="!topicRights.canEditTopic()"
+             ng-model="editableName" ng-blur="updateTopicName(editableName)"
+             placeholder="Enter a name for the topic." maxlength="20" ng-trim="false">
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableName.length === 20">
+        <em>Please use at most 20 characters for the topic name.</em>
+      </span>
+    </div>
+
+    <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+      <label for="topicDescription" class="form-heading">Description</label>
+      <textarea type="text" class="form-control protractor-test-topic-description-field"
+                ng-model="editableDescription"
+                maxlength="120"
+                ng-change="updateTopicDescriptionStatus(editableDescription)"
+                ng-blur="updateTopicDescription(editableDescription)"
+                placeholder="Enter the description of the topic">
+      </textarea>
+      <span class="help-block" style="font-size: smaller; color: red;" ng-if="editableDescription.length === 120">
+        <em>Please use at most 120 characters for the topic description.</em>
+      </span>
+      <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="help-block" style="font-size: smaller">
+        What does this topic contain?
+      </span>
+    </div>
+
+    <div class="canonical-stories">
+      <label class="form-heading"> Canonical Stories </label>
+      <button class="btn btn-default protractor-test-create-story-button"
+              ng-click="createCanonicalStory()"
+              style="float: right;">
+        Create Story
+      </button>
+      <stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
+                    story-summaries="canonicalStorySummaries"
+                    topic="topic">
+      </stories-list>
+      <h4 ng-if="topic.getCanonicalStoryIds().length === 0" style="color: gray;">
+        Click on Create Story to create a new canonical story for the topic
+      </h4>
+    </div>
+  </md-card>
+</div>
+
+<style>
+  .topic-editor textarea {
+    resize: vertical;
+  }
+  .topic-editor {
+    margin-top: 2%;
+    margin-left: 25%;
+    width: 50%;
+  }
+
+  .topic-editor .form-heading {
+    font-size: 1.2em;
+  }
+
+  .topic-editor .topic-name {
+    margin-bottom: 1.5%;
+  }
+
+  .topic-editor .canonical-stories {
+    margin-top: 2%;
+  }
+
+  .topic-editor .topic-description textarea {
+    height: 7vh;
+  }
+</style>

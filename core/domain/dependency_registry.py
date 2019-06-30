@@ -21,7 +21,6 @@ import os
 
 from extensions.dependencies import dependencies_config
 import feconf
-import jinja_utils
 import utils
 
 
@@ -55,12 +54,6 @@ class Registry(object):
         """
         html = '\n'.join([
             cls.get_dependency_html(dep) for dep in set(dependency_ids)])
-        # Html content for interactions is loaded using get_dependency_html
-        # method. This content is then interpolated using Jinja. Interactions
-        # such as logicproof contain jinja like variables that need to be
-        # interpolated. LogicProof contains a cache slug variable that is
-        # interpolated using interpolate_cache_slug method.
-        html = jinja_utils.interpolate_cache_slug(html)
         angular_modules_for_each_dep = [
             cls.get_angular_modules(dep) for dep in set(dependency_ids)]
         deduplicated_angular_modules = list(set(list(

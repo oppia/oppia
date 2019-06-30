@@ -22,38 +22,53 @@ from google.appengine.api import taskqueue
 from google.appengine.ext import deferred
 
 # NOTE: The following constants should match the queue names in queue.yaml.
+# Taskqueue for backing up state.
+QUEUE_NAME_BACKUPS = 'backups'
+# Taskqueue for running continuous computation jobs.
+QUEUE_NAME_CONTINUOUS_JOBS = 'continuous-jobs'
 # Default queue for processing tasks (including MapReduce ones).
 QUEUE_NAME_DEFAULT = 'default'
-# Deferred queue for processing events outside the request/response cycle.
-QUEUE_NAME_EVENTS = 'events'
 # Taskqueue for sending email.
 QUEUE_NAME_EMAILS = 'emails'
+# Deferred queue for processing events outside the request/response cycle.
+QUEUE_NAME_EVENTS = 'events'
+# Taskqueue for running one-off jobs.
+QUEUE_NAME_ONE_OFF_JOBS = 'one-off-jobs'
+# Taskqueue for updating stats models.
+QUEUE_NAME_STATS = 'stats'
 
-def defer(fn, *args, **kwargs):
-    """Adds a new task to the default deferred queue."""
-    deferred.defer(fn, *args, **kwargs)
+
+def defer(fn, queue_name, *args, **kwargs):
+    """Adds a new task to a specified deferred queue.
+
+    Args:
+        fn: *. The task being deferred. Will be called as: fn(*args, **kwargs).
+        queue_name: str. The name of the queue to place the task into. Should be
+            one of the QUEUE_NAME_* constants listed above.
+        *args: list(*). Positional arguments for fn.
+        **kwargs: dict(str : *). Keyword arguments for fn.
+    """
+    # See https://developers.google.com/appengine/articles/deferred for details
+    # on the _queue kwarg.
+    deferred.defer(fn, *args, _queue=queue_name, **kwargs)
 
 
-def defer_to_events_queue(fn, *args, **kwargs):
-    """Adds a new task to the deferred queue for processing events."""
-    # See https://developers.google.com/appengine/articles/deferred for
-    # details on the _queue kwarg.
-    deferred.defer(fn, *args, _queue=QUEUE_NAME_EVENTS, **kwargs)
-
-def enqueue_task(url, params, countdown):
+def enqueue_email_task(url, params, countdown):
     """Adds a new task for sending email.
 
     Args:
-    - url: url of the handler function.
-    - params: parameters that will be passed as payload to handler
-      function.
-    - countdown: amount of time, in seconds, to wait before executing task.
+        url: str. url of the handler function.
+        params: dict(str : *). parameters that will be passed as payload to
+            handler function.
+        countdown: int. amount of time, in seconds, to wait before executing
+            task.
     """
     # See https://cloud.google.com/appengine/docs/python/taskqueue for
     # details of various parameters set when adding a new task.
     taskqueue.add(
         queue_name=QUEUE_NAME_EMAILS, url=url, payload=json.dumps(params),
         countdown=countdown, target=taskqueue.DEFAULT_APP_VERSION)
+
 
 # A special exception that ensures that the task is not tried again, if it
 # fails.

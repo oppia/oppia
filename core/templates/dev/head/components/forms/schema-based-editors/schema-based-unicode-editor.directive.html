@@ -1,0 +1,28 @@
+<span>
+  <textarea ng-if="!getCodingMode() && getRows()"
+            ng-model="$parent.localValue"
+            rows="<[getRows()]>"
+            placeholder="<[getPlaceholder()]>"
+            ng-disabled="isDisabled()"
+            class="form-control" focus-on="<[labelForFocusTarget()]>"
+            ng-blur="onInputBlur()"
+            ng-focus="onInputFocus()">
+  </textarea>
+
+  <span ng-if="!getCodingMode() && !getRows()">
+    <input type="text" ng-disabled="isDisabled()" class="form-control"
+           ng-model="$parent.localValue" ng-blur="onInputBlur()"
+           ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
+           ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" apply-validation="validators()"
+           style="display: inline;">
+  </span>
+
+  <!-- Note that we do not yet support ng-blur for the code editor. -->
+  <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
+    <div ui-codemirror
+         ng-model="$parent.localValue"
+         ui-codemirror-opts="codemirrorOptions"
+         ui-refresh="codemirrorStatus">
+    </div>
+  </div>
+</span>

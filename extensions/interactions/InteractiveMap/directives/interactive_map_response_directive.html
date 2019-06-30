@@ -1,0 +1,19 @@
+<div>
+  <div class="oppia-overlay-map-response"></div>
+  <leaflet id="interactiveMapResponse"
+           defaults="$ctrl.mapOptions.defaults"
+           lf-center="$ctrl.mapOptions.center"
+           markers="$ctrl.mapOptions.mapMarkers"
+           height="150px"
+           width="150px">
+  </leaflet>
+</div>
+<style>
+  .oppia-overlay-map-response {
+    height: 100%;
+    position: absolute;
+    width: 100%;
+    opacity: 0.5;
+    z-index: 1001;
+  }
+</style>

@@ -1,0 +1,29 @@
+author_notes: ''
+blurb: ''
+category: Business
+init_state_name: Start
+language_code: en
+objective: this is an objective
+param_changes: []
+param_specs: {}
+schema_version: 17
+states:
+  Start:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Test exploration
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+states_schema_version: 13
+tags: []
+title: RatingTest

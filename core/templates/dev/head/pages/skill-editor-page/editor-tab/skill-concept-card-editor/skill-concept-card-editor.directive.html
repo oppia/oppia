@@ -1,0 +1,127 @@
+<md-card class="oppia-editor-card-with-avatar">
+  <div class="oppia-editor-card-body">
+    <div class="oppia-editor-card-section">
+      <strong style="font-size: 1.4em;">Review Material</strong>
+      <div class="concept-card-subtitle">
+        This gives the learner a brief overview of how to perform the skill.
+      </div>
+      <div ng-if="!conceptCardExplanationEditorIsShown" class="review-material" style="padding-top: 0.5em;">
+        <div ng-class="oppia-editable-section"
+             ng-click="openConceptCardExplanationEditor()">
+          <i class="material-icons oppia-editor-edit-icon pull-right protractor-test-edit-concept-card"
+             title="Edit Concept Card Explanation">&#xE254;
+          </i>
+          <div class="oppia-state-content-display oppia-transition-200 protractor-test-concept-card-explanation"
+               ng-class="oppia-prevent-selection"
+               title="Concept Card Explanation">
+            <span class="oppia-placeholder" ng-show="skill.getConceptCard().getExplanation().getHtml() === ''">
+                Give a review or explanation of the skill.
+            </span>
+            <angular-html-bind html-data="bindableFieldsDict.displayedConceptCardExplanation">
+            </angular-html-bind>
+          </div>
+          <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
+          <div class="oppia-editable-section-mask">
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="conceptCardExplanationEditorIsShown">
+        <schema-based-editor schema="HTML_SCHEMA" class="protractor-test-concept-card-text" local-value="bindableFieldsDict.displayedConceptCardExplanation">
+        </schema-based-editor>
+        <div class="editor-buttons">
+          <button type="button"
+                  class="btn btn-success oppia-save-state-item-button pull-right protractor-test-save-concept-card"
+                  ng-click="saveConceptCardExplanation()">
+            Save
+          </button>
+          <button type="button" class="btn btn-default pull-right" ng-click="closeConceptCardExplanationEditor()">Cancel</button>
+          <div style="clear: both;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</md-card>
+
+<md-card class="oppia-editor-card-with-avatar">
+  <div class="oppia-editor-card-body">
+    <div class="oppia-editor-card-section">
+      <div style="padding-bottom: 0.5em;">
+        <strong style="font-size: 1.4em;">Worked Examples</strong>
+        <div class="concept-card-subtitle">
+          These will be displayed one-by-one to the learner, in order, if they ask for them.
+        </div>
+      </div>
+      <div ng-if="bindableFieldsDict.displayedWorkedExamples.length > 0" style="padding-bottom: 10px;">
+        <ul class="nav oppia-option-list nav-stacked nav-pills"
+            role="tablist"
+            ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
+            ng-model="bindableFieldsDict.displayedWorkedExamples"
+            style="position: relative;">
+          <li ng-repeat="workedExample in bindableFieldsDict.displayedWorkedExamples"
+              ng-class="{'active': activeWorkedExampleIndex === $index, 'last-element': $index === bindableFieldsDict.displayedWorkedExamples.length - 1}"
+              class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection"
+              style="margin-top: 0;">
+            <span class="oppia-worked-example-sort-handle"
+                  ng-if="bindableFieldsDict.displayedWorkedExamples.length > 1"
+                  ng-mousedown="changeActiveWorkedExampleIndex(-1)">
+              <img ng-src="<[dragDotsImgUrl]>" width="10">
+            </span>
+            <a ng-click="changeActiveWorkedExampleIndex($index)"
+               class="oppia-rule-tab protractor-test-worked-example-<[$index]>"
+               ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
+              <summary-list-header index="$index"
+                                   disable-sorting="bindableFieldsDict.displayedWorkedExamples.length === 1"
+                                   summary="getWorkedExampleSummary(workedExample.getHtml())"
+                                   short-summary="getWorkedExampleSummary(workedExample.getHtml())"
+                                   is-active="$index === activeWorkedExampleIndex"
+                                   is-delete-available="isEditable"
+                                   on-delete-fn="deleteWorkedExample">
+              </summary-list-header>
+            </a>
+
+            <div ng-if="activeWorkedExampleIndex === $index">
+              <div class="oppia-editor-card-section">
+                <worked-example-editor worked-example="workedExample"
+                                       index="$index"
+                                       is-editable="isEditable"
+                                       on-save="onWorkedExampleSaved">
+                </worked-example-editor>
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <button type="button"
+              class="btn protractor-test-add-worked-example"
+              style="background-color: rgba(5,140,166,0.9); color: white;"
+              ng-click="openAddWorkedExampleModal()">
+        + Add Worked Example
+      </button>
+    </div>
+  </div>
+</md-card>
+<style>
+  skill-concept-card-editor .concept-card-subtitle {
+    padding-bottom: 12px;
+    color: #595959;
+    font-size: 0.8em;
+    font-style: italic;
+  }
+
+  skill-concept-card-editor .review-material {
+    padding-bottom: 36px;
+  }
+
+  skill-concept-card-editor .last-element {
+    border-bottom: 1px solid #ccc;
+  }
+
+  skill-concept-card-editor .editor-buttons {
+    margin-top: 2px;
+  }
+
+  skill-concept-card-editor .oppia-editor-edit-icon {
+    position: relative;
+  }
+</style>

@@ -16,273 +16,1244 @@
 
 """Services for exploration-related statistics."""
 
-from core.domain import exp_domain
-from core.domain import exp_services
+import collections
+import copy
+import datetime
+import itertools
+
+from core.domain import interaction_registry
 from core.domain import stats_domain
-from core.domain import stats_jobs_continuous
 from core.platform import models
+import feconf
+import utils
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
-
-IMPROVE_TYPE_DEFAULT = 'default'
-IMPROVE_TYPE_INCOMPLETE = 'incomplete'
-# TODO(bhenning): Everything is handler name submit; therefore, it is
-# pointless and should be removed.
-_OLD_SUBMIT_HANDLER_NAME = 'submit'
+transaction_services = models.Registry.import_transaction_services()
 
 
-def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
-    return {
-        answer: count for (answer, count) in
-        stats_domain.StateRuleAnswerLog.get(
-            exploration_id, state_name, exp_domain.DEFAULT_RULESPEC_STR
-        ).get_top_answers(3)
-    }
+# Counts contributions from all versions.
+VERSION_ALL = 'all'
 
 
-def get_exps_unresolved_answers_for_default_rule(exp_ids):
-    """Gets unresolved answers per exploration for default rule across all
-    states for explorations with ids in exp_ids. The value of total count should
-    match the sum of values of indiviual counts for each unresolved answer.
+def _migrate_to_latest_issue_schema(exp_issue_dict):
+    """Holds the responsibility of performing a step-by-step sequential update
+    of an exploration issue dict based on its schema version. If the current
+    issue schema version changes (stats_models.CURRENT_ISSUE_SCHEMA_VERSION), a
+    new conversion function must be added and some code appended to this
+    function to account for that new version.
 
-    TODO(526avijitgupta): Note that this method currently returns the data only
-    for the DEFAULT rule. This should ideally handle all types of unresolved
-    answers.
+    Args:
+        exp_issue_dict: dict. Dict representing the exploration issue.
 
-    Returns a dict of the following format:
-        {
-          'exp_id_1': {
-            'count': 7 (number of unresolved answers for this exploration),
-            'unresolved_answers': (list of unresolved answers sorted by count)
-              [
-                {'count': 4, 'value': 'answer_1', 'state': 'Introduction'},
-                {'count': 2, 'value': 'answer_2', 'state': 'Introduction'},
-                {'count': 1, 'value': 'answer_3', 'state': 'End'}
-              ]
-          },
-          'exp_id_2': {
-            'count': 13,
-            'unresolved_answers':
-              [
-                {'count': 8, 'value': 'answer_5', 'state': 'Introduction'},
-                {'count': 3, 'value': 'answer_4', 'state': 'Quest'},
-                {'count': 1, 'value': 'answer_6', 'state': 'End'}
-                {'count': 1, 'value': 'answer_8', 'state': 'End'}
-              ]
-          }
-        }
+    Raises:
+        Exception. The issue_schema_version is invalid.
     """
-    def _get_explorations_states_tuples_by_ids(exp_ids):
-        """Returns a list of all (exp_id, state_name) tuples for the given
-        exp_ids.
-        E.g. - [
-          ('eid1', 'Introduction'),
-          ('eid1', 'End'),
-          ('eid2', 'Introduction'),
-          ('eid3', 'Introduction')
-        ]
-        when exp_ids = ['eid1', 'eid2', 'eid3'].
-        """
-        explorations = (
-            exp_services.get_multiple_explorations_by_id(exp_ids, strict=False))
-        return [
-            (exploration.id, state_name)
-            for exploration in explorations.values()
-            for state_name in exploration.states
-        ]
+    issue_schema_version = exp_issue_dict['schema_version']
+    if issue_schema_version is None or issue_schema_version < 1:
+        issue_schema_version = 0
 
-    explorations_states_tuples = _get_explorations_states_tuples_by_ids(exp_ids)
-    exploration_states_answers_list = get_top_state_rule_answers_multi(
-        explorations_states_tuples, [exp_domain.DEFAULT_RULESPEC_STR])
-    exps_answers_mapping = {}
+    if not (0 <= issue_schema_version
+            <= stats_models.CURRENT_ISSUE_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d and unversioned issue schemas '
+            'at present.' %
+            stats_models.CURRENT_ISSUE_SCHEMA_VERSION)
 
-    for ind, statewise_answers in enumerate(exploration_states_answers_list):
-        exp_id = explorations_states_tuples[ind][0]
-        if exp_id not in exps_answers_mapping:
-            exps_answers_mapping[exp_id] = {
-                'count': 0,
-                'unresolved_answers': []
-            }
-        for answer in statewise_answers:
-            exps_answers_mapping[exp_id]['count'] += answer['count']
-            answer['state'] = explorations_states_tuples[ind][1]
-
-        exps_answers_mapping[exp_id]['unresolved_answers'].extend(
-            statewise_answers)
-
-    for exp_id in exps_answers_mapping:
-        exps_answers_mapping[exp_id]['unresolved_answers'] = (sorted(
-            exps_answers_mapping[exp_id]['unresolved_answers'],
-            key=lambda a: a['count'],
-            reverse=True))
-
-    return exps_answers_mapping
+    while issue_schema_version < stats_models.CURRENT_ISSUE_SCHEMA_VERSION:
+        stats_domain.ExplorationIssue.update_exp_issue_from_model(
+            exp_issue_dict)
+        issue_schema_version += 1
 
 
-def get_state_rules_stats(exploration_id, state_name):
-    """Gets statistics for the answer groups and rules of this state.
+def _migrate_to_latest_action_schema(learner_action_dict):
+    """Holds the responsibility of performing a step-by-step sequential update
+    of an learner action dict based on its schema version. If the current action
+    schema version changes (stats_models.CURRENT_ACTION_SCHEMA_VERSION), a new
+    conversion function must be added and some code appended to this function to
+    account for that new version.
+
+    Args:
+        learner_action_dict: dict. Dict representing the learner action.
+
+    Raises:
+        Exception. The action_schema_version is invalid.
+    """
+    action_schema_version = learner_action_dict['schema_version']
+    if action_schema_version is None or action_schema_version < 1:
+        action_schema_version = 0
+
+    if not (0 <= action_schema_version
+            <= stats_models.CURRENT_ACTION_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d and unversioned action schemas '
+            'at present.' %
+            stats_models.CURRENT_ACTION_SCHEMA_VERSION)
+
+    while action_schema_version < stats_models.CURRENT_ACTION_SCHEMA_VERSION:
+        stats_domain.LearnerAction.update_learner_action_from_model(
+            learner_action_dict)
+        action_schema_version += 1
+
+
+def get_exploration_stats(exp_id, exp_version):
+    """Retrieves the ExplorationStats domain instance.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
 
     Returns:
-        A dict, keyed by the string '{HANDLER_NAME}.{RULE_STR}', whose
-        values are the corresponding stats_domain.StateRuleAnswerLog
-        instances.
+        ExplorationStats. The exploration stats domain object.
     """
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    state = exploration.states[state_name]
+    exploration_stats = get_exploration_stats_by_id(exp_id, exp_version)
+    if exploration_stats is None:
+        exploration_stats = stats_domain.ExplorationStats.create_default(
+            exp_id, exp_version, {})
 
-    rule_keys = []
-    for group in state.interaction.answer_groups:
-        for rule in group.rule_specs:
-            rule_keys.append((
-                _OLD_SUBMIT_HANDLER_NAME, rule.stringify_classified_rule()))
-
-    if state.interaction.default_outcome:
-        rule_keys.append((
-            _OLD_SUBMIT_HANDLER_NAME, exp_domain.DEFAULT_RULESPEC_STR))
-
-    answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
-        exploration_id, [{
-            'state_name': state_name,
-            'rule_str': rule_key[1]
-        } for rule_key in rule_keys])
-
-    results = {}
-    for ind, answer_log in enumerate(answer_logs):
-        results['.'.join(rule_keys[ind])] = {
-            'answers': answer_log.get_top_answers(5),
-            'rule_hits': answer_log.total_answer_count
-        }
-
-    return results
+    return exploration_stats
 
 
-def get_top_state_rule_answers(exploration_id, state_name, rule_str_list):
-    """Returns a list of top answers (by submission frequency) submitted to the
-    given state in the given exploration which were mapped to any of the rules
-    listed in 'rule_str_list'. All answers submitted to the specified state and
-    match the rule spec strings in rule_str_list are returned.
+def update_stats(exp_id, exp_version, aggregated_stats):
+    """Updates ExplorationStatsModel according to the dict containing aggregated
+    stats.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+        aggregated_stats: dict. Dict representing an ExplorationStatsModel
+            instance with stats aggregated in the frontend.
     """
-    return get_top_state_rule_answers_multi(
-        [(exploration_id, state_name)], rule_str_list)[0]
+    exploration_stats = get_exploration_stats_by_id(
+        exp_id, exp_version)
+
+    exploration_stats.num_starts_v2 += aggregated_stats['num_starts']
+    exploration_stats.num_completions_v2 += aggregated_stats['num_completions']
+    exploration_stats.num_actual_starts_v2 += aggregated_stats[
+        'num_actual_starts']
+
+    for state_name in aggregated_stats['state_stats_mapping']:
+        exploration_stats.state_stats_mapping[
+            state_name].total_answers_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['total_answers_count']
+        exploration_stats.state_stats_mapping[
+            state_name].useful_feedback_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['useful_feedback_count']
+        exploration_stats.state_stats_mapping[
+            state_name].total_hit_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['total_hit_count']
+        exploration_stats.state_stats_mapping[
+            state_name].first_hit_count_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['first_hit_count']
+        exploration_stats.state_stats_mapping[
+            state_name].num_times_solution_viewed_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['num_times_solution_viewed']
+        exploration_stats.state_stats_mapping[
+            state_name].num_completions_v2 += aggregated_stats[
+                'state_stats_mapping'][state_name]['num_completions']
+
+    save_stats_model_transactional(exploration_stats)
 
 
-def get_top_state_rule_answers_multi(exploration_state_list, rule_str_list):
-    """Returns a list of top answers (by submission frequency) submitted to the
-    given explorations and states which were mapped to any of the rules listed
-    in 'rule_str_list' for each exploration ID and state name tuple in
-    exploration_state_list.
+def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
+    """Creates ExplorationStatsModel for the freshly created exploration and
+    sets all initial values to zero.
 
-    For each exploration ID and state, all answers submitted that match any of
-    the rule spec strings in rule_str_list are returned.
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+        state_names: list(str). State names of the exploration.
     """
-    answer_log_list = (
-        stats_domain.StateRuleAnswerLog.get_multi_by_multi_explorations(
-            exploration_state_list, rule_str_list))
-    return [[
-        {
-            'value': top_answer[0],
-            'count': top_answer[1]
-        }
-        for top_answer in answer_log.get_all_top_answers()
-    ] for answer_log in answer_log_list]
+    state_stats_mapping = {
+        state_name: stats_domain.StateStats.create_default()
+        for state_name in state_names
+    }
+
+    exploration_stats = stats_domain.ExplorationStats.create_default(
+        exp_id, exp_version, state_stats_mapping)
+    create_stats_model(exploration_stats)
 
 
-def get_state_improvements(exploration_id, exploration_version):
-    """Returns a list of dicts, each representing a suggestion for improvement
-    to a particular state.
+def handle_stats_creation_for_new_exp_version(
+        exp_id, exp_version, state_names, exp_versions_diff, revert_to_version):
+    """Retrieves the ExplorationStatsModel for the old exp_version and makes
+    any required changes to the structure of the model. Then, a new
+    ExplorationStatsModel is created for the new exp_version.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+        state_names: list(str). State names of the exploration.
+        exp_versions_diff: ExplorationVersionsDiff|None. The domain object for
+            the exploration versions difference, None if it is a revert.
+        revert_to_version: int|None. If the change is a revert, the version.
+            Otherwise, None.
     """
-    ranked_states = []
+    old_exp_version = exp_version - 1
+    new_exp_version = exp_version
+    exploration_stats = get_exploration_stats_by_id(
+        exp_id, old_exp_version)
+    if exploration_stats is None:
+        handle_stats_creation_for_new_exploration(
+            exp_id, new_exp_version, state_names)
+        return
 
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    state_names = exploration.states.keys()
+    # Handling reverts.
+    if revert_to_version:
+        old_exp_stats = get_exploration_stats_by_id(exp_id, revert_to_version)
+        # If the old exploration issues model doesn't exist, the current model
+        # is carried over (this is a fallback case for some tests, and can
+        # never happen in production.)
+        if old_exp_stats:
+            exploration_stats.num_starts_v2 = old_exp_stats.num_starts_v2
+            exploration_stats.num_actual_starts_v2 = (
+                old_exp_stats.num_actual_starts_v2)
+            exploration_stats.num_completions_v2 = (
+                old_exp_stats.num_completions_v2)
+            exploration_stats.state_stats_mapping = (
+                old_exp_stats.state_stats_mapping)
+        exploration_stats.exp_version = new_exp_version
+        create_stats_model(exploration_stats)
+        return
 
-    default_rule_answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
-        exploration_id, [{
-            'state_name': state_name,
-            'rule_str': exp_domain.DEFAULT_RULESPEC_STR
-        } for state_name in state_names])
+    # Handling state deletions.
+    for state_name in exp_versions_diff.deleted_state_names:
+        exploration_stats.state_stats_mapping.pop(state_name)
 
-    statistics = stats_jobs_continuous.StatisticsAggregator.get_statistics(
-        exploration_id, exploration_version)
-    state_hit_counts = statistics['state_hit_counts']
+    # Handling state additions.
+    for state_name in exp_versions_diff.added_state_names:
+        exploration_stats.state_stats_mapping[state_name] = (
+            stats_domain.StateStats.create_default())
 
-    for ind, state_name in enumerate(state_names):
-        total_entry_count = 0
-        no_answer_submitted_count = 0
-        if state_name in state_hit_counts:
-            total_entry_count = (
-                state_hit_counts[state_name]['total_entry_count'])
-            no_answer_submitted_count = state_hit_counts[state_name].get(
-                'no_answer_count', 0)
+    # Handling state renames.
+    for new_state_name in exp_versions_diff.new_to_old_state_names:
+        exploration_stats.state_stats_mapping[new_state_name] = (
+            exploration_stats.state_stats_mapping.pop(
+                exp_versions_diff.new_to_old_state_names[new_state_name]))
 
-        if total_entry_count == 0:
+    exploration_stats.exp_version = new_exp_version
+
+    # Create new statistics model.
+    create_stats_model(exploration_stats)
+
+
+def create_exp_issues_for_new_exploration(exp_id, exp_version):
+    """Creates the ExplorationIssuesModel instance for the exploration.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+    """
+    stats_models.ExplorationIssuesModel.create(exp_id, exp_version, [])
+
+
+def _handle_exp_issues_after_state_deletion(
+        state_name, exp_issue, deleted_state_names):
+    """Checks if the exploration issue's concerned state is a deleted state and
+    invalidates the exploration issue accoridngly.
+
+    Args:
+        state_name: str. The issue's concerened state name.
+        exp_issue: ExplorationIssue. The exploration issue domain object.
+        deleted_state_names: list(str). The list of deleted state names in this
+            commit.
+
+    Returns:
+        ExplorationIssue. The exploration issue domain object.
+    """
+    if state_name in deleted_state_names:
+        exp_issue.is_valid = False
+    return exp_issue
+
+
+def _handle_exp_issues_after_state_rename(
+        state_name, exp_issue, old_to_new_state_names,
+        playthrough_ids_by_state_name):
+    """Checks if the exploration issue's concerned state is a renamed state and
+    modifies the exploration issue accoridngly.
+
+    Args:
+        state_name: str. The issue's concerened state name.
+        exp_issue: ExplorationIssue. The exploration issue domain object.
+        old_to_new_state_names: dict. The dict mapping state names to their
+            renamed versions. This mapping contains state names only if it is
+            actually renamed.
+        playthrough_ids_by_state_name: dict. The dict mapping old state names to
+            their new ones
+
+    Returns:
+        ExplorationIssue. The exploration issue domain object.
+    """
+    if state_name not in old_to_new_state_names:
+        return exp_issue, playthrough_ids_by_state_name
+
+    old_state_name = state_name
+    new_state_name = old_to_new_state_names[old_state_name]
+    if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+            exp_issue.issue_type] == 'state_names':
+        state_names = exp_issue.issue_customization_args['state_names'][
+            'value']
+        exp_issue.issue_customization_args['state_names']['value'] = [
+            new_state_name
+            if state_name == old_state_name else state_name
+            for state_name in state_names]
+    else:
+        exp_issue.issue_customization_args['state_name']['value'] = (
+            new_state_name)
+
+    playthrough_ids_by_state_name[old_state_name].extend(
+        exp_issue.playthrough_ids)
+
+    return exp_issue, playthrough_ids_by_state_name
+
+
+def update_exp_issues_for_new_exp_version(
+        exploration, exp_versions_diff, revert_to_version):
+    """Retrieves the ExplorationIssuesModel for the old exp_version and makes
+    any required changes to the structure of the model.
+
+    Args:
+        exploration: Exploration. Domain object for the exploration.
+        exp_versions_diff: ExplorationVersionsDiff|None. The domain object for
+            the exploration versions difference, None if it is a revert.
+        revert_to_version: int|None. If the change is a revert, the version.
+            Otherwise, None.
+    """
+    exp_issues = get_exp_issues(exploration.id, exploration.version - 1)
+    if exp_issues is None:
+        create_exp_issues_for_new_exploration(
+            exploration.id, exploration.version - 1)
+        return
+
+    # Handling reverts.
+    if revert_to_version:
+        old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
+        # If the old exploration issues model doesn't exist, the current model
+        # is carried over (this is a fallback case for some tests, and can
+        # never happen in production.)
+        if old_exp_issues:
+            exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
+        exp_issues.exp_version = exploration.version + 1
+        create_exp_issues_model(exp_issues)
+        return
+
+    playthrough_ids_by_state_name = collections.defaultdict(list)
+
+    for i_idx, exp_issue in enumerate(exp_issues.unresolved_issues):
+        keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
+        if keyname == 'state_names':
+            state_names = exp_issue.issue_customization_args[keyname]['value']
+            for state_name in state_names:
+                # Handle exp issues changes for deleted states.
+                exp_issues.unresolved_issues[i_idx] = (
+                    _handle_exp_issues_after_state_deletion(
+                        state_name, exp_issue,
+                        exp_versions_diff.deleted_state_names))
+
+                # Handle exp issues changes for renamed states.
+                exp_issues.unresolved_issues[
+                    i_idx], playthrough_ids_by_state_name = (
+                        _handle_exp_issues_after_state_rename(
+                            state_name, exp_issue,
+                            exp_versions_diff.old_to_new_state_names,
+                            playthrough_ids_by_state_name))
+        else:
+            state_name = exp_issue.issue_customization_args[keyname]['value']
+
+            # Handle exp issues changes for deleted states.
+            exp_issues.unresolved_issues[i_idx] = (
+                _handle_exp_issues_after_state_deletion(
+                    state_name, exp_issue,
+                    exp_versions_diff.deleted_state_names))
+
+            # Handle exp issues changes for renamed states.
+            exp_issues.unresolved_issues[
+                i_idx], playthrough_ids_by_state_name = (
+                    _handle_exp_issues_after_state_rename(
+                        state_name, exp_issue,
+                        exp_versions_diff.old_to_new_state_names,
+                        playthrough_ids_by_state_name))
+
+    # Handling changes to playthrough instances.
+    all_playthrough_ids = []
+    all_playthroughs = []
+    for old_state_name in playthrough_ids_by_state_name:
+        new_state_name = exp_versions_diff.old_to_new_state_names[
+            old_state_name]
+        playthrough_ids = playthrough_ids_by_state_name[old_state_name]
+
+        playthroughs = get_playthroughs_multi(playthrough_ids)
+        for p_idx, playthrough in enumerate(playthroughs):
+            if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+                    playthrough.issue_type] == 'state_names':
+                state_names = playthrough.issue_customization_args[
+                    'state_names']['value']
+                playthrough.issue_customization_args['state_names']['value'] = [
+                    new_state_name
+                    if state_name == old_state_name else state_name
+                    for state_name in state_names]
+            else:
+                playthrough.issue_customization_args['state_name']['value'] = (
+                    new_state_name)
+            for a_idx, action in enumerate(playthrough.actions):
+                if action.action_customization_args['state_name']['value'] == (
+                        old_state_name):
+                    playthroughs[p_idx].actions[
+                        a_idx].action_customization_args['state_name'][
+                            'value'] = new_state_name
+
+        all_playthrough_ids.extend(playthrough_ids)
+        all_playthroughs.extend(playthroughs)
+
+    update_playthroughs_multi(all_playthrough_ids, all_playthroughs)
+
+    exp_issues.exp_version += 1
+
+    create_exp_issues_model(exp_issues)
+
+
+def get_exp_issues(exp_id, exp_version):
+    """Retrieves the ExplorationIssues domain object.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+
+    Returns:
+        ExplorationIssues|None: The domain object for exploration issues or
+            None if the exp_id is invalid.
+    """
+    exp_issues = None
+    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+        exp_id, exp_version)
+    if exp_issues_model is not None:
+        exp_issues = get_exp_issues_from_model(exp_issues_model)
+    return exp_issues
+
+
+def get_playthrough_by_id(playthrough_id):
+    """Retrieves the Playthrough domain object.
+
+    Args:
+        playthrough_id: str. ID of the playthrough.
+
+    Returns:
+        Playthrough|None: The domain object for the playthrough or None if the
+            playthrough_id is invalid.
+    """
+    playthrough = None
+    playthrough_model = stats_models.PlaythroughModel.get(
+        playthrough_id, strict=False)
+    if playthrough_model is not None:
+        playthrough = get_playthrough_from_model(playthrough_model)
+    return playthrough
+
+
+def get_playthroughs_multi(playthrough_ids):
+    """Retrieves multiple Playthrough domain objects.
+
+    Args:
+        playthrough_ids: list(str). List of playthrough IDs.
+
+    Returns:
+        list(Playthrough). List of playthrough domain objects.
+    """
+    playthrough_instances = stats_models.PlaythroughModel.get_multi(
+        playthrough_ids)
+    playthroughs = [
+        get_playthrough_from_model(playthrough_instance)
+        for playthrough_instance in playthrough_instances]
+    return playthroughs
+
+
+def update_playthroughs_multi(playthrough_ids, playthroughs):
+    """Updates the playthrough instances.
+
+    Args:
+        playthrough_ids: list(str). List of playthrough IDs.
+        playthroughs: list(Playthrough). List of playthrough domain objects.
+    """
+    playthrough_instances = stats_models.PlaythroughModel.get_multi(
+        playthrough_ids)
+    updated_instances = []
+    for idx, playthrough_instance in enumerate(playthrough_instances):
+        playthrough_dict = playthroughs[idx].to_dict()
+        playthrough_instance.issue_type = playthrough_dict['issue_type']
+        playthrough_instance.issue_customization_args = (
+            playthrough_dict['issue_customization_args'])
+        playthrough_instance.actions = playthrough_dict['actions']
+        updated_instances.append(playthrough_instance)
+    stats_models.PlaythroughModel.put_multi(updated_instances)
+
+
+def get_exploration_stats_by_id(exp_id, exp_version):
+    """Retrieves the ExplorationStats domain object.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+
+    Returns:
+        ExplorationStats. The domain object for exploration statistics.
+
+    Raises:
+        Exception: Entity for class ExplorationStatsModel with id not found.
+    """
+    exploration_stats = None
+    exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
+        exp_id, exp_version)
+    if exploration_stats_model is not None:
+        exploration_stats = get_exploration_stats_from_model(
+            exploration_stats_model)
+    return exploration_stats
+
+
+def get_multiple_exploration_stats_by_version(exp_id, version_numbers):
+    """Returns a list of ExplorationStats domain objects corresponding to the
+    specified versions.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        version_numbers: list(int). List of version numbers.
+
+    Returns:
+        list(ExplorationStats|None). List of ExplorationStats domain class
+            instances.
+    """
+    exploration_stats = []
+    exploration_stats_models = (
+        stats_models.ExplorationStatsModel.get_multi_versions(
+            exp_id, version_numbers))
+    for exploration_stats_model in exploration_stats_models:
+        if exploration_stats_model is None:
+            exploration_stats.append(None)
+        else:
+            exploration_stats.append(get_exploration_stats_from_model(
+                exploration_stats_model))
+    return exploration_stats
+
+
+def get_exp_issues_from_model(exp_issues_model):
+    """Gets an ExplorationIssues domain object from an ExplorationIssuesModel
+    instance.
+
+    Args:
+        exp_issues_model: ExplorationIssuesModel. Exploration issues model in
+            datastore.
+
+    Returns:
+        ExplorationIssues. The domain object for exploration issues.
+    """
+    unresolved_issues = []
+    for unresolved_issue_dict in exp_issues_model.unresolved_issues:
+        unresolved_issue_dict_copy = copy.deepcopy(unresolved_issue_dict)
+        _migrate_to_latest_issue_schema(unresolved_issue_dict_copy)
+        unresolved_issues.append(
+            stats_domain.ExplorationIssue.from_dict(unresolved_issue_dict_copy))
+    return stats_domain.ExplorationIssues(
+        exp_issues_model.exp_id, exp_issues_model.exp_version,
+        unresolved_issues)
+
+
+def get_exploration_stats_from_model(exploration_stats_model):
+    """Gets an ExplorationStats domain object from an ExplorationStatsModel
+    instance.
+
+    Args:
+        exploration_stats_model: ExplorationStatsModel. Exploration statistics
+            model in datastore.
+
+    Returns:
+        ExplorationStats. The domain object for exploration statistics.
+    """
+    new_state_stats_mapping = {
+        state_name: stats_domain.StateStats.from_dict(
+            exploration_stats_model.state_stats_mapping[state_name])
+        for state_name in exploration_stats_model.state_stats_mapping
+    }
+    return stats_domain.ExplorationStats(
+        exploration_stats_model.exp_id,
+        exploration_stats_model.exp_version,
+        exploration_stats_model.num_starts_v1,
+        exploration_stats_model.num_starts_v2,
+        exploration_stats_model.num_actual_starts_v1,
+        exploration_stats_model.num_actual_starts_v2,
+        exploration_stats_model.num_completions_v1,
+        exploration_stats_model.num_completions_v2,
+        new_state_stats_mapping)
+
+
+def get_playthrough_from_model(playthrough_model):
+    """Gets a PlaythroughModel domain object from a PlaythroughModel instance.
+
+    Args:
+        playthrough_model: PlaythroughModel. Playthrough model in datastore.
+
+    Returns:
+        Playthrough. The domain object for a playthrough.
+    """
+    actions = []
+    for action_dict in playthrough_model.actions:
+        _migrate_to_latest_action_schema(action_dict)
+        actions.append(stats_domain.LearnerAction.from_dict(action_dict))
+    return stats_domain.Playthrough(
+        playthrough_model.exp_id, playthrough_model.exp_version,
+        playthrough_model.issue_type,
+        playthrough_model.issue_customization_args, actions)
+
+
+def create_stats_model(exploration_stats):
+    """Creates an ExplorationStatsModel in datastore given an ExplorationStats
+    domain object.
+
+    Args:
+        exploration_stats: ExplorationStats. The domain object for exploration
+            statistics.
+
+    Returns:
+        str. ID of the datastore instance for ExplorationStatsModel.
+    """
+    new_state_stats_mapping = {
+        state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
+        for state_name in exploration_stats.state_stats_mapping
+    }
+    instance_id = stats_models.ExplorationStatsModel.create(
+        exploration_stats.exp_id,
+        exploration_stats.exp_version,
+        exploration_stats.num_starts_v1,
+        exploration_stats.num_starts_v2,
+        exploration_stats.num_actual_starts_v1,
+        exploration_stats.num_actual_starts_v2,
+        exploration_stats.num_completions_v1,
+        exploration_stats.num_completions_v2,
+        new_state_stats_mapping
+    )
+    return instance_id
+
+
+def _save_stats_model(exploration_stats):
+    """Updates the ExplorationStatsModel datastore instance with the passed
+    ExplorationStats domain object.
+
+    Args:
+        exploration_stats: ExplorationStats. The exploration statistics domain
+            object.
+    """
+    new_state_stats_mapping = {
+        state_name: exploration_stats.state_stats_mapping[state_name].to_dict()
+        for state_name in exploration_stats.state_stats_mapping
+    }
+
+    exploration_stats_model = stats_models.ExplorationStatsModel.get_model(
+        exploration_stats.exp_id, exploration_stats.exp_version)
+
+    exploration_stats_model.num_starts_v1 = exploration_stats.num_starts_v1
+    exploration_stats_model.num_starts_v2 = exploration_stats.num_starts_v2
+    exploration_stats_model.num_actual_starts_v1 = (
+        exploration_stats.num_actual_starts_v1)
+    exploration_stats_model.num_actual_starts_v2 = (
+        exploration_stats.num_actual_starts_v2)
+    exploration_stats_model.num_completions_v1 = (
+        exploration_stats.num_completions_v1)
+    exploration_stats_model.num_completions_v2 = (
+        exploration_stats.num_completions_v2)
+    exploration_stats_model.state_stats_mapping = new_state_stats_mapping
+
+    exploration_stats_model.put()
+
+
+def save_stats_model_transactional(exploration_stats):
+    """Updates the ExplorationStatsModel datastore instance with the passed
+    ExplorationStats domain object in a transaction.
+
+    Args:
+        exploration_stats: ExplorationStats. The exploration statistics domain
+            object.
+    """
+    transaction_services.run_in_transaction(
+        _save_stats_model, exploration_stats)
+
+
+def create_exp_issues_model(exp_issues):
+    """Creates a new ExplorationIssuesModel in the datastore.
+
+    Args:
+        exp_issues: ExplorationIssues. The exploration issues domain object.
+    """
+    unresolved_issues_dicts = [
+        unresolved_issue.to_dict()
+        for unresolved_issue in exp_issues.unresolved_issues]
+    stats_models.ExplorationIssuesModel.create(
+        exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
+
+
+def _save_exp_issues_model(exp_issues):
+    """Updates the ExplorationIssuesModel datastore instance with the passed
+    ExplorationIssues domain object.
+
+    Args:
+        exp_issues: ExplorationIssues. The exploration issues domain
+            object.
+    """
+    unresolved_issues_dicts = [
+        unresolved_issue.to_dict()
+        for unresolved_issue in exp_issues.unresolved_issues]
+    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues.exp_id, exp_issues.exp_version)
+    exp_issues_model.exp_version = exp_issues.exp_version
+    exp_issues_model.unresolved_issues = unresolved_issues_dicts
+
+    exp_issues_model.put()
+
+
+def save_exp_issues_model_transactional(exp_issues):
+    """Updates the ExplorationIssuesModel datastore instance with the passed
+    ExplorationIssues domain object in a transaction.
+
+    Args:
+        exp_issues: ExplorationIssues. The exploration issues domain
+            object.
+    """
+    transaction_services.run_in_transaction(
+        _save_exp_issues_model, exp_issues)
+
+
+def get_exploration_stats_multi(exp_version_references):
+    """Retrieves the exploration stats for the given explorations.
+
+    Args:
+        exp_version_references: list(ExpVersionReference). List of exploration
+            version reference domain objects.
+
+    Returns:
+        list(ExplorationStats). The list of exploration stats domain objects.
+    """
+    exploration_stats_models = (
+        stats_models.ExplorationStatsModel.get_multi_stats_models(
+            exp_version_references))
+
+    exploration_stats_list = []
+    for index, exploration_stats_model in enumerate(exploration_stats_models):
+        if exploration_stats_model is None:
+            exploration_stats_list.append(
+                stats_domain.ExplorationStats.create_default(
+                    exp_version_references[index].exp_id,
+                    exp_version_references[index].version,
+                    {}))
+        else:
+            exploration_stats_list.append(
+                get_exploration_stats_from_model(exploration_stats_model))
+
+    return exploration_stats_list
+
+
+def delete_playthroughs_multi(playthrough_ids):
+    """Deletes multiple playthrough instances.
+
+    Args:
+        playthrough_ids: list(str). List of playthrough IDs to be deleted.
+    """
+    stats_models.PlaythroughModel.delete_playthroughs_multi(playthrough_ids)
+
+
+def get_visualizations_info(exp_id, state_name, interaction_id):
+    """Returns a list of visualization info. Each item in the list is a dict
+    with keys 'data' and 'options'.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+        state_name: str. Name of the state.
+        interaction_id: str. The interaction type.
+
+    Returns:
+        list(dict). Each item in the list is a dict with keys representing
+        - 'id': str. The visualization ID.
+        - 'data': list(dict). A list of answer/frequency dicts.
+        - 'options': dict. The visualization options.
+
+        An example of the returned value may be:
+        [{'options': {'y_axis_label': 'Count', 'x_axis_label': 'Answer'},
+        'id': 'BarChart',
+        'data': [{u'frequency': 1, u'answer': 0}]}]
+    """
+    if interaction_id is None:
+        return []
+
+    visualizations = interaction_registry.Registry.get_interaction_by_id(
+        interaction_id).answer_visualizations
+
+    calculation_ids = set([
+        visualization.calculation_id for visualization in visualizations])
+
+    calculation_ids_to_outputs = {}
+    for calculation_id in calculation_ids:
+        # Don't show top unresolved answers calculation ouutput in stats of
+        # exploration.
+        if calculation_id == 'TopNUnresolvedAnswersByFrequency':
             continue
 
-        threshold = 0.2 * total_entry_count
-        default_rule_answer_log = default_rule_answer_logs[ind]
-        default_count = default_rule_answer_log.total_answer_count
+        # This is None if the calculation job has not yet been run for this
+        # state.
+        calc_output_domain_object = _get_calc_output(
+            exp_id, state_name, calculation_id)
 
-        eligible_flags = []
-        state = exploration.states[state_name]
-        if (default_count > threshold and
-                state.interaction.default_outcome is not None and
-                state.interaction.default_outcome.dest == state_name):
-            eligible_flags.append({
-                'rank': default_count,
-                'improve_type': IMPROVE_TYPE_DEFAULT})
-        if no_answer_submitted_count > threshold:
-            eligible_flags.append({
-                'rank': no_answer_submitted_count,
-                'improve_type': IMPROVE_TYPE_INCOMPLETE})
+        # If the calculation job has not yet been run for this state, we simply
+        # exclude the corresponding visualization results.
+        if calc_output_domain_object is None:
+            continue
 
-        if eligible_flags:
-            eligible_flags = sorted(
-                eligible_flags, key=lambda flag: flag['rank'], reverse=True)
-            ranked_states.append({
-                'rank': eligible_flags[0]['rank'],
-                'state_name': state_name,
-                'type': eligible_flags[0]['improve_type'],
-            })
+        # If the output was associated with a different interaction ID, skip the
+        # results. This filtering step is needed since the same calculation_id
+        # can be shared across multiple interaction types.
+        if calc_output_domain_object.interaction_id != interaction_id:
+            continue
 
-    return sorted([
-        ranked_state for ranked_state in ranked_states
-        if ranked_state['rank'] != 0
-    ], key=lambda x: -x['rank'])
+        calculation_ids_to_outputs[calculation_id] = (
+            calc_output_domain_object.calculation_output.to_raw_type())
+    return [{
+        'id': visualization.id,
+        'data': calculation_ids_to_outputs[visualization.calculation_id],
+        'options': visualization.options,
+        'addressed_info_is_supported': (
+            visualization.addressed_info_is_supported),
+    } for visualization in visualizations
+            if visualization.calculation_id in calculation_ids_to_outputs]
 
 
-def get_versions_for_exploration_stats(exploration_id):
-    """Returns list of versions for this exploration."""
-    return stats_models.ExplorationAnnotationsModel.get_versions(
-        exploration_id)
+def record_answer(
+        exploration_id, exploration_version, state_name, interaction_id,
+        submitted_answer):
+    """Record an answer by storing it to the corresponding StateAnswers entity.
 
-
-def get_exploration_stats(exploration_id, exploration_version):
-    """Returns a dict with state statistics for the given exploration id.
-
-    Note that exploration_version should be a string.
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+        interaction_id: str. The ID of the interaction.
+        submitted_answer: SubmittedAnswer. The submitted answer.
     """
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    exp_stats = stats_jobs_continuous.StatisticsAggregator.get_statistics(
-        exploration_id, exploration_version)
+    record_answers(
+        exploration_id, exploration_version, state_name, interaction_id,
+        [submitted_answer])
 
-    last_updated = exp_stats['last_updated']
-    state_hit_counts = exp_stats['state_hit_counts']
 
+def record_answers(
+        exploration_id, exploration_version, state_name, interaction_id,
+        submitted_answer_list):
+    """Optimally record a group of answers using an already loaded exploration..
+    The submitted_answer_list is a list of SubmittedAnswer domain objects.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration.
+        state_name: str. The name of the state.
+        interaction_id: str. The ID of the interaction.
+        submitted_answer_list: list(SubmittedAnswer). The list of answers to be
+            recorded.
+    """
+    state_answers = stats_domain.StateAnswers(
+        exploration_id, exploration_version, state_name, interaction_id,
+        submitted_answer_list)
+    for submitted_answer in submitted_answer_list:
+        submitted_answer.validate()
+
+    stats_models.StateAnswersModel.insert_submitted_answers(
+        state_answers.exploration_id, state_answers.exploration_version,
+        state_answers.state_name, state_answers.interaction_id,
+        state_answers.get_submitted_answer_dict_list())
+
+
+def get_state_answers(exploration_id, exploration_version, state_name):
+    """Returns a StateAnswers object containing all answers associated with the
+    specified exploration state, or None if no such answers have yet been
+    submitted.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration to fetch
+            answers for.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        StateAnswers or None. A StateAnswers object containing all answers
+        associated with the state, or None if no such answers exist.
+    """
+    state_answers_models = stats_models.StateAnswersModel.get_all_models(
+        exploration_id, exploration_version, state_name)
+    if state_answers_models:
+        main_state_answers_model = state_answers_models[0]
+        submitted_answer_dict_list = itertools.chain.from_iterable([
+            state_answers_model.submitted_answer_list
+            for state_answers_model in state_answers_models])
+        return stats_domain.StateAnswers(
+            exploration_id, exploration_version, state_name,
+            main_state_answers_model.interaction_id,
+            [stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict)
+             for submitted_answer_dict in submitted_answer_dict_list],
+            schema_version=main_state_answers_model.schema_version)
+    else:
+        return None
+
+
+def get_sample_answers(exploration_id, exploration_version, state_name):
+    """Fetches a list of sample answers that were submitted to the specified
+    exploration state (at the given version of the exploration).
+
+    Args:
+        exploration_id: str. The exploration ID.
+        exploration_version: int. The version of the exploration to fetch
+            answers for.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        list(*). A list of some sample raw answers. At most 100 answers are
+        returned.
+    """
+    answers_model = stats_models.StateAnswersModel.get_master_model(
+        exploration_id, exploration_version, state_name)
+    if answers_model is None:
+        return []
+
+    # Return at most 100 answers, and only answers from the initial shard (If
+    # we needed to use subsequent shards then the answers are probably too big
+    # anyway).
+    sample_answers = answers_model.submitted_answer_list[:100]
+    return [
+        stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict).answer
+        for submitted_answer_dict in sample_answers]
+
+
+def get_top_state_answer_stats(exploration_id, state_name):
+    """Fetches the top (at most) 10 answers from the given state_name in the
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        list(*). A list of the top 10 answers, sorted by decreasing frequency.
+    """
+    calc_output = (
+        _get_calc_output(exploration_id, state_name, 'Top10AnswerFrequencies'))
+    raw_calc_output = (
+        [] if calc_output is None else
+        calc_output.calculation_output.to_raw_type())
+    return [
+        {'answer': output['answer'], 'frequency': output['frequency']}
+        for output in raw_calc_output
+        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
+    ]
+
+
+def get_top_state_unresolved_answers(exploration_id, state_name):
+    """Fetches the top unresolved answers for the given state_name in the
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        list(*). A list of the top 10 answers, sorted by decreasing frequency.
+    """
+    calc_output_model = _get_calc_output(
+        exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
+
+    if not calc_output_model:
+        return []
+
+    calculation_output = calc_output_model.calculation_output.to_raw_type()
+    return [
+        {'answer': output['answer'], 'frequency': output['frequency']}
+        for output in calculation_output
+        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
+    ]
+
+
+def get_top_state_answer_stats_multi(exploration_id, state_names):
+    """Fetches the top (at most) 10 answers from each given state_name in the
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_names: list(str). The name of the state to fetch answers for.
+
+    Returns:
+        dict(str: list(*)). Dict mapping each state name to the list of its top
+            (at most) 10 answers, sorted by decreasing frequency.
+    """
     return {
-        'improvements': get_state_improvements(
-            exploration_id, exploration_version),
-        'last_updated': last_updated,
-        'num_completions': exp_stats['complete_exploration_count'],
-        'num_starts': exp_stats['start_exploration_count'],
-        'state_stats': {
-            state_name: {
-                'name': state_name,
-                'firstEntryCount': (
-                    state_hit_counts[state_name]['first_entry_count']
-                    if state_name in state_hit_counts else 0),
-                'totalEntryCount': (
-                    state_hit_counts[state_name]['total_entry_count']
-                    if state_name in state_hit_counts else 0),
-            } for state_name in exploration.states
-        },
+        state_name: get_top_state_answer_stats(exploration_id, state_name)
+        for state_name in state_names
     }
+
+
+def _get_calc_output(exploration_id, state_name, calculation_id):
+    """Get state answers calculation output domain object obtained from
+    StateAnswersCalcOutputModel instance stored in the data store. The
+    calculation ID comes from the name of the calculation class used to compute
+    aggregate data from submitted user answers. This returns aggregated output
+    for all versions of the specified state and exploration.
+
+    Args:
+        exploration_id: str. ID of the exploration.
+        state_name: str. Name of the state.
+        calculation_id: str. Name of the calculation class.
+
+    Returns:
+        StateAnswersCalcOutput|None. The state answers calculation output
+            domain object or None.
+    """
+    calc_output_model = stats_models.StateAnswersCalcOutputModel.get_model(
+        exploration_id, VERSION_ALL, state_name, calculation_id)
+    if calc_output_model:
+        calculation_output = None
+        if (calc_output_model.calculation_output_type ==
+                stats_domain.CALC_OUTPUT_TYPE_ANSWER_FREQUENCY_LIST):
+            calculation_output = (
+                stats_domain.AnswerFrequencyList.from_raw_type(
+                    calc_output_model.calculation_output))
+        return stats_domain.StateAnswersCalcOutput(
+            exploration_id, VERSION_ALL, state_name,
+            calc_output_model.interaction_id, calculation_id,
+            calculation_output)
+    else:
+        return None
+
+
+def get_learner_answer_details_from_model(learner_answer_details_model):
+    """Returns a LearnerAnswerDetails domain object given a
+    LearnerAnswerDetailsModel loaded from the datastore.
+
+    Args:
+        learner_answer_details_model: LearnerAnswerDetailsModel. The learner
+            answer details model loaded from the datastore.
+
+    Returns:
+        LearnerAnswerDetails. A LearnerAnswerDetails domain object
+            corresponding to the given model.
+    """
+    return stats_domain.LearnerAnswerDetails(
+        learner_answer_details_model.state_reference,
+        learner_answer_details_model.entity_type,
+        learner_answer_details_model.interaction_id,
+        [stats_domain.LearnerAnswerInfo.from_dict(learner_answer_info_dict)
+         for learner_answer_info_dict
+         in learner_answer_details_model.learner_answer_info_list],
+        learner_answer_details_model.learner_answer_info_schema_version,
+        learner_answer_details_model.accumulated_answer_info_json_size_bytes)
+
+
+def get_learner_answer_details(entity_type, state_reference):
+    """Returns a LearnerAnswerDetails domain object, with given
+    entity_type and state_name. This function checks
+    in the datastore if the corresponding LearnerAnswerDetailsModel exists,
+    if not then None is returned.
+
+    Args:
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
+            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        state_reference: str. This is used to refer to a state
+            in an exploration or question. For an exploration the
+            value will be equal to 'exp_id:state_name' and for question
+            this will be equal to 'question_id'.
+
+    Returns:
+        LearnerAnswerDetails. The learner answer domain object
+            or None if the model does not exist.
+    """
+    learner_answer_details_model = (
+        stats_models.LearnerAnswerDetailsModel.get_model_instance(
+            entity_type, state_reference))
+    if learner_answer_details_model is not None:
+        learner_answer_details = get_learner_answer_details_from_model(
+            learner_answer_details_model)
+        return learner_answer_details
+    return None
+
+
+def create_learner_answer_details_model_instance(learner_answer_details):
+    """Creates a new model instance from the given LearnerAnswerDetails domain
+    object.
+
+    Args:
+        learner_answer_details: LearnerAnswerDetails. The learner answer
+            details domain object.
+    """
+    stats_models.LearnerAnswerDetailsModel.create_model_instance(
+        learner_answer_details.entity_type,
+        learner_answer_details.state_reference,
+        learner_answer_details.interaction_id,
+        [learner_answer_info.to_dict() for learner_answer_info
+         in learner_answer_details.learner_answer_info_list],
+        learner_answer_details.learner_answer_info_schema_version,
+        learner_answer_details.accumulated_answer_info_json_size_bytes)
+
+
+
+def save_learner_answer_details(
+        entity_type, state_reference, learner_answer_details):
+    """Saves the LearnerAnswerDetails domain object in the datatstore,
+    if the model instance with the given entity_type and state_reference is
+    found and if the instance id of the model doesn't matches with the
+    generated instance id, then the earlier model is deleted and a new model
+    instance is created.
+
+    Args:
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
+            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        state_reference: str. This is used to refer to a state
+            in an exploration or question. For an exploration the
+            value will be equal to 'exp_id:state_name' and for question
+            this will be equal to 'question_id'.
+        learner_answer_details: LearnerAnswerDetails. The learner answer
+            details domain object which is to be saved.
+    """
+    learner_answer_details.validate()
+    learner_answer_details_model = (
+        stats_models.LearnerAnswerDetailsModel.get_model_instance(
+            entity_type, state_reference))
+    if learner_answer_details_model is not None:
+        instance_id = stats_models.LearnerAnswerDetailsModel.get_instance_id(
+            learner_answer_details.entity_type,
+            learner_answer_details.state_reference)
+        if learner_answer_details_model.id == instance_id:
+            learner_answer_details_model.learner_answer_info_list = (
+                [learner_answer_info.to_dict() for learner_answer_info
+                 in learner_answer_details.learner_answer_info_list])
+            learner_answer_details_model.learner_answer_info_schema_version = (
+                learner_answer_details.learner_answer_info_schema_version)
+            learner_answer_details_model.accumulated_answer_info_json_size_bytes = ( #pylint: disable=line-too-long
+                learner_answer_details.accumulated_answer_info_json_size_bytes)
+            learner_answer_details_model.put()
+        else:
+            learner_answer_details_model.delete()
+            create_learner_answer_details_model_instance(learner_answer_details)
+    else:
+        create_learner_answer_details_model_instance(learner_answer_details)
+
+
+def record_learner_answer_info(
+        entity_type, state_reference, interaction_id, answer, answer_details):
+    """Records the new learner answer info received from the learner in the
+    model and then saves it.
+
+    Args:
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
+            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        state_reference: str. This is used to refer to a state
+            in an exploration or question. For an exploration the
+            value will be equal to 'exp_id:state_name' and for question
+            this will be equal to 'question_id'.
+        interaction_id: str. The ID of the interaction.
+        answer: dict or list or str or int or bool. The answer which is
+            submitted by the learner. Actually type of the answer is
+            interaction dependent, like TextInput interactions have
+            string type answer, NumericInput have int type answers etc.
+        answer_details: str. The details the learner will submit when the
+            learner will be asked questions like 'Hey how did you land on
+            this answer', 'Why did you pick that answer' etc.
+    """
+    learner_answer_details = get_learner_answer_details(
+        entity_type, state_reference)
+    if learner_answer_details is None:
+        learner_answer_details = stats_domain.LearnerAnswerDetails(
+            state_reference, entity_type, interaction_id, [], 0)
+    learner_answer_info_id = (
+        stats_domain.LearnerAnswerInfo.get_new_learner_answer_info_id())
+    learner_answer_info = stats_domain.LearnerAnswerInfo(
+        learner_answer_info_id, answer, answer_details,
+        datetime.datetime.utcnow())
+    learner_answer_details.add_learner_answer_info(learner_answer_info)
+    save_learner_answer_details(
+        entity_type, state_reference, learner_answer_details)
+
+
+def delete_learner_answer_info(
+        entity_type, state_reference, learner_answer_info_id):
+    """Deletes the learner answer info in the model, and then
+    saves it.
+
+    Args:
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
+            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        state_reference: str. This is used to refer to a state
+            in an exploration or question. For an exploration the
+            value will be equal to 'exp_id:state_name' and for question
+            this will be equal to 'question_id'.
+        learner_answer_info_id: str. The unique ID of the learner answer info
+            which needs to be deleted.
+    """
+    learner_answer_details = get_learner_answer_details(
+        entity_type, state_reference)
+    if learner_answer_details is None:
+        raise utils.InvalidInputException(
+            'No learner answer details found with the given state '
+            'reference and entity')
+    learner_answer_details.delete_learner_answer_info(
+        learner_answer_info_id)
+    save_learner_answer_details(
+        entity_type, state_reference, learner_answer_details)
+
+
+def update_state_reference(
+        entity_type, old_state_reference, new_state_reference):
+    """Updates the state_reference field of the LearnerAnswerDetails model
+    instance with the new_state_reference recieved and then saves the instance
+    in the datastore.
+
+    Args:
+        entity_type: str. The type of entity i.e ENTITY_TYPE_EXPLORATION
+            or ENTITY_TYPE_QUESTION, which are declared in feconf.py.
+        old_state_reference: str. The old state reference which needs to be
+            changed.
+        new_state_reference: str. The new state reference which needs to be
+            updated.
+    """
+    learner_answer_details = get_learner_answer_details(
+        entity_type, old_state_reference)
+    if learner_answer_details is None:
+        raise utils.InvalidInputException(
+            'No learner answer details found with the given state '
+            'reference and entity')
+    learner_answer_details.update_state_reference(new_state_reference)
+    save_learner_answer_details(
+        entity_type, old_state_reference, learner_answer_details)
+
+
+def delete_learner_answer_details_for_exploration_state(
+        exp_id, state_name):
+    """Deletes the LearnerAnswerDetailsModel corresponding to the given
+    exploration ID and state name.
+
+    Args:
+        exp_id: str. The ID of the exploration.
+        state_name: str. The name of the state.
+    """
+    state_reference = (
+        stats_models.LearnerAnswerDetailsModel.get_state_reference_for_exploration( #pylint: disable=line-too-long
+            exp_id, state_name))
+    learner_answer_details_model = (
+        stats_models.LearnerAnswerDetailsModel.get_model_instance(
+            feconf.ENTITY_TYPE_EXPLORATION, state_reference))
+    if learner_answer_details_model is not None:
+        learner_answer_details_model.delete()
+
+
+def delete_learner_answer_details_for_question_state(question_id):
+    """Deletes the LearnerAnswerDetailsModel for the given question ID.
+
+    Args:
+        question_id: str. The ID of the question.
+    """
+    state_reference = (
+        stats_models.LearnerAnswerDetailsModel.get_state_reference_for_question(
+            question_id))
+    learner_answer_details_model = (
+        stats_models.LearnerAnswerDetailsModel.get_model_instance(
+            feconf.ENTITY_TYPE_QUESTION, state_reference))
+    if learner_answer_details_model is not None:
+        learner_answer_details_model.delete()

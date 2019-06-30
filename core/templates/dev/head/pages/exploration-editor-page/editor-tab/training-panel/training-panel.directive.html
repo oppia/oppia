@@ -1,0 +1,46 @@
+<div class="form-inline" style="margin-bottom: 10px;">
+  <div style="margin-top: 10px;">
+    <span><strong>If Oppia encounters the answer:</strong></span>
+  </div>
+
+  <div>
+    <angular-html-bind html-data="answerTemplate">
+    </angular-html-bind>
+  </div>
+
+  <br>
+
+  <div>
+    <span><strong>Select correct feedback or type a new response:</strong></span>
+
+    <div class="trained-feedback-selection-form-container">
+      <form>
+        <div class="trained-feedback-selection-container" ng-repeat="outcome in allOutcomes track by $index">
+          <button class="trained-feedback-selection" ng-click="selectAnswerGroupIndex($index)" ng-class="{'trained-feedback-selected': $index == selectedAnswerGroupIndex}">
+            <span ng-if="!outcome.feedback.isEmpty()">
+              <angular-html-bind html-data="outcome.feedback.getHtml()">
+              </angular-html-bind>
+            </span>
+            <span ng-if="outcome.feedback.isEmpty()">
+              <em>(No feedback)</em>
+            </span>
+
+            <br>
+
+            <span style="float: right;" ng-if="outcome.dest != getCurrentStateName()">
+              → <[outcome.dest]>
+            </span>
+            <span style="float: right;" ng-if="outcome.dest == getCurrentStateName()">
+              <em>→ (try again)</em>
+            </span>
+          </button>
+        </div>
+      </form>
+      <button class="btn btn-default" ng-if="!addingNewResponse" ng-click="beginAddingNewResponse()">Add New Response</button>
+      <outcome-feedback-editor ng-if="addingNewResponse" outcome="classification.newOutcome">
+      </outcome-feedback-editor>
+      <button class="btn btn-default btn-success" ng-if="addingNewResponse" ng-click="confirmNewFeedback()">Save New Response</button>
+      <button class="btn btn-default" ng-if="addingNewResponse" ng-click="cancelAddingNewResponse()">Cancel</button>
+    </div>
+  </div>
+</div>

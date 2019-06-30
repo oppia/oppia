@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python configuration for MultipleChoiceInput interaction."""
+
 from extensions.interactions import base
 
 
@@ -29,6 +31,10 @@ class MultipleChoiceInput(base.BaseInteraction):
     instructions = None
     narrow_instructions = None
     needs_summary = False
+    # Radio buttons get unselected when specifying a solution. This needs to be
+    # fixed before solution feature can support this interaction.
+    can_have_solution = False
+    show_generic_submit_button = False
 
     _customization_arg_specs = [{
         'name': 'choices',
@@ -51,4 +57,18 @@ class MultipleChoiceInput(base.BaseInteraction):
             }
         },
         'default_value': [''],
+    }]
+
+    _answer_visualization_specs = [{
+        # Bar chart with answer counts.
+        'id': 'BarChart',
+        'options': {
+            'x_axis_label': 'Answer',
+            'y_axis_label': 'Count',
+        },
+        'calculation_id': 'AnswerFrequencies',
+        # Bar charts don't have any useful way to display which answers are
+        # addressed yet. By setting this option to False, we consequentially
+        # avoid doing extra computation.
+        'addressed_info_is_supported': False,
     }]

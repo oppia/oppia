@@ -1,0 +1,45 @@
+<footer class="oppia-footer" role="contentinfo">
+  <div class="oppia-footer-container">
+    <div class="row">
+      <div class="col-sm-3">
+        <h4 translate="I18N_FOOTER_ABOUT_ALL_CAPS"></h4>
+        <ul>
+          <li><a href="/about" translate="I18N_FOOTER_ABOUT"></a></li>
+          <li><a href="http://oppiafoundation.org/" translate="I18N_FOOTER_OPPIA_FOUNDATION"></a></li>
+          <li><a href="/terms" class="protractor-test-terms-link" translate="I18N_FOOTER_TERMS_OF_SERVICE"></a></li>
+          <li><a href="/privacy" class="protractor-test-privacy-policy-link" translate="I18N_FOOTER_PRIVACY_POLICY"></a></li>
+        </ul>
+      </div>
+      <div class="col-sm-3">
+        <h4 translate="I18N_FOOTER_TEACH_LEARN_ALL_CAPS"></h4>
+        <ul>
+          <li><a href="/get_started" translate="I18N_FOOTER_GET_STARTED"></a></li>
+          <li><a href="/teach#playbook" translate="I18N_FOOTER_PARTICIPATION_PLAYBOOK"></a></li>
+          <li><a href="/library" translate="I18N_FOOTER_BROWSE_LIBRARY"></a></li>
+          <li><a href="https://groups.google.com/forum/?place=forum/oppia#!forum/oppia" translate="I18N_FOOTER_FORUM"></a></li>
+        </ul>
+      </div>
+      <div class="col-sm-3">
+        <h4 translate="I18N_FOOTER_CONTRIBUTE_ALL_CAPS"></h4>
+        <ul>
+          <li><a href="https://oppiafoundation.org/volunteer" translate="I18N_FOOTER_GET_INVOLVED"></a></li>
+          <li><a href="/teach#teach" translate="I18N_FOOTER_TEACH"></a></li>
+          <li><a href="/donate" class="protractor-test-donate-link"  translate="I18N_FOOTER_DONATE"></a></li>
+          <li><a href="/about#credits" translate="I18N_FOOTER_CREDITS"></a></li>
+        </ul>
+      </div>
+      <div class="col-sm-3">
+        <h4><span translate="I18N_LANGUAGE_FOOTER_VIEW_IN"></span></h4>
+        <ul ng-controller="I18nFooter">
+          <select ng-model="currentLanguageCode"
+                  ng-change="changeLanguage()"
+                  ng-options="language.id as language.text for language in supportedSiteLanguages"
+                  class="oppia-language-selector protractor-test-i18n-language-selector"
+                  style="color: black;" aria-label="Change languages">
+          </select>
+        </ul>
+        <social-buttons></social-buttons>
+      </div>
+    </div>
+  </div>
+</footer>

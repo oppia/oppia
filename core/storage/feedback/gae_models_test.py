@@ -14,8 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for core.storage.feedback.gae_models."""
+
+import types
+
+from core.domain import feedback_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 
@@ -25,92 +31,189 @@ DELETED_FIELD = 'deleted'
 FIELDS_NOT_REQUIRED = [CREATED_ON_FIELD, LAST_UPDATED_FIELD, DELETED_FIELD]
 
 
-class SuggestionModelTest(test_utils.GenericTestBase):
-    """Tests the SuggestionModel class."""
+class FeedbackThreadModelTest(test_utils.GenericTestBase):
+    """Tests for the GeneralFeedbackThreadModel class."""
 
-    def setUp(self):
-        super(SuggestionModelTest, self).setUp()
-        feedback_models.SuggestionModel.create('exp_id1', 'thread_id1',
-                                               'author_id', 1, 'state_name',
-                                               'description',
-                                               {'old_content': {}})
-        feedback_models.SuggestionModel.create('exp_id1', 'thread_id2',
-                                               'author_id', 1, 'state_name',
-                                               'description',
-                                               {'old_content': {}})
-        feedback_models.SuggestionModel.create('exp_id2', 'thread_id2',
-                                               'author_id', 1, 'state_name',
-                                               'description',
-                                               {'old_content': {}})
+    def test_put_function(self):
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type=feconf.ENTITY_TYPE_EXPLORATION, entity_id='exp_id_1',
+            subject='dummy subject', message_count=0)
+        feedback_thread_model.put()
 
-    def _get_suggestion_models_for_test(self, suggestions_list):
-        """Removes fields that are set to default values in the base model and
-        are thus not explicitly verified in tests."""
+        last_updated = feedback_thread_model.last_updated
 
-        updated_suggestions_list = []
-        for suggestion in suggestions_list:
-            suggestion_dict = suggestion.to_dict()
-            for field in FIELDS_NOT_REQUIRED:
-                if field in suggestion_dict:
-                    suggestion_dict.pop(field)
-            updated_suggestions_list.append(suggestion_dict)
-        return updated_suggestions_list
+        # If we do not wish to update the last_updated time, we should set
+        # the update_last_updated_time argument to False in the put function.
+        feedback_thread_model.put(update_last_updated_time=False)
+        self.assertEqual(feedback_thread_model.last_updated, last_updated)
 
-    def test_create_new_object_runs_successfully(self):
-        feedback_models.SuggestionModel.create('exp_id3', 'thread_id2',
-                                               'author_id', 1, 'state_name',
-                                               'description',
-                                               {'old_content': {}})
-        suggestion = (
-            feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-                'exp_id3', 'thread_id2'))
+        # If we do wish to change it however, we can simply use the put function
+        # as the default value of update_last_updated_time is True.
+        feedback_thread_model.put()
+        self.assertNotEqual(feedback_thread_model.last_updated, last_updated)
 
-        self.assertEqual(suggestion.exploration_id, 'exp_id3')
-        self.assertEqual(suggestion.author_id, 'author_id')
-        self.assertEqual(suggestion.exploration_version, 1)
-        self.assertEqual(suggestion.state_name, 'state_name')
-        self.assertEqual(suggestion.description, 'description')
-        self.assertEqual(suggestion.state_content, {'old_content': {}})
+    def test_raise_exception_by_mocking_collision(self):
+        feedback_thread_model_cls = feedback_models.GeneralFeedbackThreadModel
+        # Test create method.
+        with self.assertRaisesRegexp(
+            Exception, 'Feedback thread ID conflict on create.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                feedback_thread_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    feedback_thread_model_cls)):
+                feedback_thread_model_cls.create(
+                    'exploration.exp_id.thread_id')
 
-    def test_create_suggestion_fails_if_thread_already_has_suggestion(self):
-        with self.assertRaisesRegexp(Exception, 'There is already a feedback '
-                                     'thread with the given thread id: '
-                                     'exp_id1.thread_id1'):
-            feedback_models.SuggestionModel.create('exp_id1',
-                                                   'thread_id1', 'author_id', 1,
-                                                   'state_name',
-                                                   'description',
-                                                   {'old_content': {}})
+        # Test generate_new_thread_id method.
+        with self.assertRaisesRegexp(
+            Exception,
+            'New thread id generator is producing too many collisions.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                feedback_thread_model_cls, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    feedback_thread_model_cls)):
+                feedback_thread_model_cls.generate_new_thread_id(
+                    'exploration', 'exp_id')
 
-    def test_get_by_exploration_and_thread_id_suggestion_present(self):
-        actual_suggestion = [(
-            feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-                'exp_id1', 'thread_id1'))]
-        expected_suggestion = [feedback_models.SuggestionModel(
-            id='exp_id1.thread_id1',
-            author_id='author_id',
-            exploration_id='exp_id1',
-            exploration_version=1,
-            state_name='state_name',
-            description='description',
-            state_content={'old_content': {}})]
 
-        self.assertEqual(len(self._get_suggestion_models_for_test(
-            actual_suggestion)), 1)
+class GeneralFeedbackMessageModelTests(test_utils.GenericTestBase):
+    """Tests for the GeneralFeedbackMessageModel class."""
+
+    def test_raise_exception_by_mocking_collision(self):
+        with self.assertRaisesRegexp(
+            Exception, 'Feedback message ID conflict on create.'):
+            # Swap dependent method get_by_id to simulate collision every time.
+            with self.swap(
+                feedback_models.GeneralFeedbackMessageModel, 'get_by_id',
+                types.MethodType(
+                    lambda x, y: True,
+                    feedback_models.GeneralFeedbackMessageModel)):
+                feedback_models.GeneralFeedbackMessageModel.create(
+                    'thread_id', 'message_id')
+
+    def test_get_all_messages(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', None, 'subject 1', 'text 1')
+
+        feedback_services.create_message(
+            thread_id, None, 'open', 'subject 2', 'text 2')
+
+        model = feedback_models.GeneralFeedbackMessageModel.get(
+            thread_id, 0)
+        self.assertEqual(model.entity_type, 'exploration')
+
+        all_messages = (
+            feedback_models.GeneralFeedbackMessageModel
+            .get_all_messages(2, None))
+
+        self.assertEqual(len(all_messages[0]), 2)
+
+        self.assertEqual(all_messages[0][0].thread_id, thread_id)
+        self.assertEqual(all_messages[0][0].entity_id, '0')
+        self.assertEqual(all_messages[0][0].entity_type, 'exploration')
+        self.assertEqual(all_messages[0][0].text, 'text 2')
+        self.assertEqual(all_messages[0][0].updated_subject, 'subject 2')
+
+        self.assertEqual(all_messages[0][1].thread_id, thread_id)
+        self.assertEqual(all_messages[0][1].entity_id, '0')
+        self.assertEqual(all_messages[0][1].entity_type, 'exploration')
+        self.assertEqual(all_messages[0][1].text, 'text 1')
+        self.assertEqual(all_messages[0][1].updated_subject, 'subject 1')
+
+    def test_get_most_recent_message(self):
+        thread_id = feedback_services.create_thread(
+            'exploration', '0', None, 'subject 1', 'text 1')
+
+        feedback_services.create_message(
+            thread_id, None, 'open', 'subject 2', 'text 2')
+
+        model1 = feedback_models.GeneralFeedbackMessageModel.get(
+            thread_id, 0)
+
+        self.assertEqual(model1.entity_type, 'exploration')
+
+        message = (
+            feedback_models.GeneralFeedbackMessageModel
+            .get_most_recent_message(thread_id))
+
+        self.assertEqual(message.thread_id, thread_id)
+        self.assertEqual(message.entity_id, '0')
+        self.assertEqual(message.entity_type, 'exploration')
+        self.assertEqual(message.text, 'text 2')
+        self.assertEqual(message.updated_subject, 'subject 2')
+
+
+class FeedbackThreadUserModelTest(test_utils.GenericTestBase):
+    """Tests for the FeedbackThreadUserModel class."""
+
+    def test_create_new_object(self):
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            'user_id', 'exploration.exp_id.thread_id')
+        feedback_thread_user_model = (
+            feedback_models.GeneralFeedbackThreadUserModel.get(
+                'user_id', 'exploration.exp_id.thread_id'))
+
         self.assertEqual(
-            self._get_suggestion_models_for_test(expected_suggestion),
-            self._get_suggestion_models_for_test(actual_suggestion))
+            feedback_thread_user_model.id,
+            'user_id.exploration.exp_id.thread_id')
+        self.assertEqual(
+            feedback_thread_user_model.message_ids_read_by_user, [])
 
-    def test_get_by_exploration_and_thread_id_no_suggestion(self):
-        actual_suggestion = (
-            feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-                'invalid_exp_id', 'thread_id1'))
+    def test_get_object(self):
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            'user_id', 'exploration.exp_id.thread_id')
+        expected_model = feedback_models.GeneralFeedbackThreadUserModel(
+            id='user_id.exploration.exp_id.thread_id',
+            message_ids_read_by_user=[])
 
-        self.assertIsNone(actual_suggestion)
+        actual_model = (
+            feedback_models.GeneralFeedbackThreadUserModel.get(
+                'user_id', 'exploration.exp_id.thread_id'))
+
+        self.assertEqual(actual_model.id, expected_model.id)
+        self.assertEqual(
+            actual_model.message_ids_read_by_user,
+            expected_model.message_ids_read_by_user)
+
+    def test_get_multi(self):
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            'user_id', 'exploration.exp_id.thread_id_1')
+        feedback_models.GeneralFeedbackThreadUserModel.create(
+            'user_id', 'exploration.exp_id.thread_id_2')
+
+        expected_model_1 = feedback_models.GeneralFeedbackThreadUserModel(
+            id='user_id.exploration.exp_id.thread_id_1',
+            message_ids_read_by_user=[])
+        expected_model_2 = feedback_models.GeneralFeedbackThreadUserModel(
+            id='user_id.exploration.exp_id.thread_id_2',
+            message_ids_read_by_user=[])
+
+        actual_models = (
+            feedback_models.GeneralFeedbackThreadUserModel.get_multi(
+                'user_id',
+                ['exploration.exp_id.thread_id_1',
+                 'exploration.exp_id.thread_id_2']))
+
+        actual_model_1 = actual_models[0]
+        actual_model_2 = actual_models[1]
+
+        self.assertEqual(actual_model_1.id, expected_model_1.id)
+        self.assertEqual(
+            actual_model_1.message_ids_read_by_user,
+            expected_model_1.message_ids_read_by_user)
+
+        self.assertEqual(actual_model_2.id, expected_model_2.id)
+        self.assertEqual(
+            actual_model_2.message_ids_read_by_user,
+            expected_model_2.message_ids_read_by_user)
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
-    """Tests for FeedbackMessageEmailDataModel class"""
+    """Tests for FeedbackMessageEmailDataModel class."""
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'
