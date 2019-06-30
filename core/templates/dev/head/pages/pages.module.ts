@@ -28,6 +28,8 @@ import { EmailDashboardPagesModule } from
 import { ErrorPageModule } from 'pages/error-pages/error-page.module.ts';
 import { StewardsLandingPageModule } from
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts';
+import { TopicLandingPageModule } from
+  'pages/landing-pages/topic-landing-page/topic-landing-page.module.ts';
 
 @NgModule({
   imports: [
@@ -37,7 +39,8 @@ import { StewardsLandingPageModule } from
     DonatePageModule,
     EmailDashboardPagesModule,
     ErrorPageModule,
-    StewardsLandingPageModule
+    StewardsLandingPageModule,
+    TopicLandingPageModule
   ]
 })
 export class PagesModule {}
@@ -50,6 +53,7 @@ require('pages/email-dashboard-pages/email-dashboard-pages.module.ts');
 require('pages/error-pages/error-page.module.ts');
 require(
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts');
+require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
@@ -58,5 +62,6 @@ angular.module('pages', [
   'donatePageModule',
   'emailDashboardPagesModule',
   'errorPageModule',
-  'stewarsLandingPageModule'
+  'stewardsLandingPageModule',
+  'topicLandingPageModule'
 ]);

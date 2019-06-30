@@ -23,7 +23,7 @@ require('services/SiteAnalyticsService.ts');
 require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
-angular.module('stewarsLandingPageModule').directive(
+angular.module('stewardsLandingPageModule').directive(
   'stewardsLandingPage', ['UrlInterpolationService', function(
       UrlInterpolationService) {
     return {
