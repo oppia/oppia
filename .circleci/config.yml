@@ -99,7 +99,7 @@ jobs:
           name: Generate backend coverage report
           command: |
             echo "" >> .coverage
-            ./cc-test-reporter format-coverage .coverage -t coverage.py -d
+            ./cc-test-reporter format-coverage ./.coverage -t coverage.py -d
             ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -d
             ./cc-test-reporter upload-coverage -d
           when: on_success
