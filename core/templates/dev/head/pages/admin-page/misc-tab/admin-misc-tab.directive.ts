@@ -23,7 +23,7 @@ require('pages/admin-page/admin-page.constants.ts');
 
 var oppia = require('AppInit.ts').module;
 
-oppia.directive('adminMiscTab', [
+angular.module('miscTabModule').directive('adminMiscTab', [
   '$http', '$window', 'AdminTaskManagerService', 'UrlInterpolationService',
   'ADMIN_HANDLER_URL', 'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL',
   function(

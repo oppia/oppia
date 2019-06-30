@@ -13,10 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive scripts for the about page.
+ * @fileoverview Module for the admin roles tab.
  */
 
-require('App.ts');
+import { NgModule } from '@angular/core';
 
-require('base_components/BaseContentDirective.ts');
-require('pages/about-page/about-page.controller.ts');
+@NgModule({})
+export class AdminNavbarModule {}
+
+angular.module('adminNavbarModule', []);

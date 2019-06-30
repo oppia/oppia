@@ -16,19 +16,18 @@
  * @fileoverview Constants for the Oppia admin page.
  */
 
-var oppia = require('AppInit.ts').module;
-
-oppia.constant(
+angular.module('adminPageModule').constant(
   'ADMIN_ROLE_HANDLER_URL', '/adminrolehandler');
 
-oppia.constant('ADMIN_HANDLER_URL', '/adminhandler');
-oppia.constant(
+angular.module('adminPageModule').constant(
+  'ADMIN_HANDLER_URL', '/adminhandler');
+angular.module('adminPageModule').constant(
   'ADMIN_TOPICS_CSV_DOWNLOAD_HANDLER_URL', '/admintopicscsvdownloadhandler');
 
-oppia.constant(
+angular.module('adminPageModule').constant(
   'ADMIN_JOB_OUTPUT_URL_TEMPLATE', '/adminjoboutput?job_id=<jobId>');
 
-oppia.constant('ADMIN_TAB_URLS', {
+angular.module('adminPageModule').constant('ADMIN_TAB_URLS', {
   ACTIVITIES: '#activities',
   JOBS: '#jobs',
   CONFIG: '#config',
@@ -36,5 +35,5 @@ oppia.constant('ADMIN_TAB_URLS', {
   MISC: '#misc'
 });
 
-oppia.constant(
+angular.module('adminPageModule').constant(
   'PROFILE_URL_TEMPLATE', '/profile/<username>');

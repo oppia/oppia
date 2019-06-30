@@ -15,6 +15,24 @@
 /**
  * @fileoverview Module for the Oppia pages.
  */
-require('pages/about-page/about-page.module.ts');
 
-angular.module('pages', ['aboutPageModule']);
+import { NgModule } from '@angular/core';
+
+import { AboutPageModule } from 'pages/about-page/about-page.module.ts';
+import { AdminPageModule } from 'pages/admin-page/admin-page.module.ts';
+
+@NgModule({
+  imports: [
+    AboutPageModule,
+    AdminPageModule
+  ]
+})
+export class PagesModule {}
+
+require('pages/about-page/about-page.module.ts');
+require('pages/admin-page/admin-page.module.ts');
+
+angular.module('pages', [
+  'aboutPageModule',
+  'adminPageModule'
+]);

@@ -20,9 +20,12 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { StaticProvider } from '@angular/core';
 
+import { PagesModule } from 'pages/pages.module.ts';
+
 @NgModule({
   imports: [
-    BrowserModule
+    BrowserModule,
+    PagesModule
   ]
 })
 class MainAngularModule {
