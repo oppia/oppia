@@ -61,12 +61,6 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run:
-          name: CodeClimate before-build
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-            ./cc-test-reporter before-build
-      - run:
           name: Run frontend tests
           command: |
             bash -x scripts/run_frontend_tests.sh --run-minified-tests=true
