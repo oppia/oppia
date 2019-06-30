@@ -33,8 +33,8 @@ import os
 import shutil
 import subprocess
 import sys
-
 # pylint: enable=wrong-import-order
+
 
 def _install_hook():
     """Installs the pre_commit_hook script. It ensures that oppia is root."""
@@ -94,10 +94,12 @@ def _revert_changes_in_package_lock_file():
     git_unstage_cmd = ['git', 'reset', '--', 'package-lock.json']
     git_revert_cmd = ['git', 'checkout', '--', 'package-lock.json']
 
-    out_unstage_cmd, err_unstage_cmd = _start_subprocess_for_result(git_unstage_cmd)
+    _, err_unstage_cmd = (
+        _start_subprocess_for_result(git_unstage_cmd))
 
     if not err_unstage_cmd:
-        out_revert_cmd, err_revert_cmd = _start_subprocess_for_result(git_revert_cmd)
+        _, err_revert_cmd = (
+            _start_subprocess_for_result(git_revert_cmd))
 
         if not err_revert_cmd:
             print 'Changes to package-lock.json successfully reverted!'
