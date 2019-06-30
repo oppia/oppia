@@ -100,6 +100,7 @@ jobs:
           command: |
             echo "" >> .coverage
             pip install codeclimate-test-reporter
+            coverage xml
             ./cc-test-reporter format-coverage -t coverage.py -d
             ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -d
             ./cc-test-reporter upload-coverage -d
