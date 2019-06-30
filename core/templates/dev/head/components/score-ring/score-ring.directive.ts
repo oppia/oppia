@@ -50,7 +50,7 @@ oppia.directive('scoreRing', [
           });
 
           ctrl.getScoreRingColor = function() {
-            if(ctrl.isTestPassed()) {
+            if (ctrl.isTestPassed()) {
               // return color green when passed.
               return 'rgb(0, 150, 136)';
             } else {
@@ -60,7 +60,7 @@ oppia.directive('scoreRing', [
           };
 
           ctrl.getScoreOuterRingColor = function() {
-            if(ctrl.isTestPassed()) {
+            if (ctrl.isTestPassed()) {
               // return color green when passed.
               return 'rgb(143, 217, 209)';
             } else {
