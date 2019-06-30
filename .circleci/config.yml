@@ -73,6 +73,7 @@ jobs:
       - run:
           name: Generate frontend coverage report
           command: |
+            cat ../karma_coverage_reports/coverage-final.json
             ./cc-test-reporter sum-coverage ../karma_coverage_reports/coverage-final.json
             ./cc-test-reporter upload-coverage
           when: on_success
@@ -97,6 +98,7 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
+            cat .coverage
             ./cc-test-reporter format-coverage .coverage -t coverage.py
             ./cc-test-reporter sum-coverage coverage/codeclimate.*.json
             ./cc-test-reporter upload-coverage
