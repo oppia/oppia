@@ -99,8 +99,8 @@ jobs:
           name: Generate backend coverage report
           command: |
             echo "" >> .coverage
-            pip install codeclimate-test-reporter
-            pip install coverage
+            pip install codeclimate-test-reporter --user
+            pip install coverage --user
             coverage xml
             ./cc-test-reporter format-coverage -t coverage.py -d
             ./cc-test-reporter sum-coverage coverage/codeclimate.*.json -d
