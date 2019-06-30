@@ -25,6 +25,7 @@ import { CreatorDashboardPageModule } from
 import { DonatePageModule } from 'pages/donate-page/donate-page.module.ts';
 import { EmailDashboardPagesModule } from
   'pages/email-dashboard-pages/email-dashboard-pages.module.ts';
+import { ErrorPageModule } from 'pages/error-pages/error-page.module.ts';
 
 @NgModule({
   imports: [
@@ -32,7 +33,8 @@ import { EmailDashboardPagesModule } from
     AdminPageModule,
     CreatorDashboardPageModule,
     DonatePageModule,
-    EmailDashboardPagesModule
+    EmailDashboardPagesModule,
+    ErrorPageModule
   ]
 })
 export class PagesModule {}
@@ -42,11 +44,13 @@ require('pages/admin-page/admin-page.module.ts');
 require('pages/creator-dashboard-page/creator-dashboard-page.module.ts');
 require('pages/donate-page/donate-page.module.ts');
 require('pages/email-dashboard-pages/email-dashboard-pages.module.ts');
+require('pages/error-pages/error-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
   'adminPageModule',
   'creatorDashboardPageModule',
   'donatePageModule',
-  'emailDashboardPagesModule'
+  'emailDashboardPagesModule',
+  'errorPageModule'
 ]);
