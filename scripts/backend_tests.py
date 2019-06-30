@@ -154,6 +154,12 @@ class TestingTaskSpec(object):
 
         return run_shell_cmd(exc_list)
 
+    def generate_xml_coverage(self):
+        """Generates xml file from .coverage."""
+        if self.generate_coverage_report:
+            generate_xml_cmd = 'python %s xml' % COVERAGE_PATH
+            run_shell_cmd(generate_xml_cmd.split())
+
 
 def _check_all_tasks(tasks):
     """Checks the results of all tasks."""
@@ -276,6 +282,8 @@ def main():
         task = TaskThread(test.run, parsed_args.verbose, name=test_target)
         task_to_taskspec[task] = test
         tasks.append(task)
+        # Generate xml.
+        test.generate_xml_coverage()
 
     task_execution_failed = False
     try:
