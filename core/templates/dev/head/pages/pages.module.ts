@@ -28,12 +28,14 @@ import { EmailDashboardPagesModule } from
 import { ErrorPageModule } from 'pages/error-pages/error-page.module.ts';
 import { LearnerDashboardPageModule } from
   'pages/learner-dashboard-page/learner-dashboard-page.module.ts';
+import { ModeratorPageModule } from
+  'pages/moderator-page/moderator-page.module.ts';
+import { NotificationsDashboardPageModule } from
+  'pages/notifications-dashboard-page/notifications-dashboard-page.module.ts';
 import { StewardsLandingPageModule } from
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts';
 import { TopicLandingPageModule } from
   'pages/landing-pages/topic-landing-page/topic-landing-page.module.ts';
-import { ModeratorPageModule } from
-  'pages/moderator-page/moderator-page.module.ts';
 
 @NgModule({
   imports: [
@@ -45,6 +47,7 @@ import { ModeratorPageModule } from
     ErrorPageModule,
     LearnerDashboardPageModule,
     ModeratorPageModule,
+    NotificationsDashboardPageModule,
     StewardsLandingPageModule,
     TopicLandingPageModule
   ]
@@ -62,6 +65,7 @@ require(
 require('pages/moderator-page/moderator-page.module.ts');
 require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');
+require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
@@ -72,6 +76,7 @@ angular.module('pages', [
   'errorPageModule',
   'learnerDashboardPageModule',
   'moderatorPageModule',
+  'notificationsDashboardPageModule',
   'stewardsLandingPageModule',
   'topicLandingPageModule'
 ]);
