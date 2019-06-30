@@ -23,6 +23,7 @@ oppia.directive('scoreRing', [
       scope: {},
       bindToController: {
         getScore: '&score',
+        isTestPassed: '&isTestPassed'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/score-ring/score-ring.directive.html'),
@@ -47,6 +48,26 @@ oppia.directive('scoreRing', [
               setScore(newScore);
             }
           });
+
+          ctrl.getScoreRingColor = function() {
+            if(ctrl.isTestPassed()) {
+              // return color green when passed.
+              return 'rgb(0, 150, 136)';
+            } else {
+              // return color orange when failed.
+              return 'rgb(217, 92, 12)';
+            }
+          };
+
+          ctrl.getScoreOuterRingColor = function() {
+            if(ctrl.isTestPassed()) {
+              // return color green when passed.
+              return 'rgb(143, 217, 209)';
+            } else {
+              // return color orange when failed.
+              return 'rgb(244, 206, 186)';
+            }
+          };
         }
       ]
     };

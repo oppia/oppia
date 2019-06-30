@@ -17,9 +17,11 @@
   <!-- Results Page -->
   <div class="oppia-question-player-results" ng-if="resultsLoaded">
     <div class="oppia-question-player-card question-player-results-header">
-      <h3 class="oppia-question-player-header" ng-if="$ctrl.passTest"> Test Complete. Well Done! </h3>
-      <h3 class="oppia-question-player-header" ng-if="!$ctrl.passTest"> Test Failed. </h3>
-      <score-ring score="$ctrl.totalScore"></score-ring>
+      <h3 class="oppia-question-player-header" ng-if="$ctrl.isTestPassed"> Test Complete. Well Done! </h3>
+      <h3 class="oppia-question-player-header" ng-if="!$ctrl.isTestPassed"> Test Failed. </h3>
+      <score-ring score="$ctrl.totalScore"
+                  is-test-passed="$ctrl.isTestPassed">
+      </score-ring>
     </div>
 
     <div class="oppia-question-player-card question-player-skills-results">
@@ -38,15 +40,15 @@
           </th>
         </tr>
         <tr ng-repeat="scorePerSkill in $ctrl.scorePerSkillMapping">
-          <td> {{scorePerSkill.description}} </td>
+          <td> <[scorePerSkill.description]> </td>
           <td>
-            <div class="oppia-score-per-skill">
+            <div class="oppia-skill-score-container">
               <div class="score-bar" style="width: <[$ctrl.getScorePercentage(scorePerSkill)]>%; background: <[$ctrl.getColorForScore(scorePerSkill)]>"></div>
             </div>
           </td>
         </tr>
       </table>
-      <button class="btn btn-default" ng-if="!$ctrl.passTest"> Review and Retry </button>
+      <button class="btn btn-default" ng-if="!$ctrl.isTestPassed"> Review and Retry </button>
     </div>
 
     <div class="oppia-question-player-card question-player-results-footer"
@@ -186,23 +188,23 @@
     padding-bottom: 16px;
   }
 
-  .question-player-skills-results .skill-score-table {
+  .oppia-question-player-container .question-player-skills-results .skill-score-table {
     font-size: 15px;
     text-align: center;
     width: 100%;
     margin-bottom: 16px;
   }
 
-  .skill-score-table .skill-score-table-headings {
+  .oppia-question-player-container .skill-score-table .skill-score-table-headings {
     padding-bottom: 0.5em;
     text-align: center;
   }
 
-  .skill-score-table .skill-score-table-headings p {
+  .oppia-question-player-container .skill-score-table .skill-score-table-headings p {
     display: inline;
   }
 
-  .skill-score-table .oppia-score-per-skill {
+  .oppia-question-player-container .skill-score-table .oppia-skill-score-container {
     height: 10px;
     background: #FFFFFF;
     border: 1px solid rgba(0, 0, 0, 0.25);
@@ -210,7 +212,7 @@
     margin: 10px 25px 0px;
   }
 
-  .oppia-score-per-skill .score-bar {
+  .oppia-skill-score-container .score-bar {
     height: 8px;
   }
 

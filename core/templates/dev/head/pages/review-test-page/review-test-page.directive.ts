@@ -84,7 +84,7 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
                 },
                 {
                   type: 'RETRY_SESSION',
-                  text: 'New Test',
+                  text: 'Retry Test',
                   url: reviewTestsUrl
                 },
                 {
@@ -96,7 +96,11 @@ oppia.directive('reviewTestPage', ['UrlInterpolationService', function(
               skillList: skillIdList,
               skillDescriptions: skillDescriptions,
               questionCount: ReviewTestEngineService.getReviewTestQuestionCount(
-                skillIdList.length)
+                skillIdList.length),
+              questionPlayerMode: {
+                modeType: 'PASS_FAIL',
+                passCutoff: 0.75
+              }
             };
             ctrl.questionPlayerConfig = questionPlayerConfig;
           });
