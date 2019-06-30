@@ -22,7 +22,7 @@ require('services/contextual/WindowDimensionsService.ts');
 
 var oppia = require('AppInit.ts').module;
 
-oppia.directive('activityTilesInfinityGrid', [
+angular.module('searchResultsModule').directive('activityTilesInfinityGrid', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
