@@ -856,6 +856,7 @@ textarea {
   left: auto;
   right: 0;
   word-wrap: break-word;
+  white-space: nowrap;
 }
 
 .oppia-dropdown-submenu > .uib-dropdown-menu {
