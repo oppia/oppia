@@ -232,8 +232,13 @@ module.exports = {
       inject: false
     }),
     new HtmlWebpackPlugin({
-      chunks: ['exploration_editor'],
+      chunks: ['app', 'exploration_editor'],
       filename: 'exploration-editor-page.mainpage.html',
+      meta: {
+        name: 'Personalized Online Learning from Oppia',
+        description: 'Help others learn new things. Create lessons through ' +
+          'explorations and share your knowledge with the community.'
+      },
       template:
         commonPrefix + '/pages/exploration-editor-page/' +
         'exploration-editor-page.mainpage.html',

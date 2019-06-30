@@ -138,6 +138,7 @@ require(
   'suggestion-modal-for-exploration-editor.service.ts');
 // ^^^ this block of requires should be removed ^^^
 
+require('base_components/BaseContentDirective.ts');
 require(
   'components/version-diff-visualization/' +
   'version-diff-visualization.directive.ts');
