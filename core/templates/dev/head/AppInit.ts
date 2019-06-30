@@ -41,7 +41,7 @@ const downgradedModule = downgradeModule(bootstrapFn);
 
 declare var angular: any;
 
-require('pages/about-page/about-page.module.ts');
+require('pages/pages.module.ts');
 
 var oppia = angular.module(
   'oppia', [
@@ -49,7 +49,7 @@ var oppia = angular.module(
     'ngAudio', 'ngCookies', 'ngImgCrop', 'ngJoyRide', 'ngMaterial',
     'ngResource', 'ngSanitize', 'ngTouch', 'pascalprecht.translate',
     'toastr', 'ui.bootstrap', 'ui.sortable', 'ui.tree', 'ui.validate',
-    'aboutPageModule',
+    'pages',
     downgradedModule
   ].concat(
   window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
