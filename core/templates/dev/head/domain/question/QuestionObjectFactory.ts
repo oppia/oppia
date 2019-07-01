@@ -19,14 +19,18 @@
 
 require('domain/state/StateObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('QuestionObjectFactory', [
   'StateObjectFactory', 'INTERACTION_SPECS',
   function(StateObjectFactory, INTERACTION_SPECS) {
-    var Question = function(id, stateData, languageCode, version) {
+    var Question = function(id, stateData, languageCode, version,
+        linkedSkillIds) {
       this._id = id;
       this._stateData = stateData;
       this._languageCode = languageCode;
       this._version = version;
+      this._linkedSkillIds = linkedSkillIds;
     };
 
     // Instance methods
@@ -55,13 +59,21 @@ oppia.factory('QuestionObjectFactory', [
       return this._version;
     };
 
+    Question.prototype.getLinkedSkillIds = function() {
+      return this._linkedSkillIds;
+    };
+
+    Question.prototype.setLinkedSkillIds = function(linkedSkillIds) {
+      this._linkedSkillIds = linkedSkillIds;
+    };
+
     // TODO (ankita240796) Remove the bracket notation once Angular2 gets in.
     /* eslint-disable dot-notation */
-    Question['createDefaultQuestion'] = function() {
+    Question['createDefaultQuestion'] = function(skillIds) {
     /* eslint-enable dot-notation */
       return new Question(
         null, StateObjectFactory.createDefaultState(null),
-        constants.DEFAULT_LANGUAGE_CODE, 1);
+        constants.DEFAULT_LANGUAGE_CODE, 1, skillIds);
     };
 
     Question.prototype.validate = function(misconceptions) {
@@ -122,7 +134,8 @@ oppia.factory('QuestionObjectFactory', [
         questionBackendDict.id,
         StateObjectFactory.createFromBackendDict(
           'question', questionBackendDict.question_state_data),
-        questionBackendDict.language_code, questionBackendDict.version
+        questionBackendDict.language_code, questionBackendDict.version,
+        questionBackendDict.linked_skill_ids
       );
     };
 

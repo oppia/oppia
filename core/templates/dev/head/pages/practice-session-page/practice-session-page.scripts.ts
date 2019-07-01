@@ -16,4 +16,6 @@
  * @fileoverview Directive scripts for the practice session.
  */
 
+require('App.ts');
+
 require('pages/practice-session-page/practice-session-page.controller.ts');
