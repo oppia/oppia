@@ -72,28 +72,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-    def _run_but_do_not_flush_pending_tasks(self):
-        """"Runs but not flushes pending tasks."""
-        queue_names = self._get_all_queue_names()
-
-        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-        for queue in queue_names:
-            self.taskqueue_stub.FlushQueue(queue)
-
-        for task in tasks:
-            headers = {
-                key: str(val) for key, val in task.headers.iteritems()
-            }
-            headers['Content-Length'] = str(len(task.payload or ''))
-
-            app = (
-                webtest.TestApp(main_taskqueue.app)
-                if task.url.startswith('/task')
-                else self.testapp)
-            app.post(
-                url=str(task.url), params=(task.payload or ''),
-                headers=headers)
-
     def test_admin_page_rights(self):
         """Test access rights to the admin page."""
 
@@ -212,57 +190,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_handler_raises_error_with_non_int_num_dummy_exps_to_generate(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        with self.assertRaisesRegexp(
-            Exception, 'invalid_type is not a number'):
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'generate_dummy_explorations',
-                    'num_dummy_exps_to_publish': 1,
-                    'num_dummy_exps_to_generate': 'invalid_type'
-                }, csrf_token=csrf_token)
-
-        self.logout()
-
-    def test_handler_raises_error_with_non_int_num_dummy_exps_to_publish(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        with self.assertRaisesRegexp(
-            Exception, 'invalid_type is not a number'):
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'generate_dummy_explorations',
-                    'num_dummy_exps_to_publish': 'invalid_type',
-                    'num_dummy_exps_to_generate': 1
-                }, csrf_token=csrf_token)
-
-        self.logout()
-
-    def test_cannot_generate_dummy_explorations_in_prod_mode(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        response = self.get_html_response('/admin')
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
-        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
-            Exception, 'Cannot generate dummy explorations in production.')
-
-        with assert_raises_regexp_context_manager, prod_mode_swap:
-            self.post_json(
-                '/adminhandler', {
-                    'action': 'generate_dummy_explorations',
-                    'num_dummy_exps_to_generate': 10,
-                    'num_dummy_exps_to_publish': 3
-                }, csrf_token=csrf_token)
-
-        self.logout()
-
     def test_admin_topics_csv_download_handler(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_custom_response(
@@ -271,6 +198,14 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(
             response.headers['Content-Disposition'],
             'attachment; filename=topic_similarities.csv')
+
+        self.assertIn(
+            'Architecture,Art,Biology,Business,Chemistry,Computing,Economics,'
+            'Education,Engineering,Environment,Geography,Government,Hobbies,'
+            'Languages,Law,Life Skills,Mathematics,Medicine,Music,Philosophy,'
+            'Physics,Programming,Psychology,Puzzles,Reading,Religion,Sport,'
+            'Statistics,Welcome',
+            response.body)
 
         self.logout()
 
@@ -287,13 +222,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
 
         response = self.get_json('/adminjoboutput', params={'job_id': job_id})
-
         self.assertIsNone(response['output'])
 
         self.process_and_flush_pending_tasks()
 
         response = self.get_json('/adminjoboutput', params={'job_id': job_id})
-
         self.assertEqual(
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
@@ -570,8 +503,11 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
     """Test the conditions for generation of dummy explorations."""
 
-    def test_generate_count_greater_than_publish_count(self):
+    def setUp(self):
+        super(GenerateDummyExplorationsTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+
+    def test_generate_count_greater_than_publish_count(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_html_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -587,7 +523,6 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 3)
 
     def test_generate_count_equal_to_publish_count(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_html_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -603,7 +538,6 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         self.assertEqual(len(published_exps), 2)
 
     def test_generate_count_less_than_publish_count(self):
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.get_html_response('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -619,6 +553,72 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(len(generated_exps), 0)
         self.assertEqual(len(published_exps), 0)
+
+    def test_handler_raises_error_with_non_int_num_dummy_exps_to_generate(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_html_response('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with self.assertRaisesRegexp(
+            Exception, 'invalid_type is not a number'):
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_explorations',
+                    'num_dummy_exps_to_publish': 1,
+                    'num_dummy_exps_to_generate': 'invalid_type'
+                }, csrf_token=csrf_token)
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_handler_raises_error_with_non_int_num_dummy_exps_to_publish(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_html_response('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        with self.assertRaisesRegexp(
+            Exception, 'invalid_type is not a number'):
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_explorations',
+                    'num_dummy_exps_to_publish': 'invalid_type',
+                    'num_dummy_exps_to_generate': 1
+                }, csrf_token=csrf_token)
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
+
+    def test_cannot_generate_dummy_explorations_in_prod_mode(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        response = self.get_html_response('/admin')
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        prod_mode_swap = self.swap(constants, 'DEV_MODE', False)
+        assert_raises_regexp_context_manager = self.assertRaisesRegexp(
+            Exception, 'Cannot generate dummy explorations in production.')
+
+        with assert_raises_regexp_context_manager, prod_mode_swap:
+            self.post_json(
+                '/adminhandler', {
+                    'action': 'generate_dummy_explorations',
+                    'num_dummy_exps_to_generate': 10,
+                    'num_dummy_exps_to_publish': 3
+                }, csrf_token=csrf_token)
+
+        generated_exps = exp_services.get_all_exploration_summaries()
+        published_exps = exp_services.get_recently_published_exp_summaries(5)
+        self.assertEqual(generated_exps, {})
+        self.assertEqual(published_exps, {})
+
+        self.logout()
 
 
 class AdminRoleHandlerTest(test_utils.GenericTestBase):
@@ -690,7 +690,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(response['error'], 'Invalid method to view roles.')
 
-    def test_deassign_user_from_all_topics(self):
+    def test_assign_moderator(self):
         user_email = 'user1@example.com'
         username = 'user1'
 

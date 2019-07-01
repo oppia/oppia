@@ -1098,28 +1098,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('owner_id', exploration)
         self.process_and_flush_pending_tasks()
 
-    def _run_but_do_not_flush_pending_tasks(self):
-        """"Runs but not flushes pending tasks."""
-        queue_names = self._get_all_queue_names()
-
-        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
-        for queue in queue_names:
-            self.taskqueue_stub.FlushQueue(queue)
-
-        for task in tasks:
-            headers = {
-                key: str(val) for key, val in task.headers.iteritems()
-            }
-            headers['Content-Length'] = str(len(task.payload or ''))
-
-            app = (
-                webtest.TestApp(main_taskqueue.app)
-                if task.url.startswith('/task')
-                else self.testapp)
-            app.post(
-                url=str(task.url), params=(task.payload or ''),
-                headers=headers)
-
     def test_cannot_get_entity_with_invalid_id(self):
         with self.assertRaisesRegexp(
             ValueError, 'Invalid realtime id: invalid_entity_id'):
