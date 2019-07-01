@@ -28,10 +28,13 @@ import { EmailDashboardPagesModule } from
 import { ErrorPageModule } from 'pages/error-pages/error-page.module.ts';
 import { LearnerDashboardPageModule } from
   'pages/learner-dashboard-page/learner-dashboard-page.module.ts';
+import { LibraryPageModule } from 'pages/library-page/library-page.module.ts';
 import { ModeratorPageModule } from
   'pages/moderator-page/moderator-page.module.ts';
 import { NotificationsDashboardPageModule } from
   'pages/notifications-dashboard-page/notifications-dashboard-page.module.ts';
+import { PracticeSessionPageModule } from
+  'pages/practice-session-page/practice-session-page.module.ts';
 import { StewardsLandingPageModule } from
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts';
 import { TopicLandingPageModule } from
@@ -46,8 +49,10 @@ import { TopicLandingPageModule } from
     EmailDashboardPagesModule,
     ErrorPageModule,
     LearnerDashboardPageModule,
+    LibraryPageModule,
     ModeratorPageModule,
     NotificationsDashboardPageModule,
+    PracticeSessionPageModule,
     StewardsLandingPageModule,
     TopicLandingPageModule
   ]
@@ -66,6 +71,8 @@ require('pages/moderator-page/moderator-page.module.ts');
 require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');
 require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
+require('pages/library-page/library-page.module.ts');
+require('pages/practice-session-page/practice-session-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
@@ -75,8 +82,10 @@ angular.module('pages', [
   'emailDashboardPagesModule',
   'errorPageModule',
   'learnerDashboardPageModule',
+  'libraryPageModule',
   'moderatorPageModule',
   'notificationsDashboardPageModule',
+  'practiceSessionPageModule',
   'stewardsLandingPageModule',
   'topicLandingPageModule'
 ]);
