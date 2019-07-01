@@ -59,8 +59,8 @@
               <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div ng-if="$ctrl.hasPageLoaded">
-                  <select2-dropdown item="$parent.explorationTagsService.displayed"
-                                    choices="$parent.explorationTagsService.displayed"
+                  <select2-dropdown item="$ctrl.explorationTagsService.displayed"
+                                    choices="$ctrl.explorationTagsService.displayed"
                                     allow-multiple-choices="true"
                                     invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
                                     new-choice-regex="<[::$ctrl.TAG_REGEX]>"
