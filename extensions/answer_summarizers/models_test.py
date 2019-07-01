@@ -92,7 +92,7 @@ class CalculationUnitTestBase(test_utils.GenericTestBase):
         return state_answers_calc_output.calculation_output
 
 
-class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
+class AnswerFrequenciesUnitTests(CalculationUnitTestBase):
     """Tests for arbitrary answer frequency calculations."""
 
     CALCULATION_ID = 'AnswerFrequencies'
@@ -149,7 +149,7 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
-class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
+class Top5AnswerFrequenciesUnitTests(CalculationUnitTestBase):
     """Tests for Top 5 answer frequency calculations."""
 
     CALCULATION_ID = 'Top5AnswerFrequencies'
@@ -194,7 +194,7 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
-class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
+class Top10AnswerFrequenciesUnitTests(CalculationUnitTestBase):
     """Tests for Top 10 answer frequency calculations."""
 
     CALCULATION_ID = 'Top10AnswerFrequencies'
@@ -248,7 +248,7 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
 
 
-class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
+class FrequencyCommonlySubmittedElementsUnitTests(CalculationUnitTestBase):
     """This calculation only works on answers which are all lists."""
     CALCULATION_ID = 'FrequencyCommonlySubmittedElements'
 

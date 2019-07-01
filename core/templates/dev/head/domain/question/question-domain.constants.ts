@@ -16,6 +16,8 @@
  * @fileoverview Constants for question domain.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant(
   'EDITABLE_QUESTION_DATA_URL_TEMPLATE',
   '/question_editor_handler/data/<question_id>');

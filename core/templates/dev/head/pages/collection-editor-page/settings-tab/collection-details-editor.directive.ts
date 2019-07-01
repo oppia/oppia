@@ -29,6 +29,8 @@ require(
   'pages/collection-editor-page/services/collection-editor-state.service.ts');
 require('services/AlertsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('collectionDetailsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

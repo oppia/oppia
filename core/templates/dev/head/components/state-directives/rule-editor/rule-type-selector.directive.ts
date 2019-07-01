@@ -23,6 +23,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('ruleTypeSelector', [function() {
   return {
     restrict: 'E',
