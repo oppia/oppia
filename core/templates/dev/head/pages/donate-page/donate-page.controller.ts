@@ -22,6 +22,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/SiteAnalyticsService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('donatePage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

@@ -16,6 +16,8 @@
  * @fileoverview Detail service for the interaction.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('GraphDetailService', [function() {
   return {
     VERTEX_RADIUS: 6,

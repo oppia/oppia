@@ -582,7 +582,9 @@ def apply_change_list(question_id, change_list):
                     question.update_language_code(change.new_value)
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_QUESTION_STATE_DATA):
-                    question.update_question_state_data(change.new_value)
+                    state_domain_object = state_domain.State.from_dict(
+                        change.new_value)
+                    question.update_question_state_data(state_domain_object)
                 elif (change.property_name ==
                       question_domain.QUESTION_PROPERTY_LINKED_SKILL_IDS):
                     question.update_linked_skill_ids(change.new_value)

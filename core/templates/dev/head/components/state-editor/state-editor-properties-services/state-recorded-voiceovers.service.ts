@@ -21,6 +21,8 @@ require(
   'components/state-editor/state-editor-properties-services/' +
   'state-property.service.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateRecordedVoiceoversService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);
