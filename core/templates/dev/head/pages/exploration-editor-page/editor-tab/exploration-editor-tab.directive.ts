@@ -48,7 +48,6 @@ require(
 require('services/AlertsService.ts');
 require('services/ContextService.ts');
 
-
 var oppia = require('AppInit.ts').module;
 
 oppia.directive('explorationEditorTab', ['UrlInterpolationService', function(
