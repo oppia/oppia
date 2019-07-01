@@ -1,3 +1,0 @@
-exclude_patterns:
-- "third_party/*"
-- "../oppia_tools/*"
