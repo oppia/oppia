@@ -18,6 +18,8 @@
 
 require('services/services.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('RteHelperService', [
   '$document', '$filter', '$interpolate', '$log', '$uibModal',
   'ContextService', 'FocusManagerService', 'HtmlEscaperService',
