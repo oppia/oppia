@@ -16,6 +16,8 @@
  * @fileoverview Service to operate the playback of audio.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('AudioPlayerService', [
   '$q', '$timeout', 'AssetsBackendApiService', 'AudioTranslationManagerService',
   'ContextService', 'ngAudio',

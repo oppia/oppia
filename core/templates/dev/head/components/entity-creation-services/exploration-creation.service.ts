@@ -21,6 +21,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('services/AlertsService.ts');
 require('services/SiteAnalyticsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationCreationService', [
   '$http', '$rootScope', '$timeout', '$uibModal', '$window',
   'AlertsService', 'SiteAnalyticsService', 'UrlInterpolationService',

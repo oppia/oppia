@@ -30,6 +30,8 @@ require('services/contextual/UrlService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveItemSelectionInput', [
   'HtmlEscaperService', 'ItemSelectionInputRulesService',
   'UrlInterpolationService', function(

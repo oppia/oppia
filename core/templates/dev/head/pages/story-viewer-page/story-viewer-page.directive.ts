@@ -32,6 +32,8 @@ require('services/AlertsService.ts');
 require('services/PageTitleService.ts');
 require('services/contextual/UrlService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('storyViewerPage', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

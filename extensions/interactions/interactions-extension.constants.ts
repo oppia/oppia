@@ -16,6 +16,8 @@
  * @fileoverview Constants for interactions extensions.
  */
 
+var oppia = require('AppInit.ts').module;
+
 // Minimum confidence required for a predicted answer group to be shown to user.
 // Generally a threshold of 0.7-0.8 is assumed to be a good one in practice,
 // however value need not be in those bounds.

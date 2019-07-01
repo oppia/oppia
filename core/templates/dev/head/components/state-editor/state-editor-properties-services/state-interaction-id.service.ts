@@ -17,6 +17,8 @@
  */
 
 // TODO(sll): Add validation.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('StateInteractionIdService', [
   'StatePropertyService', function(StatePropertyService) {
     var child = Object.create(StatePropertyService);

@@ -17,6 +17,8 @@
  * domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('UserInfoObjectFactory', [function() {
   var UserInfo = function(
       isModerator, isAdmin, isSuperAdmin, isTopicManager, canCreateCollections,

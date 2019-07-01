@@ -5,3 +5,16 @@
     <img src="/build/fail/logo/288x128_logo_white.png">
   </div>
 {% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <!-- This code is used for inserting webpack bundles
+     https://github.com/jantimon/html-webpack-plugin#writing-your-own-templates -->
+  <% for (var chunk in htmlWebpackPlugin.files.js) { %>
+    <% if (webpackConfig.mode == 'production') { %>
+      <script src="/build/templates/head/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } else { %>
+      <script src="/dist/<%= htmlWebpackPlugin.files.js[chunk] %>"></script>
+    <% } %>
+  <% } %>
+{% endblock footer_js %}

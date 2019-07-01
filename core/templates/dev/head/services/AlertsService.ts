@@ -16,6 +16,8 @@
  * @fileoverview Factory for handling warnings and info messages.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('AlertsService', ['$log', function($log) {
   var AlertsService = {
     /**

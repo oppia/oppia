@@ -17,6 +17,8 @@
  * states based on statistics.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ImprovementsService', [function() {
   var INTERACTION_IDS_REQUIRED_TO_BE_RESOLVED = ['TextInput'];
 

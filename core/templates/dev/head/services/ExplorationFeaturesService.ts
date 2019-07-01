@@ -17,6 +17,8 @@
  *               the exploration editor.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationFeaturesService', [function() {
   var settings = {
     areParametersEnabled: false,

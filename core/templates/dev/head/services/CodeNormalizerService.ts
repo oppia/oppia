@@ -17,6 +17,8 @@
  * and pencil code interactions.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CodeNormalizerService', [function() {
   var removeLeadingWhitespace = function(str) {
     return str.replace(/^\s+/g, '');

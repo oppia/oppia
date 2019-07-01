@@ -16,6 +16,8 @@
  * @fileoverview Services for oppia email dashboard page.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('EmailDashboardDataService', [
   '$http', '$q', function($http, $q) {
     var QUERY_DATA_URL = '/emaildashboarddatahandler';

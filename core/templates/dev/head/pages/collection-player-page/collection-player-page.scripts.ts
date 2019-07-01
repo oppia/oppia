@@ -16,6 +16,8 @@
  * @fileoverview Directives required in collection player.
  */
 
+require('App.ts');
+
 require(
   'pages/collection-player-page/collection-footer/' +
   'collection-footer.directive.ts');

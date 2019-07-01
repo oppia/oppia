@@ -33,6 +33,8 @@ require('services/ValidatorsService.ts');
 // to a rule. It also includes 'Cancel' and 'Save Answer' buttons which call
 // respective 'onCancelRuleEdit' and 'onSaveRule' callbacks when called. These
 // buttons only show up if 'isEditingRuleInline' is true.
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('ruleEditor', [
   '$log', 'UrlInterpolationService', function($log, UrlInterpolationService) {
     return {

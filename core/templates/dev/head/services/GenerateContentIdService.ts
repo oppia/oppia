@@ -17,6 +17,8 @@
  * SubtitledHtml domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('GenerateContentIdService', [
   'COMPONENT_NAME_FEEDBACK', 'COMPONENT_NAME_HINT',
   'COMPONENT_NAME_WORKED_EXAMPLE', function(

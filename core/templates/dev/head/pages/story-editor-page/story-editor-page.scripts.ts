@@ -16,6 +16,8 @@
  * @fileoverview Directive scripts for the story editor page.
  */
 
+require('App.ts');
+
 require(
   'pages/story-editor-page/navbar/story-editor-navbar-breadcrumb.directive.ts');
 require('pages/story-editor-page/navbar/story-editor-navbar.directive.ts');

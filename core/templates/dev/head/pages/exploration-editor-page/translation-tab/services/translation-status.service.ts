@@ -36,6 +36,8 @@ require(
 
 require('pages/exploration-editor-page/exploration-editor-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('TranslationStatusService', [
   'ExplorationStatesService', 'StateRecordedVoiceoversService',
   'StateWrittenTranslationsService', 'TranslationLanguageService',

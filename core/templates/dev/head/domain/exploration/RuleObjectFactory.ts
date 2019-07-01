@@ -17,6 +17,8 @@
  * domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('RuleObjectFactory', [function() {
   var Rule = function(type, inputs) {
     this.type = type;

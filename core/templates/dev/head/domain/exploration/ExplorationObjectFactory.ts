@@ -22,6 +22,8 @@ require('domain/exploration/ParamSpecsObjectFactory.ts');
 require('domain/exploration/StatesObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationObjectFactory', [
   '$log', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
   'StatesObjectFactory', 'UrlInterpolationService',

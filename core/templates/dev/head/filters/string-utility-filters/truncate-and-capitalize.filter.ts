@@ -17,6 +17,8 @@
  */
 
 // Note that this filter does not truncate at the middle of a word.
+var oppia = require('AppInit.ts').module;
+
 oppia.filter('truncateAndCapitalize', [function() {
   return function(input, maxNumberOfCharacters) {
     if (!input) {

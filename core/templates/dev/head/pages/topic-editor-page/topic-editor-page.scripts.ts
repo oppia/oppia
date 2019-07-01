@@ -16,6 +16,8 @@
  * @fileoverview Directive scripts for the topic editor page.
  */
 
+require('App.ts');
+
 require(
   'pages/topic-editor-page/navbar/topic-editor-navbar-breadcrumb.directive.ts');
 require('pages/topic-editor-page/navbar/topic-editor-navbar.directive.ts');

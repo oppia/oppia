@@ -19,6 +19,8 @@
 
 require('domain/statistics/LearnerActionObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('PlaythroughObjectFactory', [
   'LearnerActionObjectFactory', function(LearnerActionObjectFactory) {
     /**

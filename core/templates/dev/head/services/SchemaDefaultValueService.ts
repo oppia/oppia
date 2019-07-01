@@ -17,6 +17,8 @@
  * SchemaBasedList item.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SchemaDefaultValueService', [function() {
   return {
     // TODO(sll): Rewrite this to take validators into account, so that

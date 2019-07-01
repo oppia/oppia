@@ -20,6 +20,8 @@
 // the current active version? Previous versions should not be editable.
 // TODO(SD): Remove translatable part from this service after translation tab
 // will get implemented.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('EditabilityService', [function() {
   var isEditable = false;
   var isTranslatable = false;

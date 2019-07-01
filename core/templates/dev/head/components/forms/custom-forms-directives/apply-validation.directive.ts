@@ -19,6 +19,8 @@
 require('filters/string-utility-filters/underscores-to-camel-case.filter.ts');
 
 /* eslint-disable angular/directive-restrict */
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('applyValidation', ['$filter', function($filter) {
   return {
     require: 'ngModel',

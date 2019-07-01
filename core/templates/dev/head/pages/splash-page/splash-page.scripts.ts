@@ -16,4 +16,5 @@
  * @fileoverview Directive scripts for the Oppia splash page.
  */
 
+require('App.ts');
 require('pages/splash-page/splash-page.controller.ts');

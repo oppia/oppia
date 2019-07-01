@@ -16,4 +16,6 @@
  * @fileoverview Constant file for the INTERACTION_SPECS constant.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);

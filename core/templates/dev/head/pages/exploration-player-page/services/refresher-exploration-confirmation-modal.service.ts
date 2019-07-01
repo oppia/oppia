@@ -21,6 +21,8 @@ require('domain/utilities/UrlInterpolationService.ts');
 require('pages/exploration-player-page/services/exploration-engine.service.ts');
 require('services/contextual/UrlService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('RefresherExplorationConfirmationModalService', [
   '$uibModal', 'ExplorationEngineService', 'UrlInterpolationService',
   'UrlService',

@@ -102,6 +102,8 @@ var TIME_HEIGHT_CHANGE_MSEC = 500;
 var TIME_FADEIN_MSEC = 100;
 var TIME_NUM_CARDS_CHANGE_MSEC = 500;
 
+var oppia = require('AppInit.ts').module;
+
 oppia.animation('.conversation-skin-animate-tutor-card-on-narrow', function() {
   var tutorCardLeft, tutorCardWidth, tutorCardHeight, oppiaAvatarLeft;
   var tutorCardAnimatedLeft, tutorCardAnimatedWidth;

@@ -17,6 +17,8 @@
    message domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('FeedbackMessageSummaryObjectFactory', [function() {
   var FeedbackMessageSummary = function(
       messageId, text, updatedStatus, suggestionHtml, currentContentHtml,

@@ -20,6 +20,8 @@ require('domain/objects/NumberWithUnitsObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaShortResponseNumberWithUnits', [
   'HtmlEscaperService', 'NumberWithUnitsObjectFactory',
   'UrlInterpolationService', function(HtmlEscaperService,

@@ -31,6 +31,8 @@ require('services/contextual/UrlService.ts');
 require('pages/practice-session-page/practice-session-page.constants.ts');
 require('pages/interaction-specs.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('practiceSessionPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

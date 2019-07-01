@@ -17,6 +17,8 @@
  */
 
 // See: https://stackoverflow.com/a/11381730
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('DeviceInfoService', ['$window', function($window) {
   return {
     isMobileDevice: function() {

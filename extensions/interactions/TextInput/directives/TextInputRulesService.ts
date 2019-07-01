@@ -18,6 +18,8 @@
 
 require('filters/string-utility-filters/normalize-whitespace.filter.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('TextInputRulesService', ['$filter', function($filter) {
   return {
     Equals: function(answer, inputs) {

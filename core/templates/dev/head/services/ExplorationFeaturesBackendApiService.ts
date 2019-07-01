@@ -19,6 +19,8 @@
 
 require('services/services.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ExplorationFeaturesBackendApiService', [
   '$http', 'UrlInterpolationService', 'EXPLORATION_FEATURES_URL',
   function($http, UrlInterpolationService, EXPLORATION_FEATURES_URL) {

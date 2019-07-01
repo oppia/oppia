@@ -17,6 +17,8 @@
  * tree.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('VersionTreeService', [function() {
   var _snapshots = null;
   var _treeParents = null;

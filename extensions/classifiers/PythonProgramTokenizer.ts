@@ -28,6 +28,8 @@
 
 require('classifiers/classifiers-extension.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('PythonProgramTokenizer', [
   '$log', 'PythonProgramTokenType', function($log, PythonProgramTokenType) {
     var groupOfRegEx = function(...params) {
