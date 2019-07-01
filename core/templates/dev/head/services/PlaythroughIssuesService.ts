@@ -18,6 +18,7 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/PlaythroughIssuesBackendApiService.ts');
+require('pages/exploration-editor-page/statistics-tab/services/learner-action-render.service.ts');
 
 oppia.factory('PlaythroughIssuesService', [
   '$uibModal', 'PlaythroughIssuesBackendApiService', 'UrlInterpolationService',
@@ -180,6 +181,23 @@ oppia.factory('PlaythroughIssuesService', [
                   return LearnerActionRenderService.renderDisplayBlockHTML(
                     displayBlock, blockActionIndexMapping[index]);
                 };
+
+                $scope.getLearnerActionIndex = function(
+                    learnerAction, displayBlock) {
+                  return displayBlock.indexOf(learnerAction);
+                };
+
+                $scope.renderLearnerActionHTML1 = function(learnerAction, blockIndex, actionIndex) {
+                  return LearnerActionRenderService.renderLearnerActionHTML1(
+                    learnerAction, blockActionIndexMapping[blockIndex],
+                    actionIndex);
+                },
+
+                $scope.getHtml = function() {
+                  var el = $('<oppia-short-response-text-input>');
+                  el.attr('answer', "&quot;fate&quot;");
+                  return ($('<span>').append(el)).html();
+                }
 
                 var getRemainingActionsElements = function(pIdx, i) {
                   return document.getElementById(
