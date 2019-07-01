@@ -15,6 +15,7 @@
 /**
  * @fileoverview Service for managing CSRF tokens.
  */
+var oppia = require('AppInit.ts').module;
 
 oppia.factory('CsrfTokenService', [function() {
   var token = null;
