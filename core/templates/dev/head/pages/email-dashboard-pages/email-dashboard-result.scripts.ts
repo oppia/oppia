@@ -16,4 +16,6 @@
  * @fileoverview Directive scripts for oppia email dashboard page.
  */
 
+require('App.ts');
+
 require('pages/email-dashboard-pages/email-dashboard-result.controller.ts');

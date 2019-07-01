@@ -14,8 +14,6 @@
 
 """Tests for the topic editor page."""
 
-from constants import constants
-from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_services
 from core.domain import topic_domain
@@ -49,10 +47,13 @@ class BaseTopicEditorControllerTests(test_utils.GenericTestBase):
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.skill_id_2 = skill_services.get_new_skill_id()
+        self.save_new_skill(
+            self.skill_id_2, self.admin_id, 'Skill Description 2')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description', [], [],
-            [self.skill_id], [], 1)
+            [self.skill_id, self.skill_id_2], [], 1)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -126,70 +127,6 @@ class TopicEditorStoryHandlerTests(BaseTopicEditorControllerTests):
         self.assertEqual(len(story_id), 12)
         self.assertIsNotNone(
             story_services.get_story_by_id(story_id, strict=False))
-        self.logout()
-
-
-class TopicEditorQuestionHandlerTests(BaseTopicEditorControllerTests):
-
-    def test_get(self):
-        # Create 5 questions linked to the same skill.
-        for i in range(0, 3): #pylint: disable=unused-variable
-            question_id = question_services.get_new_question_id()
-            self.save_new_question(
-                question_id, self.admin_id,
-                self._create_valid_question_data('ABC'), [self.skill_id])
-            question_services.create_new_question_skill_link(
-                self.admin_id, question_id, self.skill_id, 0.5)
-
-        self.login(self.ADMIN_EMAIL)
-        with self.swap(constants, 'NUM_QUESTIONS_PER_PAGE', 1):
-            json_response = self.get_json(
-                '%s/%s?cursor=' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-                ))
-            question_summary_dicts = json_response['question_summary_dicts']
-            self.assertEqual(len(question_summary_dicts), 1)
-            next_start_cursor = json_response['next_start_cursor']
-            json_response = self.get_json(
-                '%s/%s?cursor=%s' % (
-                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id,
-                    next_start_cursor
-                ))
-            question_summary_dicts_2 = (
-                json_response['question_summary_dicts'])
-            self.assertEqual(len(question_summary_dicts_2), 1)
-            self.assertEqual(
-                question_summary_dicts[0]['skill_description'],
-                'Skill Description')
-            self.assertNotEqual(
-                question_summary_dicts[0]['summary']['id'],
-                question_summary_dicts_2[0]['summary']['id'])
-        self.logout()
-
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        self.get_json(
-            '%s/%s?cursor=' % (
-                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id))
-        self.logout()
-
-        topic_services.assign_role(
-            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-            self.topic_id)
-
-        self.login(self.TOPIC_MANAGER_EMAIL)
-        json_response = self.get_json(
-            '%s/%s' % (
-                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-            ))
-        question_summary_dicts = json_response['question_summary_dicts']
-        self.assertEqual(len(question_summary_dicts), 3)
-        self.logout()
-
-        self.login(self.NEW_USER_EMAIL)
-        self.get_json(
-            '%s/%s?cursor=' % (
-                feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
-            ), expected_status_int=401)
         self.logout()
 
 
