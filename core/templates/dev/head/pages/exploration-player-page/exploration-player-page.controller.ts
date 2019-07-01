@@ -115,8 +115,19 @@ oppia.directive('explorationPlayerPage', [
           ReadOnlyExplorationBackendApiService.fetchExploration(
             explorationId, null)
             .then(function(response) {
+              console.log(response);
               PageTitleService.setPageTitle(
                 response.exploration.title + ' - Oppia');
+              document.querySelector('meta[itemprop="name"]').setAttribute(
+                'content', response.exploration.title);
+              document.querySelector(
+                'meta[itemprop="description"]').setAttribute(
+                'content', response.exploration.objective);
+              document.querySelector('meta[property="og:title"]').setAttribute(
+                'content', response.exploration.title);
+              document.querySelector(
+                'meta[property="og:description"]').setAttribute(
+                'content', response.exploration.objective);
             });
         }
       ]

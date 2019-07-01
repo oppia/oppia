@@ -100,6 +100,7 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
 
           $http.get('/collection_handler/data/' + ctrl.collectionId).then(
             function(response) {
+              response = response.data;
               document.querySelector('meta[itemprop="name"]').setAttribute(
                 'content', response.meta_name);
               document.querySelector(
