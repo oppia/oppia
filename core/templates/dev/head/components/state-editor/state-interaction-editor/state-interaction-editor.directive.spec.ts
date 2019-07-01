@@ -45,6 +45,8 @@ describe('State Interaction controller', function() {
       angular.mock.module(function($provide) {
         $provide.value('ExplorationFeaturesService', {
           isPlaythroughRecordingEnabled: function() {
+            // This is set to false since this is the default return value of
+            // function.
             return false;
           }
         });

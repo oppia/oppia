@@ -19,9 +19,9 @@
 import 'core-js/es7/reflect';
 import 'zone.js';
 
-import { NgModule, StaticProvider, Component } from '@angular/core';
+import { Component, NgModule, StaticProvider } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { downgradeInjectable, downgradeComponent } from
+import { downgradeComponent, downgradeInjectable } from
   '@angular/upgrade/static';
 
 @Component({
