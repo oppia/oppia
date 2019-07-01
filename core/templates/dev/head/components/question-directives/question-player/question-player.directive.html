@@ -48,7 +48,11 @@
           </td>
         </tr>
       </table>
-      <button class="btn btn-default" ng-if="!$ctrl.isTestPassed"> Review and Retry </button>
+      <button class="btn btn-default oppia-review-and-retry-button"
+              ng-if="!$ctrl.isTestPassed"
+              style="background-color: #11776D; color: #FFFFFF;">
+        Review and Retry
+      </button>
     </div>
 
     <div class="oppia-question-player-card question-player-results-footer"
