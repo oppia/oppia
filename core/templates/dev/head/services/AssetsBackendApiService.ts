@@ -23,6 +23,8 @@ require('domain/utilities/ImageFileObjectFactory.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 require('services/CsrfTokenService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('AssetsBackendApiService', [
   '$http', '$q', 'AudioFileObjectFactory', 'CsrfTokenService',
   'FileDownloadRequestObjectFactory', 'ImageFileObjectFactory',

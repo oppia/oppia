@@ -22,6 +22,8 @@ require(
 require('pages/exploration-editor-page/services/exploration-data.service.ts');
 require('services/AlertsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ChangeListService', [
   '$log', '$rootScope', 'AlertsService', 'AutosaveInfoModalsService',
   'ExplorationDataService',
