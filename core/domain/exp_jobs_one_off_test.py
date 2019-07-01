@@ -2178,7 +2178,7 @@ class TranslatorToVoiceArtistOneOffJobTests(test_utils.GenericTestBase):
             self, exp_jobs_one_off.TranslatorToVoiceArtistOneOffJob)
 
 
-class TestDeleteStateIdMappingModelsOneOffJob(test_utils.GenericTestBase):
+class DeleteStateIdMappingModelsOneOffJobTests(test_utils.GenericTestBase):
     """Tests the state ID mapping deletion job."""
     def test_job_deletes_all_instances_of_model(self):
         exp_models.StateIdMappingModel.create(
