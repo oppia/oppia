@@ -3,7 +3,7 @@ var_for_docker_image: &docker_image circleci/python:2.7.14-jessie-browsers
 anchor_for_job_defaults: &job_defaults
   working_directory: /home/circleci/oppia
   environment:
-    CC_TEST_REPORTER_ID: 92669ee647a6a6aea052695c6ce9677a2d6e4d7451231fd7e9eb3aa3acb8b5ca
+    CC_TEST_REPORTER_ID: CC_TEST_REPORTER_ID
   docker:
     - image: *docker_image
 
