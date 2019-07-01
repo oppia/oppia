@@ -78,6 +78,7 @@ oppia.directive('hintAndSolutionButtons', [
           ctrl.isHintButtonVisible = function(index) {
             return (
               HintsAndSolutionManagerService.isHintViewable(index) &&
+              ctrl.displayedCard !== null &&
               ctrl.displayedCard.doesInteractionSupportHints());
           };
 
