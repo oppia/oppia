@@ -428,7 +428,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """
         question_state_data = self._create_valid_question_data('Test')
 
-        self.question.update_question_state_data(question_state_data.to_dict())
+        self.question.update_question_state_data(question_state_data)
 
         self.assertEqual(
             question_state_data.to_dict(),
