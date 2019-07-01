@@ -2442,8 +2442,7 @@ class LintChecksManager(object):
             for filepath in ts_files_to_check:
                 # Check that the constants are declared only in a *.constants.ts
                 # file.
-                if not filepath.endswith(
-                        ('.constants.ts', '.constants.ajs.ts')):
+                if not filepath.endswith('.constants.ajs.ts'):
                     for line_num, line in enumerate(FileCache.readlines(
                             filepath)):
                         if 'oppia.constant(' in line:
