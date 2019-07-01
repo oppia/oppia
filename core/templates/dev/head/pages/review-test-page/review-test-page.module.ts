@@ -13,8 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the review tests.
+ * @fileoverview Module for the review tests page.
  */
 
-angular.module('reviewTestPageModule').constant(
-  'REVIEW_TEST_DATA_URL', '/review_test_handler/data/<story_id>');
+import { NgModule } from '@angular/core';
+
+@NgModule({})
+export class ReviewTestPageModule {}
+
+angular.module('reviewTestPageModule', []);
