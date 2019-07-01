@@ -17,6 +17,8 @@
  * since the Epoch to human-readable dates.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('DateTimeFormatService', ['$filter', function($filter) {
   return {
     // Returns just the time if the local datetime representation has the

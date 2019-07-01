@@ -28,6 +28,8 @@
 
 require('domain/classifier/PredictionResultObjectFactory.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SVMPredictionService', [
   '$log', 'PredictionResultObjectFactory',
   function($log, PredictionResultObjectFactory) {

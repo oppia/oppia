@@ -20,6 +20,8 @@
 require('domain/utilities/BrowserCheckerService.ts');
 require('domain/utilities/LanguageUtilService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('AudioTranslationLanguageService', [
   'BrowserCheckerService', 'LanguageUtilService',
   function(
