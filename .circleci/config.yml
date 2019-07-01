@@ -92,8 +92,8 @@ jobs:
       - run:
           name: Generate backend coverage report
           command: |
-            pwd
-            ./cc-test-reporter format-coverage -t coverage.py
+            echo $PWD
+            ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
             ./cc-test-reporter upload-coverage
           when: on_success
