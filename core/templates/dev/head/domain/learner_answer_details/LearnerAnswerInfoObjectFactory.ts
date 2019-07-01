@@ -58,8 +58,8 @@ oppia.factory('LearnerAnswerInfoObjectFactory', [
       return new LearnerAnswerInfo(
         learnerAnswerInfoDict.id,
         learnerAnswerInfoDict.answer,
-        learnerAnswerInfoDict.answerDetails,
-        learnerAnswerInfoDict.createdOn
+        learnerAnswerInfoDict.answer_details,
+        learnerAnswerInfoDict.created_on
       );
     };
 

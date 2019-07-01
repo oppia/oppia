@@ -16,7 +16,7 @@
  * @fileoverview Tests for LearnerAnswerInfoObjectFactory.
  */
 
-require('domain/learner_answer_info/LearnerAnswerInfoObjectFactory.ts');
+require('domain/learner_answer_details/LearnerAnswerInfoObjectFactory.ts');
 
 describe('Learner answer info object factory', function() {
   var LearnerAnswerInfoObjectFactory = null;
@@ -42,7 +42,7 @@ describe('Learner answer info object factory', function() {
       expect(learnerAnswerInfo.getId()).toEqual('sample_id');
       expect(learnerAnswerInfo.getAnswer()).toEqual('sample_answer');
       expect(learnerAnswerInfo.getAnswerDetails()).toEqual(
-        'sample_answer_details');
+        'answer_details');
       expect(learnerAnswerInfo.getCreatedOn()).toEqual(1000);
     });
 
