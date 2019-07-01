@@ -98,6 +98,20 @@ oppia.directive('collectionPlayerPage', ['UrlInterpolationService',
             WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS);
           $anchorScroll.yOffset = -80;
 
+          $http.get('/collection_handler/data/' + ctrl.collectionId).then(
+            function(response) {
+              document.querySelector('meta[itemprop="name"]').setAttribute(
+                'content', response.meta_name);
+              document.querySelector(
+                'meta[itemprop="description"]').setAttribute(
+                'content', response.meta_description);
+              document.querySelector('meta[property="og:title"]').setAttribute(
+                'content', response.meta_name);
+              document.querySelector(
+                'meta[property="og:description"]').setAttribute(
+                'content', response.meta_description);
+            }
+          );
           ctrl.setIconHighlight = function(index) {
             ctrl.activeHighlightedIconIndex = index;
           };
