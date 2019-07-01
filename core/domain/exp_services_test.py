@@ -95,6 +95,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
         self.set_admins([self.ADMIN_USERNAME])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.user_id_admin)
 
 
 class ExplorationRevertClassifierTests(ExplorationServicesUnitTests):
@@ -4167,6 +4168,12 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(EditorAutoSavingUnitTests, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.set_admins([self.ADMIN_USERNAME])
         # Create explorations.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID1, self.USER_ID)
@@ -4312,17 +4319,20 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
 
     def test_create_or_update_draft_with_exploration_model_not_created(self):
         self.save_new_valid_exploration(
-            'exp_id', self.USER_ID, title='title')
+            'exp_id', self.admin_id, title='title')
+
+        rights_manager.assign_role_for_exploration(
+            self.admin, 'exp_id', self.editor_id, rights_manager.ROLE_EDITOR)
 
         exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.USER_ID, 'exp_id')
+            self.editor_id, 'exp_id')
         self.assertIsNone(exp_user_data)
 
         exp_services.create_or_update_draft(
-            'exp_id', self.USER_ID, self.NEW_CHANGELIST, 1,
+            'exp_id', self.editor_id, self.NEW_CHANGELIST, 1,
             self.NEWER_DATETIME)
         exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.USER_ID, 'exp_id')
+            self.editor_id, 'exp_id')
         self.assertEqual(exp_user_data.exploration_id, 'exp_id')
         self.assertEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST_DICT)

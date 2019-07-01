@@ -1937,12 +1937,12 @@ def create_or_update_draft(
             exp_user_data.draft_change_list_last_updated > current_datetime):
         return
 
+    updated_exploration = apply_change_list(exp_id, change_list)
+    updated_exploration.validate(strict=False)
+
     if exp_user_data is None:
         exp_user_data = user_models.ExplorationUserDataModel.create(
             user_id, exp_id)
-
-    updated_exploration = apply_change_list(exp_id, change_list)
-    updated_exploration.validate(strict=False)
 
     draft_change_list_id = exp_user_data.draft_change_list_id
     draft_change_list_id += 1
