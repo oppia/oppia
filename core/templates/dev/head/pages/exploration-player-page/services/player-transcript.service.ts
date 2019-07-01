@@ -22,6 +22,8 @@ require('domain/state_card/StateCardObjectFactory.ts');
 // are shown, what answers have been given, etc. Note that this service does
 // not maintain the currently-active card -- it's more like a log of what the
 // learner has 'discovered' so far.
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('PlayerTranscriptService', [
   '$log', 'StateCardObjectFactory', function($log, StateCardObjectFactory) {
     // Each element of this array represents a 'StateCard' domain object.

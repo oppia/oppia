@@ -22,6 +22,8 @@ require('domain/skill/SkillObjectFactory.ts');
 
 require('domain/skill/skill-domain.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('SkillUpdateService', [
   'ChangeObjectFactory', 'SkillObjectFactory',
   'UndoRedoService', 'CMD_ADD_SKILL_MISCONCEPTION',
