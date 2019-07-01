@@ -69,6 +69,13 @@ jobs:
           command: |
             sudo pip install codecov
             codecov --file ../karma_coverage_reports/coverage-final.json
+          # TODO(lilithxxx): Uncomment the following lines and delete the above
+          # codecov statements once #6821 is resolved.
+          # curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+          # chmod +x ./cc-test-reporter
+          # ./cc-test-reporter before-build
+          # ./cc-test-reporter sum-coverage ../karma_coverage_reports/coverage-final.json
+          # ./cc-test-reporter upload-coverage ../karma_coverage_reports/coverage-final.json
           when: on_success
 
   backend_tests:
@@ -79,20 +86,15 @@ jobs:
       - restore_cache:
           <<: *restore_cache
       - run:
-          name: CodeClimate before-build
-          command: |
-            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
-            chmod +x ./cc-test-reporter
-            ./cc-test-reporter before-build
-      - run:
           name: Run backend tests
           command: |
             bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests
       - run:
           name: Generate backend coverage report
           command: |
-            sudo pip install codecov
-            codecov
+            curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+            chmod +x ./cc-test-reporter
+            ./cc-test-reporter before-build
             ./cc-test-reporter format-coverage -t coverage.py coverage.xml
             ./cc-test-reporter sum-coverage coverage/codeclimate.json
             ./cc-test-reporter upload-coverage
