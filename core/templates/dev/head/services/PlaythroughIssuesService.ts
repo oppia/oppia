@@ -187,17 +187,11 @@ oppia.factory('PlaythroughIssuesService', [
                   return displayBlock.indexOf(learnerAction);
                 };
 
-                $scope.renderLearnerActionHTML1 = function(learnerAction, blockIndex, actionIndex) {
-                  return LearnerActionRenderService.renderLearnerActionHTML1(
+                $scope.renderLearnerAction = function(learnerAction, blockIndex, actionIndex) {
+                  return LearnerActionRenderService.renderLearnerAction(
                     learnerAction, blockActionIndexMapping[blockIndex],
                     actionIndex);
-                },
-
-                $scope.getHtml = function() {
-                  var el = $('<oppia-short-response-text-input>');
-                  el.attr('answer', "&quot;fate&quot;");
-                  return ($('<span>').append(el)).html();
-                }
+                };
 
                 var getRemainingActionsElements = function(pIdx, i) {
                   return document.getElementById(

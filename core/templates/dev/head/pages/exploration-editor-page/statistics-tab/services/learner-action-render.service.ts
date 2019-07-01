@@ -26,7 +26,7 @@
  * learner actions and then returns a giant HTML string.
  */
 
-require('pages/exploration-editor-page/issues/answer-submit-action.directive.ts');
+require('pages/exploration-editor-page/statistics-tab/issues/answer-submit-action.directive.ts');
 
 require('pages/exploration-editor-page/services/exploration-states.service.ts');
 require('services/ExplorationHtmlFormatterService.ts');
@@ -78,37 +78,15 @@ oppia.factory('LearnerActionRenderService', [
     var renderAnswerSubmitActionHTML = function(
         answer, destStateName, timeSpentInStateSecs, currentStateName,
         actionIndex, interaction) {
-
-      var shortAnswerHtml = ExplorationHtmlFormatterService.getShortAnswerHtml(
-        answer, interaction.id, interaction.customizationArgs)
-      console.log(shortAnswerHtml);
-      // var el = $('<angular-html-bind>');
-      // el.attr('html-data', shortAnswerHtml);
-      // shortAnswerHtmlAngular = ($('<span>').append(el)).html();
-      // var shortAnswerHtmlAngular = shortAnswerHtml;
       var el = $('<answer-submit-action>');
-      el.attr('answer', HtmlEscaperService.objToEscapedJson(answer));
-      el.attr('destStateName', HtmlEscaperService.objToEscapedJson(
-        destStateName));
-      el.attr('timeSpentInStateSecs', HtmlEscaperService.objToEscapedJson(
-        timeSpentInStateSecs));
-      el.attr('currentStateName', HtmlEscaperService.objToEscapedJson(
-        currentStateName));
-      el.attr('actionIndex', HtmlEscaperService.objToEscapedJson(actionIndex));
-      el.attr('interaction', HtmlEscaperService.objToEscapedJson(interaction));
+      el.attr('answer', answer);
+      el.attr('destStateName', destStateName);
+      el.attr('timeSpentInStateSecs', timeSpentInStateSecs);
+      el.attr('currentStateName', currentStateName);
+      el.attr('actionIndex', actionIndex);
+      el.attr('interactionId', interaction.id);
+      el.attr('interactionCustomizationArgs', interaction.customizationArgs);
       return ($('<span>').append(el)).html();
-      // if (currentStateName === destStateName) {
-      //   statement =
-      //     actionIndex + '. Submitted answer "' + shortAnswerHtml + '" in card "' +
-      //     currentStateName + '".';
-      //   return ($('<span>').text(statement)).html();
-      // } else {
-      //   statement =
-      //     actionIndex + '. Submitted answer "' + shortAnswerHtml +
-      //     '" and moved to card "' + destStateName + '" after spending ' +
-      //     timeSpentInStateSecs + ' seconds on card "' + currentStateName + '".';
-      //   return ($('<span>').text(statement)).html();
-      // }
     };
 
     /**
@@ -241,7 +219,7 @@ oppia.factory('LearnerActionRenderService', [
           block[index], actionStartIndex + i + 1);
         return $sce.trustAsHtml(htmlString);
       },
-      renderLearnerActionHTML1: function(learnerAction, blockIndex, actionIndex) {
+      renderLearnerAction: function(learnerAction, blockIndex, actionIndex) {
         return renderLearnerActionHTML(
           learnerAction, blockIndex + actionIndex);
       },

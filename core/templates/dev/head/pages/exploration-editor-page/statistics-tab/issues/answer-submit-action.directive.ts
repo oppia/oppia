@@ -17,11 +17,15 @@
  */
 
 require('domain/utilities/UrlInterpolationService.ts');
+require('services/ExplorationHtmlFormatterService.ts');
 require('services/HtmlEscaperService.ts');
 
 oppia.directive('answerSubmitAction', [
-  'HtmlEscaperService', 'UrlInterpolationService',
-  function(HtmlEscaperService, UrlInterpolationService) {
+  'ExplorationHtmlFormatterService', 'HtmlEscaperService',
+  'UrlInterpolationService',
+  function(
+      ExplorationHtmlFormatterService, HtmlEscaperService,
+      UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -32,7 +36,16 @@ oppia.directive('answerSubmitAction', [
       controllerAs: '$ctrl',
       controller: ['$attrs', function($attrs) {
         var ctrl = this;
-        ctrl.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        ctrl.currentStateName = $attrs.currentstatename;
+        ctrl.destStateName = $attrs.deststatename;
+        ctrl.actionIndex = $attrs.actionindex;
+        ctrl.timeSpentInStateSecs = $attrs.timespentinstatesecs;
+
+        ctrl.getShortAnswerHtml = function() {
+          return ExplorationHtmlFormatterService.getShortAnswerHtml(
+            $attrs.answer, $attrs.interactionid,
+            $attrs.interactioncustomizationargs);
+        };
       }]
     };
   }
