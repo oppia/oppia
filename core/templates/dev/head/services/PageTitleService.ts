@@ -16,6 +16,8 @@
  * @fileoverview Service to set the title of the page.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('PageTitleService', ['$document', function($document) {
   var _setPageTitle = function(title) {
     $document[0].title = title;

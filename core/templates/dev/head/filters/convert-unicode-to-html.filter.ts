@@ -18,6 +18,8 @@
 
 require('services/HtmlEscaperService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.filter('convertUnicodeToHtml', [
   '$sanitize', 'HtmlEscaperService',
   function($sanitize, HtmlEscaperService) {

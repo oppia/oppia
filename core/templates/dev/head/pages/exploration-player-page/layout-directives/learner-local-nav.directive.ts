@@ -34,6 +34,8 @@ require('services/stateful/FocusManagerService.ts');
 
 require('pages/exploration-player-page/exploration-player-page.constants.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('learnerLocalNav', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
