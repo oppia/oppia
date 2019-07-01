@@ -37,6 +37,7 @@ import { PracticeSessionPageModule } from
   'pages/practice-session-page/practice-session-page.module.ts';
 import { PreferencesPageModule } from
   'pages/preferences-page/preferences-page.module.ts';
+import { ProfilePageModule } from 'pages/profile-page/profile-page.module.ts';
 import { StewardsLandingPageModule } from
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts';
 import { TopicLandingPageModule } from
@@ -56,6 +57,7 @@ import { TopicLandingPageModule } from
     NotificationsDashboardPageModule,
     PracticeSessionPageModule,
     PreferencesPageModule,
+    ProfilePageModule,
     StewardsLandingPageModule,
     TopicLandingPageModule
   ]
@@ -76,7 +78,8 @@ require('pages/learner-dashboard-page/learner-dashboard-page.module.ts');
 require('pages/landing-pages/topic-landing-page/topic-landing-page.module.ts');
 require('pages/library-page/library-page.module.ts');
 require('pages/practice-session-page/practice-session-page.module.ts');
-require('pages/preferences-page/preferences-page.module.ts')
+require('pages/preferences-page/preferences-page.module.ts');
+require('pages/profile-page/profile-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
@@ -91,6 +94,7 @@ angular.module('pages', [
   'notificationsDashboardPageModule',
   'practiceSessionPageModule',
   'preferencesPageModule',
+  'profilePageModule',
   'stewardsLandingPageModule',
   'topicLandingPageModule'
 ]);
