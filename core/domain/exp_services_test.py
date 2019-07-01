@@ -2195,7 +2195,9 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test that parameters in rules must have the correct type."""
         self.interaction_answer_groups[0]['rule_specs'][0][
             'inputs']['x'] = 'abc'
-        with self.assertRaisesRegexp(Exception, 'invalid literal for int()'):
+        with self.assertRaisesRegexp(
+            Exception,
+            'abc has the wrong type. It should be a NonnegativeInt.'):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID,
                 _get_change_list(
