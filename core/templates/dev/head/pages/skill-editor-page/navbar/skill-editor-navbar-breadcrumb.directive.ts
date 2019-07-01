@@ -19,6 +19,8 @@
 require('domain/utilities/UrlInterpolationService.ts');
 require('pages/skill-editor-page/services/skill-editor-state.service.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('skillEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {

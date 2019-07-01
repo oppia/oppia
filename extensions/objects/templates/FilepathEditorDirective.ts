@@ -18,6 +18,8 @@
 
 // This directive can only be used in the context of an exploration.
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('filepathEditor', [
   '$http', '$sce', 'AlertsService', 'AssetsBackendApiService',
   'ContextService', 'UrlInterpolationService',

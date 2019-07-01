@@ -28,6 +28,8 @@ require('services/ContextService.ts');
 require('services/HtmlEscaperService.ts');
 require('services/contextual/WindowDimensionsService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('oppiaInteractiveContinue', [
   'ContinueRulesService', 'HtmlEscaperService', 'UrlInterpolationService',
   function(ContinueRulesService, HtmlEscaperService, UrlInterpolationService) {

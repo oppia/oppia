@@ -17,6 +17,8 @@
  *     domain objects.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ClassifierObjectFactory', [function() {
   var Classifier = function(algorithmId, classifierData, dataSchemaVersion) {
     this.algorithmId = algorithmId;

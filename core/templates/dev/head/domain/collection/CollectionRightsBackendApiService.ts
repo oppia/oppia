@@ -18,6 +18,8 @@
 
 require('domain/utilities/UrlInterpolationService.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('CollectionRightsBackendApiService', [
   '$http', '$log', '$q', 'UrlInterpolationService',
   'COLLECTION_RIGHTS_URL_TEMPLATE',
