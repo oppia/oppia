@@ -40,6 +40,7 @@ import { PreferencesPageModule } from
 import { ProfilePageModule } from 'pages/profile-page/profile-page.module.ts';
 import { ReviewTestPageModule } from
   'pages/review-test-page/review-test-page.module.ts';
+import { SignupPageModule } from 'pages/signup-page/signup-page.module.ts'
 import { StewardsLandingPageModule } from
   'pages/landing-pages/stewards-landing-page/stewards-landing-page.module.ts';
 import { TopicLandingPageModule } from
@@ -61,6 +62,7 @@ import { TopicLandingPageModule } from
     PreferencesPageModule,
     ProfilePageModule,
     ReviewTestPageModule,
+    SignupPageModule,
     StewardsLandingPageModule,
     TopicLandingPageModule
   ]
@@ -84,6 +86,7 @@ require('pages/practice-session-page/practice-session-page.module.ts');
 require('pages/preferences-page/preferences-page.module.ts');
 require('pages/profile-page/profile-page.module.ts');
 require('pages/review-test-page/review-test-page.module.ts');
+require('pages/signup-page/signup-page.module.ts');
 
 angular.module('pages', [
   'aboutPageModule',
@@ -100,6 +103,7 @@ angular.module('pages', [
   'preferencesPageModule',
   'profilePageModule',
   'reviewTestPageModule',
+  'signupPageModule',
   'stewardsLandingPageModule',
   'topicLandingPageModule'
 ]);
