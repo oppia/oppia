@@ -194,6 +194,10 @@ if [ ! -d "$TOOLS_DIR/PyGithub-1.43.7" ]; then
   pip_install PyGithub==1.43.7 --target="$TOOLS_DIR/PyGithub-1.43.7"
 fi
 
+# install pre-commit script
+echo Installing pre-commit hook for git
+$PYTHON_CMD $OPPIA_DIR/scripts/pre_commit_hook.py --install
+
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install

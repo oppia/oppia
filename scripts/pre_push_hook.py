@@ -27,8 +27,6 @@ On Vagrant under Windows it will still copy the hook to the .git/hooks dir
 but it will have no effect.
 """
 
-# Pylint has issues with the import order of argparse.
-# pylint: disable=wrong-import-order
 import argparse
 import collections
 import os
@@ -36,8 +34,6 @@ import pprint
 import shutil
 import subprocess
 import sys
-
-# pylint: enable=wrong-import-order
 
 
 GitRef = collections.namedtuple(
