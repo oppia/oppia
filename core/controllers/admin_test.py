@@ -688,7 +688,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         self.assertEqual(response['error'], 'Invalid method to view roles.')
 
-    def test_assign_moderator(self):
+    def test_changing_user_role_from_topic_manager_to_moderator(self):
         user_email = 'user1@example.com'
         username = 'user1'
 
@@ -721,7 +721,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_assign_topic_manager(self):
+    def test_changing_user_role_from_exploration_editor_to_topic_manager(self):
         user_email = 'user1@example.com'
         username = 'user1'
 
@@ -844,7 +844,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         payload = {
             'exp_id': 'invalid_exp_id',
             'state_name': 'state name',
-            'exp_version': None,
+            'exp_version': 1,
             'num_answers': 0
         }
 
@@ -854,7 +854,26 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             response['error'],
-            'No exploration with ID \'invalid_exp_id\' exists.')
+            'Entity for exploration with id invalid_exp_id and version 1 not '
+            'found.')
+
+    def test_handler_raises_error_with_invalid_exploration_version(self):
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        payload = {
+            'exp_id': self.EXP_ID,
+            'state_name': 'state name',
+            'exp_version': 10,
+            'num_answers': 0
+        }
+
+        response = self.get_json(
+            '/explorationdataextractionhandler', params=payload,
+            expected_status_int=400)
+
+        self.assertEqual(
+            response['error'],
+            'Entity for exploration with id %s and version 10 not found.'
+            % self.EXP_ID)
 
 
 class ClearSearchIndexTest(test_utils.GenericTestBase):
