@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Module for search results.
+ * @fileoverview Module for practice session.
  */
 
 import { NgModule } from '@angular/core';

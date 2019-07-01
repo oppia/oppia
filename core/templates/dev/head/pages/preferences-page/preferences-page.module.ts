@@ -1,4 +1,4 @@
-// Copyright 2019 The Oppia Authors. All Rights Reserved.
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,18 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Constants for the practice session.
+ * @fileoverview Module for the Oppia 'edit preferences' page.
  */
 
-angular.module('practiceSessionPageModule').constant('TOTAL_QUESTIONS', 20);
+import { NgModule } from '@angular/core';
 
-angular.module('practiceSessionPageModule').constant(
-  'PRACTICE_SESSIONS_DATA_URL',
-  '/practice_session/data/<topic_name>');
+@NgModule({})
+export class PreferencesPageModule {}
 
-angular.module('practiceSessionPageModule').constant(
-  'TOPIC_VIEWER_PAGE', '/topic/<topic_name>');
-
-angular.module('practiceSessionPageModule').constant(
-  'PRACTICE_SESSIONS_URL',
-  '/practice_session/<topic_name>');
+angular.module('preferencesPageModule', []);
