@@ -43,21 +43,12 @@ oppia.factory('LearnerAnswerInfoObjectFactory', [
       return this._createdOn;
     };
 
-    LearnerAnswerInfo.prototype.toBackendDict = function() {
-      return {
-        id: this.id,
-        answer: this.answer,
-        answer_details: this.answerDetails,
-        created_on: this.createdOn
-      };
-    };
-
     /* eslint-disable dot-notation */
-    LearnerAnswerInfo['create'] = function(learnerAnswerInfoId, answer,
-        answerDetails, createdOn) {
+    LearnerAnswerInfo['createDefaultLearnerAnswerInfo'] = function(answer,
+        answerDetails) {
     /* eslint-enable dot-notation */
-      return new LearnerAnswerInfo(learnerAnswerInfoId, answer, answerDetails,
-        answerDetails, createdOn);
+      return new LearnerAnswerInfo(null, answer, answerDetails,
+        null);
     };
 
     /* eslint-disable dot-notation */
@@ -71,5 +62,7 @@ oppia.factory('LearnerAnswerInfoObjectFactory', [
         learnerAnswerInfoDict.createdOn
       );
     };
+
+    return LearnerAnswerInfo;
   }
 ]);

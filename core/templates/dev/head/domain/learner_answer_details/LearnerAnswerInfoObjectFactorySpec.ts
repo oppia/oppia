@@ -12,3 +12,49 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+ * @fileoverview Tests for LearnerAnswerInfoObjectFactory.
+ */
+
+require('domain/learner_answer_info/LearnerAnswerInfoObjectFactory.ts');
+
+describe('Learner answer info object factory', function() {
+  var LearnerAnswerInfoObjectFactory = null;
+
+  beforeEach(angular.mock.module('oppia'));
+
+  beforeEach(angular.mock.inject(function($injector) {
+    LearnerAnswerInfoObjectFactory = $injector.get(
+      'LearnerAnswerInfoObjectFactory');
+  }));
+
+  it('should create a learner answer info object from a backend dict',
+    function() {
+      var learnerAnswerInfoBackendDict = {
+        id: 'sample_id',
+        answer: 'sample_answer',
+        answer_details: 'answer_details',
+        created_on: 1000
+      };
+      var learnerAnswerInfo = (
+        LearnerAnswerInfoObjectFactory.createFromBackendDict(
+          learnerAnswerInfoBackendDict));
+      expect(learnerAnswerInfo.getId()).toEqual('sample_id');
+      expect(learnerAnswerInfo.getAnswer()).toEqual('sample_answer');
+      expect(learnerAnswerInfo.getAnswerDetails()).toEqual(
+        'sample_answer_details');
+      expect(learnerAnswerInfo.getCreatedOn()).toEqual(1000);
+    });
+
+  it('shoudl create a default learner answer info object', function() {
+    var learnerAnswerInfo = (
+      LearnerAnswerInfoObjectFactory.createDefaultLearnerAnswerInfo(
+        'This is answer', 'This is answer details'));
+
+    expect(learnerAnswerInfo.getId()).toBeNull();
+    expect(learnerAnswerInfo.getAnswer()).toEqual('This is answer');
+    expect(learnerAnswerInfo.getAnswerDetails()).toEqual(
+      'This is answer details');
+    expect(learnerAnswerInfo.getCreatedOn()).toBeNull();
+  });
+});
