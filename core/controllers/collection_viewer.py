@@ -69,9 +69,9 @@ class CollectionDataHandler(base.BaseHandler):
             'collection': collection_dict,
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_new_session_id(),
-            'meta_name': collection_dict.title,
+            'meta_name': collection_dict['title'],
             'meta_description': utils.capitalize_string(
-                collection_dict.objective)
+                collection_dict['objective'])
         })
 
         self.render_json(self.values)
