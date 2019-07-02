@@ -15,6 +15,10 @@
 /**
  * @fileoverview Directive for the community dashboard page.
  */
+
+require('App.ts');
+
+require('base_components/BaseContentDirective.ts');
 require(
   'components/common-layout-directives/common-elements/' +
   'background-banner.directive.ts');
@@ -29,6 +33,8 @@ require('domain/utilities/LanguageUtilService.ts');
 require('domain/utilities/UrlInterpolationService.ts');
 
 require('pages/community-dashboard-page/community-dashboard-page.constants.ts');
+
+var oppia = require('AppInit.ts').module;
 
 oppia.directive('communityDashboardPage', ['UrlInterpolationService', function(
     UrlInterpolationService) {

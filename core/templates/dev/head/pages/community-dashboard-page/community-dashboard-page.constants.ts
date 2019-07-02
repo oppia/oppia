@@ -16,6 +16,8 @@
  * @fileoverview Constants for the creator dashboard page.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.constant(
   'COMMUNITY_DASHBOARD_TABS_DETAILS', {
     myContributionTab: {

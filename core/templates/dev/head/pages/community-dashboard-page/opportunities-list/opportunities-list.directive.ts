@@ -20,6 +20,8 @@ require(
   'pages/community-dashboard-page/opportunities-list-item/' +
   'opportunities-list-item.directive.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('opportunitiesList', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {

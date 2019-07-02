@@ -17,6 +17,8 @@
  * contributors to contribute.
  */
 
+var oppia = require('AppInit.ts').module;
+
 oppia.factory('ContributionOpportunitiesBackendApiService', [
   '$http', 'UrlInterpolationService', 'TRANSLATION_OPPORTUNITIES_SUMMARY_URL',
   'VOICEOVER_OPPORTUNITIES_SUMMARY_URL', function(

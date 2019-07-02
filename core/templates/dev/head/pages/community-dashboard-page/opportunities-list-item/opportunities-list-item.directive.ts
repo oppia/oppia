@@ -19,6 +19,8 @@ require(
   'components/common-layout-directives/common-elements/' +
   'lazy-loading.directive.ts');
 
+var oppia = require('AppInit.ts').module;
+
 oppia.directive('opportunitiesListItem', ['UrlInterpolationService', function(
     UrlInterpolationService) {
   return {
